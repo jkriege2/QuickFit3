@@ -25,7 +25,7 @@ class QFEvaluationEditor : public QWidget {
         void saveSettings() { writeSettings(); };
     protected slots:
         /** \brief connect widgets to current data record */
-        virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) =0;
+        virtual void connectWidgets(const QFEvaluationItem* current, const QFEvaluationItem* old) =0;
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void resultsChanged() {};
         /** \brief read the settings */

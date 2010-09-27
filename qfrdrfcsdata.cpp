@@ -444,8 +444,8 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
     bool isDual=false;
 
     bool readingHeader=true;
-    bool isCorrelation=false;
-    bool isCounRate=false;
+    //bool isCorrelation=false;
+    //bool isCounRate=false;
     bool findIdentifier=true;
     ALV_TOKEN token=ALV_getToken(alv_file, readingHeader);
     // first we parse the header (until we find the first quoted string)

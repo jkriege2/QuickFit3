@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quickfitproject quickfit_version="3.0" name="unnamed" creator="">
+    <description><![CDATA[]]></description>
+    <properties/>
+    <rawdata>
+        <rawdataelement type="fcs" name="20nM_488_Day2_04s.asc" id="0">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:02:15" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/20nM_488_Day2_04s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="beads_1t1000_80pGlycerin_1.ASC" id="1">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-08-31" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH1" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="17:30:18" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/beads_1t1000_80pGlycerin_1.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="Hela_16_39d.asc" id="2">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2008-08-22" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="true" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="3" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/Hela_16_39d.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="Hela_16_39d.asc" id="3">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="1" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2008-08-22" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="true" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="3" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/Hela_16_39d.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+    </rawdata>
+    <evaluations>
+        <evaluationelement type="fcs_fit" name="FCS Fit" id="4">
+            <description><![CDATA[]]></description>
+            <selection>
+                <item id="3"/>
+                <item id="2"/>
+                <item id="1"/>
+                <item id="0"/>
+            </selection>
+            <data/>
+        </evaluationelement>
+    </evaluations>
+</quickfitproject>

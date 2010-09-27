@@ -84,6 +84,7 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(ProgramOptions* set, QFEv
     rdrModel=new QFProjectRawDataModel(NULL);
     rdrProxy=new QFEvaluationRawDataModelProxy(rdrModel);
     rdrProxy->setSourceModel(rdrModel);
+    lstRawData=NULL;
 
     setSettings(set);
     //std::cout<<"creating QFEvaluationPropertyEditor ... creating widgets ...\n";
@@ -121,8 +122,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         if (c) {
             if (c->getType()!=oldType) {
                 for (int i=oldEditorCount; i>=1; i--) {
-                    QWidget* w=tabMain->widget(i);
-                    tabMain->removeTab(i);
+                    QWidget* w=tabEditors->widget(i);
+                    tabEditors->removeTab(i);
                     if (qobject_cast<QFEvaluationEditor *>(w)) qobject_cast<QFEvaluationEditor *>(w)->setSettings(NULL, id);
                     w->deleteLater();
                     //delete w;
@@ -141,13 +142,13 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
             for (int i=0; i<current->getEditorCount(); i++) {
                 QString n=current->getEditorName(i);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... \n";
-                QFEvaluationEditor* e=current->createEditor(i, tabMain);
+                QFEvaluationEditor* e=current->createEditor(i, tabEditors);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... reading settings\n";
                 e->setSettings(settings, id);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... setting current\n";
                 e->setCurrent(current, id);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... adding tab\n";
-                tabMain->addTab(e, n);
+                tabEditors->addTab(e, n);
                 //std::cQFEvaluationPropertyEditor::setSettings(out<<"creating tab '"<<n.toStdString()<<"' ... done\n";
                 editorList.append(e);
             }
@@ -272,18 +273,26 @@ void QFEvaluationPropertyEditor::createWidgets() {
     pteDescription=new QPlainTextEdit(w);
     fl->addRow(tr("&Description:"), pteDescription);
 
-    lstRawData=new QListView(tabMain);
-    tabMain->addTab(lstRawData, tr("raw data"));
+    splitMain=new QSplitter(tabMain);
+    lstRawData=new QListView(splitMain);
+    tabEditors=new QTabWidget(splitMain);
+    splitMain->addWidget(tabEditors);
+    splitMain->addWidget(lstRawData);
 
+    connect(lstRawData, SIGNAL(activated(const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&)));
+    connect(lstRawData, SIGNAL(clicked(const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&)));
+    connect(lstRawData, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&)));
+
+    tabMain->addTab(splitMain, tr("&Evaluation"));
 }
 
 void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
     this->settings=settings;
     std::cout<<"QFEvaluationPropertyEditor::setSettings("<<settings<<")\n";
-    if (current && tabMain) {
+    if (current && tabEditors) {
         for (int i=0; i<current->getEditorCount(); i++) {
-            if (qobject_cast<QFEvaluationEditor *>(tabMain->widget(i))) {
-                qobject_cast<QFEvaluationEditor *>(tabMain->widget(i))->setSettings(settings, id);
+            if (qobject_cast<QFEvaluationEditor *>(tabEditors->widget(i))) {
+                qobject_cast<QFEvaluationEditor *>(tabEditors->widget(i))->setSettings(settings, id);
             }
         }
     }
@@ -309,7 +318,14 @@ void QFEvaluationPropertyEditor::writeSettings() {
 }
 
 
-
+void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index) {
+    if (rdrProxy!=NULL) {
+        QFRawDataRecord* rec=current->getProject()->getRawDataByID(rdrProxy->data(index, Qt::UserRole).toInt());
+        if (rec!=NULL) {
+            current->setHighlightedRecord(rec);
+        }
+    }
+}
 
 
 

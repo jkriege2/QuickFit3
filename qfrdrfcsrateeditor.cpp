@@ -260,7 +260,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
         double tt[2];
         tt[0]=rateT[0];
         tt[1]=rateT[rateN-1];
-        size_t c_tau2=ds->addCopiedColumn(tt, 2, "time");
+        //size_t c_tau2=ds->addCopiedColumn(tt, 2, "time");
 
         if (cmbRunDisplay->currentIndex()==0) { // plot all runs
             for (unsigned int i=0; i<rateRuns; i++) {

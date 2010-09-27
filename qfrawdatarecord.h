@@ -280,7 +280,7 @@ class QFRawDataRecord : public QObject {
         };
         /** \brief get the i-th evaluation name */
         inline QString resultsGetEvaluationName(unsigned int i) {
-            if (i<results.size()) return results.keys().at(i);
+            if ((long)i<results.size()) return results.keys().at(i);
             return QString("");
         };
         /** \brief get the i-th result name */

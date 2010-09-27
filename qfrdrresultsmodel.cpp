@@ -74,9 +74,9 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
 
 QList<QString> QFRDRResultsModel::calcResultNames() const {
     QList<QString> l;
-    for (int i=0; i<record->resultsGetEvaluationCount(); i++) {
+    for (unsigned int i=0; i<record->resultsGetEvaluationCount(); i++) {
         QString en=record->resultsGetEvaluationName(i);
-        for (int j=0; j<record->resultsGetCount(en); j++) {
+        for (unsigned int j=0; j<record->resultsGetCount(en); j++) {
             QString rn=record->resultsGetResultName(en, j);
             if (!l.contains(rn)) {
                 l.append(rn);

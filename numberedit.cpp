@@ -103,8 +103,8 @@ void DoubleEdit::texttChanged(const QString& text) {
     }
     double d=extractVal(text);
     setViewOK();
-    if (checkMax) if (d>max) { d=max; setViewError(); }//setValue(d);}
-    if (checkMin) if (d<min) { d=min; setViewError(); }//setValue(d); }
+    if ((checkMax) && (d>max)) { d=max; setViewError(); }//setValue(d);}
+    if ((checkMin) && (d<min)) { d=min; setViewError(); }//setValue(d); }
 
     //std::cout<<d<<std::endl;
     //QMessageBox::information(this, "", QString("value is %1").arg(d));

@@ -91,6 +91,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         /** \brief this will be connected to the project to indicate when  the currently
          *         displayed record should be deleted */
         void evaluationAboutToBeDeleted(QFEvaluationItem* r);
+        /** \brief activated when the selection in lstRawData changes */
+        void selectionChanged(const QModelIndex& index);
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -112,6 +114,10 @@ class QFEvaluationPropertyEditor : public QWidget {
         QTabWidget* tabMain;
         /** \brief QListView to display raw data records to which an evaluation is applicable */
         QListView* lstRawData;
+        /** \brief splitter between files list and evaluation tab */
+        QSplitter* splitMain;
+        /** \brief tab widget for the evaluation editor widgets */
+        QTabWidget* tabEditors;
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief of all currently instaciated editors */
