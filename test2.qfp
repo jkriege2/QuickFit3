@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quickfitproject quickfit_version="3.0" name="Test Project 3" creator="">
+    <description><![CDATA[]]></description>
+    <properties/>
+    <rawdata>
+        <rawdataelement type="fcs" name="20nM_488_Day2_200s.asc" id="1">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:14:54" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_200s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_00s.asc" id="2">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="10:58:05" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_00s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_01s.asc" id="3">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="10:59:07" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_01s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_02s.asc" id="4">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:00:10" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_02s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_03s.asc" id="5">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:01:12" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_03s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_04s.asc" id="6">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:02:15" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_04s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_05s.asc" id="7">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:03:17" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_05s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_06s.asc" id="8">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:04:20" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_06s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_07s.asc" id="9">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:05:22" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_07s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_08s.asc" id="10">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:06:25" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_08s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="20nM_488_Day2_09s.asc" id="11">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
+                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
+                <property name="TIME" type="time" data="11:07:27" usereditable="false"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../dkfz/daten/praktikum2009/Gruppe C/20nM_488_Day2_09s.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="table" name="NEW_TABLE" id="12">
+            <description><![CDATA[]]></description>
+            <properties/>
+            <results/>
+            <data>
+                <column title="">
+                    <row type="QString" value=""/>
+                </column>
+            </data>
+        </rawdataelement>
+    </rawdata>
+    <evaluations>
+        <evaluationelement type="fcs_fit" name="FCS Fit test" id="13">
+            <description><![CDATA[]]></description>
+            <selection>
+                <item id="5"/>
+                <item id="6"/>
+                <item id="7"/>
+                <item id="12"/>
+                <item id="1"/>
+            </selection>
+            <data/>
+        </evaluationelement>
+    </evaluations>
+</quickfitproject>

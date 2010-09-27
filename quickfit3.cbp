@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="quickfit3" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gnu_gcc_compiler_450" />
+		<MakeCommands>
+			<Build command="$make -f $makefile.$target" />
+			<CompileFile command="$make -f $makefile.$target $file" />
+			<Clean command="$make -f $makefile.$target clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+			<SilentBuild command="$make -s -f $makefile.$target" />
+		</MakeCommands>
+		<Build>
+			<Target title="Debug">
+				<Option output="quickfit3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_450" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean $target" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -s -f $makefile $target" />
+				</MakeCommands>
+			</Target>
+			<Target title="Release">
+				<Option output="quickfit3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_450" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<MakeCommands>
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean $target" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -s -f $makefile $target" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<ExtraCommands>
+			<Add before="$(#qt4)/bin/qmake.exe ${PROJECT_NAME}.pro" />
+		</ExtraCommands>
+		<Unit filename="..\lib\datatable2.cpp" />
+		<Unit filename="..\lib\datatable2.h" />
+		<Unit filename="..\lib\qt\jkqtmathtext.cpp" />
+		<Unit filename="..\lib\qt\jkqtmathtext.h" />
+		<Unit filename="..\lib\qt\jkqtpbaseelements.cpp" />
+		<Unit filename="..\lib\qt\jkqtpbaseelements.h" />
+		<Unit filename="..\lib\qt\jkqtpbaseplotter.cpp" />
+		<Unit filename="..\lib\qt\jkqtpbaseplotter.h" />
+		<Unit filename="..\lib\qt\jkqtpbaseplotter.qrc" />
+		<Unit filename="..\lib\qt\jkqtpdatastorage.cpp" />
+		<Unit filename="..\lib\qt\jkqtpdatastorage.h" />
+		<Unit filename="..\lib\qt\jkqtpelements.cpp" />
+		<Unit filename="..\lib\qt\jkqtpelements.h" />
+		<Unit filename="..\lib\qt\jkqtplotter.cpp" />
+		<Unit filename="..\lib\qt\jkqtplotter.h" />
+		<Unit filename="..\lib\qt\jkqtplotter.pri">
+			<Option compilerVar="CC" />
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
+		<Unit filename="..\lib\qt\jkqtptools.cpp" />
+		<Unit filename="..\lib\qt\jkqtptools.h" />
+		<Unit filename="..\lib\qt\jkqttools.cpp" />
+		<Unit filename="..\lib\qt\jkqttools.h" />
+		<Unit filename="..\lib\qt\qtlogfile.cpp" />
+		<Unit filename="..\lib\qt\qtlogfile.h" />
+		<Unit filename="..\lib\tools.cpp" />
+		<Unit filename="..\lib\tools.h" />
+		<Unit filename="Doxyfile" />
+		<Unit filename="alv5000tools.cpp" />
+		<Unit filename="alv5000tools.h" />
+		<Unit filename="dlg_csvparameters.ui" />
+		<Unit filename="dlg_newproperty.ui" />
+		<Unit filename="dlgcsvparameters.cpp" />
+		<Unit filename="dlgcsvparameters.h" />
+		<Unit filename="dlgnewproperty.cpp" />
+		<Unit filename="dlgnewproperty.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="mainwindow.cpp" />
+		<Unit filename="mainwindow.h" />
+		<Unit filename="numberedit.cpp" />
+		<Unit filename="numberedit.h" />
+		<Unit filename="optionsdialog.cpp" />
+		<Unit filename="optionsdialog.h" />
+		<Unit filename="optionsdialog.ui" />
+		<Unit filename="programoptions.cpp" />
+		<Unit filename="programoptions.h" />
+		<Unit filename="qehtreeview.cpp" />
+		<Unit filename="qehtreeview.h" />
+		<Unit filename="qfevaluationeditor.cpp" />
+		<Unit filename="qfevaluationeditor.h" />
+		<Unit filename="qfevaluationitem.cpp" />
+		<Unit filename="qfevaluationitem.h" />
+		<Unit filename="qfevaluationitemfactory.cpp" />
+		<Unit filename="qfevaluationitemfactory.h" />
+		<Unit filename="qfevaluationpropertyeditor.cpp" />
+		<Unit filename="qfevaluationpropertyeditor.h" />
+		<Unit filename="qffcsfitevaluation.cpp" />
+		<Unit filename="qffcsfitevaluation.h" />
+		<Unit filename="qffcsfitevaluationeditor.cpp" />
+		<Unit filename="qffcsfitevaluationeditor.h" />
+		<Unit filename="qfproject.cpp" />
+		<Unit filename="qfproject.h" />
+		<Unit filename="qfprojectrawdatamodel.cpp" />
+		<Unit filename="qfprojectrawdatamodel.h" />
+		<Unit filename="qfprojecttreemodel.cpp" />
+		<Unit filename="qfprojecttreemodel.h" />
+		<Unit filename="qfrawdataeditor.cpp" />
+		<Unit filename="qfrawdataeditor.h" />
+		<Unit filename="qfrawdatapropertyeditor.cpp" />
+		<Unit filename="qfrawdatapropertyeditor.h" />
+		<Unit filename="qfrawdatarecord.cpp" />
+		<Unit filename="qfrawdatarecord.h" />
+		<Unit filename="qfrawdatarecordfactory.cpp" />
+		<Unit filename="qfrawdatarecordfactory.h" />
+		<Unit filename="qfrdrfcscorrelationeditor.cpp" />
+		<Unit filename="qfrdrfcscorrelationeditor.h" />
+		<Unit filename="qfrdrfcsdata.cpp" />
+		<Unit filename="qfrdrfcsdata.h" />
+		<Unit filename="qfrdrfcsrateeditor.cpp" />
+		<Unit filename="qfrdrfcsrateeditor.h" />
+		<Unit filename="qfrdrpropertymodel.cpp" />
+		<Unit filename="qfrdrpropertymodel.h" />
+		<Unit filename="qfrdrresultsmodel.cpp" />
+		<Unit filename="qfrdrresultsmodel.h" />
+		<Unit filename="qfrdrtable.cpp" />
+		<Unit filename="qfrdrtable.h" />
+		<Unit filename="qfrdrtableeditor.cpp" />
+		<Unit filename="qfrdrtableeditor.h" />
+		<Unit filename="qftablemodel.cpp" />
+		<Unit filename="qftablemodel.h" />
+		<Unit filename="qftoolwidgets.cpp" />
+		<Unit filename="qftoolwidgets.h" />
+		<Unit filename="quickfit3.pro" />
+		<Unit filename="quickfit3.qrc" />
+		<Unit filename="translations\de.ts" />
+		<Unit filename="version.h" />
+		<Extensions>
+			<code_completion>
+				<search_path add="$(#qt4)/include" />
+				<search_path add="$(#qt4)\include\include\ActiveQt" />
+				<search_path add="$(#qt4)\include\Phonon" />
+				<search_path add="$(#qt4)\include\Qt" />
+				<search_path add="$(#qt4)\include\QtCore" />
+				<search_path add="$(#qt4)\include\QtGui" />
+				<search_path add="$(#qt4)\include\QtNetwork" />
+				<search_path add="$(#qt4)\include\QtOpenGL" />
+				<search_path add="$(#qt4)\include\QtHelp" />
+				<search_path add="$(#qt4)\include\QtScript" />
+				<search_path add="$(#qt4)\include\QtScriptTools" />
+				<search_path add="$(#qt4)\include\QtSql" />
+				<search_path add="$(#qt4)\include\QtSvg" />
+				<search_path add="$(#qt4)\include\QtWebKit" />
+				<search_path add="$(#qt4)\include\QtXml" />
+				<search_path add="$(#qt4)\include\QtXmlPatterns" />
+			</code_completion>
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="1" date_declarations="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+			<DoxyBlocks>
+				<comment_style block="3" line="0" />
+				<doxyfile_project output_directory="doc" use_auto_version="1" />
+				<doxyfile_build extract_all="1" />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot class_diagrams="1" have_dot="1" />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
