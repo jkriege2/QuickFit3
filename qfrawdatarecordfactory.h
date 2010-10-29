@@ -10,7 +10,7 @@
 #include <QPair>
 #include <QList>
 #include <QAction>
-#include "../lib/qt/qtlogfile.h"
+#include "qt/qtlogfile.h"
 #include "qfrawdatarecord.h"
 #include "programoptions.h"
 

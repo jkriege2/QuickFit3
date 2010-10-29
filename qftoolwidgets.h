@@ -1,5 +1,5 @@
 #include <QtGui>
-#include "../lib/tools.h"
+#include "tools.h"
 #include "numberedit.h"
 #include <iostream>
 

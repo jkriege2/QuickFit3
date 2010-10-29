@@ -3,7 +3,7 @@
 
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
-#include "../lib/qt/jkqtplotter.h"
+#include "qt/jkqtplotter.h"
 
 
 class QFFCSFitEvaluationEditor : public QFEvaluationEditor {

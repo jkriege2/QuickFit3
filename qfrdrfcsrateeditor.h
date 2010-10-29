@@ -2,7 +2,7 @@
 #define QFRDRFCSRateEditor_H
 
 #include "qfrawdataeditor.h"
-#include "../lib/qt/jkqtplotter.h"
+#include "qt/jkqtplotter.h"
 #include "qftoolwidgets.h"
 #include <QCheckBox>
 #include <QPushButton>

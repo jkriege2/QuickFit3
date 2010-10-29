@@ -12,7 +12,7 @@
 #include "qfevaluationeditor.h"
 #include "qfevaluationitemfactory.h"
 #include "programoptions.h"
-#include "../lib/qt/qtlogfile.h"
+#include "qt/qtlogfile.h"
 #include "qfrawdatarecordfactory.h"
 
 

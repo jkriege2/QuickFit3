@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "../lib/tools.h"
+#include "tools.h"
 
 
 /*!

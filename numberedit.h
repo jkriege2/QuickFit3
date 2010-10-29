@@ -5,7 +5,7 @@
 #include <QValidator>
 #include <QDoubleValidator>
 #include <QPushButton>
-#include "../lib/tools.h"
+#include "tools.h"
 
 
 

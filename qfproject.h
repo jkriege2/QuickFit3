@@ -9,7 +9,7 @@
 #include <iostream>
 #include <QProgressBar>
 #include <QStringList>
-#include "../lib/qt/qtlogfile.h"
+#include "qt/qtlogfile.h"
 
 // forward declaration
 class QFRawDataRecord;

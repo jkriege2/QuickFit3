@@ -15,17 +15,17 @@ HEADERS += mainwindow.h \
            qfrdrtable.h \
            qftablemodel.h \
            qfrdrtableeditor.h \
-           ../lib/qt/jkqtpbaseplotter.h \
-           ../lib/qt/jkqtpdatastorage.h \
-           ../lib/qt/jkqtpelements.h \
-           ../lib/qt/jkqtmathtext.h \
-           ../lib/qt/jkqtpbaseelements.h \
-           ../lib/qt/jkqtplotter.h \
-           ../lib/qt/jkqtptools.h \
-           ../lib/qt/jkqttools.h \
-           ../lib/qt/qtlogfile.h \
-           ../lib/tools.h \
-           ../lib/datatable2.h \
+           ../../../LIB/trunk/qt/jkqtpbaseplotter.h \
+           ../../../LIB/trunk/qt/jkqtpdatastorage.h \
+           ../../../LIB/trunk/qt/jkqtpelements.h \
+           ../../../LIB/trunk/qt/jkqtmathtext.h \
+           ../../../LIB/trunk/qt/jkqtpbaseelements.h \
+           ../../../LIB/trunk/qt/jkqtplotter.h \
+           ../../../LIB/trunk/qt/jkqtptools.h \
+           ../../../LIB/trunk/qt/jkqttools.h \
+           ../../../LIB/trunk/qt/qtlogfile.h \
+           ../../../LIB/trunk/tools.h \
+           ../../../LIB/trunk/datatable2.h \
            dlgCSVParameters.h \
            dlgnewproperty.h \
            qfevaluationitem.h \
@@ -58,17 +58,17 @@ SOURCES += main.cpp \
            qfrdrtable.cpp \
            qftablemodel.cpp \
            qfrdrtableeditor.cpp \
-           ../lib/qt/jkqtpbaseplotter.cpp \
-           ../lib/qt/jkqtpdatastorage.cpp \
-           ../lib/qt/jkqtpelements.cpp \
-           ../lib/qt/jkqtmathtext.cpp \
-           ../lib/qt/jkqtpbaseelements.cpp \
-           ../lib/qt/jkqtplotter.cpp \
-           ../lib/qt/jkqtptools.cpp \
-           ../lib/qt/jkqttools.cpp \
-           ../lib/qt/qtlogfile.cpp \
-           ../lib/tools.cpp \
-           ../lib/datatable2.cpp \
+           ../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
+           ../../../LIB/trunk/qt/jkqtpdatastorage.cpp \
+           ../../../LIB/trunk/qt/jkqtpelements.cpp \
+           ../../../LIB/trunk/qt/jkqtmathtext.cpp \
+           ../../../LIB/trunk/qt/jkqtpbaseelements.cpp \
+           ../../../LIB/trunk/qt/jkqtplotter.cpp \
+           ../../../LIB/trunk/qt/jkqtptools.cpp \
+           ../../../LIB/trunk/qt/jkqttools.cpp \
+           ../../../LIB/trunk/qt/qtlogfile.cpp \
+           ../../../LIB/trunk/tools.cpp \
+           ../../../LIB/trunk/datatable2.cpp \
            dlgCSVParameters.cpp \
            dlgnewproperty.cpp \
            qfevaluationitem.cpp \
@@ -97,10 +97,11 @@ FORMS = dlg_csvparameters.ui \
         optionsdialog.ui
 
 RESOURCES += quickfit3.qrc \
-             ../lib/qt/jkqtpbaseplotter.qrc
+             ../../../LIB/trunk/qt/jkqtpbaseplotter.qrc
 
 TRANSLATIONS= translations/de.ts
 
+INCLUDEPATH += ../../../LIB/trunk/
 
 QT += gui xml svg
 CONFIG += console

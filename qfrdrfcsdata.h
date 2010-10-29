@@ -11,12 +11,12 @@
 #include <QPair>
 #include <QList>
 #include <QAction>
-#include "../lib/qt/qtlogfile.h"
+#include "qt/qtlogfile.h"
 #include "qfrawdatarecord.h"
 #include "qfrdrfcscorrelationeditor.h"
 #include "qfrdrfcsrateeditor.h"
-#include "../lib/datatable2.h"
-#include "../lib/tools.h"
+#include "datatable2.h"
+#include "tools.h"
 #include "alv5000tools.h"
 #include "qfrawdatarecordfactory.h"
 
