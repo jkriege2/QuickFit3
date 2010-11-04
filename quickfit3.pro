@@ -3,7 +3,7 @@ TARGET = quickfit3
 DEPENDPATH += .
 INCLUDEPATH += .
 
-QMAKE_CXXFLAGS += -fexceptions -msse -msse2 -mfpmath=387,sse -O2
+#QMAKE_CXXFLAGS += -fexceptions -msse -msse2 -mfpmath=387,sse -O2
 LIBS += -lgsl -lgslcblas
 # Input
 HEADERS += mainwindow.h \
