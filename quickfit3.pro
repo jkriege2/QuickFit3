@@ -15,6 +15,7 @@ HEADERS += mainwindow.h \
            qfrdrtable.h \
            qftablemodel.h \
            qfrdrtableeditor.h \
+           qfproperties.h \
            ../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../LIB/trunk/qt/jkqtpdatastorage.h \
            ../../../LIB/trunk/qt/jkqtpelements.h \
@@ -58,6 +59,7 @@ SOURCES += main.cpp \
            qfrdrtable.cpp \
            qftablemodel.cpp \
            qfrdrtableeditor.cpp \
+           qfproperties.cpp \
            ../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../LIB/trunk/qt/jkqtpdatastorage.cpp \
            ../../../LIB/trunk/qt/jkqtpelements.cpp \

@@ -93,9 +93,6 @@ QList<QPair<QAction*, QFRawDataRecordFactory::QFRawDataRecordUserCreateFunc> > r
 }
 
 
-unsigned int ALV5000_getChannelCount(QString filename) {
-    return 1;
-}
 
 QFRDRFCSData::QFRDRFCSData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -485,37 +482,37 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
                 if (name.compare("Date",  Qt::CaseInsensitive)==0) {
                     QDate date=ALV_toDate(value);
                     if (date.year()<1950) date.setDate(date.year()+100, date.month(), date.day());
-                    setProperty("DATE", date, false, true);
+                    setQFProperty("DATE", date, false, true);
                 } else if (name.compare("Time",  Qt::CaseInsensitive)==0) {
                     QTime date=ALV_toTime(value);
-                    setProperty("TIME", date, false, true);
+                    setQFProperty("TIME", date, false, true);
                 } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
-                    setProperty("DURATION [s]", token.doubleValue, false, true);
+                    setQFProperty("DURATION [s]", token.doubleValue, false, true);
                 } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
                     runs=(unsigned int)round(token.doubleValue);
                 } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
-                    setProperty("TEMPERATURE [K]", token.doubleValue, false, true);
+                    setQFProperty("TEMPERATURE [K]", token.doubleValue, false, true);
                 } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
-                    setProperty("VISCOSITY [cp]", token.doubleValue, false, true);
+                    setQFProperty("VISCOSITY [cp]", token.doubleValue, false, true);
                 } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
-                    setProperty("REFRACTIVE_INDEX", token.doubleValue, false, true);
+                    setQFProperty("REFRACTIVE_INDEX", token.doubleValue, false, true);
                 } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
-                    setProperty("WAVELENGTH [nm]", token.doubleValue, false, true);
+                    setQFProperty("WAVELENGTH [nm]", token.doubleValue, false, true);
                 } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                    setProperty("ANGLE [°]", token.doubleValue, false, true);
+                    setQFProperty("ANGLE [°]", token.doubleValue, false, true);
                 } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
                     // ignore this property, as it is calculated by this class
                 } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
                     QString text=getProperty("SAMPLE_MEMO", "").toString();
                     if (!value.isEmpty()) text=text+"\n"+value;
-                    setProperty("SAMPLE_MEMO", text, false, true);
+                    setQFProperty("SAMPLE_MEMO", text, false, true);
                 } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
-                    setProperty("MODE", value, false, true);
-                    setProperty("CROSS_CORRELATION", (bool)value.contains("CROSS", Qt::CaseInsensitive), false, true);
+                    setQFProperty("MODE", value, false, true);
+                    setQFProperty("CROSS_CORRELATION", (bool)value.contains("CROSS", Qt::CaseInsensitive), false, true);
                     isDual=value.contains("DUAL", Qt::CaseInsensitive);
-                    setProperty("DUAL_CHANNEL", isDual, false, true);
+                    setQFProperty("DUAL_CHANNEL", isDual, false, true);
                 } else {
-                    setProperty(name, value, false, true);
+                    setQFProperty(name, value, false, true);
                 }
             } else if (token.type==ALV_QUOTED) {
                 // we stop reading the header when we meet the first quoted string token

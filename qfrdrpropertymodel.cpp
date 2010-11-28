@@ -48,7 +48,7 @@ bool QFRDRPropertyModel::setData(const QModelIndex &index, const QVariant &value
     if (index.isValid() && index.column()==1 && role == Qt::EditRole) {
         QString p=record->getVisibleProperty(index.row());
         if (!record->isPropertyUserEditable(p)) return false;
-        record->setProperty(p, value);
+        record->setQFProperty(p, value);
         return true;
     }
     return false;

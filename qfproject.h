@@ -10,6 +10,7 @@
 #include <QProgressBar>
 #include <QStringList>
 #include "qt/qtlogfile.h"
+#include "qfproperties.h"
 
 // forward declaration
 class QFRawDataRecord;
@@ -39,7 +40,7 @@ typedef QMap<QString, QVariant> qfp_param_type;
     NOT user editable!
 
 */
-class QFProject : public QObject {
+class QFProject : public QObject, public QFProperties {
         Q_OBJECT
     protected:
         /** \brief contains the currently highest ID */
@@ -70,14 +71,7 @@ class QFProject : public QObject {
         /** \brief data model representing the items in the model as a tree.
          * This model is used to display the project tree */
         QFProjectTreeModel* treeModel;
-        /** \brief struct to store a property */
-        struct propertyItem {
-            QVariant data;
-            bool usereditable;
-            bool visible;
-        };
-        /** \brief internal store for the objectproperties */
-        QMap<QString, propertyItem> props;
+
 
         /** \brief pointer to a logfile object that may be used to output logging information */
         QtLogFile* logF;
@@ -254,40 +248,7 @@ class QFProject : public QObject {
         /** \brief data model representing the items in the model as a tree.
          * This model is used to display the project tree */
         inline QFProjectTreeModel* getTreeModel() const { return treeModel; };
-        /** \brief clear all properties */
-        inline void clearProperties() { props.clear(); emit propertiesChanged(); }
-        /** \brief return the value of the specified property */
-        inline QVariant getProperty( const QString& p) { return props[p].data; };
-        /** \brief return the value of the specified property or the supplied default value */
-        inline QVariant getProperty(const QString& p, const QVariant& defaultValue) {
-            if (props.contains(p)) return props.value(p).data;
-            return defaultValue;
-        };
-        /** \brief return the number of properties in the object */
-        inline unsigned int getPropertyCount() { return props.size(); };
-        /** \brief return the number of visible properties in the object */
-        unsigned int getVisiblePropertyCount();
-        /** \brief get the name of the i-th visible property */
-        QString getVisibleProperty(unsigned int i);
-        /** \brief returns a QStringList which contains the names of all properties */
-        inline QStringList getPropertyNames() { return props.keys(); };
-        /** \brief returns the name of the i-th property */
-        inline QString getPropertyName(int i) { return props.keys().at(i); };
-        /** \brief returns whether the given property is visible */
-        inline bool isPropertyVisible(QString property) {
-            if (!props.contains(property)) return false;
-            return props[property].visible;
-        };
-        /** \brief returns whether the given property is user editable */
-        inline bool isPropertyUserEditable(QString property) {
-            if (!props.contains(property)) return false;
-            return props[property].usereditable;
-        };
-        /** \brief delete the given property */
-        inline void deleteProperty(const QString& n) { props.remove(n); emit propertiesChanged(); };
 
-        /** \brief returns true if the specified property exists */
-        inline bool propertyExists(const QString& p) { return props.contains(p); };
     signals:
         /** \brief emitted when the data changed state of the project is modified */
         void wasChanged(bool changed);
@@ -295,7 +256,7 @@ class QFProject : public QObject {
         void recordAboutToBeDeleted(QFRawDataRecord* r);
         /** \brief emitted when a record is about to be deleted */
         void evaluationAboutToBeDeleted(QFEvaluationItem* r);
-        /** \brief emitted when the project properties (name, description, ...) changed */
+        /** \brief emitted when properties changed */
         void propertiesChanged();
         /** \brief emitted when an error occured (may be used to display the error) */
         void errorOccured(QString errorDescription);
@@ -305,31 +266,7 @@ class QFProject : public QObject {
             dataChange=true;
             emit wasChanged(dataChange);
         }
-        /** \brief set property to the specified value */
-        inline void setProperty(const QString& p, QVariant value, bool usereditable=false, bool visible=false) {
-            propertyItem i;
-            i.data=value;
-            i.usereditable=usereditable;
-            i.visible=visible;
-            props[p]=i;
-            emit propertiesChanged();
-        }
-        /** \brief set property to the specified value */
-        inline void setDoubleProperty(const QString& p, double value, bool usereditable=false, bool visible=false) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
-        /** \brief set property to the specified value */
-        inline void setBoolProperty(const QString& p, bool value, bool usereditable=false, bool visible=false) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
-        /** \brief set property to the specified value */
-        inline void setIntProperty(const QString& p, qlonglong value, bool usereditable=false, bool visible=false) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
-        /** \brief set property to the specified value */
-        inline void setStringProperty(const QString& p, QString value,bool usereditable=false, bool visible=false) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
+
     protected:
         /** \brief set the internal error flag and description */
         inline void setError(QString description) {
@@ -337,6 +274,10 @@ class QFProject : public QObject {
             errorDesc=description;
             emit errorOccured(description);
         }
+        /** \copydoc QFProperties::emitPropertiesChanged() */
+        virtual void emitPropertiesChanged() { emit propertiesChanged(); };
+        /** \copybrief QFProperties::setPropertiesError() */
+        virtual void setPropertiesError(QString message) { setError(message); };
 
     protected slots:
         void projectChanged();

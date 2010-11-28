@@ -315,7 +315,7 @@ void QFRawDataPropertyEditor::newPropClicked() {
                 case 3: v.convert(QVariant::Bool); break;
                 case 4: v.convert(QVariant::DateTime); break;
             }
-            current->setProperty(d->cmbName->currentText(), v);
+            current->setQFProperty(d->cmbName->currentText(), v);
         }
 
         delete d;

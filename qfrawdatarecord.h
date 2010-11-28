@@ -13,6 +13,7 @@
 #include "qfrawdataeditor.h"
 #include "qfrdrresultsmodel.h"
 #include "qfrdrpropertymodel.h"
+#include "qfproperties.h"
 
 
 /*! \brief this class manages one raw data record in the project
@@ -26,7 +27,7 @@
     errorDescription() which returns a textual description of the error. The protected method setError() may be
     used to indicate that an error has occured to the class.
  */
-class QFRawDataRecord : public QObject {
+class QFRawDataRecord : public QObject, public QFProperties {
         Q_OBJECT
     public:
         /** \brief class constructor, reads from QDomElement */
@@ -49,40 +50,6 @@ class QFRawDataRecord : public QObject {
         /** \brief return the next sibling rawdata record in the project, which has the same type as this record */
         inline QFRawDataRecord* getPreviousOfSameType() { return project->getPreviousRawDataOfSameType(this); };
 
-        /** \brief clear all properties */
-        inline void clearProperties() { props.clear(); emit propertiesChanged(); }
-        /** \brief return the value of the specified property */
-        inline QVariant getProperty( const QString& p) { return props[p].data; };
-        /** \brief return the value of the specified property or the supplied default value */
-        inline QVariant getProperty(const QString& p, const QVariant& defaultValue) {
-            if (props.contains(p)) return props.value(p).data;
-            return defaultValue;
-        };
-        /** \brief return the number of properties in the object */
-        inline unsigned int getPropertyCount() { return props.size(); };
-        /** \brief return the number of visible properties in the object */
-        unsigned int getVisiblePropertyCount();
-        /** \brief get the name of the i-th visible property */
-        QString getVisibleProperty(unsigned int i);
-        /** \brief returns a QStringList which contains the names of all properties */
-        inline QStringList getPropertyNames() { return props.keys(); };
-        /** \brief returns the name of the i-th property */
-        inline QString getPropertyName(int i) { return props.keys().at(i); };
-        /** \brief returns whether the given property is visible */
-        inline bool isPropertyVisible(QString property) {
-            if (!props.contains(property)) return false;
-            return props[property].visible;
-        };
-        /** \brief returns whether the given property is user editable */
-        inline bool isPropertyUserEditable(QString property) {
-            if (!props.contains(property)) return false;
-            return props[property].usereditable;
-        };
-        /** \brief delete the given property */
-        inline void deleteProperty(const QString& n) { props.remove(n); emit propertiesChanged(); };
-
-        /** \brief returns true if the specified property exists */
-        inline bool propertyExists(const QString& p) { return props.contains(p); };
         /** \brief return the ID */
         inline int getID() { return ID; };
         /** \brief return the name */
@@ -99,32 +66,10 @@ class QFRawDataRecord : public QObject {
         inline bool error() { return errorOcc; }
         /** \brief returns the description of the last error */
         inline QString errorDescription() { return errorDesc; }
+
+
+
     public slots:
-        /** \brief set property to the specified value */
-        inline void setProperty(const QString& p, QVariant value, bool usereditable=true, bool visible=true) {
-            propertyItem i;
-            i.data=value;
-            i.usereditable=usereditable;
-            i.visible=visible;
-            props[p]=i;
-            emit propertiesChanged();
-        }
-        /** \brief set property to the specified value */
-        inline void setDoubleProperty(const QString& p, double value, bool usereditable=true, bool visible=true) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
-        /** \brief set property to the specified value */
-        inline void setBoolProperty(const QString& p, bool value, bool usereditable=true, bool visible=true) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
-        /** \brief set property to the specified value */
-        inline void setIntProperty(const QString& p, qlonglong value, bool usereditable=true, bool visible=true) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
-        /** \brief set property to the specified value */
-        inline void setStringProperty(const QString& p, QString value, bool usereditable=true, bool visible=true) {
-            setProperty(p, QVariant(value), usereditable, visible);
-        }
         /** \brief set the name */
         inline void setName(const QString n) {
             name=n;
@@ -147,14 +92,11 @@ class QFRawDataRecord : public QObject {
         /** \brief emitted whenever the data in this object changes */
         void rawDataChanged();
     protected:
-        /** \brief struct to store a property */
-        struct propertyItem {
-            QVariant data;
-            bool usereditable;
-            bool visible;
-        };
-        /** \brief internal store for the objectproperties */
-        QMap<QString, propertyItem> props;
+        /** \copydoc QFProperties::emitPropertiesChanged() */
+        virtual void emitPropertiesChanged() { emit propertiesChanged(); };
+        /** \copybrief QFProperties::setPropertiesError() */
+        virtual void setPropertiesError(QString message) { setError(message); };
+
         /** \brief a model used to access the properties */
         QFRDRPropertyModel* propModel;
         /** \brief ID of the raw data record */
