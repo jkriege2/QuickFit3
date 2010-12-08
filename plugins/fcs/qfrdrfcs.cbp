@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="qfrdrfcs" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gnu_gcc_compiler_450" />
+		<MakeCommands>
+			<Build command="$make -f $makefile.$target" />
+			<CompileFile command="$make -f $makefile.$target $file" />
+			<Clean command="$make -f $makefile.$target clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+			<SilentBuild command="$make -s -f $makefile.$target" />
+		</MakeCommands>
+		<Build>
+			<Target title="Debug">
+				<Option output="qfrdrfcs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_450" />
+				<Option host_application="FCSTOOLS\trunk\QuickFit3\quickfit3.exe" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="$make -f $makefile.$target" />
+					<CompileFile command="$make -f $makefile-$target $file" />
+					<Clean command="$make -f $makefile.$target clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+					<SilentBuild command="$make -s -f $makefile.$target" />
+				</MakeCommands>
+			</Target>
+			<Target title="Release">
+				<Option output="quickfit3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_450" />
+				<Option host_application="FCSTOOLS\trunk\QuickFit3\quickfit3.exe" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="$make -f $makefile.$target" />
+					<CompileFile command="$make -f $makefile.$target $file" />
+					<Clean command="$make -f $makefile.$target clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.$target" />
+					<SilentBuild command="$make -s -f $makefile.$target" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-O2" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+		</Linker>
+		<ExtraCommands>
+			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
+		</ExtraCommands>
+		<Unit filename="alv5000tools.cpp" />
+		<Unit filename="alv5000tools.h" />
+		<Unit filename="dlg_csvparameters.ui" />
+		<Unit filename="dlgcsvparameters.cpp" />
+		<Unit filename="dlgcsvparameters.h" />
+		<Unit filename="qfprdrfcs.cpp" />
+		<Unit filename="qfprdrfcs.h" />
+		<Unit filename="qfrdrfcs.pro" />
+		<Unit filename="qfrdrfcs.qrc" />
+		<Unit filename="qfrdrfcscorrelationeditor.cpp" />
+		<Unit filename="qfrdrfcscorrelationeditor.h" />
+		<Unit filename="qfrdrfcsdata.cpp" />
+		<Unit filename="qfrdrfcsdata.h" />
+		<Unit filename="qfrdrfcsrateeditor.cpp" />
+		<Unit filename="qfrdrfcsrateeditor.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\datatable2.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\datatable2.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtmathtext.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtmathtext.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpbaseelements.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpbaseelements.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpbaseplotter.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpbaseplotter.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpbaseplotter.qrc" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpdatastorage.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpdatastorage.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpelements.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtpelements.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtplotter.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtplotter.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtptools.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtptools.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqttools.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqttools.h" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\tools.cpp" />
+		<Unit filename="..\..\..\..\..\LIB\trunk\tools.h" />
+		<Extensions>
+			<code_completion>
+				<search_path add="$(#qt4)/include" />
+				<search_path add="$(#qt4)\include\include\ActiveQt" />
+				<search_path add="$(#qt4)\include\Phonon" />
+				<search_path add="$(#qt4)\include\Qt" />
+				<search_path add="$(#qt4)\include\QtCore" />
+				<search_path add="$(#qt4)\include\QtGui" />
+				<search_path add="$(#qt4)\include\QtNetwork" />
+				<search_path add="$(#qt4)\include\QtOpenGL" />
+				<search_path add="$(#qt4)\include\QtHelp" />
+				<search_path add="$(#qt4)\include\QtScript" />
+				<search_path add="$(#qt4)\include\QtScriptTools" />
+				<search_path add="$(#qt4)\include\QtSql" />
+				<search_path add="$(#qt4)\include\QtSvg" />
+				<search_path add="$(#qt4)\include\QtWebKit" />
+				<search_path add="$(#qt4)\include\QtXml" />
+				<search_path add="$(#qt4)\include\QtXmlPatterns" />
+			</code_completion>
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="1" date_declarations="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+			<DoxyBlocks>
+				<comment_style block="3" line="0" />
+				<doxyfile_project output_directory="doc" use_auto_version="1" />
+				<doxyfile_build extract_all="1" />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot class_diagrams="1" have_dot="1" />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

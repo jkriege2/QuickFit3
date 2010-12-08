@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quickfitproject quickfit_version="3.0" name="unnamed" creator="">
+    <description><![CDATA[]]></description>
+    <properties/>
+    <rawdata>
+        <rawdataelement type="table" name="NEW_TABLE" id="0">
+            <description><![CDATA[]]></description>
+            <properties/>
+            <results/>
+            <data>
+                <column title="0">
+                    <row type="QString" value="col2"/>
+                    <row type="qlonglong" value="1001"/>
+                    <row type="QString" value="100-1"/>
+                    <row type="qlonglong" value="-1001"/>
+                </column>
+                <column title="1">
+                    <row type="" value=""/>
+                    <row type="" value=""/>
+                    <row type="qlonglong" value="23"/>
+                    <row type="double" value="0"/>
+                </column>
+            </data>
+        </rawdataelement>
+        <rawdataelement type="table" name="test_semicolon.csv" id="1">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="column_separator" type="string" data=";" usereditable="false"/>
+                <property name="comment_start" type="string" data="#" usereditable="false"/>
+                <property name="decimal_separator" type="string" data="." usereditable="false"/>
+                <property name="header_start" type="string" data="#!" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/test_semicolon.csv</file>
+            </files>
+            <data/>
+        </rawdataelement>
+    </rawdata>
+    <evaluations/>
+</quickfitproject>

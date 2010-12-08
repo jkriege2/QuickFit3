@@ -1,0 +1,26 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+
+    <file alias="copy.png">../../images/22x22/edit_copy.png</file>
+    <file alias="cut.png">../../images/22x22/edit_cut.png</file>
+    <file alias="paste.png">../../images/22x22/edit_paste.png</file>
+    <file alias="print.png">../../images/22x22/document_print.png</file>
+
+    <file alias="projecttree_tablefile.png">../../images/16x16/table.png</file>
+
+    <file alias="table_clear.png">../../images/16x16/table_clear.png</file>
+    <file alias="table_open.png">../../images/16x16/table_open.png</file>
+    <file alias="table_save.png">../../images/16x16/table_save.png</file>
+    <file alias="row_insert.png">../../images/16x16/row_insert.png</file>
+    <file alias="row_append.png">../../images/16x16/row_append.png</file>
+    <file alias="row_delete.png">../../images/16x16/row_delete.png</file>
+    <file alias="column_insert.png">../../images/16x16/column_insert.png</file>
+    <file alias="column_append.png">../../images/16x16/column_append.png</file>
+    <file alias="column_delete.png">../../images/16x16/column_delete.png</file>
+    <file alias="column_title.png">../../images/16x16/column_title.png</file>
+    <file alias="cell_type.png">../../images/16x16/cell_type.png</file>
+
+
+    <file alias="table_insert.png">../../images/22x22/table_insert.png</file>
+</qresource>
+</RCC>

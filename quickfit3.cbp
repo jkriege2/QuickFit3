@@ -4,19 +4,21 @@
 	<Project>
 		<Option title="quickfit3" />
 		<Option makefile_is_custom="1" />
+		<Option execution_dir="." />
 		<Option pch_mode="2" />
 		<Option compiler="gnu_gcc_compiler_450" />
 		<MakeCommands>
-			<Build command="$make -f $makefile.$target" />
-			<CompileFile command="$make -f $makefile.$target $file" />
-			<Clean command="$make -f $makefile.$target clean" />
-			<DistClean command="$make -f $makefile distclean$target" />
-			<AskRebuildNeeded command="$make -q -f $makefile.$target" />
-			<SilentBuild command="$make -s -f $makefile.$target" />
+			<Build command="$make -f $makefile $target" />
+			<CompileFile command="$make -f $makefile $target $file" />
+			<Clean command="$make -f $makefile $target clean" />
+			<DistClean command="$make -f $makefile.$target distclean" />
+			<AskRebuildNeeded command="$make -q -f $makefile $target" />
+			<SilentBuild command="$make -s -f $makefile $target" />
 		</MakeCommands>
 		<Build>
 			<Target title="Debug">
-				<Option output="quickfit3" prefix_auto="1" extension_auto="1" />
+				<Option output="output\quickfit3" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="output" />
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gnu_gcc_compiler_450" />
@@ -27,35 +29,30 @@
 					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 				</ExtraCommands>
 				<MakeCommands>
-					<Build command="$make -f $makefile.$target" />
-					<CompileFile command="$make -f $makefile-$target $file" />
-					<Clean command="$make -f $makefile.$target clean" />
-					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile.$target" />
-					<SilentBuild command="$make -s -f $makefile.$target" />
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $target $file" />
+					<Clean command="$make -f $makefile $target clean" />
+					<DistClean command="$make -f $makefile.$target distclean" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -s -f $makefile $target" />
 				</MakeCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="quickfit3" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="output" />
 				<Option object_output="obj\Release\" />
 				<Option type="1" />
 				<Option compiler="gnu_gcc_compiler_450" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
 				<ExtraCommands>
 					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 				</ExtraCommands>
 				<MakeCommands>
-					<Build command="$make -f $makefile.$target" />
-					<CompileFile command="$make -f $makefile.$target $file" />
-					<Clean command="$make -f $makefile.$target clean" />
-					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile.$target" />
-					<SilentBuild command="$make -s -f $makefile.$target" />
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $target $file" />
+					<Clean command="$make -f $makefile $target clean" />
+					<DistClean command="$make -f $makefile.$target distclean" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -s -f $makefile $target" />
 				</MakeCommands>
 			</Target>
 		</Build>
@@ -68,105 +65,85 @@
 		<ExtraCommands>
 			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 		</ExtraCommands>
-		<Unit filename="Doxyfile" />
-		<Unit filename="alv5000tools.cpp" />
-		<Unit filename="alv5000tools.h" />
-		<Unit filename="dlg_csvparameters.ui" />
-		<Unit filename="dlg_newproperty.ui" />
-		<Unit filename="dlgcsvparameters.cpp" />
-		<Unit filename="dlgcsvparameters.h" />
-		<Unit filename="dlgnewproperty.cpp" />
-		<Unit filename="dlgnewproperty.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="mainwindow.cpp" />
-		<Unit filename="mainwindow.h" />
-		<Unit filename="numberedit.cpp" />
-		<Unit filename="numberedit.h" />
-		<Unit filename="optionsdialog.cpp" />
-		<Unit filename="optionsdialog.h" />
-		<Unit filename="optionsdialog.ui" />
-		<Unit filename="programoptions.cpp" />
-		<Unit filename="programoptions.h" />
-		<Unit filename="qehtreeview.cpp" />
-		<Unit filename="qehtreeview.h" />
-		<Unit filename="qfevaluationeditor.cpp" />
-		<Unit filename="qfevaluationeditor.h" />
-		<Unit filename="qfevaluationitem.cpp" />
-		<Unit filename="qfevaluationitem.h" />
-		<Unit filename="qfevaluationitemfactory.cpp" />
-		<Unit filename="qfevaluationitemfactory.h" />
-		<Unit filename="qfevaluationpropertyeditor.cpp" />
-		<Unit filename="qfevaluationpropertyeditor.h" />
-		<Unit filename="qffcsfitevaluation.cpp" />
-		<Unit filename="qffcsfitevaluation.h" />
-		<Unit filename="qffcsfitevaluationeditor.cpp" />
-		<Unit filename="qffcsfitevaluationeditor.h" />
-		<Unit filename="qfproject.cpp" />
-		<Unit filename="qfproject.h" />
-		<Unit filename="qfprojectrawdatamodel.cpp" />
-		<Unit filename="qfprojectrawdatamodel.h" />
-		<Unit filename="qfprojecttreemodel.cpp" />
-		<Unit filename="qfprojecttreemodel.h" />
-		<Unit filename="qfproperties.cpp" />
-		<Unit filename="qfproperties.h" />
-		<Unit filename="qfrawdataeditor.cpp" />
-		<Unit filename="qfrawdataeditor.h" />
-		<Unit filename="qfrawdatapropertyeditor.cpp" />
-		<Unit filename="qfrawdatapropertyeditor.h" />
-		<Unit filename="qfrawdatarecord.cpp" />
-		<Unit filename="qfrawdatarecord.h" />
-		<Unit filename="qfrawdatarecordfactory.cpp" />
-		<Unit filename="qfrawdatarecordfactory.h" />
-		<Unit filename="qfrdrfcscorrelationeditor.cpp" />
-		<Unit filename="qfrdrfcscorrelationeditor.h" />
-		<Unit filename="qfrdrfcsdata.cpp" />
-		<Unit filename="qfrdrfcsdata.h" />
-		<Unit filename="qfrdrfcsrateeditor.cpp" />
-		<Unit filename="qfrdrfcsrateeditor.h" />
-		<Unit filename="qfrdrpropertymodel.cpp" />
-		<Unit filename="qfrdrpropertymodel.h" />
-		<Unit filename="qfrdrresultsmodel.cpp" />
-		<Unit filename="qfrdrresultsmodel.h" />
-		<Unit filename="qfrdrtable.cpp" />
-		<Unit filename="qfrdrtable.h" />
-		<Unit filename="qfrdrtableeditor.cpp" />
-		<Unit filename="qfrdrtableeditor.h" />
-		<Unit filename="qftablemodel.cpp" />
-		<Unit filename="qftablemodel.h" />
-		<Unit filename="qftoolwidgets.cpp" />
-		<Unit filename="qftoolwidgets.h" />
-		<Unit filename="quickfit3.pro" />
-		<Unit filename="quickfit3.qrc" />
-		<Unit filename="translations\de.ts" />
-		<Unit filename="version.h" />
-		<Unit filename="..\..\..\LIB\trunk\datatable2.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\datatable2.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtmathtext.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtmathtext.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpbaseelements.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpbaseelements.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpbaseplotter.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpbaseplotter.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpbaseplotter.qrc" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpdatastorage.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpdatastorage.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpelements.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpelements.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtplotter.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtplotter.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtplotter.pri">
-			<Option compilerVar="CC" />
-			<Option compile="1" />
-			<Option link="1" />
+		<Unit filename="application\application.pro" />
+		<Unit filename="application\main.cpp" />
+		<Unit filename="application\mainwindow.cpp" />
+		<Unit filename="application\mainwindow.h" />
+		<Unit filename="application\optionsdialog.cpp" />
+		<Unit filename="application\optionsdialog.h" />
+		<Unit filename="application\optionsdialog.ui" />
+		<Unit filename="application\quickfit3.qrc" />
+		<Unit filename="application\version.h" />
+		<Unit filename="doc\Doxyfile" />
+		<Unit filename="doc\plugins.dox">
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtptools.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqtptools.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqttools.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\jkqttools.h" />
-		<Unit filename="..\..\..\LIB\trunk\qt\qtlogfile.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\qt\qtlogfile.h" />
-		<Unit filename="..\..\..\LIB\trunk\tools.cpp" />
-		<Unit filename="..\..\..\LIB\trunk\tools.h" />
+		<Unit filename="lib\dlg_newproperty.ui" />
+		<Unit filename="lib\dlgnewproperty.cpp" />
+		<Unit filename="lib\dlgnewproperty.h" />
+		<Unit filename="lib\lib.pro" />
+		<Unit filename="lib\programoptions.cpp" />
+		<Unit filename="lib\programoptions.h" />
+		<Unit filename="lib\qehtreeview.cpp" />
+		<Unit filename="lib\qehtreeview.h" />
+		<Unit filename="lib\qfevaluationeditor.cpp" />
+		<Unit filename="lib\qfevaluationeditor.h" />
+		<Unit filename="lib\qfevaluationitem.cpp" />
+		<Unit filename="lib\qfevaluationitem.h" />
+		<Unit filename="lib\qfevaluationitemfactory.cpp" />
+		<Unit filename="lib\qfevaluationitemfactory.h" />
+		<Unit filename="lib\qfevaluationpropertyeditor.cpp" />
+		<Unit filename="lib\qfevaluationpropertyeditor.h" />
+		<Unit filename="lib\qfpluginrawdata.h" />
+		<Unit filename="lib\qfplugintools.h" />
+		<Unit filename="lib\qfproject.cpp" />
+		<Unit filename="lib\qfproject.h" />
+		<Unit filename="lib\qfprojectrawdatamodel.cpp" />
+		<Unit filename="lib\qfprojectrawdatamodel.h" />
+		<Unit filename="lib\qfprojecttreemodel.cpp" />
+		<Unit filename="lib\qfprojecttreemodel.h" />
+		<Unit filename="lib\qfproperties.cpp" />
+		<Unit filename="lib\qfproperties.h" />
+		<Unit filename="lib\qfrawdataeditor.cpp" />
+		<Unit filename="lib\qfrawdataeditor.h" />
+		<Unit filename="lib\qfrawdatapropertyeditor.cpp" />
+		<Unit filename="lib\qfrawdatapropertyeditor.h" />
+		<Unit filename="lib\qfrawdatarecord.cpp" />
+		<Unit filename="lib\qfrawdatarecord.h" />
+		<Unit filename="lib\qfrawdatarecordfactory.cpp" />
+		<Unit filename="lib\qfrawdatarecordfactory.h" />
+		<Unit filename="lib\qfrdrpropertymodel.cpp" />
+		<Unit filename="lib\qfrdrpropertymodel.h" />
+		<Unit filename="lib\qfrdrresultsmodel.cpp" />
+		<Unit filename="lib\qfrdrresultsmodel.h" />
+		<Unit filename="quickfit3.pro" />
+		<Unit filename="..\translations\de.ts" />
+		<Unit filename="..\..\..\LIB\trunk\qt\qtshortcutwidgets.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="..\..\..\lib\trunk\datatable2.cpp" />
+		<Unit filename="..\..\..\lib\trunk\datatable2.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtmathtext.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtmathtext.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpbaseelements.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpbaseelements.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpbaseplotter.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpbaseplotter.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpbaseplotter.qrc" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpdatastorage.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpdatastorage.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpelements.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtpelements.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtplotter.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtplotter.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtptools.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqtptools.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqttools.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\jkqttools.h" />
+		<Unit filename="..\..\..\lib\trunk\qt\qtlogfile.cpp" />
+		<Unit filename="..\..\..\lib\trunk\qt\qtlogfile.h" />
+		<Unit filename="..\..\..\lib\trunk\tools.cpp" />
+		<Unit filename="..\..\..\lib\trunk\tools.h" />
 		<Extensions>
 			<code_completion>
 				<search_path add="$(#qt4)/include" />
