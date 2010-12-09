@@ -65,6 +65,7 @@
 		<ExtraCommands>
 			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 		</ExtraCommands>
+		<Unit filename="application\about.ui" />
 		<Unit filename="application\application.pro" />
 		<Unit filename="application\main.cpp" />
 		<Unit filename="application\mainwindow.cpp" />
@@ -75,6 +76,12 @@
 		<Unit filename="application\quickfit3.qrc" />
 		<Unit filename="application\version.h" />
 		<Unit filename="doc\Doxyfile" />
+		<Unit filename="doc\application.dox" />
+		<Unit filename="doc\lib.dox">
+			<Option compilerVar="CC" />
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Unit filename="doc\plugins.dox">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -94,6 +101,7 @@
 		<Unit filename="lib\qfevaluationitemfactory.h" />
 		<Unit filename="lib\qfevaluationpropertyeditor.cpp" />
 		<Unit filename="lib\qfevaluationpropertyeditor.h" />
+		<Unit filename="lib\qfpluginevaluation.h" />
 		<Unit filename="lib\qfpluginrawdata.h" />
 		<Unit filename="lib\qfplugintools.h" />
 		<Unit filename="lib\qfproject.cpp" />
@@ -117,7 +125,6 @@
 		<Unit filename="lib\qfrdrresultsmodel.cpp" />
 		<Unit filename="lib\qfrdrresultsmodel.h" />
 		<Unit filename="quickfit3.pro" />
-		<Unit filename="..\translations\de.ts" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qtshortcutwidgets.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

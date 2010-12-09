@@ -1,4 +1,16 @@
+/*!
+    \defgroup qf3plugins Plugins
+    \ingroup quickfit3
+
+    \defgroup qf3rawdataplugins Raw Data Record Plugins
+    \ingroup qf3plugins
+
+    \defgroup qf3evaluationplugins Evaluation Plugins
+    \ingroup qf3plugins
+*/
+
 /*! \page plugins Writing Plugins
+    \ingroup qf3plugins
 
     QuickFit 3 is in itself not a fitting application (as the name may suggest), but more or less just a
     data manager. It is based on a very simple and versatile data model:
@@ -16,6 +28,17 @@
            raw data records. The results may either be saved in the evaluation, or written back to the
            raw data record.
          .
+       -# QuickFit provieds a library that bundles all classes needed to write plugins. This library is
+          documented in \link qf3lib QuickFIt Library \endlink. All plugins have to link to this library
+          in order to work properly together with QuickFit.
+       -# QuickFit defines a range of specialized interfaces that QFRawDataRecord classes may wish to implement.
+          They are not necessary, but if you implement them, you can give your QFRawDataRecord descendent a
+          generic interface which some more general evaluations may access. Note that evaluations will have
+          to find out by RTTI which interfaces are implemented. All these interfaces are also registered with
+          the <a href="">QT Interface system</a>, so you can use the QT tools for RTTI. Of course you may also
+          add you own interfaces, but then you will have to make sure that they are available and known to the
+          evaluations working on them.
+
     .
 
     QuickFit is implemented in a way, that you may add new datatypes and evaluations as plugins. It uses
@@ -23,17 +46,18 @@
     find more details about implementing plugins here:
       - \link pluginsrdr Writing QFRawDataRecord Plugins\endlink
       - \link pluginseval Writing QFEvaluationItem Plugins\endlink
-
+    .
 */
 
 /*! \page pluginsrdr Writing QFRawDataRecord Plugins
+    \ingroup qf3plugins
 
     When implementing a new type of raw data record, you will have to follow these steps:
       - create a new Qt plugin project
       - implement a descendent of QFRawDataRecord which implements the desired features. This
         also includes implementing an editor for the data class!
       - implement a plugin class, derived from QFPluginRawDataRecordBase which describes
-        the plugin (name, ID) and provides methods that allow to register hooks used to create
+        the plugin (name, ID, ...) and provides methods that allow to register hooks used to create
         new objects (menu entries ...). Export this class in the plugin.
     .
 
@@ -44,5 +68,6 @@
 
 
 /*! \page pluginseval Writing QFEvaluationItem Plugins
+    \ingroup qf3plugins
 
 */

@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file alias="fcs_open.png">../../images/16x16/fcs_open.png</file>
+    <file alias="fcs_logo.png">../../images/22x22/fcs_open.png</file>
 </qresource>
 </RCC>

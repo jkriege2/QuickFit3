@@ -9,6 +9,7 @@
 
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
+    \ingroup qf3rdrdp_table
 
     The data is stored in a QFTableModel object which is also externally accessible for data access.
  */

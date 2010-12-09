@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="qfrdrfcs" />
+		<Option title="qfevalfcsfit" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
 		<Option compiler="gnu_gcc_compiler_450" />
@@ -16,9 +16,9 @@
 		</MakeCommands>
 		<Build>
 			<Target title="Debug">
-				<Option output="qfrdrfcs" prefix_auto="1" extension_auto="1" />
+				<Option output="qfevalfcsfit" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
-				<Option type="3" />
+				<Option type="1" />
 				<Option compiler="gnu_gcc_compiler_450" />
 				<Option host_application="FCSTOOLS\trunk\QuickFit3\quickfit3.exe" />
 				<Compiler>
@@ -70,23 +70,14 @@
 		<ExtraCommands>
 			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 		</ExtraCommands>
-		<Unit filename="alv5000tools.cpp" />
-		<Unit filename="alv5000tools.h" />
-		<Unit filename="datacutslider.cpp" />
-		<Unit filename="datacutslider.h" />
-		<Unit filename="dlg_csvparameters.ui" />
-		<Unit filename="dlgcsvparameters.cpp" />
-		<Unit filename="dlgcsvparameters.h" />
-		<Unit filename="qfprdrfcs.cpp" />
-		<Unit filename="qfprdrfcs.h" />
-		<Unit filename="qfrdrfcs.pro" />
-		<Unit filename="qfrdrfcs.qrc" />
-		<Unit filename="qfrdrfcscorrelationeditor.cpp" />
-		<Unit filename="qfrdrfcscorrelationeditor.h" />
-		<Unit filename="qfrdrfcsdata.cpp" />
-		<Unit filename="qfrdrfcsdata.h" />
-		<Unit filename="qfrdrfcsrateeditor.cpp" />
-		<Unit filename="qfrdrfcsrateeditor.h" />
+		<Unit filename="qfevalfcsfit.pro" />
+		<Unit filename="qfevalfcsfit.qrc" />
+		<Unit filename="qffcsfitevaluation.cpp" />
+		<Unit filename="qffcsfitevaluation.h" />
+		<Unit filename="qffcsfitevaluationeditor.cpp" />
+		<Unit filename="qffcsfitevaluationeditor.h" />
+		<Unit filename="qfpevalfcsfit.cpp" />
+		<Unit filename="qfpevalfcsfit.h" />
 		<Unit filename="..\..\..\..\..\LIB\trunk\datatable2.cpp" />
 		<Unit filename="..\..\..\..\..\LIB\trunk\datatable2.h" />
 		<Unit filename="..\..\..\..\..\LIB\trunk\qt\jkqtmathtext.cpp" />
@@ -126,9 +117,6 @@
 				<search_path add="$(#qt4)\include\QtWebKit" />
 				<search_path add="$(#qt4)\include\QtXml" />
 				<search_path add="$(#qt4)\include\QtXmlPatterns" />
-				<search_path add="..\..\lib" />
-				<search_path add="..\..\..\..\..\LIB\trunk" />
-				<search_path add="..\..\..\..\..\LIB\trunk\qt" />
 			</code_completion>
 			<envvars />
 			<debugger />

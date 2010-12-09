@@ -15,7 +15,9 @@
 // forward declaration
 class QFRDRFCSData;
 
-/** \brief editor for rate stored in QFRDRFCSData records */
+/*! \brief editor for rate stored in QFRDRFCSData records
+    \ingroup qf3rdrdp_fcs
+*/
 class QFRDRFCSRateEditor : public QFRawDataEditor {
         Q_OBJECT
     protected:

@@ -373,9 +373,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
 }
 
 void QFRDRFCSRateEditor::replotData(int dummy) {
-
     //std::cout<<"repainting ...";
-    writeSettings();
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     if (!m) {
@@ -383,6 +381,8 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
         ds->clear();
         return;
     }
+    //std::cout<<"*QFRDRFCSRateEditor::replotData()\n";
+    //writeSettings();
     plotter->set_emitSignals(false);
     plotter->set_doDrawing(false);
     plotter->clearGraphs();
@@ -425,13 +425,14 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
     //size_t gg=ds->addLinearColumn(10, 1, 10, "");
     //plotter->addGraph(gg, gg, "test");
     //std::cout<<" done!\n";
+    //std::cout<<"*QFRDRFCSRateEditor::replotData() end\n";
 };
 
 
 void QFRDRFCSRateEditor::readSettings() {
-    std::cout<<"QFRDRFCSRateEditor::readSettings()\n";
+    //std::cout<<"QFRDRFCSRateEditor::readSettings()\n";
     if (!settings) return;
-    std::cout<<"QFRDRFCSRateEditor::readSettings()\n";
+    //std::cout<<"QFRDRFCSRateEditor::readSettings()\n";
     plotter->loadSettings(*(settings->getQSettings()), QString("fcsdataeditor/rateplot"));
     splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/ratesplitterSizes")).toByteArray());
     cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/raterun_display"), 0).toInt());
@@ -439,6 +440,8 @@ void QFRDRFCSRateEditor::readSettings() {
     chkDisplayStatistics->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/ratestatistics_display"), false).toBool());
     chkIncludeRate0->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/include_rate0"), true).toBool());
     chkOverlay->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/rate_overlay"), false).toBool());
+
+    replotData();
 };
 
 

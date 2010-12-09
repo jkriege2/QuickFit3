@@ -16,6 +16,12 @@
 #include "../lib/qfplugintools.h"
 
 
+#define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm"
+#define QF_COPYRIGHT "&copy; 2010 by Jan Krieger"
+
+/*! \brief main widget for QuickFit
+    \ingroup qf3app
+*/
 class MainWindow : public QMainWindow, public QFPluginReportWrapper {
         Q_OBJECT
 
@@ -51,11 +57,18 @@ class MainWindow : public QMainWindow, public QFPluginReportWrapper {
         void closeEvent(QCloseEvent *event);
 
     private slots:
+        /** \brief create a new project */
         void newProject();
+        /** \brief display an open project dialog and open the selected project */
         void openProject();
+        /** \brief save current project */
         bool saveProject();
+        /** \brief save current project with a new filename */
         bool saveProjectAs();
+        /** \brief display informaion about QuickFit */
         void about();
+        /** \brief display information about plugins */
+        void aboutPlugins();
         /** \brief emitted when a project element (in the treeview) is doubl-clicked
          *
          * This will open a new window containing the elements properties and data.
@@ -121,6 +134,7 @@ class MainWindow : public QMainWindow, public QFPluginReportWrapper {
         QAction *exitAct;
         QAction *aboutAct;
         QAction *aboutQtAct;
+        QAction *aboutPluginsAct;
         QAction* optionsAct;
         QProgressBar* prgMainProgress;
 
@@ -149,27 +163,20 @@ class MainWindow : public QMainWindow, public QFPluginReportWrapper {
         QString currentProjectDir;
         /** \brief the last rawdata insert directory */
         QString currentRawDataDir;
-        ///** \brief the last FCS fileformat filter */
-        //QString currentFCSFileFormatFilter;
         /** \brief ProgramOptions object used for the application settings */
         ProgramOptions* settings;
-        /*QString column_separator;
-        QString decimal_separator;
-        QString comment_start;
-        QString header_start;*/
-
-        ///** \brief list of functions to call when a QAction is triggered.. */
-        //QList<QFRawDataRecordFactory::QFRawDataRecordUserCreateFunc> qfrdrUserCreateList;
-        /** \brief list of functions to call when a QAction is triggered.. */
-        QList<QFEvaluationItemFactory::QFEvaluationItemUserCreateFunc> qfeiUserCreateList;
 
         /** \brief evaluation item factory */
         QFEvaluationItemFactory* evaluationFactory;
         /** \brief raw data record item factory */
         QFRawDataRecordFactory* rawDataFactory;
 
+        /** \brief return a pointer to the raw data record factry object */
         inline QFRawDataRecordFactory* getRawDataRecordFactory() { return rawDataFactory; };
+        /** \brief return a pointer to the evaluation item factry object */
         inline QFEvaluationItemFactory* getEvaluationItemFactory() { return evaluationFactory; };
+        /** \brief used to store the splash screen pixmap, as given to the constructor. This pixmap may be used for info dialogs. */
+        QPixmap splashPix;
 };
 
 #endif

@@ -27,7 +27,39 @@ void QFPRDRFCS::registerToMenu(QMenu* menu) {
 }
 
 
+void QFPRDRFCS::insertALV5000File(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+    unsigned int cc=1;
+    QString mode="";
+    unsigned int runCount=0;
+    bool crossCorrelation=false;
+    try {
+        ALV_analyze(filename, mode, cc, runCount, crossCorrelation);
+    } catch (std::exception& E) {
+        cc=0;
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1':\n%2").arg(filename).arg(E.what()));
+        reporter->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(E.what()));
 
+    }
+    for (unsigned int i=0; i<cc; i++) {
+        QMap<QString, QVariant> p=paramValues;
+        p["CHANNEL"]=i;
+        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename).fileName()).arg(i), QStringList(filename), p, paramReadonly);
+        if (e->error()) {
+            project->deleteRawData(e->getID());
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1' (channel %3/%4):\n%2").arg(filename).arg(e->errorDescription()).arg(i+1).arg(cc));
+            reporter->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+        }
+    }
+}
+
+void QFPRDRFCS::insertCSVFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName(), QStringList(filename), paramValues, paramReadonly);
+    if (e->error()) {
+        project->deleteRawData(e->getID());
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+        reporter->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+    }
+}
 
 void QFPRDRFCS::insertFCS() {
     if (project) {
@@ -50,8 +82,8 @@ void QFPRDRFCS::insertFCS() {
             p["CSV_COMMENT"]=QString("#");
             // TODO: insert dialog to select CSV properties!
         }
-        QStringList roParams;
-        roParams<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT";
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT";
         QStringList list = files;
         QStringList::Iterator it = list.begin();
         reporter->setProgressRange(0, list.size());
@@ -63,34 +95,9 @@ void QFPRDRFCS::insertFCS() {
                 //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
                 reporter->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
                 if (currentFCSFileFormatFilter==alvf) {
-                    unsigned int cc=1;
-                    QString mode="";
-                    unsigned int runCount=0;
-                    bool crossCorrelation=false;
-                    try {
-                        ALV_analyze(*it, mode, cc, runCount, crossCorrelation);
-                    } catch (std::exception& E) {
-                        cc=0;
-                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1':\n%2").arg(*it).arg(E.what()));
-                        reporter->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(*it).arg(E.what()));
-
-                    }
-                    for (int i=0; i<cc; i++) {
-                        p["CHANNEL"]=i;
-                        QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
-                        if (e->error()) {
-                            project->deleteRawData(e->getID());
-                            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1':\n%2").arg(*it).arg(e->errorDescription()));
-                            reporter->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(*it).arg(e->errorDescription()));
-                        }
-                    }
+                    insertALV5000File(*it, p, paramsReadonly);
                 } else {
-                    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
-                    if (e->error()) {
-                        project->deleteRawData(e->getID());
-                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(*it).arg(e->errorDescription()));
-                        reporter->log_error(tr("Error while importing '%1':\n    %2\n").arg(*it).arg(e->errorDescription()));
-                    }
+                    insertCSVFile(*it, p, paramsReadonly);
                 }
                 //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
                 settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());

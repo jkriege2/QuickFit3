@@ -4,8 +4,9 @@
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qt/jkqtplotter.h"
-
-
+/*! \brief editor class for FCS least-square fits
+    \ingroup qf3evalp_fcsfit
+*/
 class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT
     public:

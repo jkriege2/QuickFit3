@@ -37,7 +37,9 @@ SOURCES += main.cpp \
            ../../../../LIB/trunk/datatable2.cpp \
            optionsdialog.cpp
 
-FORMS =    optionsdialog.ui
+FORMS =    optionsdialog.ui \
+           about.ui \
+           aboutplugins.ui
 
 RESOURCES += quickfit3.qrc \
              ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc

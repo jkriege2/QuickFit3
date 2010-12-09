@@ -15,6 +15,7 @@
 #include <iostream>
 
 /*! \brief this class is used to manage a table of values (QVariant)
+    \ingroup qf3rdrdp_table
 
     This class provides import/export routines for Comma-Separated-Value files (and others):
     \verbatim

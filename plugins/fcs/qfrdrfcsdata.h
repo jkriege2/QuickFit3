@@ -11,7 +11,6 @@
 #include <QPair>
 #include <QList>
 #include <QAction>
-#include "qt/qtlogfile.h"
 #include "qfrawdatarecord.h"
 #include "qfrdrfcscorrelationeditor.h"
 #include "qfrdrfcsrateeditor.h"
@@ -21,6 +20,7 @@
 #include "qfrawdatarecordfactory.h"
 
 /*! \brief manages a FCS dataset
+    \ingroup qf3rdrdp_fcs
 
   Every FCS dataset contains these elements:
     - a set of correlation curves ("runs") and their average and standard deviation (calculated after loading

@@ -1,8 +1,12 @@
 #include "mainwindow.h"
 #include "optionsdialog.h"
+#include "ui_about.h"
+#include "ui_aboutplugins.h"
 
 MainWindow::MainWindow(QSplashScreen* splash)
 {
+    splashPix=splash->pixmap();
+
     rawDataFactory=new QFRawDataRecordFactory(this);
     evaluationFactory=new QFEvaluationItemFactory(this);
 
@@ -60,19 +64,9 @@ void MainWindow::searchAndRegisterPlugins() {
         getRawDataRecordFactory()->registerMenu(sl[i], insertMenu);
     }
 
-    std::cout<<"registering evaluation types: \n";
     sl=getEvaluationItemFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
-        std::cout<<"register("<<sl[i].toStdString()<<")\n";
-        QList<QPair<QAction*, QFEvaluationItemFactory::QFEvaluationItemUserCreateFunc> > l=getEvaluationItemFactory()->registerMenu(sl[i], this, evaluationMenu);
-        std::cout<<"   "<<l.size()<<" actions\n";
-        for (int j=0; j<l.size(); j++) {
-            int k=qfeiUserCreateList.size();
-            qfeiUserCreateList.append(l[j].second);
-            QAction* a=l[j].first;
-            a->setProperty("call_id", k);
-            connect(a, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
-        }
+        getEvaluationItemFactory()->registerMenu(sl[i], evaluationMenu);
     }
 }
 
@@ -168,10 +162,62 @@ bool MainWindow::saveProjectAs() {
 
 
 void MainWindow::about() {
-   QMessageBox::about(this, tr("About QuickFit 3.0"),
-            tr(""));
+    QDialog *widget = new QDialog(this);
+    Ui::About ui;
+    ui.setupUi(widget);
+    QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
+    QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
+    ui_label->setPixmap(splashPix);
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT));
+    widget->exec();
+    delete widget;
 }
 
+
+void MainWindow::aboutPlugins() {
+    QDialog *widget = new QDialog(this);
+    Ui::AboutPlugins ui;
+    ui.setupUi(widget);
+    QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
+
+    QString text=tr("<b>Raw Data Record Plugins:</b><ul>");
+    // gather information about plugins
+    for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
+        QString id=getRawDataRecordFactory()->getIDList().at(i);
+        text+="<li>";
+        text+=QString("<b><img src=\"%2\">&nbsp;%1</b>:").arg(getRawDataRecordFactory()->getName(id)).arg(getRawDataRecordFactory()->getIconFilename(id));
+        text+="<blockquote>";
+        text+=QString("<i>description:</i> %1<br>").arg(getRawDataRecordFactory()->getDescription(id));
+        text+=QString("<i>author:</i> %1<br>").arg(getRawDataRecordFactory()->getAuthor(id));
+        text+=QString("<i>copyright:</i> %1<br>").arg(getRawDataRecordFactory()->getCopyright(id));
+        text+=QString("<i>weblink:</i> %1<br>").arg(getRawDataRecordFactory()->getWeblink(id));
+        text+=QString("<i>file:</i> %1<br>").arg(getRawDataRecordFactory()->getPluginFilename(id));
+        text+=QString("<i>id:</i> %1<br>").arg(id);
+        text+="</blockquote>";
+        text+="</li>";
+    }
+    text+="</ul>";
+    text+=tr("<br><b>Data Evaluation Plugins:</b><ul>");
+    // gather information about plugins
+    for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
+        QString id=getEvaluationItemFactory()->getIDList().at(i);
+        text+="<li>";
+        text+=QString("<b><img src=\"%2\">&nbsp;%1</b>:").arg(getEvaluationItemFactory()->getName(id)).arg(getEvaluationItemFactory()->getIconFilename(id));
+        text+="<blockquote>";
+        text+=QString("<i>description:</i> %1<br>").arg(getEvaluationItemFactory()->getDescription(id));
+        text+=QString("<i>author:</i> %1<br>").arg(getEvaluationItemFactory()->getAuthor(id));
+        text+=QString("<i>copyright:</i> %1<br>").arg(getEvaluationItemFactory()->getCopyright(id));
+        text+=QString("<i>weblink:</i> %1<br>").arg(getEvaluationItemFactory()->getWeblink(id));
+        text+=QString("<i>file:</i> %1<br>").arg(getEvaluationItemFactory()->getPluginFilename(id));
+        text+=QString("<i>id:</i> %1<br>").arg(id);
+        text+="</blockquote>";
+        text+="</li>";
+    }
+    text+="</ul>";
+    ui_textEdit->setText(text);
+    widget->exec();
+    delete widget;
+}
 void MainWindow::createWidgets() {
     spCenter=new QSplitter(Qt::Horizontal, this);
     spCenter->setOrientation(Qt::Horizontal);
@@ -256,6 +302,11 @@ void MainWindow::createActions() {
     aboutAct->setStatusTip(tr("Show the application's About box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
+    aboutPluginsAct = new QAction(QIcon(":/about.png"), tr("About &Plugins"), this);
+    aboutPluginsAct->setStatusTip(tr("Show a list with all registered plugins"));
+    connect(aboutPluginsAct, SIGNAL(triggered()), this, SLOT(aboutPlugins()));
+
+
     aboutQtAct = new QAction(QIcon(":/aboutqt.png"), tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -297,15 +348,14 @@ void MainWindow::createMenus() {
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
+    helpMenu->addAction(aboutPluginsAct);
     helpMenu->addAction(aboutQtAct);
 }
 
 void MainWindow::insertRawData() {
     QVariant id=sender()->property("call_id");
     if (id.isValid() && project) {
-        /*QFRawDataRecordFactory::QFRawDataRecordUserCreateFunc f=qfrdrUserCreateList[id.toInt()];
-        f(project, settings, this, logFileProjectWidget, statusBar(), prgMainProgress);*/
-        getRawDataRecordFactory()->createRecord(id.toString(), project);
+         getRawDataRecordFactory()->createRecord(id.toString(), project);
     }
     tvMain->expandToDepth(2);
     prgMainProgress->setRange(0,1);
@@ -317,9 +367,8 @@ void MainWindow::insertEvaluation() {
     QVariant id=sender()->property("call_id");
     //std::cout<<"insertEvaluation("<<id.toString().toStdString()<<")\n";
     if (id.isValid() && project) {
-        QFEvaluationItemFactory::QFEvaluationItemUserCreateFunc f=qfeiUserCreateList[id.toInt()];
-        f(project, settings, this, logFileProjectWidget, statusBar(), prgMainProgress);
-    }
+        getEvaluationItemFactory()->createRecord(id.toString(), project);
+     }
     tvMain->expandToDepth(2);
     prgMainProgress->setRange(0,1);
     prgMainProgress->setValue(0);
@@ -398,7 +447,13 @@ void MainWindow::writeSettings() {
     //settings->getQSettings()->setValue("csvimport/header_start", header_start);
     settings->getQSettings()->sync();
 
-
+    for (int i=0; i<rawDataPropEditors.size(); i++) {
+        rawDataPropEditors[i]->writeSettings();
+    }
+    for (int i=0; i<evaluationPropEditors.size(); i++) {
+        evaluationPropEditors[i]->writeSettings();
+    }
+    settings->getQSettings()->sync();
 
 }
 
@@ -491,6 +546,9 @@ bool MainWindow::saveProject(const QString &fileName) {
     logFileProjectWidget->log_text(tr("saving project file '%1' ...\n").arg(fileName));
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (project) {
+
+        writeSettings();
+
         tvMain->setModel(NULL);
         for (int i=0; i<rawDataPropEditors.size(); i++) {
             if (rawDataPropEditors[i]) rawDataPropEditors[i]->writeSettings();

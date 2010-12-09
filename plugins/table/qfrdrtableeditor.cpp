@@ -138,7 +138,7 @@ void QFRDRTableEditor::rawDataChanged() {
 
 void QFRDRTableEditor::readSettings() {
     if (settings) {
-        std::cout<<"QFRDRTableEditor::readSettings()\n";
+        //std::cout<<"QFRDRTableEditor::readSettings()\n";
         currentTableDir=settings->getQSettings()->value("rawtableeditor/currentTableDir", currentTableDir).toString();
     }
 }

@@ -16,7 +16,7 @@
 
 /*!
     \defgroup quickfit2ALV ALV-5000 Data File (ACSII) Import
-    \ingroup quickfit2
+    \ingroup qf3rdrdp_fcs
 
     This group contains methods, structs and enums that are used to import ALV-5000 data files.
 

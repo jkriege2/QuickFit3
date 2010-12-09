@@ -6,9 +6,10 @@
 #include "ui_dlg_csvparameters.h"
 
 
-/** \brief Dialog which allows to enter the parameters needed to import a CSV file (separators)
- *
- * After the dialog has been successfully closed, you may read the public properties
+/*! \brief Dialog which allows to enter the parameters needed to import a CSV file (separators)
+    \ingroup qf3rdrdp_fcs
+
+ After the dialog has been successfully closed, you may read the public properties
  column_separator, decimal_separator, comment_start and header_start which contain the values
  entered in the dialog. The dialog also does basic error checking (the first three properties may not have
  the same value).

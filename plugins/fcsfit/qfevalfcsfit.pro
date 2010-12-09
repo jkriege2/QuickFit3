@@ -2,18 +2,16 @@ TEMPLATE = lib
 CONFIG += plugin
 
 
-TARGET = qfrdrfcs
+TARGET = qfevalfcsfit
 DEPENDPATH += ./
 DLLDESTDIR = ../../output/plugins
 DESTDIR = ./
-LIBS += -L../../lib/ -lquickfit3lib
+LIBS += -L../../lib/ -lquickfit3lib -L../fcs/ -lqfrdrfcs
 
 # Input
-HEADERS += dlgcsvparameters.h \
-           alv5000tools.h \
-           qfrdrfcscorrelationeditor.h \
-           qfrdrfcsdata.h \
-           qfrdrfcsrateeditor.h \
+HEADERS += qfpevalfcsfit.h \
+           qffcsfitevaluation.h \
+           qffcsfitevaluationeditor.h \
            ../../../../../LIB/trunk/tools.h \
            ../../../../../LIB/trunk/datatable2.h \
            ../../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
@@ -23,15 +21,11 @@ HEADERS += dlgcsvparameters.h \
            ../../../../../LIB/trunk/qt/jkqtpbaseelements.h \
            ../../../../../LIB/trunk/qt/jkqtplotter.h \
            ../../../../../LIB/trunk/qt/jkqtptools.h \
-           ../../../../../LIB/trunk/qt/jkqttools.h \
-           datacutslider.h \
-		   qfprdrfcs.h
+           ../../../../../LIB/trunk/qt/jkqttools.h
 
-SOURCES += dlgcsvparameters.cpp \
-           alv5000tools.cpp \
-           qfrdrfcscorrelationeditor.cpp \
-           qfrdrfcsdata.cpp \
-           qfrdrfcsrateeditor.cpp \
+SOURCES += qfpevalfcsfit.cpp \
+           qffcsfitevaluation.cpp \
+           qffcsfitevaluationeditor.cpp \
            ../../../../../LIB/trunk/tools.cpp \
            ../../../../../LIB/trunk/datatable2.cpp \
            ../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -41,13 +35,11 @@ SOURCES += dlgcsvparameters.cpp \
            ../../../../../LIB/trunk/qt/jkqtpbaseelements.cpp \
            ../../../../../LIB/trunk/qt/jkqtplotter.cpp \
            ../../../../../LIB/trunk/qt/jkqtptools.cpp \
-           ../../../../../LIB/trunk/qt/jkqttools.cpp \
-           datacutslider.cpp \
-		   qfprdrfcs.cpp
+           ../../../../../LIB/trunk/qt/jkqttools.cpp
 
-FORMS = dlg_csvparameters.ui
+FORMS =
 
-RESOURCES += qfrdrfcs.qrc
+RESOURCES += qfevalfcsfit.qrc
 
 TRANSLATIONS= ../../output/translations/de.ts
 

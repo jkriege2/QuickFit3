@@ -12,8 +12,9 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include "qfrawdataeditor.h"
-
-
+/*! \brief editor class for tables
+    \ingroup qf3rdrdp_table
+*/
 class QFRDRTableEditor : public QFRawDataEditor {
         Q_OBJECT
     public:

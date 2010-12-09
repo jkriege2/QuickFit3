@@ -140,7 +140,7 @@ void QFRDRFCSData::calcBinnedRate() {
 
 void QFRDRFCSData::recalculateCorrelations() {
     if (correlationN<=0 || correlationRuns<=0 || !correlation || !correlationMean || !correlationStdDev) {
-        std::cout<<"error at start of recalculateCorrelations()\n";
+       // std::cout<<"error at start of recalculateCorrelations()\n";
         return;
     }
     for (unsigned long long i=0; i<correlationN; i++) {
@@ -149,8 +149,9 @@ void QFRDRFCSData::recalculateCorrelations() {
         double cnt=0;
         for (unsigned int run=0; run<correlationRuns; run++) {
             if (!leaveoutRun(run)) {
-                m=m+correlation[run*correlationN+i];
-                s=s+m*m;
+                double c=correlation[run*correlationN+i];
+                m=m+c;
+                s=s+c*c;
                 cnt=cnt+1.0;
             }
         }
@@ -164,7 +165,7 @@ void QFRDRFCSData::recalculateCorrelations() {
 
 double QFRDRFCSData::calcRateMean(unsigned int run) {
     if (rateN<=0 || !rate) {
-        std::cout<<"error at start of recalculateCorrelations()\n";
+       // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
     }
     double m=0.0;
@@ -178,7 +179,7 @@ double QFRDRFCSData::calcRateMean(unsigned int run) {
 
 double QFRDRFCSData::calcRateStdDev(unsigned int run) {
     if (rateN<=0 || !rate) {
-        std::cout<<"error at start of recalculateCorrelations()\n";
+       // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
     }
     double m=0.0;
@@ -195,7 +196,7 @@ double QFRDRFCSData::calcRateStdDev(unsigned int run) {
 
 void QFRDRFCSData::calcRateMinMax(unsigned int run, double& min, double& max) {
     if (rateN<=0 || !rate) {
-        std::cout<<"error at start of recalculateCorrelations()\n";
+       // std::cout<<"error at start of recalculateCorrelations()\n";
         return;
     }
     min=max=0;
@@ -505,12 +506,12 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
     }
     fclose(alv_file);
 
-    std::cout<<"recalc correlations ..."<<std::endl;
+   // std::cout<<"recalc correlations ..."<<std::endl;
     recalculateCorrelations();
 
-    std::cout<<"calc binned rates ..."<<std::endl;
+   // std::cout<<"calc binned rates ..."<<std::endl;
     calcBinnedRate();
-    std::cout<<"DONE !!!"<<std::endl;
+    //std::cout<<"DONE !!!"<<std::endl;
     emit rawDataChanged();
     return true;
 }

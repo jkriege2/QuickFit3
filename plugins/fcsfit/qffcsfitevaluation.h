@@ -2,9 +2,12 @@
 #define QFFCSFITEVALUATION_H
 
 #include "qfevaluationitem.h"
-#include "qfrdrfcsdata.h"
+#include "../fcs/qfrdrfcsdata.h"
 #include "qfevaluationitemfactory.h"
 
+/*! \brief evaluation item class for FCS least square fits
+    \ingroup qf3evalp_fcsfit
+*/
 class QFFCSFitEvaluation : public QFEvaluationItem {
         Q_OBJECT
     public:
@@ -44,11 +47,5 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         virtual void intReadData(QDomElement* e);
     private:
 };
-
-QFEvaluationItem* createQFFCSFit(QFProject* parent);
-
-void insertQFFCSFit(QFProject* project, ProgramOptions* options, QWidget* parent, QtLogFile* logWidget, QStatusBar* statusbar, QProgressBar* progressBar);
-
-QList<QPair<QAction*, QFEvaluationItemFactory::QFEvaluationItemUserCreateFunc> > registerQFFCSFitMenu(QWidget* parent, QMenu* menu);
 
 #endif // QFFCSFITEVALUATION_H

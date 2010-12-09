@@ -5,7 +5,9 @@
 #include "ui_optionsdialog.h"
 #include "../lib/programoptions.h"
 
-
+/*! \brief options dialog wrapper class for QuickFit
+    \ingroup qf3app
+*/
 class OptionsDialog : public QDialog, public Ui::OptionsDlg {
         Q_OBJECT
     public:

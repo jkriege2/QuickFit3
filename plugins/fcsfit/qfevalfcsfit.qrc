@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="fcs_fit.png">../../images/16x16/fcs_fit.png</file>
+    <file alias="fcs_fit_logo.png">../../images/22x22/fcs_fit.png</file>
+</qresource>
+</RCC>
