@@ -27,6 +27,8 @@ class dlgCSVParameters : public QDialog, private Ui::dlgCSVParameters
         char decimal_separator;
         char comment_start;
         QString header_start;
+        /** \brief display a preview of the file */
+        void setFileContents(const QString& filename);
     protected:
     private:
     private slots:

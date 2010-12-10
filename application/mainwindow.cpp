@@ -448,10 +448,10 @@ void MainWindow::writeSettings() {
     settings->getQSettings()->sync();
 
     for (int i=0; i<rawDataPropEditors.size(); i++) {
-        rawDataPropEditors[i]->writeSettings();
+        if (rawDataPropEditors[i]) rawDataPropEditors[i]->writeSettings();
     }
     for (int i=0; i<evaluationPropEditors.size(); i++) {
-        evaluationPropEditors[i]->writeSettings();
+        if (evaluationPropEditors[i]) evaluationPropEditors[i]->writeSettings();
     }
     settings->getQSettings()->sync();
 

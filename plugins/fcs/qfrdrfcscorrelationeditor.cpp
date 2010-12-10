@@ -173,8 +173,12 @@ void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     if (m) {
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
+        sliders->disableSliderSignals();
         sliders->set_min(0);
         sliders->set_max(m->getCorrelationN());
+        sliders->set_userMin(current->getProperty("fcscorreditor_datacut_min", 0).toInt());
+        sliders->set_userMax(current->getProperty("fcscorreditor_datacut_max", m->getCorrelationN()).toInt());
+        sliders->enableSliderSignals();
     } else {
 //        runs.setCurrent(current);
     }
@@ -202,6 +206,9 @@ void QFRDRFCSCorrelationEditor::rawDataChanged() {
 };
 
 void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+    if (!current) return;
+    current->setQFProperty("fcscorreditor_datacut_min", userMin, false, false);
+    current->setQFProperty("fcscorreditor_datacut_max", userMax, false, false);
     replotData();
 }
 
@@ -216,10 +223,10 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
         return;
     }
     //writeSettings();
+    plotter->set_doDrawing(false);
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
     plotter->set_emitSignals(false);
-    plotter->set_doDrawing(false);
     plotter->clearGraphs();
     ds->clear();
     //m->getProject()->setIntProperty();
@@ -338,12 +345,12 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
         }
     //std::cout<<"repainting ... 4\n";
 
-        plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(), !chkLogTauAxis->isChecked());
+        plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(), false);
     //std::cout<<"repainting ... 5\n";
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
     //std::cout<<"repainting ... 6\n";
-        plotter->getXAxis()->set_axisLabel(tr("lag time \\tau [{\\mu}s]"));
-        plotter->getYAxis()->set_axisLabel(tr("correlation function g(\\tau)"));
+        plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [{\\mu}s]"));
+        plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
     //std::cout<<"repainting ... 7\n";
         plotter->zoomToFit(true, true, false,false);
     //std::cout<<"repainting ... 8\n";
@@ -365,24 +372,7 @@ void QFRDRFCSCorrelationEditor::readSettings() {
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/log_tau_axis"), true).toBool());
     cmbAverageErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/error_display"), 2).toInt());
     cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_display"), 0).toInt());
-    if (current) {
-        //std::cout<<"  --current id="<<peID<<"\n";
-        //std::cout<<"    --"<<current->getProject()->getProperty(QString("fcsdataeditor%1/run_display").arg(peID),
-        //                               settings->getQSettings(),QString("fcsdataeditor/run_display"),
-        //                               2).toInt()<<std::endl;
-        cmbRunDisplay->setCurrentIndex(current->getProject()->getProperty(QString("fcsdataeditor%1/run_display").arg(peID),
-                                       settings->getQSettings(),QString("fcsdataeditor/run_display"),
-                                       2).toInt());
-        cmbAverageErrors->setCurrentIndex(current->getProject()->getProperty(QString("fcsdataeditor%1/error_display").arg(peID),
-                                       settings->getQSettings(),QString("fcsdataeditor/error_display"),
-                                       0).toInt());
-        chkLogTauAxis->setChecked(current->getProject()->getProperty(QString("fcsdataeditor%1/log_tau_axis").arg(peID),
-                                       settings->getQSettings(),QString("fcsdataeditor/log_tau_axis"),
-                                       true).toBool());
-        splitter->restoreState(current->getProject()->getProperty(QString("fcsdataeditor%1/corrsplitterSizes").arg(peID),
-                                       settings->getQSettings(),QString("fcsdataeditor/corrsplitterSizes"),
-                                       QString("")).toByteArray());
-    }
+
 };
 
 
@@ -394,13 +384,6 @@ void QFRDRFCSCorrelationEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("fcsdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/error_display"), cmbAverageErrors->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/run_display"), cmbRunDisplay->currentIndex());
-    if (current) {
-        //std::cout<<"  --current id="<<peID<<"\n";
-        current->getProject()->setQFProperty(QString("fcsdataeditor%1/error_display").arg(peID), cmbAverageErrors->currentIndex(), false, false);
-        current->getProject()->setQFProperty(QString("fcsdataeditor%1/run_display").arg(peID), cmbRunDisplay->currentIndex(), false, false);
-        current->getProject()->setQFProperty(QString("fcsdataeditor%1/corrsplitterSizes").arg(peID), splitter->saveState(), false, false);
-        current->getProject()->setQFProperty(QString("fcsdataeditor%1/log_tau_axis").arg(peID), chkLogTauAxis->isChecked(), false, false);
-    }
 };
 
 

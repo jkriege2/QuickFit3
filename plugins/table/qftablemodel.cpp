@@ -13,9 +13,20 @@ QFTableModel::~QFTableModel()
     //dtor
 }
 
+int QFTableModel::rowCount(const QModelIndex &parent) const {
+    //std::cout<<"rowCount: "<<rows<<"\n";
+    return rows;
+};
+int QFTableModel::columnCount(const QModelIndex &parent) const {
+    //std::cout<<"columnCount: "<<columns<<"\n";
+    return columns;
+};
+
+
 QVariant QFTableModel::data(const QModelIndex &index, int role) const {
     if (index.isValid()) {
         quint32 a=xyAdressToUInt32(index.row(), index.column());
+        //std::cout<<"QFTableModel::data("<<a<<")"<<std::endl;
         if (role == Qt::DisplayRole || role == Qt::EditRole) {
             if (dataMap.contains(a)) return dataMap[a];
         }
@@ -299,6 +310,16 @@ bool QFTableModel::saveCSV(const QString& filename, QString column_separator, ch
     return true;
 }
 
+/*bool QFTableModel::readCSV(const QString& filename, const QString& column_separator, const QString& decimal_separator, const QString& header_start, const QString& comment_start) {
+    char ccolumn_separator=',';
+    char cdecimal_separator='.';
+    char ccomment_start='#';
+    if (column_separator.size()>0) ccolumn_separator=column_separator[0].toAscii();
+    if (decimal_separator.size()>0) cdecimal_separator=decimal_separator[0].toAscii();
+    if (comment_start.size()>0) ccomment_start=comment_start[0].toAscii();
+    return readCSV(filename, ccolumn_separator, cdecimal_separator, header_start, ccomment_start);
+}*/
+
 bool QFTableModel::readCSV(const QString& filename, char column_separator, char decimal_separator, QString header_start, char comment_start) {
     // try output file
     QFile file(filename);
@@ -316,85 +337,89 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
         bool dataread=false;
         line=line.trimmed();
         //std::cout<<"read: <"<<line.toStdString()<<">\n";
-        if (line.startsWith(header_start)) {
-            header_read=true;
-            line=line.right(line.size()-header_start.size()).trimmed();
-            QStringList sl=line.split(QString(column_separator));
-            columns=(columns>sl.size())?columns:sl.size();
-            resize(rows, columns);
-            columnNames.clear();
-            for (int i=0; i<sl.size(); i++) {
-                QString n=sl[i].trimmed();
-                if (n[0]=='\"' || n[0]=='\'') {
-                    n=n.mid(1, n.size()-2);
+        if (line.size()>0) {
+            if (line.startsWith(header_start)) {
+                header_read=true;
+                line=line.right(line.size()-header_start.size()).trimmed();
+                QStringList sl=line.split(QString(column_separator));
+                columns=(columns>sl.size())?columns:sl.size();
+                resize(rows, columns);
+                columnNames.clear();
+                for (int i=0; i<sl.size(); i++) {
+                    QString n=sl[i].trimmed();
+                    if (n[0]=='\"' || n[0]=='\'') {
+                        n=n.mid(1, n.size()-2);
+                    }
+                    columnNames.append(n);
                 }
-                columnNames.append(n);
-            }
-        } else if (!line.startsWith(comment_start)) {
-            int i=0;
-            while (i<line.size()) {
-                QChar c=line[i];
-                if (c=='\'') {
-                    i++;
-                    QString s="";
-                    while (i<line.size() && line[i]!='\'') {
-                        if (line[i]!='\'') s=s+line[i];
+            } else if (!line.startsWith(comment_start)) {
+                int i=0;
+                while (i<line.size()) {
+                    QChar c=line[i];
+                    if (c=='\'') {
                         i++;
-                    }
-                    resize(rows, columns);
-                    setCell(row, column, s);
-                    //std::cout<<"  <"<<row<<", "<<column<<">="<<s.toStdString()<<"\n";
-                    dataread=true;
-                } else if (c=='\"') {
-                    i++;
-                    QString s="";
-                    while (i<line.size() && line[i]!='\"') {
-                        if (line[i]!='\"') s=s+line[i];
-                        i++;
-                    }
-                    resize(rows, columns);
-                    setCell(row, column, s);
-                    //std::cout<<"  <"<<row<<", "<<column<<">="<<s.toStdString()<<"\n";
-                    dataread=true;
-                } else if (c==comment_start) {
-                    i=line.size();
-                } else if (c==column_separator) {
-                    column++;
-                } else if ((c=='-') || (c=='+') || (c==decimal_separator) || (c>='0' && c<='9')) {
-                    QString s="";
-                    while (i<line.size() && line[i]!=column_separator) {
-                        QChar cc=line[i];
-                        if ((cc=='-') || (cc=='+') ||
-                            (cc=='0') || (cc=='1') || (cc=='2') || (cc=='3') || (cc=='4') || (cc=='5') || (cc=='6') || (cc=='7') || (cc=='8') || (cc=='9') ||
-                            (cc=='E') || (cc=='e')) s=s+cc;
-                        if (cc==decimal_separator) s=s+'.';
-                        i++;
-                    }
-                    if (i<line.size()) i--;
-                    bool ok=false;
-                    double d=QLocale::c().toDouble(s, &ok);
-                    if (ok) {
-                        if (d==round(d)) {
-                            setCell(row, column, ((qlonglong)d));
-                            //std::cout<<"  <"<<row<<", "<<column<<">="<<(qlonglong)d<<"\n";
-                            dataread=true;
-                        } else {
-                            setCell(row, column, d);
-                            //std::cout<<"  <"<<row<<", "<<column<<">="<<d<<"\n";
-                            dataread=true;
+                        QString s="";
+                        while (i<line.size() && line[i]!='\'') {
+                            if (line[i]!='\'') s=s+line[i];
+                            i++;
                         }
-                    } else {
-                        QDateTime dt=QLocale::c().toDateTime(s);
-                        if (dt.isValid()) {
-                            setCell(row, column, dt);
-                            dataread=true;
+                        resize(rows, columns);
+                        setCell(row, column, s);
+                        //std::cout<<"  <"<<row<<", "<<column<<">="<<s.toStdString()<<"\n";
+                        dataread=true;
+                    } else if (c=='\"') {
+                        i++;
+                        QString s="";
+                        while (i<line.size() && line[i]!='\"') {
+                            if (line[i]!='\"') s=s+line[i];
+                            i++;
+                        }
+                        resize(rows, columns);
+                        setCell(row, column, s);
+                        //std::cout<<"  <"<<row<<", "<<column<<">="<<s.toStdString()<<"\n";
+                        dataread=true;
+                    } else if (c==comment_start) {
+                        i=line.size();
+                    } else if (c==column_separator) {
+                        column++;
+                    } else if ((c=='-') || (c=='+') || (c==decimal_separator) || (c>='0' && c<='9')) {
+                        QString s="";
+                        while (i<line.size() && line[i]!=column_separator) {
+                            QChar cc=line[i];
+                            if ((cc=='-') || (cc=='+') ||
+                                (cc=='0') || (cc=='1') || (cc=='2') || (cc=='3') || (cc=='4') || (cc=='5') || (cc=='6') || (cc=='7') || (cc=='8') || (cc=='9') ||
+                                (cc=='E') || (cc=='e')) s=s+cc;
+                            if (cc==decimal_separator) s=s+'.';
+                            i++;
+                        }
+                        if (i<line.size()) i--;
+                        bool ok=false;
+                        double d=QLocale::c().toDouble(s, &ok);
+                        if (ok) {
+                            resize(rows, columns);
+                            if (d==round(d)) {
+                                setCell(row, column, ((qlonglong)d));
+                                //std::cout<<"  <"<<row<<"/"<<rows<<", "<<column<<"/"<<columns<<">="<<(qlonglong)d<<"\n";
+                                dataread=true;
+                            } else {
+                                setCell(row, column, d);
+                                //std::cout<<"  <"<<row<<"/"<<rows<<", "<<column<<"/"<<columns<<">="<<d<<"\n";
+                                dataread=true;
+                            }
                         } else {
-                            setCell(row, column, s);
-                            dataread=true;
+                            QDateTime dt=QLocale::c().toDateTime(s);
+                            resize(rows, columns);
+                            if (dt.isValid()) {
+                                setCell(row, column, dt);
+                                dataread=true;
+                            } else {
+                                setCell(row, column, s);
+                                dataread=true;
+                            }
                         }
                     }
+                    i++;
                 }
-                i++;
             }
         }
         line = in.readLine();
@@ -404,9 +429,11 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
         column=0;
     } ;
 
-    std::cout<<"rows="<<rows<<"   columns="<<columns<<std::endl;
-
+    //std::cout<<"rows="<<rows<<"   columns="<<columns<<std::endl;
+    this->rows=rows;
+    this->columns=columns;
     readonly=ro;
+    reset();
     return true;
 
 }

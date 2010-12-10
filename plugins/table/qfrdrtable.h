@@ -54,13 +54,13 @@ class QFRDRTable : public QFRawDataRecord {
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
         QStringList getExportFiletypes() {
             QStringList sl;
-            sl << "CSV" << "SYLK" << "DIF";
+            sl << "CSV" << "SSV" << "GERMANEXCEL" << "SYLK";
             return sl;
         };
         /** \brief returns the title of the Export file dialog */
         QString getExportDialogTitle() { return tr("Export Data Table ..."); };
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;SYLK File (*.sylk, *.slk);;DIF File (*.dif)"); };
+        QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk)"); };
     protected slots:
         void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {
             emit rawDataChanged();

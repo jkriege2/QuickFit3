@@ -446,7 +446,7 @@ void QFRDRFCSRateEditor::readSettings() {
 
 
 void QFRDRFCSRateEditor::writeSettings() {
-    std::cout<<"QFRDRFCSRateEditor::writeSettings()\n";
+    //std::cout<<"QFRDRFCSRateEditor::writeSettings()\n";
     if (!settings) return;
     plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/rateplot"));
     settings->getQSettings()->setValue(QString("fcsdataeditor/ratesplitterSizes"), splitter->saveState());

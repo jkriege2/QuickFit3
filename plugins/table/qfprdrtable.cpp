@@ -45,47 +45,50 @@ void QFPRDRTable::insertTable() {
 
 void QFPRDRTable::insertTableFile() {
     if (project) {
+        QStringList files = QFileDialog::getOpenFileNames(parentWidget, tr("Select Table File(s) to Import ..."), settings->getCurrentRawDataDir(), tr("Comma Separated Value Files (*.txt *.dat *.csv);;All Files (*.*)"));
+        QStringList list = files;
+        if (list.size()>0) {
 
-        dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("table/column_separator", ",").toString(),
-                                                              settings->getQSettings()->value("table/decimal_separator", ".").toString(),
-                                                      settings->getQSettings()->value("table/comment_start", "#").toString(),
-                                                      settings->getQSettings()->value("table/header_start", "#!").toString());
-        if (csvDlg->exec()==QDialog::Accepted) {
-            QMap<QString, QVariant> p;
-            p["column_separator"]=QString(csvDlg->column_separator);
-            p["decimal_separator"]=QString(csvDlg->decimal_separator);
-            p["comment_start"]=QString(csvDlg->comment_start);
-            p["header_start"]=QString(csvDlg->header_start);
-            settings->getQSettings()->setValue("table/column_separator", QString(csvDlg->column_separator));
-            settings->getQSettings()->setValue("table/decimal_separator", QString(csvDlg->decimal_separator));
-            settings->getQSettings()->setValue("table/comment_start", QString(csvDlg->comment_start));
-            settings->getQSettings()->setValue("table/header_start", QString(csvDlg->header_start));
+            dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("table/column_separator", ",").toString(),
+                                                                  settings->getQSettings()->value("table/decimal_separator", ".").toString(),
+                                                          settings->getQSettings()->value("table/comment_start", "#").toString(),
+                                                          settings->getQSettings()->value("table/header_start", "#!").toString());
+            csvDlg->setFileContents(list[0]);
+            if (csvDlg->exec()==QDialog::Accepted) {
+                QMap<QString, QVariant> p;
+                p["column_separator"]=QString(csvDlg->column_separator);
+                p["decimal_separator"]=QString(csvDlg->decimal_separator);
+                p["comment_start"]=QString(csvDlg->comment_start);
+                p["header_start"]=QString(csvDlg->header_start);
+                settings->getQSettings()->setValue("table/column_separator", QString(csvDlg->column_separator));
+                settings->getQSettings()->setValue("table/decimal_separator", QString(csvDlg->decimal_separator));
+                settings->getQSettings()->setValue("table/comment_start", QString(csvDlg->comment_start));
+                settings->getQSettings()->setValue("table/header_start", QString(csvDlg->header_start));
 
-            QStringList roParams;
-            roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                QStringList roParams;
+                roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
 
-            QStringList files = QFileDialog::getOpenFileNames(parentWidget, tr("Select Table File(s) to Import ..."), settings->getCurrentRawDataDir(), tr("Comma Separated Value Files (*.txt *.dat *.csv);;All Files (*.*)"));
-            QStringList list = files;
-            QStringList::Iterator it = list.begin();
-            reporter->setProgressRange(0, list.size());
-            int i=0;
-            while(it != list.end()) {
-                i++;
-                reporter->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->column_separator)).arg(QString(csvDlg->decimal_separator)).arg(QString(csvDlg->comment_start)).arg(QString(csvDlg->header_start)));
-                QFRawDataRecord* e=project->addRawData("table", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
-                if (e->error()) {
-                    project->deleteRawData(e->getID());
-                    QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(*it).arg(e->errorDescription()));
-                    reporter->log_error(tr("Error while importing '%1':\n    %2\n").arg(*it).arg(e->errorDescription()));
+                QStringList::Iterator it = list.begin();
+                reporter->setProgressRange(0, list.size());
+                int i=0;
+                while(it != list.end()) {
+                    i++;
+                    reporter->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->column_separator)).arg(QString(csvDlg->decimal_separator)).arg(QString(csvDlg->comment_start)).arg(QString(csvDlg->header_start)));
+                    QFRawDataRecord* e=project->addRawData("table", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
+                    if (e->error()) {
+                        project->deleteRawData(e->getID());
+                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(*it).arg(e->errorDescription()));
+                        reporter->log_error(tr("Error while importing '%1':\n    %2\n").arg(*it).arg(e->errorDescription()));
+                    }
+                    settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+                    ++it;
+                    reporter->setProgress(i);
+                    QApplication::processEvents();
                 }
-                settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
-                ++it;
-                reporter->setProgress(i);
-                QApplication::processEvents();
+                reporter->setProgress(0);
             }
-            reporter->setProgress(0);
+            delete csvDlg;
         }
-        delete csvDlg;
     }
 }
 

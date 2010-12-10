@@ -77,14 +77,8 @@ class QFTableModel : public QAbstractTableModel {
         virtual QVariant data(const QModelIndex &index, int role) const;
         virtual Qt::ItemFlags flags(const QModelIndex &index) const;
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const {
-            //std::cout<<"rowCount: "<<rows<<"\n";
-            return rows;
-        };
-        virtual int columnCount(const QModelIndex &parent = QModelIndex()) const {
-            //std::cout<<"columnCount: "<<columns<<"\n";
-            return columns;
-        };
+        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+        virtual int columnCount(const QModelIndex &parent = QModelIndex()) const ;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
         inline bool isReadonly() const { return readonly; };
@@ -128,6 +122,7 @@ class QFTableModel : public QAbstractTableModel {
          *
          */
         bool readCSV(const QString& filename, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#');
+        //bool readCSV(const QString& filename, const QString& column_separator, const QString& decimal_separator, const QString& header_start, const QString& comment_start);
     public slots:
         /** \brief append a new row */
         inline void appendRow() { resize(rows+1, columns); }

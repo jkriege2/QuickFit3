@@ -2,11 +2,11 @@
 <quickfitproject quickfit_version="3.0" name="unnamed" creator="">
     <description><![CDATA[]]></description>
     <properties>
-        <property name="fcsdataeditor0/corrsplitterSizes" type="bytearray" data="000000ff0000000000000002000003640000011201000000050100000001" usereditable="false"/>
+        <property name="fcsdataeditor0/corrsplitterSizes" type="bytearray" usereditable="false"/>
         <property name="fcsdataeditor0/error_display" type="int" data="2" usereditable="false"/>
         <property name="fcsdataeditor0/log_tau_axis" type="bool" data="true" usereditable="false"/>
         <property name="fcsdataeditor0/run_display" type="int" data="2" usereditable="false"/>
-        <property name="fcsdataeditor1/corrsplitterSizes" type="bytearray" data="000000ff0000000000000002000003640000011201000000050100000001" usereditable="false"/>
+        <property name="fcsdataeditor1/corrsplitterSizes" type="bytearray" usereditable="false"/>
         <property name="fcsdataeditor1/error_display" type="int" data="3" usereditable="false"/>
         <property name="fcsdataeditor1/log_tau_axis" type="bool" data="false" usereditable="false"/>
         <property name="fcsdataeditor1/run_display" type="int" data="4" usereditable="false"/>
@@ -59,6 +59,8 @@
                 <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+                <property name="fcscorreditor_datacut_max" type="int" data="138" usereditable="false"/>
+                <property name="fcscorreditor_datacut_min" type="int" data="8" usereditable="false"/>
             </properties>
             <results/>
             <files>
@@ -84,8 +86,213 @@
             <properties/>
             <results/>
             <data>
-                <column title="">
-                    <row type="QString" value=""/>
+                <column title="0">
+                    <row type="double" value="2e-06"/>
+                    <row type="double" value="3e-06"/>
+                    <row type="double" value="4e-06"/>
+                    <row type="double" value="5e-06"/>
+                    <row type="double" value="6e-06"/>
+                    <row type="double" value="7e-06"/>
+                    <row type="double" value="8e-06"/>
+                    <row type="double" value="9e-06"/>
+                    <row type="double" value="1e-05"/>
+                    <row type="double" value="1.1e-05"/>
+                    <row type="double" value="1.2e-05"/>
+                    <row type="double" value="1.8e-05"/>
+                    <row type="double" value="2.4e-05"/>
+                    <row type="double" value="3e-05"/>
+                    <row type="double" value="3.6e-05"/>
+                    <row type="double" value="4.2e-05"/>
+                    <row type="double" value="4.8e-05"/>
+                    <row type="double" value="5.4e-05"/>
+                    <row type="double" value="6e-05"/>
+                    <row type="double" value="6.6e-05"/>
+                    <row type="double" value="7.2e-05"/>
+                    <row type="double" value="0.000108"/>
+                    <row type="double" value="0.000144"/>
+                    <row type="double" value="0.00018"/>
+                    <row type="double" value="0.000216"/>
+                    <row type="double" value="0.000252"/>
+                    <row type="double" value="0.000288"/>
+                    <row type="double" value="0.000324"/>
+                    <row type="double" value="0.00036"/>
+                    <row type="double" value="0.000396"/>
+                    <row type="double" value="0.000432"/>
+                    <row type="double" value="0.000648"/>
+                    <row type="double" value="0.000864"/>
+                    <row type="double" value="0.00108"/>
+                    <row type="double" value="0.001296"/>
+                    <row type="double" value="0.001512"/>
+                    <row type="double" value="0.001728"/>
+                    <row type="double" value="0.001944"/>
+                    <row type="double" value="0.00216"/>
+                    <row type="double" value="0.002376"/>
+                    <row type="double" value="0.002592"/>
+                    <row type="double" value="0.003888"/>
+                    <row type="double" value="0.005184"/>
+                    <row type="double" value="0.00648"/>
+                    <row type="double" value="0.007776"/>
+                    <row type="double" value="0.009072"/>
+                    <row type="double" value="0.010368"/>
+                    <row type="double" value="0.011664"/>
+                    <row type="double" value="0.01296"/>
+                    <row type="double" value="0.014256"/>
+                    <row type="double" value="0.015552"/>
+                    <row type="double" value="0.023328"/>
+                    <row type="double" value="0.031104"/>
+                    <row type="double" value="0.03888"/>
+                    <row type="double" value="0.046656"/>
+                    <row type="double" value="0.054432"/>
+                    <row type="double" value="0.062208"/>
+                    <row type="double" value="0.069984"/>
+                    <row type="double" value="0.07776"/>
+                    <row type="double" value="0.085536"/>
+                    <row type="double" value="0.093312"/>
+                    <row type="double" value="0.139968"/>
+                    <row type="double" value="0.186624"/>
+                    <row type="double" value="0.23328"/>
+                    <row type="double" value="0.279936"/>
+                    <row type="double" value="0.326592"/>
+                    <row type="double" value="0.373248"/>
+                    <row type="double" value="0.419904"/>
+                    <row type="double" value="0.46656"/>
+                    <row type="double" value="0.513216"/>
+                    <row type="double" value="0.559872"/>
+                    <row type="double" value="0.839808"/>
+                    <row type="double" value="1.11974"/>
+                    <row type="double" value="1.39968"/>
+                    <row type="double" value="1.67962"/>
+                    <row type="double" value="1.95955"/>
+                    <row type="double" value="2.23949"/>
+                    <row type="double" value="2.51942"/>
+                    <row type="double" value="2.79936"/>
+                    <row type="double" value="3.0793"/>
+                    <row type="double" value="3.35923"/>
+                    <row type="double" value="5.03885"/>
+                    <row type="double" value="6.71846"/>
+                    <row type="double" value="8.39808"/>
+                    <row type="double" value="10.0777"/>
+                    <row type="double" value="11.7573"/>
+                    <row type="double" value="13.4369"/>
+                    <row type="double" value="15.1165"/>
+                    <row type="double" value="16.7962"/>
+                    <row type="double" value="18.4758"/>
+                    <row type="double" value="20.1554"/>
+                    <row type="double" value="30.2331"/>
+                    <row type="double" value="40.3108"/>
+                    <row type="double" value="50.3885"/>
+                    <row type="double" value="60.4662"/>
+                    <row type="double" value="70.5439"/>
+                    <row type="double" value="80.6216"/>
+                    <row type="double" value="90.6993"/>
+                    <row type="double" value="100.777"/>
+                    <row type="double" value="110.855"/>
+                    <row type="double" value="120.932"/>
+                    <row type="" value=""/>
+                </column>
+                <column title="1">
+                    <row type="double" value="1.03494"/>
+                    <row type="double" value="1.03239"/>
+                    <row type="double" value="1.03125"/>
+                    <row type="double" value="1.03276"/>
+                    <row type="double" value="1.03097"/>
+                    <row type="double" value="1.02971"/>
+                    <row type="double" value="1.02747"/>
+                    <row type="double" value="1.03076"/>
+                    <row type="double" value="1.02666"/>
+                    <row type="double" value="1.02738"/>
+                    <row type="double" value="1.02645"/>
+                    <row type="double" value="1.02261"/>
+                    <row type="double" value="1.02266"/>
+                    <row type="double" value="1.01882"/>
+                    <row type="double" value="1.018"/>
+                    <row type="double" value="1.01389"/>
+                    <row type="double" value="1.01309"/>
+                    <row type="double" value="1.01255"/>
+                    <row type="double" value="1.01161"/>
+                    <row type="double" value="1.00888"/>
+                    <row type="double" value="1.00827"/>
+                    <row type="double" value="1.00444"/>
+                    <row type="double" value="1.0024"/>
+                    <row type="double" value="1.00096"/>
+                    <row type="double" value="0.999636"/>
+                    <row type="double" value="0.99822"/>
+                    <row type="double" value="0.997105"/>
+                    <row type="double" value="0.998288"/>
+                    <row type="double" value="0.998032"/>
+                    <row type="double" value="0.996723"/>
+                    <row type="double" value="0.994739"/>
+                    <row type="double" value="0.99098"/>
+                    <row type="double" value="0.989361"/>
+                    <row type="double" value="0.988261"/>
+                    <row type="double" value="0.986538"/>
+                    <row type="double" value="0.985039"/>
+                    <row type="double" value="0.983383"/>
+                    <row type="double" value="0.982659"/>
+                    <row type="double" value="0.98103"/>
+                    <row type="double" value="0.978045"/>
+                    <row type="double" value="0.974524"/>
+                    <row type="double" value="0.963731"/>
+                    <row type="double" value="0.95116"/>
+                    <row type="double" value="0.940484"/>
+                    <row type="double" value="0.928447"/>
+                    <row type="double" value="0.913556"/>
+                    <row type="double" value="0.900938"/>
+                    <row type="double" value="0.886567"/>
+                    <row type="double" value="0.873884"/>
+                    <row type="double" value="0.862074"/>
+                    <row type="double" value="0.848291"/>
+                    <row type="double" value="0.750367"/>
+                    <row type="double" value="0.664616"/>
+                    <row type="double" value="0.582373"/>
+                    <row type="double" value="0.500011"/>
+                    <row type="double" value="0.417648"/>
+                    <row type="double" value="0.335432"/>
+                    <row type="double" value="0.249526"/>
+                    <row type="double" value="0.165869"/>
+                    <row type="double" value="0.0808492"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="qlonglong" value="0"/>
+                    <row type="" value=""/>
                 </column>
             </data>
         </rawdataelement>
@@ -108,6 +315,8 @@
                 <property name="TIME" type="time" data="11:02:15" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+                <property name="fcscorreditor_datacut_max" type="int" data="175" usereditable="false"/>
+                <property name="fcscorreditor_datacut_min" type="int" data="4" usereditable="false"/>
             </properties>
             <results/>
             <files>
@@ -116,6 +325,20 @@
             <data>
                 <leaveout list="2,3,4,1"/>
             </data>
+        </rawdataelement>
+        <rawdataelement type="table" name="ASCII_correlation.txt" id="8">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="column_separator" type="string" data="," usereditable="false"/>
+                <property name="comment_start" type="string" data="#" usereditable="false"/>
+                <property name="decimal_separator" type="string" data="." usereditable="false"/>
+                <property name="header_start" type="string" data="#!" usereditable="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/ASCII_correlation.txt</file>
+            </files>
+            <data/>
         </rawdataelement>
     </rawdata>
     <evaluations>

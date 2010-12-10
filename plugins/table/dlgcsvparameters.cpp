@@ -1,4 +1,6 @@
 #include "dlgcsvparameters.h"
+#include <QtGui>
+
 
 dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString columnSeparator, QString decimalSeparator, QString commentStart, QString headerStart):
     QDialog(parent)
@@ -14,6 +16,20 @@ dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString columnSeparator, QSt
 dlgCSVParameters::~dlgCSVParameters()
 {
     //dtor
+}
+
+
+void dlgCSVParameters::setFileContents(const QString& filename) {
+    QString preview="";
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            preview=preview + in.readLine() +"\n";
+        }
+        file.close();
+    }
+    txtContents->setPlainText(preview);
 }
 
 void dlgCSVParameters::checkValues() {

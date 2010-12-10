@@ -18,11 +18,6 @@ QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
     connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
 }
 
-/*QFRDRTable::QFRDRTable(QDomElement& e, QFProject* parent):
-    datamodel(NULL), QFRawDataRecord(e, parent)
-{
-    std::cout<<"created QFRDRTable\n";
-}*/
 
 QFRDRTable::~QFRDRTable()
 {
@@ -35,6 +30,10 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
     QString f=format.toUpper();
     if (f=="CSV") {
         datamodel->saveCSV(filename);
+    } else if (f=="SSV") {
+        datamodel->saveCSV(filename, ";", '.');
+    } else if (f=="GERMANEXCEL") {
+        datamodel->saveCSV(filename, ";", ',');
     } else if (f=="SLK" || f=="SYLK") {
         datamodel->saveSYLK(filename);
     }
@@ -69,7 +68,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
     datamodel->clear();
     datamodel->setReadonly(false);
     if (files.size()>0) {
-        std::cout<<"    reading CSV\n";
+        //std::cout<<"    reading CSV\n";
         QString s=getProperty("column_separator", ",").toString();
         char column_separator=(s.size()>0)?s[0].toAscii():',';
         s=getProperty("decimal_separator", ".").toString();
@@ -78,6 +77,8 @@ void QFRDRTable::intReadData(QDomElement* e) {
         QString header_start=s;
         s=getProperty("coment_start", "#").toString();
         char comment_start=(s.size()>0)?s[0].toAscii():'#';
+
+        //std::cout<<"column_separator="<<column_separator<<"  decimal_separator="<<decimal_separator<<"   header_start="<<header_start.toStdString()<<"   comment_start="<<comment_start<<std::endl;
 
         datamodel->readCSV(files[0], column_separator, decimal_separator, header_start, comment_start);
         datamodel->setReadonly(true);

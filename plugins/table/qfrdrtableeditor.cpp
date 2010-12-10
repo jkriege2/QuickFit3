@@ -1,5 +1,7 @@
 #include "qfrdrtableeditor.h"
 #include "qfrdrtable.h"
+#include "dlgcsvparameters.h"
+
 
 QFRDRTableEditor::QFRDRTableEditor(QWidget* parent):
     QFRawDataEditor(parent)
@@ -155,19 +157,12 @@ void QFRDRTableEditor::slSaveTable() {
     if (m) {
         if (m->model()) {
             QString selectedFilter="";
-            QStringList filter;
-            filter<<tr("Comma Separated Values, Decimal Dot (*.txt *.csv *.dat)")<<tr("Semicolon Separated Values, Decimal Dot (*.txt *.csv *.dat)")<<tr("Semicolon Separated Values, Decimal Comma (*.txt *.csv *.dat)")<<tr("SYLK File (*.sylk *.slk)");
-            QString fileName = QFileDialog::getSaveFileName(this, tr("Save Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
-            //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
-            int f=filter.indexOf(selectedFilter);
-            if (f==0) {
-                m->model()->saveCSV(fileName);
-            } else if (f==1) {
-                m->model()->saveCSV(fileName, QString("; "));
-            } else if (f==2) {
-                m->model()->saveCSV(fileName, QString("; "), ',');
-            } else if (f==3) {
-                m->model()->saveSYLK(fileName);
+            QString filter= m->getExportDialogFiletypes();
+            QString fileName = QFileDialog::getSaveFileName(this, m->getExportDialogTitle(), currentTableDir, filter, &selectedFilter);
+            if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+                int f=filter.split(";;").indexOf(selectedFilter);
+                std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<"   "<<m->getExportFiletypes().at(f).toStdString()<<std::endl;
+                m->exportData(m->getExportFiletypes().at(f), fileName);
             }
         }
     }
@@ -184,13 +179,38 @@ void QFRDRTableEditor::slLoadTable() {
                   <<tr("Semicolon Separated Values, Decimal Comma (*.txt *.csv *.dat)");
             QString fileName = QFileDialog::getOpenFileName(this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
             //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
-            int f=filter.indexOf(selectedFilter);
-            if (f==0) {
-                m->model()->readCSV(fileName, ',', '.', "#!", '#');
-            } else if (f==1) {
-                m->model()->readCSV(fileName, ';', '.', "#!", '#');
-            } else if (f==2) {
-                m->model()->readCSV(fileName, ';', ',', "#!", '#');
+            if (!fileName.isNull()) {
+                int f=filter.indexOf(selectedFilter);
+
+                dlgCSVParameters* csvDlg=new dlgCSVParameters(this, settings->getQSettings()->value("table/column_separator_save", ",").toString(),
+                                                              settings->getQSettings()->value("table/decimal_separator_save", ".").toString(),
+                                                              settings->getQSettings()->value("table/comment_start_save", "#").toString(),
+                                                              settings->getQSettings()->value("table/header_start_save", "#!").toString());
+                if (f==0) {
+                    csvDlg->column_separator=',';
+                    csvDlg->decimal_separator='.';
+                    csvDlg->comment_start='#';
+                    csvDlg->header_start="#!";
+                } else if (f==1) {
+                    csvDlg->column_separator=';';
+                    csvDlg->decimal_separator='.';
+                    csvDlg->comment_start='#';
+                    csvDlg->header_start="#!";
+                } else if (f==2) {
+                    csvDlg->column_separator=';';
+                    csvDlg->decimal_separator=',';
+                    csvDlg->comment_start='#';
+                    csvDlg->header_start="#!";
+                }
+                csvDlg->setFileContents(fileName);
+                if (csvDlg->exec()==QDialog::Accepted) {
+                    QMap<QString, QVariant> p;
+                    settings->getQSettings()->setValue("table/column_separator_save", QString(csvDlg->column_separator));
+                    settings->getQSettings()->setValue("table/decimal_separator_save", QString(csvDlg->decimal_separator));
+                    settings->getQSettings()->setValue("table/comment_start_save", QString(csvDlg->comment_start));
+                    settings->getQSettings()->setValue("table/header_start_save", QString(csvDlg->header_start));
+                    m->model()->readCSV(fileName, csvDlg->column_separator, csvDlg->decimal_separator, csvDlg->header_start, csvDlg->comment_start);
+                }
             }
         }
     }
