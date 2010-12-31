@@ -10,7 +10,7 @@
 		<MakeCommands>
 			<Build command="$make -f $makefile $target" />
 			<CompileFile command="$make -f $makefile $target $file" />
-			<Clean command="$make -f $makefile $target clean" />
+			<Clean command="$make -f $makefile clean" />
 			<DistClean command="$make -f $makefile.$target distclean" />
 			<AskRebuildNeeded command="$make -q -f $makefile $target" />
 			<SilentBuild command="$make -s -f $makefile $target" />
@@ -31,7 +31,7 @@
 				<MakeCommands>
 					<Build command="$make -f $makefile $target" />
 					<CompileFile command="$make -f $makefile $target $file" />
-					<Clean command="$make -f $makefile $target clean" />
+					<Clean command="$make -f $makefile clean" />
 					<DistClean command="$make -f $makefile.$target distclean" />
 					<AskRebuildNeeded command="$make -q -f $makefile $target" />
 					<SilentBuild command="$make -s -f $makefile $target" />
@@ -49,7 +49,7 @@
 				<MakeCommands>
 					<Build command="$make -f $makefile $target" />
 					<CompileFile command="$make -f $makefile $target $file" />
-					<Clean command="$make -f $makefile $target clean" />
+					<Clean command="$make -f $makefile clean" />
 					<DistClean command="$make -f $makefile.$target distclean" />
 					<AskRebuildNeeded command="$make -q -f $makefile $target" />
 					<SilentBuild command="$make -s -f $makefile $target" />
@@ -103,7 +103,7 @@
 		<Unit filename="lib\qfevaluationpropertyeditor.h" />
 		<Unit filename="lib\qfpluginevaluation.h" />
 		<Unit filename="lib\qfpluginrawdata.h" />
-		<Unit filename="lib\qfplugintools.h" />
+		<Unit filename="lib\qfpluginreportwrapper.h" />
 		<Unit filename="lib\qfproject.cpp" />
 		<Unit filename="lib\qfproject.h" />
 		<Unit filename="lib\qfprojectrawdatamodel.cpp" />
@@ -124,6 +124,47 @@
 		<Unit filename="lib\qfrdrpropertymodel.h" />
 		<Unit filename="lib\qfrdrresultsmodel.cpp" />
 		<Unit filename="lib\qfrdrresultsmodel.h" />
+		<Unit filename="plugins\fcs\alv5000tools.cpp" />
+		<Unit filename="plugins\fcs\alv5000tools.h" />
+		<Unit filename="plugins\fcs\datacutslider.cpp" />
+		<Unit filename="plugins\fcs\datacutslider.h" />
+		<Unit filename="plugins\fcs\dlg_csvparameters.ui" />
+		<Unit filename="plugins\fcs\dlgcsvparameters.cpp" />
+		<Unit filename="plugins\fcs\dlgcsvparameters.h" />
+		<Unit filename="plugins\fcs\qfprdrfcs.cpp" />
+		<Unit filename="plugins\fcs\qfprdrfcs.h" />
+		<Unit filename="plugins\fcs\qfrdrfcs.cbp" />
+		<Unit filename="plugins\fcs\qfrdrfcs.pro" />
+		<Unit filename="plugins\fcs\qfrdrfcs.qrc" />
+		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.cpp" />
+		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.h" />
+		<Unit filename="plugins\fcs\qfrdrfcsdata.cpp" />
+		<Unit filename="plugins\fcs\qfrdrfcsdata.h" />
+		<Unit filename="plugins\fcs\qfrdrfcsrateeditor.cpp" />
+		<Unit filename="plugins\fcs\qfrdrfcsrateeditor.h" />
+		<Unit filename="plugins\fcsfit\qfevalfcsfit.cbp" />
+		<Unit filename="plugins\fcsfit\qfevalfcsfit.pro" />
+		<Unit filename="plugins\fcsfit\qfevalfcsfit.qrc" />
+		<Unit filename="plugins\fcsfit\qffcsfitevaluation.cpp" />
+		<Unit filename="plugins\fcsfit\qffcsfitevaluation.h" />
+		<Unit filename="plugins\fcsfit\qffcsfitevaluationeditor.cpp" />
+		<Unit filename="plugins\fcsfit\qffcsfitevaluationeditor.h" />
+		<Unit filename="plugins\fcsfit\qfpevalfcsfit.cpp" />
+		<Unit filename="plugins\fcsfit\qfpevalfcsfit.h" />
+		<Unit filename="plugins\table\dlg_csvparameters.ui" />
+		<Unit filename="plugins\table\dlgcsvparameters.cpp" />
+		<Unit filename="plugins\table\dlgcsvparameters.h" />
+		<Unit filename="plugins\table\qfprdrtable.cpp" />
+		<Unit filename="plugins\table\qfprdrtable.h" />
+		<Unit filename="plugins\table\qfrdrtable.cbp" />
+		<Unit filename="plugins\table\qfrdrtable.cpp" />
+		<Unit filename="plugins\table\qfrdrtable.h" />
+		<Unit filename="plugins\table\qfrdrtable.pro" />
+		<Unit filename="plugins\table\qfrdrtable.qrc" />
+		<Unit filename="plugins\table\qfrdrtableeditor.cpp" />
+		<Unit filename="plugins\table\qfrdrtableeditor.h" />
+		<Unit filename="plugins\table\qftablemodel.cpp" />
+		<Unit filename="plugins\table\qftablemodel.h" />
 		<Unit filename="quickfit3.pro" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qtshortcutwidgets.h">
 			<Option target="&lt;{~None~}&gt;" />

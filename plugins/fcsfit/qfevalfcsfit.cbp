@@ -70,7 +70,7 @@
 		<ExtraCommands>
 			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 		</ExtraCommands>
-		<Unit filename="qfevalfcsfit.pro" />
+		<Unit filename="fcsfit.pro" />
 		<Unit filename="qfevalfcsfit.qrc" />
 		<Unit filename="qffcsfitevaluation.cpp" />
 		<Unit filename="qffcsfitevaluation.h" />

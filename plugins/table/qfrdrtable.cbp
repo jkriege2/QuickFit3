@@ -80,7 +80,7 @@
 		<Unit filename="qfprdrtable.h" />
 		<Unit filename="qfrdrtable.cpp" />
 		<Unit filename="qfrdrtable.h" />
-		<Unit filename="qfrdrtable.pro" />
+		<Unit filename="table.pro" />
 		<Unit filename="qfrdrtable.qrc" />
 		<Unit filename="qfrdrtableeditor.cpp" />
 		<Unit filename="qfrdrtableeditor.h" />

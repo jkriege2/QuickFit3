@@ -13,7 +13,7 @@
 #include "../lib/programoptions.h"
 #include "qt/qtlogfile.h"
 #include "../lib/qfrawdatarecordfactory.h"
-#include "../lib/qfplugintools.h"
+#include "../lib/qfpluginreportwrapper.h"
 
 
 #define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm"

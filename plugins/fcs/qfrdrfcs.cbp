@@ -79,7 +79,7 @@
 		<Unit filename="dlgcsvparameters.h" />
 		<Unit filename="qfprdrfcs.cpp" />
 		<Unit filename="qfprdrfcs.h" />
-		<Unit filename="qfrdrfcs.pro" />
+		<Unit filename="fcs.pro" />
 		<Unit filename="qfrdrfcs.qrc" />
 		<Unit filename="qfrdrfcscorrelationeditor.cpp" />
 		<Unit filename="qfrdrfcscorrelationeditor.h" />

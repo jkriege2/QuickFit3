@@ -2,18 +2,14 @@
 <quickfitproject quickfit_version="3.0" name="unnamed" creator="">
     <description><![CDATA[]]></description>
     <properties>
-        <property name="fcsdataeditor0/corrsplitterSizes" type="bytearray" usereditable="false"/>
+        <property name="fcsdataeditor0/corrsplitterSizes" type="bytearray" data="" usereditable="false"/>
         <property name="fcsdataeditor0/error_display" type="int" data="2" usereditable="false"/>
         <property name="fcsdataeditor0/log_tau_axis" type="bool" data="true" usereditable="false"/>
         <property name="fcsdataeditor0/run_display" type="int" data="2" usereditable="false"/>
-        <property name="fcsdataeditor1/corrsplitterSizes" type="bytearray" usereditable="false"/>
+        <property name="fcsdataeditor1/corrsplitterSizes" type="bytearray" data="" usereditable="false"/>
         <property name="fcsdataeditor1/error_display" type="int" data="3" usereditable="false"/>
         <property name="fcsdataeditor1/log_tau_axis" type="bool" data="false" usereditable="false"/>
         <property name="fcsdataeditor1/run_display" type="int" data="4" usereditable="false"/>
-        <property name="rawdatapropeditor0/pos" type="point" data="409/100" usereditable="false"/>
-        <property name="rawdatapropeditor0/size" type="size" data="833/496" usereditable="false"/>
-        <property name="rawdatapropeditor1/pos" type="point" data="15/216" usereditable="false"/>
-        <property name="rawdatapropeditor1/size" type="size" data="833/496" usereditable="false"/>
     </properties>
     <rawdata>
         <rawdataelement type="fcs" name="Hela_16_39d.asc - CH0" id="0">
@@ -28,12 +24,14 @@
                 <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
                 <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false"/>
                 <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
-                <property name="SAMPLE_MEMO" type="string" usereditable="false"/>
-                <property name="Samplename" type="string" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
                 <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
                 <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+                <property name="fcscorreditor_datacut_max" type="int" data="151" usereditable="false"/>
+                <property name="fcscorreditor_datacut_min" type="int" data="2" usereditable="false"/>
             </properties>
             <results/>
             <files>
@@ -53,8 +51,8 @@
                 <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
                 <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false"/>
                 <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
-                <property name="SAMPLE_MEMO" type="string" usereditable="false"/>
-                <property name="Samplename" type="string" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
                 <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
                 <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
@@ -86,7 +84,7 @@
             <properties/>
             <results/>
             <data>
-                <column title="0">
+                <column title="1">
                     <row type="double" value="2e-06"/>
                     <row type="double" value="3e-06"/>
                     <row type="double" value="4e-06"/>
@@ -188,9 +186,9 @@
                     <row type="double" value="100.777"/>
                     <row type="double" value="110.855"/>
                     <row type="double" value="120.932"/>
-                    <row type="" value=""/>
+                    <row type="QString" value=""/>
                 </column>
-                <column title="1">
+                <column title="">
                     <row type="double" value="1.03494"/>
                     <row type="double" value="1.03239"/>
                     <row type="double" value="1.03125"/>
@@ -251,48 +249,48 @@
                     <row type="double" value="0.249526"/>
                     <row type="double" value="0.165869"/>
                     <row type="double" value="0.0808492"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="qlonglong" value="0"/>
-                    <row type="" value=""/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value="0"/>
+                    <row type="QString" value=""/>
                 </column>
             </data>
         </rawdataelement>
@@ -309,8 +307,8 @@
                 <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
                 <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
                 <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
-                <property name="SAMPLE_MEMO" type="string" usereditable="false"/>
-                <property name="Samplename" type="string" usereditable="false"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
+                <property name="Samplename" type="string" data="" usereditable="false"/>
                 <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
                 <property name="TIME" type="time" data="11:02:15" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
@@ -344,6 +342,11 @@
     <evaluations>
         <evaluationelement type="fcs_fit" name="FCS Fit" id="3">
             <description><![CDATA[]]></description>
+            <selection>
+                <item id="1"/>
+                <item id="2"/>
+                <item id="5"/>
+            </selection>
             <data/>
         </evaluationelement>
         <evaluationelement type="fcs_fit" name="FCS Fit" id="6">
