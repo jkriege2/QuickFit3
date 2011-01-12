@@ -23,6 +23,7 @@ class QFRawDataRecordFactory;
 typedef QMap<QString, QVariant> qfp_param_type;
 
 /*! \brief this class manages one project
+    \ingroup qf3lib_project
 
     The  project may be thought of as the central data vault. All files,
     evaluations, ... are represented by items. These items are implemented

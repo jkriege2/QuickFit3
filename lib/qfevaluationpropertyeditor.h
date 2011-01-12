@@ -6,11 +6,11 @@
 #include "qfproject.h"
 #include "qfevaluationitem.h"
 #include "programoptions.h"
-#include "qehtreeview.h"
 
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
           that are not usable together with a given QFMultiListEvaluation.
+    \ingroup qf3lib_project
 
     This class depends on the first Qt::UserRole to supply the ID of the record to be filtered. It calls
     QFEvaluation::isApplicable() to find out whether a raw data record is to be displayed.

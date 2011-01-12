@@ -3,6 +3,9 @@
 
 #include <QString>
 
+/*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
+    \ingroup qf3plugintools
+*/
 class QFPluginReportWrapper {
     public:
         /** Default destructor */

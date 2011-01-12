@@ -9,6 +9,7 @@
 
 
 /** \brief base class for all QuickFit 3 raw data record plugins
+    \ingroup qf3evaluationplugins
 
 */
 class QFPluginEvaluationItem {

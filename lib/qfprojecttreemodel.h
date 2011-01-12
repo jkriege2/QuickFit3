@@ -8,7 +8,9 @@
 // forward declaration
 class QFProject;
 
-
+/*! \brief model that allows Model/View access to the QuickFit project tree
+    \ingroup qf3lib_project
+*/
 class QFProjectTreeModel : public QAbstractItemModel {
         Q_OBJECT
     public:

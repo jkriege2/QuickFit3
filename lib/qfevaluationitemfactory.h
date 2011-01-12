@@ -20,6 +20,7 @@ class QFEvaluationItem;
 /*! \brief this class is a factory class for QFEvaluationItem objects. You can
            request an object of a specific type by calling createItem() with
            the appropriate type string as argument
+    \ingroup qf3lib_project
 
 */
 class QFEvaluationItemFactory : public QObject {

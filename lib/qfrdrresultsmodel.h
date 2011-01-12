@@ -7,6 +7,7 @@
 class QFRawDataRecord;
 
 /*! \brief class to display the results stored in QFRawDataRecord
+    \ingroup qf3lib_project
 
 */
 class QFRDRResultsModel : public QAbstractTableModel {

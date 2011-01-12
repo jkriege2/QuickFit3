@@ -19,6 +19,7 @@ class QFRawDataRecord;
 /*! \brief this class is a factory class for QFRawDataRecord objects. You can
            request an object of a specific type by calling createRecord() with
            the appropriate type string as argument
+    \ingroup qf3lib_project
 
 */
 class QFRawDataRecordFactory : public QObject {

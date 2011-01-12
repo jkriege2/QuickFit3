@@ -3,7 +3,9 @@
 
 #include <QtGui>
 
-/** \brief this class manages the overall program options (and may also display an options Dialog */
+/*! \brief this class manages the overall program options (and may also display an options Dialog
+    \ingroup qf3lib_settings
+ */
 class ProgramOptions: public QObject {
         Q_OBJECT
     public:

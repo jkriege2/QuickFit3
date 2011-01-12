@@ -18,6 +18,7 @@
 #include "tools.h"
 #include "alv5000tools.h"
 #include "qfrawdatarecordfactory.h"
+#include "qfrdrfcsdatainterface.h"
 
 /*! \brief manages a FCS dataset
     \ingroup qf3rdrdp_fcs
@@ -37,7 +38,7 @@
   account for the correlation average. This may be usefull, if only some few of the runs in a file are damaged
   (e.g. by agregates moving through the focus ...).
 */
-class QFRDRFCSData : public QFRawDataRecord {
+class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         Q_OBJECT
     public:
         /** Default constructor */
@@ -86,111 +87,111 @@ class QFRDRFCSData : public QFRawDataRecord {
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,
          *         but only one channel is represented by one object. This is saved in the property
          *         CHANNEL. */
-        inline unsigned int getChannel() { return getProperty("CHANNEL", QVariant((int)0)).toUInt(); }
+        inline virtual unsigned int getChannel() { return getProperty("CHANNEL", QVariant((int)0)).toUInt(); }
         /** \brief number of correlation runs in this object */
-        inline unsigned int getCorrelationRuns() { return correlationRuns; };
+        inline virtual unsigned int getCorrelationRuns() { return correlationRuns; };
         /** \brief number of datapoints in every correlation curve */
-        inline unsigned long long getCorrelationN() { return correlationN; }
+        inline virtual unsigned long long getCorrelationN() { return correlationN; }
         /** \brief sample points (times \f$ \tau \f$ ) of the correlation function.
          *         This is a 1D array of size correlationN */
-        inline double* getCorrelationT() { return correlationT; };
+        inline virtual double* getCorrelationT() { return correlationT; };
         /** \brief values of the correlation function.
          *         This is a 2D array of size runs * correlationN
          *
          * access this as \code correlation[run*correlationN + n] \endcode
          */
-        inline double* getCorrelation() { return correlation; };
+        inline virtual double* getCorrelation() { return correlation; };
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        inline double* getCorrelationRun(unsigned int run) { return &(correlation[run*correlationN]); };
+        inline virtual double* getCorrelationRun(unsigned int run) { return &(correlation[run*correlationN]); };
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        inline double* getCorrelationMean() { return correlationMean; };
+        inline virtual double* getCorrelationMean() { return correlationMean; };
         /** \brief values of the standard deviation of the correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        inline double* getCorrelationStdDev() { return correlationStdDev; };
+        inline virtual double* getCorrelationStdDev() { return correlationStdDev; };
 
 
         /** \brief number of countrate runs in this object */
-        inline unsigned int getRateRuns() { return rateRuns; };
+        inline virtual unsigned int getRateRuns() { return rateRuns; };
         /** \brief number of datapoints in every count rate curve */
-        inline unsigned long long getRateN() { return rateN; };
+        inline virtual unsigned long long getRateN() { return rateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the count rate
          *         This is a 1D array of size rateN */
-        inline double* getRateT() { return rateT; };
+        inline virtual double* getRateT() { return rateT; };
         /** \brief values of the count rate.
          *         This is a 2D array of size runs * rateN
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline double* getRate() { return rate; };
+        inline virtual double* getRate() { return rate; };
         /** \brief values of the count rate nfor a given run.
          *         This is a 1D array of length  rateN
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline double* getRateRun (unsigned int run) { return &(rate[run*rateN]); };
+        inline virtual double* getRateRun (unsigned int run) { return &(rate[run*rateN]); };
 
 
         /** \brief number of binned count rate runs in this object */
-        inline unsigned int getBinnedRateRuns() { return rateRuns; };
+        inline virtual unsigned int getBinnedRateRuns() { return rateRuns; };
         /** \brief number of datapoints in every binned count rate */
-        inline unsigned long long getBinnedRateN() { return binnedRateN; };
+        inline virtual unsigned long long getBinnedRateN() { return binnedRateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate
          *         This is a 1D array of size binnedRateN */
-        inline double* getBinnedRateT() { return binnedRateT; };
+        inline virtual double* getBinnedRateT() { return binnedRateT; };
         /** \brief values of the binned count rate.
          *         This is a 2D array of size runs * binnedRateN
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline double* getBinnedRate() { return binnedRate; };
+        inline virtual double* getBinnedRate() { return binnedRate; };
         /** \brief values of the binned count rate for a given run.
          *         This is a 1D array of length  binnedRateN
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline double* getBinnedRateRun (unsigned int run) { return &(binnedRate[run*binnedRateN]); };
+        inline virtual double* getBinnedRateRun (unsigned int run) { return &(binnedRate[run*binnedRateN]); };
 
 
         /** \brief calculate the mean value of the count rate */
-        double calcRateMean(unsigned int run=0);
+        virtual double calcRateMean(unsigned int run=0);
         /** \brief calculate the standard deviation of the count rate */
-        double calcRateStdDev(unsigned int run=0);
+        virtual double calcRateStdDev(unsigned int run=0);
         /** \brief calculate minimum and maximum count rates */
-        void calcRateMinMax(unsigned int run, double& min, double& max);
+        virtual void calcRateMinMax(unsigned int run, double& min, double& max);
         /** \brief recalculate correlation curve mean and standard deviation */
-        void recalculateCorrelations();
+        virtual void recalculateCorrelations();
 
         /** \brief set the number of datapoints in every binned count rate run.
          *
          * \note this function does only take effect BEFORE loading a dataset!
          *       If you want to recalculate the binned count rate call calcBinnedRate() afterwards!
          */
-        inline void setBinnedRateN(int value) { autoCalcRateN=value; setIntProperty("AUTO_BINNED_RATE_N", value, false, false); };
+        inline virtual void setBinnedRateN(int value) { autoCalcRateN=value; setIntProperty("AUTO_BINNED_RATE_N", value, false, false); };
 
         /** \brief this function changes the size of the binned count rate and recalculates it
          *         depending on the value of autoCalcRateN. */
-        void calcBinnedRate();
+        virtual void calcBinnedRate();
 
         /** \brief returns whether to leave out a run */
-        inline bool leaveoutRun(unsigned int run) { return leaveout.contains(run); };
+        inline virtual bool leaveoutRun(unsigned int run) { return leaveout.contains(run); };
         /** \brief add a run to the leaveouts */
-        inline void leaveoutAddRun(unsigned int run) { leaveout.append(run); }
+        inline virtual void leaveoutAddRun(unsigned int run) { leaveout.append(run); }
         /** \brief remove a run from the leaveouts */
-        inline void leaveoutRemoveRun(unsigned int run) { leaveout.removeAll(run); }
+        inline virtual void leaveoutRemoveRun(unsigned int run) { leaveout.removeAll(run); }
         /** \brief clear all leaveouts */
-        inline void leaveoutClear() { leaveout.clear(); }
+        inline virtual void leaveoutClear() { leaveout.clear(); }
 
         /** \brief returns true when a given run is visible. the average run is indicated by -1 */
-        inline bool runVisible(int run) {
+        inline virtual bool runVisible(int run) {
             if (run+1<runsVisibleList.size() && run>=-1)
                 return runsVisibleList[run+1];
             else return true;
         }
         /** \brief set whether the given run is visible. the average run is indicated by -1 */
-        inline void setRunVisible(int run, bool vis) { if (run+1<runsVisibleList.size() && run>=-1) {runsVisibleList[run+1]=vis; emit propertiesChanged();} }
+        inline virtual void setRunVisible(int run, bool vis) { if (run+1<runsVisibleList.size() && run>=-1) {runsVisibleList[run+1]=vis; emit propertiesChanged();} }
 
     protected:
         /** \brief write the contents of the object to a XML file */

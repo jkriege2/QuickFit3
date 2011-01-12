@@ -7,6 +7,7 @@
 #include "programoptions.h"
 
 /*! \brief editor widget (window) for raw data items
+    \ingroup qf3lib_project
 
 
  As there were problems when changing the displayed editor for different types of raw data items. One editor window

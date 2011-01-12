@@ -8,6 +8,7 @@
 /*! \brief this class implements a data model which contains all
            raw data items in the project. This is used by the QFEvaluationPropertyEditor
            to display a list of all files that may be added to the evaluation item.
+    \ingroup qf3lib_project
 
     This data model is drag/drop enabled. Items may be draged out and will be exported as
     a list of their IDs (MIME: "application/qf2.ids.int.list"). If data is droped into this

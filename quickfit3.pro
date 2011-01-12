@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS += lib application
-application.depends = lib
+SUBDIRS += lib libqf3widgets application
+application.depends = lib libqf3widgets
 
 # also build the plugins
 SUBDIRS += plg_table

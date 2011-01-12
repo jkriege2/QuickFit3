@@ -11,7 +11,6 @@ DLLDESTDIR = ../output
 # Input
 HEADERS += dlgnewproperty.h \
            programoptions.h \
-           qehtreeview.h \
            qfevaluationeditor.h \
            qfevaluationitem.h \
            qfevaluationitemfactory.h \
@@ -32,7 +31,6 @@ HEADERS += dlgnewproperty.h \
 
 SOURCES += dlgnewproperty.cpp \
            programoptions.cpp \
-           qehtreeview.cpp \
            qfevaluationeditor.cpp \
            qfevaluationitem.cpp \
            qfevaluationitemfactory.cpp \

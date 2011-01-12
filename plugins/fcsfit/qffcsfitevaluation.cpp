@@ -1,10 +1,11 @@
 #include "qffcsfitevaluation.h"
 #include "qffcsfitevaluationeditor.h"
+#include "../fcs/qfrdrfcsdatainterface.h"
 
 
 
 QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
-    QFEvaluationItem(parent, true, true)//false)
+    QFEvaluationItem(parent, true, false)
 {
     //ctor
 }
@@ -25,3 +26,8 @@ void QFFCSFitEvaluation::intReadData(QDomElement* e) {
 QFEvaluationEditor* QFFCSFitEvaluation::createEditor(int i, QWidget* parent) {
     return new QFFCSFitEvaluationEditor(parent);
 };
+
+bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
+    return record->inherits("QFRDRFCSDataInterface");
+}
+

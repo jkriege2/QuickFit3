@@ -5,6 +5,7 @@
 
 /*! \brief this class extends the QTreeView by including signals that will be
            emitted by several internal events (key events ...).
+    \ingroup qf3lib_widgets
 
   This is usefull, if you want to trigger actions by a keypress ...
 */

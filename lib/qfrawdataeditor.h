@@ -10,6 +10,7 @@
 class QFRawDataRecord;
 
 /*! \brief base class for all raw data editors used to display/edit the raw data within QFRawDataPropertyEditor window
+    \ingroup qf3lib_project
 
  */
 class QFRawDataEditor : public QWidget {

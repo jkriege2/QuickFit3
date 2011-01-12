@@ -124,6 +124,11 @@
 		<Unit filename="lib\qfrdrpropertymodel.h" />
 		<Unit filename="lib\qfrdrresultsmodel.cpp" />
 		<Unit filename="lib\qfrdrresultsmodel.h" />
+		<Unit filename="libqf3widgets\datacutslider.cpp" />
+		<Unit filename="libqf3widgets\datacutslider.h" />
+		<Unit filename="libqf3widgets\libqf3widgets.pro" />
+		<Unit filename="libqf3widgets\qehtreeview.cpp" />
+		<Unit filename="libqf3widgets\qehtreeview.h" />
 		<Unit filename="plugins\fcs\alv5000tools.cpp" />
 		<Unit filename="plugins\fcs\alv5000tools.h" />
 		<Unit filename="plugins\fcs\datacutslider.cpp" />
@@ -131,19 +136,20 @@
 		<Unit filename="plugins\fcs\dlg_csvparameters.ui" />
 		<Unit filename="plugins\fcs\dlgcsvparameters.cpp" />
 		<Unit filename="plugins\fcs\dlgcsvparameters.h" />
+		<Unit filename="plugins\fcs\fcs.pro" />
 		<Unit filename="plugins\fcs\qfprdrfcs.cpp" />
 		<Unit filename="plugins\fcs\qfprdrfcs.h" />
 		<Unit filename="plugins\fcs\qfrdrfcs.cbp" />
-		<Unit filename="plugins\fcs\qfrdrfcs.pro" />
 		<Unit filename="plugins\fcs\qfrdrfcs.qrc" />
 		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.cpp" />
 		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.h" />
 		<Unit filename="plugins\fcs\qfrdrfcsdata.cpp" />
 		<Unit filename="plugins\fcs\qfrdrfcsdata.h" />
+		<Unit filename="plugins\fcs\qfrdrfcsdatainterface.h" />
 		<Unit filename="plugins\fcs\qfrdrfcsrateeditor.cpp" />
 		<Unit filename="plugins\fcs\qfrdrfcsrateeditor.h" />
+		<Unit filename="plugins\fcsfit\fcsfit.pro" />
 		<Unit filename="plugins\fcsfit\qfevalfcsfit.cbp" />
-		<Unit filename="plugins\fcsfit\qfevalfcsfit.pro" />
 		<Unit filename="plugins\fcsfit\qfevalfcsfit.qrc" />
 		<Unit filename="plugins\fcsfit\qffcsfitevaluation.cpp" />
 		<Unit filename="plugins\fcsfit\qffcsfitevaluation.h" />
@@ -159,12 +165,12 @@
 		<Unit filename="plugins\table\qfrdrtable.cbp" />
 		<Unit filename="plugins\table\qfrdrtable.cpp" />
 		<Unit filename="plugins\table\qfrdrtable.h" />
-		<Unit filename="plugins\table\qfrdrtable.pro" />
 		<Unit filename="plugins\table\qfrdrtable.qrc" />
 		<Unit filename="plugins\table\qfrdrtableeditor.cpp" />
 		<Unit filename="plugins\table\qfrdrtableeditor.h" />
 		<Unit filename="plugins\table\qftablemodel.cpp" />
 		<Unit filename="plugins\table\qftablemodel.h" />
+		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qtshortcutwidgets.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -216,7 +222,7 @@
 			<lib_finder disable_auto="1" />
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
-				<Settings autoincrement="1" date_declarations="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application\version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

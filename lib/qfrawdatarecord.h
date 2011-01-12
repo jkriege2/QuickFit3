@@ -17,6 +17,7 @@
 
 
 /*! \brief this class manages one raw data record in the project
+    \ingroup qf3lib_project
 
 
     This class manages the basic properties of every raw data item in QuickFit 3.0.

@@ -17,7 +17,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         virtual ~QFFCSFitEvaluation();
     public:
         /** \brief return type (short type string) */
-        virtual QString getType() const { return tr("fcs_fit"); };
+        virtual QString getType() const { return QString("fcs_fit"); };
         /** \brief return type (longer type string, user readable) */
         virtual QString getTypeName() const { return tr("FCS Fit"); };
         /** \brief return a small icon (16x16) */
@@ -32,7 +32,9 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         virtual QString getEditorName(int i) { return QString("Fit"); };
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(int i=0, QWidget* parent=NULL);
-
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(QFRawDataRecord* record);
 
     protected:
         /** \brief write object contents into XML file */

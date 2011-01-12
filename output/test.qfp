@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quickfitproject quickfit_version="3.0" name="unnamed" creator="">
     <description><![CDATA[]]></description>
-    <properties>
-        <property name="fcsdataeditor0/corrsplitterSizes" type="bytearray" data="" usereditable="false"/>
-        <property name="fcsdataeditor0/error_display" type="int" data="2" usereditable="false"/>
-        <property name="fcsdataeditor0/log_tau_axis" type="bool" data="true" usereditable="false"/>
-        <property name="fcsdataeditor0/run_display" type="int" data="2" usereditable="false"/>
-        <property name="fcsdataeditor1/corrsplitterSizes" type="bytearray" data="" usereditable="false"/>
-        <property name="fcsdataeditor1/error_display" type="int" data="3" usereditable="false"/>
-        <property name="fcsdataeditor1/log_tau_axis" type="bool" data="false" usereditable="false"/>
-        <property name="fcsdataeditor1/run_display" type="int" data="4" usereditable="false"/>
-    </properties>
+    <properties/>
     <rawdata>
         <rawdataelement type="fcs" name="Hela_16_39d.asc - CH0" id="0">
             <description><![CDATA[]]></description>
@@ -30,6 +21,8 @@
                 <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="151" usereditable="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false"/>
                 <property name="fcscorreditor_datacut_max" type="int" data="151" usereditable="false"/>
                 <property name="fcscorreditor_datacut_min" type="int" data="2" usereditable="false"/>
             </properties>
@@ -57,6 +50,8 @@
                 <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="151" usereditable="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="6" usereditable="false"/>
                 <property name="fcscorreditor_datacut_max" type="int" data="138" usereditable="false"/>
                 <property name="fcscorreditor_datacut_min" type="int" data="8" usereditable="false"/>
             </properties>
@@ -72,6 +67,8 @@
                 <property name="CSV_COMMENT" type="string" data="#" usereditable="false"/>
                 <property name="CSV_SEPARATOR" type="string" data="," usereditable="false"/>
                 <property name="FILETYPE" type="string" data="CSV_CORR" usereditable="false"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="102" usereditable="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false"/>
             </properties>
             <results/>
             <files>
@@ -313,6 +310,8 @@
                 <property name="TIME" type="time" data="11:02:15" usereditable="false"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="175" usereditable="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false"/>
                 <property name="fcscorreditor_datacut_max" type="int" data="175" usereditable="false"/>
                 <property name="fcscorreditor_datacut_min" type="int" data="4" usereditable="false"/>
             </properties>
@@ -342,11 +341,6 @@
     <evaluations>
         <evaluationelement type="fcs_fit" name="FCS Fit" id="3">
             <description><![CDATA[]]></description>
-            <selection>
-                <item id="1"/>
-                <item id="2"/>
-                <item id="5"/>
-            </selection>
             <data/>
         </evaluationelement>
         <evaluationelement type="fcs_fit" name="FCS Fit" id="6">

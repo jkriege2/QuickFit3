@@ -20,6 +20,7 @@ class QFEvaluationPropertyEditor;
 
 
 /*! \brief this class manages one evaluation record in the project
+    \ingroup qf3lib_project
 
     An evaluation is a very basic node in the project tree. It does not come with a lot of features. Basically
     the notion of an evaluation is to take (some or all of the) data and produce some kind of result from these.

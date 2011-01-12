@@ -7,6 +7,9 @@
 // forward declaration
 class QFEvaluationItem;
 
+/*! \brief base class for all evaluation widgets
+    \ingroup qf3lib_project
+*/
 class QFEvaluationEditor : public QWidget {
         Q_OBJECT
     public:

@@ -85,6 +85,7 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(ProgramOptions* set, QFEv
     rdrProxy=new QFEvaluationRawDataModelProxy(rdrModel);
     rdrProxy->setSourceModel(rdrModel);
     lstRawData=NULL;
+    splitMain=NULL;
 
     setSettings(set);
     //std::cout<<"creating QFEvaluationPropertyEditor ... creating widgets ...\n";
@@ -309,12 +310,14 @@ void QFEvaluationPropertyEditor::readSettings() {
     if (pos.x()<-width() || pos.x()>QApplication::desktop()->screenGeometry(this).width()-30) pos.setX(0);
     if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(this).height()) pos.setY(0);
     move(pos);
+    if (splitMain) splitMain->restoreState(settings->getQSettings()->value("evalpropeditor/splitter", splitMain->saveState()).toByteArray());
 }
 
 void QFEvaluationPropertyEditor::writeSettings() {
     if (!settings) return;
     settings->getQSettings()->setValue(QString("evalpropeditor/pos").arg(id), pos());
     settings->getQSettings()->setValue(QString("evalpropeditor/size").arg(id), size());
+    if (splitMain) settings->getQSettings()->setValue("evalpropeditor/splitter", splitMain->saveState());
 }
 
 

@@ -378,6 +378,7 @@ void MainWindow::insertEvaluation() {
 void MainWindow::createToolBars()
 {
     fileToolBar = addToolBar(tr("File"));
+    fileToolBar->setObjectName("toolbar_file");
     fileToolBar->addAction(newProjectAct);
     fileToolBar->addAction(openProjectAct);
     fileToolBar->addAction(saveProjectAct);
@@ -395,6 +396,7 @@ void MainWindow::createToolBars()
     tb->setPopupMode(QToolButton::InstantPopup);
     dataToolBar->addWidget(tb);
     dataToolBar->addAction(delItemAct);
+    dataToolBar->setObjectName("toolbar_data");
 
 }
 
@@ -405,13 +407,16 @@ void MainWindow::createStatusBar() {
 void MainWindow::readSettings() {
     if (!settings) return;
     logFileMainWidget->log_text(tr("reading settings from '%1' ...\n").arg(settings->getIniFilename()));
-    QPoint pos = settings->getQSettings()->value("mainwindow/pos", QPoint(200, 200)).toPoint();
-    QSize size = settings->getQSettings()->value("mainwindow/size", QSize(400, 400)).toSize();
+    //QPoint pos = settings->getQSettings()->value("mainwindow/pos", QPoint(200, 200)).toPoint();
+    //QSize size = settings->getQSettings()->value("mainwindow/size", QSize(400, 400)).toSize();
 
-    resize(size.boundedTo(QApplication::desktop()->screenGeometry(this).size()));
+    /*resize(size.boundedTo(QApplication::desktop()->screenGeometry(this).size()));
     if (pos.x()<-width() || pos.x()>QApplication::desktop()->screenGeometry(this).width()-30) pos.setX(0);
     if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(this).height()) pos.setY(0);
-    move(pos);
+    move(pos);*/
+    restoreState(settings->getQSettings()->value("mainwindow/state", saveState()).toByteArray());
+    restoreGeometry(settings->getQSettings()->value("mainwindow/geometry", saveGeometry()).toByteArray());
+
     spMain->restoreState(settings->getQSettings()->value("mainwindow/splitterSizesMain").toByteArray());
     spCenter->restoreState(settings->getQSettings()->value("mainwindow/splitterSizesCenter").toByteArray());
     currentProjectDir=settings->getQSettings()->value("mainwindow/currentProjectDir", currentProjectDir).toString();
@@ -429,8 +434,10 @@ void MainWindow::readSettings() {
 void MainWindow::writeSettings() {
     if (!settings) return;
     logFileMainWidget->log_text(tr("writing settings to '%1' ...\n").arg(settings->getIniFilename()));
-    settings->getQSettings()->setValue("mainwindow/pos", pos());
-    settings->getQSettings()->setValue("mainwindow/size", size());
+    //settings->getQSettings()->setValue("mainwindow/pos", pos());
+    //settings->getQSettings()->setValue("mainwindow/size", size());
+    settings->getQSettings()->setValue("mainwindow/state", saveState());
+    settings->getQSettings()->setValue("mainwindow/geometry", saveGeometry());
     settings->getQSettings()->setValue("mainwindow/splitterSizesMain", spMain->saveState());
     settings->getQSettings()->setValue("mainwindow/splitterSizesCenter", spCenter->saveState());
 

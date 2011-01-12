@@ -6,4 +6,17 @@
     This is a set of library classes and methods that are used by QuickFit 3 and its plugins.
     To make linking to these easy, all these classes compile into a dynamic library to which
     you may link you plugin.
+
+
+    \defgroup qf3lib_widgets Additional/Modified Widgets
+    \ingroup qf3lib
+
+    \defgroup qf3lib_settings Settings/Options Management
+    \ingroup qf3lib
+
+    \defgroup qf3lib_project QuickFit Project Tree/Internal Project Representation
+    \ingroup qf3lib
+
+
+
 */

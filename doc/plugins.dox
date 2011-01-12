@@ -7,6 +7,9 @@
 
     \defgroup qf3evaluationplugins Evaluation Plugins
     \ingroup qf3plugins
+
+    \defgroup qf3plugintools Plugin programming Tools
+    \ingroup qf3plugins
 */
 
 /*! \page plugins Writing Plugins
@@ -35,8 +38,8 @@
           They are not necessary, but if you implement them, you can give your QFRawDataRecord descendent a
           generic interface which some more general evaluations may access. Note that evaluations will have
           to find out by RTTI which interfaces are implemented. All these interfaces are also registered with
-          the <a href="http://doc.qt.nokia.com/4.6/plugins-howto.html">QT Interface system</a>, so you can use 
-		  the QT tools for RTTI. Of course you may also add you own interfaces, but then you will have to make 
+          the <a href="http://doc.qt.nokia.com/4.6/plugins-howto.html">QT Interface system</a>, so you can use
+		  the QT tools for RTTI. Of course you may also add you own interfaces, but then you will have to make
 		  sure that they are available and known to the evaluations working on them.
 
     .

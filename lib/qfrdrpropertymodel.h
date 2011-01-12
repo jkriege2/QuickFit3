@@ -10,6 +10,7 @@ class QFRawDataRecord;
 
 /*! \brief this class serves as a QAbstractTableModel for the properties associated with a
            QFRawDataRecord.
+    \ingroup qf3lib_project
 */
 class QFRDRPropertyModel : public QAbstractTableModel {
         Q_OBJECT

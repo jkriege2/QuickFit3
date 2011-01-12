@@ -10,6 +10,7 @@
 #include <QStringList>
 
 /*! \brief implements a property system, together with storage to/read from XML files
+    \ingroup qf3lib_project
 
 */
 class QFProperties {
