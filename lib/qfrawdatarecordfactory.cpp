@@ -27,11 +27,11 @@ void QFRawDataRecordFactory::searchPlugins(QString directory) {
     }
 }
 
-void QFRawDataRecordFactory::distribute(QFProject* project, ProgramOptions* settings, QFPluginReportWrapper* reporter, QWidget* parent) {
+void QFRawDataRecordFactory::distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent) {
     for (int i=0; i<getIDList().size(); i++) {
         items[getIDList().at(i)]->setProject(project);
         items[getIDList().at(i)]->setSettings(settings);
-        items[getIDList().at(i)]->setReporter(reporter);
+        items[getIDList().at(i)]->setServices(services);
         items[getIDList().at(i)]->setParentWidget(parent);
     }
 }

@@ -9,6 +9,8 @@ MainWindow::MainWindow(QSplashScreen* splash)
 
     rawDataFactory=new QFRawDataRecordFactory(this);
     evaluationFactory=new QFEvaluationItemFactory(this);
+    fitFunctionManager=new QFFitFunctionManager(this);
+    fitAlgorithmManager=new QFFitAlgorithmManager(this);
 
     settings=NULL;
     project=NULL;
@@ -40,12 +42,14 @@ MainWindow::MainWindow(QSplashScreen* splash)
     disconnect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     disconnect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
-    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()));
+    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->getIDList().size()));
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
 
     newProject();
+
+    autoWriteSettings();
 
 }
 
@@ -53,6 +57,8 @@ void MainWindow::searchAndRegisterPlugins() {
     // find plugins
     rawDataFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
     evaluationFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
+    fitFunctionManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitfunctions");
+    //fitAlgorithmManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitalgorithms");
 
     // distribute application hooks
     rawDataFactory->distribute(project, settings, this, this);
@@ -214,6 +220,43 @@ void MainWindow::aboutPlugins() {
         text+="</li>";
     }
     text+="</ul>";
+
+    text+="</ul>";
+    text+=tr("<br><b>Fit Algorithm Plugins:</b><ul>");
+    // gather information about plugins
+    for (int i=0; i<fitAlgorithmManager->getIDList().size(); i++) {
+        QString id=fitAlgorithmManager->getIDList().at(i);
+        text+="<li>";
+        text+=QString("<b>%1</b>:").arg(fitAlgorithmManager->getName(id));
+        text+="<blockquote>";
+        text+=QString("<i>description:</i> %1<br>").arg(fitAlgorithmManager->getDescription(id));
+        text+=QString("<i>author:</i> %1<br>").arg(fitAlgorithmManager->getAuthor(id));
+        text+=QString("<i>copyright:</i> %1<br>").arg(fitAlgorithmManager->getCopyright(id));
+        text+=QString("<i>weblink:</i> %1<br>").arg(fitAlgorithmManager->getWeblink(id));
+        text+=QString("<i>file:</i> %1<br>").arg(fitAlgorithmManager->getFilename(id));
+        text+=QString("<i>id:</i> %1<br>").arg(id);
+        text+="</blockquote>";
+        text+="</li>";
+    }
+    text+="</ul>";
+    text+="</ul>";
+    text+=tr("<br><b>Fit Function Plugins:</b><ul>");
+    // gather information about plugins
+    for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
+        int id=i;
+        text+="<li>";
+        text+=QString("<b>%1</b>:").arg(fitFunctionManager->getName(id));
+        text+="<blockquote>";
+        text+=QString("<i>description:</i> %1<br>").arg(fitFunctionManager->getDescription(id));
+        text+=QString("<i>author:</i> %1<br>").arg(fitFunctionManager->getAuthor(id));
+        text+=QString("<i>copyright:</i> %1<br>").arg(fitFunctionManager->getCopyright(id));
+        text+=QString("<i>weblink:</i> %1<br>").arg(fitFunctionManager->getWeblink(id));
+        text+=QString("<i>file:</i> %1<br>").arg(fitFunctionManager->getFilename(id));
+        text+=QString("<i>implemented ids:</i> %1<br>").arg(fitFunctionManager->getIDList(id).join(", "));
+        text+="</blockquote>";
+        text+="</li>";
+    }
+    text+="</ul>";
     ui_textEdit->setText(text);
     widget->exec();
     delete widget;
@@ -367,7 +410,7 @@ void MainWindow::insertEvaluation() {
     QVariant id=sender()->property("call_id");
     //std::cout<<"insertEvaluation("<<id.toString().toStdString()<<")\n";
     if (id.isValid() && project) {
-        getEvaluationItemFactory()->createRecord(id.toString(), project);
+        getEvaluationItemFactory()->createRecord(id.toString(), this, project);
      }
     tvMain->expandToDepth(2);
     prgMainProgress->setRange(0,1);
@@ -607,7 +650,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
         if (nt==QFProjectTreeModel::qfpntRawDataRecord) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(index);
             if (rec) {
-                QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
+                QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 rawDataPropEditors.append(edt);
                 edt->show();
@@ -615,7 +658,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
         } else if (nt==QFProjectTreeModel::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
-                QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
+                QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
                 //QFEvaluationPropertyEditor* edt=rec->createPropertyEditor(settings, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 evaluationPropEditors.append(edt);
@@ -718,3 +761,17 @@ void MainWindow::openSettingsDialog() {
     opt->open(settings);
     delete opt;
 }
+
+void MainWindow::autoWriteSettings() {
+    writeSettings();
+    QTimer::singleShot(30000, this, SLOT(autoWriteSettings()));
+}
+
+QFFitFunctionManager* MainWindow::getFitFunctionManager() {
+    return fitFunctionManager;
+}
+
+QFFitAlgorithmManager* MainWindow::getFitAlgorithmManager() {
+    return fitAlgorithmManager;
+}
+

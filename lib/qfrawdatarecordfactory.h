@@ -12,7 +12,7 @@
 #include <QAction>
 #include "programoptions.h"
 #include "qfpluginrawdata.h"
-#include "qfpluginreportwrapper.h"
+#include "qfpluginservices.h"
 
 class QFRawDataRecord;
 
@@ -45,7 +45,7 @@ class QFRawDataRecordFactory : public QObject {
         void searchPlugins(QString directory);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
-        void distribute(QFProject* project, ProgramOptions* settings, QFPluginReportWrapper* reporter, QWidget* parent);
+        void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);
 
 
         /** \brief returns a list of the IDs of all available QFRawDataRecords. */

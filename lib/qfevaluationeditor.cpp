@@ -2,11 +2,12 @@
 #include "qfevaluationitem.h"
 #include <QCloseEvent>
 
-QFEvaluationEditor::QFEvaluationEditor(QWidget* parent):
+QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QWidget* parent):
     QWidget(parent)
 {
     current=NULL;
     peID=0;
+    this->services=services;
 }
 
 QFEvaluationEditor::~QFEvaluationEditor()

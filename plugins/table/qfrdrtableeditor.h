@@ -19,7 +19,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRDRTableEditor(QWidget* parent=NULL);
+        QFRDRTableEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFRDRTableEditor();
     protected slots:

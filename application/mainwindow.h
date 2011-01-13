@@ -13,7 +13,9 @@
 #include "../lib/programoptions.h"
 #include "qt/qtlogfile.h"
 #include "../lib/qfrawdatarecordfactory.h"
-#include "../lib/qfpluginreportwrapper.h"
+#include "../lib/qfpluginservices.h"
+#include "../lib/qffitfunctionmanager.h"
+#include "../lib/qffitalgorithmmanager.h"
 
 
 #define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm"
@@ -22,7 +24,7 @@
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFPluginReportWrapper {
+class MainWindow : public QMainWindow, public QFPluginServices {
         Q_OBJECT
 
     public:
@@ -39,20 +41,25 @@ class MainWindow : public QMainWindow, public QFPluginReportWrapper {
             evaluationFactory->distribute(project, settings, this, this);
         }
 
-        /** \copydoc QFPluginReportWrapper::log_text()  */
+        /** \copydoc QFPluginServices::log_text()  */
         virtual void log_text(QString message);
-        /** \copydoc QFPluginReportWrapper::log_warning()  */
+        /** \copydoc QFPluginServices::log_warning()  */
         virtual void log_warning(QString message);
-        /** \copydoc QFPluginReportWrapper::log_error()  */
+        /** \copydoc QFPluginServices::log_error()  */
         virtual void log_error(QString message);
-        /** \copydoc QFPluginReportWrapper::setStatusMessage()  */
+        /** \copydoc QFPluginServices::setStatusMessage()  */
         virtual void setStatusMessage(QString message);
-        /** \copydoc QFPluginReportWrapper::setProgressRange()  */
+        /** \copydoc QFPluginServices::setProgressRange()  */
         virtual void setProgressRange(int minP, int maxP);
-        /** \copydoc QFPluginReportWrapper::setProgress()  */
+        /** \copydoc QFPluginServices::setProgress()  */
         virtual void setProgress(int value);
-        /** \copydoc QFPluginReportWrapper::incProgress()  */
+        /** \copydoc QFPluginServices::incProgress()  */
         virtual void incProgress();
+        /** \copydoc QFPluginServices::getFitFunctionManager() */
+        virtual QFFitFunctionManager* getFitFunctionManager();
+        /** \copydoc QFPluginServices::getFitAlgorithmManager() */
+        virtual QFFitAlgorithmManager* getFitAlgorithmManager();
+
     protected:
         void closeEvent(QCloseEvent *event);
 
@@ -102,6 +109,9 @@ class MainWindow : public QMainWindow, public QFPluginReportWrapper {
 
         /** \brief open settings dialog */
         void openSettingsDialog();
+
+        /** \brief this slot is executed wvery minute and is used to store the program settings */
+        void autoWriteSettings();
     private:
         void createWidgets();
         void createActions();
@@ -170,6 +180,10 @@ class MainWindow : public QMainWindow, public QFPluginReportWrapper {
         QFEvaluationItemFactory* evaluationFactory;
         /** \brief raw data record item factory */
         QFRawDataRecordFactory* rawDataFactory;
+        /** \brief fit function manager class */
+        QFFitFunctionManager* fitFunctionManager;
+        /** \brief fit algorithm manager class */
+        QFFitAlgorithmManager* fitAlgorithmManager;
 
         /** \brief return a pointer to the raw data record factry object */
         inline QFRawDataRecordFactory* getRawDataRecordFactory() { return rawDataFactory; };

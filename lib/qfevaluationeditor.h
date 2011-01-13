@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "programoptions.h"
+#include "qfpluginservices.h"
 
 // forward declaration
 class QFEvaluationItem;
@@ -14,7 +15,7 @@ class QFEvaluationEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFEvaluationEditor(QWidget* parent=NULL);
+        QFEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFEvaluationEditor();
         /** \brief set the current record */
@@ -31,6 +32,7 @@ class QFEvaluationEditor : public QWidget {
         virtual void connectWidgets(const QFEvaluationItem* current, const QFEvaluationItem* old) =0;
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void resultsChanged() {};
+    public slots:
         /** \brief read the settings */
         virtual void readSettings() =0;
         /** \brief write the settings */
@@ -43,6 +45,9 @@ class QFEvaluationEditor : public QWidget {
         ProgramOptions* settings;
         /** \brief ID of the owning QFEvaluationPropertyEditor */
         int peID;
+        /** \brief pointer that allows for access to central QuickFit services */
+        QFPluginServices* services;
+
 };
 
 

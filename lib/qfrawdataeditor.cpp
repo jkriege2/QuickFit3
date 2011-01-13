@@ -2,11 +2,12 @@
 #include "qfrawdatarecord.h"
 #include <QCloseEvent>
 
-QFRawDataEditor::QFRawDataEditor(QWidget* parent):
+QFRawDataEditor::QFRawDataEditor(QFPluginServices* services, QWidget* parent):
     QWidget(parent)
 {
     current=NULL;
     peID=0;
+    this->services=services;
 }
 
 QFRawDataEditor::~QFRawDataEditor()

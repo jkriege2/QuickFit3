@@ -74,8 +74,8 @@ int QFRDRFCSRateEditor::runsModel::columnCount(const QModelIndex &parent) const 
 
 
 
-QFRDRFCSRateEditor::QFRDRFCSRateEditor(QWidget* parent):
-    QFRawDataEditor(parent)
+QFRDRFCSRateEditor::QFRDRFCSRateEditor(QFPluginServices* services, QWidget* parent):
+    QFRawDataEditor(services, parent)
 {
     createWidgets();
 }

@@ -17,6 +17,14 @@
     \defgroup qf3lib_project QuickFit Project Tree/Internal Project Representation
     \ingroup qf3lib
 
+    \defgroup qf3lib_fitting Tools for Fitting
+    \ingroup qf3lib
+
+    As fitting is one of QuickFit's main raison-d'être s the main application provides some facilities which make implementing
+    data fitting routines simple. These are described here. First of all a common object-oriented interface to fitting functions
+    is defined, so they may be implemented as plugins. the same is valid for the fitting algorithms themselves. All these tools
+    integrate with the QuickFit Project tree (see QFFitAlgorithm and QFFitFunction).
+
 
 
 */

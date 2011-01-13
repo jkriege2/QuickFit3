@@ -13,6 +13,8 @@
 #include "qfproject.h"
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
+#include "qfproperties.h"
+#include "qfpluginservices.h"
 
 
 // forward declaration
@@ -55,17 +57,19 @@ class QFEvaluationPropertyEditor;
         .
     .
 
-
     Results created by evaluations are either stored in the according QFRawDataRecord objects (there are methods
     to save, read and display results) or in any other place possible (which then has to implemented). One could
     imagine to have an evaluation create a new, or update an existing raw data record.
+
+    Evaluation items also contain properties, but they are not visible for the user and only used as a simple
+    interface to load and store them.
 
     \section QFEvaluationRecord_Error Error Reporting
     Errors are reported by the methods error() which returns \c true if an error has occured and the method
     errorDescription() which returns a textual description of the error. The protected method setError() may be
     used to indicate that an error has occured to the class.
  */
-class QFEvaluationItem : public QObject {
+class QFEvaluationItem : public QObject, public QFProperties {
         Q_OBJECT
     public:
 
@@ -170,7 +174,7 @@ class QFEvaluationItem : public QObject {
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i) { return QString(""); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(int i=0, QWidget* parent=NULL) { return NULL; };
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) { return NULL; };
         /** \brief write object contents into XML file */
         virtual void writeXML(QXmlStreamWriter& w);
 

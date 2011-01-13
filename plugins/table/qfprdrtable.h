@@ -30,25 +30,25 @@ class QFPRDRTable : public QObject, public QFPluginRawDataRecordBase {
         virtual void registerToMenu(QMenu* menu);
 
         /** \brief short ID for the plugin */
-        virtual QString getID() { return tr("table"); };
+        virtual QString getID() const  { return tr("table"); };
 
         /** \brief name for the plugin */
-        virtual QString getName() { return tr("Data Table Plugin"); };
+        virtual QString getName() const  { return tr("Data Table Plugin"); };
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() { return tr("manages a table with arbitrary data in the cells"); };
+        virtual QString getDescription() const  { return tr("manages a table with arbitrary data in the cells"); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() { return tr("Jan Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() { return tr("(c) 2010 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010 by Jan Krieger"); };
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink() { return tr(""); };
+        virtual QString getWeblink() const  { return tr(""); };
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
-        virtual QString getIconFilename() { return QString(":/table_insert.png"); };
+        virtual QString getIconFilename() const  { return QString(":/table_insert.png"); };
 
     protected slots:
         /** \brief insert an editable table */

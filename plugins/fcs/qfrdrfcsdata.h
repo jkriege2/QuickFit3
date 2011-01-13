@@ -65,9 +65,9 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
             return QString("");
         };
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(int i=0, QWidget* parent=NULL) {
-            if (i==0) return new QFRDRFCSCorrelationEditor(parent);
-            if (i==1) return new QFRDRFCSRateEditor(parent);
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) {
+            if (i==0) return new QFRDRFCSCorrelationEditor(services, parent);
+            if (i==1) return new QFRDRFCSRateEditor(services, parent);
             return NULL;
         };
         /** \brief export the raw data into the specified format */

@@ -4,7 +4,7 @@
 
 
 QFEvaluationItem::QFEvaluationItem(QFProject* parent, bool showRDRList, bool useSelection):
-    QObject(parent)
+    QObject(parent), QFProperties()
 {
     this->useSelection=useSelection;
     this->showRDRList=showRDRList;
@@ -52,19 +52,10 @@ void QFEvaluationItem::readXML(QDomElement& e) {
     }
     QDomElement te=e.firstChildElement("description");
     if (te.isNull()) { description=""; } else { description=te.text(); }
-    //std::cout<<"    reading XML: files\n";
-    /*te=e.firstChildElement("rawdatas");
-    data.clear();
-    if (!te.isNull()) {
-        QDomElement fe=te.firstChildElement("rawdata");
-        while (!fe.isNull()) {
-            dataRecord d;
-            d.role=te.attribute("role", "0").toInt();
-            d.record=project->getRawDataByID(fe.attribute("ID").toInt());
-            data.push_back(d);
-            fe=fe.nextSiblingElement("rawdata");
-        }
-    }*/
+
+    te=e.firstChildElement("properties");
+    readProperties(te);
+
     //std::cout<<"    reading XML: data\n";
 
     // read list of selected items
@@ -99,6 +90,9 @@ void QFEvaluationItem::writeXML(QXmlStreamWriter& w) {
     w.writeAttribute("id", QString::number(ID));
     w.writeStartElement("description");
     w.writeCDATA(description);
+    w.writeEndElement();
+    w.writeStartElement("properties");
+    storeProperties(w);
     w.writeEndElement();
 
 

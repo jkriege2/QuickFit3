@@ -10,7 +10,7 @@
 #include <QProgressBar>
 #include <QStringList>
 #include "qfproperties.h"
-#include "qfpluginreportwrapper.h"
+#include "qfpluginservices.h"
 
 // forward declaration
 class QFRawDataRecord;
@@ -77,17 +77,17 @@ class QFProject : public QObject, public QFProperties {
 
         QFEvaluationItemFactory* evalFactory;
         QFRawDataRecordFactory* rdrFactory;
-        QFPluginReportWrapper* reporter;
+        QFPluginServices* services;
 
         QFRawDataRecordFactory* getRawDataRecordFactory() { return rdrFactory; };
         QFEvaluationItemFactory* getEvaluationItemFactory() { return evalFactory; };
-        QFPluginReportWrapper* getReporter() { return reporter; };
+        QFPluginServices* getServices() { return services; };
 
     public:
         /** Default constructor */
-        QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginReportWrapper* reporter, QObject* parent=NULL);
+        QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
         /** Default constructor which loads a project */
-        QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginReportWrapper* reporter, QObject* parent=NULL);
+        QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
         /** Default destructor */
         virtual ~QFProject();
 

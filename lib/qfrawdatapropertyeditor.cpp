@@ -1,18 +1,20 @@
 #include "qfrawdatapropertyeditor.h"
 #include "dlgnewproperty.h"
 
-QFRawDataPropertyEditor::QFRawDataPropertyEditor(ProgramOptions* set, QFRawDataRecord* current, int id, QWidget* parent, Qt::WindowFlags f):
+QFRawDataPropertyEditor::QFRawDataPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFRawDataRecord* current, int id, QWidget* parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
     //std::cout<<"creating QFRawDataPropertyEditor ...\n";
     this->current=NULL;
     this->id=id;
+    this->services=services;
     setSettings(set);
     //std::cout<<"creating QFRawDataPropertyEditor ... creating widgets ...\n";
     createWidgets();
     //std::cout<<"creating QFRawDataPropertyEditor ... setting current ...\n";
     setCurrent(current);
     //std::cout<<"creating QFRawDataPropertyEditor ... DONE!\n";
+    readSettings();
 }
 
 QFRawDataPropertyEditor::~QFRawDataPropertyEditor()
@@ -77,7 +79,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
             editorList.clear();
             for (int i=0; i<current->getEditorCount(); i++) {
                 QString n=current->getEditorName(i);
-                QFRawDataEditor* e=current->createEditor(i, NULL);
+                QFRawDataEditor* e=current->createEditor(services, i, NULL);
                 if (e) {
                     e->setSettings(settings, id);
                     e->setCurrent(current, id);
@@ -361,12 +363,22 @@ void QFRawDataPropertyEditor::readSettings() {
     if (pos.x()<-width() || pos.x()>QApplication::desktop()->screenGeometry(this).width()-30) pos.setX(0);
     if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(this).height()) pos.setY(0);
     move(pos);
+    for (int i=0; i<editorList.size(); i++) {
+        if (editorList[i]) {
+            editorList[i]->readSettings();
+        }
+    }
 }
 
 void QFRawDataPropertyEditor::writeSettings() {
     if (!settings) return;
     settings->getQSettings()->setValue(QString("rawdatapropeditor/pos"), pos());
     settings->getQSettings()->setValue(QString("rawdatapropeditor/size"), size());
+    for (int i=0; i<editorList.size(); i++) {
+        if (editorList[i]) {
+            editorList[i]->writeSettings();
+        }
+    }
 }
 
 

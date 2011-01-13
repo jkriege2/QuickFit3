@@ -3,8 +3,8 @@
 #include "dlgcsvparameters.h"
 
 
-QFRDRTableEditor::QFRDRTableEditor(QWidget* parent):
-    QFRawDataEditor(parent)
+QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services, QWidget* parent):
+    QFRawDataEditor(services, parent)
 {
     //std::cout<<"QFRDRTableEditor() ...\n";
     createWidgets();

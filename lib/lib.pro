@@ -17,7 +17,7 @@ HEADERS += dlgnewproperty.h \
            qfevaluationpropertyeditor.h \
            qfpluginevaluation.h \
            qfpluginrawdata.h \
-           qfpluginreportwrapper.h \
+           qfpluginservices.h \
            qfproject.h \
            qfprojectrawdatamodel.h \
            qfprojecttreemodel.h \
@@ -27,7 +27,13 @@ HEADERS += dlgnewproperty.h \
            qfrawdatarecord.h \
            qfrawdatarecordfactory.h \
            qfrdrpropertymodel.h \
-           qfrdrresultsmodel.h
+           qfrdrresultsmodel.h \
+           qffitfunction.h \
+           qffitalgorithm.h \
+           qffitfunctionmanager.h \
+           qffitalgorithmmanager.h \
+           qfpluginfitfunction.h \
+           qfpluginfitalgorithm.h
 
 SOURCES += dlgnewproperty.cpp \
            programoptions.cpp \
@@ -44,7 +50,10 @@ SOURCES += dlgnewproperty.cpp \
            qfrawdatarecord.cpp \
            qfrawdatarecordfactory.cpp \
            qfrdrpropertymodel.cpp \
-           qfrdrresultsmodel.cpp
+           qfrdrresultsmodel.cpp \
+           qffitalgorithm.cpp \
+           qffitfunctionmanager.cpp \
+           qffitalgorithmmanager.cpp
 
 FORMS +=   dlg_newproperty.ui
 

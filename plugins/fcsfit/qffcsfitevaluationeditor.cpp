@@ -8,10 +8,13 @@
 #include "../fcs/qfrdrfcsdatainterface.h"
 
 
-QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QWidget* parent):
-    QFEvaluationEditor(parent)
+QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
+    QFEvaluationEditor(services, parent)
 {
     cmbModel=NULL;
+
+    fitModels=services->getFitFunctionManager()->getModels("fcs_", this);
+
     createWidgets();
 }
 
@@ -34,6 +37,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     splitPlot->setOrientation(Qt::Vertical);
 
     pltData=new JKQtPlotter(true, this);
+    pltData->resize(300,200);
     splitPlot->addWidget(pltData);
 
     QWidget* w=new QWidget(this);
@@ -42,6 +46,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     w->setLayout(vbl);
 
     pltResiduals=new JKQtPlotter(true, this);
+    pltResiduals->resize(300,50);
     vbl->addWidget(pltResiduals,1);
 
     datacut=new DataCutSliders(this);
@@ -82,6 +87,13 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     l->setMinimumWidth(lwidth);
     cmbModel=new QComboBox(w);
     cmbModel->setEditable(false);
+
+    QMapIterator<QString, QFFitFunction*> i(fitModels);
+    while (i.hasNext()) {
+         i.next();
+         cmbModel->addItem(i.value()->name(), i.key());
+    }
+
     l->setBuddy(cmbModel);
     hbl->addWidget(l);
     hbl->addWidget(cmbModel);

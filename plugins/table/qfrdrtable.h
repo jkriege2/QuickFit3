@@ -46,8 +46,8 @@ class QFRDRTable : public QFRawDataRecord {
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i) { return tr("Table Editor"); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(int i=0, QWidget* parent=NULL) {
-            return new QFRDRTableEditor(parent);
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) {
+            return new QFRDRTableEditor(services, parent);
         };
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;

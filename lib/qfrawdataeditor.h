@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "programoptions.h"
 #include <iostream>
+#include "qfpluginservices.h"
 
 
 // forward declaration
@@ -17,7 +18,7 @@ class QFRawDataEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRawDataEditor(QWidget* parent=NULL);
+        QFRawDataEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFRawDataEditor();
         /** \brief set the current record */
@@ -31,6 +32,7 @@ class QFRawDataEditor : public QWidget {
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) =0;
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged() {};
+    public slots:
         /** \brief read the settings */
         virtual void readSettings() =0;
         /** \brief write the settings */
@@ -43,6 +45,8 @@ class QFRawDataEditor : public QWidget {
         ProgramOptions* settings;
         /** \brief the ID of the parent QFRawDataPropertyEditor */
         int peID;
+        /** \brief pointer that allows for access to central QuickFit services */
+        QFPluginServices* services;
     private:
 };
 

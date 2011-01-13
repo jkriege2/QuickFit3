@@ -19,7 +19,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFFCSFitEvaluationEditor(QWidget* parent=NULL);
+        QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFFCSFitEvaluationEditor();
     protected slots:
@@ -56,6 +56,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnModelHelp;
 
 
+        QMap<QString, QFFitFunction*> fitModels;
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
@@ -67,6 +68,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
     private:
         /** \brief create all widgets on the form */
         void createWidgets();
+
+
 };
 
 #endif // QFFCSFITEVALUATIONEDITOR_H

@@ -23,8 +23,8 @@ void QFFCSFitEvaluation::intReadData(QDomElement* e) {
 }
 
 
-QFEvaluationEditor* QFFCSFitEvaluation::createEditor(int i, QWidget* parent) {
-    return new QFFCSFitEvaluationEditor(parent);
+QFEvaluationEditor* QFFCSFitEvaluation::createEditor(QFPluginServices* services, int i, QWidget* parent) {
+    return new QFFCSFitEvaluationEditor(services, parent);
 };
 
 bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {

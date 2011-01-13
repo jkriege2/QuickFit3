@@ -6,6 +6,7 @@
 #include "qfproject.h"
 #include "qfevaluationitem.h"
 #include "programoptions.h"
+#include "qfpluginservices.h"
 
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
@@ -62,13 +63,15 @@ class QFEvaluationPropertyEditor : public QWidget {
 
     public:
         /** Default constructor */
-        QFEvaluationPropertyEditor(ProgramOptions* set, QFEvaluationItem* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = 0);
+        QFEvaluationPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFEvaluationItem* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = 0);
         /** Default destructor */
         virtual ~QFEvaluationPropertyEditor();
         /** \brief set a ProgramOptions object to use for storing application settings */
         void setSettings(ProgramOptions* settings);
         /** \brief write the settings */
         virtual void writeSettings();
+        /** \brief return widget ID */
+        int getID() { return id; };
     protected:
         /** \brief points to the record currently displayed */
         QFEvaluationItem* current;
@@ -121,9 +124,11 @@ class QFEvaluationPropertyEditor : public QWidget {
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief of all currently instaciated editors */
-        QList<QFEvaluationEditor*> editorList;
+        QList<QPointer<QFEvaluationEditor> > editorList;
         /** \brief ID used to distinguish between different dialog (e.g. for settings) */
         int id;
+        /** \brief pointer that allows for access to central QuickFit services */
+        QFPluginServices* services;
 };
 
 #endif // QFEVALUATIONPROPERTYEDITOR_H

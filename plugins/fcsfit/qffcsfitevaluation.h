@@ -31,7 +31,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i) { return QString("Fit"); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(int i=0, QWidget* parent=NULL);
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL);
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(QFRawDataRecord* record);

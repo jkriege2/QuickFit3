@@ -69,23 +69,23 @@ void QFPRDRTable::insertTableFile() {
                 roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
 
                 QStringList::Iterator it = list.begin();
-                reporter->setProgressRange(0, list.size());
+                services->setProgressRange(0, list.size());
                 int i=0;
                 while(it != list.end()) {
                     i++;
-                    reporter->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->column_separator)).arg(QString(csvDlg->decimal_separator)).arg(QString(csvDlg->comment_start)).arg(QString(csvDlg->header_start)));
+                    services->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->column_separator)).arg(QString(csvDlg->decimal_separator)).arg(QString(csvDlg->comment_start)).arg(QString(csvDlg->header_start)));
                     QFRawDataRecord* e=project->addRawData("table", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
                     if (e->error()) {
                         project->deleteRawData(e->getID());
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(*it).arg(e->errorDescription()));
-                        reporter->log_error(tr("Error while importing '%1':\n    %2\n").arg(*it).arg(e->errorDescription()));
+                        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(*it).arg(e->errorDescription()));
                     }
                     settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
                     ++it;
-                    reporter->setProgress(i);
+                    services->setProgress(i);
                     QApplication::processEvents();
                 }
-                reporter->setProgress(0);
+                services->setProgress(0);
             }
             delete csvDlg;
         }

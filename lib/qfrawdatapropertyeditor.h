@@ -2,9 +2,11 @@
 #define QFRAWDATAPROPERTYEDITOR_H
 
 #include <QtGui>
+#include <QPointer>
 #include "qfproject.h"
 #include "qfrawdatarecord.h"
 #include "programoptions.h"
+#include "qfpluginservices.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -17,7 +19,7 @@ class QFRawDataPropertyEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRawDataPropertyEditor(ProgramOptions* set, QFRawDataRecord* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = 0);
+        QFRawDataPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFRawDataRecord* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = 0);
         /** Default destructor */
         virtual ~QFRawDataPropertyEditor();
         /** \brief set the current record */
@@ -91,8 +93,10 @@ class QFRawDataPropertyEditor : public QWidget {
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
 
-        QList<QFRawDataEditor*> editorList;
+        QList<QPointer<QFRawDataEditor> > editorList;
         int id;
+        /** \brief pointer that allows for access to central QuickFit services */
+        QFPluginServices* services;
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_H

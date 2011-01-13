@@ -1,7 +1,7 @@
 #ifndef QFPLUGINRAWDATARECORDBASE_H
 #define QFPLUGINRAWDATARECORDBASE_H
 
-#include "qfpluginreportwrapper.h"
+#include "qfpluginservices.h"
 #include "programoptions.h"
 #include "qfproject.h"
 #include <QWidget>
@@ -27,30 +27,30 @@ class QFPluginRawDataRecord {
         virtual void registerToMenu(QMenu* menu)=0;
 
         /** \brief short ID for the plugin */
-        virtual QString getID()=0;
+        virtual QString getID() const =0;
 
         /** \brief name for the plugin */
-        virtual QString getName()=0;
+        virtual QString getName() const =0;
 
         /** \brief short description for the plugin */
-        virtual QString getDescription()=0;
+        virtual QString getDescription() const =0;
 
         /** \brief author the plugin */
-        virtual QString getAuthor()=0;
+        virtual QString getAuthor() const =0;
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright()=0;
+        virtual QString getCopyright() const =0;
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink()=0;
+        virtual QString getWeblink() const =0;
 
         /** \brief icon for the plugin */
-        virtual QString getIconFilename()=0;
+        virtual QString getIconFilename() const =0;
 
         /** \brief set current project */
         virtual void setProject(QFProject* project)=0;
-        /** \brief set reporter class to use for reporting/status output */
-        virtual void setReporter(QFPluginReportWrapper* reporter)=0;
+        /** \brief set services class to use for reporting/status output */
+        virtual void setServices(QFPluginServices* services)=0;
         /** \brief set program options object used by the application */
         virtual void setSettings(ProgramOptions* settings)=0;
         /** \brief set parent widget (e.g. for message dialogs) */
@@ -59,6 +59,7 @@ class QFPluginRawDataRecord {
 };
 
 /** \brief virtual base class for all QuickFit 3 raw data record plugins
+    \ingroup qf3rawdataplugins
 
     Use this class as base when developing raw data record plugins. This class implements some of
     the methods from QFPluginRawDataRecord, as they are generic to all plugins!
@@ -71,14 +72,14 @@ class QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
 
         /** \brief set current project */
         virtual void setProject(QFProject* project) { this->project=project; };
-        /** \brief set reporter class to use for reporting/status output */
-        virtual void setReporter(QFPluginReportWrapper* reporter) { this->reporter=reporter; };
+        /** \brief set services class to use for reporting/status output */
+        virtual void setServices(QFPluginServices* services) { this->services=services; };
         /** \brief set program options object used by the application */
         virtual void setSettings(ProgramOptions* settings) { this->settings=settings; };
         /** \brief set parent widget (e.g. for message dialogs) */
         virtual void setParentWidget(QWidget* parentWidget) { this->parentWidget=parentWidget; };
     protected:
-        QFPluginReportWrapper* reporter;
+        QFPluginServices* services;
         QFProject* project;
         ProgramOptions* settings;
         QWidget* parentWidget;

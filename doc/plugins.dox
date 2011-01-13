@@ -8,6 +8,12 @@
     \defgroup qf3evaluationplugins Evaluation Plugins
     \ingroup qf3plugins
 
+    \defgroup qf3fitalgplugins Fitting Algorithm Plugins
+    \ingroup qf3plugins
+
+    \defgroup qf3fitfunplugins Fitting Function Plugins
+    \ingroup qf3plugins
+
     \defgroup qf3plugintools Plugin programming Tools
     \ingroup qf3plugins
 */

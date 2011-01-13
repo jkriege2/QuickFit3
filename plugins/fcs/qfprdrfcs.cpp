@@ -37,7 +37,7 @@ void QFPRDRFCS::insertALV5000File(const QString& filename, const QMap<QString, Q
     } catch (std::exception& E) {
         cc=0;
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1':\n%2").arg(filename).arg(E.what()));
-        reporter->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(E.what()));
+        services->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(E.what()));
 
     }
     for (unsigned int i=0; i<cc; i++) {
@@ -47,7 +47,7 @@ void QFPRDRFCS::insertALV5000File(const QString& filename, const QMap<QString, Q
         if (e->error()) {
             project->deleteRawData(e->getID());
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1' (channel %3/%4):\n%2").arg(filename).arg(e->errorDescription()).arg(i+1).arg(cc));
-            reporter->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+            services->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
         }
     }
 }
@@ -57,7 +57,7 @@ void QFPRDRFCS::insertCSVFile(const QString& filename, const QMap<QString, QVari
     if (e->error()) {
         project->deleteRawData(e->getID());
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
-        reporter->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
     }
 }
 
@@ -86,14 +86,14 @@ void QFPRDRFCS::insertFCS() {
         paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT";
         QStringList list = files;
         QStringList::Iterator it = list.begin();
-        reporter->setProgressRange(0, list.size());
-        reporter->setProgress(0);
+        services->setProgressRange(0, list.size());
+        services->setProgress(0);
         int i=0;
         while(it != list.end()) {
             i++;
             if (QFile::exists(*it)) {
                 //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
-                reporter->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
+                services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
                 if (currentFCSFileFormatFilter==alvf) {
                     insertALV5000File(*it, p, paramsReadonly);
                 } else {
@@ -104,10 +104,10 @@ void QFPRDRFCS::insertFCS() {
                 //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
                 ++it;
             }
-            reporter->setProgress(i);
+            services->setProgress(i);
             QApplication::processEvents();
         }
-        reporter->setProgress(0);
+        services->setProgress(0);
         //std::cout<<"loading done ...\n";
         //tvMain->expandToDepth(2);
     }

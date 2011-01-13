@@ -74,12 +74,13 @@ void QFEvaluationRawDataModelProxy::selectionChanged(QList<QFRawDataRecord*> sel
 
 
 
-QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(ProgramOptions* set, QFEvaluationItem* current, int id, QWidget* parent, Qt::WindowFlags f):
+QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFEvaluationItem* current, int id, QWidget* parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
     //std::cout<<"creating QFEvaluationPropertyEditor ... \n";
     this->id=id;
     this->current=NULL;
+    this->services=services;
 
     rdrModel=new QFProjectRawDataModel(NULL);
     rdrProxy=new QFEvaluationRawDataModelProxy(rdrModel);
@@ -87,30 +88,38 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(ProgramOptions* set, QFEv
     lstRawData=NULL;
     splitMain=NULL;
 
+    resize(400,300);
+    move(5,5);
+
     setSettings(set);
     //std::cout<<"creating QFEvaluationPropertyEditor ... creating widgets ...\n";
     createWidgets();
+
+    resize(400,300);
+    move(5,5);
     //std::cout<<"creating QFEvaluationPropertyEditor ... setting current ...\n";
     setCurrent(current);
     //std::cout<<"creating QFEvaluationPropertyEditor ... DONE!\n";
+    readSettings();
 }
 
-QFEvaluationPropertyEditor::~QFEvaluationPropertyEditor()
-{
-    std::cout<<"deleting QFEvaluationPropertyEditor\n";
-    std::cout<<"deleting QFEvaluationPropertyEditor ... OK\n";
+QFEvaluationPropertyEditor::~QFEvaluationPropertyEditor() {
+    //std::cout<<"deleting QFEvaluationPropertyEditor\n";
+    //std::cout<<"deleting QFEvaluationPropertyEditor ... OK\n";
 }
 
 void QFEvaluationPropertyEditor::closeEvent ( QCloseEvent * event ) {
+    //std::cout<<"QFEvaluationPropertyEditor::closeEvent\n";
     writeSettings();
     event->accept();
+    //std::cout<<"QFEvaluationPropertyEditor::closeEvent ... OK\n";
 }
 
 void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
     QString oldType="";
     int oldEditorCount=0;
     if (current) {
-        std::cout<<"disconnecting old ...\n";
+        //std::cout<<"disconnecting old ...\n";
         lstRawData->setModel(NULL);
         rdrProxy->setEvaluation(NULL);
         rdrModel->setProject(NULL);
@@ -131,11 +140,11 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
                 }
             }
         }
-        std::cout<<"old disconnected ...\n";
+        //std::cout<<"old disconnected ...\n";
     }
     current=c;
     if (current) {
-        std::cout<<"connecting new ...\n";
+        //std::cout<<"connecting new ...\n";
         rdrModel->setProject(current->getProject());
         rdrProxy->setEvaluation(current);
         if (current->getType()!=oldType) {
@@ -143,7 +152,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
             for (int i=0; i<current->getEditorCount(); i++) {
                 QString n=current->getEditorName(i);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... \n";
-                QFEvaluationEditor* e=current->createEditor(i, tabEditors);
+                QFEvaluationEditor* e=current->createEditor(services, i, tabEditors);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... reading settings\n";
                 e->setSettings(settings, id);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... setting current\n";
@@ -175,8 +184,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
-
-        std::cout<<"new connected ...\n";
+        lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::Select);
+        //std::cout<<"new connected ...\n";
 
 
     } else {
@@ -302,22 +311,34 @@ void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
 
 
 void QFEvaluationPropertyEditor::readSettings() {
-    std::cout<<"QFEvaluationPropertyEditor::readSettings()\n";
     if (!settings) return;
-    QPoint pos = settings->getQSettings()->value(QString("evalpropeditor/pos").arg(id), QPoint(200, 200)).toPoint();
-    QSize size = settings->getQSettings()->value(QString("evalpropeditor/size").arg(id), QSize(300, 400)).toSize();
+    //std::cout<<"QFEvaluationPropertyEditor::readSettings()\n";
+    settings->getQSettings()->sync();
+    /*QPoint pos = settings->getQSettings()->value(QString("evalpropeditor/pos"), QPoint(200, 200)).toPoint();
+    QSize size = settings->getQSettings()->value(QString("evalpropeditor/size"), QSize(300, 400)).toSize();
     resize(size.boundedTo(QApplication::desktop()->screenGeometry(this).size()));
     if (pos.x()<-width() || pos.x()>QApplication::desktop()->screenGeometry(this).width()-30) pos.setX(0);
     if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(this).height()) pos.setY(0);
-    move(pos);
+    move(pos);*/
+    restoreGeometry(settings->getQSettings()->value(QString("evalpropeditor/geometry"), saveGeometry()).toByteArray());
+    //restoreState(settings->getQSettings()->value(QString("evalpropeditor/state"), saveState()).toByteArray());
     if (splitMain) splitMain->restoreState(settings->getQSettings()->value("evalpropeditor/splitter", splitMain->saveState()).toByteArray());
+    for (int i=0; i<editorList.size(); i++) {
+        if (editorList[i]) editorList[i]->readSettings();
+    }
 }
 
 void QFEvaluationPropertyEditor::writeSettings() {
     if (!settings) return;
-    settings->getQSettings()->setValue(QString("evalpropeditor/pos").arg(id), pos());
-    settings->getQSettings()->setValue(QString("evalpropeditor/size").arg(id), size());
+    //std::cout<<"QFEvaluationPropertyEditor::writeSettings()\n";
+    //settings->getQSettings()->setValue(QString("evalpropeditor/pos"), pos());
+    //settings->getQSettings()->setValue(QString("evalpropeditor/size"), size());
+    settings->getQSettings()->setValue(QString("evalpropeditor/geometry"), saveGeometry());
+    //settings->getQSettings()->setValue(QString("evalpropeditor/state"), saveState());
     if (splitMain) settings->getQSettings()->setValue("evalpropeditor/splitter", splitMain->saveState());
+    for (int i=0; i<editorList.size(); i++) {
+        if (editorList[i]) editorList[i]->writeSettings();
+    }
 }
 
 

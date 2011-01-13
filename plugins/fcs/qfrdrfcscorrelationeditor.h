@@ -35,7 +35,7 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         runsModel runs;
     public:
         /** Default constructor */
-        QFRDRFCSCorrelationEditor(QWidget* parent);
+        QFRDRFCSCorrelationEditor(QFPluginServices* services, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRFCSCorrelationEditor();
     protected slots:

@@ -11,7 +11,7 @@
 #include <QList>
 #include <QAction>
 #include "programoptions.h"
-#include "qfpluginreportwrapper.h"
+#include "qfpluginservices.h"
 #include "qfpluginevaluation.h"
 
 // forward
@@ -46,7 +46,7 @@ class QFEvaluationItemFactory : public QObject {
         void searchPlugins(QString directory);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
-        void distribute(QFProject* project, ProgramOptions* settings, QFPluginReportWrapper* reporter, QWidget* parent);
+        void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);
 
 
         /** \brief returns a list of the IDs of all available QFRawDataRecords. */
@@ -65,7 +65,7 @@ class QFEvaluationItemFactory : public QObject {
         };
 
         /** \brief returns a new object (created by new) for a specified QFRawDataRecord ID. */
-        inline QFEvaluationItem* createRecord(QString ID, QFProject* parent)  {
+        inline QFEvaluationItem* createRecord(QString ID, QFPluginServices* services, QFProject* parent)  {
             if (items.contains(ID)) return items[ID]->createRecord(parent);
             return NULL;
         };

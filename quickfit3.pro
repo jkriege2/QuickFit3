@@ -15,5 +15,7 @@ SUBDIRS += plg_fcsfit
 plg_fcsfit.subdir = ./plugins/fcsfit
 plg_fcsfit.depends = lib
 
+SUBDIRS += fcs_fitfuctions
+fcs_fitfuctions.subdir=./plugins/fcs_fitfuctions
 
 

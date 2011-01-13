@@ -7,11 +7,11 @@
 #include "qfrawdatarecordfactory.h"
 
 
-QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginReportWrapper* reporter, QObject* parent):
+QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent), QFProperties()
 {
     dataChange=false;
-    this->reporter=reporter;
+    this->services=services;
     this->rdrFactory=rdrFactory;
     this->evalFactory=evalFactory;
     name="unnamed";
@@ -36,10 +36,10 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     //addEvaluation("unknown", "eval2");
 }
 
-QFProject::QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginReportWrapper* reporter, QObject* parent):
+QFProject::QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent)
 {
-    this->reporter=reporter;
+    this->services=services;
     this->rdrFactory=rdrFactory;
     this->evalFactory=evalFactory;
     dataChange=false;
@@ -290,15 +290,15 @@ void QFProject::readXML(const QString& file) {
                 QDomElement te=e.firstChildElement("properties");
                 readProperties(te);
 
-                if (reporter) {
-                    reporter->setProgressRange(0, e.firstChildElement("rawdata").elementsByTagName("rawdataelement").size()+e.firstChildElement("evaluations").elementsByTagName("evaluation").size());
+                if (services) {
+                    services->setProgressRange(0, e.firstChildElement("rawdata").elementsByTagName("rawdataelement").size()+e.firstChildElement("evaluations").elementsByTagName("evaluation").size());
                 }
                 QDomElement rd=e.firstChildElement("rawdata");
                 if (!rd.isNull()) {
                     rd=rd.firstChildElement("rawdataelement");
                     while (!rd.isNull()) {
-                        if (reporter) {
-                            reporter->incProgress();
+                        if (services) {
+                            services->incProgress();
                             QApplication::processEvents();
                         }
                         QString t=rd.attribute("type", "invalid").toLower();
@@ -316,14 +316,14 @@ void QFProject::readXML(const QString& file) {
                 if (!rd.isNull()) {
                     rd=rd.firstChildElement("evaluationelement");
                     while (!rd.isNull()) {
-                        if (reporter) {
-                            reporter->incProgress();
+                        if (services) {
+                            services->incProgress();
                             QApplication::processEvents();
                         }
                         QString t=rd.attribute("type", "invalid").toLower();
 
                         try {
-                            QFEvaluationItem* e=getEvaluationItemFactory()->createRecord(t, this);
+                            QFEvaluationItem* e=getEvaluationItemFactory()->createRecord(t, services, this);
                             e->init(rd);
                         } catch(std::exception& E) {
                             setError(tr("Error while opening raw data element: %2").arg(E.what()));
@@ -339,8 +339,8 @@ void QFProject::readXML(const QString& file) {
                         rd=rd.nextSiblingElement("evaluationelement");
                     }
                 }
-                if (reporter) {
-                    reporter->setProgress(0);
+                if (services) {
+                    services->setProgress(0);
                 }
             }
         } else {
@@ -415,7 +415,7 @@ QFEvaluationItem* QFProject::addEvaluation(QString type, QString name) {
         e->init(name);
         rde=e;
     }*/
-    rde=getEvaluationItemFactory()->createRecord(type, this);
+    rde=getEvaluationItemFactory()->createRecord(type, services, this);
     if (rde) {
         rde->init(name);
     } else {
