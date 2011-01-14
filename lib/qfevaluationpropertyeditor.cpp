@@ -131,7 +131,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         if (c) {
             if (c->getType()!=oldType) {
-                for (int i=oldEditorCount; i>=1; i--) {
+                for (int i=oldEditorCount; i>=0; i--) {
                     QWidget* w=tabEditors->widget(i);
                     tabEditors->removeTab(i);
                     if (qobject_cast<QFEvaluationEditor *>(w)) qobject_cast<QFEvaluationEditor *>(w)->setSettings(NULL, id);

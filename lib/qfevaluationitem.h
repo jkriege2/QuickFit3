@@ -15,6 +15,8 @@
 #include "qfrawdatarecord.h"
 #include "qfproperties.h"
 #include "qfpluginservices.h"
+#include "qffitalgorithm.h"
+#include "qffitfunction.h"
 
 
 // forward declaration

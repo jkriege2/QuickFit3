@@ -22,7 +22,7 @@ void QFEvaluationItemFactory::searchPlugins(QString directory) {
             QFPluginEvaluationItem* iRecord = qobject_cast<QFPluginEvaluationItem*>(plugin);
             if (iRecord) {
                 items[iRecord->getID()]=iRecord;
-                filenames[iRecord->getID()]=fileName;
+                filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
             }
         }
     }

@@ -59,6 +59,10 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         virtual QFFitFunctionManager* getFitFunctionManager();
         /** \copydoc QFPluginServices::getFitAlgorithmManager() */
         virtual QFFitAlgorithmManager* getFitAlgorithmManager();
+        /** \copydoc QFPluginServices::getSettings() */
+        virtual QSettings* getSettings();
+        /** \copydoc QFPluginServices::getOptions() */
+        virtual ProgramOptions* getOptions();
 
     protected:
         void closeEvent(QCloseEvent *event);

@@ -21,7 +21,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/tools.h \
            ../../../../LIB/trunk/datatable2.h \
            qehtreeview.h \
-           datacutslider.h
+           datacutslider.h \
+           numberedit.h \
+           qfhtmlhelpwindow.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -36,7 +38,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/tools.cpp \
            ../../../../LIB/trunk/datatable2.cpp \
            qehtreeview.cpp \
-           datacutslider.cpp
+           datacutslider.cpp \
+           numberedit.cpp \
+           qfhtmlhelpwindow.cpp
 
 FORMS +=
 

@@ -24,7 +24,7 @@ void QFFitAlgorithmManager::searchPlugins(QString directory) {
             QFPluginFitAlgorithm* iRecord = qobject_cast<QFPluginFitAlgorithm*>(plugin);
             if (iRecord) {
                 fitPlugins[iRecord->getID()]=iRecord;
-                filenames[iRecord->getID()]=fileName;
+                filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
             }
         }
     }

@@ -10,6 +10,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include "datacutslider.h"
+#include "qfhtmlhelpwindow.h"
 
 
 /*! \brief editor class for FCS least-square fits
@@ -24,7 +25,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         virtual ~QFFCSFitEvaluationEditor();
     protected slots:
         /** \brief connect widgets to current data record */
-        virtual void connectWidgets(const QFEvaluationItem* current, const QFEvaluationItem* old);
+        virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void resultsChanged();
         /** \brief read the settings */
@@ -55,16 +56,26 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief pushbutton to show help on Fitting Algorithm */
         QPushButton* btnModelHelp;
 
+        QFHTMLHelpWindow* hlpAlgorithm;
+        QFHTMLHelpWindow* hlpFunction;
 
-        QMap<QString, QFFitFunction*> fitModels;
+
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
+
+        /** \brief display all data and parameters describing the current record */
+        void displayModel();
 
         /** \brief replot curves */
         void replotData();
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
+
+        /** \brief display fit function help */
+        void displayFitFunctionHelp();
+        /** \brief display fit algorithm help */
+        void displayFitAlgorithmHelp();
     private:
         /** \brief create all widgets on the form */
         void createWidgets();

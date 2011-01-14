@@ -775,3 +775,10 @@ QFFitAlgorithmManager* MainWindow::getFitAlgorithmManager() {
     return fitAlgorithmManager;
 }
 
+QSettings* MainWindow::getSettings() {
+    return settings->getQSettings();
+}
+
+ProgramOptions* MainWindow::getOptions() {
+    return settings;
+}

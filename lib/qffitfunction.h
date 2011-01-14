@@ -63,6 +63,20 @@ class QFFitFunction {
         ParameterDescription getDescription(int i) const  {
             return m_parameters[i];
         }
+
+        /** \brief get num of the given parameter or -1 */
+        int getParameterNum(QString param) {
+            for (int i=0; i<m_parameters.size(); i++) {
+                if (m_parameters[i].id==param) return i;
+            }
+            return -1;
+        }
+
+        /** \brief get id of the given parameter or an empty string */
+        QString getParameterID(int i) {
+            if ((i>=0) && (i<m_parameters.size())) return m_parameters[i].id;
+            return QString("");
+        }
     protected:
         /*! \brief add a parameter description
 

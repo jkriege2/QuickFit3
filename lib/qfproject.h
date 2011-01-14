@@ -81,7 +81,6 @@ class QFProject : public QObject, public QFProperties {
 
         QFRawDataRecordFactory* getRawDataRecordFactory() { return rdrFactory; };
         QFEvaluationItemFactory* getEvaluationItemFactory() { return evalFactory; };
-        QFPluginServices* getServices() { return services; };
 
     public:
         /** Default constructor */
@@ -91,6 +90,7 @@ class QFProject : public QObject, public QFProperties {
         /** Default destructor */
         virtual ~QFProject();
 
+        QFPluginServices* getServices() { return services; };
 
         /** \brief return a new unused ID (stores the returned ID as currently highestID, so the next call will return a higher ID!) */
         int getNewID();

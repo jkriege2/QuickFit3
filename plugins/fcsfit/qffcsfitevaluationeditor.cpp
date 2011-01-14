@@ -6,14 +6,13 @@
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
 #include "../fcs/qfrdrfcsdatainterface.h"
-
+#include <iostream>
+#include "qffcsfitevaluation.h"
 
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
     QFEvaluationEditor(services, parent)
 {
     cmbModel=NULL;
-
-    fitModels=services->getFitFunctionManager()->getModels("fcs_", this);
 
     createWidgets();
 }
@@ -88,11 +87,6 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     cmbModel=new QComboBox(w);
     cmbModel->setEditable(false);
 
-    QMapIterator<QString, QFFitFunction*> i(fitModels);
-    while (i.hasNext()) {
-         i.next();
-         cmbModel->addItem(i.value()->name(), i.key());
-    }
 
     l->setBuddy(cmbModel);
     hbl->addWidget(l);
@@ -109,21 +103,48 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     l->setBuddy(cmbWeights);
     hbl->addWidget(l);
     hbl->addWidget(cmbWeights);
+    hbl->addStretch();
     vbl->addLayout(hbl);
-
 
     splitPlot->addWidget(w);
 
+    hlpAlgorithm=new QFHTMLHelpWindow(0);
+    hlpAlgorithm->close();
+    hlpFunction=new QFHTMLHelpWindow(0);
+    hlpFunction->close();
+
     connect(datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
+    connect(btnAlgorithmHelp, SIGNAL(clicked()), this, SLOT(displayFitAlgorithmHelp()));
+    connect(btnModelHelp, SIGNAL(clicked()), this, SLOT(displayFitFunctionHelp()));
 
 }
 
 
-void QFFCSFitEvaluationEditor::connectWidgets(const QFEvaluationItem* current, const QFEvaluationItem* old) {
+void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
+    const QFFCSFitEvaluation* fcs=qobject_cast<QFFCSFitEvaluation*>(current);
+
     if (old!=NULL) {
         disconnect(old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
+
+        cmbModel->clear();
+        cmbAlgorithm->clear();
     }
     connect(current, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
+
+    if (fcs) {
+        QStringList ff=fcs->getAvailableFitFunctions();
+        for (int i=0; i<ff.size(); i++) {
+            QString id=ff[i];
+            cmbModel->addItem(fcs->getFitFunction(id)->name(), id);
+        }
+        ff=fcs->getAvailableFitAlgorithms();
+        for (int i=0; i<ff.size(); i++) {
+            QString id=ff[i];
+            cmbAlgorithm->addItem(fcs->getFitAlgorithm(id)->name(), id);
+        }
+    }
+
+    replotData();
 }
 
 void QFFCSFitEvaluationEditor::resultsChanged() {
@@ -137,7 +158,8 @@ void QFFCSFitEvaluationEditor::readSettings() {
         cmbWeights->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/weights", cmbWeights->currentIndex()).toInt());
         pltData->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
         pltResiduals->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
-
+        hlpAlgorithm->readSettings(*settings->getQSettings(), "fcsfitevaleditor/algorithm_");
+        hlpFunction->readSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
     }
 }
 
@@ -149,6 +171,8 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         settings->getQSettings()->setValue("fcsfitevaleditor/weights", cmbWeights->currentIndex());
         pltData->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
         pltResiduals->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
+        hlpAlgorithm->writeSettings(*settings->getQSettings(), "fcsfitevaleditor/algorithm_");
+        hlpFunction->writeSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
     }
 }
 
@@ -168,7 +192,13 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         datacut->enableSliderSignals();
 
     }
+    displayModel();
     replotData();
+}
+
+void QFFCSFitEvaluationEditor::displayModel() {
+    if (!current) return;
+    if (!cmbModel) return;
 }
 
 void QFFCSFitEvaluationEditor::replotData() {
@@ -244,3 +274,33 @@ void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min,
     replotData();
 }
 
+void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
+    if (!current) return;
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QStringList sl;
+    sl<<":/";
+    QString ppid=cmbModel->itemData(cmbModel->currentIndex()).toString();
+    int pid=services->getFitFunctionManager()->getPluginForID(ppid);
+    QString dll=services->getFitFunctionManager()->getFilename(pid);
+    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).completeBaseName()+QString("/");
+    //std::cout<<sl[1].toStdString()<<std::endl;
+    hlpFunction->setSearchPath(sl);
+    if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), data->getFitFunction(ppid)->id()+".html");
+    else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), data->getFitFunction(ppid)->helpFile());
+    hlpFunction->show();
+}
+
+void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
+    if (!current) return;
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QStringList sl;
+    sl<<":/";
+    QString pid=cmbModel->itemData(cmbModel->currentIndex()).toString();
+    QString dll=services->getFitAlgorithmManager()->getFilename(pid);
+    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).completeBaseName()+QString("/");
+    //std::cout<<sl[1].toStdString()<<std::endl;
+    hlpAlgorithm->setSearchPath(sl);
+    if (data->getFitAlgorithm(pid)->helpFile().isEmpty()) hlpAlgorithm->updateHelp(data->getFitAlgorithm(pid)->name(), data->getFitAlgorithm(pid)->id()+".html");
+    else hlpAlgorithm->updateHelp(data->getFitAlgorithm(pid)->name(), data->getFitAlgorithm(pid)->helpFile());
+    hlpAlgorithm->show();
+}

@@ -21,7 +21,7 @@ void QFRawDataRecordFactory::searchPlugins(QString directory) {
             QFPluginRawDataRecord* iRecord = qobject_cast<QFPluginRawDataRecord*>(plugin);
             if (iRecord) {
                 items[iRecord->getID()]=iRecord;
-                filenames[iRecord->getID()]=fileName;
+                filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
             }
         }
     }

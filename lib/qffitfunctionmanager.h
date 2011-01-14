@@ -55,6 +55,9 @@ class QFFitFunctionManager : public QObject {
          *         all instance are newly created with the given parent in every call! */
         QMap<QString, QFFitFunction*> getModels(QString id_start=QString(""), QObject* parent=NULL);
 
+        /** \brief return the plugin index for a given fit function id */
+        int getPluginForID(QString id) const;
+
     private:
         QList<QFPluginFitFunction*> fitPlugins;
         QStringList filenames;

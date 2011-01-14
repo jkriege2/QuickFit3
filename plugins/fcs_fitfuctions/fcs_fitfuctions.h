@@ -19,7 +19,7 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
         /** \brief return a short unique model ID string */
         virtual QString id() const { return QString("fcs_diff"); };
         /** \brief return a HTML file to be displayed as model help */
-        virtual QString helpFile() const { return QString(""); };
+        virtual QString helpFile() const { return id()+".html"; };
 
         /** \brief evaluate the fitting function with the given parameter vector */
         virtual double evaluate(double t, const double* data) const;
@@ -39,7 +39,7 @@ class QFFitFunctionFCSADiff: public QFFitFunction {
         /** \brief return a short unique model ID string */
         virtual QString id() const { return QString("fcs_adiff"); };
         /** \brief return a HTML file to be displayed as model help */
-        virtual QString helpFile() const { return QString(""); };
+        virtual QString helpFile() const { return id()+".html"; };
 
         /** \brief evaluate the fitting function with the given parameter vector */
         virtual double evaluate(double t, const double* data) const;

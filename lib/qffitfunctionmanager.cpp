@@ -23,7 +23,7 @@ void QFFitFunctionManager::searchPlugins(QString directory) {
             QFPluginFitFunction* iRecord = qobject_cast<QFPluginFitFunction*>(plugin);
             if (iRecord) {
                 fitPlugins.append(iRecord);
-                filenames.append(fileName);
+                filenames.append(pluginsDir.absoluteFilePath(fileName));
             }
         }
     }
@@ -71,4 +71,12 @@ QString QFFitFunctionManager::getWeblink(int i) const {
 
 QStringList QFFitFunctionManager::getIDList(int i) const {
     return fitPlugins[i]->getIDs();
+}
+
+int QFFitFunctionManager::getPluginForID(QString id) const {
+    for (int i=0; i<fitPlugins.size(); i++) {
+         QStringList ids=fitPlugins[i]->getIDs();
+         if (ids.contains(id)) return i;
+   }
+   return -1;
 }

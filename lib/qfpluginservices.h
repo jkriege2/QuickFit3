@@ -2,8 +2,10 @@
 #define QFPLUGINSERVICES_H
 
 #include <QString>
+#include <QSettings>
 #include "qffitalgorithmmanager.h"
 #include "qffitfunctionmanager.h"
+#include "programoptions.h"
 
 /*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
     \ingroup qf3plugintools
@@ -31,6 +33,10 @@ class QFPluginServices {
         virtual QFFitFunctionManager* getFitFunctionManager()=0;
         /** \brief return a pointer to a fit function manager object */
         virtual QFFitAlgorithmManager* getFitAlgorithmManager()=0;
+        /** \brief return a pointer to a valid QSettings object for the main settings INI file */
+        virtual QSettings* getSettings()=0;
+        /** \brief return a pointer to the applications ProgramOptions object */
+        virtual ProgramOptions* getOptions()=0;
 };
 
 #endif // QFPLUGINSERVICES_H

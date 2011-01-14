@@ -134,8 +134,12 @@
 		<Unit filename="libqf3widgets\datacutslider.cpp" />
 		<Unit filename="libqf3widgets\datacutslider.h" />
 		<Unit filename="libqf3widgets\libqf3widgets.pro" />
+		<Unit filename="libqf3widgets\numberedit.cpp" />
+		<Unit filename="libqf3widgets\numberedit.h" />
 		<Unit filename="libqf3widgets\qehtreeview.cpp" />
 		<Unit filename="libqf3widgets\qehtreeview.h" />
+		<Unit filename="libqf3widgets\qfhtmlhelpwindow.cpp" />
+		<Unit filename="libqf3widgets\qfhtmlhelpwindow.h" />
 		<Unit filename="plugins\fcs\alv5000tools.cpp" />
 		<Unit filename="plugins\fcs\alv5000tools.h" />
 		<Unit filename="plugins\fcs\dlg_csvparameters.ui" />
