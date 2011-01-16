@@ -208,6 +208,8 @@ class QFRawDataRecord : public QObject, public QFProperties {
         QString  resultsGetAsString(QString evalName, QString resultName);
         /** \brief return a specified result as double (or 0 if not possible!) */
         double resultsGetAsDouble(QString evalName, QString resultName);
+        /** \brief return a specified result as integer (or 0 if not possible!) */
+        int64_t resultsGetAsInteger(QString evalName, QString resultName);
         /** \brief return a specified result as double (or 0 if not possible!) */
         QVector<double> resultsGetAsDoubleList(QString evalName, QString resultName);
         /** \brief return a specified result's error as double (or 0 if not possible!) */

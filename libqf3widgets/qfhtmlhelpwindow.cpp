@@ -50,3 +50,8 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename) {
     descriptionBrowser->reload();
 }
 
+
+void QFHTMLHelpWindow::clear() {
+    labelTitle->setText("");
+    descriptionBrowser->clear();
+}

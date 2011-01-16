@@ -40,6 +40,8 @@ class QFHTMLHelpWindow : public QWidget {
     public slots:
         /** \brief updates the information in the window */
         void updateHelp(QString title, QString filename);
+        /** \brief clear contents of window */
+        void clear();
     private:
         /** \brief a label for the model name */
         QLabel* labelTitle;

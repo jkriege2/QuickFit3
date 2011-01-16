@@ -23,6 +23,8 @@ void QFEvaluationItemFactory::searchPlugins(QString directory) {
             if (iRecord) {
                 items[iRecord->getID()]=iRecord;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
+                emit showMessage(tr("loaded evaluation plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
+                emit showLongMessage(tr("loaded evaluation plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[iRecord->getID()]).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
             }
         }
     }

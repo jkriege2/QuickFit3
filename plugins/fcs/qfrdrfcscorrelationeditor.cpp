@@ -164,6 +164,10 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
 
     splitter->addWidget(wp);
     splitter->addWidget(w);
+    splitter->setCollapsible(0, false);
+    splitter->setCollapsible(1, false);
+    splitter->setStretchFactor(0,5);
+    splitter->setStretchFactor(1,1);
 
 };
 
@@ -368,11 +372,11 @@ void QFRDRFCSCorrelationEditor::readSettings() {
     if (!settings) return;
     //std::cout<<"--QFRDRFCSCorrelationEditor::readSettings()\n";
     plotter->loadSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
-    splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/corrsplitterSizes")).toByteArray());
+    //splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/corrsplitterSizes")).toByteArray());
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/log_tau_axis"), true).toBool());
     cmbAverageErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/error_display"), 2).toInt());
     cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_display"), 0).toInt());
-
+    loadSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/corrsplitterSizes");
 };
 
 
@@ -380,10 +384,11 @@ void QFRDRFCSCorrelationEditor::writeSettings() {
     if (!settings) return;
     //std::cout<<"--QFRDRFCSCorrelationEditor::writeSettings()\n";
     plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
-    settings->getQSettings()->setValue(QString("fcsdataeditor/corrsplitterSizes"), splitter->saveState());
+    //settings->getQSettings()->setValue(QString("fcsdataeditor/corrsplitterSizes"), splitter->saveState());
     settings->getQSettings()->setValue(QString("fcsdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/error_display"), cmbAverageErrors->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/run_display"), cmbRunDisplay->currentIndex());
+    saveSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/corrsplitterSizes");
 };
 
 

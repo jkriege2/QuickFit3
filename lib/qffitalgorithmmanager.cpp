@@ -25,6 +25,8 @@ void QFFitAlgorithmManager::searchPlugins(QString directory) {
             if (iRecord) {
                 fitPlugins[iRecord->getID()]=iRecord;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
+                emit showMessage(tr("loaded fit algorithm plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
+                emit showLongMessage(tr("loaded fit algorithm plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
             }
         }
     }

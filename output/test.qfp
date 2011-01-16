@@ -3,348 +3,238 @@
     <description><![CDATA[]]></description>
     <properties/>
     <rawdata>
-        <rawdataelement type="fcs" name="Hela_16_39d.asc - CH0" id="0">
-            <description><![CDATA[]]></description>
-            <properties>
-                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
-                <property name="CHANNEL" type="int" data="0" usereditable="false"/>
-                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
-                <property name="DATE" type="date" data="2008-08-22" usereditable="false"/>
-                <property name="DUAL_CHANNEL" type="bool" data="true" usereditable="false"/>
-                <property name="DURATION [s]" type="double" data="3" usereditable="false"/>
-                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
-                <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false"/>
-                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
-                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
-                <property name="Samplename" type="string" data="" usereditable="false"/>
-                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
-                <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
-                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
-                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="151" usereditable="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false"/>
-                <property name="fcscorreditor_datacut_max" type="int" data="151" usereditable="false"/>
-                <property name="fcscorreditor_datacut_min" type="int" data="2" usereditable="false"/>
-            </properties>
-            <results/>
-            <files>
-                <file>testdata/Hela_16_39d.asc</file>
-            </files>
-            <data/>
-        </rawdataelement>
-        <rawdataelement type="fcs" name="Hela_16_39d.asc - CH1" id="1">
-            <description><![CDATA[]]></description>
-            <properties>
-                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
-                <property name="CHANNEL" type="int" data="1" usereditable="false"/>
-                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
-                <property name="DATE" type="date" data="2008-08-22" usereditable="false"/>
-                <property name="DUAL_CHANNEL" type="bool" data="true" usereditable="false"/>
-                <property name="DURATION [s]" type="double" data="3" usereditable="false"/>
-                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
-                <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false"/>
-                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
-                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
-                <property name="Samplename" type="string" data="" usereditable="false"/>
-                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
-                <property name="TIME" type="time" data="14:13:31" usereditable="false"/>
-                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
-                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="151" usereditable="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="6" usereditable="false"/>
-                <property name="fcscorreditor_datacut_max" type="int" data="138" usereditable="false"/>
-                <property name="fcscorreditor_datacut_min" type="int" data="8" usereditable="false"/>
-            </properties>
-            <results/>
-            <files>
-                <file>testdata/Hela_16_39d.asc</file>
-            </files>
-            <data/>
-        </rawdataelement>
-        <rawdataelement type="fcs" name="ASCII_correlation.txt" id="2">
-            <description><![CDATA[]]></description>
-            <properties>
-                <property name="CSV_COMMENT" type="string" data="#" usereditable="false"/>
-                <property name="CSV_SEPARATOR" type="string" data="," usereditable="false"/>
-                <property name="FILETYPE" type="string" data="CSV_CORR" usereditable="false"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="102" usereditable="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false"/>
-            </properties>
-            <results/>
-            <files>
-                <file>testdata/ASCII_correlation.txt</file>
-            </files>
-            <data/>
-        </rawdataelement>
-        <rawdataelement type="table" name="NEW_TABLE" id="4">
-            <description><![CDATA[]]></description>
-            <properties/>
-            <results/>
-            <data>
-                <column title="1">
-                    <row type="double" value="2e-06"/>
-                    <row type="double" value="3e-06"/>
-                    <row type="double" value="4e-06"/>
-                    <row type="double" value="5e-06"/>
-                    <row type="double" value="6e-06"/>
-                    <row type="double" value="7e-06"/>
-                    <row type="double" value="8e-06"/>
-                    <row type="double" value="9e-06"/>
-                    <row type="double" value="1e-05"/>
-                    <row type="double" value="1.1e-05"/>
-                    <row type="double" value="1.2e-05"/>
-                    <row type="double" value="1.8e-05"/>
-                    <row type="double" value="2.4e-05"/>
-                    <row type="double" value="3e-05"/>
-                    <row type="double" value="3.6e-05"/>
-                    <row type="double" value="4.2e-05"/>
-                    <row type="double" value="4.8e-05"/>
-                    <row type="double" value="5.4e-05"/>
-                    <row type="double" value="6e-05"/>
-                    <row type="double" value="6.6e-05"/>
-                    <row type="double" value="7.2e-05"/>
-                    <row type="double" value="0.000108"/>
-                    <row type="double" value="0.000144"/>
-                    <row type="double" value="0.00018"/>
-                    <row type="double" value="0.000216"/>
-                    <row type="double" value="0.000252"/>
-                    <row type="double" value="0.000288"/>
-                    <row type="double" value="0.000324"/>
-                    <row type="double" value="0.00036"/>
-                    <row type="double" value="0.000396"/>
-                    <row type="double" value="0.000432"/>
-                    <row type="double" value="0.000648"/>
-                    <row type="double" value="0.000864"/>
-                    <row type="double" value="0.00108"/>
-                    <row type="double" value="0.001296"/>
-                    <row type="double" value="0.001512"/>
-                    <row type="double" value="0.001728"/>
-                    <row type="double" value="0.001944"/>
-                    <row type="double" value="0.00216"/>
-                    <row type="double" value="0.002376"/>
-                    <row type="double" value="0.002592"/>
-                    <row type="double" value="0.003888"/>
-                    <row type="double" value="0.005184"/>
-                    <row type="double" value="0.00648"/>
-                    <row type="double" value="0.007776"/>
-                    <row type="double" value="0.009072"/>
-                    <row type="double" value="0.010368"/>
-                    <row type="double" value="0.011664"/>
-                    <row type="double" value="0.01296"/>
-                    <row type="double" value="0.014256"/>
-                    <row type="double" value="0.015552"/>
-                    <row type="double" value="0.023328"/>
-                    <row type="double" value="0.031104"/>
-                    <row type="double" value="0.03888"/>
-                    <row type="double" value="0.046656"/>
-                    <row type="double" value="0.054432"/>
-                    <row type="double" value="0.062208"/>
-                    <row type="double" value="0.069984"/>
-                    <row type="double" value="0.07776"/>
-                    <row type="double" value="0.085536"/>
-                    <row type="double" value="0.093312"/>
-                    <row type="double" value="0.139968"/>
-                    <row type="double" value="0.186624"/>
-                    <row type="double" value="0.23328"/>
-                    <row type="double" value="0.279936"/>
-                    <row type="double" value="0.326592"/>
-                    <row type="double" value="0.373248"/>
-                    <row type="double" value="0.419904"/>
-                    <row type="double" value="0.46656"/>
-                    <row type="double" value="0.513216"/>
-                    <row type="double" value="0.559872"/>
-                    <row type="double" value="0.839808"/>
-                    <row type="double" value="1.11974"/>
-                    <row type="double" value="1.39968"/>
-                    <row type="double" value="1.67962"/>
-                    <row type="double" value="1.95955"/>
-                    <row type="double" value="2.23949"/>
-                    <row type="double" value="2.51942"/>
-                    <row type="double" value="2.79936"/>
-                    <row type="double" value="3.0793"/>
-                    <row type="double" value="3.35923"/>
-                    <row type="double" value="5.03885"/>
-                    <row type="double" value="6.71846"/>
-                    <row type="double" value="8.39808"/>
-                    <row type="double" value="10.0777"/>
-                    <row type="double" value="11.7573"/>
-                    <row type="double" value="13.4369"/>
-                    <row type="double" value="15.1165"/>
-                    <row type="double" value="16.7962"/>
-                    <row type="double" value="18.4758"/>
-                    <row type="double" value="20.1554"/>
-                    <row type="double" value="30.2331"/>
-                    <row type="double" value="40.3108"/>
-                    <row type="double" value="50.3885"/>
-                    <row type="double" value="60.4662"/>
-                    <row type="double" value="70.5439"/>
-                    <row type="double" value="80.6216"/>
-                    <row type="double" value="90.6993"/>
-                    <row type="double" value="100.777"/>
-                    <row type="double" value="110.855"/>
-                    <row type="double" value="120.932"/>
-                    <row type="QString" value=""/>
-                </column>
-                <column title="">
-                    <row type="double" value="1.03494"/>
-                    <row type="double" value="1.03239"/>
-                    <row type="double" value="1.03125"/>
-                    <row type="double" value="1.03276"/>
-                    <row type="double" value="1.03097"/>
-                    <row type="double" value="1.02971"/>
-                    <row type="double" value="1.02747"/>
-                    <row type="double" value="1.03076"/>
-                    <row type="double" value="1.02666"/>
-                    <row type="double" value="1.02738"/>
-                    <row type="double" value="1.02645"/>
-                    <row type="double" value="1.02261"/>
-                    <row type="double" value="1.02266"/>
-                    <row type="double" value="1.01882"/>
-                    <row type="double" value="1.018"/>
-                    <row type="double" value="1.01389"/>
-                    <row type="double" value="1.01309"/>
-                    <row type="double" value="1.01255"/>
-                    <row type="double" value="1.01161"/>
-                    <row type="double" value="1.00888"/>
-                    <row type="double" value="1.00827"/>
-                    <row type="double" value="1.00444"/>
-                    <row type="double" value="1.0024"/>
-                    <row type="double" value="1.00096"/>
-                    <row type="double" value="0.999636"/>
-                    <row type="double" value="0.99822"/>
-                    <row type="double" value="0.997105"/>
-                    <row type="double" value="0.998288"/>
-                    <row type="double" value="0.998032"/>
-                    <row type="double" value="0.996723"/>
-                    <row type="double" value="0.994739"/>
-                    <row type="double" value="0.99098"/>
-                    <row type="double" value="0.989361"/>
-                    <row type="double" value="0.988261"/>
-                    <row type="double" value="0.986538"/>
-                    <row type="double" value="0.985039"/>
-                    <row type="double" value="0.983383"/>
-                    <row type="double" value="0.982659"/>
-                    <row type="double" value="0.98103"/>
-                    <row type="double" value="0.978045"/>
-                    <row type="double" value="0.974524"/>
-                    <row type="double" value="0.963731"/>
-                    <row type="double" value="0.95116"/>
-                    <row type="double" value="0.940484"/>
-                    <row type="double" value="0.928447"/>
-                    <row type="double" value="0.913556"/>
-                    <row type="double" value="0.900938"/>
-                    <row type="double" value="0.886567"/>
-                    <row type="double" value="0.873884"/>
-                    <row type="double" value="0.862074"/>
-                    <row type="double" value="0.848291"/>
-                    <row type="double" value="0.750367"/>
-                    <row type="double" value="0.664616"/>
-                    <row type="double" value="0.582373"/>
-                    <row type="double" value="0.500011"/>
-                    <row type="double" value="0.417648"/>
-                    <row type="double" value="0.335432"/>
-                    <row type="double" value="0.249526"/>
-                    <row type="double" value="0.165869"/>
-                    <row type="double" value="0.0808492"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value="0"/>
-                    <row type="QString" value=""/>
-                </column>
-            </data>
-        </rawdataelement>
-        <rawdataelement type="fcs" name="20nM_488_Day2_04s.asc - CH0" id="5">
-            <description><![CDATA[]]></description>
-            <properties>
-                <property name="ANGLE [°]" type="double" data="0" usereditable="false"/>
-                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false"/>
-                <property name="CHANNEL" type="uint" data="0" usereditable="false"/>
-                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false"/>
-                <property name="DATE" type="date" data="2009-01-20" usereditable="false"/>
-                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false"/>
-                <property name="DURATION [s]" type="double" data="10" usereditable="false"/>
-                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false"/>
-                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false"/>
-                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false"/>
-                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false"/>
-                <property name="Samplename" type="string" data="" usereditable="false"/>
-                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false"/>
-                <property name="TIME" type="time" data="11:02:15" usereditable="false"/>
-                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false"/>
-                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="175" usereditable="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false"/>
-                <property name="fcscorreditor_datacut_max" type="int" data="175" usereditable="false"/>
-                <property name="fcscorreditor_datacut_min" type="int" data="4" usereditable="false"/>
-            </properties>
-            <results/>
-            <files>
-                <file>testdata/20nM_488_Day2_04s.asc</file>
-            </files>
-            <data>
-                <leaveout list="2,3,4,1"/>
-            </data>
-        </rawdataelement>
         <rawdataelement type="table" name="ASCII_correlation.txt" id="8">
             <description><![CDATA[]]></description>
             <properties>
-                <property name="column_separator" type="string" data="," usereditable="false"/>
-                <property name="comment_start" type="string" data="#" usereditable="false"/>
-                <property name="decimal_separator" type="string" data="." usereditable="false"/>
-                <property name="header_start" type="string" data="#!" usereditable="false"/>
+                <property name="column_separator" type="string" data="," usereditable="false" visible="true"/>
+                <property name="comment_start" type="string" data="#" usereditable="false" visible="true"/>
+                <property name="decimal_separator" type="string" data="." usereditable="false" visible="true"/>
+                <property name="header_start" type="string" data="#!" usereditable="false" visible="true"/>
             </properties>
             <results/>
             <files>
                 <file>testdata/ASCII_correlation.txt</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="qd525_20nM_15ul_al488_20nM_15ul.ASC - CH0" id="9">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="14:52:17" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcscorreditor_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="al488_20nM_3.ASC - CH0" id="10">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="15:00:57" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/al488_20nM_3.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_0ul_1.ASC - CH0" id="11">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="13:49:03" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_2nM_Al488_0ul_1.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_5ul.ASC - CH0" id="12">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="12:05:08" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
+                <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_2nM_Al488_5ul.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_10ul.ASC - CH0" id="13">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="12:06:05" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_2nM_Al488_10ul.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_15ul.ASC - CH0" id="14">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="12:07:01" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_2nM_Al488_15ul.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="egfp1_2.ASC - CH0" id="15">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="15:23:50" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="10" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
+                <property name="fcs_fit16_last_run" type="int" data="1" usereditable="true" visible="true"/>
+                <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcscorreditor_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results>
+                <evaluation name="fcs_fit_16">
+                    <result name="last_run" type="integer" value="1" unit=""/>
+                </evaluation>
+            </results>
+            <files>
+                <file>testdata/egfp1_2.ASC</file>
             </files>
             <data/>
         </rawdataelement>
     </rawdata>
     <evaluations>
-        <evaluationelement type="fcs_fit" name="FCS Fit" id="3">
+        <evaluationelement type="fcs_fit" name="FCS Fit" id="16">
             <description><![CDATA[]]></description>
-            <data/>
-        </evaluationelement>
-        <evaluationelement type="fcs_fit" name="FCS Fit" id="6">
-            <description><![CDATA[]]></description>
+            <properties>
+                <property name="plot_errorstyle" type="int" data="2" usereditable="false" visible="false"/>
+                <property name="plot_grid" type="bool" data="false" usereditable="false" visible="false"/>
+                <property name="plot_style" type="int" data="0" usereditable="false" visible="false"/>
+                <property name="plot_taulog" type="bool" data="true" usereditable="false" visible="false"/>
+            </properties>
             <data/>
         </evaluationelement>
     </evaluations>

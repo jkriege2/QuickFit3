@@ -24,6 +24,8 @@ void QFFitFunctionManager::searchPlugins(QString directory) {
             if (iRecord) {
                 fitPlugins.append(iRecord);
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
+                emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
+                emit showLongMessage(tr("loaded fit function plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
             }
         }
     }

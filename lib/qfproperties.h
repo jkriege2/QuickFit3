@@ -23,7 +23,7 @@ class QFProperties {
         /** \brief clear all properties */
         inline void clearProperties() { props.clear(); emitPropertiesChanged(); }
         /** \brief return the value of the specified property */
-        inline QVariant getProperty( const QString& p) { return props[p].data; };
+        inline QVariant getProperty( const QString& p) { if (props.contains(p)) return props[p].data; else return QVariant(); };
         /** \brief return the value of the specified property or the supplied default value */
         inline QVariant getProperty(const QString& p, const QVariant& defaultValue) {
             if (props.contains(p)) return props.value(p).data;

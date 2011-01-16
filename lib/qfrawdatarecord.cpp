@@ -105,6 +105,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     r.unit=re.attribute("unit", "");
                 }
                 if (!n.isEmpty() && !en.isEmpty()) results[en].insert(n, r);
+                re=re.nextSiblingElement("result");
             }
             te = te.nextSiblingElement("evaluation");
         }
@@ -143,15 +144,21 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
     storeProperties(w);
     w.writeEndElement();
     w.writeStartElement("results");
-    for (int i=0; i<results.keys().size(); i++) {
+    QMapIterator<QString, QMap<QString, evaluationResult> > i(results);
+    while (i.hasNext()) {
+    //for (int i=0; i<results.keys().size(); i++) {
+        i.next();
         w.writeStartElement("evaluation");
-        QString n=props.keys().at(i);
+        QString n=i.key();
         w.writeAttribute("name", n);
-        for (int j=0; j<results[n].size(); j++) {
+        QMapIterator<QString, evaluationResult> j(i.value());
+        //for (int j=0; j<i.value().size(); j++) {
+        while (j.hasNext()) {
+            j.next();
             w.writeStartElement("result");
-            QString rn=results[n].keys().at(j);
+            QString rn=j.key();
             w.writeAttribute("name", rn);
-            evaluationResult r=results[n].value(rn);
+            evaluationResult r=j.value();
             switch(r.type) {
                 case qfrdreInvalid:
                     w.writeAttribute("type", "invalid");
@@ -299,6 +306,17 @@ double QFRawDataRecord::resultsGetAsDouble(QString evalName, QString resultName)
         case qfrdreInteger: return r.ivalue;
         case qfrdreNumber: case qfrdreNumberError: return r.dvalue;
         case qfrdreString: return r.svalue.toDouble();
+    }
+    return 0.0;
+}
+
+int64_t QFRawDataRecord::resultsGetAsInteger(QString evalName, QString resultName) {
+    evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreBoolean: if (r.bvalue) return 1; else return 0;
+        case qfrdreInteger: return r.ivalue;
+        case qfrdreNumber: case qfrdreNumberError: return r.dvalue;
+        case qfrdreString: return r.svalue.toInt();
     }
     return 0.0;
 }

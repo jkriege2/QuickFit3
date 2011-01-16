@@ -7,6 +7,7 @@
 #include "qfrawdatarecord.h"
 #include "programoptions.h"
 #include "qfpluginservices.h"
+#include "qftools.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project

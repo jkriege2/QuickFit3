@@ -29,17 +29,16 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         /** \brief return type (longer type string, user readable) */
         virtual QString getTypeName() const { return tr("FCS Fit"); };
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/projecttree_emptyevaluation.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/fcs_fit.png"); };
         /** \brief return type description */
         virtual QString getTypeDescription() const { return tr("Least squares fitting for fluorescence correlation spectroscopy data"); };
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/projecttree_emptyevaluatione.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/fcs_fit_logo.png"); };
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 1; };
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName(int i) { return QString("Fit"); };
+        virtual QString getEditorName() { return QString("Fit"); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL);
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(QFRawDataRecord* record);
@@ -51,11 +50,12 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         QFFitAlgorithm* getFitAlgorithm() const { return getFitAlgorithm(m_fitAlgorithm); };
 
         /** \brief set the current fitting algorithm */
-        void setFitFunction(QString fitFunction) { m_fitFunction=fitFunction; };
+        void setFitFunction(QString fitFunction);
         /** \brief get the current fitting algorithm */
-        QFFitFunction* getFitFunction() const { return getFitFunction(m_fitFunction); };
+        QFFitFunction* getFitFunction();
 
-
+        /** \brief set the current run to use, -1 = average, 0..N = runs, <-1: invalid */
+        int getCurrentRun();//{ return m_currentRun; }
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
 
@@ -189,6 +189,11 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         void fillParametersMax(double* param);
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction */
         void fillFix(bool* param);
+
+    public slots:
+        /** \brief set the current run to use, -1 = average, 0..N = runs, <-1: invalid */
+        void setCurrentRun(int run);
+
     protected:
         /** \brief struct used to locally store fit parameter properties */
         struct FitParameter {
@@ -206,18 +211,24 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         QMap<QString, FitParameter> parameterStore;
 
         /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-        inline QString getParameterStoreID(QString parameter) const {
+        inline QString getParameterStoreID(QString parameter) {
             QString ff="";
             if (getFitFunction()!=NULL) {
-                ff=m_fitFunction;
+                ff=getFitFunction()->id();
             }
             return QString(ff+"___"+parameter).trimmed().toLower();
         };
 
         /** \brief create an ID to reference results that belong to this evaluation \u object (includes the evaluation id) and the
          *         current fit function */
-        inline QString getEvaluationResultID() const {
-            return getType()+"_"+m_fitFunction;
+        inline QString getEvaluationResultID() {
+            return getEvaluationResultID(m_fitFunction);
+        }
+
+        /** \brief create an ID to reference results that belong to this evaluation \u object (includes the evaluation id) and the
+         *         current fit function for a given fitFunction ID */
+        inline QString getEvaluationResultID(QString fitFunction) {
+            return getType()+"_"+QString::number(getID())+"_"+fitFunction+"_run"+QString::number(m_currentRun);
         }
 
         /** \brief determine whether a fit has been carried out for the currently highlighted record
@@ -248,6 +259,9 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
 
         /** \brief settings object to access fit parameters */
         QSettings* fitParamSettings;
+
+        /** \brief current run to use, -1 = average, 0..N = runs, <-1: invalid */
+        int m_currentRun;
 
     private:
 };

@@ -181,6 +181,10 @@ void QFRDRFCSRateEditor::createWidgets() {
 
     splitter->addWidget(wp);
     splitter->addWidget(w);
+    splitter->setCollapsible(0, false);
+    splitter->setCollapsible(1, false);
+    splitter->setStretchFactor(0,5);
+    splitter->setStretchFactor(1,1);
 
 };
 
@@ -238,20 +242,20 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
         rateT=m->getBinnedRateT();
         rate=m->getBinnedRate();
         rateN=m->getBinnedRateN();
-        binned=tr("binned");
+        binned=tr("bin ");
     } else if (cmbRateDisplay->currentIndex()==1) {
         if (m->getBinnedRateN()>0){
             rateT=m->getBinnedRateT();
             rate=m->getBinnedRate();
             rateN=m->getBinnedRateN();
-            binned=tr("binned");
+            binned=tr("bin ");
         }
     } else if (cmbRateDisplay->currentIndex()==2) {
         if (rateN<=0){
             rateT=m->getBinnedRateT();
             rate=m->getBinnedRate();
             rateN=m->getBinnedRateN();
-            binned=tr("binned");
+            binned=tr("bin ");
         }
     }
 
@@ -264,13 +268,13 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
 
         if (cmbRunDisplay->currentIndex()==0) { // plot all runs
             for (unsigned int i=0; i<rateRuns; i++) {
-                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3: %2 run %1").arg(i).arg(binned).arg(name).toStdString());
+                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3: %2run %1").arg(i).arg(binned).arg(name).toStdString());
 
                 JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter);
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_run);
-                g->set_title(tr("\\verb{%2} run %1").arg(i).arg(binned));
+                g->set_title(tr("\\verb{%3} %2run %1").arg(i).arg(binned).arg(name));
                 plotter->addGraph(g);
                 if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
                     double mean=m->calcRateMean(i);
@@ -303,7 +307,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                     g->set_color(QColor("red"));
                     g->set_xColumn(c_tau);
                     g->set_yColumn(c_run);
-                    g->set_title(tr("\\verb{%3}: %2 run %1").arg(i).arg(binned).arg(name));
+                    g->set_title(tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name));
                     plotter->addGraph(g);
                     if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
                         double mean=m->calcRateMean(i);
@@ -327,9 +331,9 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                     }
                 } else {
                     if (!m->leaveoutRun(i)) {
-                        plotter->addGraph(c_tau, c_run, tr("\\verb{%3}: %2 run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        plotter->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
                     } else {
-                        plotter->addGraph(c_tau, c_run, tr("\\verb{%3}: %2 run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("grey"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        plotter->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("grey"), JKQTPnoSymbol, Qt::SolidLine, 1);
                     }
                 }
             }
@@ -342,7 +346,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                     g->set_lineWidth(1);
                     g->set_xColumn(c_tau);
                     g->set_yColumn(c_run);
-                    g->set_title(tr("\\verb{%3}: %2 run %1").arg(i).arg(binned).arg(name));
+                    g->set_title(tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name));
                     plotter->addGraph(g);
                     if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
                         double mean=m->calcRateMean(i);
@@ -434,12 +438,13 @@ void QFRDRFCSRateEditor::readSettings() {
     if (!settings) return;
     //std::cout<<"QFRDRFCSRateEditor::readSettings()\n";
     plotter->loadSettings(*(settings->getQSettings()), QString("fcsdataeditor/rateplot"));
-    splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/ratesplitterSizes")).toByteArray());
+    //splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/ratesplitterSizes")).toByteArray());
     cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/raterun_display"), 0).toInt());
     chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/rateaverage_display"), true).toBool());
     chkDisplayStatistics->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/ratestatistics_display"), false).toBool());
     chkIncludeRate0->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/include_rate0"), true).toBool());
     chkOverlay->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/rate_overlay"), false).toBool());
+    loadSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/ratesplitterSizes");
 
     replotData();
 };
@@ -449,12 +454,13 @@ void QFRDRFCSRateEditor::writeSettings() {
     //std::cout<<"QFRDRFCSRateEditor::writeSettings()\n";
     if (!settings) return;
     plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/rateplot"));
-    settings->getQSettings()->setValue(QString("fcsdataeditor/ratesplitterSizes"), splitter->saveState());
+    //settings->getQSettings()->setValue(QString("fcsdataeditor/ratesplitterSizes"), splitter->saveState());
     settings->getQSettings()->setValue(QString("fcsdataeditor/raterun_display"), cmbRunDisplay->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/rateaverage_display"), chkDisplayAverage->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/ratestatistics_display"), chkDisplayStatistics->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/include_rate0"), chkIncludeRate0->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/rate_overlay"), chkOverlay->isChecked());
+    saveSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/ratesplitterSizes");
 };
 
 

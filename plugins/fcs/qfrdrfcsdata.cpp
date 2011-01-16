@@ -225,9 +225,9 @@ void QFRDRFCSData::exportData(const QString& format, const QString& filename)con
 
 void QFRDRFCSData::intWriteData(QXmlStreamWriter& w) {
     if (leaveout.size()>0) {
-        QString l;
+        QString l="";
         for (int i=0; i<leaveout.size(); i++) {
-            if (i>0) l=l+",";
+            if (!l.isEmpty()) l=l+",";
             l=l+QString::number(leaveout[i]);
         }
         w.writeStartElement("leaveout");
@@ -252,6 +252,7 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
     autoCalcRateN=getProperty("AUTO_BINNED_RATE_N", autoCalcRateN).toInt();
 
     QString filetype=getProperty("FILETYPE", "unknown").toString();
+    //std::cout<<"reading data "<<filetype.toStdString()<<"\n";
     if (filetype.toUpper()=="ALV5000") {
         loadFromALV5000(files[0]);
     } else if (filetype.toUpper()=="CSV_CORR") {

@@ -221,6 +221,7 @@ void QFRawDataPropertyEditor::propsChanged() {
 void QFRawDataPropertyEditor::createWidgets() {
     QVBoxLayout* ml=new QVBoxLayout(this);
     setLayout(ml);
+    ml->setContentsMargins(2,2,2,2);
     QHBoxLayout* vl=new QHBoxLayout(this);
     ml->addLayout(vl);
     btnPrevious=new QPushButton(QIcon(":/prop_previous.png"), tr("&previous"), this);
@@ -357,12 +358,7 @@ void QFRawDataPropertyEditor::setSettings(ProgramOptions* settings) {
 
 void QFRawDataPropertyEditor::readSettings() {
     if (!settings) return;
-    QPoint pos = settings->getQSettings()->value(QString("rawdatapropeditor/pos"), QPoint(200, 200)).toPoint();
-    QSize size = settings->getQSettings()->value(QString("rawdatapropeditor/size"), QSize(300, 400)).toSize();
-    resize(size.boundedTo(QApplication::desktop()->screenGeometry(this).size()));
-    if (pos.x()<-width() || pos.x()>QApplication::desktop()->screenGeometry(this).width()-30) pos.setX(0);
-    if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(this).height()) pos.setY(0);
-    move(pos);
+    loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(20, 20), QSize(800, 600), "rawdatapropeditor/");
     for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) {
             editorList[i]->readSettings();
@@ -372,8 +368,7 @@ void QFRawDataPropertyEditor::readSettings() {
 
 void QFRawDataPropertyEditor::writeSettings() {
     if (!settings) return;
-    settings->getQSettings()->setValue(QString("rawdatapropeditor/pos"), pos());
-    settings->getQSettings()->setValue(QString("rawdatapropeditor/size"), size());
+    saveWidgetGeometry(*(settings->getQSettings()), this, "rawdatapropeditor/");
     for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) {
             editorList[i]->writeSettings();

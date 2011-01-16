@@ -2,5 +2,23 @@
 <qresource>
     <file alias="fcs_fit.png">../../images/16x16/fcs_fit.png</file>
     <file alias="fcs_fit_logo.png">../../images/22x22/fcs_fit.png</file>
+    <file alias="fcs_fit_config.png">../../images/16x16/fcsfit_configure.png</file>
+    <file alias="fcs_fit_help.png">../../images/16x16/fcsfit_help.png</file>
+    <file alias="fcs_fit_savereport.png">../../images/22x22/fcs_savereport.png</file>
+    <file alias="fcs_fit_printreport.png">../../images/22x22/fcs_printreport.png</file>
+
+    <file alias="fcsplot_saveplot.png">../../images/22x22/fcsplot_saveplot.png</file>
+    <file alias="fcsplot_savedata.png">../../images/22x22/fcsplot_savedata.png</file>
+    <file alias="fcsplot_print.png">../../images/22x22/fcsplot_print.png</file>
+    <file alias="fcsplot_zoomall.png">../../images/22x22/fcsplot_zoomall.png</file>
+
+    <file alias="fcsplot_points.png">../../images/16x16/fcsplot_points.png</file>
+    <file alias="fcsplot_pointslines.png">../../images/16x16/fcsplot_pointslines.png</file>
+    <file alias="fcsplot_lines.png">../../images/16x16/fcsplot_lines.png</file>
+    <file alias="fcsplot_elines.png">../../images/16x16/fcsplot_elines.png</file>
+    <file alias="fcsplot_elinesbars.png">../../images/16x16/fcsplot_elinesbars.png</file>
+    <file alias="fcsplot_ebars.png">../../images/16x16/fcsplot_ebars.png</file>
+    <file alias="fcsplot_enone.png">../../images/16x16/fcsplot_enone.png</file>
+
 </qresource>
 </RCC>

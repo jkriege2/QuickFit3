@@ -5,6 +5,7 @@
 #include "programoptions.h"
 #include <iostream>
 #include "qfpluginservices.h"
+#include "qftools.h"
 
 
 // forward declaration

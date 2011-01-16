@@ -1,7 +1,11 @@
 TEMPLATE = app
 TARGET = quickfit3
-DEPENDPATH += .
-INCLUDEPATH += .
+DEPENDPATH += . \
+               ../lib/ \
+               ../libqf3widgets/
+INCLUDEPATH += . \
+               ../lib/ \
+               ../libqf3widgets/
 DESTDIR = ../output
 
 #QMAKE_CXXFLAGS += -fexceptions -msse -msse2 -mfpmath=387,sse -O2

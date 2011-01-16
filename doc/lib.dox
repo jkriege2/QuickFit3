@@ -11,6 +11,9 @@
     \defgroup qf3lib_widgets Additional/Modified Widgets
     \ingroup qf3lib
 
+    \defgroup qf3lib_tools Tool Functions and Classes
+    \ingroup qf3lib
+
     \defgroup qf3lib_settings Settings/Options Management
     \ingroup qf3lib
 

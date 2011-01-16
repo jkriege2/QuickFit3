@@ -2,6 +2,7 @@
 #include "optionsdialog.h"
 #include "ui_about.h"
 #include "ui_aboutplugins.h"
+#include "qftools.h"
 
 MainWindow::MainWindow(QSplashScreen* splash)
 {
@@ -28,19 +29,21 @@ MainWindow::MainWindow(QSplashScreen* splash)
     // search for plugin
     connect(rawDataFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(evaluationFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
+    connect(fitFunctionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
+    connect(fitAlgorithmManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
+
     connect(rawDataFactory, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
     connect(evaluationFactory, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
+    connect(fitAlgorithmManager, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
+    connect(fitFunctionManager, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
+
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
     logFileMainWidget->dec_indent();
-
-    disconnect(rawDataFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
-    disconnect(evaluationFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
-    disconnect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
-    disconnect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
     splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->getIDList().size()));
 
@@ -450,18 +453,17 @@ void MainWindow::createStatusBar() {
 void MainWindow::readSettings() {
     if (!settings) return;
     logFileMainWidget->log_text(tr("reading settings from '%1' ...\n").arg(settings->getIniFilename()));
-    //QPoint pos = settings->getQSettings()->value("mainwindow/pos", QPoint(200, 200)).toPoint();
-    //QSize size = settings->getQSettings()->value("mainwindow/size", QSize(400, 400)).toSize();
 
-    /*resize(size.boundedTo(QApplication::desktop()->screenGeometry(this).size()));
-    if (pos.x()<-width() || pos.x()>QApplication::desktop()->screenGeometry(this).width()-30) pos.setX(0);
-    if (pos.y()<0 || pos.y()>QApplication::desktop()->screenGeometry(this).height()) pos.setY(0);
-    move(pos);*/
-    restoreState(settings->getQSettings()->value("mainwindow/state", saveState()).toByteArray());
-    restoreGeometry(settings->getQSettings()->value("mainwindow/geometry", saveGeometry()).toByteArray());
+    //restoreState(settings->getQSettings()->value("mainwindow/state", saveState()).toByteArray());
+    //restoreGeometry(settings->getQSettings()->value("mainwindow/geometry", saveGeometry()).toByteArray());
 
-    spMain->restoreState(settings->getQSettings()->value("mainwindow/splitterSizesMain").toByteArray());
-    spCenter->restoreState(settings->getQSettings()->value("mainwindow/splitterSizesCenter").toByteArray());
+    //spMain->restoreState(settings->getQSettings()->value("mainwindow/splitterSizesMain").toByteArray());
+    //spCenter->restoreState(settings->getQSettings()->value("mainwindow/splitterSizesCenter").toByteArray());
+
+    loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(5,5), QSize(800,600), "mainwindow/");
+    loadSplitter(*(settings->getQSettings()), spMain, "mainwindow/splitterSizesMain/");
+    loadSplitter(*(settings->getQSettings()), spCenter, "mainwindow/splitterSizesCenter/");
+
     currentProjectDir=settings->getQSettings()->value("mainwindow/currentProjectDir", currentProjectDir).toString();
     currentRawDataDir=settings->getQSettings()->value("mainwindow/currentRawDataDir", currentRawDataDir).toString();
     //column_separator=settings->getQSettings()->value("csvimport/column_separator", column_separator).toString();
@@ -470,8 +472,8 @@ void MainWindow::readSettings() {
     //header_start=settings->getQSettings()->value("csvimport/header_start", header_start).toString();
     //currentFCSFileFormatFilter=settings->getQSettings()->value("mainwindow/currentFCSFileFormatFilter", currentFCSFileFormatFilter).toString();
 
-    logFileMainWidget->readSettings(*(settings->getQSettings()), "mainwindow/");
-    logFileProjectWidget->readSettings(*(settings->getQSettings()), "mainwindow/");
+    logFileMainWidget->readSettings(*(settings->getQSettings()), "mainwindow/logMain");
+    logFileProjectWidget->readSettings(*(settings->getQSettings()), "mainwindow/logProject");
 }
 
 void MainWindow::writeSettings() {
@@ -479,14 +481,17 @@ void MainWindow::writeSettings() {
     logFileMainWidget->log_text(tr("writing settings to '%1' ...\n").arg(settings->getIniFilename()));
     //settings->getQSettings()->setValue("mainwindow/pos", pos());
     //settings->getQSettings()->setValue("mainwindow/size", size());
-    settings->getQSettings()->setValue("mainwindow/state", saveState());
+    /*(settings->getQSettings())->setValue("mainwindow/state", saveState());
     settings->getQSettings()->setValue("mainwindow/geometry", saveGeometry());
     settings->getQSettings()->setValue("mainwindow/splitterSizesMain", spMain->saveState());
-    settings->getQSettings()->setValue("mainwindow/splitterSizesCenter", spCenter->saveState());
+    settings->getQSettings()->setValue("mainwindow/splitterSizesCenter", spCenter->saveState());*/
 
+    saveWidgetGeometry(*(settings->getQSettings()), this, "mainwindow/");
+    saveSplitter(*(settings->getQSettings()), spMain, "mainwindow/splitterSizesMain/");
+    saveSplitter(*(settings->getQSettings()), spCenter, "mainwindow/splitterSizesCenter/");
 
-    logFileMainWidget->saveSettings(*(settings->getQSettings()), "mainwindow/");
-    logFileProjectWidget->saveSettings(*(settings->getQSettings()), "mainwindow/");
+    logFileMainWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logMain");
+    logFileProjectWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logProject");
 
     settings->getQSettings()->setValue("mainwindow/currentProjectDir", currentProjectDir);
     settings->getQSettings()->setValue("mainwindow/currentRawDataDir", currentRawDataDir);

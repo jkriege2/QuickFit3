@@ -33,7 +33,8 @@ HEADERS += dlgnewproperty.h \
            qffitfunctionmanager.h \
            qffitalgorithmmanager.h \
            qfpluginfitfunction.h \
-           qfpluginfitalgorithm.h
+           qfpluginfitalgorithm.h \
+           qftools.h
 
 SOURCES += dlgnewproperty.cpp \
            programoptions.cpp \
@@ -53,7 +54,8 @@ SOURCES += dlgnewproperty.cpp \
            qfrdrresultsmodel.cpp \
            qffitalgorithm.cpp \
            qffitfunctionmanager.cpp \
-           qffitalgorithmmanager.cpp
+           qffitalgorithmmanager.cpp \
+           qftools.cpp
 
 FORMS +=   dlg_newproperty.ui
 

@@ -6,6 +6,8 @@
 #include "qfevaluationitemfactory.h"
 #include "qfrawdatarecordfactory.h"
 
+#include <QTemporaryFile>
+
 
 QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent), QFProperties()
@@ -221,11 +223,13 @@ void QFProject::writeXML(const QString& file) {
 
     bool namechanged=(file!=this->file);
     this->file=file;
-    QFile f(file);
+    /*QFile f(file);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
         return;
-    }
+    }*/
+    QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
+    f.open();
     QXmlStreamWriter w(&f);
     w.setAutoFormatting(true);
     w.writeStartDocument();
@@ -240,16 +244,25 @@ void QFProject::writeXML(const QString& file) {
     storeProperties(w);
     w.writeEndElement();
     w.writeStartElement("rawdata");
-    for (int i=0; i<rawData.keys().size(); i++) {
-        int k=rawData.keys().at(i);
-        rawData[k]->writeXML(w);
+    QMapIterator<int, QFRawDataRecord*> ir(rawData);
+    //for (int i=0; i<rawData.keys().size(); i++) {
+    while (ir.hasNext()) {
+        ir.next();
+        std::cout<<"writing rdr "<<ir.key()<<std::endl;
+        //int k=rawData.keys().at(i);
+        ir.value()->writeXML(w);
+        std::cout<<"   DONE!"<<std::endl;
     }
     w.writeEndElement();
     w.writeStartElement("evaluations");
-    for (int i=0; i<evaluations.keys().size(); i++) {
-        std::cout<<"writing eval "<<i<<std::endl;
-        int k=evaluations.keys().at(i);
-        evaluations[k]->writeXML(w);
+    QMapIterator<int, QFEvaluationItem*> i(evaluations);
+    //for (int i=0; i<evaluations.keys().size(); i++) {
+    while (i.hasNext()) {
+        i.next();
+        std::cout<<"writing eval "<<i.key()<<std::endl;
+        //int k=evaluations.keys().at(i);
+        i.value()->writeXML(w);
+        std::cout<<"   DONE!"<<std::endl;
     }
     w.writeEndElement();
 
@@ -260,6 +273,20 @@ void QFProject::writeXML(const QString& file) {
         emit wasChanged(dataChange);
         if (namechanged) emit propertiesChanged();
     }
+
+    QFile f2(file+".backup");
+    if (f2.exists()) f2.remove();
+
+    QFile f1(file);
+    f1.rename(file+".backup");
+    f.setAutoRemove(false);
+    if (!f.rename(file)) {
+        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+    }
+    /*if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+        return;
+    }*/
 }
 
 void QFProject::readXML(const QString& file) {

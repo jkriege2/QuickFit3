@@ -7,6 +7,7 @@
 #include "qfevaluationitem.h"
 #include "programoptions.h"
 #include "qfpluginservices.h"
+#include "qftools.h"
 
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
@@ -95,7 +96,7 @@ class QFEvaluationPropertyEditor : public QWidget {
          *         displayed record should be deleted */
         void evaluationAboutToBeDeleted(QFEvaluationItem* r);
         /** \brief activated when the selection in lstRawData changes */
-        void selectionChanged(const QModelIndex& index);
+        void selectionChanged(const QModelIndex& index, const QModelIndex& oldindex);
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -119,12 +120,12 @@ class QFEvaluationPropertyEditor : public QWidget {
         QListView* lstRawData;
         /** \brief splitter between files list and evaluation tab */
         QSplitter* splitMain;
-        /** \brief tab widget for the evaluation editor widgets */
-        QTabWidget* tabEditors;
+        /** \brief Layout widget for the evaluation editor widget */
+        QHBoxLayout* layWidgets;
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief of all currently instaciated editors */
-        QList<QPointer<QFEvaluationEditor> > editorList;
+        QPointer<QFEvaluationEditor> editor;
         /** \brief ID used to distinguish between different dialog (e.g. for settings) */
         int id;
         /** \brief pointer that allows for access to central QuickFit services */

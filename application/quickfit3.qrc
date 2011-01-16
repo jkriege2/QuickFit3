@@ -5,7 +5,7 @@
     <file alias="configure.png">../images/22x22/configure_alt.png</file>
     <file alias="exit.png">../images/22x22/window_close.png</file>
     <file alias="about.png">../images/22x22/help_about.png</file>
-    <file alias="aboutqt.png">../images/22x22/help_aboutqt.png</file>
+    <file alias="aboutqt.png">../images/22x22/help_about_qt.png</file>
     <file alias="copy.png">../images/22x22/edit_copy.png</file>
     <file alias="cut.png">../images/22x22/edit_cut.png</file>
     <file alias="paste.png">../images/22x22/edit_paste.png</file>

@@ -17,6 +17,7 @@
 #include "qfpluginservices.h"
 #include "qffitalgorithm.h"
 #include "qffitfunction.h"
+#include "qftools.h"
 
 
 // forward declaration
@@ -101,19 +102,19 @@ class QFEvaluationItem : public QObject, public QFProperties {
         inline QFEvaluationItem* getPreviousOfSameType() { return project->getPreviousEvaluationOfSameType(this); };
 
         /** \brief return the ID */
-        inline int getID() { return ID; };
+        inline int getID() const { return ID; };
         /** \brief return the name */
-        inline QString getName() { return name; }
+        inline QString getName() const { return name; }
         /** \brief return the description  */
-        inline QString getDescription() { return description; };
+        inline QString getDescription() const { return description; };
         /** \brief return a pointer to the project that contains this QRawDatarecord */
-        inline QFProject* getProject() { return project; }
+        inline QFProject* getProject() const { return project; }
 
 
         /** \brief returns \c true if an error occured */
-        inline bool error() { return errorOcc; }
+        inline bool error() const { return errorOcc; }
         /** \brief returns the description of the last error */
-        inline QString errorDescription() { return errorDesc; }
+        inline QString errorDescription() const { return errorDesc; }
 
 
 
@@ -123,13 +124,13 @@ class QFEvaluationItem : public QObject, public QFProperties {
         virtual bool isApplicable(QFRawDataRecord* record) { return true; };
 
         /** \brief returns whether the user may select a set of records (\c true ) or not (\c false ). */
-        bool getUseSelection() { return useSelection; };
+        bool getUseSelection() const { return useSelection; };
 
         /** \brief returns whether a list of applicable records is displayed (\c true ) or not (\c false ). */
-        bool getShowRDRList() { return showRDRList; };
+        bool getShowRDRList() const { return showRDRList; };
 
         /** \brief returns a list of currently selected items */
-        QList<QFRawDataRecord*> getSelectedRecords() { return selectedRecords; };
+        QList<QFRawDataRecord*> getSelectedRecords() const { return selectedRecords; };
 
         /** \brief add a record to the set of selected records */
         void selectRecord(QFRawDataRecord* record);
@@ -153,10 +154,10 @@ class QFEvaluationItem : public QObject, public QFProperties {
         void clearSelectedRecords();
 
         /** \brief returns \c true, if the given record is selected */
-        bool isSelected(QFRawDataRecord* record) { return selectedRecords.contains(record); };
+        bool isSelected(QFRawDataRecord* record) const { return selectedRecords.contains(record); };
 
         /** \brief returns the currently highlughted record */
-        QFRawDataRecord* getHighlightedRecord() { return highlightedRecord; };
+        QFRawDataRecord* getHighlightedRecord() const { return highlightedRecord; };
 
         /** \brief this method may be called in order to select a new record or to select none (call with \c NULL as argument) */
         void setHighlightedRecord(QFRawDataRecord* record);
@@ -171,12 +172,10 @@ class QFEvaluationItem : public QObject, public QFProperties {
         virtual QString getTypeDescription() const { return tr("unknown"); };
         /** \brief return a large icon (32x32) */
         virtual QIcon getLargeIcon() const { return QIcon(":/projecttree_emptyevaluatione.png"); };
-        /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 0; };
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName(int i) { return QString(""); };
+        virtual QString getEditorName() { return QString(""); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) { return NULL; };
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QWidget* parent=NULL) { return NULL; };
         /** \brief write object contents into XML file */
         virtual void writeXML(QXmlStreamWriter& w);
 

@@ -61,6 +61,11 @@ class QFFitAlgorithmManager : public QObject {
 
         /** \brief create a new fit algorithm object instance */
         QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL);
+    signals:
+        /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
+        void showMessage(const QString& message);
+        /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
+        void showLongMessage(const QString& message);
 
     private:
         QMap<QString, QFPluginFitAlgorithm*> fitPlugins;

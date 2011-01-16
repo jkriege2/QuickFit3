@@ -50,14 +50,15 @@ void QFFCSFitEvaluation::intWriteXML(QXmlStreamWriter& w) {
     w.writeEndElement();
     w.writeStartElement("functions");
     w.writeAttribute("current", m_fitFunction);
-    QStringList params=parameterStore.keys();
-    for (int i=0; i<params.size(); i++) {
+    QMapIterator<QString, FitParameter> i(parameterStore);
+    while (i.hasNext()) {
+        i.next();
         w.writeStartElement("parameter");
-        w.writeAttribute("id", params[i]);
-        w.writeAttribute("value", QString::number(parameterStore[params[i]].value, 'g', 12));
-        w.writeAttribute("min", QString::number(parameterStore[params[i]].min, 'g', 12));
-        w.writeAttribute("max", QString::number(parameterStore[params[i]].max, 'g', 12));
-        w.writeAttribute("fix", QString((parameterStore[params[i]].fix)?QString("1"):QString("0")));
+        w.writeAttribute("id", i.key());
+        w.writeAttribute("value", QString::number(i.value().value, 'g', 12));
+        w.writeAttribute("min", QString::number(i.value().min, 'g', 12));
+        w.writeAttribute("max", QString::number(i.value().max, 'g', 12));
+        w.writeAttribute("fix", QString((i.value().fix)?QString("1"):QString("0")));
         w.writeEndElement();
     }
     w.writeEndElement();
@@ -101,7 +102,7 @@ void QFFCSFitEvaluation::intReadData(QDomElement* e) {
 }
 
 
-QFEvaluationEditor* QFFCSFitEvaluation::createEditor(QFPluginServices* services, int i, QWidget* parent) {
+QFEvaluationEditor* QFFCSFitEvaluation::createEditor(QFPluginServices* services, QWidget* parent) {
     return new QFFCSFitEvaluationEditor(services, parent);
 };
 
@@ -137,6 +138,7 @@ void QFFCSFitEvaluation::setFitValue(QString id, double value) {
             setFitResultValue(id, value);
         } else {
             parameterStore[getParameterStoreID(id)].value=value;
+            emit propertiesChanged();
         }
 
     }
@@ -188,6 +190,7 @@ void QFFCSFitEvaluation::setFitFix(QString id, bool fix) {
             setFitResultFix(id, fix);
         } else {
             parameterStore[getParameterStoreID(id)].fix=fix;
+            emit propertiesChanged();
         }
 
     }
@@ -226,6 +229,7 @@ void QFFCSFitEvaluation::setFitRange(QString id, double min, double max) {
         QString dsid=getParameterStoreID(id);
         parameterStore[getParameterStoreID(id)].min=min;
         parameterStore[getParameterStoreID(id)].max=max;
+        emit propertiesChanged();
     }
 }
 
@@ -233,6 +237,7 @@ void QFFCSFitEvaluation::setFitMin(QString id, double min) {
     if (getHighlightedRecord()!=NULL) {
         QString dsid=getParameterStoreID(id);
         parameterStore[getParameterStoreID(id)].min=min;
+        emit propertiesChanged();
     }
 }
 
@@ -240,6 +245,7 @@ void QFFCSFitEvaluation::setFitMax(QString id, double max) {
     if (getHighlightedRecord()!=NULL) {
         QString dsid=getParameterStoreID(id);
         parameterStore[getParameterStoreID(id)].max=max;
+        emit propertiesChanged();
     }
 }
 
@@ -303,3 +309,36 @@ void QFFCSFitEvaluation::fillFix(bool* param) {
     }
 }
 
+void QFFCSFitEvaluation::setCurrentRun(int run) {
+    QFRawDataRecord* r=getHighlightedRecord();
+    QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(r);
+    if ((r!=NULL)) {
+        if (run<-1) m_currentRun=-1;
+        if (run<fcs->getCorrelationRuns()) m_currentRun=run;
+        r->setQFProperty(getType()+QString::number(getID())+"_last_run", m_currentRun);
+    }
+}
+
+int QFFCSFitEvaluation::getCurrentRun() {
+    QFRawDataRecord* r=getHighlightedRecord();
+    QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(r);
+    int run=m_currentRun;
+    if ((r!=NULL)&&(fcs!=NULL)) {
+        run=r->getProperty(getType()+QString::number(getID())+"_last_run", run).toInt();
+    }
+    if (run<-1) run=-1;
+    if (run>=fcs->getCorrelationRuns()) run=-1;
+    return run;
+}
+
+
+void QFFCSFitEvaluation::setFitFunction(QString fitFunction) {
+    if (!getAvailableFitFunctions().contains(fitFunction)) return;
+    m_fitFunction=fitFunction;
+    emit propertiesChanged();
+}
+
+
+QFFitFunction* QFFCSFitEvaluation::getFitFunction() {
+    return getFitFunction(m_fitFunction);
+}

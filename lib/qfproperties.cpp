@@ -1,4 +1,6 @@
 #include "qfproperties.h"
+#include <iostream>
+
 
 QFProperties::QFProperties() {
     //ctor
@@ -12,19 +14,25 @@ QFProperties::~QFProperties() {
 
 unsigned int QFProperties::getVisiblePropertyCount() {
     unsigned int c=0;
-    for (int i=0; i<props.keys().size(); i++) {
-        QString p=props.keys().at(i);
-        if (props[p].visible) c++;
+    //for (int i=0; i<props.keys().size(); i++) {
+        //QString p=props.keys().at(i);
+    QMapIterator<QString, propertyItem> i(props);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value().visible) c++;
     }
     return c;
 }
 
 QString QFProperties::getVisibleProperty(unsigned int j) {
     unsigned int c=0;
-    for (int i=0; i<props.keys().size(); i++) {
-        QString p=props.keys().at(i);
-        if (props[p].visible) {
-            if (c==j) return p;
+    //for (int i=0; i<props.keys().size(); i++) {
+        //QString p=props.keys().at(i);
+    QMapIterator<QString, propertyItem> i(props);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value().visible) {
+            if (c==j) return i.key();
             c++;
         }
     }
@@ -32,12 +40,15 @@ QString QFProperties::getVisibleProperty(unsigned int j) {
 }
 
 void QFProperties::storeProperties(QXmlStreamWriter& w) {
-    for (int i=0; i<props.keys().size(); i++) {
+    QMapIterator<QString, propertyItem> i(props);
+    while (i.hasNext()) {
+        i.next();
         w.writeStartElement("property");
-        QString n=props.keys().at(i);
+        QString n=i.key();
+        propertyItem it=i.value();
         w.writeAttribute("name", n);
         QString t="invalid";
-        switch(props[n].data.type()) {
+        switch(it.data.type()) {
             case QVariant::Bool: t="bool"; break;
             case QVariant::Char: t="char"; break;
             case QVariant::Date: t="date"; break;
@@ -64,11 +75,12 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) {
             case QVariant::RectF: t="rectf"; break;
             case QVariant::Invalid: t="invalid"; break;
             case QVariant::Url: t="url"; break;
-
+            default: t="unknown"; break;
         }
         w.writeAttribute("type", t);
-        w.writeAttribute("data", props[n].data.toString());
-        w.writeAttribute("usereditable", (props[n].usereditable)?QString("true"):QString("false"));
+        w.writeAttribute("data", it.data.toString());
+        w.writeAttribute("usereditable", (it.usereditable)?QString("true"):QString("false"));
+        w.writeAttribute("visible", (it.visible)?QString("true"):QString("false"));
         w.writeEndElement();
     }
 }
@@ -80,6 +92,7 @@ void QFProperties::readProperties(QDomElement& e) {
         QString n=te.attribute("name", "");
         QString t=te.attribute("type", "string").toLower();
         QVariant d=te.attribute("data", "");
+        //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
         bool c=false;
         if (t=="bool") { c=d.convert(QVariant::Bool); }
         else if (t=="char") { c=d.convert(QVariant::Char); }
@@ -97,15 +110,16 @@ void QFProperties::readProperties(QDomElement& e) {
         else if (t=="color") { c=d.convert(QVariant::Color); }
         else {
             setPropertiesError(QString("Property '%1' has an unsupported type (%2)!\n Value is \"%3\".").arg(n).arg(t).arg(te.attribute("data", "")));
-            return;
+            //return;
         }
         if (!c) {
             setPropertiesError(QString("The value of property '%1' (%2) could not be converted to type %3!").arg(n).arg(te.attribute("data", "")).arg(t));
-            return;
+            //return;
         }
         propertyItem pi;
         pi.data=d;
         pi.usereditable=QVariant(te.attribute("usereditable", "true")).toBool();
+        pi.visible=QVariant(te.attribute("visible", "true")).toBool();
         props[n]=pi;
         te = te.nextSiblingElement("property");
     }

@@ -57,6 +57,11 @@ class QFFitFunctionManager : public QObject {
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
+    signals:
+        /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
+        void showMessage(const QString& message);
+        /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
+        void showLongMessage(const QString& message);
 
     private:
         QList<QFPluginFitFunction*> fitPlugins;
