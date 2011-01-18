@@ -154,6 +154,8 @@
                 <property name="TIME" type="time" data="12:06:05" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
             </properties>
             <results/>

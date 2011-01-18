@@ -7,7 +7,7 @@
 #define DATACUTSLIDER_H
 
 /** \brief two sliders in a box, aligned left and right
- *  \ingroup quickfit2_widgets
+ *  \ingroup qf3lib_widgets
  *
  * The widget looks like this:
  *  \image html datacutsliders.png

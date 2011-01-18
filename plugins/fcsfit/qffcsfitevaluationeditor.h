@@ -12,9 +12,13 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QAction>
+#include <QList>
+#include <QPointer>
+#include <QFormLayout>
+#include <QScrollArea>
 #include "datacutslider.h"
 #include "qfhtmlhelpwindow.h"
-
+#include "qffitparameterwidget.h"
 
 /*! \brief editor class for FCS least-square fits
     \ingroup qf3evalp_fcsfit
@@ -35,6 +39,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+        /** \brief used to reread all parameter widget values from the datastore */
+        void updateParameterValues();
     protected:
         /** \brief label displaying the current record */
         QLabel* labRecord;
@@ -82,6 +88,21 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QToolBar* toolbar;
         /** \brief label to display the current position of the mouse cursor */
         QLabel* labMousePosition;
+        /** \brief label that displays whether the current fit parameters are global or local */
+        QLabel* labFitParameters;
+        /** \brief button to toggle editing ranges  */
+        QPushButton* btnEditRanges;
+
+        /** \brief scroll area for the fit parameters */
+        QScrollArea* scrollParameters;
+        /** \brief layout that is used to display fit parameters */
+        QFormLayout* layParameters;
+
+        /** \brief this list contains all currently displayed fitParameterWidgets */
+        QList<QPointer<QFFitParameterWidget> > m_fitParameters;
+
+        /** \brief width of the widgets in m_fitParameters */
+        int m_parameterWidgetWidth;
 
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */
@@ -97,7 +118,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
 
         /** \brief display all data and parameters describing the current record */
-        void displayModel();
+        void displayModel(bool newWidget);
 
         /** \brief replot curves */
         void replotData();

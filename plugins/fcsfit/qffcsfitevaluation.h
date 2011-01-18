@@ -9,6 +9,7 @@
 #include "qfevaluationitemfactory.h"
 #include "qffitfunction.h"
 #include "qffitalgorithm.h"
+#include "qffitparameterbasicinterface.h"
 
 /*! \brief evaluation item class for FCS least square fits
     \ingroup qf3evalp_fcsfit
@@ -16,7 +17,7 @@
     \note This evaluation is applicable to all QFRawDataRecords that implement the QFRDRFCSDataInterface interface! Also it makes use of all
           fit functions (see QFFitFunction and QFFitFunctionManager) registered to QuickFit where the id starts with \c "fcs_" !
 */
-class QFFCSFitEvaluation : public QFEvaluationItem {
+class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
         Q_OBJECT
     public:
         /** Default constructor */
@@ -116,7 +117,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
 
             For a detailed description of where the value is searched, see getFitValue()
         */
-        bool getFix(QString id);
+        bool getFitFix(QString id);
 
 
         /*! \brief set the value range of a fit parameter of the current fit function (see m_fitFunction)
@@ -153,14 +154,14 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
 
             For a detailed description of where the value is searched, see getFitValue()
         */
-        double getMin(QString id);
+        double getFitMin(QString id);
 
 
         /*! \brief return the upper value bound of a given parameter
 
             For a detailed description of where the value is searched, see getFitValue()
         */
-        double getMax(QString id);
+        double getFitMax(QString id);
 
 
         /** \brief returns a list of all FCS fitting functions available for this evaluation
@@ -189,6 +190,13 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         void fillParametersMax(double* param);
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction */
         void fillFix(bool* param);
+
+        /** \brief determine whether a fit has been carried out for the currently highlighted record
+         *
+         *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
+         *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
+         */
+        bool hasFit();
 
     public slots:
         /** \brief set the current run to use, -1 = average, 0..N = runs, <-1: invalid */
@@ -230,13 +238,6 @@ class QFFCSFitEvaluation : public QFEvaluationItem {
         inline QString getEvaluationResultID(QString fitFunction) {
             return getType()+"_"+QString::number(getID())+"_"+fitFunction+"_run"+QString::number(m_currentRun);
         }
-
-        /** \brief determine whether a fit has been carried out for the currently highlighted record
-         *
-         *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
-         *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
-         */
-        bool hasFit();
 
         /** \brief write object contents into XML file
          *

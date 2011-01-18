@@ -209,7 +209,7 @@ void QFFCSFitEvaluation::setFitResultFix(QString id, bool fix) {
     }
 }
 
-bool QFFCSFitEvaluation::getFix(QString id) {
+bool QFFCSFitEvaluation::getFitFix(QString id) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
     bool res=false;
@@ -249,7 +249,7 @@ void QFFCSFitEvaluation::setFitMax(QString id, double max) {
     }
 }
 
-double QFFCSFitEvaluation::getMin(QString id)  {
+double QFFCSFitEvaluation::getFitMin(QString id)  {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
     double res=0;
@@ -259,7 +259,7 @@ double QFFCSFitEvaluation::getMin(QString id)  {
     return res;
 }
 
-double QFFCSFitEvaluation::getMax(QString id) {
+double QFFCSFitEvaluation::getFitMax(QString id) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
     double res=0;
@@ -284,7 +284,7 @@ void QFFCSFitEvaluation::fillParametersMin(double* param) {
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            param[i]=getMin(id);
+            param[i]=getFitMin(id);
         }
     }
 }
@@ -294,7 +294,7 @@ void QFFCSFitEvaluation::fillParametersMax(double* param) {
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            param[i]=getMax(id);
+            param[i]=getFitMax(id);
         }
     }
 }
@@ -304,7 +304,7 @@ void QFFCSFitEvaluation::fillFix(bool* param) {
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            param[i]=getFix(id);
+            param[i]=getFitFix(id);
         }
     }
 }

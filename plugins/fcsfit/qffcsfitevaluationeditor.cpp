@@ -15,6 +15,7 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
 {
     cmbModel=NULL;
     dataEventsEnabled=true;
+    m_parameterWidgetWidth=100;
 
     createWidgets();
 }
@@ -173,21 +174,44 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
 
     QWidget* modelWidget=new QWidget(this);
-    fl=new QFormLayout(modelWidget);
+    QVBoxLayout* layModel=new QVBoxLayout(this);
+    modelWidget->setLayout(layModel);
+
+    fl=new QFormLayout(this);
     fl->setContentsMargins(9,0,0,0);
     fl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    modelWidget->setLayout(fl);
-
     spinRun=new QSpinBox(this);
     spinRun->setMinimum(-1);
     spinRun->setMaximum(-1);
     spinRun->setSpecialValueText(tr("average"));
     spinRun->setMinimumWidth(100);
     fl->addRow(tr("run: "), spinRun);
+    layModel->addLayout(fl, 0);
 
+    labFitParameters=new QLabel(this);
+    layModel->addWidget(labFitParameters);
+    btnEditRanges=new QPushButton(tr("Edit &Ranges"), this);
+    btnEditRanges->setCheckable(true);
+    QHBoxLayout* hblfp=new QHBoxLayout(this);
+    hblfp->addWidget(labFitParameters);
+    hblfp->addStretch();
+    hblfp->addWidget(btnEditRanges);
+    layModel->addLayout(hblfp);
+
+
+
+    scrollParameters=new QScrollArea(this);
+    layModel->addWidget(scrollParameters, 100);
+    layModel->setMargin(2);
+    QWidget* widParameters=new QWidget(this);
+    scrollParameters->setWidget(widParameters);
+    scrollParameters->setWidgetResizable(true);
+    layParameters=new QFormLayout(this);
+    widParameters->setLayout(layParameters);
 
 
     splitModel->addWidget(modelWidget);
+
 
 
 
@@ -290,7 +314,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
     connect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
     connect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
 
-    displayModel();
+    displayModel(true);
     replotData();
 }
 
@@ -309,6 +333,8 @@ void QFFCSFitEvaluationEditor::readSettings() {
         hlpFunction->readSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
         loadSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
         loadSplitter(*(settings->getQSettings()), splitModel, "fcsfitevaleditor/splitter_model");
+        m_parameterWidgetWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth).toInt();
+        btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", m_parameterWidgetWidth).toBool());
     }
 }
 
@@ -324,6 +350,8 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         hlpFunction->writeSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
         saveSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
         saveSplitter(*(settings->getQSettings()), splitModel, "fcsfitevaleditor/splitter_model");
+        settings->getQSettings()->setValue("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth);
+        settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", btnEditRanges->isChecked());
     }
 }
 
@@ -332,6 +360,7 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
     QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(currentRecord);
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
+    bool modelChanged=false;
     if (data) {
         //labRecord->setText(tr("<b>current:</b> <i>%1</i>").arg(currentRecord->getName()) );
         connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
@@ -345,20 +374,71 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         dataEventsEnabled=false;
         spinRun->setMaximum(data->getCorrelationRuns()-1);
         spinRun->setValue(fcs->getCurrentRun());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
-        cmbModel->setCurrentIndex(cmbModel->findData(fcs->getFitFunction()->id()));
+        int newidx=cmbModel->findData(fcs->getFitFunction()->id());
+        if (newidx!=cmbModel->currentIndex()) modelChanged=true;
+        cmbModel->setCurrentIndex(newidx);
         dataEventsEnabled=true;
 
     }
-    displayModel();
+    displayModel(modelChanged);
     replotData();
 }
 
-void QFFCSFitEvaluationEditor::displayModel() {
+void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     if (!current) return;
     if (!cmbModel) return;
     QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFitFunction* ffunc=eval->getFitFunction();
 
+    if (newWidget) {
+        for (int i=0; i<m_fitParameters.size(); i++) {
+            if (m_fitParameters[i]) {
+                m_fitParameters[i]->disableDatastore();
+                layParameters->removeWidget(layParameters->labelForField(m_fitParameters[i]));
+                layParameters->removeWidget(m_fitParameters[i]);
+                disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                delete m_fitParameters[i];
+            }
+        }
+        m_fitParameters.clear();
+
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            QFFitParameterWidget::WidgetType wtype=QFFitParameterWidget::FloatEdit;
+            if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidget::IntSpinBox;
+            bool editable=d.userEditable;
+            bool displayFix=d.userEditable;
+            bool displayError=d.displayError;
+            bool editRange=d.userEditable;
+            if (!d.fit) {
+                displayFix=false;
+            }
+            QFFitParameterWidget* fpw=new QFFitParameterWidget(eval, id, wtype, editable, displayFix, displayError, editRange, this);
+            fpw->setUnit(d.unit);
+            fpw->setIncrement(d.inc);
+            fpw->setWidgetWidth(m_parameterWidgetWidth);
+            QLabel* l=new QLabel(d.label, this);
+            if (!d.unit.isEmpty()) l->setText(QString("%1 [%2] =").arg(d.label).arg(d.unit));
+            fpw->setToolTip(d.name);
+            l->setToolTip(d.name);
+            l->setTextFormat(Qt::RichText);
+            layParameters->addRow(l, fpw);
+            m_fitParameters.append(fpw);
+            connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
+            fpw->setEditRange(btnEditRanges->isChecked());
+        }
+    }
+    if (eval->hasFit()) labFitParameters->setText(tr("<u>Local Fit Parameters:</u>"));
+    else labFitParameters->setText(tr("<u>Global Fit Parameters:</u>"));
+    updateParameterValues();
+}
+
+void QFFCSFitEvaluationEditor::updateParameterValues() {
+    for (int i=0; i<m_fitParameters.size(); i++) {
+        if (m_fitParameters[i]) m_fitParameters[i]->reloadValues();
+    }
 }
 
 void QFFCSFitEvaluationEditor::replotData() {
@@ -593,7 +673,7 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     if (!current->getHighlightedRecord()) return;
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     data->setCurrentRun(run);
-    displayModel();
+    displayModel(false);
     replotData();
 }
 
@@ -604,7 +684,7 @@ void QFFCSFitEvaluationEditor::modelChanged(int model) {
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     QString ff=cmbModel->itemData(cmbModel->currentIndex()).toString();
     data->setFitFunction(ff);
-    displayModel();
+    displayModel(true);
     replotData();
 }
 
@@ -635,3 +715,4 @@ void QFFCSFitEvaluationEditor::plotMouseMove(double x, double y) {
     labMousePosition->setTextFormat(Qt::RichText);
     labMousePosition->setText(tr("cursor: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
 }
+

@@ -2,11 +2,11 @@
 #include <cmath>
 
 QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
-    //           type,         id,                name,                                 label,                         unit,       fit,       userEditable, initialValue, minValue, maxValue, inc
-    addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N = ",                        "",         true,      true,         10,           1e-10,    1e5,      1    );
-    addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N = ",                      "",         false,     false,        0.1,          1e-10,    1e5,      0.1  );
-    addParameter(FloatNumber,  "diff_tau1",       "Diffusion time of first component",  "&tau;<sub>D,1</sub> = ",      "usec",     true,      true,         30,           1e-10,    1e5,      1    );
-    addParameter(FloatNumber,  "focus_struct_fac","Focus: axial ratio",                 "&gamma;<sub>Laser</sub> = ",  "",         true,      true,         6,            0.01,     100,      0.5  );
+    //           type,         id,                name,                                 label,                         unit,       fit,       userEditable, displayError, initialValue, minValue, maxValue, inc
+    addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N = ",                        "",         true,      true,         true,         10,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N = ",                      "",         false,     false,        true,         0.1,          1e-10,    1e5,      0.1  );
+    addParameter(FloatNumber,  "diff_tau1",       "Diffusion time of first component",  "&tau;<sub>D,1</sub> = ",      "usec",     true,      true,         true,         30,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "focus_struct_fac","Focus: axial ratio",                 "&gamma;<sub>Laser</sub> = ",  "",         true,      true,         true,         6,            0.01,     100,      0.5  );
 }
 
 double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
@@ -28,12 +28,12 @@ void QFFitFunctionFCSDiff::calcParameter(double* data) const {
 
 
 QFFitFunctionFCSADiff::QFFitFunctionFCSADiff() {
-    //           type,         id,                name,                                 label,                         unit,       fit,       userEditable, initialValue, minValue, maxValue, inc
-    addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N = ",                        "",         true,      true,         10,           1e-10,    1e5,      1    );
-    addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N = ",                      "",         false,     false,        0.1,          1e-10,    1e5,      0.1  );
-    addParameter(FloatNumber,  "diff_tau1",       "Diffusion time of first component",  "&tau;<sub>D,1</sub> = ",      "usec",     true,      true,         30,           1e-10,    1e5,      1    );
-    addParameter(FloatNumber,  "alpha",           "Anomality parameter",                "&alpha; = ",                  ""    ,     true,      true,         1,            0.000001, 100,      0.1  );
-    addParameter(FloatNumber,  "focus_struct_fac","Focus: axial ratio",                 "&gamma;<sub>Laser</sub> = ",  "",         true,      true,         6,            0.01,     100,      0.5  );
+    //           type,         id,                name,                                 label,                         unit,       fit,       userEditable, displayError, initialValue, minValue, maxValue, inc
+    addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N = ",                        "",         true,      true,         true,         10,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N = ",                      "",         false,     false,        true,         0.1,          1e-10,    1e5,      0.1  );
+    addParameter(FloatNumber,  "diff_tau1",       "Diffusion time of first component",  "&tau;<sub>D,1</sub> = ",      "usec",     true,      true,         true,         30,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "alpha",           "Anomality parameter",                "&alpha; = ",                  ""    ,     true,      true,         true,         1,            0.000001, 100,      0.1  );
+    addParameter(FloatNumber,  "focus_struct_fac","Focus: axial ratio",                 "&gamma;<sub>Laser</sub> = ",  "",         true,      true,         true,         6,            0.01,     100,      0.5  );
 }
 
 double QFFitFunctionFCSADiff::evaluate(double t, const double* data) const {

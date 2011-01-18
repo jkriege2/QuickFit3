@@ -30,6 +30,8 @@ class QFFitFunction {
             /** \brief determine whether, or not the user is allowed to change the value of a parameter. You could use a parameter with
              *         \c fit=userEditable=false to output values that were calculated from the fitting parameters after the fit. */
             bool userEditable;
+            /** \brief determine whether, or not an error value is displayed for this parameter */
+            bool displayError;
             /** \brief an initial value for the parameter */
             double initialValue;
             /** \brief minimum value of the parameter range (if supported by algorithm) */
@@ -94,7 +96,7 @@ class QFFitFunction {
             \param description parameter description to be aded
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, bool fit, bool userEditable, double initialValue, double minValue, double maxValue, double inc) {
+        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, bool fit, bool userEditable, bool displayError, double initialValue, double minValue, double maxValue, double inc) {
             ParameterDescription d;
             d.type=type;
             d.id=id;
@@ -107,6 +109,7 @@ class QFFitFunction {
             d.minValue=minValue;
             d.maxValue=maxValue;
             d.inc=inc;
+            d.displayError=displayError;
 
             return addParameter(d);
         }

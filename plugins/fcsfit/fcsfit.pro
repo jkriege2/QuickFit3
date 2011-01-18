@@ -27,7 +27,8 @@ TRANSLATIONS= ../../output/translations/de.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
-               ../../../../../LIB/trunk/
+               ../../../../../LIB/trunk/ \
+               ../../../../../LIB/trunk/qt/
 
 QT += gui xml svg core
 
