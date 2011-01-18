@@ -225,7 +225,9 @@
             <files>
                 <file>testdata/egfp1_2.ASC</file>
             </files>
-            <data/>
+            <data>
+                <leaveout list="4"/>
+            </data>
         </rawdataelement>
     </rawdata>
     <evaluations>
