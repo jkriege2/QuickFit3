@@ -248,10 +248,10 @@ void QFProject::writeXML(const QString& file) {
     //for (int i=0; i<rawData.keys().size(); i++) {
     while (ir.hasNext()) {
         ir.next();
-        std::cout<<"writing rdr "<<ir.key()<<std::endl;
+        //std::cout<<"writing rdr "<<ir.key()<<std::endl;
         //int k=rawData.keys().at(i);
         ir.value()->writeXML(w);
-        std::cout<<"   DONE!"<<std::endl;
+        //std::cout<<"   DONE!"<<std::endl;
     }
     w.writeEndElement();
     w.writeStartElement("evaluations");
@@ -259,10 +259,10 @@ void QFProject::writeXML(const QString& file) {
     //for (int i=0; i<evaluations.keys().size(); i++) {
     while (i.hasNext()) {
         i.next();
-        std::cout<<"writing eval "<<i.key()<<std::endl;
+        //std::cout<<"writing eval "<<i.key()<<std::endl;
         //int k=evaluations.keys().at(i);
         i.value()->writeXML(w);
-        std::cout<<"   DONE!"<<std::endl;
+        //std::cout<<"   DONE!"<<std::endl;
     }
     w.writeEndElement();
 
@@ -355,7 +355,7 @@ void QFProject::readXML(const QString& file) {
                         } catch(std::exception& E) {
                             setError(tr("Error while opening raw data element: %2").arg(E.what()));
                         }
-                        std::cout<<t.toStdString()<<std::endl;
+                        //std::cout<<t.toStdString()<<std::endl;
                         /*if (t=="plot") {
 
                         } else if (t=="unknown") {

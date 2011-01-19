@@ -21,7 +21,7 @@ class QFFitParameterWidget : public QWidget {
         Q_OBJECT
     public:
         /** \brief used to specify the widget to display */
-        enum WidgetType { FloatEdit=0, IntSpinBox=1 };
+        enum WidgetType { FloatEdit=0, IntSpinBox=1, Header=255 };
         /*! \brief constructor
 
             \param datastore this is used to read/write the values
@@ -30,10 +30,10 @@ class QFFitParameterWidget : public QWidget {
             \param editable is the value editable? (fix and range is only displayed, if this is \c true)
             \param displayFix display a fix checkbox?
             \param displayError display the error of the fit value (if !=0) ?
-            \param editRange display widgets to edit the value range?
+            \param editRangeAllowed display widgets to edit the value range allowed?
             \param parent parent widget
         */
-        QFFitParameterWidget(QFFitParameterBasicInterface* datastore, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRange, QWidget* parent=NULL);
+        QFFitParameterWidget(QFFitParameterBasicInterface* datastore, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent=NULL);
         virtual ~QFFitParameterWidget();
 
         /** \brief return whether the user may edit the values */
@@ -45,8 +45,10 @@ class QFFitParameterWidget : public QWidget {
         /** \brief return the parameter id */
         QString parameterID() { return m_parameterID; }
 
-        /** \brief set widths of the widgets */
-        void setWidgetWidth(int width);
+        /** \brief set widths of the edit widgets */
+        void setWidgetWidth(int width, int fixWidth);
+        /** \brief set widths of checkbox widthes */
+        void setCheckWidth(int width);
         /** \brief set unit string */
         void setUnit(QString unit);
         /** \brief set widget increment */
@@ -58,6 +60,14 @@ class QFFitParameterWidget : public QWidget {
     public slots:
         /** \brief reload values from datastore */
         void reloadValues();
+        /*! \brief set value of the editor
+            \param value the value to set the widget to
+            \param error the error of the value (if any)
+            \param writeback if \c true this function will write back the value (not the error) to m_datastore, using QFFitParameterBasicInterface::setFitValue()
+
+            This function also calls reloadValues() but superseeds it.
+         */
+        void setValue(double value, double error, bool writeback=false);
         /** \brief switch the min/max widget on/off */
         void setEditRange(bool editRange);
     signals:
@@ -69,9 +79,11 @@ class QFFitParameterWidget : public QWidget {
         void rangeChanged(QString id, double min, double max);
     protected slots:
         void doubleValueChanged(double value);
-        void doubleMinChanged(double value);
-        void doubleMaxChanged(double value);
         void intValueChanged(int value);
+        void doubleMinChanged(double value);
+        void intMinChanged(int value);
+        void doubleMaxChanged(double value);
+        void intMaxChanged(int value);
         void sfixChanged(bool fix);
     protected:
         /** \brief this is used to read/write the values */
@@ -94,8 +106,12 @@ class QFFitParameterWidget : public QWidget {
         double m_increment;
         /** \brief indicates whether to display the range of the value */
         bool m_editRange;
+        /** \brief indicates whether it is allowed to display the range of the value */
+        bool m_editRangeAllowed;
         /** \brief width of the input widgets */
         int m_widgetWidth;
+        /** \brief with of checkboxes */
+        int m_checkWidth;
 
         NumberEdit* neditValue;
         QSpinBox* spinIntValue;
@@ -106,8 +122,11 @@ class QFFitParameterWidget : public QWidget {
         QCheckBox* chkFix;
         QLabel* labError;
         QHBoxLayout* layMain;
-        QLabel* labRangeMax;
-        QLabel* labRangeMin;
+        QLabel* hlabValue;
+        QLabel* hlabMin;
+        QLabel* hlabMax;
+        QLabel* hlabFix;
+        QWidget* spCheck;
 
     private:
 };

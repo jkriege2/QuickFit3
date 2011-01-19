@@ -25,7 +25,10 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
         virtual double evaluate(double t, const double* data) const;
 
         /** \brief calculate non-fit parameters, i.e. fit=userEditable=false */
-        virtual void calcParameter(double* data) const;
+        virtual void calcParameter(double* data, double* error=NULL) const;
+
+        /** \brief returns \c true if the given parameter is currently visible (which could e.g. depend on the setting of the other parameters) */
+        virtual bool isParameterVisible(int parameter, double* data) const;
 
 };
 
@@ -45,7 +48,7 @@ class QFFitFunctionFCSADiff: public QFFitFunction {
         virtual double evaluate(double t, const double* data) const;
 
         /** \brief calculate non-fit parameters, i.e. fit=userEditable=false */
-        virtual void calcParameter(double* data) const;
+        virtual void calcParameter(double* data, double* error=NULL) const;
 
 };
 

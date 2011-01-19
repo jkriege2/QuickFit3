@@ -235,11 +235,24 @@
             <description><![CDATA[]]></description>
             <properties>
                 <property name="plot_errorstyle" type="int" data="2" usereditable="false" visible="false"/>
-                <property name="plot_grid" type="bool" data="false" usereditable="false" visible="false"/>
+                <property name="plot_grid" type="bool" data="true" usereditable="false" visible="false"/>
                 <property name="plot_style" type="int" data="0" usereditable="false" visible="false"/>
                 <property name="plot_taulog" type="bool" data="true" usereditable="false" visible="false"/>
             </properties>
-            <data/>
+            <data>
+                <algorithms current=""/>
+                <functions current="fcs_diff">
+                    <parameter id="fcs_adiff___alpha" value="0.7"/>
+                    <parameter id="fcs_adiff___diff_tau1" value="33"/>
+                    <parameter id="fcs_adiff___focus_struct_fac" value="7" fix="1"/>
+                    <parameter id="fcs_adiff___n_particle" value="17"/>
+                    <parameter id="fcs_diff___diff_rho2" value="0.7"/>
+                    <parameter id="fcs_diff___diff_tau1" value="1.1"/>
+                    <parameter id="fcs_diff___focus_struct_fac" value="4"/>
+                    <parameter id="fcs_diff___n_components" value="2"/>
+                    <parameter id="fcs_diff___n_particle" value="1" min="1e-11" max="1000000"/>
+                </functions>
+            </data>
         </evaluationelement>
     </evaluations>
 </quickfitproject>

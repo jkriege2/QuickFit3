@@ -103,6 +103,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** \brief width of the widgets in m_fitParameters */
         int m_parameterWidgetWidth;
+        /** \brief width of the checkboxes in the parameter widgets */
+        int m_parameterCheckboxWidth;
 
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */
@@ -151,6 +153,13 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void plotStyleChanged(int style);
         /** \brief emitted when the error plot style changes */
         void errorStyleChanged(int style);
+
+        /** \brief executed when a parameter is changed by the user */
+        void parameterValueChanged(QString id, double value);
+        /** \brief executed when a parameter fix is changed by the user */
+        void parameterFixChanged(QString id, bool fix);
+        /** \brief executed when a parameter range is changed by the user */
+        void parameterRangeChanged(QString id, double min, double max);
 
 
     private:

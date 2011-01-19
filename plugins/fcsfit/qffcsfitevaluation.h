@@ -184,12 +184,35 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
 
         /** \brief fill the given array of doubles with the current parameter values, as appropriate to use together with QFFitFunction */
         void fillParameters(double* param);
+        /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction */
+        void fillParameterErrors(double* param);
         /** \brief fill the given array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction */
         void fillParametersMin(double* param);
         /** \brief fill the given array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction */
         void fillParametersMax(double* param);
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction */
         void fillFix(bool* param);
+
+        /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
+            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+        */
+        double* allocFillParameters();
+        /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
+            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+        */
+        double* allocFillParameterErrors();
+        /*! \brief fill a newly allocated array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
+            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+        */
+        double* allocFillParametersMin();
+        /*! \brief fill a newly allocated array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
+            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+        */
+        double* allocFillParametersMax();
+        /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
+            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+        */
+        bool* allocFillFix();
 
         /** \brief determine whether a fit has been carried out for the currently highlighted record
          *
@@ -203,12 +226,32 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         void setCurrentRun(int run);
 
     protected:
-        /** \brief struct used to locally store fit parameter properties */
+        /*! \brief struct used to locally store fit parameter properties
+
+            For each parameter that is stored in parameterStore this saves also whether it is really set, so each
+            parameter is represented by two datamemeber: \c value and \c valueSet which is \c true only if the user
+            has explicitly set the \c value. This information is used in the \c getFitXYZ() functions and set in the
+            \c setFitXYZ() functions.
+        */
         struct FitParameter {
             double value;
             bool fix;
             double min;
             double max;
+            bool valueSet;
+            bool fixSet;
+            bool minSet;
+            bool maxSet;
+            FitParameter() {
+                value=0;
+                fix=false;
+                min=0;
+                max=0;
+                valueSet=false;
+                fixSet=false;
+                minSet=false;
+                maxSet=false;
+            }
         };
 
         /*! \brief datastore for fit parameter values
@@ -244,7 +287,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to
          *  the given XML file.
          */
-        virtual void intWriteXML(QXmlStreamWriter& w);
+        virtual void intWriteData(QXmlStreamWriter& w);
         /** \brief read back the data stored by intWriteXML() */
         virtual void intReadData(QDomElement* e);
 

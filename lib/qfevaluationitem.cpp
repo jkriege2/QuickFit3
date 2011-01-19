@@ -107,8 +107,6 @@ void QFEvaluationItem::writeXML(QXmlStreamWriter& w) {
         w.writeEndElement();
     }
     w.writeStartElement("data");
-
-
     intWriteData(w);
     w.writeEndElement();
     w.writeEndElement();

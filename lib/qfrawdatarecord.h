@@ -123,7 +123,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
          */
-        virtual void intReadData(QDomElement* e=NULL) { /*std::cout<<"QFRawDataRecord::intReadData()\n";*/ };
+        virtual void intReadData(QDomElement* e=NULL) {};
         /** \brief set the internal error flag and description */
         void setError(QString description) { errorOcc=true; errorDesc=description; }
 

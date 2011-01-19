@@ -15,7 +15,8 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
 {
     cmbModel=NULL;
     dataEventsEnabled=true;
-    m_parameterWidgetWidth=100;
+    m_parameterWidgetWidth=75;
+    m_parameterCheckboxWidth=32;
 
     createWidgets();
 }
@@ -334,6 +335,7 @@ void QFFCSFitEvaluationEditor::readSettings() {
         loadSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
         loadSplitter(*(settings->getQSettings()), splitModel, "fcsfitevaleditor/splitter_model");
         m_parameterWidgetWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth).toInt();
+        m_parameterCheckboxWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth).toInt();
         btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", m_parameterWidgetWidth).toBool());
     }
 }
@@ -351,6 +353,7 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         saveSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
         saveSplitter(*(settings->getQSettings()), splitModel, "fcsfitevaleditor/splitter_model");
         settings->getQSettings()->setValue("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth);
+        settings->getQSettings()->setValue("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth);
         settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", btnEditRanges->isChecked());
     }
 }
@@ -392,17 +395,37 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     QFFitFunction* ffunc=eval->getFitFunction();
 
     if (newWidget) {
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // first delete all fit parameter widgets
+        /////////////////////////////////////////////////////////////////////////////////////////////
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
-                layParameters->removeWidget(layParameters->labelForField(m_fitParameters[i]));
+                QWidget* label=layParameters->labelForField(m_fitParameters[i]);
+                layParameters->removeWidget(label);
                 layParameters->removeWidget(m_fitParameters[i]);
                 disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
+                disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
+                disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
                 delete m_fitParameters[i];
+                delete label;
             }
         }
         m_fitParameters.clear();
 
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // create header widget
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        QFFitParameterWidget* header=new QFFitParameterWidget(eval, "", QFFitParameterWidget::Header, true, true, true, true, this);
+        layParameters->addRow("", header);
+        m_fitParameters.append(header);
+        connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
+        header->setEditRange(btnEditRanges->isChecked());
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // create new parameter widgets
+        /////////////////////////////////////////////////////////////////////////////////////////////
         for (int i=0; i<ffunc->paramCount(); i++) {
             QString id=ffunc->getParameterID(i);
             QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
@@ -411,22 +434,25 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             bool editable=d.userEditable;
             bool displayFix=d.userEditable;
             bool displayError=d.displayError;
-            bool editRange=d.userEditable;
+            bool editRange=d.userEditable && d.userRangeEditable;
             if (!d.fit) {
                 displayFix=false;
             }
             QFFitParameterWidget* fpw=new QFFitParameterWidget(eval, id, wtype, editable, displayFix, displayError, editRange, this);
             fpw->setUnit(d.unit);
             fpw->setIncrement(d.inc);
-            fpw->setWidgetWidth(m_parameterWidgetWidth);
-            QLabel* l=new QLabel(d.label, this);
-            if (!d.unit.isEmpty()) l->setText(QString("%1 [%2] =").arg(d.label).arg(d.unit));
+            fpw->setWidgetWidth(m_parameterWidgetWidth, m_parameterCheckboxWidth);
+            QLabel* l=new QLabel(QString("<font size=\"+2\">%1:</font>").arg(d.label), this);
+            if (!d.unit.isEmpty()) l->setText(QString("<font size=\"+2\">%1 [%2]:</font>").arg(d.label).arg(d.unit));
             fpw->setToolTip(d.name);
             l->setToolTip(d.name);
             l->setTextFormat(Qt::RichText);
             layParameters->addRow(l, fpw);
             m_fitParameters.append(fpw);
             connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
+            connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
+            connect(fpw, SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
+            connect(fpw, SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
             fpw->setEditRange(btnEditRanges->isChecked());
         }
     }
@@ -435,10 +461,46 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     updateParameterValues();
 }
 
+void QFFCSFitEvaluationEditor::parameterValueChanged(QString id, double value) {
+    updateParameterValues();
+}
+
+void QFFCSFitEvaluationEditor::parameterFixChanged(QString id, bool fix) {
+    updateParameterValues();
+}
+
+void QFFCSFitEvaluationEditor::parameterRangeChanged(QString id, double min, double max) {
+    updateParameterValues();
+}
+
 void QFFCSFitEvaluationEditor::updateParameterValues() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    if (!ffunc) return;
+
+    double* values=eval->allocFillParameters();
+    double* errors=eval->allocFillParameterErrors();
+    ffunc->calcParameter(values, errors);
+
+
     for (int i=0; i<m_fitParameters.size(); i++) {
-        if (m_fitParameters[i]) m_fitParameters[i]->reloadValues();
+        if (m_fitParameters[i]) {
+            //m_fitParameters[i]->reloadValues();
+            QString id=m_fitParameters[i]->parameterID();
+            int num=ffunc->getParameterNum(id);
+            if (!id.isEmpty()) {
+                if (num>=0) m_fitParameters[i]->setValue(values[num], errors[num], false);
+                m_fitParameters[i]->setVisible(ffunc->isParameterVisible(ffunc->getParameterNum(id), values));
+            }
+        }
     }
+
+    free(values);
+    free(errors);
 }
 
 void QFFCSFitEvaluationEditor::replotData() {

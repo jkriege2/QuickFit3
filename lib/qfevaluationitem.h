@@ -233,7 +233,7 @@ class QFEvaluationItem : public QObject, public QFProperties {
          * evaluation class in order to ensure that all data is correctly read from the project file!  Do so by calling
          * \code QFEvaluationItem::intReadData(e); \endcode at the start of your method !!!
          */
-        virtual void intReadData(QDomElement* e) {  };
+        virtual void intReadData(QDomElement* e) {};
         /** \brief set the internal error flag and description */
         void setError(QString description) { errorOcc=true; errorDesc=description; }
 

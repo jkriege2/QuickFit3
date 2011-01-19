@@ -11,7 +11,7 @@
 class QFFitFunction {
     public:
         /** \brief different types of input widgets for parameters */
-        enum ParameterType { FloatNumber=0, IntNumber=1 };
+        enum ParameterType { FloatNumber=0, IntNumber=1, Invalid=100 };
         /** \brief this struct is used to describe the fitting parameters */
         struct ParameterDescription {
             /** \brief type of the parameter */
@@ -32,6 +32,8 @@ class QFFitFunction {
             bool userEditable;
             /** \brief determine whether, or not an error value is displayed for this parameter */
             bool displayError;
+            /** \brief determine whether the user should be allowed to edit the parameter range */
+            bool userRangeEditable;
             /** \brief an initial value for the parameter */
             double initialValue;
             /** \brief minimum value of the parameter range (if supported by algorithm) */
@@ -40,6 +42,22 @@ class QFFitFunction {
             double maxValue;
             /** \brief value increment for the widget associated with the parameter */
             double inc;
+
+            ParameterDescription() {
+                type=Invalid;
+                id="";
+                name="";
+                label="";
+                unit="";
+                fit=false;
+                userEditable=false;
+                displayError=false;
+                userRangeEditable=false;
+                initialValue=0;
+                minValue=0;
+                maxValue=0;
+                inc=1;
+            }
         };
 
         virtual ~QFFitFunction() {}
@@ -58,20 +76,35 @@ class QFFitFunction {
         /** \brief evaluate the fitting function with the given parameter vector */
         virtual double evaluate(double t, const double* data) const =0;
 
-        /** \brief calculate non-fit parameters, i.e. fit=userEditable=false */
-        virtual void calcParameter(double* data) const {};
+        /** \brief calculate non-fit parameters and their errors (if \a error is supplied), i.e. \c fit=userEditable=false */
+        virtual void calcParameter(double* data, double* error=NULL) const {};
+
+        /** \brief returns \c true if the given parameter is currently visible (which could e.g. depend on the setting of the other parameters) */
+        virtual bool isParameterVisible(int parameter, double* data) const { return true; };
 
         /** \brief returns the description of the i-th parameter */
         ParameterDescription getDescription(int i) const  {
             return m_parameters[i];
         }
 
+        /** \brief returns the description of the parameter id */
+        ParameterDescription getDescription(QString id) const  {
+            int i=getParameterNum(id);
+            if (i>-1) return m_parameters[i];
+            else return ParameterDescription();
+        }
+
         /** \brief get num of the given parameter or -1 */
-        int getParameterNum(QString param) {
+        int getParameterNum(QString param) const {
             for (int i=0; i<m_parameters.size(); i++) {
                 if (m_parameters[i].id==param) return i;
             }
             return -1;
+        }
+
+        /** \brief return \c true if a parameter wit the given id exists */
+        bool hasParameter(QString id) {
+            return (getParameterNum(id)>=0);
         }
 
         /** \brief get id of the given parameter or an empty string */
@@ -96,7 +129,7 @@ class QFFitFunction {
             \param description parameter description to be aded
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, bool fit, bool userEditable, bool displayError, double initialValue, double minValue, double maxValue, double inc) {
+        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, bool fit, bool userEditable, bool userRangeEditable, bool displayError, double initialValue, double minValue, double maxValue, double inc) {
             ParameterDescription d;
             d.type=type;
             d.id=id;
@@ -110,6 +143,7 @@ class QFFitFunction {
             d.maxValue=maxValue;
             d.inc=inc;
             d.displayError=displayError;
+            d.userRangeEditable=userRangeEditable;
 
             return addParameter(d);
         }

@@ -2,7 +2,7 @@
 
 #include <limits.h>
 
-QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datastore, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRange, QWidget* parent):
+QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datastore, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent):
     QWidget(parent)
 {
     m_datastore=datastore;
@@ -14,8 +14,10 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     m_unit="";
     m_settingData=true;
     m_increment=1;
-    m_editRange=editRange;
+    m_editRange=editRangeAllowed;
+    m_editRangeAllowed=editRangeAllowed;
     m_widgetWidth=75;
+    m_checkWidth=32;
 
     neditValue=NULL;
     spinIntValue=NULL;
@@ -23,13 +25,18 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     spinIntMin=NULL;
     neditMax=NULL;
     neditMin=NULL;
-    labRangeMax=NULL;
-    labRangeMin=NULL;
     chkFix=NULL;
+    spCheck=NULL;
+    hlabFix=NULL;
+    hlabMax=NULL;
+    hlabMin=NULL;
+    hlabValue=NULL;
+    labError=NULL;
 
     // create widgets:
     layMain=new QHBoxLayout(this);
     layMain->setContentsMargins(0,0,0,0);
+    layMain->setMargin(1);
     setLayout(layMain);
     if (widget==FloatEdit) {
         neditValue=new NumberEdit(this);
@@ -39,7 +46,6 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         neditValue->setSingleStep(m_increment);
         neditValue->setReadOnly(!editable);
         neditValue->setEnabled(editable);
-
         connect(neditValue, SIGNAL(valueChanged(double)), this, SLOT(doubleValueChanged(double)));
     } else if (widget==IntSpinBox) {
         spinIntValue=new QSpinBox(this);
@@ -49,20 +55,24 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         spinIntValue->setReadOnly(!editable);
         spinIntValue->setEnabled(editable);
         layMain->addWidget(spinIntValue);
-        connect(spinIntValue, SIGNAL(valueChanged(int)), this, SLOT(doubleValueChanged(double)));
+        connect(spinIntValue, SIGNAL(valueChanged(int)), this, SLOT(intValueChanged(int)));
+    } else if (widget==Header) {
+        hlabValue=new QLabel(tr("<b>value</b>"), this);
+        layMain->addWidget(hlabValue);
     }
 
     if (displayError) {
-        labError=new QLabel(this);
-        layMain->addWidget(labError);
+        if (widget==Header) {
+            hlabValue->setText(tr("<b>value &plusmn; error</b>"));
+        } else {
+            labError=new QLabel(this);
+            layMain->addWidget(labError);
+        }
     }
 
     layMain->addStretch();
 
     if (editable) {
-        labRangeMin=new QLabel(tr("min: "), this);
-        labRangeMax=new QLabel(tr("max: "), this);
-        layMain->addWidget(labRangeMin);
         if (widget==FloatEdit) {
             neditMin=new NumberEdit(this);
             neditMin->setCheckBounds(false, false);
@@ -77,45 +87,54 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
             connect(neditMax, SIGNAL(valueChanged(double)), this, SLOT(doubleMaxChanged(double)));
 
             layMain->addWidget(neditMin);
-            layMain->addWidget(labRangeMax);
             layMain->addWidget(neditMax);
         } else if (widget==IntSpinBox) {
             spinIntMin=new QSpinBox(this);
             spinIntMin->setSuffix(m_unit);
             spinIntMin->setSingleStep(m_increment);
             spinIntMin->setRange(INT_MIN, INT_MAX);
-            connect(spinIntMin, SIGNAL(valueChanged(int)), this, SLOT(doubleMinChanged(double)));
+            connect(spinIntMin, SIGNAL(valueChanged(int)), this, SLOT(intMinChanged(int)));
 
             spinIntMax=new QSpinBox(this);
             spinIntMax->setSuffix(m_unit);
             spinIntMax->setSingleStep(m_increment);
             spinIntMax->setRange(INT_MIN, INT_MAX);
-            connect(spinIntMax, SIGNAL(valueChanged(int)), this, SLOT(doubleMaxChanged(double)));
+            connect(spinIntMax, SIGNAL(valueChanged(int)), this, SLOT(intMaxChanged(int)));
 
             layMain->addWidget(spinIntMin);
-            layMain->addWidget(labRangeMax);
             layMain->addWidget(spinIntMax);
+        } else if (widget==Header) {
+            hlabMin=new QLabel(tr("<b>minimum</b>"), this);
+            layMain->addWidget(hlabMin);
+            hlabMax=new QLabel(tr("<b>maximum</b>"), this);
+            layMain->addWidget(hlabMax);
         }
     }
 
-
-    chkFix=new QCheckBox(tr("fix"), this);
+    chkFix=new QCheckBox(this);
     int fixwidth=chkFix->width();
     chkFix->setMinimumWidth(fixwidth);
     chkFix->setMaximumWidth(fixwidth);
     if (displayFix) {
-        layMain->addWidget(chkFix);
-        connect(chkFix, SIGNAL(toggled(bool)), this, SLOT(sfixChanged(bool)));
+        if (widget==Header) {
+            delete chkFix;
+            chkFix=NULL;
+            hlabFix=new QLabel(tr("<b>fix</b>"), this);
+            layMain->addWidget(hlabFix);
+        } else {
+            layMain->addWidget(chkFix);
+            connect(chkFix, SIGNAL(toggled(bool)), this, SLOT(sfixChanged(bool)));
+        }
     } else {
         delete chkFix;
         chkFix=NULL;
-        QWidget* sp=new QWidget(this);
-        sp->setMinimumWidth(fixwidth);
-        sp->setMaximumWidth(fixwidth);
-        layMain->addWidget(sp);
+        spCheck=new QWidget(this);
+        spCheck->setMinimumWidth(m_checkWidth);
+        spCheck->setMaximumWidth(m_checkWidth);
+        layMain->addWidget(spCheck);
     }
-    setEditRange(editRange);
-    setWidgetWidth(m_widgetWidth);
+    setEditRange(editRangeAllowed);
+    setWidgetWidth(m_widgetWidth, m_checkWidth);
     setUnit(m_unit);
     setIncrement(m_increment);
     m_settingData=false;
@@ -139,25 +158,50 @@ void QFFitParameterWidget::reloadValues() {
         if (spinIntMax) spinIntMax->setValue(m_datastore->getFitMax(m_parameterID));
     }
 
+    double value=m_datastore->getFitValue(m_parameterID);
+
     if (m_widgetType==FloatEdit) {
-        neditValue->setValue(m_datastore->getFitValue(m_parameterID));
-        neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (neditValue && (neditValue->value()!=value)) neditValue->setValue(value);
     } else if (m_widgetType==IntSpinBox) {
-        spinIntValue->setValue(m_datastore->getFitValue(m_parameterID));
-        spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
     }
-    if (m_displayError) {
+    if (m_displayError && labError) {
         double error=m_datastore->getFitError(m_parameterID);
         labError->setTextFormat(Qt::RichText);
-        if (error != 0) labError->setText(tr("&plusmn; %1 %2").arg(error).arg(m_unit));
-        else labError->setText("");
+        labError->setText(tr("&plusmn; %1").arg(error));
     }
-    if (m_displayFix && m_editable) {
-        if (chkFix) chkFix->setChecked(m_datastore->getFitFix(m_parameterID));
+    if (m_displayFix && m_editable && chkFix) {
+        chkFix->setChecked(m_datastore->getFitFix(m_parameterID));
     }
     m_settingData=old_m_settingData;
 }
 
+void QFFitParameterWidget::setValue(double value, double error, bool writeback) {
+    bool old_m_settingData=m_settingData;
+    m_settingData=true;
+
+    reloadValues();
+
+    if (writeback) {
+        m_datastore->setFitValue(m_parameterID, value);
+    }
+
+    if (m_widgetType==FloatEdit) {
+        if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (neditValue && (neditValue->value()!=value)) neditValue->setValue(value);
+    } else if (m_widgetType==IntSpinBox) {
+        if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
+    }
+    if (m_displayError && labError) {
+        labError->setTextFormat(Qt::RichText);
+        labError->setText(tr("&plusmn; %1").arg(error));
+    }
+
+    m_settingData=old_m_settingData;
+}
 
 void QFFitParameterWidget::doubleValueChanged(double value) {
     if ((!m_settingData) && m_editable) {
@@ -183,23 +227,42 @@ void QFFitParameterWidget::sfixChanged(bool fix) {
 void QFFitParameterWidget::doubleMinChanged(double value) {
     if ((!m_settingData) && m_editable && m_editRange) {
         m_datastore->setFitMin(m_parameterID, value);
-        emit rangeChanged(m_parameterID, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        emit rangeChanged(m_parameterID, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
     }
 }
 
 void QFFitParameterWidget::doubleMaxChanged(double value) {
     if ((!m_settingData) && m_editable && m_editRange) {
         m_datastore->setFitMax(m_parameterID, value);
-        emit rangeChanged(m_parameterID, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        emit rangeChanged(m_parameterID, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
     }
 }
 
-void QFFitParameterWidget::setWidgetWidth(int width) {
+void QFFitParameterWidget::intMinChanged(int value) {
+    if ((!m_settingData) && m_editable && m_editRange) {
+        m_datastore->setFitMin(m_parameterID, value);
+        if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        emit rangeChanged(m_parameterID, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+    }
+}
+
+void QFFitParameterWidget::intMaxChanged(int value) {
+    if ((!m_settingData) && m_editable && m_editRange) {
+        m_datastore->setFitMax(m_parameterID, value);
+        if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        emit rangeChanged(m_parameterID, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+    }
+}
+
+void QFFitParameterWidget::setWidgetWidth(int width, int fixWidth) {
     m_widgetWidth=width;
+    m_checkWidth=fixWidth;
     if (neditValue) {
         neditValue->setMinimumWidth(m_widgetWidth);
         neditValue->setMaximumWidth(m_widgetWidth);
@@ -224,28 +287,39 @@ void QFFitParameterWidget::setWidgetWidth(int width) {
         spinIntMax->setMinimumWidth(m_widgetWidth);
         spinIntMax->setMaximumWidth(m_widgetWidth);
     }
+    if (labError) {
+        labError->setMinimumWidth(m_widgetWidth);
+        labError->setMaximumWidth(m_widgetWidth);
+    }
+    if (chkFix) {
+        chkFix->setMinimumWidth(m_checkWidth);
+        chkFix->setMaximumWidth(m_checkWidth);
+    }
+    if (hlabFix) {
+        hlabFix->setMinimumWidth(m_checkWidth);
+        hlabFix->setMaximumWidth(m_checkWidth);
+    }
+    if (hlabMax) {
+        hlabMax->setMinimumWidth(m_widgetWidth);
+        hlabMax->setMaximumWidth(m_widgetWidth);
+    }
+    if (hlabMin) {
+        hlabMin->setMinimumWidth(m_widgetWidth);
+        hlabMin->setMaximumWidth(m_widgetWidth);
+    }
+    if (hlabValue) {
+        if (m_displayError) {
+            hlabValue->setMinimumWidth(2*m_widgetWidth+layMain->margin());
+            hlabValue->setMaximumWidth(2*m_widgetWidth+layMain->margin());
+        } else {
+            hlabValue->setMinimumWidth(m_widgetWidth);
+            hlabValue->setMaximumWidth(m_widgetWidth);
+        }
+    }
 }
 
 void QFFitParameterWidget::setUnit(QString unit) {
     m_unit=unit;
-    if (neditValue) {
-        neditValue->setSuffix(m_unit);
-    }
-    if (neditMin) {
-        neditMin->setSuffix(m_unit);
-    }
-    if (neditMax) {
-        neditMax->setSuffix(m_unit);
-    }
-    if (spinIntValue) {
-        spinIntValue->setSuffix(m_unit);
-    }
-    if (spinIntMin) {
-        spinIntMin->setSuffix(m_unit);
-    }
-    if (spinIntMax) {
-        spinIntMax->setSuffix(m_unit);
-    }
 }
 
 void QFFitParameterWidget::setIncrement(double increment) {
@@ -271,11 +345,21 @@ void QFFitParameterWidget::setIncrement(double increment) {
 }
 
 void QFFitParameterWidget::setEditRange(bool editRange) {
-    m_editRange=editRange;
-    if (labRangeMax) labRangeMax->setVisible(editRange);
-    if (labRangeMin) labRangeMin->setVisible(editRange);
-    if (spinIntMax) spinIntMax->setVisible(editRange);
-    if (spinIntMin) spinIntMin->setVisible(editRange);
-    if (neditMax) neditMax->setVisible(editRange);
-    if (neditMin) neditMin->setVisible(editRange);
+    if (!m_editRangeAllowed) {
+        m_editRange=false;
+        if (spinIntMax) spinIntMax->setVisible(false);
+        if (spinIntMin) spinIntMin->setVisible(false);
+        if (neditMax) neditMax->setVisible(false);
+        if (neditMin) neditMin->setVisible(false);
+        if (hlabMin) hlabMin->setVisible(false);
+        if (hlabMax) hlabMax->setVisible(false);
+    } else {
+        m_editRange=editRange;
+        if (spinIntMax) spinIntMax->setVisible(editRange);
+        if (spinIntMin) spinIntMin->setVisible(editRange);
+        if (neditMax) neditMax->setVisible(editRange);
+        if (neditMin) neditMin->setVisible(editRange);
+        if (hlabMin) hlabMin->setVisible(editRange);
+        if (hlabMax) hlabMax->setVisible(editRange);
+    }
 }
