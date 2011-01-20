@@ -17,7 +17,7 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     m_editRange=editRangeAllowed;
     m_editRangeAllowed=editRangeAllowed;
     m_widgetWidth=75;
-    m_checkWidth=32;
+    m_checkWidth=24;
 
     neditValue=NULL;
     spinIntValue=NULL;
@@ -38,6 +38,29 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     layMain->setContentsMargins(0,0,0,0);
     layMain->setMargin(1);
     setLayout(layMain);
+
+    chkFix=new QCheckBox(this);
+    chkFix->setMinimumWidth(m_checkWidth);
+    chkFix->setMaximumWidth(m_checkWidth);
+    if (displayFix) {
+        if (widget==Header) {
+            delete chkFix;
+            chkFix=NULL;
+            hlabFix=new QLabel(tr("<b>fix</b>"), this);
+            layMain->addWidget(hlabFix);
+        } else {
+            layMain->addWidget(chkFix);
+            connect(chkFix, SIGNAL(toggled(bool)), this, SLOT(sfixChanged(bool)));
+        }
+    } else {
+        delete chkFix;
+        chkFix=NULL;
+        spCheck=new QWidget(this);
+        spCheck->setMinimumWidth(m_checkWidth);
+        spCheck->setMaximumWidth(m_checkWidth);
+        layMain->addWidget(spCheck);
+    }
+
     if (widget==FloatEdit) {
         neditValue=new NumberEdit(this);
         neditValue->setRange(datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
@@ -62,12 +85,17 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     }
 
     if (displayError) {
+        labError=new QLabel(this);
+        layMain->addWidget(labError);
         if (widget==Header) {
+            labError->setText(tr("<b>&plusmn; error</b>"));
+        }
+        /*if (widget==Header) {
             hlabValue->setText(tr("<b>value &plusmn; error</b>"));
         } else {
             labError=new QLabel(this);
             layMain->addWidget(labError);
-        }
+        }*/
     }
 
     layMain->addStretch();
@@ -111,28 +139,7 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         }
     }
 
-    chkFix=new QCheckBox(this);
-    int fixwidth=chkFix->width();
-    chkFix->setMinimumWidth(fixwidth);
-    chkFix->setMaximumWidth(fixwidth);
-    if (displayFix) {
-        if (widget==Header) {
-            delete chkFix;
-            chkFix=NULL;
-            hlabFix=new QLabel(tr("<b>fix</b>"), this);
-            layMain->addWidget(hlabFix);
-        } else {
-            layMain->addWidget(chkFix);
-            connect(chkFix, SIGNAL(toggled(bool)), this, SLOT(sfixChanged(bool)));
-        }
-    } else {
-        delete chkFix;
-        chkFix=NULL;
-        spCheck=new QWidget(this);
-        spCheck->setMinimumWidth(m_checkWidth);
-        spCheck->setMaximumWidth(m_checkWidth);
-        layMain->addWidget(spCheck);
-    }
+
     setEditRange(editRangeAllowed);
     setWidgetWidth(m_widgetWidth, m_checkWidth);
     setUnit(m_unit);
@@ -167,7 +174,7 @@ void QFFitParameterWidget::reloadValues() {
         if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
     }
-    if (m_displayError && labError) {
+    if (m_displayError && labError && (m_widgetType!=Header)) {
         double error=m_datastore->getFitError(m_parameterID);
         labError->setTextFormat(Qt::RichText);
         labError->setText(tr("&plusmn; %1").arg(error));
@@ -195,7 +202,7 @@ void QFFitParameterWidget::setValue(double value, double error, bool writeback) 
         if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
     }
-    if (m_displayError && labError) {
+    if (m_displayError && labError && (m_widgetType!=Header)) {
         labError->setTextFormat(Qt::RichText);
         labError->setText(tr("&plusmn; %1").arg(error));
     }
@@ -295,6 +302,10 @@ void QFFitParameterWidget::setWidgetWidth(int width, int fixWidth) {
         chkFix->setMinimumWidth(m_checkWidth);
         chkFix->setMaximumWidth(m_checkWidth);
     }
+    if (spCheck) {
+        spCheck->setMinimumWidth(m_checkWidth);
+        spCheck->setMaximumWidth(m_checkWidth);
+    }
     if (hlabFix) {
         hlabFix->setMinimumWidth(m_checkWidth);
         hlabFix->setMaximumWidth(m_checkWidth);
@@ -308,13 +319,15 @@ void QFFitParameterWidget::setWidgetWidth(int width, int fixWidth) {
         hlabMin->setMaximumWidth(m_widgetWidth);
     }
     if (hlabValue) {
-        if (m_displayError) {
+        hlabValue->setMinimumWidth(m_widgetWidth);
+        hlabValue->setMaximumWidth(m_widgetWidth);
+        /*if (m_displayError) {
             hlabValue->setMinimumWidth(2*m_widgetWidth+layMain->margin());
             hlabValue->setMaximumWidth(2*m_widgetWidth+layMain->margin());
         } else {
             hlabValue->setMinimumWidth(m_widgetWidth);
             hlabValue->setMaximumWidth(m_widgetWidth);
-        }
+        }*/
     }
 }
 

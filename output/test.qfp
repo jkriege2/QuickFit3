@@ -36,6 +36,8 @@
                 <property name="TIME" type="time" data="14:52:17" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
@@ -242,15 +244,16 @@
             <data>
                 <algorithms current=""/>
                 <functions current="fcs_diff">
-                    <parameter id="fcs_adiff___alpha" value="0.7"/>
-                    <parameter id="fcs_adiff___diff_tau1" value="33"/>
+                    <parameter id="fcs_adiff___alpha" value="1"/>
+                    <parameter id="fcs_adiff___diff_tau1" value="44"/>
                     <parameter id="fcs_adiff___focus_struct_fac" value="7" fix="1"/>
-                    <parameter id="fcs_adiff___n_particle" value="17"/>
+                    <parameter id="fcs_adiff___n_particle" value="9"/>
                     <parameter id="fcs_diff___diff_rho2" value="0.7"/>
-                    <parameter id="fcs_diff___diff_tau1" value="1.1"/>
-                    <parameter id="fcs_diff___focus_struct_fac" value="4"/>
-                    <parameter id="fcs_diff___n_components" value="2"/>
-                    <parameter id="fcs_diff___n_particle" value="1" min="1e-11" max="1000000"/>
+                    <parameter id="fcs_diff___diff_tau1" value="44"/>
+                    <parameter id="fcs_diff___diff_tau2" value="30"/>
+                    <parameter id="fcs_diff___focus_struct_fac" value="6" fix="1"/>
+                    <parameter id="fcs_diff___n_components" value="1"/>
+                    <parameter id="fcs_diff___n_particle" value="8.5" min="1e-11" max="1000000"/>
                 </functions>
             </data>
         </evaluationelement>

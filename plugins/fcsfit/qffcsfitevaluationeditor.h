@@ -16,6 +16,10 @@
 #include <QPointer>
 #include <QFormLayout>
 #include <QScrollArea>
+#include <QSpinBox>
+#include <QTextEdit>
+#include <QToolBox>
+#include <QTabWidget>
 #include "datacutslider.h"
 #include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
@@ -92,6 +96,18 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QLabel* labFitParameters;
         /** \brief button to toggle editing ranges  */
         QPushButton* btnEditRanges;
+        /** \brief plotter for residual distribution histogram */
+        JKQtPlotter* pltResidualHistogram;
+        /** \brief label for fit statistics */
+        QTextEdit* txtFitStatistics;
+        /** \brief spin box to set the number of bins in residuals histogram */
+        QSpinBox* spinResidualHistogramBins;
+        /** \brief splitter between residual statistics plotter pltResidualHistogram and fit results txtFitStatistics */
+        QSplitter* splitFitStatistics;
+        /** \brief layout used to configure the residuals evaluation */
+        QFormLayout* layResidualAnalysis;
+        /** \brief toolbox to switch between residual histogram and parameters */
+        QTabWidget* tabResidulas;
 
         /** \brief scroll area for the fit parameters */
         QScrollArea* scrollParameters;
@@ -124,6 +140,14 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** \brief replot curves */
         void replotData();
+
+        /*! \brief update the fit model function and the residuals in the graphs
+
+            This function only adds the fit function plot objects and does NOT cause a replot of the graphs. It is called by
+            replotData().
+        */
+        void updateFitFunctions();
+
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
         /** \brief emitted when the pltData rezooms */

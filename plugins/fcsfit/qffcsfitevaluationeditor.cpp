@@ -88,12 +88,12 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     vbl->addLayout(hbl);
 
 
-    QFrame* frame=new QFrame(this);
+    /*QFrame* frame=new QFrame(this);
     frame->setFrameShape(QFrame::HLine);
     frame->setFrameShadow(QFrame::Raised);
     frame->setMinimumHeight(5);
     frame->setMaximumHeight(5);
-    vbl->addWidget(frame);
+    vbl->addWidget(frame);*/
 
     toolbar=new QToolBar("toolbar_fcs_fit", this);
     vbl->addWidget(toolbar);
@@ -142,6 +142,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     QWidget* widgetResiduals=new QWidget(this);
     vbl=new QVBoxLayout(widgetResiduals);
     vbl->setContentsMargins(0,0,0,0);
+    vbl->setMargin(0);
     widgetResiduals->setLayout(vbl);
 
     pltResiduals=new JKQtPlotter(true, this);
@@ -153,10 +154,17 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltData->set_displayToolbar(false);
     pltResiduals->set_displayToolbar(false);
     pltResiduals->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [{\\mu}s]"));
+    pltResiduals->getXAxis()->set_labelFontSize(11);
+    pltResiduals->getXAxis()->set_tickLabelFontSize(10);
     pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
+    pltResiduals->getYAxis()->set_labelFontSize(11);
+    pltResiduals->getYAxis()->set_tickLabelFontSize(10);
     pltData->getXAxis()->set_axisLabel("");
     pltData->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
+    pltData->getYAxis()->set_labelFontSize(11);
+    pltData->getYAxis()->set_tickLabelFontSize(10);
     pltData->getXAxis()->set_drawMode1(JKQTPCADMticks);
+    pltData->getXAxis()->set_tickLabelFontSize(10);
     pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
     pltResiduals->setBorder(1,1,1,1);
     pltData->setBorder(1,1,1,1);
@@ -167,10 +175,65 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltResiduals->set_useAntiAliasingForGraphs(true);
     pltData->set_displayMousePosition(false);
     pltResiduals->set_displayMousePosition(false);
+    pltData->set_keyFontSize(9);
+    pltData->set_keyXMargin(2);
+    pltData->set_keyYMargin(2);
+    pltResiduals->set_keyFontSize(9);
+    pltResiduals->set_keyXMargin(2);
+    pltResiduals->set_keyYMargin(2);
+
 
     datacut=new DataCutSliders(this);
     vbl->addWidget(datacut,0);
     splitPlot->addWidget(widgetResiduals);
+
+    splitFitStatistics=new QSplitter(this);
+    splitPlot->addWidget(splitFitStatistics);
+    tabResidulas=new QTabWidget(this);
+    tabResidulas->setTabPosition(QTabWidget::West);
+    tabResidulas->setTabShape(QTabWidget::Triangular);
+    tabResidulas->setDocumentMode(true);
+    splitFitStatistics->addWidget(tabResidulas);
+    //QHBoxLayout* layFitStat=new QHBoxLayout(this);
+    //layFitStat->setContentsMargins(0,0,0,0);
+    //layFitStat->setMargin(0);
+    //QWidget* wFitStat=new QWidget(this);
+    //wFitStat->setLayout(layFitStat);
+    //splitFitStatistics->addWidget(wFitStat);
+    pltResidualHistogram=new JKQtPlotter(true, this);
+    pltResidualHistogram->resize(200,200);
+    pltResidualHistogram->set_displayToolbar(false);
+    pltResidualHistogram->getXAxis()->set_axisLabel(tr("residuals"));
+    pltResidualHistogram->getXAxis()->set_labelFontSize(8);
+    pltResidualHistogram->getXAxis()->set_tickLabelFontSize(8);
+    pltResidualHistogram->getYAxis()->set_axisLabel(tr("frequency"));
+    pltResidualHistogram->getYAxis()->set_labelFontSize(8);
+    pltResidualHistogram->getYAxis()->set_tickLabelFontSize(8);
+    pltResidualHistogram->setBorder(0,0,0,0);
+    pltResidualHistogram->set_useAntiAliasingForSystem(true);
+    pltResidualHistogram->set_useAntiAliasingForGraphs(true);
+    pltResidualHistogram->set_displayMousePosition(false);
+    pltResidualHistogram->set_keyFontSize(8);
+    pltResidualHistogram->set_keyXMargin(1);
+    pltResidualHistogram->set_keyYMargin(1);
+    pltResidualHistogram->getYAxis()->set_minTicks(5);
+    pltResidualHistogram->getYAxis()->set_minTicks(5);
+    tabResidulas->addTab(pltResidualHistogram, tr("Histogram"));
+    //layFitStat->addWidget(pltResidualHistogram, 10);
+    layResidualAnalysis=new QFormLayout(this);
+    layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    QWidget* widResidualParameters=new QWidget(this);
+    widResidualParameters->setLayout(layResidualAnalysis);
+    //layFitStat->addLayout(layResidualAnalysis, 1);
+    spinResidualHistogramBins=new QSpinBox(this);
+    spinResidualHistogramBins->setRange(1,1000);
+    layResidualAnalysis->addRow(tr("# bins:"), spinResidualHistogramBins);
+
+    tabResidulas->addTab(widResidualParameters, tr("Parameters"));
+
+    txtFitStatistics=new QTextEdit(this);
+    txtFitStatistics->setReadOnly(true);
+    splitFitStatistics->addWidget(txtFitStatistics);
 
 
 
@@ -208,6 +271,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     scrollParameters->setWidget(widParameters);
     scrollParameters->setWidgetResizable(true);
     layParameters=new QFormLayout(this);
+    layParameters->setMargin(2);
     widParameters->setLayout(layParameters);
 
 
@@ -239,6 +303,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addAction(pltData->get_actPrint()); pltData->get_actPrint()->setIcon(QIcon(":/fcsplot_print.png"));
     toolbar->addSeparator();
     toolbar->addAction(pltData->get_actZoomAll()); pltData->get_actZoomAll()->setIcon(QIcon(":/fcsplot_zoomall.png"));
+    connect(pltData->get_actZoomAll(), SIGNAL(riggered()), pltResiduals, SLOT(zoomToFit()));
     toolbar->addSeparator();
     toolbar->addWidget(lPS);
     toolbar->addWidget(cmbPlotStyle);
@@ -330,13 +395,17 @@ void QFFCSFitEvaluationEditor::readSettings() {
         //cmbWeights->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/weights", cmbWeights->currentIndex()).toInt());
         pltData->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
         pltResiduals->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
+        pltResidualHistogram->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresidualhistogram/");
         hlpAlgorithm->readSettings(*settings->getQSettings(), "fcsfitevaleditor/algorithm_");
         hlpFunction->readSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
         loadSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
         loadSplitter(*(settings->getQSettings()), splitModel, "fcsfitevaleditor/splitter_model");
+        loadSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsfitevaleditor/splitter_fitstatistics");
         m_parameterWidgetWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth).toInt();
         m_parameterCheckboxWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth).toInt();
         btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", m_parameterWidgetWidth).toBool());
+        spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
+        tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
     }
 }
 
@@ -346,15 +415,18 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         settings->getQSettings()->setValue("fcsfitevaleditor/algorithm", cmbAlgorithm->currentIndex());
         //settings->getQSettings()->setValue("fcsfitevaleditor/model", cmbModel->currentIndex());
         //settings->getQSettings()->setValue("fcsfitevaleditor/weights", cmbWeights->currentIndex());
-        pltData->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
-        pltResiduals->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
+        //pltData->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
+        //pltResiduals->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
         hlpAlgorithm->writeSettings(*settings->getQSettings(), "fcsfitevaleditor/algorithm_");
         hlpFunction->writeSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
         saveSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
         saveSplitter(*(settings->getQSettings()), splitModel, "fcsfitevaleditor/splitter_model");
+        saveSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsfitevaleditor/splitter_fitstatistics");
         settings->getQSettings()->setValue("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth);
         settings->getQSettings()->setValue("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth);
         settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", btnEditRanges->isChecked());
+        settings->getQSettings()->setValue("fcsfitevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
+        settings->getQSettings()->setValue("fcsfitevaleditor/residual_toolbox_current", tabResidulas->currentIndex());
     }
 }
 
@@ -442,8 +514,8 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             fpw->setUnit(d.unit);
             fpw->setIncrement(d.inc);
             fpw->setWidgetWidth(m_parameterWidgetWidth, m_parameterCheckboxWidth);
-            QLabel* l=new QLabel(QString("<font size=\"+2\">%1:</font>").arg(d.label), this);
-            if (!d.unit.isEmpty()) l->setText(QString("<font size=\"+2\">%1 [%2]:</font>").arg(d.label).arg(d.unit));
+            QLabel* l=new QLabel(QString("<font size=\"+1\">%1:</font>").arg(d.label), this);
+            if (!d.unit.isEmpty()) l->setText(QString("<font size=\"+1\">%1 [%2]:</font>").arg(d.label).arg(d.unit));
             fpw->setToolTip(d.name);
             l->setToolTip(d.name);
             l->setTextFormat(Qt::RichText);
@@ -463,6 +535,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
 
 void QFFCSFitEvaluationEditor::parameterValueChanged(QString id, double value) {
     updateParameterValues();
+    replotData();
 }
 
 void QFFCSFitEvaluationEditor::parameterFixChanged(QString id, bool fix) {
@@ -494,7 +567,9 @@ void QFFCSFitEvaluationEditor::updateParameterValues() {
             int num=ffunc->getParameterNum(id);
             if (!id.isEmpty()) {
                 if (num>=0) m_fitParameters[i]->setValue(values[num], errors[num], false);
-                m_fitParameters[i]->setVisible(ffunc->isParameterVisible(ffunc->getParameterNum(id), values));
+                bool visible=ffunc->isParameterVisible(ffunc->getParameterNum(id), values);
+                m_fitParameters[i]->setVisible(visible);
+                layParameters->labelForField(m_fitParameters[i])->setVisible(visible);
             }
         }
     }
@@ -557,14 +632,14 @@ void QFFCSFitEvaluationEditor::replotData() {
         QString graphName="";
         if (eval->getCurrentRun()<0) {
             c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
-            graphName=tr("\\verb{%1} average data").arg(record->getName());
+            graphName=tr("\\verb{%1} average").arg(record->getName());
         } else {
             if (eval->getCurrentRun()<data->getCorrelationRuns()) {
                 c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentRun()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentRun())).toStdString());
-                graphName=tr("\\verb{%2} run %1 data").arg(eval->getCurrentRun()).arg(record->getName());
+                graphName=tr("\\verb{%2} run %1").arg(eval->getCurrentRun()).arg(record->getName());
             } else {
                 c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
-                graphName=tr("\\verb{%1} average data").arg(record->getName());
+                graphName=tr("\\verb{%1} average").arg(record->getName());
             }
         }
         size_t c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
@@ -575,11 +650,12 @@ void QFFCSFitEvaluationEditor::replotData() {
             case 3: styl=JKQTPerrorBarsLines; break;
         }
 
-        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
-        g->set_color(QColor("blue"));
-        g->set_errorColor(QColor("blue").lighter());
+        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(pltData);
+        QColor gcolor=pltData->get_graphColor();
+        g->set_color(gcolor);
+        g->set_errorColor(gcolor.lighter());
         g->set_lineWidth(2);
-        g->set_symbolSize(6);
+        g->set_symbolSize(8);
         g->set_symbolWidth(1);
         g->set_xColumn(c_tau);
         g->set_yColumn(c_mean);
@@ -598,17 +674,107 @@ void QFFCSFitEvaluationEditor::replotData() {
         }
         pltData->addGraph(g);
 
+        updateFitFunctions();
 
         pltData->zoomToFit(true, true);
+        pltResiduals->zoomToFit(false, true);
 
         pltResiduals->setX(pltData->getXMin(), pltData->getXMax());
     }
+
+
     pltResiduals->set_doDrawing(true);
     pltResiduals->set_emitSignals(true);
     pltData->set_doDrawing(true);
     pltData->set_emitSignals(true);
     pltResiduals->update_plot();
     pltData->update_plot();
+}
+
+void QFFCSFitEvaluationEditor::updateFitFunctions() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    JKQTPdatastore* ds=pltData->getDatastore();
+    JKQTPdatastore* dsres=pltResiduals->getDatastore();
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    if (!ffunc) return;
+
+    if ((!eval)||(!data)) {
+        return;
+    }
+
+    if (data->getCorrelationN()>0) {
+        int c_tau=ds->getColumnNum("tau");
+        if (c_tau>=0) { // we only add a graph, if we have a column with tau values
+            long N=data->getCorrelationN();
+            double* fitfunc=(double*)malloc(N*sizeof(double));
+            double* residuals=(double*)malloc(N*sizeof(double));
+            double* tauvals=data->getCorrelationT();
+            double* corrdata=NULL;
+            if (eval->getCurrentRun()<0) {
+                corrdata=data->getCorrelationMean();
+            } else {
+                if (eval->getCurrentRun()<data->getCorrelationRuns()) {
+                    corrdata=data->getCorrelationRun(eval->getCurrentRun());
+                } else {
+                    corrdata=data->getCorrelationMean();
+                }
+            }
+
+            // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+            // we are working with a complete set of parameters
+            double* values=eval->allocFillParameters();
+            double* errors=eval->allocFillParameterErrors();
+            ffunc->calcParameter(values, errors);
+
+            double residSqrSum=0;
+
+            for (int i=0; i<N; i++) {
+                double value=ffunc->evaluate(tauvals[i], values);
+                //di_fit->set(0, i, value);
+                //di_resid->set(0,0,value)
+                fitfunc[i]=value;
+                residuals[i]=corrdata[i]-value;
+                residSqrSum+=residuals[i]*residuals[i];
+            }
+
+            free(values);
+            free(errors);
+
+            size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
+            free(fitfunc);
+            size_t c_taures=dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
+            size_t c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
+            free(residuals);
+            JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData);
+            g_fit->set_drawLine(true);
+            g_fit->set_title("fit function");
+            g_fit->set_xColumn(c_tau);
+            g_fit->set_yColumn(c_fit);
+            g_fit->set_datarange_start(datacut->get_userMin());
+            g_fit->set_datarange_end(datacut->get_userMax());
+            pltData->addGraph(g_fit);
+
+            JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals);
+            g_residuals->set_drawLine(false);
+            g_residuals->set_title("residuals");
+            g_residuals->set_xColumn(c_taures);
+            g_residuals->set_yColumn(c_residuals);
+            g_residuals->set_symbolSize(8);
+            g_residuals->set_symbolWidth(1);
+            g_residuals->set_datarange_start(datacut->get_userMin());
+            g_residuals->set_datarange_end(datacut->get_userMax());
+            g_residuals->set_symbol(JKQTPcross);
+            pltResiduals->addGraph(g_residuals);
+
+            txtFitStatistics->setHtml(tr("<font size=\"+2\">&chi;<sup>2</sup></font> = %1").arg(residSqrSum));
+        }
+    }
+
 }
 
 void QFFCSFitEvaluationEditor::saveReport() {

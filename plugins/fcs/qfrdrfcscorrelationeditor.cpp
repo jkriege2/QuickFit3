@@ -383,7 +383,7 @@ void QFRDRFCSCorrelationEditor::readSettings() {
 void QFRDRFCSCorrelationEditor::writeSettings() {
     if (!settings) return;
     //std::cout<<"--QFRDRFCSCorrelationEditor::writeSettings()\n";
-    plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
+    //plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
     //settings->getQSettings()->setValue(QString("fcsdataeditor/corrsplitterSizes"), splitter->saveState());
     settings->getQSettings()->setValue(QString("fcsdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
     settings->getQSettings()->setValue(QString("fcsdataeditor/error_display"), cmbAverageErrors->currentIndex());

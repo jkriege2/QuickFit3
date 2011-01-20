@@ -3,8 +3,8 @@
 DataCutSliders::DataCutSliders(QWidget* parent):
     QWidget(parent)
 {
-    setMaximumHeight(60);
-    setMinimumHeight(60);
+    //setMaximumHeight(60);
+    //setMinimumHeight(60);
 
     sliderSignals=true;
     allowCopyToAll=false;
@@ -25,6 +25,7 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     lab2->setAlignment(Qt::AlignRight);
 
     QGridLayout* layout=new QGridLayout(this);
+    layout->setContentsMargins(0,0,0,0);
     layout->addWidget(lab1, 0, 0, Qt::AlignLeft|Qt::AlignBottom);
     layout->addWidget(lab2, 0, 3, Qt::AlignRight|Qt::AlignBottom);
     layout->addWidget(editLow,  1, 0, Qt::AlignLeft|Qt::AlignTop);

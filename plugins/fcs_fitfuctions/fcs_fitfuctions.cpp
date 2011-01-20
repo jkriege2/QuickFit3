@@ -14,12 +14,12 @@ QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
 }
 
 double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
-    double N=data[0];
-    double rho2=data[5];
-    double tauD1=data[4];
-    double tauD2=data[6];
-    double gamma2=data[7]*data[7];
     int comp=data[0];
+    double N=data[1];
+    double rho2=data[5];
+    double tauD1=data[4]/1.0e6;
+    double tauD2=data[6]/1.0e6;
+    double gamma2=data[7]*data[7];
 
     double reltau1=t/tauD1;
     double reltau2=t/tauD2;
@@ -77,7 +77,7 @@ QFFitFunctionFCSADiff::QFFitFunctionFCSADiff() {
 
 double QFFitFunctionFCSADiff::evaluate(double t, const double* data) const {
     double N=data[0];
-    double tauD=data[2];
+    double tauD=data[2]/1.0e6;
     double gamma2=data[4]*data[4];
     double alpha=data[3];
     double reltau=t/tauD;

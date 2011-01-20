@@ -453,7 +453,7 @@ void QFRDRFCSRateEditor::readSettings() {
 void QFRDRFCSRateEditor::writeSettings() {
     //std::cout<<"QFRDRFCSRateEditor::writeSettings()\n";
     if (!settings) return;
-    plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/rateplot"));
+    //plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/rateplot"));
     //settings->getQSettings()->setValue(QString("fcsdataeditor/ratesplitterSizes"), splitter->saveState());
     settings->getQSettings()->setValue(QString("fcsdataeditor/raterun_display"), cmbRunDisplay->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/rateaverage_display"), chkDisplayAverage->isChecked());
