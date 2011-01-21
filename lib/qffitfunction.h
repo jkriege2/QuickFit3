@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QList>
+#include <QStringList>
 
 /*! \brief describes a virtual base class fitting functions that are used together with QFFitAlgorithm objects.
     \ingroup qf3lib_fitting
@@ -70,7 +71,7 @@ class QFFitFunction {
         virtual QString name() const=0;
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
-        /** \brief return a HTML file to be displayed as model help */
+        /** \brief return a HTML file to be displayed as model help. This file has to be positioned in \c plugins/fitfunctions/help/<plugin_id> */
         virtual QString helpFile() const { return QString(""); };
 
         /** \brief evaluate the fitting function with the given parameter vector */
@@ -111,6 +112,13 @@ class QFFitFunction {
         QString getParameterID(int i) {
             if ((i>=0) && (i<m_parameters.size())) return m_parameters[i].id;
             return QString("");
+        }
+
+        /** \brief return a list with the ids of all parameters of this model */
+        QStringList getParameterIDs() {
+            QStringList sl;
+            for (int i=0; i<m_parameters.size(); i++) sl.append(m_parameters[i].id);
+            return sl;
         }
     protected:
         /*! \brief add a parameter description

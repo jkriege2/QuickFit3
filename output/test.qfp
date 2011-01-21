@@ -245,15 +245,15 @@
                 <algorithms current=""/>
                 <functions current="fcs_diff">
                     <parameter id="fcs_adiff___alpha" value="1"/>
-                    <parameter id="fcs_adiff___diff_tau1" value="44"/>
-                    <parameter id="fcs_adiff___focus_struct_fac" value="7" fix="1"/>
-                    <parameter id="fcs_adiff___n_particle" value="9"/>
-                    <parameter id="fcs_diff___diff_rho2" value="0.7"/>
-                    <parameter id="fcs_diff___diff_tau1" value="44"/>
-                    <parameter id="fcs_diff___diff_tau2" value="30"/>
+                    <parameter id="fcs_adiff___diff_tau1" value="46" min="1" fix="1"/>
+                    <parameter id="fcs_adiff___focus_struct_fac" value="6" fix="1"/>
+                    <parameter id="fcs_adiff___n_particle" value="8.5" min="1e-11" max="1000000" fix="1"/>
+                    <parameter id="fcs_diff___diff_rho2" value="0.05"/>
+                    <parameter id="fcs_diff___diff_tau1" value="46" fix="1"/>
+                    <parameter id="fcs_diff___diff_tau2" value="300"/>
                     <parameter id="fcs_diff___focus_struct_fac" value="6" fix="1"/>
-                    <parameter id="fcs_diff___n_components" value="1"/>
-                    <parameter id="fcs_diff___n_particle" value="8.5" min="1e-11" max="1000000"/>
+                    <parameter id="fcs_diff___n_components" value="2"/>
+                    <parameter id="fcs_diff___n_particle" value="8.5" min="1e-11" max="1000000" fix="1"/>
                 </functions>
             </data>
         </evaluationelement>

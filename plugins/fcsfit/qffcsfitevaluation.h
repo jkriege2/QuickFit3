@@ -50,7 +50,12 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /** \brief get the current fitting algorithm */
         QFFitAlgorithm* getFitAlgorithm() const { return getFitAlgorithm(m_fitAlgorithm); };
 
-        /** \brief set the current fitting algorithm */
+        /*! \brief set the current fitting algorithm
+
+            This function also tries to transform the parameters between different models. The transformation is based on the parameter
+            name. If the new model has some parameters with the same name as the old model, the new model parameters are set to the value
+            of the old parameter.
+        */
         void setFitFunction(QString fitFunction);
         /** \brief get the current fitting algorithm */
         QFFitFunction* getFitFunction();
@@ -267,7 +272,12 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             if (getFitFunction()!=NULL) {
                 ff=getFitFunction()->id();
             }
-            return QString(ff+"___"+parameter).trimmed().toLower();
+            return getParameterStoreID(ff, parameter);
+        };
+
+        /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
+        inline QString getParameterStoreID(QString fitfunction, QString parameter) {
+            return QString(fitfunction+"___"+parameter).trimmed().toLower();
         };
 
         /** \brief create an ID to reference results that belong to this evaluation \u object (includes the evaluation id) and the

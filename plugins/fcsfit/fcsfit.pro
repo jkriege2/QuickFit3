@@ -6,7 +6,7 @@ TARGET = qfevalfcsfit
 DEPENDPATH += ./
 DLLDESTDIR = ../../output/plugins
 DESTDIR = ./
-LIBS += -L../../lib/ -lquickfit3lib -L../../libqf3widgets/ -lquickfit3widgets
+LIBS += -lgsl -lgslcblas -L../../lib/ -lquickfit3lib -L../../libqf3widgets/ -lquickfit3widgets
 # -L../fcs/ -lqfrdrfcs
 
 # Input

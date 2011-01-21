@@ -880,9 +880,12 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).completeBaseName()+QString("/");
     //std::cout<<sl[1].toStdString()<<std::endl;
     hlpAlgorithm->setSearchPath(sl);
-    if (data->getFitAlgorithm(pid)->helpFile().isEmpty()) hlpAlgorithm->updateHelp(data->getFitAlgorithm(pid)->name(), data->getFitAlgorithm(pid)->id()+".html");
-    else hlpAlgorithm->updateHelp(data->getFitAlgorithm(pid)->name(), data->getFitAlgorithm(pid)->helpFile());
-    hlpAlgorithm->show();
+    QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
+    if (algorithm) {
+        if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), algorithm->id()+".html");
+        else hlpAlgorithm->updateHelp(algorithm->name(), algorithm->helpFile());
+        hlpAlgorithm->show();
+    }
 }
 
 void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {

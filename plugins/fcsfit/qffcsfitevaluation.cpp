@@ -474,8 +474,33 @@ int QFFCSFitEvaluation::getCurrentRun() {
 
 void QFFCSFitEvaluation::setFitFunction(QString fitFunction) {
     if (!getAvailableFitFunctions().contains(fitFunction)) return;
-    m_fitFunction=fitFunction;
-    emit propertiesChanged();
+    if (m_fitFunction!=fitFunction) {
+        QString oldff=m_fitFunction;
+        QFFitFunction* ffold=getFitFunction(m_fitFunction);
+        QMap<QString, FitParameter> params;
+        if (ffold) {
+            for (int i=0; i<ffold->paramCount(); i++) {
+                QString pid=ffold->getParameterID(i);
+                params[pid].value=getFitValue(pid);
+                params[pid].min=getFitMin(pid);
+                params[pid].max=getFitMax(pid);
+                params[pid].fix=getFitFix(pid);
+            }
+        }
+        m_fitFunction=fitFunction;
+        QFFitFunction* ff=getFitFunction(fitFunction);
+        for (int i=0; i<ff->paramCount(); i++) {
+            QString pid=ff->getParameterID(i);
+            QString newid=getParameterStoreID(fitFunction, ff->getParameterID(i));
+            if (params.contains(pid)) {
+                if (params[pid].value!=getFitValue(pid)) setFitValue(pid, params[pid].value);
+                if (params[pid].fix!=getFitFix(pid)) setFitFix(pid, params[pid].fix);
+                if (params[pid].min!=getFitMin(pid)) setFitMin(pid, params[pid].min);
+                if (params[pid].max!=getFitMax(pid)) setFitMax(pid, params[pid].max);
+            }
+        }
+        emit propertiesChanged();
+    }
 }
 
 
