@@ -2,6 +2,7 @@
 #include <QtGui>
 #include "qfrdrfcsdata.h"
 #include "dlgcsvparameters.h"
+#include "dlgcsvparameters.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -61,15 +62,26 @@ void QFPRDRFCS::insertCSVFile(const QString& filename, const QMap<QString, QVari
     }
 }
 
+
+void QFPRDRFCS::insertALBAFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName(), QStringList(filename), paramValues, paramReadonly);
+    if (e->error()) {
+        project->deleteRawData(e->getID());
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+    }
+}
+
 void QFPRDRFCS::insertFCS() {
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
+        QString albaf=tr("ISS Alba Files (*.csv)");
         QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
         QStringList files = QFileDialog::getOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+asciif, &currentFCSFileFormatFilter);
+                              alvf+";;"+asciif+";;"+albaf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
         QMap<QString, QVariant> p;
@@ -80,10 +92,32 @@ void QFPRDRFCS::insertFCS() {
             p["FILETYPE"]="CSV_CORR";
             p["CSV_SEPARATOR"]=QString(",");
             p["CSV_COMMENT"]=QString("#");
-            // TODO: insert dialog to select CSV properties!
+            p["CSV_STARTSWITH"]=QString("");
+            p["CSV_TIMEFACTOR"]=1.0;
+
+            dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
+                                                          settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
+                                                          settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
+                                                          settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble());
+            if (files.size()>0) csvDlg->setFileContents(files[0]);
+            if (csvDlg->exec()==QDialog::Accepted) {
+                p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
+                p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
+                p["CSV_STARTSWITH"]=csvDlg->get_startswith();
+                p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
+                settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
+                settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
+                settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
+                settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
+            } else {
+                services->setProgress(0);
+                return;
+            }
+        } else if (currentFCSFileFormatFilter==albaf) {
+            p["FILETYPE"]="ISS_ALBA";
         }
         QStringList paramsReadonly;
-        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT";
+        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_TIMEFACTOR";
         QStringList list = files;
         QStringList::Iterator it = list.begin();
         services->setProgressRange(0, list.size());
@@ -96,6 +130,8 @@ void QFPRDRFCS::insertFCS() {
                 services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
                 if (currentFCSFileFormatFilter==alvf) {
                     insertALV5000File(*it, p, paramsReadonly);
+                } else if (currentFCSFileFormatFilter==albaf) {
+                    insertALBAFile(*it, p, paramsReadonly);
                 } else {
                     insertCSVFile(*it, p, paramsReadonly);
                 }

@@ -68,6 +68,14 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
             \param paramReadonly names of initial parameters that should be declared readonly
         */
         void insertCSVFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+
+        /*! \brief add an ALBA file to the current project
+
+            \param filename filename of the CSV file
+            \param paramValues values for parameters in paramNames
+            \param paramReadonly names of initial parameters that should be declared readonly
+        */
+        void insertALBAFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
     private:
 };
 

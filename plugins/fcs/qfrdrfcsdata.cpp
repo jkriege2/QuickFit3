@@ -255,6 +255,8 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
     //std::cout<<"reading data "<<filetype.toStdString()<<"\n";
     if (filetype.toUpper()=="ALV5000") {
         loadFromALV5000(files[0]);
+    } else if (filetype.toUpper()=="ISS_ALBA") {
+        loadCorrelationCurvesFromALBA(files[0]);
     } else if (filetype.toUpper()=="CSV_CORR") {
         loadCorrelationCurvesFromCSV(files[0]);
     } else if (filetype.toUpper()=="CSV_RATE") {
@@ -270,19 +272,21 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
     char separatorchar=',';
     char commentchar='#';
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
+    std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
+    double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", ",").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
     try {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar);        // load some csv file
+        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
         unsigned long long lines=tab.get_line_count();
         unsigned long long columns=tab.get_column_count();
         resizeRates(lines, columns-1);
         //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
         for (unsigned long long l=0; l<lines; l++) {
-            rateT[l]=tab.get(0, l);
+            rateT[l]=tab.get(0, l)*timefactor;
             //std::cout<<correlationT[l]<<", ";
             for (unsigned int c=1; c<columns; c++) {
                 rate[(c-1)*rateN+l]=tab.get(c, l);
@@ -305,20 +309,23 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
 bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
     char separatorchar=',';
     char commentchar='#';
+    double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
+    std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", ",").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
     try {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar);        // load some csv file
+        std::cout<<"startswith = "<<startswith<<std::endl;
+        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
         unsigned long long lines=tab.get_line_count();
         unsigned int columns=tab.get_column_count();
         resizeCorrelations(lines, columns-1);
         //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
         for (unsigned long long l=0; l<lines; l++) {
-            correlationT[l]=tab.get(0, l);
+            correlationT[l]=tab.get(0, l)*timefactor;
             //std::cout<<correlationT[l]<<", ";
             for (unsigned int c=1; c<columns; c++) {
                 correlation[(c-1)*correlationN+l]=tab.get(c, l);
@@ -334,6 +341,44 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
         setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(filename).arg(QString(e.get_message().c_str())));
     }
     //std::cout<<"opening CSV: "<<filename.toStdString()<<" ... DONE!\n";
+    emit rawDataChanged();
+    return true;
+}
+
+bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QString filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly)) {
+        QTextStream stream(&f);
+        QString line;
+        // search for [Data] in file
+        do {
+            line=stream.readLine().toLower();
+        } while ((!line.isNull()) && (!line.contains("[data]")));
+        if (line.contains("[data]")) {
+            QList<double> tdata, cdata;
+            do {
+                line=stream.readLine();
+                QStringList sl=line.split(",");
+                if (sl.size()>=2) {
+                    tdata.append(sl[0].toDouble());
+                    cdata.append(sl[1].toDouble());
+                    //std::cout<<tdata[tdata.size()-1]<<", "<<cdata[cdata.size()-1]<<std::endl;
+                }
+            } while (!line.isNull());
+            resizeCorrelations(qMin(tdata.size(), cdata.size()), 1);
+            for (int i=0; i<qMin(tdata.size(), cdata.size()); i++) {
+                correlationT[i]=tdata[i];
+                correlation[i]=cdata[i];
+            }
+        } else {
+            setError(tr("ISS ALBA file '%1' does not contain a [data] section").arg(filename));
+            return false;
+        }
+    } else {
+        setError(tr("could not open file '%1'").arg(filename));
+        return false;
+    }
+    recalculateCorrelations();
     emit rawDataChanged();
     return true;
 }

@@ -280,6 +280,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         bool loadCountRatesFromCSV(QString filename);
         /** \brief load a CSV file containing a correlation curve */
         bool loadCorrelationCurvesFromCSV(QString filename);
+        /** \brief load an ISS ALBA file containing a correlation curve */
+        bool loadCorrelationCurvesFromALBA(QString filename);
         /** \brief read in an ALV data file (created by ALV correlator software)
          *
          * If multiple channels are present in the file, this method looks for an integer property CHANNEL
