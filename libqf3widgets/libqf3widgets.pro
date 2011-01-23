@@ -28,7 +28,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/numberedit.h \
            qfhtmlhelpwindow.h \
            qffitparameterbasicinterface.h \
-           qffitparameterwidget.h
+           qffitparameterwidget.h \
+           qfdlgcsvparameters.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -49,9 +50,10 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            datacutslider.cpp \
            ../../../../LIB/trunk/qt/numberedit.cpp \
            qfhtmlhelpwindow.cpp \
-           qffitparameterwidget.cpp
+           qffitparameterwidget.cpp \
+           qfdlgcsvparameters.cpp
 
-FORMS +=
+FORMS += qfdlg_csvparameters.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc
 
