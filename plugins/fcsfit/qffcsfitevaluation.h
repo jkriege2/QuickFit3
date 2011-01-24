@@ -20,11 +20,17 @@
 class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
         Q_OBJECT
     public:
+        /** \brief which data weighting should be applied */
+        enum DataWeight {
+            EqualWeighting=0,
+            StdDevWeighting=1
+        };
+
         /** Default constructor */
         QFFCSFitEvaluation(QFProject* parent);
         /** Default destructor */
         virtual ~QFFCSFitEvaluation();
-    public:
+
         /** \brief return type (short type string) */
         virtual QString getType() const { return QString("fcs_fit"); };
         /** \brief return type (longer type string, user readable) */
@@ -49,6 +55,11 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         void setFitAlgorithm(QString fitAlgorithm) { m_fitAlgorithm=fitAlgorithm; };
         /** \brief get the current fitting algorithm */
         QFFitAlgorithm* getFitAlgorithm() const { return getFitAlgorithm(m_fitAlgorithm); };
+
+        /** \brief set the current fitting algorithm */
+        void setFitDataWeighting(DataWeight weighting) { m_weighting=weighting; };
+        /** \brief get the current fitting algorithm */
+        DataWeight getFitDataWeighting() const { return m_weighting; };
 
         /*! \brief set the current fitting algorithm
 
@@ -83,9 +94,29 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord */
         void setFitResultValue(QString id, double value);
 
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValue(QString id, double value, QString unit);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValueString(QString id, QString value);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValueInt(QString id, int64_t value);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValueInt(QString id, int64_t value, QString unit);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValueBool(QString id, bool value);
 
         /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord */
         void setFitResultValue(QString id, double value, double error);
+
+        /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValues(double* values, double* errors);
+
+        /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultValuesVisible(double* values, double* errors);
 
         /*! \brief return the value of a given parameter
 
@@ -184,7 +215,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /** \brief return the instance of a given fit algorithm for this evaluation (DO NEVER DELETE THIS INSTANCE!)  */
         QFFitAlgorithm* getFitAlgorithm(QString id) const {
             if (m_fitAlgorithms.contains(id)) return m_fitAlgorithms[id];
-            else return NULL;
+            return NULL;
         };
 
         /** \brief fill the given array of doubles with the current parameter values, as appropriate to use together with QFFitFunction */
@@ -289,6 +320,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /** \brief create an ID to reference results that belong to this evaluation \u object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
         inline QString getEvaluationResultID(QString fitFunction) {
+            if (m_currentRun<0) return getType()+"_"+QString::number(getID())+"_"+fitFunction+"_runavg";
             return getType()+"_"+QString::number(getID())+"_"+fitFunction+"_run"+QString::number(m_currentRun);
         }
 
@@ -306,6 +338,8 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         QString m_fitFunction;
         /** \brief the current fitting algorithm */
         QString m_fitAlgorithm;
+        /** \brief type of data weighting */
+        DataWeight m_weighting;
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
         /** \brief map with all available fit algorithms */

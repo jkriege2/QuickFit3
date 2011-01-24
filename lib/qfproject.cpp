@@ -171,8 +171,10 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     IDs.insert(rec->getID());
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
+    connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setDataChanged()));
+    connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
     dataChange=true;
     emit wasChanged(dataChange);
     return true;

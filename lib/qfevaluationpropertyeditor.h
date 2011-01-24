@@ -73,6 +73,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         virtual void writeSettings();
         /** \brief return widget ID */
         int getID() { return id; };
+        /** \brief set the current record */
+        void setCurrent(QFEvaluationItem* c);
     protected:
         /** \brief points to the record currently displayed */
         QFEvaluationItem* current;
@@ -83,8 +85,6 @@ class QFEvaluationPropertyEditor : public QWidget {
         /** \brief read the settings from ProgramOptions set by setSettings() */
         virtual void readSettings();
         void closeEvent( QCloseEvent * event );
-        /** \brief set the current record */
-        void setCurrent(QFEvaluationItem* c);
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);

@@ -100,6 +100,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         JKQtPlotter* pltResidualHistogram;
         /** \brief label for fit statistics */
         QTextEdit* txtFitStatistics;
+        /** \brief label for fit statistics */
+        QLabel* labFitResult;
         /** \brief spin box to set the number of bins in residuals histogram */
         QSpinBox* spinResidualHistogramBins;
         /** \brief splitter between residual statistics plotter pltResidualHistogram and fit results txtFitStatistics */
@@ -108,6 +110,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QFormLayout* layResidualAnalysis;
         /** \brief toolbox to switch between residual histogram and parameters */
         QTabWidget* tabResidulas;
+        /** \button to fit current file */
+        QPushButton* btnFitCurrent;
 
         /** \brief scroll area for the fit parameters */
         QScrollArea* scrollParameters;
@@ -148,6 +152,10 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         */
         void updateFitFunctions();
 
+        /*! \brief fit model to current data
+         */
+        void fitCurrent();
+
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
         /** \brief emitted when the pltData rezooms */
@@ -157,6 +165,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void displayFitFunctionHelp();
         /** \brief display fit algorithm help */
         void displayFitAlgorithmHelp();
+        /** \brief configure the fitting algorithm */
+        void configFitAlgorithm();
         /** \brief called when the current run changes */
         void runChanged(int run);
         /** \brief called when the fit model changes */

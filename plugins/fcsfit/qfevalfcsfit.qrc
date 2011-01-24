@@ -20,5 +20,7 @@
     <file alias="fcsplot_ebars.png">../../images/16x16/fcsplot_ebars.png</file>
     <file alias="fcsplot_enone.png">../../images/16x16/fcsplot_enone.png</file>
 
+    <file alias="fcs_fit_fit.png">../../images/16x16/wizard.png</file>
+
 </qresource>
 </RCC>

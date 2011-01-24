@@ -70,6 +70,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
     private slots:
         /** \brief create a new project */
         void newProject();
+        /** \brief close the current project */
+        void closeProject();
         /** \brief display an open project dialog and open the selected project */
         void openProject();
         /** \brief save current project */
@@ -132,7 +134,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QString strippedName(const QString &fullFileName);
 
         QString curFile;
-        QFProject* project;
+        QPointer<QFProject> project;
 
         QMenu *fileMenu;
         QMenu *dataMenu;

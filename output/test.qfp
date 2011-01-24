@@ -36,15 +36,52 @@
                 <property name="TIME" type="time" data="14:52:17" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="algorithm" type="string" data="fit_levmar" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
                 <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcscorreditor_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
             </properties>
-            <results/>
+            <results>
+                <evaluation name="fcs_fit_16_fcs_adiff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.259678" error="0.0091055" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.464618" error="0.0247316" unit=""/>
+                    <result name="diff_rho1" type="numbererror" value="0.95" error="0" unit=""/>
+                    <result name="diff_rho2" type="numbererror" value="0.05" error="0" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="56.5245" error="8.42548" unit="usec"/>
+                    <result name="diff_tau1_fix" type="boolean" value="false"/>
+                    <result name="diff_tau2" type="numbererror" value="300" error="0" unit="usec"/>
+                    <result name="fitalg_error_sum" type="number" value="0.0279933" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="3" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="518" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.0279933" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="5" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="5" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="5" unit=""/>
+                    <result name="fitalg_message" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 5 iterations.&lt;br&gt;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.0279933  [old_SES = 0.0279933]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="-47" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="modle_name" type="string" value="fcs_adiff"/>
+                    <result name="n_components" type="number" value="1" unit=""/>
+                    <result name="n_particle" type="numbererror" value="3.85092" error="0.135031" unit=""/>
+                    <result name="n_particle_fix" type="boolean" value="false"/>
+                    <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
+                    <result name="1n_particle" type="numbererror" value="0.259678" error="0.0091055" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.464618" error="0.0247316" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="56.5245" error="8.42548" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="3.85092" error="0.135031" unit=""/>
+                </evaluation>
+            </results>
             <files>
                 <file>testdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
             </files>
@@ -70,12 +107,52 @@
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
                 <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="20" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
+                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
                 <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="weights" type="int" data="1" usereditable="false" visible="false"/>
             </properties>
-            <results/>
+            <results>
+                <evaluation name="fcs_fit_16_fcs_adiff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.1" error="0" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.456436" error="0" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="false"/>
+                    <result name="diff_tau1" type="numbererror" value="40" error="0" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="10" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
+                    <result name="1n_particle" type="numbererror" value="0.140741" error="0.0028542" unit=""/>
+                    <result name="alpha" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="true"/>
+                    <result name="diff_tau1" type="numbererror" value="27.2261" error="2.12129" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="7.10527" error="0.144094" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_diff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.140741" error="0" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="27.226" error="0" unit="usec"/>
+                    <result name="fitalg_error_sum" type="number" value="0.0210894" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="615" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.0210894" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="12" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="12" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="12" unit=""/>
+                    <result name="fitalg_message" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 12 iterations.&lt;br&gt;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.0210894  [old_SES = 0.0210894]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="-15" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="modle_name" type="string" value="fcs_diff"/>
+                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="7.10527" error="0" unit=""/>
+                    <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+            </results>
             <files>
                 <file>testdata/al488_20nM_3.ASC</file>
             </files>
@@ -100,9 +177,60 @@
                 <property name="TIME" type="time" data="13:49:03" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="32" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
+                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
             </properties>
-            <results/>
+            <results>
+                <evaluation name="fcs_fit_16_fcs_adiff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.879045" error="0.0197706" unit=""/>
+                    <result name="alpha" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="true"/>
+                    <result name="diff_tau1" type="numbererror" value="567.89" error="72.3096" unit="usec"/>
+                    <result name="fitalg_error_sum" type="number" value="3.26913" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="2" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="15001" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="3.27158" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
+                    <result name="fitalg_message" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 3000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 3.26913  [old_SES = 3.27158]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="-1094" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
+                    <result name="modle_name" type="string" value="fcs_adiff"/>
+                    <result name="n_particle" type="numbererror" value="1.1376" error="0.0255857" unit=""/>
+                    <result name="used_run" type="integer" value="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_diff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.878023" error="0" unit=""/>
+                    <result name="diff_rho1" type="numbererror" value="0.000111659" error="0.000395413" unit=""/>
+                    <result name="diff_rho2" type="numbererror" value="0.999888" error="0.000395413" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="575.183" error="0" unit="usec"/>
+                    <result name="diff_tau2" type="numbererror" value="0.000241275" error="0.000577141" unit="usec"/>
+                    <result name="fitalg_error_sum" type="number" value="3.26927" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="21001" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="3.46415" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
+                    <result name="fitalg_message" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 3000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 3.26927  [old_SES = 3.46415]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="-500" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="modle_name" type="string" value="fcs_diff"/>
+                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="1.13892" error="0" unit=""/>
+                    <result name="used_run" type="integer" value="0" unit=""/>
+                </evaluation>
+            </results>
             <files>
                 <file>testdata/DNA_2nM_Al488_0ul_1.ASC</file>
             </files>
@@ -185,9 +313,20 @@
                 <property name="TIME" type="time" data="12:07:01" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
+                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
             </properties>
-            <results/>
+            <results>
+                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
+                    <result name="1n_particle" type="numbererror" value="2.94358" error="2.45953" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.259084" error="0.0253665" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="false"/>
+                    <result name="diff_tau1" type="numbererror" value="0.001" error="0.00323451" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="0.339722" error="0.283857" unit=""/>
+                </evaluation>
+            </results>
             <files>
                 <file>testdata/DNA_2nM_Al488_15ul.ASC</file>
             </files>
@@ -215,13 +354,68 @@
                 <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_datacut_min" type="int" data="10" usereditable="false" visible="false"/>
                 <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
-                <property name="fcs_fit16_last_run" type="int" data="1" usereditable="true" visible="true"/>
+                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
                 <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
                 <property name="fcscorreditor_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="weights" type="int" data="1" usereditable="false" visible="false"/>
             </properties>
             <results>
                 <evaluation name="fcs_fit_16">
-                    <result name="last_run" type="integer" value="1" unit=""/>
+                    <result name="1n_particle" type="numbererror" value="0.0640282" error="0.0013841" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.832561" error="0.0227291" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="false"/>
+                    <result name="diff_tau1" type="numbererror" value="117.257" error="7.30012" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.6181" error="0.337617" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.0641846" error="0.00133609" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.826714" error="0.0217337" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="120.809" error="7.27869" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.5801" error="0.324321" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_run1">
+                    <result name="1n_particle" type="numbererror" value="0.063437" error="0.00138853" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.827304" error="0.02279" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="118.503" error="7.49484" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.7637" error="0.345042" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_run2">
+                    <result name="1n_particle" type="numbererror" value="0.0637412" error="0.00133682" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.83351" error="0.0221994" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="119.726" error="7.23964" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.6884" error="0.329029" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_run3">
+                    <result name="1n_particle" type="numbererror" value="0.0640282" error="0.0013841" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.832561" error="0.0227291" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="117.257" error="7.30012" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.6181" error="0.337617" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_run4">
+                    <result name="1n_particle" type="numbererror" value="0.0632084" error="0.00137393" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.819208" error="0.0221334" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="116.573" error="7.34116" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.8207" error="0.343886" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_run5">
+                    <result name="1n_particle" type="numbererror" value="0.0635377" error="0.00135178" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.835818" error="0.0227355" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="122.112" error="7.4932" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.7387" error="0.334846" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
+                    <result name="1n_particle" type="numbererror" value="0.0637859" error="0.00134628" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.831145" error="0.0222175" unit=""/>
+                    <result name="diff_tau1" type="numbererror" value="119.669" error="7.29005" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="15.6775" error="0.330891" unit=""/>
                 </evaluation>
             </results>
             <files>
@@ -230,6 +424,37 @@
             <data>
                 <leaveout list="4"/>
             </data>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="101213_helas3_braf_1_2.iss.csv" id="17">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="FILETYPE" type="string" data="ISS_ALBA" usereditable="false" visible="true"/>
+                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
+                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
+            </properties>
+            <results>
+                <evaluation name="fcs_fit_16_fcs_adiff_run0">
+                    <result name="1n_particle" type="numbererror" value="0.0749683" error="0.000615294" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.808976" error="0.0118433" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="false"/>
+                    <result name="diff_tau1" type="numbererror" value="540.333" error="13.8217" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="8" error="0" unit=""/>
+                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
+                    <result name="n_particle" type="numbererror" value="13.339" error="0.109478" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
+                    <result name="1n_particle" type="numbererror" value="0.075327" error="0.000633425" unit=""/>
+                    <result name="alpha" type="numbererror" value="0.793118" error="0.0119137" unit=""/>
+                    <result name="alpha_fix" type="boolean" value="false"/>
+                    <result name="diff_tau1" type="numbererror" value="550.122" error="13.9589" unit="usec"/>
+                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="n_particle" type="numbererror" value="13.2754" error="0.111633" unit=""/>
+                </evaluation>
+            </results>
+            <files>
+                <file>testdata/101213_helas3_braf_1_2.iss.csv</file>
+            </files>
+            <data/>
         </rawdataelement>
     </rawdata>
     <evaluations>
@@ -242,18 +467,18 @@
                 <property name="plot_taulog" type="bool" data="true" usereditable="false" visible="false"/>
             </properties>
             <data>
-                <algorithms current=""/>
+                <algorithms current="fit_levmar" weighting="equal"/>
                 <functions current="fcs_diff">
-                    <parameter id="fcs_adiff___alpha" value="1"/>
-                    <parameter id="fcs_adiff___diff_tau1" value="46" min="1" fix="1"/>
+                    <parameter id="fcs_adiff___alpha" value="1" fix="0"/>
+                    <parameter id="fcs_adiff___diff_tau1" value="10" min="0.001" fix="0"/>
                     <parameter id="fcs_adiff___focus_struct_fac" value="6" fix="1"/>
-                    <parameter id="fcs_adiff___n_particle" value="8.5" min="1e-11" max="1000000" fix="1"/>
+                    <parameter id="fcs_adiff___n_particle" value="2" min="1e-11" max="1000000" fix="0"/>
                     <parameter id="fcs_diff___diff_rho2" value="0.05"/>
-                    <parameter id="fcs_diff___diff_tau1" value="46" fix="1"/>
-                    <parameter id="fcs_diff___diff_tau2" value="300"/>
+                    <parameter id="fcs_diff___diff_tau1" value="567.889907203" min="0.001" fix="0"/>
+                    <parameter id="fcs_diff___diff_tau2" value="300" min="0"/>
                     <parameter id="fcs_diff___focus_struct_fac" value="6" fix="1"/>
-                    <parameter id="fcs_diff___n_components" value="2"/>
-                    <parameter id="fcs_diff___n_particle" value="8.5" min="1e-11" max="1000000" fix="1"/>
+                    <parameter id="fcs_diff___n_components" value="1"/>
+                    <parameter id="fcs_diff___n_particle" value="1.13759764169" min="1e-11" max="1000000" fix="0"/>
                 </functions>
             </data>
         </evaluationelement>

@@ -99,6 +99,7 @@ void QFPRDRFCS::insertFCS() {
                                                           settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
                                                           settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
                                                           settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble());
+            loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), QSize(), QString("fcs/csv_dialog."));
             if (files.size()>0) csvDlg->setFileContents(files[0]);
             if (csvDlg->exec()==QDialog::Accepted) {
                 p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
@@ -109,6 +110,7 @@ void QFPRDRFCS::insertFCS() {
                 settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
                 settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
                 settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
+                saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
             } else {
                 services->setProgress(0);
                 return;

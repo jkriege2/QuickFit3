@@ -23,8 +23,8 @@ void QFFitAlgorithmManager::searchPlugins(QString directory) {
         if (plugin) {
             QFPluginFitAlgorithm* iRecord = qobject_cast<QFPluginFitAlgorithm*>(plugin);
             if (iRecord) {
-                fitPlugins[iRecord->getID()]=iRecord;
-                filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
+                fitPlugins.append(iRecord);
+                filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded fit algorithm plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
                 emit showLongMessage(tr("loaded fit algorithm plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
             }
@@ -32,8 +32,58 @@ void QFFitAlgorithmManager::searchPlugins(QString directory) {
     }
 }
 
-/** \brief create a new fit algorithm object instance */
-QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(QString id, QObject* parent) {
-    if (fitPlugins.contains(id)) return fitPlugins[id]->create(parent);
-    else return NULL;
+QString QFFitAlgorithmManager::getName(int i) const {
+    return fitPlugins[i]->getName();
+}
+
+QString QFFitAlgorithmManager::getFilename(int i) const {
+    return filenames[i];
+}
+
+QString QFFitAlgorithmManager::getDescription(int i) const {
+    return fitPlugins[i]->getDescription();
+}
+
+QString QFFitAlgorithmManager::getAuthor(int i) const {
+    return fitPlugins[i]->getAuthor();
+}
+
+QString QFFitAlgorithmManager::getCopyright(int i) const {
+    return fitPlugins[i]->getCopyright();
+}
+
+QString QFFitAlgorithmManager::getWeblink(int i) const {
+    return fitPlugins[i]->getWeblink();
+}
+
+QStringList QFFitAlgorithmManager::getIDList(int i) const {
+    return fitPlugins[i]->getIDs();
+}
+
+
+QStringList QFFitAlgorithmManager::getIDList() const {
+    QStringList res;
+    for (int i=0; i<fitPlugins.size(); i++) {
+        res.append(fitPlugins[i]->getIDs());
+    }
+    res.removeDuplicates();
+    return res;
+}
+
+int QFFitAlgorithmManager::getPluginForID(QString id) const {
+    for (int i=0; i<fitPlugins.size(); i++) {
+         QStringList ids=fitPlugins[i]->getIDs();
+         if (ids.contains(id)) return i;
+   }
+   return -1;
+}
+
+QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(QString id, QObject* parent) const {
+    for (int i=0; i<fitPlugins.size(); i++) {
+        QStringList ids=fitPlugins[i]->getIDs();
+        if (ids.contains(id)) {
+            return fitPlugins[i]->get(id, parent);
+        }
+    }
+    return NULL;
 }

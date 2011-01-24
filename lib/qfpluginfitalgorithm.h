@@ -10,6 +10,8 @@
 /** \brief virtual interface class for all QuickFit 3 fit algorithm plugins
     \ingroup qf3fitalgplugins
 
+    These plugins may contain several fitting functions. The function getIDs() returns a QStringList
+    with all implemented plugin IDs.
 */
 class QFPluginFitAlgorithm
 {
@@ -35,8 +37,11 @@ class QFPluginFitAlgorithm
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const=0;
 
-        /** \brief create an instance */
-        virtual QFFitAlgorithm* create(QObject* parent) const =0;
+        /** \brief return list of plugin IDs */
+        virtual QStringList getIDs() const =0;
+
+        /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
+        virtual QFFitAlgorithm* get(QString id, QObject* parent) const =0;
     protected:
     private:
 };

@@ -78,6 +78,7 @@ void QFEvaluationRawDataModelProxy::selectionChanged(QList<QFRawDataRecord*> sel
 QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFEvaluationItem* current, int id, QWidget* parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
+    setAttribute(Qt::WA_DeleteOnClose, true);
     //std::cout<<"creating QFEvaluationPropertyEditor ... \n";
     this->id=id;
     this->current=NULL;
@@ -329,6 +330,10 @@ void QFEvaluationPropertyEditor::readSettings() {
     if (!settings) return;
     //std::cout<<"QFEvaluationPropertyEditor::readSettings()\n";
     settings->getQSettings()->sync();
+    if (tabMain) {
+        int idx=settings->getQSettings()->value("evalpropeditor/currentTab", 0).toInt();
+        //if ((idx>=0) && (idx<tabMain->count())) tabMain->setCurrentIndex(idx);
+    }
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(10, 10), QSize(800, 600), "evalpropeditor/");
     if (splitMain) loadSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
     if (editor) editor->readSettings();
@@ -338,6 +343,7 @@ void QFEvaluationPropertyEditor::writeSettings() {
     if (!settings) return;
     saveWidgetGeometry(*(settings->getQSettings()), this, "evalpropeditor/");
     saveSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
+    if (tabMain) settings->getQSettings()->setValue("evalpropeditor/currentTab", tabMain->currentIndex());
     /*for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) editorList[i]->writeSettings();
     }*/

@@ -18,4 +18,6 @@ plg_fcsfit.depends = lib
 SUBDIRS += fcs_fitfuctions
 fcs_fitfuctions.subdir=./plugins/fcs_fitfuctions
 
+SUBDIRS += fitalgorithm_levmar
+fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
 

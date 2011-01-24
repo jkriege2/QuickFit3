@@ -10,8 +10,23 @@
     <height>229</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>539</width>
+    <height>229</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>539</width>
+    <height>229</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>CSV Import Properties</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -39,7 +54,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Please specify the parameters used to import a comma separated values (CSV) file into QuickFit 3.0.</string>
+    <string>Please specify the parameters used to import a comma separated values (CSV) file into QuickFit.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

@@ -64,8 +64,8 @@ void QFRawDataRecord::readXML(QDomElement& e) {
     te=e.firstChildElement("results");
     if (!te.isNull()) {
         te=te.firstChildElement("evaluation");
-        QString en=te.attribute("name");
         while (!te.isNull()) {
+            QString en=te.attribute("name");
             QDomElement re=te.firstChildElement("result");
             while (!re.isNull()) {
                 QString n=re.attribute("name", "");

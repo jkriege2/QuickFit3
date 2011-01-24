@@ -18,49 +18,40 @@ class QFFitAlgorithmManager : public QObject {
         virtual ~QFFitAlgorithmManager();
 
         /** \brief returns a list of the IDs of all available QFRawDataRecords. */
-        inline QStringList getIDList() { return fitPlugins.keys(); }
+        QStringList getIDList() const;
+
+        /** \brief returns a list of the IDs of all available QFRawDataRecords. */
+        QStringList getIDList(int i) const;
+
+        /** \brief return number of available plugins */
+        int pluginCount() { return fitPlugins.size(); }
 
         /** \brief name for the plugin */
-        virtual QString getName(QString i) const {
-            if (!fitPlugins.contains(i)) return "";
-            return fitPlugins[i]->getName();
-        }
+        virtual QString getName(int i) const;
 
         /** \brief plugin filename */
-        virtual QString getFilename(QString i) const {
-            if (!filenames.contains(i)) return "";
-            return filenames[i];
-        }
+        virtual QString getFilename(int i) const;
 
         /** \brief short description for the plugin */
-        virtual QString getDescription(QString i) const {
-            if (!fitPlugins.contains(i)) return "";
-            return fitPlugins[i]->getDescription();
-        }
+        virtual QString getDescription(int i) const;
 
         /** \brief author the plugin */
-        virtual QString getAuthor(QString i) const {
-            if (!fitPlugins.contains(i)) return "";
-            return fitPlugins[i]->getAuthor();
-        }
+        virtual QString getAuthor(int i) const;
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright(QString i) const {
-            if (!fitPlugins.contains(i)) return "";
-            return fitPlugins[i]->getCopyright();
-        }
+        virtual QString getCopyright(int i) const;
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink(QString i) const {
-            if (!fitPlugins.contains(i)) return "";
-            return fitPlugins[i]->getWeblink();
-        }
+        virtual QString getWeblink(int i) const;
 
         /** \brief search for raw data record plugins in the given directory */
         void searchPlugins(QString directory);
 
+        /** \brief return the plugin index for a given fit function id */
+        int getPluginForID(QString id) const;
+
         /** \brief create a new fit algorithm object instance */
-        QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL);
+        QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);
@@ -68,8 +59,8 @@ class QFFitAlgorithmManager : public QObject {
         void showLongMessage(const QString& message);
 
     private:
-        QMap<QString, QFPluginFitAlgorithm*> fitPlugins;
-        QMap<QString, QString> filenames;
+        QList<QFPluginFitAlgorithm*> fitPlugins;
+        QStringList filenames;
     private:
 };
 

@@ -4,12 +4,14 @@
 #include "qfpluginfitfunction.h"
 /*!
     \defgroup qf3fitfunp_fcs FCS Fitting Function Plugin
-    \ingroup qf3evaluationplugins
+    \ingroup qf3fitfunplugins
 */
 
 
 
-
+/*! \brief plugin class for FCS Normal Diffusion Fit Functions
+    \ingroup qf3fitfunp_fcs
+*/
 class QFFitFunctionFCSDiff: public QFFitFunction {
     public:
         QFFitFunctionFCSDiff();
@@ -32,7 +34,9 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
 
 };
 
-
+/*! \brief plugin class for FCS Anomalous Diffusion Fit Functions
+    \ingroup qf3fitfunp_fcs
+*/
 class QFFitFunctionFCSADiff: public QFFitFunction {
     public:
         QFFitFunctionFCSADiff();

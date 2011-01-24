@@ -4,6 +4,7 @@
 QFRawDataPropertyEditor::QFRawDataPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFRawDataRecord* current, int id, QWidget* parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
+    setAttribute(Qt::WA_DeleteOnClose, true);
     //std::cout<<"creating QFRawDataPropertyEditor ...\n";
     this->current=NULL;
     this->id=id;
@@ -283,7 +284,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     QVBoxLayout* rwvlayout=new QVBoxLayout(this);
     widResults->setLayout(rwvlayout);
     tvResults=new QTableView(widResults);
-    tvResults->verticalHeader()->setDefaultSectionSize(fm.height());
+    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     rwvlayout->addWidget(tvResults);
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
@@ -359,6 +360,10 @@ void QFRawDataPropertyEditor::setSettings(ProgramOptions* settings) {
 void QFRawDataPropertyEditor::readSettings() {
     if (!settings) return;
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(20, 20), QSize(800, 600), "rawdatapropeditor/");
+    if (tabMain) {
+        int idx=settings->getQSettings()->value("rawdatapropeditor/currentTab", 0).toInt();
+        //if ((idx>=0) && (idx<tabMain->count())) tabMain->setCurrentIndex(idx);
+    }
     for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) {
             editorList[i]->readSettings();
@@ -369,6 +374,7 @@ void QFRawDataPropertyEditor::readSettings() {
 void QFRawDataPropertyEditor::writeSettings() {
     if (!settings) return;
     saveWidgetGeometry(*(settings->getQSettings()), this, "rawdatapropeditor/");
+    if (tabMain) settings->getQSettings()->setValue("rawdatapropeditor/currentTab", tabMain->currentIndex());
     for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) {
             editorList[i]->writeSettings();

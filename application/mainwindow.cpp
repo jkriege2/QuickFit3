@@ -29,23 +29,21 @@ MainWindow::MainWindow(QSplashScreen* splash)
     // search for plugin
     connect(rawDataFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(evaluationFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+    connect(fitAlgorithmManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+    connect(fitFunctionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
 
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitFunctionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitAlgorithmManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
-    connect(rawDataFactory, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
-    connect(evaluationFactory, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
-    connect(fitAlgorithmManager, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
-    connect(fitFunctionManager, SIGNAL(showMessage(const QString&)), this, SLOT(showLogMessage(const QString&)));
 
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
     logFileMainWidget->dec_indent();
 
-    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->getIDList().size()));
+    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()));
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
@@ -61,7 +59,7 @@ void MainWindow::searchAndRegisterPlugins() {
     rawDataFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
     evaluationFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
     fitFunctionManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitfunctions");
-    //fitAlgorithmManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitalgorithms");
+    fitAlgorithmManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitalgorithms");
 
     // distribute application hooks
     rawDataFactory->distribute(project, settings, this, this);
@@ -94,38 +92,49 @@ void MainWindow::showLogMessage(const QString& message) {
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (maybeSave()) {
         writeSettings();
-        for (int i=0; i<rawDataPropEditors.size(); i++) {
-            if (rawDataPropEditors[i]) {
-                //rawDataPropEditors[i]->setCurrent(NULL);
-                rawDataPropEditors[i]->writeSettings();
-                rawDataPropEditors[i]->close();
-                delete rawDataPropEditors[i];
-            }
-        }
-        for (int i=0; i<evaluationPropEditors.size(); i++) {
-            if (evaluationPropEditors[i]) {
-                //evaluationPropEditors[i]->setCurrent(NULL);
-                evaluationPropEditors[i]->writeSettings();
-                evaluationPropEditors[i]->close();
-                delete evaluationPropEditors[i];
-            }
-        }
+        closeProject();
         event->accept();
     } else {
         event->ignore();
     }
 }
 
+void MainWindow::closeProject() {
+    if (project) {
+        logFileProjectWidget->clearLog();
+        logFileProjectWidget->close_logfile();
+        for (int i=0; i<rawDataPropEditors.size(); i++) {
+            if (rawDataPropEditors[i]) {
+                rawDataPropEditors[i]->writeSettings();
+                rawDataPropEditors[i]->setCurrent(NULL);
+                rawDataPropEditors[i]->close();
+            }
+        }
+        for (int i=0; i<evaluationPropEditors.size(); i++) {
+            if (evaluationPropEditors[i]) {
+                evaluationPropEditors[i]->writeSettings();
+                evaluationPropEditors[i]->setCurrent(NULL);
+                evaluationPropEditors[i]->close();
+            }
+        }
+        evaluationPropEditors.clear();
+        rawDataPropEditors.clear();
+
+        project->disconnect();
+        tvMain->setModel(NULL);
+        rawDataFactory->distribute(NULL, settings, this, this);
+        evaluationFactory->distribute(NULL, settings, this, this);
+
+        delete project;
+    }
+}
+
 void MainWindow::newProject() {
     if (maybeSave()) {
         setCurrentProject("");
-        logFileProjectWidget->clearLog();
-        logFileProjectWidget->close_logfile();
+        closeProject();
         tvMain->setModel(NULL);
-        if (project) {
-            project->disconnect();
-            delete project;
-        }
+
         project=new QFProject(getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
         logFileMainWidget->log_text(tr("created new project!\n"));
         tabLogs->setCurrentWidget(logFileProjectWidget);
@@ -227,8 +236,8 @@ void MainWindow::aboutPlugins() {
     text+="</ul>";
     text+=tr("<br><b>Fit Algorithm Plugins:</b><ul>");
     // gather information about plugins
-    for (int i=0; i<fitAlgorithmManager->getIDList().size(); i++) {
-        QString id=fitAlgorithmManager->getIDList().at(i);
+    for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
+        int id=i;
         text+="<li>";
         text+=QString("<b>%1</b>:").arg(fitAlgorithmManager->getName(id));
         text+="<blockquote>";
@@ -237,7 +246,7 @@ void MainWindow::aboutPlugins() {
         text+=QString("<i>copyright:</i> %1<br>").arg(fitAlgorithmManager->getCopyright(id));
         text+=QString("<i>weblink:</i> %1<br>").arg(fitAlgorithmManager->getWeblink(id));
         text+=QString("<i>file:</i> %1<br>").arg(fitAlgorithmManager->getFilename(id));
-        text+=QString("<i>id:</i> %1<br>").arg(id);
+        text+=QString("<i>implemented ids:</i> %1<br>").arg(fitAlgorithmManager->getIDList(id).join(", "));
         text+="</blockquote>";
         text+="</li>";
     }
@@ -452,7 +461,7 @@ void MainWindow::createStatusBar() {
 
 void MainWindow::readSettings() {
     if (!settings) return;
-    logFileMainWidget->log_text(tr("reading settings from '%1' ...\n").arg(settings->getIniFilename()));
+    //logFileMainWidget->log_text(tr("reading settings from '%1' ...\n").arg(settings->getIniFilename()));
 
     //restoreState(settings->getQSettings()->value("mainwindow/state", saveState()).toByteArray());
     //restoreGeometry(settings->getQSettings()->value("mainwindow/geometry", saveGeometry()).toByteArray());
@@ -478,7 +487,7 @@ void MainWindow::readSettings() {
 
 void MainWindow::writeSettings() {
     if (!settings) return;
-    logFileMainWidget->log_text(tr("writing settings to '%1' ...\n").arg(settings->getIniFilename()));
+    //logFileMainWidget->log_text(tr("writing settings to '%1' ...\n").arg(settings->getIniFilename()));
     //settings->getQSettings()->setValue("mainwindow/pos", pos());
     //settings->getQSettings()->setValue("mainwindow/size", size());
     /*(settings->getQSettings())->setValue("mainwindow/state", saveState());
@@ -551,21 +560,7 @@ void MainWindow::loadProject(const QString &fileName) {
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    if (project) {
-        for (int i=0; i<rawDataPropEditors.size(); i++) {
-            if (rawDataPropEditors[i]) {
-                rawDataPropEditors[i]->writeSettings();
-                rawDataPropEditors[i]->setCurrent(NULL);
-                rawDataPropEditors[i]->close();
-            }
-        }
-        rawDataPropEditors.clear();
-        project->disconnect();
-        tvMain->setModel(NULL);
-        rawDataFactory->distribute(NULL, settings, this, this);
-        evaluationFactory->distribute(NULL, settings, this, this);
-        delete project;
-    }
+    closeProject();
     QString fn=fileName;
     logFileProjectWidget->open_logfile(tr("%1.log").arg(fn), false);
     logFileProjectWidget->clearLogStore();

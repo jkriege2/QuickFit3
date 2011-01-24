@@ -1,4 +1,5 @@
 #include "qffitparameterwidget.h"
+#include "tools.h"
 
 #include <limits.h>
 
@@ -177,7 +178,7 @@ void QFFitParameterWidget::reloadValues() {
     if (m_displayError && labError && (m_widgetType!=Header)) {
         double error=m_datastore->getFitError(m_parameterID);
         labError->setTextFormat(Qt::RichText);
-        labError->setText(tr("&plusmn; %1").arg(error));
+        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(error, 2, true).c_str()));
     }
     if (m_displayFix && m_editable && chkFix) {
         chkFix->setChecked(m_datastore->getFitFix(m_parameterID));
@@ -204,7 +205,7 @@ void QFFitParameterWidget::setValue(double value, double error, bool writeback) 
     }
     if (m_displayError && labError && (m_widgetType!=Header)) {
         labError->setTextFormat(Qt::RichText);
-        labError->setText(tr("&plusmn; %1").arg(error));
+        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(error, 2, true).c_str()));
     }
 
     m_settingData=old_m_settingData;

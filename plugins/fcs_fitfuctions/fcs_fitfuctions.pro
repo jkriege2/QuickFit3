@@ -7,7 +7,6 @@ DEPENDPATH += ./
 DLLDESTDIR = ../../output/plugins/fitfunctions
 DESTDIR = ./
 LIBS +=
-# -L../fcs/ -lqfrdrfcs
 
 # Input
 HEADERS += fcs_fitfuctions.h

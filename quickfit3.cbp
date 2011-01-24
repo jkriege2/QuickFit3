@@ -138,6 +138,9 @@
 		<Unit filename="libqf3widgets\libqf3widgets.pro" />
 		<Unit filename="libqf3widgets\qehtreeview.cpp" />
 		<Unit filename="libqf3widgets\qehtreeview.h" />
+		<Unit filename="libqf3widgets\qfdlg_csvparameters.ui" />
+		<Unit filename="libqf3widgets\qfdlgcsvparameters.cpp" />
+		<Unit filename="libqf3widgets\qfdlgcsvparameters.h" />
 		<Unit filename="libqf3widgets\qffitparameterbasicinterface.h" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.cpp" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.h" />
@@ -171,6 +174,9 @@
 		<Unit filename="plugins\fcsfit\qffcsfitevaluationeditor.h" />
 		<Unit filename="plugins\fcsfit\qfpevalfcsfit.cpp" />
 		<Unit filename="plugins\fcsfit\qfpevalfcsfit.h" />
+		<Unit filename="plugins\fitalgorithm_levmar\fitalgorithm_levmar.cpp" />
+		<Unit filename="plugins\fitalgorithm_levmar\fitalgorithm_levmar.h" />
+		<Unit filename="plugins\fitalgorithm_levmar\fitalgorithm_levmar.pro" />
 		<Unit filename="plugins\table\dlg_csvparameters.ui" />
 		<Unit filename="plugins\table\dlgcsvparameters.cpp" />
 		<Unit filename="plugins\table\dlgcsvparameters.h" />

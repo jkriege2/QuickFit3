@@ -157,7 +157,7 @@ void QFRDRFCSData::recalculateCorrelations() {
         }
         if (cnt==0) correlationMean[i]=0;
         else correlationMean[i]=m/cnt;
-        if (cnt==0) correlationStdDev[i]=0;
+        if (cnt<=1) correlationStdDev[i]=0;
         else correlationStdDev[i]=sqrt(s/cnt-m*m/cnt/cnt);
     }
     emit rawDataChanged();
@@ -318,7 +318,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
     try {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        std::cout<<"startswith = "<<startswith<<std::endl;
+        //std::cout<<"startswith = "<<startswith<<std::endl;
         tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
         unsigned long long lines=tab.get_line_count();
         unsigned int columns=tab.get_column_count();

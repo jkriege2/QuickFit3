@@ -7,6 +7,7 @@
 #include "qfevaluationitem.h"
 #include "../fcs/qfrdrfcsdatainterface.h"
 #include <iostream>
+#include <cfloat>
 #include "qffcsfitevaluation.h"
 #include "tools.h"
 
@@ -59,7 +60,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     cmbWeights=new QComboBox(this);
     cmbWeights->setEditable(false);
     cmbWeights->addItem(tr("equal weights"));
-    cmbWeights->addItem(tr("from std. dev."));
+    cmbWeights->addItem(tr("standard deviation"));
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
     l=new QLabel(tr("&Weight Model: "), this);
@@ -181,6 +182,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltResiduals->set_keyFontSize(9);
     pltResiduals->set_keyXMargin(2);
     pltResiduals->set_keyYMargin(2);
+    pltResiduals->useExternalDatastore(pltData->getDatastore());
 
 
     datacut=new DataCutSliders(this);
@@ -275,6 +277,11 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     widParameters->setLayout(layParameters);
 
 
+    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current ..."), this);
+    layModel->addWidget(btnFitCurrent);
+    labFitResult=new QLabel(this);
+    layModel->addWidget(labFitResult);
+
     splitModel->addWidget(modelWidget);
 
 
@@ -303,7 +310,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addAction(pltData->get_actPrint()); pltData->get_actPrint()->setIcon(QIcon(":/fcsplot_print.png"));
     toolbar->addSeparator();
     toolbar->addAction(pltData->get_actZoomAll()); pltData->get_actZoomAll()->setIcon(QIcon(":/fcsplot_zoomall.png"));
-    connect(pltData->get_actZoomAll(), SIGNAL(riggered()), pltResiduals, SLOT(zoomToFit()));
+    connect(pltData->get_actZoomAll(), SIGNAL(triggered()), pltResiduals, SLOT(zoomToFit()));
     toolbar->addSeparator();
     toolbar->addWidget(lPS);
     toolbar->addWidget(cmbPlotStyle);
@@ -317,16 +324,18 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addWidget(labMousePosition);
 
     connect(btnAlgorithmHelp, SIGNAL(clicked()), this, SLOT(displayFitAlgorithmHelp()));
+    connect(btnConfigAlgorithm, SIGNAL(clicked()), this, SLOT(configFitAlgorithm()));
     connect(btnModelHelp, SIGNAL(clicked()), this, SLOT(displayFitFunctionHelp()));
     connect(pltData, SIGNAL(zoomChangedLocally(double, double, double, double, QWidget*)), this, SLOT(zoomChangedLocally(double, double, double, double, QWidget*)));
     connect(pltData, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResiduals, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
+    connect(btnFitCurrent, SIGNAL(clicked()), this, SLOT(fitCurrent()));
 
 }
 
 
 void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
-    const QFFCSFitEvaluation* fcs=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* fcs=qobject_cast<QFFCSFitEvaluation*>(current);
 
     if (old!=NULL) {
         disconnect(old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
@@ -353,9 +362,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         chkGrid->setChecked(current->getProperty("plot_grid", true).toBool());
         cmbPlotStyle->setCurrentIndex(current->getProperty("plot_style", 1).toInt());
         cmbErrorStyle->setCurrentIndex(current->getProperty("plot_errorstyle", 0).toInt());
-        cmbAlgorithm->setCurrentIndex(cmbAlgorithm->findData(current->getProperty("algorithm", cmbAlgorithm->itemData(0)).toString()));
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
-        cmbModel->setCurrentIndex(cmbModel->findData(current->getProperty("model", cmbModel->itemData(0)).toString()));
         QStringList ff=fcs->getAvailableFitFunctions();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
@@ -365,6 +372,18 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
             cmbAlgorithm->addItem(fcs->getFitAlgorithm(id)->name(), id);
+        }
+
+
+        if (fcs->getFitFunction()!=NULL) {
+            cmbModel->setCurrentIndex(cmbModel->findData(fcs->getFitFunction()->id()));
+        } else {
+            cmbModel->setCurrentIndex(cmbModel->findData(-1));
+        }
+        if (fcs->getFitAlgorithm()!=NULL) {
+            cmbAlgorithm->setCurrentIndex(cmbAlgorithm->findData(fcs->getFitAlgorithm()->id()));
+        } else {
+            cmbAlgorithm->setCurrentIndex(-1);
         }
         dataEventsEnabled=true;
     }
@@ -389,8 +408,7 @@ void QFFCSFitEvaluationEditor::resultsChanged() {
 
 void QFFCSFitEvaluationEditor::readSettings() {
     if (cmbModel) {
-        //splitPlot->restoreState(settings->getQSettings()->value("fcsfitevaleditor/splitter_plot", splitPlot->saveState()).toByteArray());
-        cmbAlgorithm->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/algorithm", cmbAlgorithm->currentIndex()).toInt());
+        //cmbAlgorithm->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/algorithm", cmbAlgorithm->currentIndex()).toInt());
         //cmbModel->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/model", cmbModel->currentIndex()).toInt());
         //cmbWeights->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/weights", cmbWeights->currentIndex()).toInt());
         pltData->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
@@ -448,10 +466,13 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         datacut->enableSliderSignals();
         dataEventsEnabled=false;
         spinRun->setMaximum(data->getCorrelationRuns()-1);
+        if (data->getCorrelationRuns()==1) spinRun->setMaximum(-1);
         spinRun->setValue(fcs->getCurrentRun());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
+        if (data->getCorrelationRuns()>1) spinRun->setSuffix(QString(" / %1").arg(data->getCorrelationRuns()-1));
         int newidx=cmbModel->findData(fcs->getFitFunction()->id());
         if (newidx!=cmbModel->currentIndex()) modelChanged=true;
         cmbModel->setCurrentIndex(newidx);
+        cmbWeights->setCurrentIndex(fcs->getFitDataWeighting());
         dataEventsEnabled=true;
 
     }
@@ -747,7 +768,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
             size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
             free(fitfunc);
-            size_t c_taures=dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
+            size_t c_taures=c_tau;//dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
             size_t c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
             free(residuals);
             JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData);
@@ -775,6 +796,116 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
         }
     }
 
+}
+
+void QFFCSFitEvaluationEditor::fitCurrent() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!data)||(!falg)) return;
+
+    QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
+
+    if (data->getCorrelationN()>0) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        services->log_text(tr("running fit with %1 and model %2 on raw data record %3 ... \n").arg(falg->id()).arg(ffunc->id()).arg(record->getName()));
+
+        long N=data->getCorrelationN();
+        double* weights=NULL;
+        double* taudata=data->getCorrelationT();
+        double* corrdata=NULL;
+        if (eval->getCurrentRun()<0) {
+            corrdata=data->getCorrelationMean();
+        } else {
+            if (eval->getCurrentRun()<data->getCorrelationRuns()) {
+                corrdata=data->getCorrelationRun(eval->getCurrentRun());
+            } else {
+                corrdata=data->getCorrelationMean();
+            }
+        }
+
+        weights=(double*)malloc(N*sizeof(double));
+        bool weightsOK=false;
+        if (weighting==QFFCSFitEvaluation::StdDevWeighting) {
+            double* std=data->getCorrelationStdDev();
+            weightsOK=true;
+            for (int i=0; i<N; i++) {
+                weights[i]=std[i];
+                if (fabs(weights[i])<10*DBL_MIN) {
+                    weightsOK=false;
+                    services->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
+                    break;
+                };
+            }
+        }
+        if (!weightsOK) {
+            for (int i=0; i<N; i++) weights[i]=1;
+        }
+
+        // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+        // we are working with a complete set of parameters
+        double* params=eval->allocFillParameters();
+        double* initialparams=eval->allocFillParameters();
+        double* errors=eval->allocFillParameterErrors();
+        double* paramsMin=eval->allocFillParametersMin();
+        double* paramsMax=eval->allocFillParametersMax();
+        bool* paramsFix=eval->allocFillFix();
+
+        ffunc->calcParameter(params, errors);
+        ffunc->calcParameter(initialparams, errors);
+
+        QTime tstart=QTime::currentTime();
+        QFFitAlgorithm::FitResult result=falg->fit(params, errors, taudata, corrdata, weights, N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+        double deltaTime=(double)QTime::currentTime().msecsTo(tstart);
+        ffunc->calcParameter(params, errors);
+        eval->setFitResultValuesVisible(params, errors);
+        services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(deltaTime).arg(result.fitOK?tr("success"):tr("no convergence")));
+        services->log_text(tr("   - result-message %1\n").arg(result.message));
+        labFitResult->setText(result.message);
+        eval->setFitResultValueInt("used_run", eval->getCurrentRun());
+        eval->setFitResultValueString("modle_name", ffunc->id());
+        eval->setFitResultValueString("fitalg_name", falg->id());
+        eval->setFitResultValue("fitalg_runtime", deltaTime, "msecs");
+        eval->setFitResultValueBool("fitalg_success", result.fitOK);
+        eval->setFitResultValueString("fitalg_message", result.messageSimple);
+        QMapIterator<QString, QVariant> it(result.params);
+        while (it.hasNext()) {
+            it.next();
+            switch(it.value().type()) {
+                case QVariant::Double:
+                    eval->setFitResultValue("fitalg_"+it.key(), it.value().toDouble()); break;
+                case QVariant::Char:
+                case QVariant::Date:
+                case QVariant::DateTime:
+                case QVariant::String:
+                    eval->setFitResultValueString("fitalg_"+it.key(), it.value().toString()); break;
+                case QVariant::Int:
+                case QVariant::LongLong:
+                case QVariant::UInt:
+                case QVariant::ULongLong:
+                    eval->setFitResultValueInt("fitalg_"+it.key(), it.value().toInt()); break;
+                case QVariant::Bool:
+                    eval->setFitResultValueBool("fitalg_"+it.key(), it.value().toBool()); break;
+            }
+        }
+        // clean temporary parameters
+        free(weights);
+        free(params);
+        free(initialparams);
+        free(errors);
+        free(paramsFix);
+        free(paramsMax);
+        free(paramsMin);
+
+        displayModel(false);
+        replotData();
+        QApplication::restoreOverrideCursor();
+    }
 }
 
 void QFFCSFitEvaluationEditor::saveReport() {
@@ -875,10 +1006,12 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     QStringList sl;
     sl<<":/";
-    QString pid=cmbModel->itemData(cmbModel->currentIndex()).toString();
-    QString dll=services->getFitAlgorithmManager()->getFilename(pid);
+    QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
+    int ppid=services->getFitAlgorithmManager()->getPluginForID(pid);
+    std::cout<<pid.toStdString()<<"   "<<ppid<<std::endl;
+    QString dll=services->getFitAlgorithmManager()->getFilename(ppid);
     sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).completeBaseName()+QString("/");
-    //std::cout<<sl[1].toStdString()<<std::endl;
+    std::cout<<sl[1].toStdString()<<std::endl;
     hlpAlgorithm->setSearchPath(sl);
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
     if (algorithm) {
@@ -888,6 +1021,16 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     }
 }
 
+void QFFCSFitEvaluationEditor::configFitAlgorithm() {
+    if (!current) return;
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
+    QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
+    if (algorithm) {
+        algorithm->displayConfig();
+    }
+}
 void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!dataEventsEnabled) return;
     if (!current) return;
@@ -924,6 +1067,12 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
     current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (data) {
+        if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
+        else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
+        else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
+    }
 }
 
 void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
@@ -931,6 +1080,9 @@ void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
     current->getHighlightedRecord()->setQFProperty("algorithm", cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString(), false, false);
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QString alg=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
+    data->setFitAlgorithm(alg);
 }
 
 void QFFCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, QWidget* sender) {

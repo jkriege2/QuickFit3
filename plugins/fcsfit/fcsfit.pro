@@ -7,7 +7,6 @@ DEPENDPATH += ./
 DLLDESTDIR = ../../output/plugins
 DESTDIR = ./
 LIBS += -lgsl -lgslcblas -L../../lib/ -lquickfit3lib -L../../libqf3widgets/ -lquickfit3widgets
-# -L../fcs/ -lqfrdrfcs
 
 # Input
 HEADERS += qfpevalfcsfit.h \
