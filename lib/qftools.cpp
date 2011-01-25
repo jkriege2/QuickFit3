@@ -51,21 +51,17 @@ void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
 
 
 double roundError(double error, int addSignifcant) {
-    if (fabs(error)<DBL_MIN*10) return error;
-    return error;
-    // TODO: IMPLEMENT
-    int sbits_error=fabs(ceil(log(error)/log(10.0)));
-    double f=pow(10, sbits_error+addSignifcant);
+    if (fabs(error)<DBL_MIN*10.0) return error;
+    int sbits_error=ceil(log(fabs(error))/log(10.0));
+    double f=pow(10.0, sbits_error-1-addSignifcant);
     return round(error/f)*f;
 }
 
 double roundWithError(double value, double error, int addSignifcant)  {
     if (fabs(error)<DBL_MIN*10) return value;
-    return value;
-    // TODO: IMPLEMENT
-    int sbits_error=ceil(log(error)/log(10.0));
-    double f=1;
-    if (sbits_error>=0) f=pow(10, sbits_error+addSignifcant);
-    else f=pow(10, sbits_error-addSignifcant);
+
+    int sbits_error=ceil(log(fabs(error))/log(10.0));
+    double f=pow(10.0, sbits_error-1-addSignifcant);
+
     return round(value/f)*f;
 }
