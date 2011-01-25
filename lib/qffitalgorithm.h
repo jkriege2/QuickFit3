@@ -38,7 +38,7 @@ class QFFitAlgorithm {
         /*! \brief functor base class that may be used to optimize arbitrary functions
 
             This functor allows to evaluate arbitrary vector-valued functions
-              \f[ \vec{y}=\vec{f}(\vec{p})\in\mathbf{R}^M, \vec{p}\in\mathbb{R}^N. \f]
+              \f[ \vec{y}=\vec{f}(\vec{p})\in\mathbb{R}^M, \vec{p}\in\mathbb{R}^N. \f]
             For some data fitting/optimization algorithms we also have to know the jacobian of the model function, i.e.
               \f[ J_{m,i}=\frac{\partial y_m}{\partial p_i}\ \ \ \ \ \ \text{with}\ \ \ \ \ \ \vec{y}=\vec{f}(x, \vec{p}) \f]
             This function is implemented in evaluateJacobian(). As it is impossible to calculate the jacobian analytically for
