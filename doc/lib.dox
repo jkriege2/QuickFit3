@@ -14,13 +14,16 @@
     \defgroup qf3lib_tools Tool Functions and Classes
     \ingroup qf3lib
 
+    \defgroup qf3lib_mathtools Math Tool Functions and Classes
+    \ingroup qf3lib
+
+    \defgroup qf3lib_fitting Tools for Fitting
+    \ingroup qf3lib_mathtools
+
     \defgroup qf3lib_settings Settings/Options Management
     \ingroup qf3lib
 
     \defgroup qf3lib_project QuickFit Project Tree/Internal Project Representation
-    \ingroup qf3lib
-
-    \defgroup qf3lib_fitting Tools for Fitting
     \ingroup qf3lib
 
     As fitting is one of QuickFit's main raison-d'être s the main application provides some facilities which make implementing

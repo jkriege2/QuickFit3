@@ -4,6 +4,13 @@
 #include <cfloat>
 #include <cstdio>
 
+void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) {
+}
+
+
+
+
+
 class privateQFFitAlgorithmFitFunctor: public QFFitAlgorithm::Functor {
     public:
         privateQFFitAlgorithmFitFunctor(QFFitFunction* model, double* currentParams, bool* fixParams, double* dataX, double* dataY, double* dataWeight, uint64_t N):
@@ -71,12 +78,29 @@ class privateQFFitAlgorithmFitFunctor: public QFFitAlgorithm::Functor {
         }
 
 
-        inline virtual void evaluate(double* evalout, double* params, int Nparams) {
+        inline virtual void evaluate(double* evalout, double* params) {
             mapArrayFromFunctorToModel(modelParams, params);
-            for (int i=0; i<get_evalout(); i++) {
+            for (register int i=0; i<get_evalout(); i++) {
                 evalout[i]=(m_dataY[i]-m_model->evaluate(m_dataX[i], modelParams))/m_dataWeight[i];
             }
         }
+
+        void evaluateJacobian(double* evalout, double* params) {
+            mapArrayFromFunctorToModel(modelParams, params);
+            register int pcount=get_paramcount();
+            register int ecount=get_evalout();
+            double* p=(double*)calloc(pcount, sizeof(double));
+            for (register int i=0; i<ecount; i++) {
+                register int offset=i=pcount;
+                m_model->evaluateDerivatives(p, m_dataX[i], modelParams);
+                for (register int j=0; j<pcount; j++) {
+                    evalout[offset+j]=-1.0*p[j]/m_dataWeight[i];
+                }
+            }
+            free(p);
+        }
+
+        virtual bool get_implementsJacobian() const { return m_model->get_implementsDerivatives(); };
 
         virtual int get_paramcount() const { return m_paramCount; };
     protected:
@@ -90,7 +114,6 @@ class privateQFFitAlgorithmFitFunctor: public QFFitAlgorithm::Functor {
         int* functorFromModel;
         int* modelFromFunctor;
         double* modelParams;
-
 };
 
 
@@ -125,7 +148,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     double* tparamErrorsOut=(double*)calloc(fm.get_paramcount(), sizeof(double));
     double* tinitialParams=fm.createMappedArrayForFunctor(initialParams);
 
-    result=intMinimize(tparamsOut, tparamErrorsOut, tinitialParams, &fm, tparamsMin, tparamsMax);
+    result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, &fm, tparamsMin, tparamsMax);
 
     for (int i=0; i<model->paramCount(); i++) {
         paramsMax[i]=initialParams[i];
@@ -146,7 +169,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     return result;
 }
 
-QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramErrorsOut, Functor* model, double* initialParams, double* paramsMin, double* paramsMax) {
+/*QFFitAlgorithm::FitResult QFFitAlgorithm::optimize(double* paramsOut, double* paramErrorsOut, Functor* model, double* initialParams, double* paramsMin, double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
     double* pparamsMin=paramsMin;
@@ -169,7 +192,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     if (paramsMin==NULL) free(pparamsMin);
     if (paramsMax==NULL) free(pparamsMax);
     return result;
-}
+}*/
 
 bool QFFitAlgorithm::displayConfig() {
     QMessageBox::information(NULL, name(), QObject::tr("No configuration dialog is supplied for this optimization algorithm!"));

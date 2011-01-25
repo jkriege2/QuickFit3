@@ -3,7 +3,7 @@
 
 QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
     //           type,         id,                name,                                 label,                      unit,       fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc
-    addParameter(IntNumber,    "n_components",    "number of diffusing components",     "components",               "",         false,     true,         false,             false,        1,            1,        2,        1    );
+    addParameter(IntCombo,     "n_components",    "number of diffusing components",     "components",               "",         false,     true,         false,             false,        1,            1,        2,        1    );
     addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N",                        "",         true,      true,         true,              true,         10,           1e-10,    1e5,      1    );
     addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N",                      "",         false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1  );
     addParameter(FloatNumber,  "diff_rho1",       "fraction of first component",        "&rho;<sub>1</sub>",        "",         false,     false,        false,             false,        0.5,          0,        1,        0.1  );

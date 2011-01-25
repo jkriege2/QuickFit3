@@ -143,7 +143,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     QWidget* widgetResiduals=new QWidget(this);
     vbl=new QVBoxLayout(widgetResiduals);
     vbl->setContentsMargins(0,0,0,0);
-    vbl->setMargin(0);
+    vbl->setSpacing(1);
     widgetResiduals->setLayout(vbl);
 
     pltResiduals=new JKQtPlotter(true, this);
@@ -268,12 +268,12 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     scrollParameters=new QScrollArea(this);
     layModel->addWidget(scrollParameters, 100);
-    layModel->setMargin(2);
+    layModel->setSpacing(2);
     QWidget* widParameters=new QWidget(this);
     scrollParameters->setWidget(widParameters);
     scrollParameters->setWidgetResizable(true);
     layParameters=new QFormLayout(this);
-    layParameters->setMargin(2);
+    layParameters->setSpacing(2);
     widParameters->setLayout(layParameters);
 
 
@@ -486,6 +486,28 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
+    if (!ffunc) {
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // delete all fit parameter widgets
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        for (int i=0; i<m_fitParameters.size(); i++) {
+            if (m_fitParameters[i]) {
+                m_fitParameters[i]->disableDatastore();
+                QWidget* label=layParameters->labelForField(m_fitParameters[i]);
+                layParameters->removeWidget(label);
+                layParameters->removeWidget(m_fitParameters[i]);
+                disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
+                disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
+                disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
+                delete m_fitParameters[i];
+                delete label;
+            }
+        }
+        m_fitParameters.clear();
+        return;
+    }
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
 
     if (newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -535,6 +557,8 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             fpw->setUnit(d.unit);
             fpw->setIncrement(d.inc);
             fpw->setWidgetWidth(m_parameterWidgetWidth, m_parameterCheckboxWidth);
+            fpw->setRangeEnabled(true);
+            if (falg) fpw->setRangeEnabled(falg->get_supportsBoxConstraints());
             QLabel* l=new QLabel(QString("<font size=\"+1\">%1:</font>").arg(d.label), this);
             if (!d.unit.isEmpty()) l->setText(QString("<font size=\"+1\">%1 [%2]:</font>").arg(d.label).arg(d.unit));
             fpw->setToolTip(d.name);
@@ -813,7 +837,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
 
     if (data->getCorrelationN()>0) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        services->log_text(tr("running fit with %1 and model %2 on raw data record %3 ... \n").arg(falg->id()).arg(ffunc->id()).arg(record->getName()));
+        services->log_text(tr("running fit with %1 and model %2 on raw data record %3, run %4 ... \n").arg(falg->id()).arg(ffunc->id()).arg(record->getName()).arg(eval->getCurrentRun()));
 
         long N=data->getCorrelationN();
         double* weights=NULL;
@@ -859,11 +883,30 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
         ffunc->calcParameter(params, errors);
         ffunc->calcParameter(initialparams, errors);
 
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            printf("  %s = %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), initialparams[i]);
+        }
+
         QTime tstart=QTime::currentTime();
         QFFitAlgorithm::FitResult result=falg->fit(params, errors, taudata, corrdata, weights, N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
         double deltaTime=(double)QTime::currentTime().msecsTo(tstart);
         ffunc->calcParameter(params, errors);
+
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+        }
+
+        // round errors and values
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            errors[i]=roundError(errors[i], 2);
+            params[i]=roundWithError(params[i], errors[i], 2);
+        }
         eval->setFitResultValuesVisible(params, errors);
+
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            printf("  rounded.fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+        }
+
         services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(deltaTime).arg(result.fitOK?tr("success"):tr("no convergence")));
         services->log_text(tr("   - result-message %1\n").arg(result.message));
         labFitResult->setText(result.message);

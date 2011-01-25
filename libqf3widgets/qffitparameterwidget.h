@@ -6,14 +6,15 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QComboBox>
 #include "qffitparameterbasicinterface.h"
-#include "numberedit.h"
+#include "jkdoubleedit.h"
 
 /*! \brief a widget that displays a fit parameter, together with a label, possibly a checkbox to fix the value, possible a label for the error.
     \ingroup qf3lib_widgets
 
     This widget will display a widget that is used to set the parameter. These widgets are possible:
-      - a NumberEdit
+      - a JKDoubleEdit
       - a QSpinBox
     .
 */
@@ -21,7 +22,7 @@ class QFFitParameterWidget : public QWidget {
         Q_OBJECT
     public:
         /** \brief used to specify the widget to display */
-        enum WidgetType { FloatEdit=0, IntSpinBox=1, Header=255 };
+        enum WidgetType { FloatEdit=0, IntSpinBox=1, IntDropDown=2, Header=255 };
         /*! \brief constructor
 
             \param datastore this is used to read/write the values
@@ -70,6 +71,8 @@ class QFFitParameterWidget : public QWidget {
         void setValue(double value, double error, bool writeback=false);
         /** \brief switch the min/max widget on/off */
         void setEditRange(bool editRange);
+        /** \brief en/disable range editing widgets */
+        void setRangeEnabled(bool enabled);
     signals:
         /** \brief emited when a value changed */
         void valueChanged(QString id, double value);
@@ -80,6 +83,7 @@ class QFFitParameterWidget : public QWidget {
     protected slots:
         void doubleValueChanged(double value);
         void intValueChanged(int value);
+        void intValueChangedFromCombo(int value);
         void doubleMinChanged(double value);
         void intMinChanged(int value);
         void doubleMaxChanged(double value);
@@ -113,11 +117,12 @@ class QFFitParameterWidget : public QWidget {
         /** \brief with of checkboxes */
         int m_checkWidth;
 
-        NumberEdit* neditValue;
+        JKDoubleEdit* neditValue;
         QSpinBox* spinIntValue;
-        NumberEdit* neditMin;
+        QComboBox* cmbIntValue;
+        JKDoubleEdit* neditMin;
         QSpinBox* spinIntMin;
-        NumberEdit* neditMax;
+        JKDoubleEdit* neditMax;
         QSpinBox* spinIntMax;
         QCheckBox* chkFix;
         QLabel* labError;
@@ -127,6 +132,8 @@ class QFFitParameterWidget : public QWidget {
         QLabel* hlabMax;
         QLabel* hlabFix;
         QWidget* spCheck;
+
+        void fillCombo(QComboBox* cmb, int min, int max);
 
     private:
 };

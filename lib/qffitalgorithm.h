@@ -12,31 +12,38 @@
     When implementing a fitting algorithm you will have to implement this:
       - implement name(), id() and helpFile()
       - in the cosntructor you will have to set the parameters of your fitting algorithm using setParameter()
-        later on you can read it back using getParameter().
-      - in the protected function intMinimize() you will have to implement your fitting algorithm as an optimization
-        algorithm which minimizes a function \f$ f(\vec{p}) \f$ of a set of parameters \f$ \vec{p} \f$ :
-          \f[ \vec{p}^\ast=\min\limits_{\vec{p}}f(\vec{p}) \f]
-        The function \f$ f(\vec{p}) \f$ is implemented as a QFFitAlgorithm::Functor object.
+        later on you can read it back using getParameter(). Note that is is possible that the main application
+        overwrites these parameters by calling setParameter() with externally defined values (e.g. from an INI
+        file). So if you want really private parameters, used private/protected variables for them.
+      - in the protected function intFit() you will have to implement your fitting algorithm in a form which
+        minimizes a vector values function \f$ \vec{f}(\vec{p})\in\mathbb{R}^M \f$ of a set of parameters
+        \f$ \vec{p}\in\mathbb{R}^N \f$ with an arbitrary norm (usually \f$ L^2 \f$ ):
+          \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\| \f]
+        The function \f$ \vec{f}(\vec{p}) \f$ is implemented as a QFFitAlgorithm::Functor object.
       - optionally you may overwrite displayConfig() which displays a modal configuration dialog for your fit algorithm
+      - use get_supportsBoxConstraints() to tell the user/program whether the fitting algorithm supports box constraints or not.
     .
+
+
+    This class provides interfaces to data fitting and optimization:
+      - fit() is used to solve a data fitting problem with an objective function provided by a QFFitFunction and a set of measurements
+        \f$ (x_i,y_i)_{i=1..M} \f$ :
+            \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{m=1}^M\left\|\frac{y_m-f_m(x_m, \vec{p})}{\sigma_m}\right\| \f]
+    .
+    All interfaces are internally mapped to the protected function intFit().
+
 */
 class QFFitAlgorithm {
     public:
         /*! \brief functor base class that may be used to optimize arbitrary functions
 
-            This functor allows to evaluate arbitrary vector-valued functions \f[ \vec{y}=\vec{f}(\vec{p})\in\mathbf{R}^M, \vec{p}\in\mathbb{R}^N. \f]
-
-            This can be used to either solve a simple minimization problem problem
-              \f[ \vec{p}^\ast=\min\limits_{\vec{p}}g(\vec{p}) \f]
-            by setting \c Mevalout=1. Then the function evaluate() evaluates to \f[ f_1=g(\vec{p}) \f]
-
-            It is also possible to solve data fitting problems of the form
-              \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{m=1}^M\left(\frac{y_m-f(x_m, \vec{p})}{\sigma_m}\right)^2 \f]
-            by setting \c Mevalout= \f$ M \f$ where \f$ M \f$ is the number of measurements \f$ (x_m, y_m) \f$ . The method
-            evaluate() then returns a vector of size \f$ M \f$ where the m-th entry evluates to
-              \f[ f_m=\frac{y_m-f(x_m, \vec{p})}{\sigma_m} \f]
-            The summing and squaring has to be done by the optimization algorithm afterwards.
-
+            This functor allows to evaluate arbitrary vector-valued functions
+              \f[ \vec{y}=\vec{f}(\vec{p})\in\mathbf{R}^M, \vec{p}\in\mathbb{R}^N. \f]
+            For some data fitting/optimization algorithms we also have to know the jacobian of the model function, i.e.
+              \f[ J_{m,i}=\frac{\partial y_m}{\partial p_i}\ \ \ \ \ \ \text{with}\ \ \ \ \ \ \vec{y}=\vec{f}(x, \vec{p}) \f]
+            This function is implemented in evaluateJacobian(). As it is impossible to calculate the jacobian analytically for
+            some functions, or because the implementor didn't do it, there is the function get_implementsJacobian() which tells
+            whether the jacobian was implemented or not.
 
          */
         class Functor {
@@ -44,14 +51,26 @@ class QFFitAlgorithm {
                 Functor(int Mevalout) { m_evalout=Mevalout; }
                 /*! \brief function that evaluates the arbitrary function
 
-                    \param[out] evalout
-                    \param params parameter vector
-                    \param Nparams number of parameters \f$ N \f$
+                    \param[out] evalout with size get_evalout()
+                    \param params parameter vector with size get_paramcount()
                  */
-                virtual void evaluate(double* evalout, double* params, int Nparams)=0;
+                virtual void evaluate(double* evalout, double* params)=0;
+
+                /*! \brief function that evaluates the arbitrary function
+
+                    \param[out] evalout with size get_evalout()*get_paramcount() in the order
+                                \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
+                    \param params parameter vector with size get_paramcount()
+
+                    \note This is only implemented if get_implementsJacobian() returns true
+                 */
+                virtual void evaluateJacobian(double* evalout, double* params);
 
                 /** \brief return the number of parameters \f$ N \f$ */
                 virtual int get_paramcount() const=0;
+
+                /** \brief return \c true if the jacobian is implemented */
+                virtual bool get_implementsJacobian() const { return false; };
 
                 /** \brief return dimension of function output vector \f$ M \f$ */
                 inline int get_evalout() const { return m_evalout; };
@@ -97,7 +116,7 @@ class QFFitAlgorithm {
 
         /*! \brief this wrapper routine allows to use the fitting algorithm for 1D data fitting with a given model function \f$ f(x; \vec{p}) \f$ encoded in \a model
                    and a set of measurements \f$ (x_i, y_i, \sigma_i) \f$ where \f$ \sigma_i \f$ are the weights for the measurements. Then this routine solves the problem:
-                   \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left(\frac{y_i-f(x_i; \vec{p})}{\sigma_i}\right)^2 \f$
+                   \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{y_i-f(x_i; \vec{p})}{\sigma_i}\right\| \f$
 
             \param[out] paramsOut The optimal parameter vector is written into this array
             \param[out] paramErrorsOut The optimal parameter error vector is written into this array
@@ -114,18 +133,6 @@ class QFFitAlgorithm {
         */
         FitResult fit(double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams=NULL, double* paramsMin=NULL, double* paramsMax=NULL);
 
-        /*! \brief this wrapper routine allows to use the fitting algorithm for general optimization of a vector valued function \f$ \vec{y}=\vec{f}(\vec{p})\in\mathbf{R}^M, \vec{p}\in\mathbb{R}^N \f$
-                   encoded in the parameter \a model. So this solves \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\|^2_2 \f$
-
-            \param[out] paramsOut The optimal parameter vector is written into this array
-            \param[out] paramErrorsOut The optimal parameter error vector is written into this array
-            \param model the model function to use
-            \param initialParams initial values for the parameters
-            \param paramsMin lower parameter bound
-            \param paramsMax upper parameter bound
-            \return a FitResult object describing the fit result
-        */
-        FitResult fit(double* paramsOut, double* paramErrorsOut, Functor* model, double* initialParams, double* paramsMin=NULL, double* paramsMax=NULL);
 
 
         /*! \brief display a modal configuration dialog for you fit algorithm
@@ -148,8 +155,16 @@ class QFFitAlgorithm {
             \param paramsMin lower parameter bound
             \param paramsMax upper parameter bound
             \return a FitResult object describing the fit result
+
+
+            This method uses the nested Functor class to solve a problem of the form
+                \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\| \f]
+            The norm \f$ \|\cdot\| \f$ is usually the \f$ L^2 \f$ norm, but may be any other norm defined
+            by the fitting algorithm. Note that this function is called for data fitting problems with an internal
+            implementation of Functor which evaluates to \f$ f_m=\frac{y_m-f_m(x_m, \vec{p})}{\sigma_m} \f$ where
+            \f$ (x_m, y_m, \sigma_m) \f$ is a measurement vector with weights \f$ \sigma_m \f$ .
         */
-        virtual FitResult intMinimize(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax)=0;
+        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax)=0;
     public:
         /** \brief return a name for the algorithm */
         virtual QString name() const=0;
@@ -157,6 +172,8 @@ class QFFitAlgorithm {
         virtual QString id() const=0;
         /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in \c plugins/fitalgorithms/help/<plugin_id> */
         virtual QString helpFile() const { return QString(""); };
+        /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
+        virtual bool get_supportsBoxConstraints() const =0;
 };
 
 #endif // QFFITALGORITHM_H

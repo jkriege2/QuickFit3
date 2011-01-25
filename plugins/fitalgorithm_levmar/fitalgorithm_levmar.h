@@ -79,7 +79,7 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
             \param paramsMax upper parameter bound
             \return a FitResult object describing the fit result
         */
-        virtual FitResult intMinimize(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax);
+        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax);
 
 
     public:
@@ -91,6 +91,8 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
         virtual QString id() const { return QString("fit_levmar"); };
         /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in \c plugins/fitalgorithms/help/<plugin_id> */
         virtual QString helpFile() const { return id()+".html"; };
+        /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
+        virtual bool get_supportsBoxConstraints() const { return true; };
 };
 
 

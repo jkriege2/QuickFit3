@@ -6,6 +6,23 @@
 #include <QWidget>
 #include <QSplitter>
 
+/*! \brief round a value according to the error
+    \ingroup qf3lib_mathtools
+
+    this returns a rounded value that equals the input value with \a addSignifcant mor
+    significant digits than the error
+
+    So with \a addSignifcant = 2 The value 1.23456789&pm;0.001
+    will be rounded to 1.23456&pm;0.001
+*/
+double roundWithError(double value, double error, int addSignifcant=1) ;
+
+/*! \brief round a value to its first 1+\a addSignifcant significant digits
+    \ingroup qf3lib_mathtools
+
+*/
+double roundError(double error, int addSignifcant=1) ;
+
 /*! \brief store the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
 

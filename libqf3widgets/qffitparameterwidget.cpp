@@ -33,11 +33,12 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     hlabMin=NULL;
     hlabValue=NULL;
     labError=NULL;
+    cmbIntValue=NULL;
 
     // create widgets:
     layMain=new QHBoxLayout(this);
     layMain->setContentsMargins(0,0,0,0);
-    layMain->setMargin(1);
+    layMain->setSpacing(2);
     setLayout(layMain);
 
     chkFix=new QCheckBox(this);
@@ -48,6 +49,8 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
             delete chkFix;
             chkFix=NULL;
             hlabFix=new QLabel(tr("<b>fix</b>"), this);
+            hlabFix->setMinimumWidth(m_checkWidth);
+            hlabFix->setMaximumWidth(m_checkWidth);
             layMain->addWidget(hlabFix);
         } else {
             layMain->addWidget(chkFix);
@@ -63,23 +66,38 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     }
 
     if (widget==FloatEdit) {
-        neditValue=new NumberEdit(this);
+        neditValue=new JKDoubleEdit(this);
         neditValue->setRange(datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
         layMain->addWidget(neditValue);
-        neditValue->setSuffix(m_unit);
+        //neditValue->setSuffix(m_unit);
         neditValue->setSingleStep(m_increment);
         neditValue->setReadOnly(!editable);
-        neditValue->setEnabled(editable);
+        //neditValue->setEnabled(editable);
+        if (editable) {
+            neditValue->setBackgroundColor(palette().color(QPalette::Base));
+        } else {
+            neditValue->setBackgroundColor(palette().color(QPalette::Window));
+        }
+        neditValue->setShowUpDown(false);
         connect(neditValue, SIGNAL(valueChanged(double)), this, SLOT(doubleValueChanged(double)));
     } else if (widget==IntSpinBox) {
         spinIntValue=new QSpinBox(this);
         spinIntValue->setRange(datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
-        spinIntValue->setSuffix(m_unit);
+        //spinIntValue->setSuffix(m_unit);
         spinIntValue->setSingleStep(m_increment);
         spinIntValue->setReadOnly(!editable);
         spinIntValue->setEnabled(editable);
         layMain->addWidget(spinIntValue);
         connect(spinIntValue, SIGNAL(valueChanged(int)), this, SLOT(intValueChanged(int)));
+    } else if (widget==IntDropDown) {
+        cmbIntValue=new QComboBox(this);
+        fillCombo(cmbIntValue, datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
+        //spinIntValue->setSuffix(m_unit);
+        //cmbIntValue->setReadOnly(!editable  );
+        cmbIntValue->setEditable(false);
+        cmbIntValue->setEnabled(editable);
+        layMain->addWidget(cmbIntValue);
+        connect(cmbIntValue, SIGNAL(currentIndexChanged(int)), this, SLOT(intValueChangedFromCombo(int)));
     } else if (widget==Header) {
         hlabValue=new QLabel(tr("<b>value</b>"), this);
         layMain->addWidget(hlabValue);
@@ -103,29 +121,31 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
 
     if (editable) {
         if (widget==FloatEdit) {
-            neditMin=new NumberEdit(this);
+            neditMin=new JKDoubleEdit(this);
             neditMin->setCheckBounds(false, false);
-            neditMin->setSuffix(m_unit);
+            //neditMin->setSuffix(m_unit);
             neditMin->setSingleStep(m_increment);
+            neditMin->setShowUpDown(false);
             connect(neditMin, SIGNAL(valueChanged(double)), this, SLOT(doubleMinChanged(double)));
 
-            neditMax=new NumberEdit(this);
+            neditMax=new JKDoubleEdit(this);
             neditMax->setCheckBounds(false, false);
-            neditMax->setSuffix(m_unit);
+            //neditMax->setSuffix(m_unit);
             neditMax->setSingleStep(m_increment);
+            neditMax->setShowUpDown(false);
             connect(neditMax, SIGNAL(valueChanged(double)), this, SLOT(doubleMaxChanged(double)));
 
             layMain->addWidget(neditMin);
             layMain->addWidget(neditMax);
-        } else if (widget==IntSpinBox) {
+        } else if ((widget==IntSpinBox)||(widget==IntDropDown)) {
             spinIntMin=new QSpinBox(this);
-            spinIntMin->setSuffix(m_unit);
+            //spinIntMin->setSuffix(m_unit);
             spinIntMin->setSingleStep(m_increment);
             spinIntMin->setRange(INT_MIN, INT_MAX);
             connect(spinIntMin, SIGNAL(valueChanged(int)), this, SLOT(intMinChanged(int)));
 
             spinIntMax=new QSpinBox(this);
-            spinIntMax->setSuffix(m_unit);
+            //spinIntMax->setSuffix(m_unit);
             spinIntMax->setSingleStep(m_increment);
             spinIntMax->setRange(INT_MIN, INT_MAX);
             connect(spinIntMax, SIGNAL(valueChanged(int)), this, SLOT(intMaxChanged(int)));
@@ -142,6 +162,7 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
 
 
     setEditRange(editRangeAllowed);
+    setRangeEnabled(true);
     setWidgetWidth(m_widgetWidth, m_checkWidth);
     setUnit(m_unit);
     setIncrement(m_increment);
@@ -174,6 +195,11 @@ void QFFitParameterWidget::reloadValues() {
     } else if (m_widgetType==IntSpinBox) {
         if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
+    } else if (m_widgetType==IntDropDown) {
+        if (cmbIntValue) {
+            fillCombo(cmbIntValue, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+            cmbIntValue->setCurrentIndex(cmbIntValue->findData((int)value));
+        }
     }
     if (m_displayError && labError && (m_widgetType!=Header)) {
         double error=m_datastore->getFitError(m_parameterID);
@@ -202,7 +228,9 @@ void QFFitParameterWidget::setValue(double value, double error, bool writeback) 
     } else if (m_widgetType==IntSpinBox) {
         if (spinIntValue) spinIntValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
-    }
+    } else if (m_widgetType==IntDropDown) {
+        fillCombo(cmbIntValue, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
+        cmbIntValue->setCurrentIndex(cmbIntValue->findData((int)value));    }
     if (m_displayError && labError && (m_widgetType!=Header)) {
         labError->setTextFormat(Qt::RichText);
         labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(error, 2, true).c_str()));
@@ -225,6 +253,14 @@ void QFFitParameterWidget::intValueChanged(int value) {
     }
 }
 
+void QFFitParameterWidget::intValueChangedFromCombo(int valueIn) {
+    int value=valueIn;
+    if (cmbIntValue) value=cmbIntValue->itemData(valueIn).toInt();
+    if ((!m_settingData) && m_editable) {
+        m_datastore->setFitValue(m_parameterID, value);
+        emit valueChanged(m_parameterID, value);
+    }
+}
 void QFFitParameterWidget::sfixChanged(bool fix) {
     if ((!m_settingData) && m_editable) {
         m_datastore->setFitFix(m_parameterID, fix);
@@ -287,6 +323,10 @@ void QFFitParameterWidget::setWidgetWidth(int width, int fixWidth) {
         spinIntValue->setMinimumWidth(m_widgetWidth);
         spinIntValue->setMaximumWidth(m_widgetWidth);
     }
+    if (cmbIntValue) {
+        cmbIntValue->setMinimumWidth(m_widgetWidth);
+        cmbIntValue->setMaximumWidth(m_widgetWidth);
+    }
     if (spinIntMin) {
         spinIntMin->setMinimumWidth(m_widgetWidth);
         spinIntMin->setMaximumWidth(m_widgetWidth);
@@ -322,13 +362,6 @@ void QFFitParameterWidget::setWidgetWidth(int width, int fixWidth) {
     if (hlabValue) {
         hlabValue->setMinimumWidth(m_widgetWidth);
         hlabValue->setMaximumWidth(m_widgetWidth);
-        /*if (m_displayError) {
-            hlabValue->setMinimumWidth(2*m_widgetWidth+layMain->margin());
-            hlabValue->setMaximumWidth(2*m_widgetWidth+layMain->margin());
-        } else {
-            hlabValue->setMinimumWidth(m_widgetWidth);
-            hlabValue->setMaximumWidth(m_widgetWidth);
-        }*/
     }
 }
 
@@ -375,5 +408,21 @@ void QFFitParameterWidget::setEditRange(bool editRange) {
         if (neditMin) neditMin->setVisible(editRange);
         if (hlabMin) hlabMin->setVisible(editRange);
         if (hlabMax) hlabMax->setVisible(editRange);
+    }
+}
+
+void QFFitParameterWidget::setRangeEnabled(bool enabled) {
+    if (spinIntMax) spinIntMax->setEnabled(enabled);
+    if (spinIntMin) spinIntMin->setEnabled(enabled);
+    if (neditMax) neditMax->setEnabled(enabled);
+    if (neditMin) neditMin->setEnabled(enabled);
+    if (hlabMin) hlabMin->setEnabled(enabled);
+    if (hlabMax) hlabMax->setEnabled(enabled);
+}
+
+void QFFitParameterWidget::fillCombo(QComboBox* cmb, int min, int max) {
+    cmb->clear();
+    for(int i=min; i<max; i++) {
+        cmb->addItem(QString::number(i), i);
     }
 }

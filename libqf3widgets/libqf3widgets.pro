@@ -23,9 +23,10 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/qtshortcutwidgets.h \
            ../../../../LIB/trunk/tools.h \
            ../../../../LIB/trunk/datatable2.h \
+           ../../../../LIB/trunk/qt/numberedit.h \
+           ../../../../LIB/trunk/qt/jkdoubleedit.h \
            qehtreeview.h \
            datacutslider.h \
-           ../../../../LIB/trunk/qt/numberedit.h \
            qfhtmlhelpwindow.h \
            qffitparameterbasicinterface.h \
            qffitparameterwidget.h \
@@ -46,9 +47,10 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/qt/qtshortcutwidgets.cpp \
            ../../../../LIB/trunk/tools.cpp \
            ../../../../LIB/trunk/datatable2.cpp \
+           ../../../../LIB/trunk/qt/numberedit.cpp \
+           ../../../../LIB/trunk/qt/jkdoubleedit.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
-           ../../../../LIB/trunk/qt/numberedit.cpp \
            qfhtmlhelpwindow.cpp \
            qffitparameterwidget.cpp \
            qfdlgcsvparameters.cpp

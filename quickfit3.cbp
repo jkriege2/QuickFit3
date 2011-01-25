@@ -192,6 +192,8 @@
 		<Unit filename="plugins\table\qftablemodel.h" />
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
+		<Unit filename="..\..\..\LIB\trunk\qt\jkdoubleedit.cpp" />
+		<Unit filename="..\..\..\LIB\trunk\qt\jkdoubleedit.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtfastplotter.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtfastplotter.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpgeoelements.cpp" />

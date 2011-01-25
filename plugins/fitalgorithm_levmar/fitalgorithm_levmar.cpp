@@ -16,10 +16,10 @@ QFFitAlgorithmLevmar::QFFitAlgorithmLevmar() {
 void levmarfitfunc(double* p, double* x, int m, int n, void* data)
 {
     QFFitAlgorithm::Functor* adata=(QFFitAlgorithm::Functor*)data;
-    adata->evaluate(x, p, m);
+    adata->evaluate(x, p);
 }
 
-QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intMinimize(double* paramsOut, double* paramErrorsOut, double* initialParams, QFFitAlgorithm::Functor* model, double* paramsMin, double* paramsMax) {
+QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, QFFitAlgorithm::Functor* model, double* paramsMin, double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
     int paramCount=model->get_paramcount();
@@ -68,13 +68,13 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intMinimize(double* paramsOut, d
                 reason_simple=QObject::tr("stopped by small gradient J<sup>T</sup>&middot;<b>e</b>.");
                 break;
         case 2: reason=QObject::tr("stopped by small &delta;<sub><b>p</b></sub>.");
-                reason_simple=tr("stopped by small delta_p.");
+                reason_simple=QObject::tr("stopped by small delta_p.");
                 break;
         case 3: reason=QObject::tr("stopped by maximum iterations.");
                 reason_simple=QObject::tr("stopped by maximum iterations.");
                 break;
         case 4: reason=QObject::tr("singular matrix. Restart from current p with increased &mu;.");
-                reason_simple=tr("singular matrix. Restart from current p with increased mu.");
+                reason_simple=QObject::tr("singular matrix. Restart from current p with increased mu.");
                 break;
         case 5: reason=QObject::tr("no further error reduction is possible. Restart with increased &mu;.");
                 reason_simple=QObject::tr("no further error reduction is possible. Restart with increased mu.");

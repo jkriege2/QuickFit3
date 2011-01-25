@@ -250,7 +250,7 @@ void QFFCSFitEvaluation::setFitResultValues(double* values, double* errors) {
         if (f) {
             for (int i=0; i<f->paramCount(); i++) {
                 QString pid=f->getParameterID(i);
-                setFitResultValue(pid, values[i], errors[i]);
+                //setFitResultValue(pid, values[i], errors[i]);
                 QString unit=f->getDescription(pid).unit;
                 r->resultsSetNumberError(getEvaluationResultID(), pid, values[i], errors[i], unit);
             }
@@ -268,7 +268,7 @@ void QFFCSFitEvaluation::setFitResultValuesVisible(double* values, double* error
             for (int i=0; i<f->paramCount(); i++) {
                 if (f->isParameterVisible(i, values)) {
                     QString pid=f->getParameterID(i);
-                    setFitResultValue(pid, values[i], errors[i]);
+                    //setFitResultValue(pid, values[i], errors[i]);
                     QString unit=f->getDescription(pid).unit;
                     r->resultsSetNumberError(getEvaluationResultID(), pid, values[i], errors[i], unit);
                 }
