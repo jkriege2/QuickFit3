@@ -1,0 +1,296 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.0'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      9778,        227]*)
+(*NotebookOutlinePosition[     10423,        249]*)
+(*  CellTagsIndexPosition[     10379,        245]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+    \(\(f := 
+        1\/N*\((\(1 - \((\[Theta]\_1 + \[Theta]\_2)\) + \ \[Theta]\_1*Exp[\(-\
+\[Tau]\)/T\_1] + \ \[Theta]\_2*Exp[\(-\[Tau]\)/T\_2]\)\/\(1 - \((\[Theta]\_1 \
++ \[Theta]\_2)\)\))\)*\((\[Rho]\_1*\((1 + \[Tau]\/\[Tau]\_1)\)\^\(-1\)*\((1 + \
+\[Tau]\/\(\[Gamma]\^2*\[Tau]\_1\))\)\^\(\(-1\)/2\) + \[Rho]\_2*\((1 + \
+\[Tau]\/\[Tau]\_2)\)\^\(-1\)*\((1 + \
+\[Tau]\/\(\[Gamma]\^2*\[Tau]\_2\))\)\^\(\(-1\)/2\) + \[Rho]\_3*\((1 + \
+\[Tau]\/\[Tau]\_3)\)\^\(-1\)*\((1 + \
+\[Tau]\/\(\[Gamma]\^2*\[Tau]\_3\))\)\^\(\(-1\)/2\))\);\)\[IndentingNewLine]\),\
+ "\[IndentingNewLine]", 
+    \(\(simprules := {\[IndentingNewLine]\((1 - \[Theta]\_1 + \[ExponentialE]\
+\^\(-\(\[Tau]\/T\_1\)\)\ \[Theta]\_1 - \[Theta]\_2 + \[ExponentialE]\^\(-\(\
+\[Tau]\/T\_2\)\)\ \[Theta]\_2)\) \[Rule] 
+            tripall, \
+\[IndentingNewLine]\[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \[Theta]\_1 \
+\[Rule] tr1, \[IndentingNewLine]\[ExponentialE]\^\(-\(\[Tau]\/T\_2\)\)\ \
+\[Theta]\_2 \[Rule] 
+            tr2, \[IndentingNewLine]\[Rho]\_2\/\(\((1 + \[Tau]\/\[Tau]\_2)\)\ \
+\@\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_2\)\)\) \[Rule] 
+            DiffTwo, \[IndentingNewLine]\[Rho]\_1\/\(\((1 + \
+\[Tau]\/\[Tau]\_1)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_1\)\)\) \[Rule] 
+            DiffOne, \[IndentingNewLine]\[Rho]\_3\/\(\((1 + \
+\[Tau]\/\[Tau]\_3)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_3\)\)\) \[Rule] 
+            DiffThree, \[IndentingNewLine]\((DiffOne + DiffThree + 
+                DiffTwo)\) \[Rule] 
+            DiffAll, \[IndentingNewLine]1 + \[Tau]\/\[Tau]\_1 \[Rule] 
+            DDone, \[IndentingNewLine]\@DDonesqrtarg \[Rule] 
+            DDonesqrt, \[IndentingNewLine]1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_1\) \[Rule] 
+            DDonesqrtarg, \[IndentingNewLine]1 + \[Tau]\/\[Tau]\_2 \[Rule] 
+            DDtwo, \[IndentingNewLine]\@DDtwosqrtarg \[Rule] 
+            DDtwosqrt, \[IndentingNewLine]1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_2\) \[Rule] 
+            DDtwosqrtarg, \[IndentingNewLine]1 + \[Tau]\/\[Tau]\_3 \[Rule] 
+            DDthree, \[IndentingNewLine]\@DDthreesqrtarg \[Rule] 
+            
+            DDthreesqrt, \[IndentingNewLine]1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\
+\_3\) \[Rule] DDthreesqrt};\)\), "\[IndentingNewLine]", 
+    \(\(r := \[PartialD]\_N\ f;\)\), "\[IndentingNewLine]", 
+    \(r\), "\[IndentingNewLine]", 
+    \(ReplaceRepeated[r, \ simprules]\), "\[IndentingNewLine]", 
+    \(\)}], "Input"],
+
+Cell[BoxData[
+    \(\(-\(\(\((1 - \[Theta]\_1 + \[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \
+\[Theta]\_1 - \[Theta]\_2 + \[ExponentialE]\^\(-\(\[Tau]\/T\_2\)\)\ \
+\[Theta]\_2)\)\ \((\[Rho]\_1\/\(\((1 + \[Tau]\/\[Tau]\_1)\)\ \@\(1 + \[Tau]\/\
+\(\[Gamma]\^2\ \[Tau]\_1\)\)\) + \[Rho]\_2\/\(\((1 + \[Tau]\/\[Tau]\_2)\)\ \@\
+\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_2\)\)\) + \[Rho]\_3\/\(\((1 + \[Tau]\/\
+\[Tau]\_3)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_3\)\)\))\)\)\/\(N\^2\ \
+\((1 - \[Theta]\_1 - \[Theta]\_2)\)\)\)\)\)], "Output"],
+
+Cell[BoxData[
+    \(\(-\(\(DiffAll\ tripall\)\/\(N\^2\ \((1 - \[Theta]\_1 - \
+\[Theta]\_2)\)\)\)\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(\(r := \[PartialD]\_\(\[Theta]\_1\)\ f;\)\), "\[IndentingNewLine]", 
+    \(r\), "\[IndentingNewLine]", 
+    \(ReplaceRepeated[r, \ simprules]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(\((\(-1\) + \[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\))\)\ \((\[Rho]\_1\/\
+\(\((1 + \[Tau]\/\[Tau]\_1)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_1\)\)\) \
++ \[Rho]\_2\/\(\((1 + \[Tau]\/\[Tau]\_2)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_2\)\)\) + \[Rho]\_3\/\(\((1 + \[Tau]\/\[Tau]\_3)\)\ \@\(1 + \
+\[Tau]\/\(\[Gamma]\^2\ \[Tau]\_3\)\)\))\)\)\/\(N\ \((1 - \[Theta]\_1 - \
+\[Theta]\_2)\)\) + \(\((1 - \[Theta]\_1 + \
+\[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \[Theta]\_1 - \[Theta]\_2 + \
+\[ExponentialE]\^\(-\(\[Tau]\/T\_2\)\)\ \[Theta]\_2)\)\ \((\[Rho]\_1\/\(\((1 \
++ \[Tau]\/\[Tau]\_1)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_1\)\)\) + \
+\[Rho]\_2\/\(\((1 + \[Tau]\/\[Tau]\_2)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_2\)\)\) + \[Rho]\_3\/\(\((1 + \[Tau]\/\[Tau]\_3)\)\ \@\(1 + \
+\[Tau]\/\(\[Gamma]\^2\ \[Tau]\_3\)\)\))\)\)\/\(N\ \((1 - \[Theta]\_1 - \
+\[Theta]\_2)\)\^2\)\)], "Output"],
+
+Cell[BoxData[
+    \(\(DiffAll\ tripall\)\/\(N\ \((1 - \[Theta]\_1 - \[Theta]\_2)\)\^2\) + \
+\(DiffAll\ \((\(-1\) + \[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\))\)\)\/\(N\ \((1 \
+- \[Theta]\_1 - \[Theta]\_2)\)\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(r := \[PartialD]\_\(T\_1\)\ f\), "\[IndentingNewLine]", 
+    \(r\), "\[IndentingNewLine]", 
+    \(ReplaceRepeated[r, \ simprules]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(\[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \[Tau]\ \[Theta]\_1\ \
+\((\[Rho]\_1\/\(\((1 + \[Tau]\/\[Tau]\_1)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_1\)\)\) + \[Rho]\_2\/\(\((1 + \[Tau]\/\[Tau]\_2)\)\ \@\(1 + \
+\[Tau]\/\(\[Gamma]\^2\ \[Tau]\_2\)\)\) + \[Rho]\_3\/\(\((1 + \
+\[Tau]\/\[Tau]\_3)\)\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_3\)\)\))\)\)\/\(N\ T\_1\%2\ \((1 - \[Theta]\_1 - \[Theta]\_2)\)\)\)], \
+"Output"],
+
+Cell[BoxData[
+    \(\(DiffAll\ tr1\ \[Tau]\)\/\(N\ T\_1\%2\ \((1 - \[Theta]\_1 - \
+\[Theta]\_2)\)\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(r := \[PartialD]\_\(\[Rho]\_1\)\ f\), "\[IndentingNewLine]", 
+    \(r\), "\[IndentingNewLine]", 
+    \(ReplaceRepeated[r, \ simprules]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(1 - \[Theta]\_1 + \[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \[Theta]\_1 \
+- \[Theta]\_2 + \[ExponentialE]\^\(-\(\[Tau]\/T\_2\)\)\ \[Theta]\_2\)\/\(N\ \
+\((1 - \[Theta]\_1 - \[Theta]\_2)\)\ \((1 + \[Tau]\/\[Tau]\_1)\)\ \@\(1 + \
+\[Tau]\/\(\[Gamma]\^2\ \[Tau]\_1\)\)\)\)], "Output"],
+
+Cell[BoxData[
+    \(tripall\/\(DDone\ \@DDonesqrtarg\ N\ \((1 - \[Theta]\_1 - \
+\[Theta]\_2)\)\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(r := \[PartialD]\_\(\[Tau]\_1\)\ f\), "\[IndentingNewLine]", 
+    \(r\), "\[IndentingNewLine]", 
+    \(ReplaceRepeated[r, \ simprules]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(\((1 - \[Theta]\_1 + \[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \[Theta]\
+\_1 - \[Theta]\_2 + \[ExponentialE]\^\(-\(\[Tau]\/T\_2\)\)\ \[Theta]\_2)\)\ \
+\((\(\[Tau]\ \[Rho]\_1\)\/\(2\ \[Gamma]\^2\ \((1 + \[Tau]\/\[Tau]\_1)\)\ \((1 \
++ \[Tau]\/\(\[Gamma]\^2\ \[Tau]\_1\))\)\^\(3/2\)\ \[Tau]\_1\%2\) + \(\[Tau]\ \
+\[Rho]\_1\)\/\(\((1 + \[Tau]\/\[Tau]\_1)\)\^2\ \@\(1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_1\)\)\ \[Tau]\_1\%2\))\)\)\/\(N\ \((1 - \[Theta]\_1 - \
+\[Theta]\_2)\)\)\)], "Output"],
+
+Cell[BoxData[
+    \(\(tripall\ \((\(\[Tau]\ \[Rho]\_1\)\/\(DDone\^2\ \@DDonesqrtarg\ \[Tau]\
+\_1\%2\) + \(\[Tau]\ \[Rho]\_1\)\/\(2\ DDone\ DDonesqrtarg\^\(3/2\)\ \[Gamma]\
+\^2\ \[Tau]\_1\%2\))\)\)\/\(N\ \((1 - \[Theta]\_1 - \[Theta]\_2)\)\)\)], \
+"Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(r := \[PartialD]\_\[Gamma]\ f\), "\[IndentingNewLine]", 
+    \(r\), "\[IndentingNewLine]", 
+    \(ReplaceRepeated[r, \ simprules]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(\((1 - \[Theta]\_1 + \[ExponentialE]\^\(-\(\[Tau]\/T\_1\)\)\ \[Theta]\
+\_1 - \[Theta]\_2 + \[ExponentialE]\^\(-\(\[Tau]\/T\_2\)\)\ \[Theta]\_2)\)\ \
+\((\(\[Tau]\ \[Rho]\_1\)\/\(\[Gamma]\^3\ \((1 + \[Tau]\/\[Tau]\_1)\)\ \((1 + \
+\[Tau]\/\(\[Gamma]\^2\ \[Tau]\_1\))\)\^\(3/2\)\ \[Tau]\_1\) + \(\[Tau]\ \
+\[Rho]\_2\)\/\(\[Gamma]\^3\ \((1 + \[Tau]\/\[Tau]\_2)\)\ \((1 + \[Tau]\/\(\
+\[Gamma]\^2\ \[Tau]\_2\))\)\^\(3/2\)\ \[Tau]\_2\) + \(\[Tau]\ \[Rho]\_3\)\/\(\
+\[Gamma]\^3\ \((1 + \[Tau]\/\[Tau]\_3)\)\ \((1 + \[Tau]\/\(\[Gamma]\^2\ \
+\[Tau]\_3\))\)\^\(3/2\)\ \[Tau]\_3\))\)\)\/\(N\ \((1 - \[Theta]\_1 - \[Theta]\
+\_2)\)\)\)], "Output"],
+
+Cell[BoxData[
+    \(\(tripall\ \((\(\[Tau]\ \[Rho]\_1\)\/\(DDone\ DDonesqrtarg\^\(3/2\)\ \
+\[Gamma]\^3\ \[Tau]\_1\) + \(\[Tau]\ \[Rho]\_2\)\/\(DDtwo\ \
+DDtwosqrtarg\^\(3/2\)\ \[Gamma]\^3\ \[Tau]\_2\) + \(\[Tau]\ \
+\[Rho]\_3\)\/\(DDthree\ DDthreesqrt\^\(3/2\)\ \[Gamma]\^3\ \[Tau]\_3\))\)\)\/\
+\(N\ \((1 - \[Theta]\_1 - \[Theta]\_2)\)\)\)], "Output"]
+}, Open  ]]
+},
+FrontEndVersion->"5.0 for Microsoft Windows",
+ScreenRectangle->{{0, 1920}, {0, 1005}},
+WindowSize->{1519, 740},
+WindowMargins->{{0, Automatic}, {Automatic, 0}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 2428, 42, 745, "Input"],
+Cell[4207, 97, 527, 7, 88, "Output"],
+Cell[4737, 106, 112, 2, 44, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[4886, 113, 176, 3, 71, "Input"],
+Cell[5065, 118, 912, 13, 88, "Output"],
+Cell[5980, 133, 218, 3, 64, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6235, 141, 164, 3, 71, "Input"],
+Cell[6402, 146, 440, 7, 90, "Output"],
+Cell[6845, 155, 113, 2, 46, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6995, 162, 169, 3, 71, "Input"],
+Cell[7167, 167, 300, 4, 79, "Output"],
+Cell[7470, 173, 110, 2, 47, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[7617, 180, 169, 3, 71, "Input"],
+Cell[7789, 185, 504, 7, 88, "Output"],
+Cell[8296, 194, 256, 4, 68, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[8589, 203, 164, 3, 70, "Input"],
+Cell[8756, 208, 654, 9, 87, "Output"],
+Cell[9413, 219, 349, 5, 57, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

@@ -200,7 +200,6 @@ void QFRDRFCSRateEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecor
     //sliders->set_min(0);
     //sliders->set_max(m->getCorrelationN());
 
-    // TODO: read settings from project
     //readSettings();
 
 };
@@ -392,7 +391,6 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
     plotter->clearGraphs();
     ds->clear();
     //m->getProject()->setIntProperty();
-    // TODO: save  widget settings to project
     labRuns->setText(QString::number(m->getRateRuns()));
     labRatePoints->setText(QString::number(m->getRateN()));
 

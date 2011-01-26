@@ -546,6 +546,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
             QFFitParameterWidget::WidgetType wtype=QFFitParameterWidget::FloatEdit;
             if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidget::IntSpinBox;
+            if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidget::IntDropDown;
             bool editable=d.userEditable;
             bool displayFix=d.userEditable;
             bool displayError=d.displayError;
@@ -559,8 +560,13 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             fpw->setWidgetWidth(m_parameterWidgetWidth, m_parameterCheckboxWidth);
             fpw->setRangeEnabled(true);
             if (falg) fpw->setRangeEnabled(falg->get_supportsBoxConstraints());
-            QLabel* l=new QLabel(QString("<font size=\"+1\">%1:</font>").arg(d.label), this);
-            if (!d.unit.isEmpty()) l->setText(QString("<font size=\"+1\">%1 [%2]:</font>").arg(d.label).arg(d.unit));
+            QString label=d.label;
+            label.replace("<sub>", "<sub><font size=\"+2\">", Qt::CaseInsensitive);
+            label.replace("<sup>", "<sup><font size=\"+2\">", Qt::CaseInsensitive);
+            label.replace("</sup>", "</font></sup>", Qt::CaseInsensitive);
+            label.replace("</sub>", "</font></sub>", Qt::CaseInsensitive);
+            QLabel* l=new QLabel(QString("<i>%1</i>:").arg(d.label), this);
+            if (!d.unit.isEmpty()) l->setText(QString("<i>%1</i> [%2]:").arg(d.label).arg(d.unit));
             fpw->setToolTip(d.name);
             l->setToolTip(d.name);
             l->setTextFormat(Qt::RichText);
@@ -589,6 +595,7 @@ void QFFCSFitEvaluationEditor::parameterFixChanged(QString id, bool fix) {
 
 void QFFCSFitEvaluationEditor::parameterRangeChanged(QString id, double min, double max) {
     updateParameterValues();
+    replotData();
 }
 
 void QFFCSFitEvaluationEditor::updateParameterValues() {
@@ -777,6 +784,14 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
             ffunc->calcParameter(values, errors);
 
             double residSqrSum=0;
+
+            /*QString text="";
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                QString t="";
+                t=t.sprintf("  %s = %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), values[i]);
+                text=text+t;
+            }
+            QMessageBox::information(this, "plotting", text);*/
 
             for (int i=0; i<N; i++) {
                 double value=ffunc->evaluate(tauvals[i], values);

@@ -1,4 +1,5 @@
 #include "qffitalgorithm.h"
+#include "qftools.h"
 #include <QMessageBox>
 #include <QObject>
 #include <cfloat>
@@ -80,8 +81,11 @@ class privateQFFitAlgorithmFitFunctor: public QFFitAlgorithm::Functor {
 
         inline virtual void evaluate(double* evalout, double* params) {
             mapArrayFromFunctorToModel(modelParams, params);
+            double v;
             for (register int i=0; i<get_evalout(); i++) {
-                evalout[i]=(m_dataY[i]-m_model->evaluate(m_dataX[i], modelParams))/m_dataWeight[i];
+                v=(m_dataY[i]-m_model->evaluate(m_dataX[i], modelParams))/m_dataWeight[i];
+                if (!QFFloatIsOK(v)) v=0;
+                evalout[i]=v;
             }
         }
 

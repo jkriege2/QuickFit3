@@ -2,9 +2,16 @@
 #define QFTOOLS_H
 
 
+#include <cmath>
+#include <cfloat>
 #include <QSettings>
 #include <QWidget>
 #include <QSplitter>
+
+/*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
+    \ingroup qf3lib_mathtools
+ */
+#define QFFloatIsOK(v) (std::isfinite(v))
 
 /*! \brief round a value according to the error
     \ingroup qf3lib_mathtools

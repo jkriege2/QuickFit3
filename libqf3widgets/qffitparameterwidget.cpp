@@ -422,7 +422,7 @@ void QFFitParameterWidget::setRangeEnabled(bool enabled) {
 
 void QFFitParameterWidget::fillCombo(QComboBox* cmb, int min, int max) {
     cmb->clear();
-    for(int i=min; i<max; i++) {
+    for(int i=min; i<=max; i++) {
         cmb->addItem(QString::number(i), i);
     }
 }
