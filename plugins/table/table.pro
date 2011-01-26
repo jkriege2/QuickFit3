@@ -4,9 +4,9 @@ CONFIG += plugin
 
 TARGET = qfrdrtable
 DEPENDPATH += ./
-DLLDESTDIR = ../../output/plugins
-DESTDIR = ./
-LIBS += -L../../lib/ -lquickfit3lib -L../../libqf3widgets/ -lquickfit3widgets
+DESTDIR = ../../output/plugins
+DLLDESTDIR = $$DESTDIR
+LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += dlgcsvparameters.h \

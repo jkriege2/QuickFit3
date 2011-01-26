@@ -4,8 +4,8 @@ CONFIG += plugin
 
 TARGET = qffcsfitfuncs
 DEPENDPATH += ./
-DLLDESTDIR = ../../output/plugins/fitfunctions
-DESTDIR = ./
+DESTDIR = ../../output/plugins/fitfunctions
+DLLDESTDIR = $$DESTDIR
 LIBS +=
 
 # Input

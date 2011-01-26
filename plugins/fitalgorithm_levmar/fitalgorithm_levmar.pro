@@ -4,9 +4,9 @@ CONFIG += plugin
 
 TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
-DLLDESTDIR = ../../output/plugins/fitalgorithms
-DESTDIR = ./
-LIBS += -llevmar -L../../lib/ -lquickfit3lib
+DESTDIR = ../../output/plugins/fitalgorithms/
+DLLDESTDIR = $$DESTDIR
+LIBS += -llevmar -L../../output/ -lquickfit3lib 
 
 # Input
 HEADERS += fitalgorithm_levmar.h

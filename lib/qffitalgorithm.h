@@ -5,7 +5,7 @@
 #include <QString>
 #include <QMap>
 #include <QVariant>
-
+#include <stdint.h>
 /*! \brief describes a virtual base class fitting algorithms that are applied to QFFitFunction objects.
     \ingroup qf3lib_fitting
 

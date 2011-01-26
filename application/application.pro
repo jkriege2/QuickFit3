@@ -8,8 +8,7 @@ INCLUDEPATH += . \
                ../libqf3widgets/
 DESTDIR = ../output
 
-#QMAKE_CXXFLAGS += -fexceptions -msse -msse2 -mfpmath=387,sse -O2
-LIBS += -lgsl -lgslcblas -L../lib/ -lquickfit3lib -L../libqf3widgets/ -lquickfit3widgets
+LIBS += -lgsl -lgslcblas -L../output/ -lquickfit3lib -lquickfit3widgets
 # Input
 HEADERS += mainwindow.h \
            version.h \

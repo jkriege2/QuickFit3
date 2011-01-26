@@ -1,5 +1,6 @@
 #include "alv5000tools.h"
 #include <QLocale>
+#include <errno.h>
 
 
 

@@ -5,8 +5,8 @@ DEPENDPATH += .
 INCLUDEPATH += ../../../../LIB/trunk/
 
 QT += gui xml
-DESTDIR = ./
-DLLDESTDIR = ../output
+DESTDIR = ../output/
+DLLDESTDIR = $$DESTDIR
 
 # Input
 HEADERS += dlgnewproperty.h \

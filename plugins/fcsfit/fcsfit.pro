@@ -4,9 +4,9 @@ CONFIG += plugin
 
 TARGET = qfevalfcsfit
 DEPENDPATH += ./
-DLLDESTDIR = ../../output/plugins
-DESTDIR = ./
-LIBS += -lgsl -lgslcblas -L../../lib/ -lquickfit3lib -L../../libqf3widgets/ -lquickfit3widgets
+DESTDIR = ../../output/plugins
+DLLDESTDIR = $$DESTDIR
+LIBS += -lgsl -lgslcblas -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += qfpevalfcsfit.h \

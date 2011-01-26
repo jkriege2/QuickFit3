@@ -5,8 +5,8 @@ DEPENDPATH += .
 INCLUDEPATH += ../../../../LIB/trunk/
 
 QT += gui xml svg
-DESTDIR = ./
-DLLDESTDIR = ../output
+DESTDIR = ../output/
+DLLDESTDIR = $$DESTDIR
 
 # Input
 HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \

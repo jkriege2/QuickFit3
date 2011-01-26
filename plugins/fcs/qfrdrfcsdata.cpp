@@ -1,4 +1,5 @@
 #include "qfrdrfcsdata.h"
+#include <errno.h>
 
 QFRDRFCSData::QFRDRFCSData(QFProject* parent):
     QFRawDataRecord(parent)

@@ -2,7 +2,7 @@
 #define FCS_FITFUCTIONS_H
 
 #include "qfpluginfitalgorithm.h"
-#include <levmar.h>
+#include <levmar/levmar.h>
 
 /*!
     \defgroup qf3fitalgp_levmar Levmar Fitting Algorithm Plugin
