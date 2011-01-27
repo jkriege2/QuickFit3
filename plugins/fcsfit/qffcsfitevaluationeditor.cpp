@@ -902,8 +902,19 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
             printf("  %s = %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), initialparams[i]);
         }
 
+        // we also have to care for the data cutting
+        int cut_low=datacut->get_userMin();
+        int cut_up=datacut->get_userMax();
+        int cut_N=N-cut_low-(N-cut_up);
+        if (cut_N<0) {
+            cut_low=0;
+            cut_up=ffunc->paramCount()-1;
+            if (cut_up>=N) cut_up=N;
+            cut_N=cut_up;
+        }
+
         QTime tstart=QTime::currentTime();
-        QFFitAlgorithm::FitResult result=falg->fit(params, errors, taudata, corrdata, weights, N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+        QFFitAlgorithm::FitResult result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
         double deltaTime=(double)QTime::currentTime().msecsTo(tstart);
         ffunc->calcParameter(params, errors);
 

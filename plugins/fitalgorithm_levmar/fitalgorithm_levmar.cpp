@@ -48,10 +48,9 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
        The model already evaluates to f_i = ( y_i - m(x_i, p) ) / sigma_i, so we set the parameter vector to all 0
        then levmar evaluates 0-f_i = f_i and optimizes that.
     */
-    double* data=(double*)calloc(model->get_evalout(), sizeof(double));
 
     int ret=0;
-    ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, data, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+    ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
 
 
     result.params["initial_error_sum"]=info[0];
@@ -91,7 +90,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     printf("Levenberg-Marquardt returned in %g iter, reason %s, sumsq %g [%g]\n", info[5], reason.toStdString().c_str(), info[1], info[0]);
 
     result.message=QObject::tr("<b>levmar</b> returned after %1 iterations.<br>reason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason).arg(info[1]).arg(info[0]);
-    result.messageSimple=QObject::tr("levmar returned after %1 iterations.\nreason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason).arg(info[1]).arg(info[0]);
+    result.messageSimple=QObject::tr("levmar returned after %1 iterations.\nreason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason_simple).arg(info[1]).arg(info[0]);
 
     for (unsigned int i=0; i<paramCount; i++) {
         paramErrorsOut[i]=sqrt(covar[i*paramCount+i]);
@@ -99,7 +98,6 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     }
 
     free(covar);
-    free(data);
 
     result.fitOK=(ret!=LM_ERROR);
     return result;

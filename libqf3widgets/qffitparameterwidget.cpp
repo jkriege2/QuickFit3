@@ -2,6 +2,15 @@
 #include "tools.h"
 
 #include <limits.h>
+#include <cfloat>
+
+double roundError(double error, int addSignifcant) {
+    if (fabs(error)<DBL_MIN*10.0) return error;
+    int sbits_error=ceil(log(fabs(error))/log(10.0));
+    double f=pow(10.0, sbits_error-1-addSignifcant);
+    return round(error/f)*f;
+}
+
 
 QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datastore, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent):
     QWidget(parent)
@@ -204,7 +213,7 @@ void QFFitParameterWidget::reloadValues() {
     if (m_displayError && labError && (m_widgetType!=Header)) {
         double error=m_datastore->getFitError(m_parameterID);
         labError->setTextFormat(Qt::RichText);
-        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(error, 2, true).c_str()));
+        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
     }
     if (m_displayFix && m_editable && chkFix) {
         chkFix->setChecked(m_datastore->getFitFix(m_parameterID));
@@ -233,7 +242,7 @@ void QFFitParameterWidget::setValue(double value, double error, bool writeback) 
         cmbIntValue->setCurrentIndex(cmbIntValue->findData((int)value));    }
     if (m_displayError && labError && (m_widgetType!=Header)) {
         labError->setTextFormat(Qt::RichText);
-        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(error, 2, true).c_str()));
+        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
     }
 
     m_settingData=old_m_settingData;

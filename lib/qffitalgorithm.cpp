@@ -4,6 +4,8 @@
 #include <QObject>
 #include <cfloat>
 #include <cstdio>
+#include <iostream>
+
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) {
 }
@@ -12,119 +14,126 @@ void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) 
 
 
 
-class privateQFFitAlgorithmFitFunctor: public QFFitAlgorithm::Functor {
-    public:
-        privateQFFitAlgorithmFitFunctor(QFFitFunction* model, double* currentParams, bool* fixParams, double* dataX, double* dataY, double* dataWeight, uint64_t N):
-            QFFitAlgorithm::Functor(N)
-        {
-            m_model=model;
-            m_dataX=dataX;
-            m_dataY=dataY;
-            m_dataWeight=dataWeight;
-            m_N=N;
-            functorFromModel=NULL;
-            modelFromFunctor=NULL;
+QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* model, double* currentParams, bool* fixParams, double* dataX, double* dataY, double* dataWeight, uint64_t M):
+    QFFitAlgorithm::Functor(M)
+{
+    m_model=model;
+    m_dataX=dataX;
+    m_dataY=dataY;
+    m_dataWeight=dataWeight;
+    m_M=M;
+    m_N=model->paramCount();
+    functorFromModel=NULL;
+    modelFromFunctor=NULL;
 
-            // now we calculate the mapping of the data
-            m_paramCount=0;
-            for (int i=0; i<model->paramCount(); i++) {
-                if (!fixParams[i]) {
-                    QFFitFunction::ParameterDescription d=model->getDescription(i);
-                    if (d.fit) {
-                        m_paramCount++;
-                    }
-                }
-            }
-            functorFromModel=(int*)calloc(model->paramCount(), sizeof(int));
-            modelFromFunctor=(int*)calloc(m_paramCount, sizeof(int));
-            int pid=0;
-            for (int i=0; i<model->paramCount(); i++) {
-                functorFromModel[i]=-1;
-                if (!fixParams[i]) {
-                    QFFitFunction::ParameterDescription d=model->getDescription(i);
-                    if (d.fit && model->isParameterVisible(i, currentParams)) {
-                        functorFromModel[i]=pid;
-                        modelFromFunctor[pid]=i;
-                        //printf("   mapping m=%2d -> f=%2d [%s]\n", i, pid, d.id.toStdString().c_str());
-                        pid++;
-                    }
-                }
-            }
-            modelParams=(double*)calloc(model->paramCount(), sizeof(double));
-            for (int i=0; i<model->paramCount(); i++) {
-                modelParams[i]=currentParams[i];
-            }
-        };
-
-        ~privateQFFitAlgorithmFitFunctor() {
-            if (functorFromModel) free(functorFromModel);
-            if (modelFromFunctor) free(modelFromFunctor);
-            free(modelParams);
-        }
-
-        inline double* createMappedArrayForFunctor(double* modelData) {
-            double* result=(double*)calloc(m_paramCount, sizeof(double));
-
-            for (register int i=0; i<m_paramCount; i++) {
-                result[i]=modelData[modelFromFunctor[i]];
-            }
-
-            return result;
-        }
-
-        inline void mapArrayFromFunctorToModel(double* modelData, double* functorData) {
-            for (register int i=0; i<m_paramCount; i++) {
-                modelData[modelFromFunctor[i]]=functorData[i];
+    // now we calculate the mapping of the data
+    m_paramCount=0;
+    for (int i=0; i<m_N; i++) {
+        if (!fixParams[i]) {
+            QFFitFunction::ParameterDescription d=model->getDescription(i);
+            if (d.fit && model->isParameterVisible(i, currentParams)) {
+                m_paramCount++;
             }
         }
-
-
-        inline virtual void evaluate(double* evalout, double* params) {
-            mapArrayFromFunctorToModel(modelParams, params);
-            double v;
-            for (register int i=0; i<get_evalout(); i++) {
-                v=(m_dataY[i]-m_model->evaluate(m_dataX[i], modelParams))/m_dataWeight[i];
-                if (!QFFloatIsOK(v)) v=0;
-                evalout[i]=v;
+    }
+    functorFromModel=(int*)calloc(m_N, sizeof(int));
+    modelFromFunctor=(int*)calloc(m_paramCount, sizeof(int));
+    int pid=0;
+    for (int i=0; i<m_N; i++) {
+        functorFromModel[i]=-1;
+        if (!fixParams[i]) {
+            QFFitFunction::ParameterDescription d=model->getDescription(i);
+            if (d.fit && model->isParameterVisible(i, currentParams)) {
+                functorFromModel[i]=pid;
+                modelFromFunctor[pid]=i;
+                //printf("   mapping m=%2d -> f=%2d [%s]\n", i, pid, d.id.toStdString().c_str());
+                pid++;
             }
         }
-
-        void evaluateJacobian(double* evalout, double* params) {
-            mapArrayFromFunctorToModel(modelParams, params);
-            register int pcount=get_paramcount();
-            register int ecount=get_evalout();
-            double* p=(double*)calloc(pcount, sizeof(double));
-            for (register int i=0; i<ecount; i++) {
-                register int offset=i=pcount;
-                m_model->evaluateDerivatives(p, m_dataX[i], modelParams);
-                for (register int j=0; j<pcount; j++) {
-                    evalout[offset+j]=-1.0*p[j]/m_dataWeight[i];
-                }
-            }
-            free(p);
-        }
-
-        virtual bool get_implementsJacobian() const { return m_model->get_implementsDerivatives(); };
-
-        virtual int get_paramcount() const { return m_paramCount; };
-    protected:
-
-        QFFitFunction* m_model;
-        double* m_dataX;
-        double* m_dataY;
-        double* m_dataWeight;
-        uint64_t m_N;
-        int m_paramCount;
-        int* functorFromModel;
-        int* modelFromFunctor;
-        double* modelParams;
+    }
+    m_modelParams=(double*)calloc(m_N, sizeof(double));
+    for (int i=0; i<m_N; i++) {
+        m_modelParams[i]=currentParams[i];
+    }
 };
+
+QFFitAlgorithm::FitQFFitFunctionFunctor::~FitQFFitFunctionFunctor() {
+    free(functorFromModel);
+    free(modelFromFunctor);
+    free(m_modelParams);
+}
+
+double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(double* modelData) {
+    double* result=(double*)calloc(m_paramCount, sizeof(double));
+
+    for (register int i=0; i<m_paramCount; i++) {
+        result[i]=modelData[modelFromFunctor[i]];
+    }
+
+    return result;
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromModelToFunctor(double* functorData, double* modelData) {
+    for (register int i=0; i<m_paramCount; i++) {
+        functorData[i]=modelData[modelFromFunctor[i]];
+    }
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, double* functorData) {
+    for (register int i=0; i<m_paramCount; i++) {
+        modelData[modelFromFunctor[i]]=functorData[i];
+    }
+}
+
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, double* params) {
+    mapArrayFromFunctorToModel(m_modelParams, params);
+    /*std::cout<<"N="<<m_N<<" Q="<<m_paramCount<<" M="<<get_evalout()<<"  P = ( ";
+    for (register int i=0; i<m_N; i++) {
+        if (i>0) std::cout<<", ";
+        std::cout<<m_modelParams[i];
+    }*/
+    /*std::cout<<"P = ( ";
+    for (register int i=0; i<m_paramCount; i++) {
+        if (i>0) std::cout<<", ";
+        std::cout<<params[i];
+    }
+    std::cout<<" )\n";*/
+    register double v;
+    register int ecount=get_evalout();
+    for (register int i=0; i<ecount; i++) {
+        v = ( m_dataY[i] - m_model->evaluate(m_dataX[i], m_modelParams) ) / m_dataWeight[i];
+        if (!QFFloatIsOK(v)) {
+            if (i>0) v=evalout[i-1];
+            else v=0;
+        }
+        evalout[i]=v;
+    }
+    mapArrayFromModelToFunctor(params, m_modelParams);
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, double* params) {
+    mapArrayFromFunctorToModel(m_modelParams, params);
+    register int pcount=get_paramcount();
+    register int ecount=get_evalout();
+    double* p=(double*)calloc(pcount, sizeof(double));
+    for (register int i=0; i<ecount; i++) {
+        register int offset=i*pcount;
+        m_model->evaluateDerivatives(p, m_dataX[i], m_modelParams);
+        for (register int j=0; j<pcount; j++) {
+            evalout[offset+j]=-1.0*p[j]/m_dataWeight[i];
+        }
+    }
+    free(p);
+}
+
 
 
 QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams, double* paramsMin, double* paramsMax) {
     QFFitAlgorithm::FitResult result;
     double* pparamsMin=paramsMin;
     double* pparamsMax=paramsMax;
+    double* ddataWeight=dataWeight;
     bool* pparamsFix=fixParams;
     if (paramsMin==NULL) {
         pparamsMin=(double*)calloc(model->paramCount(), sizeof(double));
@@ -138,6 +147,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
             pparamsMax[i]=DBL_MAX;
         }
     }
+    if (dataWeight==NULL) {
+        ddataWeight=(double*)calloc(N, sizeof(double));
+        for (uint64_t i=0; i<N; i++) {
+            ddataWeight[i]=1.0;
+        }
+    }
     if (fixParams==NULL) {
         pparamsFix=(bool*)calloc(model->paramCount(), sizeof(bool));
         for (int i=0; i<model->paramCount(); i++) {
@@ -145,7 +160,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
         }
     }
 
-    privateQFFitAlgorithmFitFunctor fm(model, initialParams, pparamsFix, dataX, dataY, dataWeight, N);
+    QFFitAlgorithm::FitQFFitFunctionFunctor fm(model, initialParams, pparamsFix, dataX, dataY, ddataWeight, N);
     double* tparamsMin=fm.createMappedArrayForFunctor(pparamsMin);
     double* tparamsMax=fm.createMappedArrayForFunctor(pparamsMax);
     double* tparamsOut=(double*)calloc(fm.get_paramcount(), sizeof(double));
@@ -170,6 +185,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     if (paramsMin==NULL) free(pparamsMin);
     if (paramsMax==NULL) free(pparamsMax);
     if (fixParams==NULL) free(pparamsFix);
+    if (dataWeight==NULL) free(ddataWeight);
     return result;
 }
 

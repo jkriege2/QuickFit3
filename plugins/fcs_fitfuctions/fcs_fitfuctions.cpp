@@ -85,24 +85,21 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
         double reltau2=0;
         if (tauD2!=0) reltau2=t/tauD2;
         d2=rho2/(1.0+reltau2)/sqrt(1.0+reltau2/gamma2);
-        rho1=rho1-rho2;
+        rho1=1.0-rho2;
     }
     if (comp>2) {
         double reltau3=0;
-        if (tauD3!=0) reltau1=t/tauD3;
+        if (tauD3!=0) reltau3=t/tauD3;
         d3=rho3/(1.0+reltau3)/sqrt(1.0+reltau3/gamma2);
         rho1=1.0-rho2-rho3;
     }
-    double t1=0, t2=0, tnorm=1.0;
-    if (nonfl_comp>0) {
-        if (nf_tau1!=0) t1=nf_theta1*(1.0-exp(-t/nf_tau1));
-        tnorm=1.0-nf_theta1;
+    double pre=1.0;
+    if (nonfl_comp==1) {
+        pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1))/(1.0-nf_theta1);
+    } else if (nonfl_comp==2) {
+        pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
     }
-    if (nonfl_comp>1) {
-        if (nf_tau2!=0) t2=nf_theta2*(1.0-exp(-t/nf_tau2));
-        tnorm=1.0-nf_theta1-nf_theta2;
-    }
-    return offset+((1.0-t1-t2)/tnorm*(rho1*d1+d2+d3)/N);
+    return offset+pre/N*(rho1*d1+d2+d3);
 }
 
 void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
@@ -206,7 +203,12 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         // sort diffusion times in ascending order
         if (tauD1<tauD2) {
             if (tauD2<tauD3) { // tauD1<tauD2<tauD3
-                // correct order
+                data[FCSDiff_diff_tau1]=tauD1;
+                data[FCSDiff_diff_rho1]=rho1;
+                data[FCSDiff_diff_tau2]=tauD2;
+                data[FCSDiff_diff_rho2]=rho2;
+                data[FCSDiff_diff_tau3]=tauD3;
+                data[FCSDiff_diff_rho3]=rho3;
             } else { // tauD3<tauD2
                 if (tauD1<tauD3) { // tauD1<tauD3<tauD2
                     data[FCSDiff_diff_tau1]=tauD1;
