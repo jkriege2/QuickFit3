@@ -16,21 +16,26 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
     public:
         QFFitFunctionFCSDiff();
         virtual ~QFFitFunctionFCSDiff() {}
-        /** \brief return a name for the model */
+        /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QString("FCS: Normal Diffusion 3D"); };
-        /** \brief return a short unique model ID string */
+        /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diff"); };
-        /** \brief return a HTML file to be displayed as model help */
+        /*! \copydoc QFFitFunction::helpFile()   */
         virtual QString helpFile() const { return id()+".html"; };
 
-        /** \brief evaluate the fitting function with the given parameter vector */
+        /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* data) const;
 
-        /** \brief calculate non-fit parameters, i.e. fit=userEditable=false */
+        /*! \copydoc QFFitFunction::calcParameter()   */
         virtual void calcParameter(double* data, double* error=NULL) const;
 
-        /** \brief returns \c true if the given parameter is currently visible (which could e.g. depend on the setting of the other parameters) */
+        /*! \copydoc QFFitFunction::isParameterVisible()   */
         virtual bool isParameterVisible(int parameter, double* data) const;
+        /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
+        virtual unsigned int getAdditionalPlotCount(const double* params);
+
+        /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
 };
 

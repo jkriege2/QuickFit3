@@ -20,9 +20,14 @@
 #include <QTextEdit>
 #include <QToolBox>
 #include <QTabWidget>
+#include <QGridLayout>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 #include "datacutslider.h"
 #include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
+#include "jkverticalscrollarea.h"
 
 /*! \brief editor class for FCS least-square fits
     \ingroup qf3evalp_fcsfit
@@ -114,9 +119,9 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnFitCurrent;
 
         /** \brief scroll area for the fit parameters */
-        QScrollArea* scrollParameters;
+        JKVerticalScrollArea* scrollParameters;
         /** \brief layout that is used to display fit parameters */
-        QFormLayout* layParameters;
+        QGridLayout* layParameters;
 
         /** \brief this list contains all currently displayed fitParameterWidgets */
         QList<QPointer<QFFitParameterWidget> > m_fitParameters;

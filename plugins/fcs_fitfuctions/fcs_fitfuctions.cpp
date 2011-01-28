@@ -9,50 +9,50 @@
 #define NAVOGADRO (6.02214179e23)
 
 QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
-    //           type,         id,                        name,                                                    label,                      unit,       fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc
-    addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",         false,     true,         false,             false,        1,            0,        2,        1    );
+    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc, absMin, absMax
+    addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             false,        1,            0,        2,        1,   0,      2);
     #define FCSDiff_n_nonfluorescent 0
-    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",         false,     true,         false,             false,        1,            1,        3,        1    );
+    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             false,        1,            1,        3,        1,   1,      2);
     #define FCSDiff_n_components 1
-    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",     true,      true,         false,             true,         3.0,          0,        10,       0.1  );
+    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              true,         3.0,          0,        10,       0.1, 0  );
     #define FCSDiff_nonfl_tau1 2
-    addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",         true,      true,         false,             true,         0.2,          0,        0.99999,  0.1  );
+    addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",            "",                      true,      true,         true,              true,         0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSDiff_nonfl_theta1 3
-    addParameter(FloatNumber,  "nonfl_tau2",              "dark component 2 decay time",                           "&tau;<sub>dark,2</sub>",   "usec",     true,      true,         false,             true,         300,          1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "nonfl_tau2",              "dark component 2 decay time",                           "&tau;<sub>dark,2</sub>",   "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1e-10,    1e5,      1,   0);
     #define FCSDiff_nonfl_tau2 4
-    addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",         true,      true,         false,             true,         0.2,          0,        0.99999,  0.1  );
+    addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              true,         0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSDiff_nonfl_theta2 5
-    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",         true,      true,         true,              true,         10,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              true,         10,           1e-10,    1e5,      1,   0);
     #define FCSDiff_n_particle 6
-    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",         false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1  );
+    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSDiff_1n_particle 7
-    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",         false,     false,        false,             false,        0.5,          0,        0.99999,        0.1  );
+    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             true,         0.5,          0,        0.99999,  0.1, 0,      1);
     #define FCSDiff_diff_rho1 8
-    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",     true,      true,         true,              true,         30,           1,        1e5,      1    );
+    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         30,           1,        1e5,      1,   0        );
     #define FCSDiff_diff_tau1 9
-    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",         true,      true,         false,             true,         0.5,          0,        0.99999,        0.1  );
+    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              true,         0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSDiff_diff_rho2 10
-    addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",     true,      true,         true,              true,         300,          1,        1e8,      1    );
+    addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1,        1e8,      1,   0    );
     #define FCSDiff_diff_tau2 11
-    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",         true,      true,         false,             true,         0.5,          0,        0.99999,        0.1  );
+    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              true,         0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSDiff_diff_rho3 12
-    addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",     true,      true,         true,              true,         300,          1,        1e8,      1    );
+    addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1,        1e8,      1    );
     #define FCSDiff_diff_tau3 13
-    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infty;</sub>",       "",        true,      true,         true,              true,         0,            -10,      10,       0.1  );
+    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                      true,      true,         true,              true,         0,            -10,      10,       0.1  );
     #define FCSDiff_offset 14
-    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                   "",        true,      true,         true,              true,         6,            0.01,     100,      0.5  );
+    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                      true,      true,         true,              true,         6,            0.01,     100,      0.5  );
     #define FCSDiff_focus_struct_fac 15
-    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",           "nm",      false,     true,        false,              true,         250,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                    false,     true,        false,              true,         250,          0,        1e4,      1    );
     #define FCSDiff_focus_width 16
-    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",           "fl",      false,    false,        false,              true,         0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                    false,    false,        false,              true,         0.5,          0,        1e50,     1    );
     #define FCSDiff_focus_volume 17
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",           "nM",      false,    false,        false,              true,         0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                    false,    false,        false,              true,         0.5,          0,        1e50,     1    );
     #define FCSDiff_concentration 18
-    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",             "micron^2/s", false, false,        false,              true,         500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",   false,    false,        false,              true,         500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff1 19
-    addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",             "micron^2/s", false, false,        false,              true,         500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",   false,    false,        false,              true,         500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff2 20
-    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",             "micron^2/s", false, false,        false,              true,         500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",   false,    false,        false,              true,         500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff3 21
 }
 
@@ -365,6 +365,14 @@ bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, double* data) const
     return true;
 }
 
+unsigned int QFFitFunctionFCSDiff::getAdditionalPlotCount(const double* params) {
+    return 1;
+}
+
+QString QFFitFunctionFCSDiff::transformParametersForAdditionalPlot(int plot, double* params) {
+    params[FCSDiff_n_nonfluorescent]=0;
+    return "without non-fluorescent";
+}
 
 
 
@@ -372,12 +380,12 @@ bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, double* data) const
 
 
 QFFitFunctionFCSADiff::QFFitFunctionFCSADiff() {
-    //           type,         id,                name,                                 label,                      unit,       fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc
-    addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N",                        "",         true,      true,         true,              true,         10,           1e-10,    1e5,      1    );
-    addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N",                      "",         false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1  );
-    addParameter(FloatNumber,  "diff_tau1",       "Diffusion time of first component",  "&tau;<sub>D,1</sub>",      "usec",     true,      true,         true,              true,         30,           1e-10,    1e5,      1    );
-    addParameter(FloatNumber,  "alpha",           "Anomality parameter",                "&alpha;",                  ""    ,     true,      true,         true,              true,         1,            0.000001, 100,      0.1  );
-    addParameter(FloatNumber,  "focus_struct_fac","Focus: axial ratio",                 "&gamma;<sub>Laser</sub>",  "",         true,      true,         true,              true,         6,            0.01,     100,      0.5  );
+    //           type,         id,                name,                                 label,                      unit,       unitlabel,              fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc
+    addParameter(FloatNumber,  "n_particle",      "Particle number N",                  "N",                        "",         "",                     true,      true,         true,              true,         10,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "1n_particle",     "1/Particle number N",                "1/N",                      "",         "",                     false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1  );
+    addParameter(FloatNumber,  "diff_tau1",       "Diffusion time of first component",  "&tau;<sub>D,1</sub>",      "usec",     "&mu;s",                true,      true,         true,              true,         30,           1e-10,    1e5,      1    );
+    addParameter(FloatNumber,  "alpha",           "Anomality parameter",                "&alpha;",                  "",         "",                     true,      true,         true,              true,         1,            0.000001, 100,      0.1  );
+    addParameter(FloatNumber,  "focus_struct_fac","Focus: axial ratio",                 "&gamma;<sub>Laser</sub>",  "",         "",                     true,      true,         true,              true,         6,            0.01,     100,      0.5  );
 }
 
 double QFFitFunctionFCSADiff::evaluate(double t, const double* data) const {

@@ -266,14 +266,17 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
 
 
-    scrollParameters=new QScrollArea(this);
+    scrollParameters=new JKVerticalScrollArea(this);
     layModel->addWidget(scrollParameters, 100);
     layModel->setSpacing(2);
     QWidget* widParameters=new QWidget(this);
     scrollParameters->setWidget(widParameters);
     scrollParameters->setWidgetResizable(true);
-    layParameters=new QFormLayout(this);
+    layParameters=new QGridLayout(this);
     layParameters->setSpacing(2);
+    layParameters->setVerticalSpacing(1);
+    layParameters->setHorizontalSpacing(0);
+    layParameters->setMargin(4);
     widParameters->setLayout(layParameters);
 
 
@@ -493,15 +496,11 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
-                QWidget* label=layParameters->labelForField(m_fitParameters[i]);
-                layParameters->removeWidget(label);
-                layParameters->removeWidget(m_fitParameters[i]);
                 disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
                 disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
                 disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
                 disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
                 delete m_fitParameters[i];
-                delete label;
             }
         }
         m_fitParameters.clear();
@@ -516,27 +515,29 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
-                QWidget* label=layParameters->labelForField(m_fitParameters[i]);
-                layParameters->removeWidget(label);
-                layParameters->removeWidget(m_fitParameters[i]);
                 disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(unsetEditValues(bool)));
                 disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
                 disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
                 disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
                 delete m_fitParameters[i];
-                delete label;
             }
         }
-        m_fitParameters.clear();
+        // remove all widgets from layout
+        QLayoutItem *child;
+        while ((child = layParameters->takeAt(0)) != 0) {
+            delete child;
+        }
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create header widget
         /////////////////////////////////////////////////////////////////////////////////////////////
-        QFFitParameterWidget* header=new QFFitParameterWidget(eval, "", QFFitParameterWidget::Header, true, true, true, true, this);
-        layParameters->addRow("", header);
+        QFFitParameterWidget* header=new QFFitParameterWidget(eval, layParameters, 0, "", QFFitParameterWidget::Header, true, true, true, true, this, tr("parameter"));
         m_fitParameters.append(header);
         connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
+        connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(unsetEditValues(bool)));
         header->setEditRange(btnEditRanges->isChecked());
+        header->unsetEditValues(!btnEditRanges->isChecked());
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create new parameter widgets
@@ -554,33 +555,34 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             if (!d.fit) {
                 displayFix=false;
             }
-            QFFitParameterWidget* fpw=new QFFitParameterWidget(eval, id, wtype, editable, displayFix, displayError, editRange, this);
+            QString l=QString("<font size=\"+1\">%1</font>:").arg(d.label);
+            if (!d.unit.isEmpty()) l=QString("<font size=\"+1\">%1 [%2]</font>:").arg(d.label).arg(d.unitLabel);
+            l.replace("<sub>", "<sub><font size=\"+2\">", Qt::CaseInsensitive);
+            l.replace("<sup>", "<sup><font size=\"+2\">", Qt::CaseInsensitive);
+            l.replace("</sup>", "</font></sup>", Qt::CaseInsensitive);
+            l.replace("</sub>", "</font></sub>", Qt::CaseInsensitive);
+            QFFitParameterWidget* fpw=new QFFitParameterWidget(eval, layParameters, i+1, id, wtype, editable, displayFix, displayError, editRange, this, l);
             fpw->setUnit(d.unit);
             fpw->setIncrement(d.inc);
-            fpw->setWidgetWidth(m_parameterWidgetWidth, m_parameterCheckboxWidth);
+            fpw->setWidgetWidth(m_parameterWidgetWidth);
             fpw->setRangeEnabled(true);
+            fpw->setValueAbsoluteRange(d.absMinValue, d.absMaxValue);
             if (falg) fpw->setRangeEnabled(falg->get_supportsBoxConstraints());
-            QString label=d.label;
-            label.replace("<sub>", "<sub><font size=\"+2\">", Qt::CaseInsensitive);
-            label.replace("<sup>", "<sup><font size=\"+2\">", Qt::CaseInsensitive);
-            label.replace("</sup>", "</font></sup>", Qt::CaseInsensitive);
-            label.replace("</sub>", "</font></sub>", Qt::CaseInsensitive);
-            QLabel* l=new QLabel(QString("<i>%1</i>:").arg(d.label), this);
-            if (!d.unit.isEmpty()) l->setText(QString("<i>%1</i> [%2]:").arg(d.label).arg(d.unit));
             fpw->setToolTip(d.name);
-            l->setToolTip(d.name);
-            l->setTextFormat(Qt::RichText);
-            layParameters->addRow(l, fpw);
             m_fitParameters.append(fpw);
+            connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(unsetEditValues(bool)));
             connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
             connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
             connect(fpw, SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
             connect(fpw, SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
             fpw->setEditRange(btnEditRanges->isChecked());
+            fpw->unsetEditValues(btnEditRanges->isChecked());
         }
+        // add stretcher item in bottom row
+        layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
     }
-    if (eval->hasFit()) labFitParameters->setText(tr("<u>Local Fit Parameters:</u>"));
-    else labFitParameters->setText(tr("<u>Global Fit Parameters:</u>"));
+    if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
+    else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
     updateParameterValues();
 }
 
@@ -607,9 +609,9 @@ void QFFCSFitEvaluationEditor::updateParameterValues() {
 
     if (!ffunc) return;
 
-    double* values=eval->allocFillParameters();
+    double* fullParams=eval->allocFillParameters();
     double* errors=eval->allocFillParameterErrors();
-    ffunc->calcParameter(values, errors);
+    ffunc->calcParameter(fullParams, errors);
 
 
     for (int i=0; i<m_fitParameters.size(); i++) {
@@ -618,15 +620,15 @@ void QFFCSFitEvaluationEditor::updateParameterValues() {
             QString id=m_fitParameters[i]->parameterID();
             int num=ffunc->getParameterNum(id);
             if (!id.isEmpty()) {
-                if (num>=0) m_fitParameters[i]->setValue(values[num], errors[num], false);
-                bool visible=ffunc->isParameterVisible(ffunc->getParameterNum(id), values);
+                if (num>=0) m_fitParameters[i]->setValue(fullParams[num], errors[num], false);
+                bool visible=ffunc->isParameterVisible(ffunc->getParameterNum(id), fullParams);
                 m_fitParameters[i]->setVisible(visible);
-                layParameters->labelForField(m_fitParameters[i])->setVisible(visible);
+                //layParameters->labelForField(m_fitParameters[i])->setVisible(visible);
             }
         }
     }
 
-    free(values);
+    free(fullParams);
     free(errors);
 }
 
@@ -762,6 +764,9 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     if (data->getCorrelationN()>0) {
         int c_tau=ds->getColumnNum("tau");
         if (c_tau>=0) { // we only add a graph, if we have a column with tau values
+            /////////////////////////////////////////////////////////////////////////////////
+            // retrieve data and tau-values from rawdata record
+            /////////////////////////////////////////////////////////////////////////////////
             long N=data->getCorrelationN();
             double* fitfunc=(double*)malloc(N*sizeof(double));
             double* residuals=(double*)malloc(N*sizeof(double));
@@ -777,24 +782,20 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
             }
 
+            /////////////////////////////////////////////////////////////////////////////////
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters
-            double* values=eval->allocFillParameters();
+            /////////////////////////////////////////////////////////////////////////////////
+            double* fullParams=eval->allocFillParameters();
             double* errors=eval->allocFillParameterErrors();
-            ffunc->calcParameter(values, errors);
+            ffunc->calcParameter(fullParams, errors);
 
+            /////////////////////////////////////////////////////////////////////////////////
+            // calculate model function values, residuals and residual parameters
+            /////////////////////////////////////////////////////////////////////////////////
             double residSqrSum=0;
-
-            /*QString text="";
-            for (int i=0; i<ffunc->paramCount(); i++) {
-                QString t="";
-                t=t.sprintf("  %s = %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), values[i]);
-                text=text+t;
-            }
-            QMessageBox::information(this, "plotting", text);*/
-
             for (int i=0; i<N; i++) {
-                double value=ffunc->evaluate(tauvals[i], values);
+                double value=ffunc->evaluate(tauvals[i], fullParams);
                 //di_fit->set(0, i, value);
                 //di_resid->set(0,0,value)
                 fitfunc[i]=value;
@@ -802,14 +803,12 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 residSqrSum+=residuals[i]*residuals[i];
             }
 
-            free(values);
-            free(errors);
 
             size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
-            free(fitfunc);
-            size_t c_taures=c_tau;//dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
-            size_t c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
-            free(residuals);
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // plot fit model and additional function graphs
+            /////////////////////////////////////////////////////////////////////////////////
             JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData);
             g_fit->set_drawLine(true);
             g_fit->set_title("fit function");
@@ -817,8 +816,34 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
             g_fit->set_yColumn(c_fit);
             g_fit->set_datarange_start(datacut->get_userMin());
             g_fit->set_datarange_end(datacut->get_userMax());
+            for (int i=0; i<ffunc->getAdditionalPlotCount(fullParams); i++) {
+                double* params=eval->allocFillParameters();
+                QString name=ffunc->transformParametersForAdditionalPlot(i, params);
+                double* afitfunc=(double*)malloc(N*sizeof(double));
+                for (int j=0; j<N; j++) {
+                    afitfunc[j]=ffunc->evaluate(tauvals[j], params);
+                }
+                size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i).toStdString());
+                JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData);
+                g_afit->set_drawLine(true);
+                g_afit->set_title(name);
+                g_afit->set_xColumn(c_tau);
+                g_afit->set_yColumn(c_afit);
+                g_afit->set_datarange_start(datacut->get_userMin());
+                g_afit->set_datarange_end(datacut->get_userMax());
+                pltData->addGraph(g_afit);
+                free(params);
+                free(afitfunc);
+            }
             pltData->addGraph(g_fit);
 
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // plot residuals
+            /////////////////////////////////////////////////////////////////////////////////
+            size_t c_taures=c_tau;//dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
+            size_t c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
+            free(residuals);
             JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals);
             g_residuals->set_drawLine(false);
             g_residuals->set_title("residuals");
@@ -831,7 +856,18 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
             g_residuals->set_symbol(JKQTPcross);
             pltResiduals->addGraph(g_residuals);
 
+            /////////////////////////////////////////////////////////////////////////////////
+            // updtae display of fit results
+            /////////////////////////////////////////////////////////////////////////////////
             txtFitStatistics->setHtml(tr("<font size=\"+2\">&chi;<sup>2</sup></font> = %1").arg(residSqrSum));
+
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // clean memory
+            /////////////////////////////////////////////////////////////////////////////////
+            free(fullParams);
+            free(errors);
+            free(fitfunc);
         }
     }
 
@@ -915,7 +951,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
 
         QTime tstart=QTime::currentTime();
         QFFitAlgorithm::FitResult result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-        double deltaTime=(double)QTime::currentTime().msecsTo(tstart);
+        double deltaTime=(double)tstart.msecsTo(QTime::currentTime());
         ffunc->calcParameter(params, errors);
 
         for (int i=0; i<ffunc->paramCount(); i++) {
@@ -960,6 +996,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
                     eval->setFitResultValueInt("fitalg_"+it.key(), it.value().toInt()); break;
                 case QVariant::Bool:
                     eval->setFitResultValueBool("fitalg_"+it.key(), it.value().toBool()); break;
+                default: break;
             }
         }
         // clean temporary parameters
@@ -1061,7 +1098,7 @@ void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
     QString ppid=cmbModel->itemData(cmbModel->currentIndex()).toString();
     int pid=services->getFitFunctionManager()->getPluginForID(ppid);
     QString dll=services->getFitFunctionManager()->getFilename(pid);
-    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).completeBaseName()+QString("/");
+    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).baseName()+QString("/");
     //std::cout<<sl[1].toStdString()<<std::endl;
     hlpFunction->setSearchPath(sl);
     if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), data->getFitFunction(ppid)->id()+".html");
@@ -1079,7 +1116,7 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     int ppid=services->getFitAlgorithmManager()->getPluginForID(pid);
     std::cout<<pid.toStdString()<<"   "<<ppid<<std::endl;
     QString dll=services->getFitAlgorithmManager()->getFilename(ppid);
-    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).completeBaseName()+QString("/");
+    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).baseName()+QString("/");
     std::cout<<sl[1].toStdString()<<std::endl;
     hlpAlgorithm->setSearchPath(sl);
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);

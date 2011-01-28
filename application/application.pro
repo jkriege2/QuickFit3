@@ -8,7 +8,7 @@ INCLUDEPATH += . \
                ../libqf3widgets/
 DESTDIR = ../output
 
-LIBS += -lgsl -lgslcblas -L../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -L../output/ -lquickfit3lib -lquickfit3widgets
 # Input
 HEADERS += mainwindow.h \
            version.h \

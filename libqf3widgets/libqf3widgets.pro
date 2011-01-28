@@ -2,7 +2,13 @@ TEMPLATE = lib
 TARGET = quickfit3widgets
 DEPENDPATH += .
 
-INCLUDEPATH += ../../../../LIB/trunk/
+INCLUDEPATH += ../../../../LIB/trunk/ \
+               . \
+               ../lib/
+
+DESTDIR = ../output
+
+LIBS += -L../output/ -lquickfit3lib
 
 QT += gui xml svg
 DESTDIR = ../output/
@@ -25,6 +31,7 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/datatable2.h \
            ../../../../LIB/trunk/qt/numberedit.h \
            ../../../../LIB/trunk/qt/jkdoubleedit.h \
+           ../../../../LIB/trunk/qt/jkverticalscrollarea.h \
            qehtreeview.h \
            datacutslider.h \
            qfhtmlhelpwindow.h \
@@ -49,6 +56,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/datatable2.cpp \
            ../../../../LIB/trunk/qt/numberedit.cpp \
            ../../../../LIB/trunk/qt/jkdoubleedit.cpp \
+           ../../../../LIB/trunk/qt/jkverticalscrollarea.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
            qfhtmlhelpwindow.cpp \

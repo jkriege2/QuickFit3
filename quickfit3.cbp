@@ -198,6 +198,8 @@
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtfastplotter.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpgeoelements.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtpgeoelements.h" />
+		<Unit filename="..\..\..\LIB\trunk\qt\jkverticalscrollarea.cpp" />
+		<Unit filename="..\..\..\LIB\trunk\qt\jkverticalscrollarea.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\numberedit.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\numberedit.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qtshortcutwidgets.h">

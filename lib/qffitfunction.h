@@ -4,6 +4,8 @@
 #include <QString>
 #include <QList>
 #include <QStringList>
+#include <cfloat>
+#include <cmath>
 
 /*! \brief describes a virtual base class fitting functions that are used together with QFFitAlgorithm objects.
     \ingroup qf3lib_fitting
@@ -28,6 +30,7 @@
       - \c name: description of the parameter, e.g. "particle number N"
       - \c label: a label for the parameter, e.g. "<i>N</i>" You may use HTML markup for this
       - \c unit: unit of the parameter, e.g. "usec", "g"
+      - \c unitLabel: unit of the parameter, e.g. "&mu;s", "g" as HTML markupped label
       - \c fit: \c true if this parameter is a fit parameter
       - \c userEditable: \c true if the parameter may be edited by the user
       - \c displayError: \c true if a widget shall be displayed that shows the error associated with this parameter
@@ -35,10 +38,19 @@
       - \c initialValue: an initial value for the parameter
       - \c minValue: initial minimal value for the parameter
       - \c maxValue: initial maximal value for the parameter
+      - \c absMinValue: absolute minimal value for the parameter, or \c -DBL_MAX if disabled
+      - \c absMaxValue: absolute maximal value for the parameter, or \c DBL_MAX if disabled
       - \c inc: increment if a user clicks on a "+" or "" button in the widget used to edit the parameter (spin boxes)
     .
 
     You have to declare all used parameters in the constructor by calling addParameter().
+
+    It is also possible to define transformed parameter sets for plotting. By default the function graph with the full parameter
+    set should be plottet. If you define additional graphs, you have to implement getAdditionalPlotCount() and transformParametersForAdditionalPlot().
+    The first function should return the number of additional plots whereas the second transforms the plot parameters so they may be used to
+    plot the additional function by calling evaluate().
+
+    \todo add possibility to make fit function editable
 
 */
 class QFFitFunction {
@@ -58,10 +70,12 @@ class QFFitFunction {
             QString id;
             /** \brief description of the parameter, e.g. "particle number N" */
             QString name;
-            /** \brief a label for the parameter, e.g. "<i>N</i>" You may use HTML markup for this */
+            /** \brief a label for the parameter, e.g. "<i>N</i>". You may use HTML markup for this */
             QString label;
             /** \brief unit of the parameter, e.g. "usec", "g"  */
             QString unit;
+            /** \brief unit label of the parameter, e.g. "&mu;s", "g". You may use HTML markup for this  */
+            QString unitLabel;
             /** \brief is this a fitting parameter, if \c false the user may supply a value, but the value will never be changed by the fitting
              *         algorithm. Use this e.g. to configure a model (number of components, ...) */
             bool fit;
@@ -80,6 +94,10 @@ class QFFitFunction {
             double maxValue;
             /** \brief value increment for the widget associated with the parameter */
             double inc;
+            /** \brief absolute minimum value of the parameter range (if supported by algorithm), or \c -DBL_MAX if disabled */
+            double absMinValue;
+            /** \brief absolute maximum value of the parameter range (if supported by algorithm), or \c DBL_MAX if disabled */
+            double absMaxValue;
 
             ParameterDescription() {
                 type=Invalid;
@@ -95,6 +113,8 @@ class QFFitFunction {
                 minValue=0;
                 maxValue=0;
                 inc=1;
+                absMinValue=-DBL_MAX;
+                absMaxValue=DBL_MAX;
             }
         };
 
@@ -144,6 +164,18 @@ class QFFitFunction {
             \param parameterValues the parameter values on which to base the decission
         */
         virtual bool isParameterVisible(int parameter, double* parameterValues) const { return true; };
+
+        /*! \brief return the number of graphs that should be plotted additional to the function grph itself
+            \param params The decision may be based on this parameter set.
+        */
+        virtual unsigned int getAdditionalPlotCount(const double* params) { return 0; }
+
+        /*! \brief transform the given parameter vector so tht it my be used to plot the \a plot -th additional graph
+            \param plot the number of the plot to plot
+            \param[in,out] params parameter vector. This is assumed to be filled with the full parameters when the function is called
+            \return label/name for the graph
+        */
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) { return QString(""); }
 
         /** \brief returns the description of the i-th parameter */
         ParameterDescription getDescription(int i) const  {
@@ -196,16 +228,16 @@ class QFFitFunction {
         /*! \brief add a parameter description
 
             used in the constructor to define the model parameters
-            \param description parameter description to be aded
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, bool fit, bool userEditable, bool userRangeEditable, bool displayError, double initialValue, double minValue, double maxValue, double inc) {
+        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, bool displayError, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX) {
             ParameterDescription d;
             d.type=type;
             d.id=id;
             d.name=name;
             d.label=label;
             d.unit=unit;
+            d.unitLabel=unitLabel;
             d.fit=fit;
             d.userEditable=userEditable;
             d.initialValue=initialValue;
@@ -214,6 +246,8 @@ class QFFitFunction {
             d.inc=inc;
             d.displayError=displayError;
             d.userRangeEditable=userRangeEditable;
+            d.absMaxValue=absMaxValue;
+            d.absMinValue=absMinValue;
 
             return addParameter(d);
         }

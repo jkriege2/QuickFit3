@@ -7,18 +7,33 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QGridLayout>
+#include <QPointer>
+#include <cfloat>
+#include <limits.h>
 #include "qffitparameterbasicinterface.h"
 #include "jkdoubleedit.h"
+#include "qffitfunction.h"
 
-/*! \brief a widget that displays a fit parameter, together with a label, possibly a checkbox to fix the value, possible a label for the error.
+/*! \brief a class that displays a fit parameter, together with a label, possibly a checkbox to fix the value, possibly a label for the error and the fit range widgets.
     \ingroup qf3lib_widgets
+
+    This class is NOT a widget. It is "only" a wrapper that displays widgets for a given parameter (description given to the constructor).
+    The widgets created by this class are added to a given grid layout in the columns starting from 0 with the label.
+
+    This class keeps track of the associated widgets. \c delete ing it also deletes the widgets. Before that they are removed
+    from the layout.
 
     This widget will display a widget that is used to set the parameter. These widgets are possible:
       - a JKDoubleEdit
       - a QSpinBox
+      - a QComboBox
+      - a header for the parameters
     .
+
+    \todo add possibility to edit errors
 */
-class QFFitParameterWidget : public QWidget {
+class QFFitParameterWidget : public QObject {
         Q_OBJECT
     public:
         /** \brief used to specify the widget to display */
@@ -26,6 +41,8 @@ class QFFitParameterWidget : public QWidget {
         /*! \brief constructor
 
             \param datastore this is used to read/write the values
+            \param layout the layout to which the widgets are added.
+            \param row the row o add the widgets to in \ layout
             \param parameterID id of the parameter to change
             \param widget which widget to display
             \param editable is the value editable? (fix and range is only displayed, if this is \c true)
@@ -33,8 +50,9 @@ class QFFitParameterWidget : public QWidget {
             \param displayError display the error of the fit value (if !=0) ?
             \param editRangeAllowed display widgets to edit the value range allowed?
             \param parent parent widget
+            \param label label for the parameter
         */
-        QFFitParameterWidget(QFFitParameterBasicInterface* datastore, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent=NULL);
+        QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""));
         virtual ~QFFitParameterWidget();
 
         /** \brief return whether the user may edit the values */
@@ -46,10 +64,8 @@ class QFFitParameterWidget : public QWidget {
         /** \brief return the parameter id */
         QString parameterID() { return m_parameterID; }
 
-        /** \brief set widths of the edit widgets */
-        void setWidgetWidth(int width, int fixWidth);
-        /** \brief set widths of checkbox widthes */
-        void setCheckWidth(int width);
+        /** \brief set minimum widths of the edit widgets */
+        void setWidgetWidth(int width);
         /** \brief set unit string */
         void setUnit(QString unit);
         /** \brief set widget increment */
@@ -73,6 +89,16 @@ class QFFitParameterWidget : public QWidget {
         void setEditRange(bool editRange);
         /** \brief en/disable range editing widgets */
         void setRangeEnabled(bool enabled);
+        /** \brief show/hide the value/error/fix widgets */
+        void setEditValues(bool editValues);
+        /** \brief show/hide the value/error/fix widgets, inverted version of setEditValues() */
+        void unsetEditValues(bool editValues) { setEditValues(!editValues); };
+        /** \brief set the absolute min/max for a given value */
+        void setValueAbsoluteRange(double min, double max);
+        /** \brief set tooltip for widgets (actually this should contain a description of the parameter, as things like "error of " or "value of " will be added autmatically) */
+        void setToolTip(QString paramDescription);
+        /** \brief show/hide the complete widget */
+        void setVisible(bool visible);
     signals:
         /** \brief emited when a value changed */
         void valueChanged(QString id, double value);
@@ -90,6 +116,10 @@ class QFFitParameterWidget : public QWidget {
         void intMaxChanged(int value);
         void sfixChanged(bool fix);
     protected:
+        /** \brief parameter label */
+        QString m_label;
+        /** \brief parameter description */
+        QString m_paramDescription;
         /** \brief this is used to read/write the values */
         QFFitParameterBasicInterface* m_datastore;
         /** \brief id of the parameter to change */
@@ -108,30 +138,34 @@ class QFFitParameterWidget : public QWidget {
         bool m_settingData;
         /** \brief increment for the widget */
         double m_increment;
-        /** \brief indicates whether to display the range of the value */
+        /** \brief indicates whether to display the range widgets  */
         bool m_editRange;
+        /** \brief indicates whether to display the value/error/fix widgets */
+        bool m_editValues;
         /** \brief indicates whether it is allowed to display the range of the value */
         bool m_editRangeAllowed;
         /** \brief width of the input widgets */
         int m_widgetWidth;
-        /** \brief with of checkboxes */
-        int m_checkWidth;
+        bool m_visible;
+        /** \brief parent widget */
+        QPointer<QWidget> m_parent;
 
-        JKDoubleEdit* neditValue;
-        QSpinBox* spinIntValue;
-        QComboBox* cmbIntValue;
-        JKDoubleEdit* neditMin;
-        QSpinBox* spinIntMin;
-        JKDoubleEdit* neditMax;
-        QSpinBox* spinIntMax;
-        QCheckBox* chkFix;
-        QLabel* labError;
-        QHBoxLayout* layMain;
-        QLabel* hlabValue;
-        QLabel* hlabMin;
-        QLabel* hlabMax;
-        QLabel* hlabFix;
-        QWidget* spCheck;
+        QPointer<JKDoubleEdit> neditValue;
+        QPointer<QSpinBox> spinIntValue;
+        QPointer<QComboBox> cmbIntValue;
+        QPointer<JKDoubleEdit> neditMin;
+        QPointer<QSpinBox> spinIntMin;
+        QPointer<JKDoubleEdit> neditMax;
+        QPointer<QSpinBox> spinIntMax;
+        QPointer<QCheckBox> chkFix;
+        QPointer<QLabel> labError;
+        QPointer<QLabel> hlabValue;
+        QPointer<QLabel> hlabMin;
+        QPointer<QLabel> hlabMax;
+        QPointer<QLabel> hlabFix;
+        QPointer<QLabel> labLabel;
+
+        QPointer<QGridLayout> m_layout;
 
         void fillCombo(QComboBox* cmb, int min, int max);
 
