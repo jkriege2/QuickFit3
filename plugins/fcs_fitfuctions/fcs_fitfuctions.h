@@ -56,8 +56,16 @@ class QFFitFunctionFCSADiff: public QFFitFunction {
         /** \brief evaluate the fitting function with the given parameter vector */
         virtual double evaluate(double t, const double* data) const;
 
-        /** \brief calculate non-fit parameters, i.e. fit=userEditable=false */
+        /*! \copydoc QFFitFunction::calcParameter()   */
         virtual void calcParameter(double* data, double* error=NULL) const;
+
+        /*! \copydoc QFFitFunction::isParameterVisible()   */
+        virtual bool isParameterVisible(int parameter, double* data) const;
+        /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
+        virtual unsigned int getAdditionalPlotCount(const double* params);
+
+        /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
 };
 
