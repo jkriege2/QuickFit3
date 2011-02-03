@@ -233,6 +233,23 @@ void QFRawDataRecord::resultsSetNumber(QString evaluationName, QString resultNam
     emit resultsChanged();
 };
 
+void QFRawDataRecord::resultsRemove(QString evalName, QString resultName) {
+    if (results.contains(evalName)) {
+        if (results[evalName].remove(resultName)>0) emit resultsChanged();
+    }
+}
+
+void QFRawDataRecord::resultsClear(QString name, QString postfix) {
+    if (results.contains(name)) {
+        QMapIterator<QString, evaluationResult> i(results[name]);
+        while (i.hasNext()) {
+            i.next();
+            //cout << i.key() << ": " << i.value() << endl;
+            if (i.key().endsWith(postfix)) results[name].remove(i.key());
+        }
+        emit resultsChanged();
+    }
+};
 
 void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resultName, QVector<double>& value, QString unit) {
     evaluationResult r;

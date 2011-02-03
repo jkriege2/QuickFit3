@@ -102,6 +102,10 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
     return offset+pre/N*(rho1*d1+d2+d3);
 }
 
+
+
+// TODO: Remove resorting of diffusion times in all calcParameters()
+
 void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     int comp=data[FCSDiff_n_components];
     int nonfl_comp=data[FCSDiff_n_nonfluorescent];
@@ -169,6 +173,20 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         erho2=0;
         rho3=0;
         erho3=0;
+        data[FCSDiff_diff_tau1]=tauD1;
+        data[FCSDiff_diff_rho1]=rho1;
+        data[FCSDiff_diff_tau2]=tauD2;
+        data[FCSDiff_diff_rho2]=rho2;
+        data[FCSDiff_diff_tau3]=tauD3;
+        data[FCSDiff_diff_rho3]=rho3;
+        if (error) {
+            error[FCSDiff_diff_tau1]=etauD1;
+            error[FCSDiff_diff_rho1]=erho1;
+            error[FCSDiff_diff_tau2]=etauD2;
+            error[FCSDiff_diff_rho2]=erho2;
+            error[FCSDiff_diff_tau3]=etauD3;
+            error[FCSDiff_diff_rho3]=erho3;
+        }
     } else if (comp==2) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
@@ -182,11 +200,30 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
             data[FCSDiff_diff_rho1]=rho2;
             data[FCSDiff_diff_tau2]=tauD1;
             data[FCSDiff_diff_rho2]=rho1;
+            data[FCSDiff_diff_tau3]=tauD3;
+            data[FCSDiff_diff_rho3]=rho3;
             if (error) {
                 error[FCSDiff_diff_tau1]=etauD2;
                 error[FCSDiff_diff_rho1]=erho2;
                 error[FCSDiff_diff_tau2]=etauD1;
                 error[FCSDiff_diff_rho2]=erho1;
+                error[FCSDiff_diff_tau3]=etauD3;
+                error[FCSDiff_diff_rho3]=erho3;
+            }
+        } else {
+            data[FCSDiff_diff_tau1]=tauD1;
+            data[FCSDiff_diff_rho1]=rho1;
+            data[FCSDiff_diff_tau2]=tauD2;
+            data[FCSDiff_diff_rho2]=rho2;
+            data[FCSDiff_diff_tau3]=tauD3;
+            data[FCSDiff_diff_rho3]=rho3;
+            if (error) {
+                error[FCSDiff_diff_tau1]=etauD1;
+                error[FCSDiff_diff_rho1]=erho1;
+                error[FCSDiff_diff_tau2]=etauD2;
+                error[FCSDiff_diff_rho2]=erho2;
+                error[FCSDiff_diff_tau3]=etauD3;
+                error[FCSDiff_diff_rho3]=erho3;
             }
         }
     } else if (comp==3) {
@@ -553,8 +590,6 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         erho2=0;
         rho3=0;
         erho3=0;
-        ealpha2=0;
-        ealpha3=0;
     } else if (comp==2) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
@@ -562,7 +597,6 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         erho1=erho2;
         rho3=0;
         erho3=0;
-        ealpha3=0;
         // sort diffusion times in ascending order
         if (tauD1>tauD2) {
             data[FCSADiff_diff_tau1]=tauD2;

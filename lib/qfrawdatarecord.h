@@ -173,6 +173,8 @@ class QFRawDataRecord : public QObject, public QFProperties {
                 emit resultsChanged();
             }
         };
+        /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */
+        virtual void resultsClear(QString name, QString postfix);
         /** \brief check whether a result exists */
         inline bool resultsExists(QString evalName, QString resultName) {
             if (results.contains(evalName)) {
@@ -206,6 +208,8 @@ class QFRawDataRecord : public QObject, public QFProperties {
         };
         /** \brief return a specified result as string */
         QString  resultsGetAsString(QString evalName, QString resultName);
+        /** \brief remove the value stored in the given position */
+        void resultsRemove(QString evalName, QString resultName);
         /** \brief return a specified result as double (or 0 if not possible!) */
         double resultsGetAsDouble(QString evalName, QString resultName);
         /** \brief return a specified result as integer (or 0 if not possible!) */

@@ -189,5 +189,12 @@ void QFEvaluationItem::selectAllAplicableRecords() {
     }
 }
 
-
+QList<QFRawDataRecord*> QFEvaluationItem::getApplicableRecords() {
+    QList<QFRawDataRecord*> recs;
+    for (int i=0; i<project->getRawDataCount(); i++) {
+        QFRawDataRecord* rec=project->getRawDataByNum(i);
+        recs.append(rec);
+    }
+    return recs;
+}
 

@@ -59,6 +59,40 @@ class QFFitParameterBasicInterface {
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
         virtual double getFitMax(QString id)=0;
+
+
+        /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
+            \param id set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+
+         */
+        virtual void setInitFitValue(QString id, double value)=0;
+        /*! \brief set the fix property of a fit parameter in the initial parameters
+            \param id set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+         */
+        virtual void setInitFitFix(QString id, bool fix)=0;
+
+        /*! \brief set the given parameter \a id to the given value (and error) in all files */
+        virtual void setAllFitValues(QString id, double value, double error=0.0)=0;
+        /*! \brief set the given parameter \a id to the given fix value */
+        virtual void setAllFitFixes(QString id, bool fix)=0;
+        /*! \brief reset the given parameter \a id to the initial/global/default value */
+        virtual void resetDefaultFitValue(QString id)=0;
+        /*! \brief reset the given parameter \a id to the initial/global/default fix */
+        virtual void resetDefaultFitFix(QString id)=0;
+        /*! \brief return the default/initial/global value of a given parameter        */
+        virtual double getDefaultFitValue(QString id)=0;
+        /*! \brief return the default/initial/global fix of a given parameter        */
+        virtual bool getDefaultFitFix(QString id)=0;
+        /*! \brief reset the all parameters to the initial/global/default value in all files */
+        virtual void resetAllFitValue()=0;
+        /*! \brief reset the all parameters to the initial/global/default fix in all files */
+        virtual void resetAllFitFix()=0;
+        /*! \brief reset the all parameters to the initial/global/default value in current files */
+        virtual void resetAllFitValueCurrent()=0;
+        /*! \brief reset the all parameters to the initial/global/default fix in current files */
+        virtual void resetAllFitFixCurrent()=0;
 };
 
 #endif // QFFITPARAMETERBASICINTERFACE_H

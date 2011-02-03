@@ -62,6 +62,31 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     hlabValue=NULL;
     labError=NULL;
     cmbIntValue=NULL;
+    scSpace=NULL;
+    scReturn=NULL;
+    scEnter=NULL;
+
+    actCopyValue = new QAction(tr("copy &value to all files"), this);
+    connect(actCopyValue, SIGNAL(triggered()), this, SLOT(s_actCopyValue()));
+    actCopyFix = new QAction(tr("copy &fix to all files"), this);
+    connect(actCopyFix, SIGNAL(triggered()), this, SLOT(s_actCopyFix()));
+    actCopyValueFix = new QAction(tr("copy value && fix to all files"), this);
+    connect(actCopyValueFix, SIGNAL(triggered()), this, SLOT(s_actCopyValueFix()));
+    actCopyValueInit = new QAction(tr("copy &value to initial"), this);
+    connect(actCopyValueInit, SIGNAL(triggered()), this, SLOT(s_actCopyValueInit()));
+    actCopyFixInit = new QAction(tr("copy &fix to initial"), this);
+    connect(actCopyFixInit, SIGNAL(triggered()), this, SLOT(s_actCopyFixInit()));
+    actCopyValueFixInit = new QAction(tr("copy value && fix to initial"), this);
+    connect(actCopyValueFixInit, SIGNAL(triggered()), this, SLOT(s_actCopyValueFixInit()));
+
+
+    actResetValue = new QAction(tr("reset this value"), this);
+    connect(actResetValue, SIGNAL(triggered()), this, SLOT(s_actResetValue()));
+    actResetFix = new QAction(tr("reset this fix"), this);
+    connect(actResetFix, SIGNAL(triggered()), this, SLOT(s_actResetFix()));
+    actResetValueFix = new QAction(tr("reset this value && fix"), this);
+    connect(actResetValueFix, SIGNAL(triggered()), this, SLOT(s_actResetValueFix()));
+
 
     int height=5;
 
@@ -104,6 +129,26 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         neditValue->setShowUpDown(false);
         connect(neditValue, SIGNAL(valueChanged(double)), this, SLOT(doubleValueChanged(double)));
         height=qMax(height, neditValue->minimumSizeHint().height());
+        neditValue->addContextmenuAction(actCopyValue);
+        neditValue->addContextmenuAction(actCopyFix);
+        neditValue->addContextmenuAction(actCopyValueFix);
+        neditValue->addContextmenuAction(actCopyValueInit);
+        neditValue->addContextmenuAction(actCopyFixInit);
+        neditValue->addContextmenuAction(actCopyValueFixInit);
+        neditValue->addContextmenuAction(actResetValue);
+        neditValue->addContextmenuAction(actResetFix);
+        neditValue->addContextmenuAction(actResetValueFix);
+
+        if (chkFix) {
+            scSpace=new QShortcut(QKeySequence(Qt::Key_Space), neditValue);
+            connect(scSpace, SIGNAL(activated()), chkFix, SLOT(toggle()));
+        }
+        scEnter=new QShortcut(QKeySequence(Qt::Key_Enter), neditValue);
+        connect(scEnter, SIGNAL(activated()), this, SLOT(pEnterPressed()));
+        scReturn=new QShortcut(QKeySequence(Qt::Key_Return), neditValue);
+        connect(scReturn, SIGNAL(activated()), this, SLOT(pEnterPressed()));
+        // TODO: Enter/Space do not work ... use activatedAmbiguously()?
+
     } else if (widget==IntSpinBox) {
         spinIntValue=new QSpinBox(parent);
         spinIntValue->setRange(datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
@@ -113,6 +158,15 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         layout->addWidget(spinIntValue, row, COL_VALUE);
         connect(spinIntValue, SIGNAL(valueChanged(int)), this, SLOT(intValueChanged(int)));
         height=qMax(height, spinIntValue->minimumSizeHint().height());
+
+        if (chkFix) {
+            scSpace=new QShortcut(QKeySequence(Qt::Key_Space), spinIntValue);
+            connect(scSpace, SIGNAL(activated()), chkFix, SLOT(toggle()));
+        }
+        scEnter=new QShortcut(QKeySequence(Qt::Key_Enter), spinIntValue);
+        connect(scEnter, SIGNAL(activated()), this, SLOT(pEnterPressed()));
+        scReturn=new QShortcut(QKeySequence(Qt::Key_Return), spinIntValue);
+        connect(scReturn, SIGNAL(activated()), this, SLOT(pEnterPressed()));
     } else if (widget==IntDropDown) {
         cmbIntValue=new QComboBox(parent);
         fillCombo(cmbIntValue, datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
@@ -121,6 +175,15 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         layout->addWidget(cmbIntValue, row, COL_VALUE);
         connect(cmbIntValue, SIGNAL(currentIndexChanged(int)), this, SLOT(intValueChangedFromCombo(int)));
         height=qMax(height, cmbIntValue->minimumSizeHint().height());
+
+        if (chkFix) {
+            scSpace=new QShortcut(QKeySequence(Qt::Key_Space), cmbIntValue);
+            connect(scSpace, SIGNAL(activated()), chkFix, SLOT(toggle()));
+        }
+        scEnter=new QShortcut(QKeySequence(Qt::Key_Enter), cmbIntValue);
+        connect(scEnter, SIGNAL(activated()), this, SLOT(pEnterPressed()));
+        scReturn=new QShortcut(QKeySequence(Qt::Key_Return), cmbIntValue);
+        connect(scReturn, SIGNAL(activated()), this, SLOT(pEnterPressed()));
     } else if (widget==Header) {
         hlabValue=new QLabel(tr("<b>value</b>"), parent);
         hlabValue->setAlignment(Qt::AlignHCenter);
@@ -331,6 +394,7 @@ void QFFitParameterWidget::sfixChanged(bool fix) {
         emit fixChanged(m_parameterID, fix);
     }
 }
+
 
 void QFFitParameterWidget::doubleMinChanged(double value) {
     if ((!m_settingData) && m_editable && m_editRange) {
@@ -576,4 +640,52 @@ void QFFitParameterWidget::setVisible(bool visible) {
         setEditRange(m_editRange);
         setEditValues(m_editValues);
     }
+}
+
+
+void QFFitParameterWidget::pEnterPressed() {
+    emit enterPressed(m_parameterID);
+}
+
+void QFFitParameterWidget::s_actCopyValue() {
+    m_datastore->setAllFitValues(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
+    m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+}
+
+void QFFitParameterWidget::s_actCopyFix() {
+    m_datastore->setAllFitFixes(m_parameterID, m_datastore->getFitFix(m_parameterID));
+    m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+}
+
+void QFFitParameterWidget::s_actCopyValueFix() {
+    s_actCopyValue();
+    s_actCopyFix();
+}
+
+void QFFitParameterWidget::s_actCopyValueInit() {
+    m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+}
+
+void QFFitParameterWidget::s_actCopyFixInit() {
+    m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+}
+
+void QFFitParameterWidget::s_actCopyValueFixInit() {
+    s_actCopyValueInit();
+    s_actCopyFixInit();
+}
+
+void QFFitParameterWidget::s_actResetValue() {
+    m_datastore->resetDefaultFitValue(m_parameterID);
+    reloadValues();
+}
+
+void QFFitParameterWidget::s_actResetFix() {
+    m_datastore->resetDefaultFitFix(m_parameterID);
+    reloadValues();
+}
+
+void QFFitParameterWidget::s_actResetValueFix() {
+    s_actResetValue();
+    s_actResetFix();
 }

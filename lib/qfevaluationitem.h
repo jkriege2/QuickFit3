@@ -255,6 +255,9 @@ class QFEvaluationItem : public QObject, public QFProperties {
         /** \brief list of the currently selected records */
         QList<QFRawDataRecord*> selectedRecords;
 
+        /** \brief list of the raw data records this evaluation is applicable to */
+        QList<QFRawDataRecord*> getApplicableRecords();
+
         /** \brief points to the currently highlighted record */
         QFRawDataRecord* highlightedRecord;
 };

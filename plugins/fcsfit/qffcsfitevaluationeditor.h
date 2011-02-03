@@ -115,8 +115,22 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QFormLayout* layResidualAnalysis;
         /** \brief toolbox to switch between residual histogram and parameters */
         QTabWidget* tabResidulas;
-        /** \button to fit current file */
+        /** \brief to fit current file */
         QPushButton* btnFitCurrent;
+        /** \brief to fit all runs in current file */
+        QPushButton* btnFitRunsCurrent;
+        /** \brief to fit current run in all file */
+        QPushButton* btnFitAll;
+        /** \brief to fit all runs in all file */
+        QPushButton* btnFitRunsAll;
+        /** \brief reset current parameter set to default */
+        QPushButton* btnResetCurrent;
+        /** \brief reset all parameter sets to default */
+        QPushButton* btnResetAll;
+        /** \brief copy current parameter set to default parameters */
+        QPushButton* btnCopyToInitial;
+        /** \brief copy current parameter set to all files & initial parameters */
+        QPushButton* btnCopyToAll;
 
         /** \brief scroll area for the fit parameters */
         JKVerticalScrollArea* scrollParameters;
@@ -200,6 +214,21 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief executed when a parameter range is changed by the user */
         void parameterRangeChanged(QString id, double min, double max);
 
+
+        /** \brief fit all files (current run) */
+        void fitAll();
+        /** \brief fit all files, all runs */
+        void fitRunsAll();
+        /** \brief fit all runs in current file */
+        void fitRunsCurrent();
+        /** \brief reset current */
+        void resetCurrent();
+        /** \brief reset all files */
+        void resetAll();
+        /** \brief copy to all files */
+        void copyToAll();
+        /** \brief copy to initial values */
+        void copyToInitial();
 
     private:
         /** \brief create all widgets on the form */

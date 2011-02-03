@@ -133,9 +133,9 @@ bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
-bool QFFCSFitEvaluation::hasFit() {
+bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r) {
     if (getFitFunction()==NULL) return false;
-    QFRawDataRecord* r=getHighlightedRecord();
+    if (r==NULL) r=getHighlightedRecord();
     if (r==NULL) return false;
     QString rsid=getEvaluationResultID();
     return r->resultsExistsFromEvaluation(rsid);
@@ -214,7 +214,7 @@ void QFFCSFitEvaluation::setFitValue(QString id, double value) {
     if (getHighlightedRecord()!=NULL) {
         QString dsid=getParameterStoreID(id);
         if (hasFit()) {
-            setFitResultValue(id, value);
+            setFitResultValue(id, value, getFitError(id));
         } else {
             QFFitFunction* f=getFitFunction();
             if (f) {
@@ -608,4 +608,190 @@ void QFFCSFitEvaluation::setFitFunction(QString fitFunction) {
 
 QFFitFunction* QFFCSFitEvaluation::getFitFunction() {
     return getFitFunction(m_fitFunction);
+}
+
+/*! \brief return the default/initial/global value of a given parameter        */
+double QFFCSFitEvaluation::getDefaultFitValue(QString id) {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) {
+        //std::cout<<"getFitValue("<<id.toStdString()<<") = "<<0<<" [getFitFunction()==NULL]\n";
+        return 0;
+    }
+    if (!f->hasParameter(id)) return 0;
+    int pid=f->getParameterNum(id);
+    double res=0;
+    if (pid>-1) res=f->getDescription(pid).initialValue;
+    res=fitParamSettings->value(m_fitFunction+"/"+id, res).toDouble();
+    QString psID=getParameterStoreID(id);
+    if (parameterStore.contains(psID)) {
+        if (parameterStore[psID].valueSet) {
+            res=parameterStore[psID].value;
+        }
+    }
+    return res;
+}
+
+/*! \brief return the default/initial/global fix of a given parameter        */
+bool QFFCSFitEvaluation::getDefaultFitFix(QString id) {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return 0;
+    bool res=false;
+    res=fitParamSettings->value(m_fitFunction+"/"+id+"_fix", res).toBool();
+    QString psID=getParameterStoreID(id);
+    if (parameterStore.contains(psID)) {
+        if (parameterStore[psID].fixSet) {
+            res=parameterStore[psID].fix;
+        }
+    }
+    return res;
+}
+
+/*! \brief reset the given parameter \a id to the initial/global/default value */
+void QFFCSFitEvaluation::resetDefaultFitValue(QString id) {
+    if (hasFit()) {
+        QFRawDataRecord* r=getHighlightedRecord();
+        QString en=getEvaluationResultID();
+        if (r->resultsExists(en, id)) r->resultsRemove(en, id);
+    }
+}
+
+/*! \brief reset the given parameter \a id to the initial/global/default fix */
+void QFFCSFitEvaluation::resetDefaultFitFix(QString id) {
+    if (hasFit()) {
+        QFRawDataRecord* r=getHighlightedRecord();
+        QString en=getEvaluationResultID();
+        if (r->resultsExists(en, id+"_fix")) r->resultsRemove(en, id+"_fix");
+    }
+}
+
+/*! \brief reset the all parameters to the initial/global/default value in current files */
+void QFFCSFitEvaluation::resetAllFitValueCurrent() {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    if (hasFit()) {
+        QFRawDataRecord* r=getHighlightedRecord();
+        QString en=getEvaluationResultID();
+        for (int i=0; i<f->paramCount(); i++) {
+            QString id=f->getParameterID(i);
+            if (r->resultsExists(en, id)) r->resultsRemove(en, id);
+        }
+    }
+}
+
+/*! \brief reset the all parameters to the initial/global/default fix in current files */
+void QFFCSFitEvaluation::resetAllFitFixCurrent() {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    if (hasFit()) {
+        QFRawDataRecord* r=getHighlightedRecord();
+        QString en=getEvaluationResultID();
+        for (int i=0; i<f->paramCount(); i++) {
+            QString id=f->getParameterID(i);
+            if (r->resultsExists(en, id+"_fix")) r->resultsRemove(en, id+"_fix");
+        }
+    }
+}
+
+/*! \brief reset the all fit results to the initial/global/default value in all files */
+void QFFCSFitEvaluation::resetAllFitResultsCurrent() {
+    QFRawDataRecord* r=getHighlightedRecord();
+    if (!r) return;
+    QString en=getEvaluationResultID();
+    r->resultsClear(en);
+}
+
+
+/*! \brief reset all fit results to the initial/global/default value in all files */
+void QFFCSFitEvaluation::resetAllFitResults() {
+    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QString en=getEvaluationResultID();
+    for (int i=0; i<recs.size(); i++) {
+        recs[i]->resultsClear(en);
+    }
+}
+
+/*! \brief reset all parameters to the initial/global/default value in all files */
+void QFFCSFitEvaluation::resetAllFitValue()  {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QString en=getEvaluationResultID();
+    for (int i=0; i<recs.size(); i++) {
+        for (int j=0; j<f->paramCount(); j++) {
+            QString id=f->getParameterID(j);
+            if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
+        }
+    }
+}
+
+/*! \brief reset all parameters to the initial/global/default fix in all files */
+void QFFCSFitEvaluation::resetAllFitFix() {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QString en=getEvaluationResultID();
+    for (int i=0; i<recs.size(); i++) {
+        for (int j=0; j<f->paramCount(); j++) {
+            QString id=f->getParameterID(j)+"_fix";
+            if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
+        }
+    }
+}
+
+/*! \brief set the given parameter \a id to the given value (and error) in all files, hasFit for the file is \c true */
+void QFFCSFitEvaluation::setAllFitValues(QString id, double value, double error) {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QString en=getEvaluationResultID();
+    int pid=f->getParameterNum(id);
+    QString unit="";
+    if (pid>-1) unit=f->getDescription(pid).unit;
+    for (int i=0; i<recs.size(); i++) {
+        if (hasFit(recs[i])) recs[i]->resultsSetNumberError(getEvaluationResultID(), id, value, error, unit);
+    }
+}
+
+/*! \brief set the given parameter \a id to the given fix value */
+void QFFCSFitEvaluation::setAllFitFixes(QString id, bool fix) {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QString en=getEvaluationResultID();
+    int pid=f->getParameterNum(id);
+    QString unit="";
+    if (pid>-1) unit=f->getDescription(pid).unit;
+    for (int i=0; i<recs.size(); i++) {
+        if (hasFit(recs[i])) recs[i]->resultsSetBoolean(getEvaluationResultID(), id+"_fix", fix);
+    }
+}
+
+void QFFCSFitEvaluation::setInitFitValue(QString id, double value) {
+    if (getHighlightedRecord()!=NULL) {
+        QString dsid=getParameterStoreID(id);
+        QFFitFunction* f=getFitFunction();
+        if (f) {
+            QFFitFunction::ParameterDescription d=f->getDescription(id);
+            if (d.userEditable) {
+                parameterStore[getParameterStoreID(id)].value=value;
+                parameterStore[getParameterStoreID(id)].valueSet=true;
+                emit propertiesChanged();
+            }
+        }
+    }
+}
+
+void QFFCSFitEvaluation::setInitFitFix(QString id, bool fix) {
+    if (getHighlightedRecord()!=NULL) {
+        QString dsid=getParameterStoreID(id);
+        QFFitFunction* f=getFitFunction();
+        if (f) {
+            QFFitFunction::ParameterDescription d=f->getDescription(id);
+            if (d.userEditable) {
+                parameterStore[getParameterStoreID(id)].fix=fix;
+                parameterStore[getParameterStoreID(id)].fixSet=true;
+                emit propertiesChanged();
+            }
+        }
+    }
 }

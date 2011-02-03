@@ -252,10 +252,47 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
 
         /** \brief determine whether a fit has been carried out for the currently highlighted record
          *
+         *  \param check the given record, if \c NULL the currently highlighted record is checked
          *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
          *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
          */
-        bool hasFit();
+        bool hasFit(QFRawDataRecord* r=NULL);
+
+        /*! \brief set the given parameter \a id to the given value (and error) in all files */
+        virtual void setAllFitValues(QString id, double value, double error=0.0);
+        /*! \brief set the given parameter \a id to the given fix value */
+        virtual void setAllFitFixes(QString id, bool fix);
+        /*! \brief reset the given parameter \a id to the initial/global/default value */
+        virtual void resetDefaultFitValue(QString id);
+        /*! \brief reset the given parameter \a id to the initial/global/default fix */
+        virtual void resetDefaultFitFix(QString id);
+        /*! \brief return the default/initial/global value of a given parameter        */
+        virtual double getDefaultFitValue(QString id);
+        /*! \brief return the default/initial/global fix of a given parameter        */
+        virtual bool getDefaultFitFix(QString id);
+        /*! \brief reset the all parameters to the initial/global/default value in all files */
+        virtual void resetAllFitValue();
+        /*! \brief reset the all fit results to the initial/global/default value in all files */
+        virtual void resetAllFitResults();
+        /*! \brief reset the all fit results to the initial/global/default value in all files */
+        virtual void resetAllFitResultsCurrent();
+        /*! \brief reset the all parameters to the initial/global/default fix in all files */
+        virtual void resetAllFitFix();
+        /*! \brief reset the all parameters to the initial/global/default value in current files */
+        virtual void resetAllFitValueCurrent();
+        /*! \brief reset the all parameters to the initial/global/default fix in current files */
+        virtual void resetAllFitFixCurrent();
+        /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
+            \param id set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+
+         */
+        virtual void setInitFitValue(QString id, double value);
+        /*! \brief set the fix property of a fit parameter in the initial parameters
+            \param id set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+         */
+        virtual void setInitFitFix(QString id, bool fix);
 
     public slots:
         /** \brief set the current run to use, -1 = average, 0..N = runs, <-1: invalid */

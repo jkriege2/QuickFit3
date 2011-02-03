@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QGridLayout>
 #include <QPointer>
+#include <QShortcut>
 #include <cfloat>
 #include <limits.h>
 #include "qffitparameterbasicinterface.h"
@@ -106,6 +107,8 @@ class QFFitParameterWidget : public QObject {
         void fixChanged(QString id, bool fix);
         /** \brief emited when a range changed */
         void rangeChanged(QString id, double min, double max);
+        /** \brief emited when the suer hits the ENTER key in a value edit widget */
+        void enterPressed(QString id);
     protected slots:
         void doubleValueChanged(double value);
         void intValueChanged(int value);
@@ -115,6 +118,16 @@ class QFFitParameterWidget : public QObject {
         void doubleMaxChanged(double value);
         void intMaxChanged(int value);
         void sfixChanged(bool fix);
+        void pEnterPressed();
+        void s_actCopyValue();
+        void s_actCopyFix();
+        void s_actCopyValueFix();
+        void s_actCopyValueInit();
+        void s_actCopyFixInit();
+        void s_actCopyValueFixInit();
+        void s_actResetValue();
+        void s_actResetFix();
+        void s_actResetValueFix();
     protected:
         /** \brief parameter label */
         QString m_label;
@@ -164,6 +177,19 @@ class QFFitParameterWidget : public QObject {
         QPointer<QLabel> hlabMax;
         QPointer<QLabel> hlabFix;
         QPointer<QLabel> labLabel;
+
+        QShortcut* scSpace;
+        QShortcut* scReturn;
+        QShortcut* scEnter;
+        QAction* actCopyValue;
+        QAction* actCopyFix;
+        QAction* actCopyValueFix;
+        QAction* actCopyValueInit;
+        QAction* actCopyFixInit;
+        QAction* actCopyValueFixInit;
+        QAction* actResetValue;
+        QAction* actResetFix;
+        QAction* actResetValueFix;
 
         QPointer<QGridLayout> m_layout;
 

@@ -280,8 +280,29 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     widParameters->setLayout(layParameters);
 
 
-    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current ..."), this);
-    layModel->addWidget(btnFitCurrent);
+    QGridLayout* layBtn=new QGridLayout(this);
+    layBtn->setContentsMargins(0,0,0,0);
+    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current (this run)"), this);
+    layBtn->addWidget(btnFitCurrent, 0, 0);
+    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Runs"), this);
+    layBtn->addWidget(btnFitRunsCurrent, 0, 1);
+    btnFitAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Files (this run)"), this);
+    layBtn->addWidget(btnFitAll, 1, 0);
+    btnFitRunsAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit &All Files (all runs)"), this);
+    layBtn->addWidget(btnFitRunsAll, 1, 1);
+    btnResetCurrent=new QPushButton(tr("&Reset Current"), this);
+    layBtn->addWidget(btnResetCurrent, 2, 0);
+    btnResetAll=new QPushButton(tr("&Reset All"), this);
+    layBtn->addWidget(btnResetAll, 2, 1);
+    btnCopyToInitial=new QPushButton(tr("Copy to &Initial"), this);
+    layBtn->addWidget(btnCopyToInitial, 3, 0);
+    btnCopyToAll=new QPushButton(tr("&Copy to All"), this);
+    layBtn->addWidget(btnCopyToAll, 3, 1);
+
+    layModel->addLayout(layBtn);
+
+
+
     labFitResult=new QLabel(this);
     layModel->addWidget(labFitResult);
 
@@ -332,7 +353,15 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(pltData, SIGNAL(zoomChangedLocally(double, double, double, double, QWidget*)), this, SLOT(zoomChangedLocally(double, double, double, double, QWidget*)));
     connect(pltData, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResiduals, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
+
     connect(btnFitCurrent, SIGNAL(clicked()), this, SLOT(fitCurrent()));
+    connect(btnFitAll, SIGNAL(clicked()), this, SLOT(fitAll()));
+    connect(btnFitRunsAll, SIGNAL(clicked()), this, SLOT(fitRunsAll()));
+    connect(btnFitRunsCurrent, SIGNAL(clicked()), this, SLOT(fitRunsCurrent()));
+    connect(btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
+    connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetAll()));
+    connect(btnCopyToAll, SIGNAL(clicked()), this, SLOT(copyToAll()));
+    connect(btnCopyToInitial, SIGNAL(clicked()), this, SLOT(copyToInitial()));
 
 }
 
@@ -520,6 +549,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
                 disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
                 disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
                 disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
+                disconnect(m_fitParameters[i], SIGNAL(enterPressed(QString)), this, SLOT(fitCurrent()));
                 delete m_fitParameters[i];
             }
         }
@@ -575,6 +605,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
             connect(fpw, SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
             connect(fpw, SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
+            connect(fpw, SIGNAL(enterPressed(QString)), this, SLOT(fitCurrent()));
             fpw->setEditRange(btnEditRanges->isChecked());
             fpw->unsetEditValues(btnEditRanges->isChecked());
         }
@@ -1013,6 +1044,56 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
         QApplication::restoreOverrideCursor();
     }
 }
+
+
+
+void QFFCSFitEvaluationEditor::fitAll() {
+    // TODO: implement
+}
+
+void QFFCSFitEvaluationEditor::fitRunsAll() {
+    // TODO: implement
+}
+
+void QFFCSFitEvaluationEditor::fitRunsCurrent() {
+    // TODO: implement
+}
+
+void QFFCSFitEvaluationEditor::resetCurrent() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    eval->resetAllFitFixCurrent();
+    eval->resetAllFitValueCurrent();
+    updateParameterValues();
+    replotData();
+}
+
+void QFFCSFitEvaluationEditor::resetAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    eval->resetAllFitFix();
+    eval->resetAllFitValue();
+    updateParameterValues();
+    replotData();
+}
+
+void QFFCSFitEvaluationEditor::copyToAll() {
+    // TODO: implement
+}
+
+void QFFCSFitEvaluationEditor::copyToInitial() {
+    // TODO: implement
+}
+
+
+
+
 
 void QFFCSFitEvaluationEditor::saveReport() {
     QString fn="";
