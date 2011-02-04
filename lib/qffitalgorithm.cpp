@@ -171,7 +171,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
 
     for (int i=0; i<model->paramCount(); i++) {
         paramsMax[i]=initialParams[i];
-        paramErrorsOut[i]=0;
+        //paramErrorsOut[i]=0;
     }
     fm.mapArrayFromFunctorToModel(paramsOut, tparamsOut);
     fm.mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);

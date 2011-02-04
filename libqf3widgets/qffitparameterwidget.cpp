@@ -27,7 +27,7 @@ double roundError(double error, int addSignifcant) {
 
 #define QFFitParameterWidget_setMaxHeight(widget, height) { if (widget) { widget->setMaximumHeight(height); } }
 
-QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent, QString label):
+QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent, QString label):
     QObject(parent)
 {
     m_datastore=datastore;
@@ -65,6 +65,7 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     scSpace=NULL;
     scReturn=NULL;
     scEnter=NULL;
+    neditError=NULL;
 
     actCopyValue = new QAction(tr("copy &value to all files"), this);
     connect(actCopyValue, SIGNAL(triggered()), this, SLOT(s_actCopyValue()));
@@ -139,15 +140,10 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         neditValue->addContextmenuAction(actResetFix);
         neditValue->addContextmenuAction(actResetValueFix);
 
-        if (chkFix) {
-            scSpace=new QShortcut(QKeySequence(Qt::Key_Space), neditValue);
-            connect(scSpace, SIGNAL(activated()), chkFix, SLOT(toggle()));
-        }
-        scEnter=new QShortcut(QKeySequence(Qt::Key_Enter), neditValue);
-        connect(scEnter, SIGNAL(activated()), this, SLOT(pEnterPressed()));
-        scReturn=new QShortcut(QKeySequence(Qt::Key_Return), neditValue);
-        connect(scReturn, SIGNAL(activated()), this, SLOT(pEnterPressed()));
-        // TODO: Enter/Space do not work ... use activatedAmbiguously()?
+        connect(neditValue, SIGNAL(keyEventMatches(int, Qt::KeyboardModifiers)), this, SLOT(keyEventMatches(int, Qt::KeyboardModifiers)));
+        neditValue->addKeyEvent(Qt::Key_Space, Qt::NoModifier);
+        neditValue->addKeyEvent(Qt::Key_Enter, Qt::NoModifier);
+        neditValue->addKeyEvent(Qt::Key_Return, Qt::NoModifier);
 
     } else if (widget==IntSpinBox) {
         spinIntValue=new QSpinBox(parent);
@@ -191,14 +187,31 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
         height=qMax(height, hlabValue->minimumSizeHint().height());
     }
 
-    if (displayError) {
-        labError=new QLabel(parent);
-        layout->addWidget(labError, row, COL_ERROR);
-        if (widget==Header) {
+    if (widget==Header) {
+        if ((displayError==QFFitFunction::DisplayError)||(displayError==QFFitFunction::EditError)) {
+            labError=new QLabel(parent);
+            layout->addWidget(labError, row, COL_ERROR);
             labError->setText(tr("<b>&plusmn; error</b>"));
             labError->setAlignment(Qt::AlignHCenter);
+            height=qMax(height, labError->minimumSizeHint().height());
         }
-        height=qMax(height, labError->minimumSizeHint().height());
+    } else {
+        if (displayError==QFFitFunction::DisplayError) {
+            labError=new QLabel(parent);
+            layout->addWidget(labError, row, COL_ERROR);
+            height=qMax(height, labError->minimumSizeHint().height());
+        } else if (displayError==QFFitFunction::EditError) {
+            neditError=new JKDoubleEdit(parent);
+            neditError->setCheckBounds(false, false);
+            neditValue->setShowUpDown(false);
+            layout->addWidget(neditError, row, COL_ERROR);
+            height=qMax(height, neditError->minimumSizeHint().height());
+            connect(neditError, SIGNAL(valueChanged(double)), this, SLOT(doubleErrorChanged(double)));
+            connect(neditError, SIGNAL(keyEventMatches(int, Qt::KeyboardModifiers)), this, SLOT(keyEventMatches(int, Qt::KeyboardModifiers)));
+            neditError->addKeyEvent(Qt::Key_Space, Qt::NoModifier);
+            neditError->addKeyEvent(Qt::Key_Enter, Qt::NoModifier);
+            neditError->addKeyEvent(Qt::Key_Return, Qt::NoModifier);
+        }
     }
 
     if (editable) {
@@ -264,6 +277,7 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     QFFitParameterWidget_setMaxHeight(spinIntMax, height);
     QFFitParameterWidget_setMaxHeight(chkFix, height);
     QFFitParameterWidget_setMaxHeight(labError, height);
+    QFFitParameterWidget_setMaxHeight(neditError, height);
     QFFitParameterWidget_setMaxHeight(hlabValue, height);
     QFFitParameterWidget_setMaxHeight(hlabMin, height);
     QFFitParameterWidget_setMaxHeight(hlabMax, height);
@@ -295,6 +309,7 @@ QFFitParameterWidget::~QFFitParameterWidget() {
     QFFitParameterWidget_delete(spinIntMax);
     QFFitParameterWidget_delete(chkFix);
     QFFitParameterWidget_delete(labError);
+    QFFitParameterWidget_delete(neditError);
     QFFitParameterWidget_delete(hlabValue);
     QFFitParameterWidget_delete(hlabMin);
     QFFitParameterWidget_delete(hlabMax);
@@ -328,10 +343,14 @@ void QFFitParameterWidget::reloadValues() {
             cmbIntValue->setCurrentIndex(cmbIntValue->findData((int)value));
         }
     }
-    if (m_displayError && labError && (m_widgetType!=Header)) {
-        double error=m_datastore->getFitError(m_parameterID);
-        labError->setTextFormat(Qt::RichText);
-        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
+    double error=m_datastore->getFitError(m_parameterID);
+    if (m_displayError  && (m_widgetType!=Header)) {
+        if (labError) {
+            labError->setTextFormat(Qt::RichText);
+            labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
+        } else if (neditError) {
+            neditError->setValue(error);
+        }
     }
     if (m_displayFix && m_editable && chkFix) {
         chkFix->setChecked(m_datastore->getFitFix(m_parameterID));
@@ -357,10 +376,15 @@ void QFFitParameterWidget::setValue(double value, double error, bool writeback) 
         if (spinIntValue && (spinIntValue->value()!=value)) spinIntValue->setValue(value);
     } else if (m_widgetType==IntDropDown) {
         fillCombo(cmbIntValue, m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
-        cmbIntValue->setCurrentIndex(cmbIntValue->findData((int)value));    }
-    if (m_displayError && labError && (m_widgetType!=Header)) {
-        labError->setTextFormat(Qt::RichText);
-        labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
+        cmbIntValue->setCurrentIndex(cmbIntValue->findData((int)value));
+    }
+    if (m_displayError  && (m_widgetType!=Header)) {
+        if (labError) {
+            labError->setTextFormat(Qt::RichText);
+            labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
+        } else if (neditError) {
+            neditError->setValue(error);
+        }
     }
 
     m_settingData=old_m_settingData;
@@ -370,6 +394,13 @@ void QFFitParameterWidget::doubleValueChanged(double value) {
     if ((!m_settingData) && m_editable) {
         m_datastore->setFitValue(m_parameterID, value);
         emit valueChanged(m_parameterID, value);
+    }
+}
+
+void QFFitParameterWidget::doubleErrorChanged(double error) {
+    if ((!m_settingData) && m_editable) {
+        m_datastore->setFitError(m_parameterID, error);
+        emit errorChanged(m_parameterID, error);
     }
 }
 
@@ -535,6 +566,7 @@ void QFFitParameterWidget::setEditValues(bool editValues) {
     if (cmbIntValue) cmbIntValue->setVisible(m_visible && editValues);
     if (chkFix) chkFix->setVisible(m_visible && editValues);
     if (labError) labError->setVisible(m_visible && editValues);
+    if (neditError) neditError->setVisible(m_visible && editValues);
     if (hlabFix) hlabFix->setVisible(m_visible && editValues);
     if (hlabValue) hlabValue->setVisible(m_visible && editValues);
     if (m_visible && m_editValues) {
@@ -614,6 +646,7 @@ void QFFitParameterWidget::setToolTip(QString paramDescription) {
     if (spinIntMax) spinIntMax->setToolTip(ttMax);
     if (chkFix) chkFix->setToolTip(ttMax);
     if (labError) labError->setToolTip(ttError);
+    if (neditError) neditError->setToolTip(ttError);
     if (labLabel) labLabel->setToolTip(ttLabel);
 }
 
@@ -631,6 +664,7 @@ void QFFitParameterWidget::setVisible(bool visible) {
         QFFitParameterWidget_setVisible(spinIntMax);
         QFFitParameterWidget_setVisible(chkFix);
         QFFitParameterWidget_setVisible(labError);
+        QFFitParameterWidget_setVisible(neditError);
         QFFitParameterWidget_setVisible(hlabValue);
         QFFitParameterWidget_setVisible(hlabMin);
         QFFitParameterWidget_setVisible(hlabMax);
@@ -663,7 +697,7 @@ void QFFitParameterWidget::s_actCopyValueFix() {
 }
 
 void QFFitParameterWidget::s_actCopyValueInit() {
-    m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+    m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
 }
 
 void QFFitParameterWidget::s_actCopyFixInit() {
@@ -689,3 +723,14 @@ void QFFitParameterWidget::s_actResetValueFix() {
     s_actResetValue();
     s_actResetFix();
 }
+
+void QFFitParameterWidget::keyEventMatches(int key, Qt::KeyboardModifiers modifiers) {
+    if ((modifiers==Qt::NoModifier)&&(key==Qt::Key_Space)) {
+        if (chkFix) chkFix->toggle();
+    }
+    if ((modifiers==Qt::NoModifier)&&((key==Qt::Key_Return)||(key==Qt::Key_Enter))) {
+        emit enterPressed(m_parameterID);
+    }
+}
+
+

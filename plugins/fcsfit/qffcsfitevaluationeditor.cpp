@@ -526,9 +526,10 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
                 disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
-                disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
-                disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
-                disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
+                disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));
+                disconnect(m_fitParameters[i], SIGNAL(errorChanged(QString, double)), this, SLOT(parameterValueChanged()));
+                disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged()));
+                disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged()));
                 delete m_fitParameters[i];
             }
         }
@@ -546,9 +547,10 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
                 m_fitParameters[i]->disableDatastore();
                 disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
                 disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(unsetEditValues(bool)));
-                disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
-                disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
-                disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
+                disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));
+                disconnect(m_fitParameters[i], SIGNAL(errorChanged(QString, double)), this, SLOT(parameterValueChanged()));
+                disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged()));
+                disconnect(m_fitParameters[i], SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged()));
                 disconnect(m_fitParameters[i], SIGNAL(enterPressed(QString)), this, SLOT(fitCurrent()));
                 delete m_fitParameters[i];
             }
@@ -562,7 +564,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create header widget
         /////////////////////////////////////////////////////////////////////////////////////////////
-        QFFitParameterWidget* header=new QFFitParameterWidget(eval, layParameters, 0, "", QFFitParameterWidget::Header, true, true, true, true, this, tr("parameter"));
+        QFFitParameterWidget* header=new QFFitParameterWidget(eval, layParameters, 0, "", QFFitParameterWidget::Header, true, true, QFFitFunction::DisplayError, true, this, tr("parameter"));
         m_fitParameters.append(header);
         connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
         connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(unsetEditValues(bool)));
@@ -580,7 +582,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidget::IntDropDown;
             bool editable=d.userEditable;
             bool displayFix=d.userEditable;
-            bool displayError=d.displayError;
+            QFFitFunction::ErrorDisplayMode displayError=d.displayError;
             bool editRange=d.userEditable && d.userRangeEditable;
             if (!d.fit) {
                 displayFix=false;
@@ -602,9 +604,10 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             m_fitParameters.append(fpw);
             connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(unsetEditValues(bool)));
             connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
-            connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged(QString, double)));
-            connect(fpw, SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged(QString, bool)));
-            connect(fpw, SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged(QString, double, double)));
+            connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));
+            connect(fpw, SIGNAL(errorChanged(QString, double)), this, SLOT(parameterValueChanged()));
+            connect(fpw, SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged()));
+            connect(fpw, SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged()));
             connect(fpw, SIGNAL(enterPressed(QString)), this, SLOT(fitCurrent()));
             fpw->setEditRange(btnEditRanges->isChecked());
             fpw->unsetEditValues(btnEditRanges->isChecked());
@@ -617,16 +620,16 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     updateParameterValues();
 }
 
-void QFFCSFitEvaluationEditor::parameterValueChanged(QString id, double value) {
+void QFFCSFitEvaluationEditor::parameterValueChanged() {
     updateParameterValues();
     replotData();
 }
 
-void QFFCSFitEvaluationEditor::parameterFixChanged(QString id, bool fix) {
+void QFFCSFitEvaluationEditor::parameterFixChanged() {
     updateParameterValues();
 }
 
-void QFFCSFitEvaluationEditor::parameterRangeChanged(QString id, double min, double max) {
+void QFFCSFitEvaluationEditor::parameterRangeChanged() {
     updateParameterValues();
     replotData();
 }
@@ -661,6 +664,9 @@ void QFFCSFitEvaluationEditor::updateParameterValues() {
 
     free(fullParams);
     free(errors);
+
+    if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
+    else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
 }
 
 void QFFCSFitEvaluationEditor::replotData() {
@@ -1065,8 +1071,7 @@ void QFFCSFitEvaluationEditor::resetCurrent() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
-    eval->resetAllFitFixCurrent();
-    eval->resetAllFitValueCurrent();
+    eval->resetAllFitResultsCurrent();
     updateParameterValues();
     replotData();
 }
@@ -1077,8 +1082,7 @@ void QFFCSFitEvaluationEditor::resetAll() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
-    eval->resetAllFitFix();
-    eval->resetAllFitValue();
+    eval->resetAllFitResults();
     updateParameterValues();
     replotData();
 }

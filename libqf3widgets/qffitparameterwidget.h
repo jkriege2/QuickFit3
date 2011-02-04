@@ -32,7 +32,6 @@
       - a header for the parameters
     .
 
-    \todo add possibility to edit errors
 */
 class QFFitParameterWidget : public QObject {
         Q_OBJECT
@@ -53,7 +52,7 @@ class QFFitParameterWidget : public QObject {
             \param parent parent widget
             \param label label for the parameter
         */
-        QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, bool displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""));
+        QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""));
         virtual ~QFFitParameterWidget();
 
         /** \brief return whether the user may edit the values */
@@ -103,6 +102,8 @@ class QFFitParameterWidget : public QObject {
     signals:
         /** \brief emited when a value changed */
         void valueChanged(QString id, double value);
+        /** \brief emited when an error changed */
+        void errorChanged(QString id, double error);
         /** \brief emited when a fix changed */
         void fixChanged(QString id, bool fix);
         /** \brief emited when a range changed */
@@ -111,6 +112,7 @@ class QFFitParameterWidget : public QObject {
         void enterPressed(QString id);
     protected slots:
         void doubleValueChanged(double value);
+        void doubleErrorChanged(double error);
         void intValueChanged(int value);
         void intValueChangedFromCombo(int value);
         void doubleMinChanged(double value);
@@ -128,6 +130,7 @@ class QFFitParameterWidget : public QObject {
         void s_actResetValue();
         void s_actResetFix();
         void s_actResetValueFix();
+        void keyEventMatches(int key, Qt::KeyboardModifiers modifiers);
     protected:
         /** \brief parameter label */
         QString m_label;
@@ -142,7 +145,7 @@ class QFFitParameterWidget : public QObject {
         /** \brief display a fix checkbox? */
         bool m_displayFix;
         /** \brief display the error of the fit value (if !=0) ? */
-        bool m_displayError;
+        QFFitFunction::ErrorDisplayMode m_displayError;
         /** \brief display the error of the fit value (if !=0) ? */
         bool m_editable;
         /** \brief unit of the values */
@@ -164,6 +167,7 @@ class QFFitParameterWidget : public QObject {
         QPointer<QWidget> m_parent;
 
         QPointer<JKDoubleEdit> neditValue;
+        QPointer<JKDoubleEdit> neditError;
         QPointer<QSpinBox> spinIntValue;
         QPointer<QComboBox> cmbIntValue;
         QPointer<JKDoubleEdit> neditMin;

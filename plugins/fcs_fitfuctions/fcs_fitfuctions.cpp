@@ -9,50 +9,50 @@
 #define NAVOGADRO (6.02214179e23)
 
 QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
-    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             false,        1,            0,        2,        1,   0,      2);
+    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
+    addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      1,            0,        2,        1,   0,      2);
     #define FCSDiff_n_nonfluorescent 0
-    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             false,        1,            1,        3,        1,   1,      2);
+    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      1,            1,        3,        1,   1,      2);
     #define FCSDiff_n_components 1
-    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              true,         3.0,          0,        10,       0.1, 0  );
+    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 3.0,          0,        10,       0.1, 0  );
     #define FCSDiff_nonfl_tau1 2
-    addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",            "",                      true,      true,         true,              true,         0.2,          0,        0.99999,  0.1, 0,      1);
+    addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSDiff_nonfl_theta1 3
-    addParameter(FloatNumber,  "nonfl_tau2",              "dark component 2 decay time",                           "&tau;<sub>dark,2</sub>",   "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "nonfl_tau2",              "dark component 2 decay time",                           "&tau;<sub>dark,2</sub>",   "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1e-10,    1e5,      1,   0);
     #define FCSDiff_nonfl_tau2 4
-    addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              true,         0.2,          0,        0.99999,  0.1, 0,      1);
+    addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSDiff_nonfl_theta2 5
-    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              true,         10,           1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 10,           1e-10,    1e5,      1,   0);
     #define FCSDiff_n_particle 6
-    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1, 0);
+    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSDiff_1n_particle 7
-    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             true,         0.5,          0,        0.99999,  0.1, 0,      1);
+    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1);
     #define FCSDiff_diff_rho1 8
-    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         30,           1,        1e5,      1,   0        );
+    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 30,           1,        1e5,      1,   0        );
     #define FCSDiff_diff_tau1 9
-    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              true,         0.5,          0,        0.99999,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSDiff_diff_rho2 10
-    addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1,        1e8,      1,   0    );
+    addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1,        1e8,      1,   0    );
     #define FCSDiff_diff_tau2 11
-    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              true,         0.5,          0,        0.99999,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSDiff_diff_rho3 12
-    addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1,        1e8,      1    );
+    addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1,        1e8,      1    );
     #define FCSDiff_diff_tau3 13
-    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                      true,      true,         true,              true,         0,            -10,      10,       0.1  );
+    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 0,            -10,      10,       0.1  );
     #define FCSDiff_offset 14
-    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                      true,      true,         true,              true,         6,            0.01,     100,      0.5  );
+    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    6,            0.01,     100,      0.5  );
     #define FCSDiff_focus_struct_fac 15
-    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                    false,     true,        false,              true,         250,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     false,     true,        false,              QFFitFunction::EditError,    250,          0,        1e4,      1    );
     #define FCSDiff_focus_width 16
-    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                    false,    false,        false,              true,         0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, 0.5,          0,        1e50,     1    );
     #define FCSDiff_focus_volume 17
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                    false,    false,        false,              true,         0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, 0.5,          0,        1e50,     1    );
     #define FCSDiff_concentration 18
-    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",   false,    false,        false,              true,         500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, 500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff1 19
-    addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",   false,    false,        false,              true,         500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, 500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff2 20
-    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",   false,    false,        false,              true,         500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, 500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff3 21
 }
 
@@ -104,7 +104,6 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
 
 
 
-// TODO: Remove resorting of diffusion times in all calcParameters()
 
 void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     int comp=data[FCSDiff_n_components];
@@ -195,7 +194,7 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         rho3=0;
         erho3=0;
         // sort diffusion times in ascending order
-        if (tauD1>tauD2) {
+        /*if (tauD1>tauD2) {
             data[FCSDiff_diff_tau1]=tauD2;
             data[FCSDiff_diff_rho1]=rho2;
             data[FCSDiff_diff_tau2]=tauD1;
@@ -225,7 +224,7 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
                 error[FCSDiff_diff_tau3]=etauD3;
                 error[FCSDiff_diff_rho3]=erho3;
             }
-        }
+        //}*/
     } else if (comp==3) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
@@ -238,7 +237,7 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         rho1=1.0-rho2-rho3;
         erho1=sqrt(erho2*erho2+erho3*erho3);
         // sort diffusion times in ascending order
-        if (tauD1<tauD2) {
+        /*if (tauD1<tauD2) {
             if (tauD2<tauD3) { // tauD1<tauD2<tauD3
                 data[FCSDiff_diff_tau1]=tauD1;
                 data[FCSDiff_diff_rho1]=rho1;
@@ -246,6 +245,14 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
                 data[FCSDiff_diff_rho2]=rho2;
                 data[FCSDiff_diff_tau3]=tauD3;
                 data[FCSDiff_diff_rho3]=rho3;
+                if (error) {
+                    error[FCSDiff_diff_tau1]=etauD1;
+                    error[FCSDiff_diff_rho1]=erho1;
+                    error[FCSDiff_diff_tau2]=etauD2;
+                    error[FCSDiff_diff_rho2]=erho2;
+                    error[FCSDiff_diff_tau3]=etauD3;
+                    error[FCSDiff_diff_rho3]=erho3;
+                }
             } else { // tauD3<tauD2
                 if (tauD1<tauD3) { // tauD1<tauD3<tauD2
                     data[FCSDiff_diff_tau1]=tauD1;
@@ -328,24 +335,31 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
                     }
                 }
             }
-        }
+        }*/
     }
 
-
+    data[FCSDiff_diff_rho1]=rho1;
+    data[FCSDiff_diff_rho2]=rho2;
+    data[FCSDiff_diff_rho3]=rho3;
+    if (error) {
+        error[FCSDiff_diff_rho1]=erho1;
+        error[FCSDiff_diff_rho2]=erho2;
+        error[FCSDiff_diff_rho3]=erho3;
+    }
 
     // reread to variables after sort
-    rho1=data[FCSDiff_diff_rho1];
+    //rho1=data[FCSDiff_diff_rho1];
     tauD1=data[FCSDiff_diff_tau1]/1.0e6;
-    rho2=data[FCSDiff_diff_rho2];
+    //rho2=data[FCSDiff_diff_rho2];
     tauD2=data[FCSDiff_diff_tau2]/1.0e6;
-    rho3=data[FCSDiff_diff_rho3];
+    //rho3=data[FCSDiff_diff_rho3];
     tauD3=data[FCSDiff_diff_tau3]/1.0e6;
     if (error) {
-        erho1=error[FCSDiff_diff_rho1];
+        //erho1=error[FCSDiff_diff_rho1];
         etauD1=error[FCSDiff_diff_tau1]/1.0e6;
-        erho2=error[FCSDiff_diff_rho2];
+        //erho2=error[FCSDiff_diff_rho2];
         etauD2=error[FCSDiff_diff_tau2]/1.0e6;
-        erho3=error[FCSDiff_diff_rho3];
+        //erho3=error[FCSDiff_diff_rho3];
         etauD3=error[FCSDiff_diff_tau3]/1.0e6;
     }
 
@@ -417,50 +431,50 @@ QString QFFitFunctionFCSDiff::transformParametersForAdditionalPlot(int plot, dou
 
 
 QFFitFunctionFCSADiff::QFFitFunctionFCSADiff() {
-    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError, initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             false,        1,            0,        2,        1,   0,      2);
+    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
+    addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      1,            0,        2,        1,   0,      2);
     #define FCSADiff_n_nonfluorescent 0
-    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             false,        1,            1,        3,        1,   1,      2);
+    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      1,            1,        3,        1,   1,      2);
     #define FCSADiff_n_components 1
-    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              true,         3.0,          0,        10,       0.1, 0  );
+    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 3.0,          0,        10,       0.1, 0  );
     #define FCSADiff_nonfl_tau1 2
-    addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",            "",                      true,      true,         true,              true,         0.2,          0,        0.99999,  0.1, 0,      1);
+    addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSADiff_nonfl_theta1 3
-    addParameter(FloatNumber,  "nonfl_tau2",              "dark component 2 decay time",                           "&tau;<sub>dark,2</sub>",   "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "nonfl_tau2",              "dark component 2 decay time",                           "&tau;<sub>dark,2</sub>",   "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1e-10,    1e5,      1,   0);
     #define FCSADiff_nonfl_tau2 4
-    addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              true,         0.2,          0,        0.99999,  0.1, 0,      1);
+    addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSADiff_nonfl_theta2 5
-    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              true,         10,           1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 10,           1e-10,    1e5,      1,   0);
     #define FCSADiff_n_particle 6
-    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             true,         0.1,          1e-10,    1e5,      0.1, 0);
+    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSADiff_1n_particle 7
-    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             true,         0.5,          0,        0.99999,  0.1, 0,      1);
+    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1);
     #define FCSADiff_diff_rho1 8
-    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         30,           1,        1e5,      1,   0        );
+    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 30,           1,        1e5,      1,   0        );
     #define FCSADiff_diff_tau1 9
-    addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of first component",                "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              true,         1,            1e-5,     1e5,      0.1, 0        );
+    addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of first component",                "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-5,     1e5,      0.1, 0        );
     #define FCSADiff_diff_alpha1 10
-    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              true,         0.5,          0,        0.99999,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSADiff_diff_rho2 11
-    addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1,        1e8,      1,   0    );
+    addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1,        1e8,      1,   0    );
     #define FCSADiff_diff_tau2 12
-    addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of second component",               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              true,         1,            1e-5,     1e5,      0.1, 0        );
+    addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of second component",               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-5,     1e5,      0.1, 0        );
     #define FCSADiff_diff_alpha2 13
-    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              true,         0.5,          0,        0.99999,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSADiff_diff_rho3 14
-    addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              true,         300,          1,        1e8,      1    );
+    addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1,        1e8,      1    );
     #define FCSADiff_diff_tau3 15
-    addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of third component",                "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              true,         1,            1e-5,     1e5,      0.1, 0        );
+    addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of third component",                "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-5,     1e5,      0.1, 0        );
     #define FCSADiff_diff_alpha3 16
-    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              true,         0,            -10,      10,       0.1  );
+    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 0,            -10,      10,       0.1  );
     #define FCSADiff_offset 17
-    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              true,         6,            0.01,     100,      0.5  );
+    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 6,            0.01,     100,      0.5  );
     #define FCSADiff_focus_struct_fac 18
-    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     false,     true,        false,              true,         250,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     false,     true,        false,              QFFitFunction::DisplayError, 250,          0,        1e4,      1    );
     #define FCSADiff_focus_width 19
-    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              true,         0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, 0.5,          0,        1e50,     1    );
     #define FCSADiff_focus_volume 20
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              true,         0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, 0.5,          0,        1e50,     1    );
     #define FCSADiff_concentration 21
 }
 
@@ -598,7 +612,7 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         rho3=0;
         erho3=0;
         // sort diffusion times in ascending order
-        if (tauD1>tauD2) {
+        /*if (tauD1>tauD2) {
             data[FCSADiff_diff_tau1]=tauD2;
             data[FCSADiff_diff_rho1]=rho2;
             data[FCSADiff_diff_alpha1]=alpha2;
@@ -613,7 +627,7 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
                 error[FCSADiff_diff_rho2]=erho1;
                 error[FCSADiff_diff_alpha2]=alpha1;
             }
-        }
+        }*/
     } else if (comp==3) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
@@ -626,7 +640,7 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         rho1=1.0-rho2-rho3;
         erho1=sqrt(erho2*erho2+erho3*erho3);
         // sort diffusion times in ascending order
-        if (tauD1<tauD2) {
+        /*if (tauD1<tauD2) {
             if (tauD2<tauD3) { // tauD1<tauD2<tauD3
                 data[FCSADiff_diff_tau1]=tauD1;
                 data[FCSADiff_diff_rho1]=rho1;
@@ -750,27 +764,35 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
                     }
                 }
             }
-        }
+        }*/
+    }
+
+    data[FCSDiff_diff_rho1]=rho1;
+    data[FCSDiff_diff_rho2]=rho2;
+    data[FCSDiff_diff_rho3]=rho3;
+    if (error) {
+        error[FCSDiff_diff_rho1]=erho1;
+        error[FCSDiff_diff_rho2]=erho2;
+        error[FCSDiff_diff_rho3]=erho3;
     }
 
 
-
     // reread to variables after sort
-    rho1=data[FCSADiff_diff_rho1];
+    //rho1=data[FCSADiff_diff_rho1];
     tauD1=data[FCSADiff_diff_tau1]/1.0e6;
-    rho2=data[FCSADiff_diff_rho2];
+    //rho2=data[FCSADiff_diff_rho2];
     tauD2=data[FCSADiff_diff_tau2]/1.0e6;
-    rho3=data[FCSADiff_diff_rho3];
+    //rho3=data[FCSADiff_diff_rho3];
     tauD3=data[FCSADiff_diff_tau3]/1.0e6;
     alpha1=data[FCSADiff_diff_alpha1];
     alpha2=data[FCSADiff_diff_alpha2];
     alpha3=data[FCSADiff_diff_alpha3];
     if (error) {
-        erho1=error[FCSADiff_diff_rho1];
+        //erho1=error[FCSADiff_diff_rho1];
         etauD1=error[FCSADiff_diff_tau1]/1.0e6;
-        erho2=error[FCSADiff_diff_rho2];
+        //erho2=error[FCSADiff_diff_rho2];
         etauD2=error[FCSADiff_diff_tau2]/1.0e6;
-        erho3=error[FCSADiff_diff_rho3];
+        //erho3=error[FCSADiff_diff_rho3];
         etauD3=error[FCSADiff_diff_tau3]/1.0e6;
         ealpha1=error[FCSADiff_diff_alpha1];
         ealpha2=error[FCSADiff_diff_alpha2];

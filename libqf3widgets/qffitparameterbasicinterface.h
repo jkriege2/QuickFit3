@@ -25,6 +25,13 @@ class QFFitParameterBasicInterface {
                     The error may only be stored in the QFRawDataRecord, if it is not available or accessible, then \c 0 is returned
         */
         virtual double getFitError(QString id)=0;
+        /*! \brief set the error of a given parameter
+
+            \param id set the value of the parameter with this id (see QFFitFunction)
+            \param error error to be set
+        */
+        virtual void setFitError(QString id, double error)=0;
+
         /*! \brief set the fix property of a fit parameter of the current fit function
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param value value to be stored
@@ -66,7 +73,7 @@ class QFFitParameterBasicInterface {
             \param value value to be stored
 
          */
-        virtual void setInitFitValue(QString id, double value)=0;
+        virtual void setInitFitValue(QString id, double value, double error=0.0)=0;
         /*! \brief set the fix property of a fit parameter in the initial parameters
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param value value to be stored

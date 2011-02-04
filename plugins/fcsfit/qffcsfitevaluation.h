@@ -112,6 +112,9 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord */
         void setFitResultValue(QString id, double value, double error);
 
+        /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord */
+        void setFitResultError(QString id, double error);
+
         /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord */
         void setFitResultValues(double* values, double* errors);
 
@@ -132,16 +135,22 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /*! \brief return the fit error of a given parameter
 
             \return the error associated with the given parameter.
-                    The error may only be stored in the QFRawDataRecord, if it is not available or accessible, then \c 0 is returned
         */
         double getFitError(QString id);
+
+        /*! \brief set the error of a given parameter
+
+            \param id set the value of the parameter with this id (see QFFitFunction)
+            \param error error to be set
+        */
+        void setFitError(QString id, double error);
 
         /*! \brief set the fix property of a fit parameter of the current fit function (see m_fitFunction)
 
             For a description of when data is stored, see setFitValue()
 
             \param id set the value of the parameter with this id (see QFFitFunction)
-            \param value value to be stored
+            \param fix fix to be stored
 
          */
         void setFitFix(QString id, bool fix);
@@ -270,24 +279,24 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         virtual double getDefaultFitValue(QString id);
         /*! \brief return the default/initial/global fix of a given parameter        */
         virtual bool getDefaultFitFix(QString id);
-        /*! \brief reset the all parameters to the initial/global/default value in all files */
+        /*! \brief reset all parameters to the initial/global/default value in all files */
         virtual void resetAllFitValue();
-        /*! \brief reset the all fit results to the initial/global/default value in all files */
+        /*! \brief reset all fit results to the initial/global/default value in all files */
         virtual void resetAllFitResults();
-        /*! \brief reset the all fit results to the initial/global/default value in all files */
-        virtual void resetAllFitResultsCurrent();
-        /*! \brief reset the all parameters to the initial/global/default fix in all files */
+        /*! \brief reset all parameters to the initial/global/default fix in all files */
         virtual void resetAllFitFix();
-        /*! \brief reset the all parameters to the initial/global/default value in current files */
+        /*! \brief reset all fit results to the initial/global/default value in the current file */
+        virtual void resetAllFitResultsCurrent();
+        /*! \brief reset all parameters to the initial/global/default value in current files */
         virtual void resetAllFitValueCurrent();
-        /*! \brief reset the all parameters to the initial/global/default fix in current files */
+        /*! \brief reset all parameters to the initial/global/default fix in current files */
         virtual void resetAllFitFixCurrent();
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param value value to be stored
 
          */
-        virtual void setInitFitValue(QString id, double value);
+        virtual void setInitFitValue(QString id, double value, double error=0.0);
         /*! \brief set the fix property of a fit parameter in the initial parameters
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param value value to be stored
@@ -308,6 +317,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         */
         struct FitParameter {
             double value;
+            double error;
             bool fix;
             double min;
             double max;
@@ -315,8 +325,10 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             bool fixSet;
             bool minSet;
             bool maxSet;
+            bool errorSet;
             FitParameter() {
                 value=0;
+                error=0;
                 fix=false;
                 min=0;
                 max=0;
@@ -324,6 +336,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
                 fixSet=false;
                 minSet=false;
                 maxSet=false;
+                errorSet=false;
             }
         };
 

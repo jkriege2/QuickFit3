@@ -50,7 +50,7 @@
     The first function should return the number of additional plots whereas the second transforms the plot parameters so they may be used to
     plot the additional function by calling evaluate().
 
-    \todo add possibility to make fit function editable
+    \todo add possibility to make fit function editable by user (math parser)
 
 */
 class QFFitFunction {
@@ -61,6 +61,14 @@ class QFFitFunction {
             IntNumber=1,   /**< an integer number edit widget is used for the parameter*/
             IntCombo=2,    /**< a combobox widget is used for the parameter*/
             Invalid=100    /**< invalid widget */
+        };
+
+        /** \brief error display mode */
+        enum ErrorDisplayMode {
+            NoError=0,      /**< do not display an error widget */
+            DisplayError=1, /**< display a label for the error */
+            EditError=2     /**< display a widget to edit the error */
+
         };
         /** \brief this struct is used to describe the fitting parameters */
         struct ParameterDescription {
@@ -83,7 +91,7 @@ class QFFitFunction {
              *         \c fit=userEditable=false to output values that were calculated from the fitting parameters after the fit. */
             bool userEditable;
             /** \brief determine whether, or not an error value is displayed for this parameter */
-            bool displayError;
+            ErrorDisplayMode displayError;
             /** \brief determine whether the user should be allowed to edit the parameter range */
             bool userRangeEditable;
             /** \brief an initial value for the parameter */
@@ -107,7 +115,7 @@ class QFFitFunction {
                 unit="";
                 fit=false;
                 userEditable=false;
-                displayError=false;
+                displayError=NoError;
                 userRangeEditable=false;
                 initialValue=0;
                 minValue=0;
@@ -230,7 +238,7 @@ class QFFitFunction {
             used in the constructor to define the model parameters
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, bool displayError, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX) {
+        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX) {
             ParameterDescription d;
             d.type=type;
             d.id=id;

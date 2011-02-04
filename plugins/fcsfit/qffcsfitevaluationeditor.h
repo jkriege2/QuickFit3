@@ -208,11 +208,11 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void errorStyleChanged(int style);
 
         /** \brief executed when a parameter is changed by the user */
-        void parameterValueChanged(QString id, double value);
+        void parameterValueChanged();
         /** \brief executed when a parameter fix is changed by the user */
-        void parameterFixChanged(QString id, bool fix);
+        void parameterFixChanged();
         /** \brief executed when a parameter range is changed by the user */
-        void parameterRangeChanged(QString id, double min, double max);
+        void parameterRangeChanged();
 
 
         /** \brief fit all files (current run) */

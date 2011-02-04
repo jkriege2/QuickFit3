@@ -62,6 +62,7 @@ void QFFCSFitEvaluation::intWriteData(QXmlStreamWriter& w) {
         w.writeStartElement("parameter");
         w.writeAttribute("id", i.key());
         if (i.value().valueSet) w.writeAttribute("value", QString::number(i.value().value, 'g', 12));
+        if (i.value().errorSet) w.writeAttribute("error", QString::number(i.value().error, 'g', 12));
         if (i.value().minSet) w.writeAttribute("min", QString::number(i.value().min, 'g', 12));
         if (i.value().maxSet) w.writeAttribute("max", QString::number(i.value().max, 'g', 12));
         if (i.value().fixSet) w.writeAttribute("fix", QString((i.value().fix)?QString("1"):QString("0")));
@@ -110,6 +111,10 @@ void QFFCSFitEvaluation::intReadData(QDomElement* e) {
             if (elt.hasAttribute("value")) {
                 p.value=elt.attribute("value").toDouble();
                 p.valueSet=true;
+            }
+            if (elt.hasAttribute("error")) {
+                p.error=elt.attribute("error").toDouble();
+                p.errorSet=true;
             }
             if (elt.hasAttribute("min")) {
                 p.min=elt.attribute("min").toDouble();
@@ -230,6 +235,27 @@ void QFFCSFitEvaluation::setFitValue(QString id, double value) {
     }
 }
 
+void QFFCSFitEvaluation::setFitError(QString id, double error) {
+    //std::cout<<"setFitValue("<<id.toStdString()<<", "<<value<<")\n";
+    if (getHighlightedRecord()!=NULL) {
+        QString dsid=getParameterStoreID(id);
+        if (hasFit()) {
+            setFitResultError(id, error);
+        } else {
+            QFFitFunction* f=getFitFunction();
+            if (f) {
+                QFFitFunction::ParameterDescription d=f->getDescription(id);
+                if (d.userEditable) {
+                    parameterStore[getParameterStoreID(id)].error=error;
+                    parameterStore[getParameterStoreID(id)].errorSet=true;
+                    emit propertiesChanged();
+                }
+            }
+        }
+
+    }
+}
+
 void QFFCSFitEvaluation::setFitResultValue(QString id, double value, double error) {
     QFRawDataRecord* r=getHighlightedRecord();
     if (r!=NULL) {
@@ -240,6 +266,19 @@ void QFFCSFitEvaluation::setFitResultValue(QString id, double value, double erro
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumberError(getEvaluationResultID(), id, value, error, unit);
+    }
+}
+
+void QFFCSFitEvaluation::setFitResultError(QString id, double error) {
+    QFRawDataRecord* r=getHighlightedRecord();
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction();
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(id);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumberError(getEvaluationResultID(), id, getFitValue(id), error, unit);
     }
 }
 
@@ -305,10 +344,17 @@ double QFFCSFitEvaluation::getFitValue(QString id) {
 }
 
 double QFFCSFitEvaluation::getFitError(QString id)  {
-    if (!hasFit()) return 0;
-    QFRawDataRecord* r=getHighlightedRecord();
-    if (r!=NULL) {
-        return r->resultsGetErrorAsDouble(getEvaluationResultID(), id);
+    if (hasFit()) {
+        QFRawDataRecord* r=getHighlightedRecord();
+        if (r!=NULL) {
+            return r->resultsGetErrorAsDouble(getEvaluationResultID(), id);
+        }
+    }
+    QString psID=getParameterStoreID(id);
+    if (parameterStore.contains(psID)) {
+        if (parameterStore[psID].errorSet) {
+            return parameterStore[psID].error;
+        }
     }
     return 0.0;
 }
@@ -766,7 +812,7 @@ void QFFCSFitEvaluation::setAllFitFixes(QString id, bool fix) {
     }
 }
 
-void QFFCSFitEvaluation::setInitFitValue(QString id, double value) {
+void QFFCSFitEvaluation::setInitFitValue(QString id, double value, double error) {
     if (getHighlightedRecord()!=NULL) {
         QString dsid=getParameterStoreID(id);
         QFFitFunction* f=getFitFunction();
@@ -775,6 +821,13 @@ void QFFCSFitEvaluation::setInitFitValue(QString id, double value) {
             if (d.userEditable) {
                 parameterStore[getParameterStoreID(id)].value=value;
                 parameterStore[getParameterStoreID(id)].valueSet=true;
+                if ((error!=0)&&(d.displayError==QFFitFunction::EditError)) {
+                    parameterStore[getParameterStoreID(id)].error=error;
+                    parameterStore[getParameterStoreID(id)].errorSet=true;
+                } else {
+                    parameterStore[getParameterStoreID(id)].error=0;
+                    parameterStore[getParameterStoreID(id)].errorSet=false;
+                }
                 emit propertiesChanged();
             }
         }
