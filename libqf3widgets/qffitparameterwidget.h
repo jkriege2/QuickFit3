@@ -1,5 +1,5 @@
-#ifndef QFFITPARAMETERWIDGET_H
-#define QFFITPARAMETERWIDGET_H
+#ifndef QFFitParameterWidgetWrapper_H
+#define QFFitParameterWidgetWrapper_H
 
 #include <QWidget>
 #include <QCheckBox>
@@ -33,7 +33,7 @@
     .
 
 */
-class QFFitParameterWidget : public QObject {
+class QFFitParameterWidgetWrapper : public QObject {
         Q_OBJECT
     public:
         /** \brief used to specify the widget to display */
@@ -52,8 +52,8 @@ class QFFitParameterWidget : public QObject {
             \param parent parent widget
             \param label label for the parameter
         */
-        QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""));
-        virtual ~QFFitParameterWidget();
+        QFFitParameterWidgetWrapper(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""));
+        virtual ~QFFitParameterWidgetWrapper();
 
         /** \brief return whether the user may edit the values */
         bool editable() { return m_editable; };
@@ -202,4 +202,4 @@ class QFFitParameterWidget : public QObject {
     private:
 };
 
-#endif // QFFITPARAMETERWIDGET_H
+#endif // QFFitParameterWidgetWrapper_H

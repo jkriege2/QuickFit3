@@ -25,9 +25,9 @@ double roundError(double error, int addSignifcant) {
     return round(error/f)*f;
 }
 
-#define QFFitParameterWidget_setMaxHeight(widget, height) { if (widget) { widget->setMaximumHeight(height); } }
+#define QFFitParameterWidgetWrapper_setMaxHeight(widget, height) { if (widget) { widget->setMaximumHeight(height); } }
 
-QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent, QString label):
+QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent, QString label):
     QObject(parent)
 {
     m_datastore=datastore;
@@ -268,21 +268,21 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     layout->setColumnStretch(COL_MIN, STRETCH_MIN);
     layout->setColumnStretch(COL_MAX, STRETCH_MAX);
 
-    QFFitParameterWidget_setMaxHeight(neditValue, height);
-    QFFitParameterWidget_setMaxHeight(spinIntValue, height);
-    QFFitParameterWidget_setMaxHeight(cmbIntValue, height);
-    QFFitParameterWidget_setMaxHeight(neditMin, height);
-    QFFitParameterWidget_setMaxHeight(spinIntMin, height);
-    QFFitParameterWidget_setMaxHeight(neditMax, height);
-    QFFitParameterWidget_setMaxHeight(spinIntMax, height);
-    QFFitParameterWidget_setMaxHeight(chkFix, height);
-    QFFitParameterWidget_setMaxHeight(labError, height);
-    QFFitParameterWidget_setMaxHeight(neditError, height);
-    QFFitParameterWidget_setMaxHeight(hlabValue, height);
-    QFFitParameterWidget_setMaxHeight(hlabMin, height);
-    QFFitParameterWidget_setMaxHeight(hlabMax, height);
-    QFFitParameterWidget_setMaxHeight(hlabFix, height);
-    QFFitParameterWidget_setMaxHeight(labLabel, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(neditValue, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(spinIntValue, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(cmbIntValue, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(neditMin, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(spinIntMin, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(neditMax, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(spinIntMax, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(chkFix, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(labError, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(neditError, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(hlabValue, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(hlabMin, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(hlabMax, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(hlabFix, height);
+    QFFitParameterWidgetWrapper_setMaxHeight(labLabel, height);
 
     setToolTip("");
     setEditRange(editRangeAllowed);
@@ -297,28 +297,28 @@ QFFitParameterWidget::QFFitParameterWidget(QFFitParameterBasicInterface* datasto
     reloadValues();
 }
 
-#define QFFitParameterWidget_delete(widget) { if (m_layout && widget) m_layout->removeWidget(widget); if (widget) { delete widget; widget=0; } }
+#define QFFitParameterWidgetWrapper_delete(widget) { if (m_layout && widget) m_layout->removeWidget(widget); if (widget) { delete widget; widget=0; } }
 
-QFFitParameterWidget::~QFFitParameterWidget() {
-    QFFitParameterWidget_delete(neditValue);
-    QFFitParameterWidget_delete(spinIntValue);
-    QFFitParameterWidget_delete(cmbIntValue);
-    QFFitParameterWidget_delete(neditMin);
-    QFFitParameterWidget_delete(spinIntMin);
-    QFFitParameterWidget_delete(neditMax);
-    QFFitParameterWidget_delete(spinIntMax);
-    QFFitParameterWidget_delete(chkFix);
-    QFFitParameterWidget_delete(labError);
-    QFFitParameterWidget_delete(neditError);
-    QFFitParameterWidget_delete(hlabValue);
-    QFFitParameterWidget_delete(hlabMin);
-    QFFitParameterWidget_delete(hlabMax);
-    QFFitParameterWidget_delete(hlabFix);
-    QFFitParameterWidget_delete(labLabel);
+QFFitParameterWidgetWrapper::~QFFitParameterWidgetWrapper() {
+    QFFitParameterWidgetWrapper_delete(neditValue);
+    QFFitParameterWidgetWrapper_delete(spinIntValue);
+    QFFitParameterWidgetWrapper_delete(cmbIntValue);
+    QFFitParameterWidgetWrapper_delete(neditMin);
+    QFFitParameterWidgetWrapper_delete(spinIntMin);
+    QFFitParameterWidgetWrapper_delete(neditMax);
+    QFFitParameterWidgetWrapper_delete(spinIntMax);
+    QFFitParameterWidgetWrapper_delete(chkFix);
+    QFFitParameterWidgetWrapper_delete(labError);
+    QFFitParameterWidgetWrapper_delete(neditError);
+    QFFitParameterWidgetWrapper_delete(hlabValue);
+    QFFitParameterWidgetWrapper_delete(hlabMin);
+    QFFitParameterWidgetWrapper_delete(hlabMax);
+    QFFitParameterWidgetWrapper_delete(hlabFix);
+    QFFitParameterWidgetWrapper_delete(labLabel);
 }
 
 
-void QFFitParameterWidget::reloadValues() {
+void QFFitParameterWidgetWrapper::reloadValues() {
     bool old_m_settingData=m_settingData;
     m_settingData=true;
 
@@ -358,7 +358,7 @@ void QFFitParameterWidget::reloadValues() {
     m_settingData=old_m_settingData;
 }
 
-void QFFitParameterWidget::setValue(double value, double error, bool writeback) {
+void QFFitParameterWidgetWrapper::setValue(double value, double error, bool writeback) {
     bool old_m_settingData=m_settingData;
     m_settingData=true;
 
@@ -390,28 +390,28 @@ void QFFitParameterWidget::setValue(double value, double error, bool writeback) 
     m_settingData=old_m_settingData;
 }
 
-void QFFitParameterWidget::doubleValueChanged(double value) {
+void QFFitParameterWidgetWrapper::doubleValueChanged(double value) {
     if ((!m_settingData) && m_editable) {
         m_datastore->setFitValue(m_parameterID, value);
         emit valueChanged(m_parameterID, value);
     }
 }
 
-void QFFitParameterWidget::doubleErrorChanged(double error) {
+void QFFitParameterWidgetWrapper::doubleErrorChanged(double error) {
     if ((!m_settingData) && m_editable) {
         m_datastore->setFitError(m_parameterID, error);
         emit errorChanged(m_parameterID, error);
     }
 }
 
-void QFFitParameterWidget::intValueChanged(int value) {
+void QFFitParameterWidgetWrapper::intValueChanged(int value) {
     if ((!m_settingData) && m_editable) {
         m_datastore->setFitValue(m_parameterID, value);
         emit valueChanged(m_parameterID, value);
     }
 }
 
-void QFFitParameterWidget::intValueChangedFromCombo(int valueIn) {
+void QFFitParameterWidgetWrapper::intValueChangedFromCombo(int valueIn) {
     int value=valueIn;
     if (cmbIntValue) value=cmbIntValue->itemData(valueIn).toInt();
     if ((!m_settingData) && m_editable) {
@@ -419,7 +419,7 @@ void QFFitParameterWidget::intValueChangedFromCombo(int valueIn) {
         emit valueChanged(m_parameterID, value);
     }
 }
-void QFFitParameterWidget::sfixChanged(bool fix) {
+void QFFitParameterWidgetWrapper::sfixChanged(bool fix) {
     if ((!m_settingData) && m_editable) {
         m_datastore->setFitFix(m_parameterID, fix);
         emit fixChanged(m_parameterID, fix);
@@ -427,7 +427,7 @@ void QFFitParameterWidget::sfixChanged(bool fix) {
 }
 
 
-void QFFitParameterWidget::doubleMinChanged(double value) {
+void QFFitParameterWidgetWrapper::doubleMinChanged(double value) {
     if ((!m_settingData) && m_editable && m_editRange) {
         m_datastore->setFitMin(m_parameterID, value);
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
@@ -436,7 +436,7 @@ void QFFitParameterWidget::doubleMinChanged(double value) {
     }
 }
 
-void QFFitParameterWidget::doubleMaxChanged(double value) {
+void QFFitParameterWidgetWrapper::doubleMaxChanged(double value) {
     if ((!m_settingData) && m_editable && m_editRange) {
         m_datastore->setFitMax(m_parameterID, value);
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
@@ -445,7 +445,7 @@ void QFFitParameterWidget::doubleMaxChanged(double value) {
     }
 }
 
-void QFFitParameterWidget::intMinChanged(int value) {
+void QFFitParameterWidgetWrapper::intMinChanged(int value) {
     if ((!m_settingData) && m_editable && m_editRange) {
         m_datastore->setFitMin(m_parameterID, value);
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
@@ -454,7 +454,7 @@ void QFFitParameterWidget::intMinChanged(int value) {
     }
 }
 
-void QFFitParameterWidget::intMaxChanged(int value) {
+void QFFitParameterWidgetWrapper::intMaxChanged(int value) {
     if ((!m_settingData) && m_editable && m_editRange) {
         m_datastore->setFitMax(m_parameterID, value);
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
@@ -463,7 +463,7 @@ void QFFitParameterWidget::intMaxChanged(int value) {
     }
 }
 
-void QFFitParameterWidget::setWidgetWidth(int width) {
+void QFFitParameterWidgetWrapper::setWidgetWidth(int width) {
     m_widgetWidth=width;
     /*if (neditValue) {
         neditValue->setMinimumWidth(m_widgetWidth);
@@ -501,11 +501,11 @@ void QFFitParameterWidget::setWidgetWidth(int width) {
     //m_layout->setColumnMinimumWidth(2, m_widgetWidth);
 }
 
-void QFFitParameterWidget::setUnit(QString unit) {
+void QFFitParameterWidgetWrapper::setUnit(QString unit) {
     m_unit=unit;
 }
 
-void QFFitParameterWidget::setIncrement(double increment) {
+void QFFitParameterWidgetWrapper::setIncrement(double increment) {
     m_increment=increment;
     if (neditValue) {
         neditValue->setSingleStep(m_increment);
@@ -527,7 +527,7 @@ void QFFitParameterWidget::setIncrement(double increment) {
     }
 }
 
-void QFFitParameterWidget::setEditRange(bool editRange) {
+void QFFitParameterWidgetWrapper::setEditRange(bool editRange) {
     if (!m_editRangeAllowed) {
         m_editRange=false;
         if (spinIntMax) spinIntMax->setVisible(false);
@@ -559,7 +559,7 @@ void QFFitParameterWidget::setEditRange(bool editRange) {
     }
 }
 
-void QFFitParameterWidget::setEditValues(bool editValues) {
+void QFFitParameterWidgetWrapper::setEditValues(bool editValues) {
     m_editValues=editValues;
     if (spinIntValue) spinIntValue->setVisible(m_visible && editValues);
     if (neditValue) neditValue->setVisible(m_visible && editValues);
@@ -585,7 +585,7 @@ void QFFitParameterWidget::setEditValues(bool editValues) {
     }
 }
 
-void QFFitParameterWidget::setRangeEnabled(bool enabled) {
+void QFFitParameterWidgetWrapper::setRangeEnabled(bool enabled) {
     if (spinIntMax) spinIntMax->setEnabled(enabled);
     if (spinIntMin) spinIntMin->setEnabled(enabled);
     if (neditMax) neditMax->setEnabled(enabled);
@@ -594,14 +594,14 @@ void QFFitParameterWidget::setRangeEnabled(bool enabled) {
     if (hlabMax) hlabMax->setEnabled(enabled);
 }
 
-void QFFitParameterWidget::fillCombo(QComboBox* cmb, int min, int max) {
+void QFFitParameterWidgetWrapper::fillCombo(QComboBox* cmb, int min, int max) {
     cmb->clear();
     for(int i=min; i<=max; i++) {
         cmb->addItem(QString::number(i), i);
     }
 }
 
-void QFFitParameterWidget::setValueAbsoluteRange(double min, double max) {
+void QFFitParameterWidgetWrapper::setValueAbsoluteRange(double min, double max) {
     if ( min != -DBL_MAX ) {
         if (neditMin) neditMin->setMinimum(min);
         if (spinIntMin) {
@@ -629,7 +629,7 @@ void QFFitParameterWidget::setValueAbsoluteRange(double min, double max) {
     }
 }
 
-void QFFitParameterWidget::setToolTip(QString paramDescription) {
+void QFFitParameterWidgetWrapper::setToolTip(QString paramDescription) {
     m_paramDescription=paramDescription;
     QString ttLabel=m_paramDescription;
     QString ttValue=m_paramDescription;
@@ -650,26 +650,26 @@ void QFFitParameterWidget::setToolTip(QString paramDescription) {
     if (labLabel) labLabel->setToolTip(ttLabel);
 }
 
-#define QFFitParameterWidget_setVisible(widget) if (widget) widget->setVisible(visible);
+#define QFFitParameterWidgetWrapper_setVisible(widget) if (widget) widget->setVisible(visible);
 
-void QFFitParameterWidget::setVisible(bool visible) {
+void QFFitParameterWidgetWrapper::setVisible(bool visible) {
     m_visible=visible;
     if (!visible) {
-        QFFitParameterWidget_setVisible(neditValue);
-        QFFitParameterWidget_setVisible(spinIntValue);
-        QFFitParameterWidget_setVisible(cmbIntValue);
-        QFFitParameterWidget_setVisible(neditMin);
-        QFFitParameterWidget_setVisible(spinIntMin);
-        QFFitParameterWidget_setVisible(neditMax);
-        QFFitParameterWidget_setVisible(spinIntMax);
-        QFFitParameterWidget_setVisible(chkFix);
-        QFFitParameterWidget_setVisible(labError);
-        QFFitParameterWidget_setVisible(neditError);
-        QFFitParameterWidget_setVisible(hlabValue);
-        QFFitParameterWidget_setVisible(hlabMin);
-        QFFitParameterWidget_setVisible(hlabMax);
-        QFFitParameterWidget_setVisible(hlabFix);
-        QFFitParameterWidget_setVisible(labLabel);
+        QFFitParameterWidgetWrapper_setVisible(neditValue);
+        QFFitParameterWidgetWrapper_setVisible(spinIntValue);
+        QFFitParameterWidgetWrapper_setVisible(cmbIntValue);
+        QFFitParameterWidgetWrapper_setVisible(neditMin);
+        QFFitParameterWidgetWrapper_setVisible(spinIntMin);
+        QFFitParameterWidgetWrapper_setVisible(neditMax);
+        QFFitParameterWidgetWrapper_setVisible(spinIntMax);
+        QFFitParameterWidgetWrapper_setVisible(chkFix);
+        QFFitParameterWidgetWrapper_setVisible(labError);
+        QFFitParameterWidgetWrapper_setVisible(neditError);
+        QFFitParameterWidgetWrapper_setVisible(hlabValue);
+        QFFitParameterWidgetWrapper_setVisible(hlabMin);
+        QFFitParameterWidgetWrapper_setVisible(hlabMax);
+        QFFitParameterWidgetWrapper_setVisible(hlabFix);
+        QFFitParameterWidgetWrapper_setVisible(labLabel);
     } else {
         setEditRange(m_editRange);
         setEditValues(m_editValues);
@@ -677,54 +677,54 @@ void QFFitParameterWidget::setVisible(bool visible) {
 }
 
 
-void QFFitParameterWidget::pEnterPressed() {
+void QFFitParameterWidgetWrapper::pEnterPressed() {
     emit enterPressed(m_parameterID);
 }
 
-void QFFitParameterWidget::s_actCopyValue() {
+void QFFitParameterWidgetWrapper::s_actCopyValue() {
     m_datastore->setAllFitValues(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
     m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
 }
 
-void QFFitParameterWidget::s_actCopyFix() {
+void QFFitParameterWidgetWrapper::s_actCopyFix() {
     m_datastore->setAllFitFixes(m_parameterID, m_datastore->getFitFix(m_parameterID));
     m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
 }
 
-void QFFitParameterWidget::s_actCopyValueFix() {
+void QFFitParameterWidgetWrapper::s_actCopyValueFix() {
     s_actCopyValue();
     s_actCopyFix();
 }
 
-void QFFitParameterWidget::s_actCopyValueInit() {
+void QFFitParameterWidgetWrapper::s_actCopyValueInit() {
     m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
 }
 
-void QFFitParameterWidget::s_actCopyFixInit() {
+void QFFitParameterWidgetWrapper::s_actCopyFixInit() {
     m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
 }
 
-void QFFitParameterWidget::s_actCopyValueFixInit() {
+void QFFitParameterWidgetWrapper::s_actCopyValueFixInit() {
     s_actCopyValueInit();
     s_actCopyFixInit();
 }
 
-void QFFitParameterWidget::s_actResetValue() {
+void QFFitParameterWidgetWrapper::s_actResetValue() {
     m_datastore->resetDefaultFitValue(m_parameterID);
     reloadValues();
 }
 
-void QFFitParameterWidget::s_actResetFix() {
+void QFFitParameterWidgetWrapper::s_actResetFix() {
     m_datastore->resetDefaultFitFix(m_parameterID);
     reloadValues();
 }
 
-void QFFitParameterWidget::s_actResetValueFix() {
+void QFFitParameterWidgetWrapper::s_actResetValueFix() {
     s_actResetValue();
     s_actResetFix();
 }
 
-void QFFitParameterWidget::keyEventMatches(int key, Qt::KeyboardModifiers modifiers) {
+void QFFitParameterWidgetWrapper::keyEventMatches(int key, Qt::KeyboardModifiers modifiers) {
     if ((modifiers==Qt::NoModifier)&&(key==Qt::Key_Space)) {
         if (chkFix) chkFix->toggle();
     }

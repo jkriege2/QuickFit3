@@ -564,7 +564,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create header widget
         /////////////////////////////////////////////////////////////////////////////////////////////
-        QFFitParameterWidget* header=new QFFitParameterWidget(eval, layParameters, 0, "", QFFitParameterWidget::Header, true, true, QFFitFunction::DisplayError, true, this, tr("parameter"));
+        QFFitParameterWidgetWrapper* header=new QFFitParameterWidgetWrapper(eval, layParameters, 0, "", QFFitParameterWidgetWrapper::Header, true, true, QFFitFunction::DisplayError, true, this, tr("parameter"));
         m_fitParameters.append(header);
         connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
         connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(unsetEditValues(bool)));
@@ -577,9 +577,9 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         for (int i=0; i<ffunc->paramCount(); i++) {
             QString id=ffunc->getParameterID(i);
             QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
-            QFFitParameterWidget::WidgetType wtype=QFFitParameterWidget::FloatEdit;
-            if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidget::IntSpinBox;
-            if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidget::IntDropDown;
+            QFFitParameterWidgetWrapper::WidgetType wtype=QFFitParameterWidgetWrapper::FloatEdit;
+            if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidgetWrapper::IntSpinBox;
+            if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidgetWrapper::IntDropDown;
             bool editable=d.userEditable;
             bool displayFix=d.userEditable;
             QFFitFunction::ErrorDisplayMode displayError=d.displayError;
@@ -593,7 +593,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             l.replace("<sup>", "<sup><font size=\"+2\">", Qt::CaseInsensitive);
             l.replace("</sup>", "</font></sup>", Qt::CaseInsensitive);
             l.replace("</sub>", "</font></sub>", Qt::CaseInsensitive);
-            QFFitParameterWidget* fpw=new QFFitParameterWidget(eval, layParameters, i+1, id, wtype, editable, displayFix, displayError, editRange, this, l);
+            QFFitParameterWidgetWrapper* fpw=new QFFitParameterWidgetWrapper(eval, layParameters, i+1, id, wtype, editable, displayFix, displayError, editRange, this, l);
             fpw->setUnit(d.unit);
             fpw->setIncrement(d.inc);
             fpw->setWidgetWidth(m_parameterWidgetWidth);

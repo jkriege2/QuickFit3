@@ -138,7 +138,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QGridLayout* layParameters;
 
         /** \brief this list contains all currently displayed fitParameterWidgets */
-        QList<QPointer<QFFitParameterWidget> > m_fitParameters;
+        QList<QPointer<QFFitParameterWidgetWrapper> > m_fitParameters;
 
         /** \brief width of the widgets in m_fitParameters */
         int m_parameterWidgetWidth;

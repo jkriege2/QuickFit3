@@ -41,24 +41,25 @@ DataCutSliders::DataCutSliders(QWidget* parent):
 }
 
 void DataCutSliders::contextMenuEvent(QContextMenuEvent *event) {
-    if (!allowCopyToAll) return;
-    if (contextMenu==NULL) {
-        contextMenu=new QMenu(this);
 
-        actCopyMin=contextMenu->addAction(tr("copy m&in to all files"));
+    QMenu *menu = createStandardContextMenu();
+    if (allowCopyToAll) {
+        menu->addSeparator();
+        actCopyMin=menu->addAction(tr("copy m&in to all files"));
         connect(actCopyMin, SIGNAL(triggered()), this, SLOT(copyUserMinClicked()));
-        actCopyMax=contextMenu->addAction(tr("copy m&ax to all files"));
+        actCopyMax=menu->addAction(tr("copy m&ax to all files"));
         connect(actCopyMax, SIGNAL(triggered()), this, SLOT(copyUserMaxClicked()));
-        actCopyBoth=contextMenu->addAction(tr("copy min&+max to all files"));
+        actCopyBoth=menu->addAction(tr("copy min&+max to all files"));
         connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMinClicked()));
         connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMaxClicked()));
-        contextMenu->addSeparator();
-        actFitCurrent=contextMenu->addAction(tr("fit &current file"));
+        menu->addSeparator();
+        actFitCurrent=menu->addAction(tr("fit &current file"));
         connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrentClicked()));
-        actFitAll=contextMenu->addAction(tr("fit &all files"));
+        actFitAll=menu->addAction(tr("fit &all files"));
         connect(actFitAll, SIGNAL(triggered()), this, SLOT(fitAllClicked()));
     }
-    contextMenu->exec(event->globalPos());
+    menu->exec(event->globalPos());
+    delete menu;
 }
 
 void DataCutSliders::sliderLowValueChanged(int value){
