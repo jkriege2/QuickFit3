@@ -1,6 +1,10 @@
 #include "qfrawdatapropertyeditor.h"
 #include "dlgnewproperty.h"
 
+// TODO: add some more options to the fit results display: average over several selected data items
+// TODO: add some more options to the fit results display: store column under different name
+
+
 QFRawDataPropertyEditor::QFRawDataPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFRawDataRecord* current, int id, QWidget* parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
@@ -284,6 +288,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     QVBoxLayout* rwvlayout=new QVBoxLayout(this);
     widResults->setLayout(rwvlayout);
     tvResults=new QTableView(widResults);
+    tvResults->setAlternatingRowColors(true);
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     rwvlayout->addWidget(tvResults);
     tabMain->addTab(widResults, tr("Evaluation &Results"));

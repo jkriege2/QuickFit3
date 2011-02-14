@@ -6,10 +6,11 @@ INCLUDEPATH += ../../../../LIB/trunk/
 
 QT += gui xml
 DESTDIR = ../output/
-DLLDESTDIR = $$DESTDIR
+#DLLDESTDIR = $$DESTDIR
 
 # Input
 HEADERS += dlgnewproperty.h \
+           dlgqffitalgorithmprogressdialog.h \
            programoptions.h \
            qfevaluationeditor.h \
            qfevaluationitem.h \
@@ -34,9 +35,11 @@ HEADERS += dlgnewproperty.h \
            qffitalgorithmmanager.h \
            qfpluginfitfunction.h \
            qfpluginfitalgorithm.h \
-           qftools.h
+           qftools.h \
+           qffitalgorithmthreaddedfit.h
 
 SOURCES += dlgnewproperty.cpp \
+           dlgqffitalgorithmprogressdialog.cpp \
            programoptions.cpp \
            qfevaluationeditor.cpp \
            qfevaluationitem.cpp \
@@ -55,9 +58,11 @@ SOURCES += dlgnewproperty.cpp \
            qffitalgorithm.cpp \
            qffitfunctionmanager.cpp \
            qffitalgorithmmanager.cpp \
-           qftools.cpp
+           qftools.cpp \
+           qffitalgorithmthreaddedfit.cpp
 
-FORMS +=   dlg_newproperty.ui
+FORMS +=   dlg_newproperty.ui \
+           dlg_fitalgorithmprogress.ui
 
 RESOURCES +=
 

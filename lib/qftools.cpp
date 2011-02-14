@@ -58,10 +58,82 @@ double roundError(double error, int addSignifcant) {
 }
 
 double roundWithError(double value, double error, int addSignifcant)  {
-    if (fabs(error)<DBL_MIN*10) return value;
+    if ((fabs(error)<DBL_MIN*10)||(!std::isfinite(error))) return value;
 
     int sbits_error=ceil(log(fabs(error))/log(10.0));
+    if (sbits_error>=0) sbits_error=-1;
     double f=pow(10.0, sbits_error-1-addSignifcant);
 
     return round(value/f)*f;
 }
+
+
+
+
+QString getQVariantType(const QVariant& variant) {
+    QString t="invalid";
+    switch(variant.type()) {
+        case QVariant::Bool: t="bool"; break;
+        case QVariant::Char: t="char"; break;
+        case QVariant::Date: t="date"; break;
+        case QVariant::DateTime: t="datetime"; break;
+        case QVariant::Double: t="double"; break;
+        case QVariant::Int: t="int"; break;
+        case QVariant::LongLong: t="longlong"; break;
+        case QVariant::String: t="string"; break;
+        case QVariant::StringList: t="stringlist"; break;
+        case QVariant::UInt: t="uint"; break;
+        case QVariant::ULongLong: t="ulonglong"; break;
+        case QVariant::Time: t="time"; break;
+        case QVariant::Point: t="point"; break;
+        case QVariant::Size: t="size"; break;
+        case QVariant::SizeF: t="sizef"; break;
+        case QVariant::BitArray: t="bitarray"; break;
+        case QVariant::ByteArray: t="bytearray"; break;
+        case QVariant::Color: t="color"; break;
+        case QVariant::Font: t="font"; break;
+        case QVariant::Hash: t="hash"; break;
+        case QVariant::List: t="list"; break;
+        case QVariant::Map: t="map"; break;
+        case QVariant::Rect: t="rect"; break;
+        case QVariant::RectF: t="rectf"; break;
+        case QVariant::Invalid: t="invalid"; break;
+        case QVariant::Url: t="url"; break;
+        default: t="unknown"; break;
+    }
+    return t;
+}
+
+QString getQVariantData(const QVariant& variant) {
+    return variant.toString();
+}
+
+QVariant getQVariantFromString(const QString& type, const QString& data) {
+    QVariant d=data;
+    //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
+    bool c=false;
+    if (type=="bool") { c=d.convert(QVariant::Bool); }
+    else if (type=="char") { c=d.convert(QVariant::Char); }
+    else if (type=="date") { c=d.convert(QVariant::Date); }
+    else if (type=="datetime") { c=d.convert(QVariant::DateTime); }
+    else if (type=="double") { c=d.convert(QVariant::Double); }
+    else if (type=="int") { c=d.convert(QVariant::Int); }
+    else if (type=="longlong") { c=d.convert(QVariant::LongLong); }
+    else if (type=="string") { c=d.convert(QVariant::String); }
+    else if (type=="stringlist") { c=d.convert(QVariant::StringList); }
+    else if (type=="uint") { c=d.convert(QVariant::UInt); }
+    else if (type=="ulonglong") { c=d.convert(QVariant::ULongLong); }
+    else if (type=="time") { c=d.convert(QVariant::Time); }
+    else if (type=="bytearray") { c=d.convert(QVariant::ByteArray); }
+    else if (type=="color") { c=d.convert(QVariant::Color); }
+    else {
+        d=QVariant();
+    }
+    if (!c) {
+        d=QVariant();
+    }
+    return d;
+}
+
+
+

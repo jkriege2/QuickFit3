@@ -3,6 +3,7 @@
 #define MAINWINDOW_H
 
 #include <QtGui>
+#include <QTimer>
 #include "../lib/qfproject.h"
 #include "../lib/qfprojecttreemodel.h"
 #include "../lib/qfrawdatapropertyeditor.h"
@@ -118,6 +119,9 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief this slot is executed wvery minute and is used to store the program settings */
         void autoWriteSettings();
+
+        /** \brief autosave the current project */
+        void autosaveProject();
     private:
         void createWidgets();
         void createActions();
@@ -171,6 +175,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QtLogFile* logFileProjectWidget;
         QtLogFile* logFileMainWidget;
         QTabWidget* tabLogs;
+
+        QTimer* timerAutosave;
 
 
         QList<QPointer<QFRawDataPropertyEditor> > rawDataPropEditors;

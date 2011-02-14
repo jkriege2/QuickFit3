@@ -57,11 +57,6 @@ class DataCutSliders : public QWidget
         /** \brief this emity copyUserMaxToAll() */
         void copyUserMaxClicked() { emit copyUserMaxToAll(userMax); };
 
-        /** \brief called when actFitAll was clicked */
-        void fitAllClicked() { emit fitAll(); };
-
-        /** \brief called when actFitCurrent was clicked */
-        void fitCurrentClicked() { emit fitCurrent(); };
 
     signals:
         /** \brief this signal is emitted by the DataCutSlider widget, whenever the user moved the sliders or set new values by
@@ -76,11 +71,6 @@ class DataCutSliders : public QWidget
         /** \brief this signal is emited when the user clicks the "copy to all" context menu of the max widget item. */
         void copyUserMaxToAll(int userMax);
 
-        /** \brief tells the application to fit the current file again */
-        void fitCurrent();
-
-        /** \brief tells the application to fit all files */
-        void fitAll();
 
     public slots:
         /** \brief sets all the data and constraints of the widget at once */
@@ -107,12 +97,6 @@ class DataCutSliders : public QWidget
         QAction* actCopyMax;
         /** \brief this signal is emited when the user clicks the "copymin+maxto all" context menu item. */
         QAction* actCopyBoth;
-
-        /** \brief "fit current file" action inside contextMenu */
-        QAction* actFitCurrent;
-
-        /** \brief "fit all files" action inside contextMenu */
-        QAction* actFitAll;
 
         /** \brief if set \c true this widget may emit a copyToAll() signal */
         bool allowCopyToAll;

@@ -7,7 +7,7 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     //setMinimumHeight(60);
 
     sliderSignals=true;
-    allowCopyToAll=false;
+    allowCopyToAll=true;
     min=0;
     max=100;
     userMin=0;
@@ -41,8 +41,7 @@ DataCutSliders::DataCutSliders(QWidget* parent):
 }
 
 void DataCutSliders::contextMenuEvent(QContextMenuEvent *event) {
-
-    QMenu *menu = createStandardContextMenu();
+    QMenu *menu = new QMenu(this);
     if (allowCopyToAll) {
         menu->addSeparator();
         actCopyMin=menu->addAction(tr("copy m&in to all files"));
@@ -52,11 +51,6 @@ void DataCutSliders::contextMenuEvent(QContextMenuEvent *event) {
         actCopyBoth=menu->addAction(tr("copy min&+max to all files"));
         connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMinClicked()));
         connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMaxClicked()));
-        menu->addSeparator();
-        actFitCurrent=menu->addAction(tr("fit &current file"));
-        connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrentClicked()));
-        actFitAll=menu->addAction(tr("fit &all files"));
-        connect(actFitAll, SIGNAL(triggered()), this, SLOT(fitAllClicked()));
     }
     menu->exec(event->globalPos());
     delete menu;

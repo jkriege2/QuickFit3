@@ -129,6 +129,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
         emit propertiesChanged();
         emit rawDataChanged();
     }
+    resultsmodel->init(this);
 }
 
 
@@ -295,6 +296,27 @@ void QFRawDataRecord::resultsSetBoolean(QString evaluationName, QString resultNa
     results[evaluationName].insert(resultName, r);
     emit resultsChanged();
 };
+
+QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultName) {
+    QVariant result;
+    evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreBoolean: result=r.bvalue; break;
+        case qfrdreInteger: result=r.ivalue; break;
+        case qfrdreNumberError:
+        case qfrdreNumber: result=r.dvalue; break;
+        case qfrdreNumberList: {
+            QList<QVariant> data;
+            for (int i=0; i<r.dvec.size(); i++) {
+                data.append(r.dvec[i]);
+            }
+            result=data;
+            break;
+        }
+        case qfrdreString: result=r.svalue; break;
+    }
+    return result;
+}
 
 QString QFRawDataRecord::resultsGetAsString(QString evalName, QString resultName) {
     evaluationResult r=resultsGet(evalName, resultName);

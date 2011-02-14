@@ -191,7 +191,7 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
         if ((displayError==QFFitFunction::DisplayError)||(displayError==QFFitFunction::EditError)) {
             labError=new QLabel(parent);
             layout->addWidget(labError, row, COL_ERROR);
-            labError->setText(tr("<b>&plusmn; error</b>"));
+            labError->setText(tr("<b>&nbsp;&plusmn; error</b>"));
             labError->setAlignment(Qt::AlignHCenter);
             height=qMax(height, labError->minimumSizeHint().height());
         }
@@ -287,8 +287,8 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     setToolTip("");
     setEditRange(editRangeAllowed);
     setRangeEnabled(true);
+    setEditRange(false);
     setEditValues(true);
-    setEditRange(true);
     setVisible(true);
     setWidgetWidth(m_widgetWidth);
     setUnit(m_unit);
@@ -322,12 +322,12 @@ void QFFitParameterWidgetWrapper::reloadValues() {
     bool old_m_settingData=m_settingData;
     m_settingData=true;
 
-    if (m_editRange) {
+    //if (m_editRange) {
         if (neditMin) neditMin->setValue(m_datastore->getFitMin(m_parameterID));
         if (neditMax) neditMax->setValue(m_datastore->getFitMax(m_parameterID));
         if (spinIntMin) spinIntMin->setValue(m_datastore->getFitMin(m_parameterID));
         if (spinIntMax) spinIntMax->setValue(m_datastore->getFitMax(m_parameterID));
-    }
+    //}
 
     double value=m_datastore->getFitValue(m_parameterID);
 
@@ -344,7 +344,7 @@ void QFFitParameterWidgetWrapper::reloadValues() {
         }
     }
     double error=m_datastore->getFitError(m_parameterID);
-    if (m_displayError  && (m_widgetType!=Header)) {
+    if (m_widgetType!=Header) {
         if (labError) {
             labError->setTextFormat(Qt::RichText);
             labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
@@ -352,7 +352,7 @@ void QFFitParameterWidgetWrapper::reloadValues() {
             neditError->setValue(error);
         }
     }
-    if (m_displayFix && m_editable && chkFix) {
+    if (chkFix) {
         chkFix->setChecked(m_datastore->getFitFix(m_parameterID));
     }
     m_settingData=old_m_settingData;
@@ -726,6 +726,10 @@ void QFFitParameterWidgetWrapper::s_actResetValueFix() {
 
 void QFFitParameterWidgetWrapper::keyEventMatches(int key, Qt::KeyboardModifiers modifiers) {
     if ((modifiers==Qt::NoModifier)&&(key==Qt::Key_Space)) {
+        if ((!m_settingData) && m_editable && neditValue) {
+            m_datastore->setFitValue(m_parameterID, neditValue->value());
+            emit valueChanged(m_parameterID, neditValue->value());
+        }
         if (chkFix) chkFix->toggle();
     }
     if ((modifiers==Qt::NoModifier)&&((key==Qt::Key_Return)||(key==Qt::Key_Enter))) {

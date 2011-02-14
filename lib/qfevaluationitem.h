@@ -179,6 +179,9 @@ class QFEvaluationItem : public QObject, public QFProperties {
         /** \brief write object contents into XML file */
         virtual void writeXML(QXmlStreamWriter& w);
 
+        /** \brief list of the raw data records this evaluation is applicable to */
+        QList<QFRawDataRecord*> getApplicableRecords();
+
     public slots:
         /** \brief set the name */
         inline void setName(const QString n) {
@@ -254,9 +257,6 @@ class QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief list of the currently selected records */
         QList<QFRawDataRecord*> selectedRecords;
-
-        /** \brief list of the raw data records this evaluation is applicable to */
-        QList<QFRawDataRecord*> getApplicableRecords();
 
         /** \brief points to the currently highlighted record */
         QFRawDataRecord* highlightedRecord;

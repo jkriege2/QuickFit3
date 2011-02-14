@@ -53,6 +53,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbLanguage->setCurrentIndex( cmbLanguage->findText(options->getLanguageID()));
     cmbStyle->addItems(QStyleFactory::keys());
     cmbStyle->setCurrentIndex(cmbStyle->findText(options->getStyle(), Qt::MatchContains));
+    spinAutosave->setValue(options->getAutosave());
 
 
     // find all available stylesheets
@@ -71,6 +72,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setLanguageID(cmbLanguage->currentText());
         options->setStylesheet(cmbStylesheet->currentText());
         options->setStyle(cmbStyle->currentText());
+        options->setAutosave(spinAutosave->value());
     }
 
 }

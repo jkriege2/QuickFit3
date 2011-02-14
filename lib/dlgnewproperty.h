@@ -4,8 +4,11 @@
 #include <QDialog>
 #include "ui_dlg_newproperty.h"
 
+
+
 class dlgNewProperty : public QDialog, public Ui::dlgNewProperty
 {
+        Q_OBJECT
     public:
         /** Default constructor */
         dlgNewProperty(QWidget* parent);

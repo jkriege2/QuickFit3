@@ -136,7 +136,7 @@ class QFFitFunction {
         virtual QString name() const=0;
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
-        /** \brief return a HTML file to be displayed as model help. This file has to be positioned in \c plugins/fitfunctions/help/<plugin_id> */
+        /** \brief return a HTML file to be displayed as model help. This file has to be positioned in \verbatim plugins/fitfunctions/help/<plugin_id> \endverbatim */
         virtual QString helpFile() const { return QString(""); };
 
         /*! \brief evaluate the fitting function \f$ f(x, \vec{p}) \f$ at the position \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
@@ -148,7 +148,7 @@ class QFFitFunction {
 
         /*! \brief evaluate the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
                    \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
-            \param[out] Derivatives as a vector \f$ \left[\frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}\right] \f$ .
+            \param[out] derivatives as a vector \f$ \left[\frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}\right] \f$ .
                         Only the derivaties for fit parameters are calculated.
             \param x position \f$ x \f$ where to evaluate the fit function derivatives
             \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$
@@ -164,17 +164,28 @@ class QFFitFunction {
                            used to write back the calculated values.
             \param[in,out] error if \c !=NULL this contains the errors of the parameters in parameterValues. the calculated
                            errors are also stored in this array.
+            \see sortParameter()
         */
         virtual void calcParameter(double* parameterValues, double* error=NULL) const {};
+
+        /*! \brief Sometimes it is desireable to sort the fit parameters in some given order. This function may be uused to do so.
+                   <b>DO NOT SORT IN calcParameter()</b>
+            \param[in,out] parameterValues the parameter values which to sort
+            \param[in,out] error if \c !=NULL this contains the errors to be sorted
+            \see calcParameter()
+        */
+        virtual void sortParameter(double* parameterValues, double* error=NULL) const {};
 
         /*! \brief returns \c true if the given parameter is currently visible (which could e.g. depend on the setting of the other parameters)
             \param parameter which parameter to test
             \param parameterValues the parameter values on which to base the decission
+            \return \c true if parameter is visibled (based on the parameter values in \a parameterValues )
         */
         virtual bool isParameterVisible(int parameter, double* parameterValues) const { return true; };
 
         /*! \brief return the number of graphs that should be plotted additional to the function grph itself
             \param params The decision may be based on this parameter set.
+            \return number of additional plots, or 0 if none
         */
         virtual unsigned int getAdditionalPlotCount(const double* params) { return 0; }
 

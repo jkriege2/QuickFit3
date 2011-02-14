@@ -221,7 +221,7 @@ void QFProject::deleteEvaluation(int ID) {
     }
 }
 
-void QFProject::writeXML(const QString& file) {
+void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 
     bool namechanged=(file!=this->file);
     this->file=file;
@@ -270,10 +270,12 @@ void QFProject::writeXML(const QString& file) {
 
     w.writeEndElement();
     w.writeEndDocument();
-    if (!errorOcc) {
-        dataChange=false;
-        emit wasChanged(dataChange);
-        if (namechanged) emit propertiesChanged();
+    if (resetDataChanged) {
+        if (!errorOcc) {
+            dataChange=false;
+            emit wasChanged(dataChange);
+            if (namechanged) emit propertiesChanged();
+        }
     }
 
     QFile f2(file+".backup");

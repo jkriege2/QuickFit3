@@ -119,7 +119,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
         void readXML(QDomElement& e);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
         virtual void intWriteData(QXmlStreamWriter& w) {};
-        /** \brief read in external data files <u>and</u> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
+        /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
          */
@@ -210,6 +210,12 @@ class QFRawDataRecord : public QObject, public QFProperties {
         QString  resultsGetAsString(QString evalName, QString resultName);
         /** \brief remove the value stored in the given position */
         void resultsRemove(QString evalName, QString resultName);
+        /*! \brief return a specified result as a QVariant
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber, qfrdreNumberError) or a QList<QVariant> (qfrdreNumberList).
+        */
+        QVariant resultsGetAsQVariant(QString evalName, QString resultName);
         /** \brief return a specified result as double (or 0 if not possible!) */
         double resultsGetAsDouble(QString evalName, QString resultName);
         /** \brief return a specified result as integer (or 0 if not possible!) */

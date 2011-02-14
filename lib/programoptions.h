@@ -53,6 +53,11 @@ class ProgramOptions: public QObject {
 
         /** \brief set the maximum number of threds */
         void setMaxThreads(int threads) { maxThreads=threads; };
+
+        /** \brief autosave project every X minutes */
+        int getAutosave() { return autosave; }
+        /** \brief autosave project every X minutes (0 == off) */
+        void setAutosave(int interval) { autosave=interval; }
     public slots:
 
 
@@ -95,6 +100,8 @@ class ProgramOptions: public QObject {
         QString currentRawDataDir;
         /** \brief maximum number of threads */
         int maxThreads;
+        /** \brief autosave interval in minutes (0=off) */
+        int autosave;
 
 };
 

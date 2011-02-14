@@ -20,5 +20,9 @@ fcs_fitfuctions.subdir=./plugins/fcs_fitfuctions
 
 SUBDIRS += fitalgorithm_levmar
 fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
-fitalgorithm_levmar.depends = lib
+fitalgorithm_levmar.depends = lib libqf3widgets
+
+SUBDIRS += fitalgorithm_simanneal
+fitalgorithm_simanneal.subdir=./plugins/fitalgorithm_simanneal
+fitalgorithm_simanneal.depends = lib libqf3widgets
 

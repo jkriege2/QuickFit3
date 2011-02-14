@@ -88,4 +88,29 @@ void saveSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QStri
 */
 void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
 
+/*! \brief outputs a string designating the type of a QVariant
+    \ingroup qf3lib_tools
+
+    \param variant input QVariant
+    \return a string describing the type of \a variant
+*/
+QString getQVariantType(const QVariant& variant);
+
+/*! \brief outputs a string encoding the contents of a QVariant
+    \ingroup qf3lib_tools
+
+    \param variant input QVariant
+    \return a string encoding the contents of \a variant
+*/
+QString getQVariantData(const QVariant& variant);
+
+/*! \brief outputs a Variant, from a type and data, as encoded by getQVariantType() and getQVariantData()
+    \ingroup qf3lib_tools
+
+    \param type type string
+    \param data contents of the new QVariant, encoded as string
+    \return a QVariant, based on \a type and \a data. If the data is invalid for some reason, the function returns an invalid QVariant
+*/
+QVariant getQVariantFromString(const QString& type, const QString& data);
+
 #endif // QFTOOLS_H

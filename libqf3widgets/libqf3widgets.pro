@@ -6,13 +6,11 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
                . \
                ../lib/
 
-DESTDIR = ../output
-
 LIBS += -L../output/ -lquickfit3lib
 
 QT += gui xml svg
 DESTDIR = ../output/
-DLLDESTDIR = $$DESTDIR
+#DLLDESTDIR = $$DESTDIR
 
 # Input
 HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \

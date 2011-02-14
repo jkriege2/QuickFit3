@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file alias="splash.png">../images/splash.png</file>
+    <file alias="icon.png">../images/qf3icon.png</file>
 
     <file alias="configure.png">../images/22x22/configure_alt.png</file>
     <file alias="exit.png">../images/22x22/window_close.png</file>

@@ -6,6 +6,36 @@
 #include <QMap>
 #include <QVariant>
 #include <stdint.h>
+
+/*! \brief reporter interface for fitting algorithms
+    \ingroup qf3lib_fitting
+
+    This interface may be used to report status information on the ongoing fit to the user:
+      - you may report status messages using reportStatus()
+      - you may report the progress using setProgressMax() and setProgress(), or incProgress()
+      - you may also ask whether the user has canceled the fit procedure using isCanceled()
+    .
+
+    An Implementation of a QFFitAlgorithmReporter is dlgQFFitAlgorithmProgressDialog.
+
+*/
+class QFFitAlgorithmReporter {
+    public:
+        virtual ~QFFitAlgorithmReporter() {};
+        /** \brief report a status message */
+        virtual void reportStatus(const QString& message)=0;
+        /** \brief set the progress maximum to \a max */
+        virtual void setProgressMax(int max=100)=0;
+        /** \brief set the current progress to the given value */
+        virtual void setProgress(int value)=0;
+        /** \brief set the current progress to 100% */
+        virtual void setProgressFull()=0;
+        /** \brief increment the current progress */
+        virtual void incProgress(int increment=1)=0;
+        /** \brief return \c true, if the user has canceled the fit procedure */
+        virtual bool isCanceled() { return false; };
+};
+
 /*! \brief describes a virtual base class fitting algorithms that are applied to QFFitFunction objects.
     \ingroup qf3lib_fitting
 
@@ -31,6 +61,20 @@
             \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{m=1}^M\left\|\frac{y_m-f_m(x_m, \vec{p})}{\sigma_m}\right\| \f]
     .
     All interfaces are internally mapped to the protected function intFit().
+
+    If you want to execute the fit in a separate thread, you may use QFFitAlgoruthmThreadedFit. You may use
+    setReporter() to set a QFFitAlgorithmReporter (e.g. dlgQFFitAlgorithmProgressDialog) implementation used
+    to output messages to the user. Use these protected methods to output the message. They will return without
+    effect if no reporter is set:
+        - reportStatus()
+        - setProgressMax()
+        - setProgress()
+        - incProgress()
+    .
+    Using the function isCanceled() you my check whether the user has canceled the fit. If you do, you should
+    finish the fit immediately when isCanceled() is \c true, No valid results are expected, but you should clean
+    up any temporary memory allocated. If you do NOT react in isCanceled(), the fit function won't be stopped,
+    so you are guaranteed to finish the function.
 
 */
 class QFFitAlgorithm {
@@ -91,8 +135,8 @@ class QFFitAlgorithm {
                 \f[ g_m(\vec{p})=\frac{y_m-f(x_m; m(\vec{p}))}{\sigma_m} \f]
             As QFFitFunction may contain parameters \f$ p_n, n=1..N \f$ that are no fitting parameters (either because they are defined as such, or because they were fixed
             by the user, or they are currently hidden) we have to do parameter reordering. So the fitting algorithm is presented with a modified parameter vector
-            \f$ \vec{q}\in\mathbb{R}^Q \f$ with \f$ Q<N \f$ . The mapping is done using a function \f$ m(\cdot) \f$ with \f$ \veq{p}=m(\vec{q})\in\mathbb{R}^N \f$ and
-            \f$ \veq{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
+            \f$ \vec{q}\in\mathbb{R}^Q \f$ with \f$ Q<N \f$ . The mapping is done using a function \f$ m(\cdot) \f$ with \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ and
+            \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
                 \f[ g_m(\vec{q})=\frac{y_m-f(x_m; m(\vec{q}))}{\sigma_m} \f]
             The data, the weights and the fix-vector is given to this functor in the constructor. Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
         */
@@ -111,17 +155,17 @@ class QFFitAlgorithm {
 
                 ~FitQFFitFunctionFunctor();
 
-                /*! \brief Implements the inverse mapping function \f$ \veq{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()
                 */
                 double* createMappedArrayForFunctor(double* modelData);
 
-                /*! \brief Implements the inverse mapping function \f$ \veq{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
                 void mapArrayFromModelToFunctor(double* functorData, double* modelData);
 
-                /*! \brief Implements the mapping function \f$ \veq{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
                 void mapArrayFromFunctorToModel(double* modelData, double* functorData);
@@ -129,7 +173,7 @@ class QFFitAlgorithm {
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
                 virtual void evaluate(double* evalout, double* params);
 
-                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q}=\frac{\partial g_m(\vec{q})}{\prtial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q})}{\partial m(q_n)} \f$ */
+                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q}=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q})}{\partial m(q_n)} \f$ */
                 virtual void evaluateJacobian(double* evalout, double* params);
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
@@ -168,6 +212,9 @@ class QFFitAlgorithm {
             /** \brief a report of the fit result in human-readable form, you may NOT use HTML markup to enrich your results */
             QString messageSimple;
         };
+
+        /** \brief class construtor */
+        QFFitAlgorithm() { m_reporter=NULL; }
 
         /** \brief class destructor */
         virtual ~QFFitAlgorithm() {}
@@ -215,9 +262,34 @@ class QFFitAlgorithm {
             \note you will also have to implement the writeback of the parameters, using setParameter()
         */
         virtual bool displayConfig();
+
+        /** \brief tell the class to use the specified reporter widget */
+        void setReporter(QFFitAlgorithmReporter* reporter) {
+            m_reporter=reporter;
+        }
+
+        /** \brief return the current reporter */
+        QFFitAlgorithmReporter* reporter() { return m_reporter; }
     protected:
         /** \brief fit algorithm parameters */
         QMap<QString, QVariant> m_parameters;
+
+        /** \brief reporter object */
+        QFFitAlgorithmReporter* m_reporter;
+
+
+        /** \brief report a status message */
+        void reportStatus(const QString& message) { if (m_reporter) m_reporter->reportStatus(message); };
+        /** \brief set the progress maximum to \a max */
+        void setProgressMax(int max=100) { if (m_reporter) m_reporter->setProgressMax(max); };
+        /** \brief set the current progress to the given value */
+        void setProgress(int value) { if (m_reporter) m_reporter->setProgress(value); };
+        /** \brief set the current progress to the given value */
+        void setProgressFull() { if (m_reporter) m_reporter->setProgressFull(); };
+        /** \brief increment the current progress */
+        void incProgress(int increment=1) { if (m_reporter) m_reporter->incProgress(increment); };
+        /** \brief return \c true, if the user has canceled the fit procedure */
+        bool isCanceled() { if (m_reporter) return m_reporter->isCanceled(); else return false; };
 
     protected:
         /*! \brief this routine implements the fitting itself
@@ -244,7 +316,7 @@ class QFFitAlgorithm {
         virtual QString name() const=0;
         /** \brief return a short unique algorithm ID string */
         virtual QString id() const=0;
-        /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in \c plugins/fitalgorithms/help/<plugin_id> */
+        /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in \verbatim plugins/fitalgorithms/help/<plugin_id> \endverbatim */
         virtual QString helpFile() const { return QString(""); };
         /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
         virtual bool get_supportsBoxConstraints() const =0;

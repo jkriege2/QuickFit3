@@ -74,6 +74,9 @@
 		<Unit filename="application\optionsdialog.h" />
 		<Unit filename="application\optionsdialog.ui" />
 		<Unit filename="application\quickfit3.qrc" />
+		<Unit filename="application\quickfit3.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="application\version.h" />
 		<Unit filename="doc\Doxyfile" />
 		<Unit filename="doc\application.dox" />
@@ -85,9 +88,12 @@
 		<Unit filename="doc\plugins.dox">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="lib\dlg_fitalgorithmprogress.ui" />
 		<Unit filename="lib\dlg_newproperty.ui" />
 		<Unit filename="lib\dlgnewproperty.cpp" />
 		<Unit filename="lib\dlgnewproperty.h" />
+		<Unit filename="lib\dlgqffitalgorithmprogressdialog.cpp" />
+		<Unit filename="lib\dlgqffitalgorithmprogressdialog.h" />
 		<Unit filename="lib\lib.pro" />
 		<Unit filename="lib\programoptions.cpp" />
 		<Unit filename="lib\programoptions.h" />
@@ -103,6 +109,8 @@
 		<Unit filename="lib\qffitalgorithm.h" />
 		<Unit filename="lib\qffitalgorithmmanager.cpp" />
 		<Unit filename="lib\qffitalgorithmmanager.h" />
+		<Unit filename="lib\qffitalgorithmthreaddedfit.cpp" />
+		<Unit filename="lib\qffitalgorithmthreaddedfit.h" />
 		<Unit filename="lib\qffitfunction.h" />
 		<Unit filename="lib\qffitfunctionmanager.cpp" />
 		<Unit filename="lib\qffitfunctionmanager.h" />
@@ -154,7 +162,6 @@
 		<Unit filename="plugins\fcs\fcs.pro" />
 		<Unit filename="plugins\fcs\qfprdrfcs.cpp" />
 		<Unit filename="plugins\fcs\qfprdrfcs.h" />
-		<Unit filename="plugins\fcs\qfrdrfcs.cbp" />
 		<Unit filename="plugins\fcs\qfrdrfcs.qrc" />
 		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.cpp" />
 		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.h" />
@@ -177,12 +184,18 @@
 		<Unit filename="plugins\fitalgorithm_levmar\fitalgorithm_levmar.cpp" />
 		<Unit filename="plugins\fitalgorithm_levmar\fitalgorithm_levmar.h" />
 		<Unit filename="plugins\fitalgorithm_levmar\fitalgorithm_levmar.pro" />
+		<Unit filename="plugins\fitalgorithm_levmar\levmarconfig.cpp" />
+		<Unit filename="plugins\fitalgorithm_levmar\levmarconfig.h" />
+		<Unit filename="plugins\fitalgorithm_simanneal\fitalgorithm_simanneal.cpp" />
+		<Unit filename="plugins\fitalgorithm_simanneal\fitalgorithm_simanneal.h" />
+		<Unit filename="plugins\fitalgorithm_simanneal\fitalgorithm_simanneal.pro" />
+		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.cpp" />
+		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.h" />
 		<Unit filename="plugins\table\dlg_csvparameters.ui" />
 		<Unit filename="plugins\table\dlgcsvparameters.cpp" />
 		<Unit filename="plugins\table\dlgcsvparameters.h" />
 		<Unit filename="plugins\table\qfprdrtable.cpp" />
 		<Unit filename="plugins\table\qfprdrtable.h" />
-		<Unit filename="plugins\table\qfrdrtable.cbp" />
 		<Unit filename="plugins\table\qfrdrtable.cpp" />
 		<Unit filename="plugins\table\qfrdrtable.h" />
 		<Unit filename="plugins\table\qfrdrtable.qrc" />

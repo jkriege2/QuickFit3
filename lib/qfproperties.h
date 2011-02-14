@@ -110,7 +110,7 @@ class QFProperties {
 
             This function uses the given XML writer to store all properties in a XML file.
             Note that you have to enter a XML node before calling thius and close it afterwards,
-            so you can choose in which subnode (e.g. \c <properties> ) everything is saved.
+            so you can choose in which subnode (e.g. \verbatim <properties>\endverbatim ) everything is saved.
             Here is some example code for calling it:
             \code
             w.writeStartElement("properties");

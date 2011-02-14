@@ -17,6 +17,9 @@ MainWindow::MainWindow(QSplashScreen* splash)
     project=NULL;
     currentProjectDir="";
 
+    timerAutosave=new QTimer(this);
+    timerAutosave->setInterval(5*60*1000);
+
 
     createWidgets();
     createActions();
@@ -37,6 +40,8 @@ MainWindow::MainWindow(QSplashScreen* splash)
     connect(fitFunctionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitAlgorithmManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
+    connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
+
 
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
@@ -51,7 +56,17 @@ MainWindow::MainWindow(QSplashScreen* splash)
     newProject();
 
     autoWriteSettings();
+    timerAutosave->start();
 
+}
+
+
+MainWindow::~MainWindow() {
+    //std::cout<<"deleting MainWindow\n";
+    rawDataFactory->distribute(NULL, settings, this, this);
+    evaluationFactory->distribute(NULL, settings, this, this);
+    if (project) delete project;
+    //std::cout<<"deleting MainWindow ... OK\n";
 }
 
 void MainWindow::searchAndRegisterPlugins() {
@@ -75,14 +90,6 @@ void MainWindow::searchAndRegisterPlugins() {
     for (int i=0; i<sl.size(); i++) {
         getEvaluationItemFactory()->registerMenu(sl[i], evaluationMenu);
     }
-}
-
-MainWindow::~MainWindow() {
-    //std::cout<<"deleting MainWindow\n";
-    rawDataFactory->distribute(NULL, settings, this, this);
-    evaluationFactory->distribute(NULL, settings, this, this);
-    if (project) delete project;
-    //std::cout<<"deleting MainWindow ... OK\n";
 }
 
 void MainWindow::showLogMessage(const QString& message) {
@@ -483,6 +490,15 @@ void MainWindow::readSettings() {
 
     logFileMainWidget->readSettings(*(settings->getQSettings()), "mainwindow/logMain");
     logFileProjectWidget->readSettings(*(settings->getQSettings()), "mainwindow/logProject");
+
+    //std::cout<<"autosave="<<settings->getAutosave()<<"\n";
+    if (settings->getAutosave()<=0) {
+        timerAutosave->stop();
+    } else {
+        timerAutosave->setInterval(settings->getAutosave()*60000);
+        timerAutosave->start();
+    }
+
 }
 
 void MainWindow::writeSettings() {
@@ -757,8 +773,15 @@ void MainWindow::incProgress() {
 
 void MainWindow::openSettingsDialog() {
     OptionsDialog* opt=new OptionsDialog(this);
-    std::cout<<"opening settings\n";
+    //std::cout<<"opening settings\n";
     opt->open(settings);
+    //std::cout<<"autosave="<<settings->getAutosave()<<"\n";
+    if (settings->getAutosave()<=0) {
+        timerAutosave->stop();
+    } else {
+        timerAutosave->setInterval(settings->getAutosave()*60000);
+        timerAutosave->start();
+    }
     delete opt;
 }
 
@@ -781,4 +804,16 @@ QSettings* MainWindow::getSettings() {
 
 ProgramOptions* MainWindow::getOptions() {
     return settings;
+}
+
+void MainWindow::autosaveProject() {
+    if (!project->hasChanged()) return;
+    QString autosaveFilename=curFile;
+    if (autosaveFilename.isEmpty()) autosaveFilename="untitled.qfp";
+    autosaveFilename=autosaveFilename+".autosave";
+
+    statusBar()->showMessage(tr("autosaving project file '%1' ...").arg(autosaveFilename), 500);
+    logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
+    project->writeXML(autosaveFilename, false);
+
 }

@@ -19,6 +19,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     stylesheet="default";
     languageID="en";
     maxThreads=1;
+    autosave=5;
 
     readSettings();
 }
@@ -34,6 +35,7 @@ void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/stylesheet", stylesheet);
     settings->setValue("quickfit/style", style);
     settings->setValue("quickfit/max_threads", maxThreads);
+    settings->setValue("quickfit/autosave", autosave);
     settings->setValue("quickfit/current_raw_data_dir", currentRawDataDir);
 }
 
@@ -49,6 +51,7 @@ void ProgramOptions::readSettings() {
         }
     }
     maxThreads=settings->value("quickfit/max_threads", maxThreads).toInt();
+    autosave=settings->value("quickfit/autosave", autosave).toInt();
     currentRawDataDir=settings->value("quickfit/current_raw_data_dir", currentRawDataDir).toString();
 
     languageID=settings->value("quickfit/language", languageID).toString();

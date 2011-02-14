@@ -30,22 +30,14 @@ void QFProjectRawDataModel::projectChanged(bool data) {
 QVariant QFProjectRawDataModel::data(const QModelIndex &index, int role) const {
     if ((!index.isValid()) || (item==NULL)) return QVariant();
     if (role==Qt::DisplayRole) {
-        if (index.internalId()>=0) {
-            QFRawDataRecord* rec=item->getRawDataByNum(index.row());
-            return QVariant(rec->getName());
-        } else {
-            if (index.row()==0) return QVariant(tr("Raw Data"));
-        }
+        QFRawDataRecord* rec=item->getRawDataByNum(index.row());
+        if (rec) return QVariant(rec->getName());
     } else if (role==Qt::DecorationRole) {
-        if (index.internalId()>=0) {
-            QFRawDataRecord* rec=item->getRawDataByNum(index.row());
-            return QVariant(rec->getSmallIcon());
-        }
+        QFRawDataRecord* rec=item->getRawDataByNum(index.row());
+        if (rec) return QVariant(rec->getSmallIcon());
     } else if (role==Qt::UserRole) {
-        if (index.internalId()>=0) {
-            QFRawDataRecord* rec=item->getRawDataByNum(index.row());
-            return QVariant(rec->getID());
-        }
+        QFRawDataRecord* rec=item->getRawDataByNum(index.row());
+        if (rec) return QVariant(rec->getID());
     }
     return QVariant();
 }

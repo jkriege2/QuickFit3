@@ -64,7 +64,7 @@ class QFEvaluationPropertyEditor : public QWidget {
 
     public:
         /** Default constructor */
-        QFEvaluationPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFEvaluationItem* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = 0);
+        QFEvaluationPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFEvaluationItem* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
         /** Default destructor */
         virtual ~QFEvaluationPropertyEditor();
         /** \brief set a ProgramOptions object to use for storing application settings */
@@ -75,16 +75,6 @@ class QFEvaluationPropertyEditor : public QWidget {
         int getID() { return id; };
         /** \brief set the current record */
         void setCurrent(QFEvaluationItem* c);
-    protected:
-        /** \brief points to the record currently displayed */
-        QFEvaluationItem* current;
-        /** \brief model showing all available raw data records */
-        QFProjectRawDataModel* rdrModel;
-        /** \brief proxy model to filter rdrModel */
-        QFEvaluationRawDataModelProxy* rdrProxy;
-        /** \brief read the settings from ProgramOptions set by setSettings() */
-        virtual void readSettings();
-        void closeEvent( QCloseEvent * event );
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);
@@ -95,8 +85,27 @@ class QFEvaluationPropertyEditor : public QWidget {
         /** \brief this will be connected to the project to indicate when  the currently
          *         displayed record should be deleted */
         void evaluationAboutToBeDeleted(QFEvaluationItem* r);
-        /** \brief activated when the selection in lstRawData changes */
+        /** \brief activated when the selection in lstRawData changes
+         *  \see rdrModelReset()
+         */
         void selectionChanged(const QModelIndex& index, const QModelIndex& oldindex);
+        /*! \brief emitted when the model representing the list of raw data records is reset (rdrProxy).
+
+            This is used to work a round the behaviour of Qt that a selection changes whenever
+            a model is reset. In this case we simply select the currently selected record, if it
+            is still available or another record, if not (it has been deleted).
+        */
+        void rdrModelReset();
+    protected:
+        /** \brief points to the record currently displayed */
+        QFEvaluationItem* current;
+        /** \brief model showing all available raw data records */
+        QFProjectRawDataModel* rdrModel;
+        /** \brief proxy model to filter rdrModel */
+        QFEvaluationRawDataModelProxy* rdrProxy;
+        /** \brief read the settings from ProgramOptions set by setSettings() */
+        virtual void readSettings();
+        void closeEvent( QCloseEvent * event );
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();

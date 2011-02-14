@@ -34,10 +34,12 @@ class QFFitParameterBasicInterface {
 
         /*! \brief set the fix property of a fit parameter of the current fit function
             \param id set the value of the parameter with this id (see QFFitFunction)
-            \param value value to be stored
+            \param fix value to be stored
          */
         virtual void setFitFix(QString id, bool fix)=0;
-        /*! \brief return the fix property of a given parameter  */
+        /*! \brief return the fix property of a given parameter
+            \param id set the value of the parameter with this id (see QFFitFunction)
+        */
         virtual bool getFitFix(QString id)=0;
         /*! \brief set the value range of a fit parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
@@ -71,12 +73,13 @@ class QFFitParameterBasicInterface {
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param value value to be stored
+            \param error error assigned to the given \a value
 
          */
         virtual void setInitFitValue(QString id, double value, double error=0.0)=0;
         /*! \brief set the fix property of a fit parameter in the initial parameters
             \param id set the value of the parameter with this id (see QFFitFunction)
-            \param value value to be stored
+            \param fix value to be stored
          */
         virtual void setInitFitFix(QString id, bool fix)=0;
 

@@ -61,10 +61,9 @@ void QFEvaluationRawDataModelProxy::setEvaluation(QFEvaluationItem* eval) {
 }
 
 void QFEvaluationRawDataModelProxy::selectionChanged(QList<QFRawDataRecord*> selectedRecords) {
-    std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
+    //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
     invalidateFilter();
 }
-
 
 
 
@@ -134,6 +133,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
+        disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         if (c) {
             if (c->getType()!=oldType) {
                 /*for (int i=oldEditorCount; i>=0; i--) {
@@ -195,9 +195,9 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
+        connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
-        selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));
-        //std::cout<<"new connected ...\n";
+        selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
 
 
     } else {
@@ -356,10 +356,20 @@ void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, cons
         QFRawDataRecord* rec=current->getProject()->getRawDataByID(rdrProxy->data(index, Qt::UserRole).toInt());
         if (rec!=NULL) {
             current->setHighlightedRecord(rec);
+        } else {
+            //std::cout<<"!!!   QFEvaluationPropertyEditor::selectionChanged() with NULL new record\n";
         }
     }
 }
 
-
+void QFEvaluationPropertyEditor::rdrModelReset() {
+    //std::cout<<"!!!   QFEvaluationPropertyEditor::rdrModelReset() called\n";
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    if ((!rdrModel) || (!rdrProxy)) return;
+    QModelIndex idx=rdrModel->index(current->getProject()->getRawDataIndex(current->getHighlightedRecord()));
+    QModelIndex pidx=rdrProxy->mapFromSource(idx);
+    lstRawData->selectionModel()->select(pidx, QItemSelectionModel::SelectCurrent);
+}
 
 

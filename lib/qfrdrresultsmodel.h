@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 
+
 // forward declaration
 class QFRawDataRecord;
 
@@ -27,12 +28,17 @@ class QFRDRResultsModel : public QAbstractTableModel {
 
         QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
         QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+        enum {
+            ValueRole=Qt::UserRole
+        };
     private slots:
         void resultsChanged();
     protected:
         QFRawDataRecord* record;
     private:
         QList<QString> calcResultNames() const;
+        QList<QString> lastResultNames;
 };
 
 #endif // QFRDRRESULTSMODEL_H

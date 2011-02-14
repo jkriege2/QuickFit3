@@ -1,6 +1,8 @@
 #include "qfproperties.h"
 #include <iostream>
 
+#include "qftools.h"
+
 
 QFProperties::QFProperties() {
     //ctor
@@ -47,7 +49,7 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) {
         QString n=i.key();
         propertyItem it=i.value();
         w.writeAttribute("name", n);
-        QString t="invalid";
+        /*QString t="invalid";
         switch(it.data.type()) {
             case QVariant::Bool: t="bool"; break;
             case QVariant::Char: t="char"; break;
@@ -78,7 +80,9 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) {
             default: t="unknown"; break;
         }
         w.writeAttribute("type", t);
-        w.writeAttribute("data", it.data.toString());
+        w.writeAttribute("data", it.data.toString());*/
+        w.writeAttribute("type", getQVariantType(it.data));
+        w.writeAttribute("data", getQVariantData(it.data));
         w.writeAttribute("usereditable", (it.usereditable)?QString("true"):QString("false"));
         w.writeAttribute("visible", (it.visible)?QString("true"):QString("false"));
         w.writeEndElement();
@@ -90,7 +94,7 @@ void QFProperties::readProperties(QDomElement& e) {
     props.clear();
     while (!te.isNull()) {
         QString n=te.attribute("name", "");
-        QString t=te.attribute("type", "string").toLower();
+        /*QString t=te.attribute("type", "string").toLower();
         QVariant d=te.attribute("data", "");
         //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
         bool c=false;
@@ -115,7 +119,14 @@ void QFProperties::readProperties(QDomElement& e) {
         if (!c) {
             setPropertiesError(QString("The value of property '%1' (%2) could not be converted to type %3!").arg(n).arg(te.attribute("data", "")).arg(t));
             //return;
+        }*/
+        QString t=te.attribute("type", "string").toLower();
+        QString pd=te.attribute("data", "");
+        QVariant d=getQVariantFromString(t, pd);
+        if (!d.isValid()) {
+            setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
         }
+
         propertyItem pi;
         pi.data=d;
         pi.usereditable=QVariant(te.attribute("usereditable", "true")).toBool();

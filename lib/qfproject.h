@@ -233,8 +233,12 @@ class QFProject : public QObject, public QFProperties {
         inline bool error() const { return errorOcc; };
         /** \brief returns the description of the last error */
         inline QString errorDescription() const { return errorDesc; };
-        /** \brief write project to XML file, sets error and errorDescription, as well as \c dataChange=false */
-        void writeXML(const QString& file);
+        /*! \brief write project to XML file, sets error and errorDescription, as well as \c dataChange=false
+            \param file the file to store the project to
+            \param resetDataChanged if \c true (default) the property dataChange is reset to \c false.
+                   Set this to \c false, if you want to save the project, without influence on the contained data (e.g. for autosaves).
+        */
+        void writeXML(const QString& file, bool resetDataChanged=true);
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void readXML(const QString& file);
         /** \brief returns \c true when the project has changed */
@@ -257,6 +261,9 @@ class QFProject : public QObject, public QFProperties {
         void propertiesChanged();
         /** \brief emitted when an error occured (may be used to display the error) */
         void errorOccured(QString errorDescription);
+
+        /** \brief emitted when the data in a record changes */
+        //void rdDataChanged(QFRawDataRecord* record);
     public slots:
         /** \brief tell the project that the data contained in it has changed ... and it needs to be saved */
         void setDataChanged() {

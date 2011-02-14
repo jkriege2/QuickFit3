@@ -20,7 +20,7 @@ class QFRawDataPropertyEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRawDataPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFRawDataRecord* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = 0);
+        QFRawDataPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFRawDataRecord* current=NULL, int id=0, QWidget* parent=NULL, Qt::WindowFlags f = Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
         /** Default destructor */
         virtual ~QFRawDataPropertyEditor();
         /** \brief set the current record */

@@ -14,21 +14,24 @@ QFRDRResultsModel::~QFRDRResultsModel()
 }
 
 void QFRDRResultsModel::resultsChanged() {
+    lastResultNames=calcResultNames();
     reset();
 }
 
 void QFRDRResultsModel::init(QFRawDataRecord* record) {
+    disconnect();
     setParent(record);
     this->record=record;
-    disconnect();
+    lastResultNames=calcResultNames();
     connect(record, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+    reset();
 }
 
 int QFRDRResultsModel::rowCount(const QModelIndex &parent ) const {
     if (!record) return 0;
-    QList<QString> l=calcResultNames();
+    //QList<QString>& l=lastResultNames;
     //std::cout<<"result row count="<<l.size()<<std::endl;
-    return l.size();
+    return lastResultNames.size();
 }
 
 int QFRDRResultsModel::columnCount(const QModelIndex &parent) const {
@@ -44,16 +47,21 @@ Qt::ItemFlags QFRDRResultsModel::flags(const QModelIndex &index) const {
 QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
     if (!record || !index.isValid()) return QVariant();
     if (role==Qt::DisplayRole) {
-        QList<QString> l=calcResultNames();
-        QString en=record->resultsGetEvaluationName(index.column());
-        if (index.row()<l.size()) if (record->resultsExists(en, l[index.row()])) {
-            QFRawDataRecord::evaluationResult r=record->resultsGet(en, l[index.row()]);
-            return QVariant(record->resultsGetAsString(en, l[index.row()]));
+        //QList<QString>& l=lastResultNames;//calcResultNames();
+        if (index.row()<lastResultNames.size()) {
+            QString en=record->resultsGetEvaluationName(index.column());
+            if (record->resultsExists(en, lastResultNames[index.row()])) {
+                QFRawDataRecord::evaluationResult r=record->resultsGet(en, lastResultNames[index.row()]);
+                return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]));
+            }
         }
-    } else if (role==Qt::BackgroundRole) {
-        QPalette pal;
-        if (index.row()%2) return pal.color(QPalette::AlternateBase);
-        return pal.color(QPalette::Base);
+    } else if (role==ValueRole) {
+        if (index.row()<lastResultNames.size()) {
+            QString en=record->resultsGetEvaluationName(index.column());
+            if (record->resultsExists(en, lastResultNames[index.row()])) {
+                return record->resultsGetAsQVariant(en, lastResultNames[index.row()]);
+            }
+        }
     }
 
     return QVariant();
@@ -65,8 +73,8 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
         if (orientation==Qt::Horizontal) {
             return QVariant(record->resultsGetEvaluationName(section));
         } else {
-            QList<QString> l=calcResultNames();
-            if (section<l.size()) return QVariant(l[section]);
+            //QList<QString>& l=lastResultNames;//calcResultNames();
+            if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
         }
     }
     return QVariant();
@@ -74,9 +82,11 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
 
 QList<QString> QFRDRResultsModel::calcResultNames() const {
     QList<QString> l;
-    for (unsigned int i=0; i<record->resultsGetEvaluationCount(); i++) {
+    int evalCount=record->resultsGetEvaluationCount();
+    for (unsigned int i=0; i<evalCount; i++) {
         QString en=record->resultsGetEvaluationName(i);
-        for (unsigned int j=0; j<record->resultsGetCount(en); j++) {
+        int jmax=record->resultsGetCount(en);
+        for (unsigned int j=0; j<jmax; j++) {
             QString rn=record->resultsGetResultName(en, j);
             if (!l.contains(rn)) {
                 l.append(rn);
