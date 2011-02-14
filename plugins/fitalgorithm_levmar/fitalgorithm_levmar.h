@@ -1,5 +1,5 @@
-#ifndef FCS_FITFUCTIONS_H
-#define FCS_FITFUCTIONS_H
+#ifndef FITALGORITHM_LEVMAR_H
+#define FITALGORITHM_LEVMAR_H
 
 #include "qfpluginfitalgorithm.h"
 #include <levmar/levmar.h>
@@ -28,9 +28,9 @@
     The child class quickfitFitLevmarUnconstrained makes the unconstrained fit available.
 
     The next lines will give a short (and basic) description of the Levenberg-Marquardt method, as it is also
-    described in
-    <blockquote><b>[PRE92]</b>	Press, W. H., Teukolsky, S. A., Vetterling, W. T. und Flannery, B. P.: <b>Numerical Recipes in C.</b> The Art of Scientific Computing. 2. Auflage, Cambridge University Press, Cambridge - New York - Port Chester - Melbourne - Sydney, 1992</blockquote>
-
+    described in:
+      - <b>[PRE92]</b>	Press, W. H., Teukolsky, S. A., Vetterling, W. T. und Flannery, B. P.: <b>Numerical Recipes in C.</b> The Art of Scientific Computing. 2. Auflage, Cambridge University Press, Cambridge - New York - Port Chester - Melbourne - Sydney, 1992</blockquote>
+    .
 
     We start from a least-squares score function
       \f[ \chi^2(\vec{p})=\sum\limits_{i=1}^N\frac{\bigl(y_i-m(\tau_i, \vec{p})\bigr)^2}{\sigma_i^2} \f]
@@ -69,30 +69,23 @@
 class QFFitAlgorithmLevmar: public QFFitAlgorithm {
     protected:
 
-        /*! \brief this routine implements the fitting itself
-
-            \param[out] paramsOut The optimal parameter vector is written into this array
-            \param[out] paramErrorsOut The optimal parameter error vector is written into this array
-            \param initialParams initial values for the parameters
-            \param model the model function to minimize
-            \param paramsMin lower parameter bound
-            \param paramsMax upper parameter bound
-            \return a FitResult object describing the fit result
-        */
+        /** \copydoc QFFitAlgorithm::intFit() */
         virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax);
 
 
     public:
         /** \brief class constructor */
         QFFitAlgorithmLevmar();
-        /** \brief return a name for the algorithm */
+        /** \copydoc QFFitAlgorithm::name() */
         virtual QString name() const { return QObject::tr("levmar: Levenberg-Marquardt Fitting Algorithm with box constraints"); };
-        /** \brief return a short unique algorithm ID string */
+        /** \copydoc QFFitAlgorithm::id() */
         virtual QString id() const { return QString("fit_levmar"); };
-        /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in \c plugins/fitalgorithms/help/<plugin_id> */
+        /** \copydoc QFFitAlgorithm::helpFile() */
         virtual QString helpFile() const { return id()+".html"; };
-        /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
+        /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
         virtual bool get_supportsBoxConstraints() const { return true; };
+        /** \copydoc QFFitAlgorithm::displayConfig() */
+        virtual bool displayConfig();
 };
 
 
@@ -155,4 +148,4 @@ class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
     private:
 };
 
-#endif // FCS_FITFUCTIONS_H
+#endif // FITALGORITHM_LEVMAR_H

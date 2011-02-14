@@ -28,6 +28,9 @@
 #include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
 #include "jkverticalscrollarea.h"
+#include "dlgqffitalgorithmprogressdialog.h"
+#include "qffitalgorithmthreaddedfit.h"
+
 
 /*! \brief editor class for FCS least-square fits
     \ingroup qf3evalp_fcsfit
@@ -50,6 +53,12 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         virtual void writeSettings();
         /** \brief used to reread all parameter widget values from the datastore */
         void updateParameterValues();
+
+        /** \brief copy min cut to all files */
+        void copyUserMinToAll(int userMin);
+
+        /** \brief copy max cut to all files */
+        void copyUserMaxToAll(int userMax);
     protected:
         /** \brief label displaying the current record */
         QLabel* labRecord;
@@ -131,11 +140,18 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnCopyToInitial;
         /** \brief copy current parameter set to all files & initial parameters */
         QPushButton* btnCopyToAll;
+        /** \brief copy current parameter set to all files & initial parameters */
+        QPushButton* btnCopyToAllCurrentRun;
 
         /** \brief scroll area for the fit parameters */
         JKVerticalScrollArea* scrollParameters;
         /** \brief layout that is used to display fit parameters */
         QGridLayout* layParameters;
+
+        /** \brief fit progress dialog */
+        dlgQFFitAlgorithmProgressDialog* dlgFitProgress;
+        /** \brief reporter for dlgFitProgress */
+        dlgQFFitAlgorithmProgressDialogReporter* dlgFitProgressReporter;
 
         /** \brief this list contains all currently displayed fitParameterWidgets */
         QList<QPointer<QFFitParameterWidgetWrapper> > m_fitParameters;
@@ -150,6 +166,20 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         bool dataEventsEnabled;
         /** \brief current save directory */
         QString currentSaveDirectory;
+
+        /*! \brief execute a fit for the given record and run
+
+            \param record the record to to the fit for
+            \param run the run in \a record to do the fit for
+
+            This function is called from fitAll(), fitRunsAll(), fitRunsCurrent(), fitCurrent().
+
+            All parameters except \a record and \a run are read from the currently set parameters.
+
+            It will set some messages in dlgFitProgress, but won't display or hide this window. This will have to be
+            done in the calling function. Also the redisplay of the model ... won't be done by this method.
+        */
+        void doFit(QFRawDataRecord* record, int run);
 
 
     protected slots:
@@ -225,8 +255,10 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void resetCurrent();
         /** \brief reset all files */
         void resetAll();
-        /** \brief copy to all files */
+        /** \brief copy to all files, all runs */
         void copyToAll();
+        /** \brief copy to all files, but only current run */
+        void copyToAllCurrentRun();
         /** \brief copy to initial values */
         void copyToInitial();
 

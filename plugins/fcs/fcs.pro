@@ -5,7 +5,7 @@ CONFIG += plugin
 TARGET = qfrdrfcs
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins
-DLLDESTDIR = $$DESTDIR
+#DLLDESTDIR = $$DESTDIR
 # ./
 LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 

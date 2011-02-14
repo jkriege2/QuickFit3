@@ -10,6 +10,13 @@
 #include <cfloat>
 #include "qffcsfitevaluation.h"
 #include "tools.h"
+#include <QThread>
+
+
+
+
+
+
 
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
     QFEvaluationEditor(services, parent)
@@ -29,6 +36,10 @@ QFFCSFitEvaluationEditor::~QFFCSFitEvaluationEditor()
 
 
 void QFFCSFitEvaluationEditor::createWidgets() {
+    dlgFitProgress = new dlgQFFitAlgorithmProgressDialog(this);
+    dlgFitProgressReporter=new dlgQFFitAlgorithmProgressDialogReporter(dlgFitProgress);
+
+
     QVBoxLayout* mainLayout=new QVBoxLayout(this);
     mainLayout->setContentsMargins(5,5,5,5);
     setLayout(mainLayout);
@@ -282,28 +293,40 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     QGridLayout* layBtn=new QGridLayout(this);
     layBtn->setContentsMargins(0,0,0,0);
-    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current (this run)"), this);
+    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current and Run"), this);
+    btnFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));
     layBtn->addWidget(btnFitCurrent, 0, 0);
-    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Runs"), this);
+    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Runs (Current File)"), this);
+    btnFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently displayed file "));
     layBtn->addWidget(btnFitRunsCurrent, 0, 1);
-    btnFitAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Files (this run)"), this);
+    btnFitAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Files (Current Run)"), this);
+    btnFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
     layBtn->addWidget(btnFitAll, 1, 0);
-    btnFitRunsAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit &All Files (all runs)"), this);
+    btnFitRunsAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit &All Files and All Runs"), this);
+    btnFitRunsAll->setToolTip(tr("perform a fit for all runs in all files"));
     layBtn->addWidget(btnFitRunsAll, 1, 1);
     btnResetCurrent=new QPushButton(tr("&Reset Current"), this);
+    btnResetCurrent->setToolTip(tr("reset the currently displayed file (and run) to the initial parameters\nThis deletes all fit results stored for the current file."));
     layBtn->addWidget(btnResetCurrent, 2, 0);
     btnResetAll=new QPushButton(tr("&Reset All"), this);
+    btnResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
     layBtn->addWidget(btnResetAll, 2, 1);
     btnCopyToInitial=new QPushButton(tr("Copy to &Initial"), this);
+    btnCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters, so they are used by files/runs that were not fit yet."));
     layBtn->addWidget(btnCopyToInitial, 3, 0);
     btnCopyToAll=new QPushButton(tr("&Copy to All"), this);
+    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters and also to all files."));
     layBtn->addWidget(btnCopyToAll, 3, 1);
+    btnCopyToAllCurrentRun=new QPushButton(tr("&Copy to All (Current Run)"), this);
+    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters and also to all files, but only to the current run therein."));
+    layBtn->addWidget(btnCopyToAllCurrentRun, 4, 0);
 
     layModel->addLayout(layBtn);
 
 
 
     labFitResult=new QLabel(this);
+    labFitResult->setWordWrap(true);
     layModel->addWidget(labFitResult);
 
     splitModel->addWidget(modelWidget);
@@ -362,6 +385,10 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetAll()));
     connect(btnCopyToAll, SIGNAL(clicked()), this, SLOT(copyToAll()));
     connect(btnCopyToInitial, SIGNAL(clicked()), this, SLOT(copyToInitial()));
+    connect(btnCopyToAllCurrentRun, SIGNAL(clicked()), this, SLOT(copyToAllCurrentRun()));
+
+    connect(datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
+    connect(datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
 
 }
 
@@ -493,8 +520,10 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         datacut->disableSliderSignals();
         datacut->set_min(0);
         datacut->set_max(data->getCorrelationN());
-        datacut->set_userMin(currentRecord->getProperty(resultID+"_datacut_min", 0).toInt());
-        datacut->set_userMax(currentRecord->getProperty(resultID+"_datacut_max", data->getCorrelationN()).toInt());
+        QString run="avg";
+        if (fcs->getCurrentRun()>-1) run=QString::number(fcs->getCurrentRun());
+        datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+run+"_datacut_min", 0).toInt());
+        datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+run+"_datacut_max", data->getCorrelationN()).toInt());
         datacut->enableSliderSignals();
         dataEventsEnabled=false;
         spinRun->setMaximum(data->getCorrelationRuns()-1);
@@ -615,8 +644,14 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         // add stretcher item in bottom row
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
     }
-    if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
-    else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
+    if (eval->hasFit()) {
+        labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
+        labFitResult->setText(current->getHighlightedRecord()->resultsGetAsString(eval->getEvaluationResultID(), "fitalg_messageHTML"));
+    } else {
+        labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
+        labFitResult->setText("");
+    }
+
     updateParameterValues();
 }
 
@@ -670,6 +705,8 @@ void QFFCSFitEvaluationEditor::updateParameterValues() {
 }
 
 void QFFCSFitEvaluationEditor::replotData() {
+
+
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -798,122 +835,126 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
         return;
     }
 
-    if (data->getCorrelationN()>0) {
-        int c_tau=ds->getColumnNum("tau");
-        if (c_tau>=0) { // we only add a graph, if we have a column with tau values
-            /////////////////////////////////////////////////////////////////////////////////
-            // retrieve data and tau-values from rawdata record
-            /////////////////////////////////////////////////////////////////////////////////
-            long N=data->getCorrelationN();
-            double* fitfunc=(double*)malloc(N*sizeof(double));
-            double* residuals=(double*)malloc(N*sizeof(double));
-            double* tauvals=data->getCorrelationT();
-            double* corrdata=NULL;
-            if (eval->getCurrentRun()<0) {
-                corrdata=data->getCorrelationMean();
-            } else {
-                if (eval->getCurrentRun()<data->getCorrelationRuns()) {
-                    corrdata=data->getCorrelationRun(eval->getCurrentRun());
-                } else {
+    try {
+
+        if (data->getCorrelationN()>0) {
+            int c_tau=ds->getColumnNum("tau");
+            if (c_tau>=0) { // we only add a graph, if we have a column with tau values
+                /////////////////////////////////////////////////////////////////////////////////
+                // retrieve data and tau-values from rawdata record
+                /////////////////////////////////////////////////////////////////////////////////
+                long N=data->getCorrelationN();
+                double* fitfunc=(double*)calloc(N,sizeof(double));
+                double* residuals=(double*)calloc(N,sizeof(double));
+                double* tauvals=data->getCorrelationT();
+                double* corrdata=NULL;
+                if (eval->getCurrentRun()<0) {
                     corrdata=data->getCorrelationMean();
+                } else {
+                    if (eval->getCurrentRun()<data->getCorrelationRuns()) {
+                        corrdata=data->getCorrelationRun(eval->getCurrentRun());
+                    } else {
+                        corrdata=data->getCorrelationMean();
+                    }
                 }
-            }
 
-            /////////////////////////////////////////////////////////////////////////////////
-            // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
-            // we are working with a complete set of parameters
-            /////////////////////////////////////////////////////////////////////////////////
-            double* fullParams=eval->allocFillParameters();
-            double* errors=eval->allocFillParameterErrors();
-            ffunc->calcParameter(fullParams, errors);
+                /////////////////////////////////////////////////////////////////////////////////
+                // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+                // we are working with a complete set of parameters
+                /////////////////////////////////////////////////////////////////////////////////
+                double* fullParams=eval->allocFillParameters();
+                double* errors=eval->allocFillParameterErrors();
+                ffunc->calcParameter(fullParams, errors);
 
-            /////////////////////////////////////////////////////////////////////////////////
-            // calculate model function values, residuals and residual parameters
-            /////////////////////////////////////////////////////////////////////////////////
-            double residSqrSum=0;
-            for (int i=0; i<N; i++) {
-                double value=ffunc->evaluate(tauvals[i], fullParams);
-                //di_fit->set(0, i, value);
-                //di_resid->set(0,0,value)
-                fitfunc[i]=value;
-                residuals[i]=corrdata[i]-value;
-                residSqrSum+=residuals[i]*residuals[i];
-            }
-
-
-            size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
-
-            /////////////////////////////////////////////////////////////////////////////////
-            // plot fit model and additional function graphs
-            /////////////////////////////////////////////////////////////////////////////////
-            JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData);
-            g_fit->set_drawLine(true);
-            g_fit->set_title("fit function");
-            g_fit->set_xColumn(c_tau);
-            g_fit->set_yColumn(c_fit);
-            g_fit->set_datarange_start(datacut->get_userMin());
-            g_fit->set_datarange_end(datacut->get_userMax());
-            for (int i=0; i<ffunc->getAdditionalPlotCount(fullParams); i++) {
-                double* params=eval->allocFillParameters();
-                QString name=ffunc->transformParametersForAdditionalPlot(i, params);
-                double* afitfunc=(double*)malloc(N*sizeof(double));
-                for (int j=0; j<N; j++) {
-                    afitfunc[j]=ffunc->evaluate(tauvals[j], params);
+                /////////////////////////////////////////////////////////////////////////////////
+                // calculate model function values, residuals and residual parameters
+                /////////////////////////////////////////////////////////////////////////////////
+                double residSqrSum=0;
+                for (int i=0; i<N; i++) {
+                    double value=ffunc->evaluate(tauvals[i], fullParams);
+                    //di_fit->set(0, i, value);
+                    //di_resid->set(0,0,value)
+                    fitfunc[i]=value;
+                    residuals[i]=corrdata[i]-value;
+                    residSqrSum+=residuals[i]*residuals[i];
                 }
-                size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i).toStdString());
-                JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData);
-                g_afit->set_drawLine(true);
-                g_afit->set_title(name);
-                g_afit->set_xColumn(c_tau);
-                g_afit->set_yColumn(c_afit);
-                g_afit->set_datarange_start(datacut->get_userMin());
-                g_afit->set_datarange_end(datacut->get_userMax());
-                pltData->addGraph(g_afit);
-                free(params);
-                free(afitfunc);
+
+
+                size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // plot fit model and additional function graphs
+                /////////////////////////////////////////////////////////////////////////////////
+                JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData);
+                g_fit->set_drawLine(true);
+                g_fit->set_title("fit function");
+                g_fit->set_xColumn(c_tau);
+                g_fit->set_yColumn(c_fit);
+                g_fit->set_datarange_start(datacut->get_userMin());
+                g_fit->set_datarange_end(datacut->get_userMax());
+                for (int i=0; i<ffunc->getAdditionalPlotCount(fullParams); i++) {
+                    double* params=eval->allocFillParameters();
+                    QString name=ffunc->transformParametersForAdditionalPlot(i, params);
+                    double* afitfunc=(double*)malloc(N*sizeof(double));
+                    for (int j=0; j<N; j++) {
+                        afitfunc[j]=ffunc->evaluate(tauvals[j], params);
+                    }
+                    size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i).toStdString());
+                    JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData);
+                    g_afit->set_drawLine(true);
+                    g_afit->set_title(name);
+                    g_afit->set_xColumn(c_tau);
+                    g_afit->set_yColumn(c_afit);
+                    g_afit->set_datarange_start(datacut->get_userMin());
+                    g_afit->set_datarange_end(datacut->get_userMax());
+                    pltData->addGraph(g_afit);
+                    free(params);
+                    free(afitfunc);
+                }
+                pltData->addGraph(g_fit);
+
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // plot residuals
+                /////////////////////////////////////////////////////////////////////////////////
+                size_t c_taures=c_tau;//dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
+                size_t c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
+                free(residuals);
+                JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals);
+                g_residuals->set_drawLine(false);
+                g_residuals->set_title("residuals");
+                g_residuals->set_xColumn(c_taures);
+                g_residuals->set_yColumn(c_residuals);
+                g_residuals->set_symbolSize(8);
+                g_residuals->set_symbolWidth(1);
+                g_residuals->set_datarange_start(datacut->get_userMin());
+                g_residuals->set_datarange_end(datacut->get_userMax());
+                g_residuals->set_symbol(JKQTPcross);
+                pltResiduals->addGraph(g_residuals);
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // updtae display of fit results
+                /////////////////////////////////////////////////////////////////////////////////
+                txtFitStatistics->setHtml(tr("<font size=\"+2\">&chi;<sup>2</sup></font> = %1").arg(residSqrSum));
+
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // clean memory
+                /////////////////////////////////////////////////////////////////////////////////
+                free(fullParams);
+                free(errors);
+                free(fitfunc);
             }
-            pltData->addGraph(g_fit);
-
-
-            /////////////////////////////////////////////////////////////////////////////////
-            // plot residuals
-            /////////////////////////////////////////////////////////////////////////////////
-            size_t c_taures=c_tau;//dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
-            size_t c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
-            free(residuals);
-            JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals);
-            g_residuals->set_drawLine(false);
-            g_residuals->set_title("residuals");
-            g_residuals->set_xColumn(c_taures);
-            g_residuals->set_yColumn(c_residuals);
-            g_residuals->set_symbolSize(8);
-            g_residuals->set_symbolWidth(1);
-            g_residuals->set_datarange_start(datacut->get_userMin());
-            g_residuals->set_datarange_end(datacut->get_userMax());
-            g_residuals->set_symbol(JKQTPcross);
-            pltResiduals->addGraph(g_residuals);
-
-            /////////////////////////////////////////////////////////////////////////////////
-            // updtae display of fit results
-            /////////////////////////////////////////////////////////////////////////////////
-            txtFitStatistics->setHtml(tr("<font size=\"+2\">&chi;<sup>2</sup></font> = %1").arg(residSqrSum));
-
-
-            /////////////////////////////////////////////////////////////////////////////////
-            // clean memory
-            /////////////////////////////////////////////////////////////////////////////////
-            free(fullParams);
-            free(errors);
-            free(fitfunc);
         }
+    } catch(std::exception& E) {
+        services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
     }
 
 }
 
-void QFFCSFitEvaluationEditor::fitCurrent() {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFRawDataRecord* record=current->getHighlightedRecord();
+
+
+void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
     QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
@@ -921,21 +962,29 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!data)||(!falg)) return;
 
+    eval->restoreQFFitAlgorithmParameters(falg);
+
     QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
 
     if (data->getCorrelationN()>0) {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        services->log_text(tr("running fit with %1 and model %2 on raw data record %3, run %4 ... \n").arg(falg->id()).arg(ffunc->id()).arg(record->getName()).arg(eval->getCurrentRun()));
+        falg->setReporter(dlgFitProgressReporter);
+        QString runname=tr("average");
+        if (run>=0) runname=QString::number(run);
+        dlgFitProgress->reportStatus(tr("setting up ..."));
+        dlgFitProgress->setProgressMax(100);
+        dlgFitProgress->setProgress(0);
+
+        services->log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', run %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
 
         long N=data->getCorrelationN();
         double* weights=NULL;
         double* taudata=data->getCorrelationT();
         double* corrdata=NULL;
-        if (eval->getCurrentRun()<0) {
+        if (run<0) {
             corrdata=data->getCorrelationMean();
         } else {
-            if (eval->getCurrentRun()<data->getCorrelationRuns()) {
-                corrdata=data->getCorrelationRun(eval->getCurrentRun());
+            if (run<data->getCorrelationRuns()) {
+                corrdata=data->getCorrelationRun(run);
             } else {
                 corrdata=data->getCorrelationMean();
             }
@@ -948,7 +997,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
             weightsOK=true;
             for (int i=0; i<N; i++) {
                 weights[i]=std[i];
-                if (fabs(weights[i])<10*DBL_MIN) {
+                if ((fabs(weights[i])<1000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
                     weightsOK=false;
                     services->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
                     break;
@@ -961,82 +1010,136 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters
-        double* params=eval->allocFillParameters();
-        double* initialparams=eval->allocFillParameters();
-        double* errors=eval->allocFillParameterErrors();
+        double* params=eval->allocFillParameters(record, run);
+        double* initialparams=eval->allocFillParameters(record, run);
+        double* errors=eval->allocFillParameterErrors(record, run);
         double* paramsMin=eval->allocFillParametersMin();
         double* paramsMax=eval->allocFillParametersMax();
-        bool* paramsFix=eval->allocFillFix();
+        bool* paramsFix=eval->allocFillFix(record, run);
+        QFFitAlgorithmThreadedFit* thread=new QFFitAlgorithmThreadedFit(this);
 
-        ffunc->calcParameter(params, errors);
-        ffunc->calcParameter(initialparams, errors);
 
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            printf("  %s = %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), initialparams[i]);
-        }
+        try {
 
-        // we also have to care for the data cutting
-        int cut_low=datacut->get_userMin();
-        int cut_up=datacut->get_userMax();
-        int cut_N=N-cut_low-(N-cut_up);
-        if (cut_N<0) {
-            cut_low=0;
-            cut_up=ffunc->paramCount()-1;
-            if (cut_up>=N) cut_up=N;
-            cut_N=cut_up;
-        }
+            ffunc->calcParameter(params, errors);
+            ffunc->calcParameter(initialparams, errors);
 
-        QTime tstart=QTime::currentTime();
-        QFFitAlgorithm::FitResult result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-        double deltaTime=(double)tstart.msecsTo(QTime::currentTime());
-        ffunc->calcParameter(params, errors);
+            QString iparams="";
+            QString oparams="";
+            QString orparams="";
 
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-        }
-
-        // round errors and values
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            errors[i]=roundError(errors[i], 2);
-            params[i]=roundWithError(params[i], errors[i], 2);
-        }
-        eval->setFitResultValuesVisible(params, errors);
-
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            printf("  rounded.fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-        }
-
-        services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(deltaTime).arg(result.fitOK?tr("success"):tr("no convergence")));
-        services->log_text(tr("   - result-message %1\n").arg(result.message));
-        labFitResult->setText(result.message);
-        eval->setFitResultValueInt("used_run", eval->getCurrentRun());
-        eval->setFitResultValueString("modle_name", ffunc->id());
-        eval->setFitResultValueString("fitalg_name", falg->id());
-        eval->setFitResultValue("fitalg_runtime", deltaTime, "msecs");
-        eval->setFitResultValueBool("fitalg_success", result.fitOK);
-        eval->setFitResultValueString("fitalg_message", result.messageSimple);
-        QMapIterator<QString, QVariant> it(result.params);
-        while (it.hasNext()) {
-            it.next();
-            switch(it.value().type()) {
-                case QVariant::Double:
-                    eval->setFitResultValue("fitalg_"+it.key(), it.value().toDouble()); break;
-                case QVariant::Char:
-                case QVariant::Date:
-                case QVariant::DateTime:
-                case QVariant::String:
-                    eval->setFitResultValueString("fitalg_"+it.key(), it.value().toString()); break;
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                    eval->setFitResultValueInt("fitalg_"+it.key(), it.value().toInt()); break;
-                case QVariant::Bool:
-                    eval->setFitResultValueBool("fitalg_"+it.key(), it.value().toBool()); break;
-                default: break;
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                    if (!iparams.isEmpty()) iparams=iparams+";  ";
+                    iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(params[i]);
+                }
+                //printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
             }
+
+            // we also have to care for the data cutting
+            int cut_low=datacut->get_userMin();
+            int cut_up=datacut->get_userMax();
+            int cut_N=N-cut_low-(N-cut_up);
+            if (cut_N<0) {
+                cut_low=0;
+                cut_up=ffunc->paramCount()-1;
+                if (cut_up>=N) cut_up=N;
+                cut_N=cut_up;
+            }
+
+
+
+            if (!dlgFitProgress->isCanceled()) {
+
+                dlgFitProgress->reportStatus(tr("fitting ..."));
+                dlgFitProgress->setProgressMax(100);
+                dlgFitProgress->setProgress(0);
+                thread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                thread->start(QThread::HighestPriority);
+                while (!thread->isFinished()) {
+                    QApplication::processEvents();
+                }
+                dlgFitProgress->setProgressFull();
+                dlgFitProgress->reportStatus(tr("calculating parameters, errors and storing data ..."));
+            }
+            //dlgFitProgress->setAllowCancel(false);
+
+
+            if (!dlgFitProgress->isCanceled()) {
+                QFFitAlgorithm::FitResult result=thread->getResult();
+                ffunc->calcParameter(params, errors);
+                ffunc->sortParameter(params, errors);
+                ffunc->calcParameter(params, errors);
+
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                        if (!oparams.isEmpty()) oparams=oparams+";  ";
+                        oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                    }
+                    //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                }
+
+                // round errors and values
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    errors[i]=roundError(errors[i], 2);
+                    params[i]=roundWithError(params[i], errors[i], 2);
+                }
+                eval->setFitResultValuesVisible(record, run, params, errors);
+
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                        if (!orparams.isEmpty()) orparams=orparams+";  ";
+                        orparams=orparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                    }
+                    //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                }
+
+                services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(thread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
+                services->log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
+                services->log_text(tr("   - initial params         (%1)\n").arg(iparams));
+                services->log_text(tr("   - output params          (%1)\n").arg(oparams));
+                services->log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
+                //labFitResult->setText(result.message);
+                eval->setFitResultValueInt(record, run, "used_run", run);
+                eval->setFitResultValueString(record, run, "modle_name", ffunc->id());
+                eval->setFitResultValueString(record, run, "fitalg_name", falg->id());
+                eval->setFitResultValue(record, run, "fitalg_runtime", thread->getDeltaTime(), "msecs");
+                eval->setFitResultValueBool(record, run, "fitalg_success", result.fitOK);
+                eval->setFitResultValueString(record, run, "fitalg_message", result.messageSimple);
+                eval->setFitResultValueString(record, run, "fitalg_messageHTML", result.message);
+                eval->setFitResultValueInt(record, run, "datapoints", cut_N);
+                eval->setFitResultValueInt(record, run, "cut_low", cut_low);
+                eval->setFitResultValueInt(record, run, "cut_up", cut_up);
+                QMapIterator<QString, QVariant> it(result.params);
+                while (it.hasNext()) {
+                    it.next();
+                    switch(it.value().type()) {
+                        case QVariant::Double:
+                            eval->setFitResultValue(record, run, "fitalg_"+it.key(), it.value().toDouble()); break;
+                        case QVariant::Char:
+                        case QVariant::Date:
+                        case QVariant::DateTime:
+                        case QVariant::String:
+                            eval->setFitResultValueString(record, run, "fitalg_"+it.key(), it.value().toString()); break;
+                        case QVariant::Int:
+                        case QVariant::LongLong:
+                        case QVariant::UInt:
+                        case QVariant::ULongLong:
+                            eval->setFitResultValueInt(record, run, "fitalg_"+it.key(), it.value().toInt()); break;
+                        case QVariant::Bool:
+                            eval->setFitResultValueBool(record, run, "fitalg_"+it.key(), it.value().toBool()); break;
+                        default: break;
+                    }
+                }
+            } else {
+                services->log_warning(tr("   - fit canceled by user!!!\n"));
+            }
+        } catch(std::exception& E) {
+            services->log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
         }
+
         // clean temporary parameters
+        delete thread;
         free(weights);
         free(params);
         free(initialparams);
@@ -1045,25 +1148,219 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
         free(paramsMax);
         free(paramsMin);
 
-        displayModel(false);
-        replotData();
-        QApplication::restoreOverrideCursor();
+        //displayModel(false);
+        //replotData();
+        //QApplication::restoreOverrideCursor();
+        //dlgFitProgress->done();
+        falg->setReporter(NULL);
     }
 }
 
 
 
-void QFFCSFitEvaluationEditor::fitAll() {
-    // TODO: implement
-}
 
-void QFFCSFitEvaluationEditor::fitRunsAll() {
-    // TODO: implement
+void QFFCSFitEvaluationEditor::fitCurrent() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!data)||(!falg)) return;
+
+    if (data->getCorrelationN()>0) {
+        falg->setReporter(dlgFitProgressReporter);
+        QString runname=tr("average");
+        if (eval->getCurrentRun()>=0) runname=QString::number(eval->getCurrentRun());
+        dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+        dlgFitProgress->reportStatus("");
+        dlgFitProgress->setProgressMax(100);
+        dlgFitProgress->setSuperProgressMax(100);
+        dlgFitProgress->setProgress(0);
+        dlgFitProgress->setSuperProgress(0);
+        dlgFitProgress->setAllowCancel(true);
+        dlgFitProgress->display();
+
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+        doFit(record, eval->getCurrentRun());
+
+        displayModel(false);
+        replotData();
+        QApplication::restoreOverrideCursor();
+        dlgFitProgress->done();
+        falg->setReporter(NULL);
+    }
 }
 
 void QFFCSFitEvaluationEditor::fitRunsCurrent() {
-    // TODO: implement
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!data)||(!falg)) return;
+
+
+    dlgFitProgress->reportSuperStatus(tr("fit all runs<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(data->getCorrelationRuns());
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->display();
+    int runmax=data->getCorrelationRuns();
+    if (runmax==1) runmax=0;
+    for (int run=-1; run<runmax; run++) {
+        if (data->getCorrelationN()>0) {
+            falg->setReporter(dlgFitProgressReporter);
+            QString runname=tr("average");
+            if (run>=0) runname=QString::number(run);
+            dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+
+            doFit(record, run);
+
+            dlgFitProgress->incSuperProgress();
+            falg->setReporter(NULL);
+            if (dlgFitProgress->isCanceled()) break;
+        }
+    }
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
 }
+
+
+void QFFCSFitEvaluationEditor::fitAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    int run=eval->getCurrentRun();
+    QString runname=tr("average");
+    if (run>=0) runname=QString::number(run);
+
+    dlgFitProgress->reportSuperStatus(tr("fit all files and current run (%3) therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()).arg(runname));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(10);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->display();
+
+
+    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+
+    // count the records and runs to work on (for proper superProgress
+    int items=recs.size();
+    dlgFitProgress->setSuperProgressMax(items);
+
+    // iterate through all records and all runs therein and do the fits
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+
+        if (record && data) {
+            if ((data->getCorrelationN()>0)&&(run<data->getCorrelationRuns())) {
+                falg->setReporter(dlgFitProgressReporter);
+                QString runname=tr("average");
+                if (run>=0) runname=QString::number(run);
+                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+
+                doFit(record, run);
+
+                falg->setReporter(NULL);
+                if (dlgFitProgress->isCanceled()) break;
+            }
+            dlgFitProgress->incSuperProgress();
+        }
+    }
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
+
+void QFFCSFitEvaluationEditor::fitRunsAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    dlgFitProgress->reportSuperStatus(tr("fit all files and all runs therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(10);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->display();
+
+
+    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+
+    // count the records and runs to work on (for proper superProgress
+    int items=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+
+        if (record && data) {
+            int runmax=data->getCorrelationRuns();
+            if (runmax==1) runmax=0;
+            items=items+runmax+1;
+        }
+    }
+    dlgFitProgress->setSuperProgressMax(items);
+
+    // iterate through all records and all runs therein and do the fits
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+
+        if (record && data) {
+            int runmax=data->getCorrelationRuns();
+            if (runmax==1) runmax=0;
+            for (int run=-1; run<runmax; run++) {
+                if (data->getCorrelationN()>0) {
+                    falg->setReporter(dlgFitProgressReporter);
+                    QString runname=tr("average");
+                    if (run>=0) runname=QString::number(run);
+                    dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+
+                    doFit(record, run);
+
+                    dlgFitProgress->incSuperProgress();
+                    falg->setReporter(NULL);
+                    if (dlgFitProgress->isCanceled()) break;
+                }
+            }
+        }
+    }
+
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+}
+
 
 void QFFCSFitEvaluationEditor::resetCurrent() {
     if (!current) return;
@@ -1071,9 +1368,11 @@ void QFFCSFitEvaluationEditor::resetCurrent() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
-    eval->resetAllFitResultsCurrent();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    eval->resetAllFitResultsCurrentCurrentRun();
     updateParameterValues();
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::resetAll() {
@@ -1082,17 +1381,126 @@ void QFFCSFitEvaluationEditor::resetAll() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     eval->resetAllFitResults();
     updateParameterValues();
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::copyToAll() {
-    // TODO: implement
+
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    copyToInitial();
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            for (int i=0; i<recs.size(); i++) {
+                QFRawDataRecord* record=recs[i];
+                QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(record);
+                if (fcs) {
+                    int runmax=fcs->getCorrelationRuns();
+                    if (runmax<=1) runmax=0;
+                    for (int run=-1; run<runmax; run++) {
+                        if (eval->hasFit(record, run)) {
+                            eval->setFitResultValue(record, run, id, value, error);
+                            eval->setFitResultFix(record, run, id, fix);
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
+
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    copyToInitial();
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            for (int i=0; i<recs.size(); i++) {
+                QFRawDataRecord* record=recs[i];
+                QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(record);
+                if (fcs) {
+                    int runmax=fcs->getCorrelationRuns();
+                    if (runmax<=1) runmax=0;
+
+                    int run=eval->getCurrentRun();
+
+                    if (eval->hasFit(record, run)) {
+                        eval->setFitResultValue(record, run, id, value, error);
+                        eval->setFitResultFix(record, run, id, fix);
+                    }
+
+                }
+            }
+        };
+    }
+
+    free(params);
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::copyToInitial() {
-    // TODO: implement
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    if (!fcs) return;
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            eval->setInitFitFix(id, fix);
+            eval->setInitFitValue(id, value, error);
+        };
+    }
+
+    free(params);
+    QApplication::restoreOverrideCursor();
 }
 
 
@@ -1109,6 +1517,7 @@ void QFFCSFitEvaluationEditor::saveReport() {
     }
 
     if (!fn.isEmpty()) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QFileInfo fi(fn);
         QPrinter* printer=new QPrinter;
         printer->setPaperSize(QPrinter::A4);
@@ -1122,6 +1531,7 @@ void QFFCSFitEvaluationEditor::saveReport() {
         pltData->draw(painter, printer->pageRect());
         painter.end();
         delete printer;
+        QApplication::restoreOverrideCursor();
     }
 }
 
@@ -1137,40 +1547,50 @@ void QFFCSFitEvaluationEditor::printReport() {
         return;
     }
 
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QPainter painter;
     painter.begin(p);
     pltData->draw(painter, p->pageRect());
     painter.end();
 
     delete p;
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
     if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
     if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_grid", chkGrid->isChecked(), false, false);
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
     if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_style", cmbPlotStyle->currentIndex(), false, false);
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
     if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_errorstyle", cmbErrorStyle->currentIndex(), false, false);
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 
@@ -1219,44 +1639,123 @@ void QFFCSFitEvaluationEditor::configFitAlgorithm() {
     QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
     if (algorithm) {
-        algorithm->displayConfig();
+        data->restoreQFFitAlgorithmParameters(algorithm);
+        if (algorithm->displayConfig()) {
+            data->storeQFFitAlgorithmParameters(algorithm);
+        }
     }
 }
 void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!dataEventsEnabled) return;
     if (!current) return;
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
     if (!current->getHighlightedRecord()) return;
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    current->getHighlightedRecord()->setQFProperty(resultID+"_datacut_min", userMin, false, false);
-    current->getHighlightedRecord()->setQFProperty(resultID+"_datacut_max", userMax, false, false);
+    QString run=QString::number(data->getCurrentRun());
+    if (data->getCurrentRun()<0) run="avg";
+    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
+    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
     replotData();
 }
+
+void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
+    if (!current) return;
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    for (int i=0; i<recs.size(); i++) {
+        if (current->isApplicable(recs[i])) {
+            QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
+            recs[i]->setQFProperty(resultID+"_ravg_datacut_min", userMin, false, false);
+
+            for (int r=0; r<fcs->getCorrelationRuns(); r++) {
+                QString run=QString::number(r);
+                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentRun()))) {
+                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
+                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
+                }
+            }
+
+        }
+    }
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
+    if (!current) return;
+    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    for (int i=0; i<recs.size(); i++) {
+        if (current->isApplicable(recs[i])) {
+            QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
+            recs[i]->setQFProperty(resultID+"_ravg_datacut_max", userMax, false, false);
+
+            for (int r=0; r<fcs->getCorrelationRuns(); r++) {
+                QString run=QString::number(r);
+                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentRun()))) {
+                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
+                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
+                }
+            }
+
+        }
+    }
+    QApplication::restoreOverrideCursor();
+}
+
 
 void QFFCSFitEvaluationEditor::runChanged(int run) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
+
+    QFRawDataRecord* currentRecord=current->getHighlightedRecord();
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(currentRecord);
+
     data->setCurrentRun(run);
+
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+
+    datacut->disableSliderSignals();
+    datacut->set_min(0);
+    datacut->set_max(fcs->getCorrelationN());
+    QString runn="avg";
+    if (data->getCurrentRun()>-1) runn=QString::number(data->getCurrentRun());
+    datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_min", 0).toInt());
+    datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_max", fcs->getCorrelationN()).toInt());
+    datacut->enableSliderSignals();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     displayModel(false);
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::modelChanged(int model) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     QString ff=cmbModel->itemData(cmbModel->currentIndex()).toString();
     data->setFitFunction(ff);
     displayModel(true);
     replotData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     if (data) {
@@ -1264,16 +1763,19 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
         else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
         else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->getHighlightedRecord()->setQFProperty("algorithm", cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString(), false, false);
     QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
     QString alg=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
     data->setFitAlgorithm(alg);
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, QWidget* sender) {

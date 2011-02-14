@@ -5,21 +5,26 @@ CONFIG += plugin
 TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/fitalgorithms/
-DLLDESTDIR = $$DESTDIR
-LIBS += -llevmar -L../../output/ -lquickfit3lib 
+#DLLDESTDIR = $$DESTDIR
+LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
-HEADERS += fitalgorithm_levmar.h
+HEADERS += fitalgorithm_levmar.h \
+           levmarconfig.h
 
-SOURCES += fitalgorithm_levmar.cpp
+SOURCES += fitalgorithm_levmar.cpp \
+           levmarconfig.cpp
 
-FORMS =
+FORMS += 
 
 RESOURCES +=
 
 TRANSLATIONS= ../../output/translations/de.ts
 
-INCLUDEPATH += ../../lib/
+INCLUDEPATH += ../../lib/ \
+               ../../libqf3widgets/ \
+               ../../../../../LIB/trunk/ \
+               ../../../../../LIB/trunk/qt/
 
 
 QT += core

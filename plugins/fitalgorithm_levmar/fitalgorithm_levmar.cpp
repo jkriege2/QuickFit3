@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+#include "levmarconfig.h"
 
 QFFitAlgorithmLevmar::QFFitAlgorithmLevmar() {
     setParameter("max_iterations", 3000);
@@ -64,7 +65,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     QString reason="", reason_simple="";
     switch((int)info[6]) {
         case 1: reason=QObject::tr("stopped by small gradient J<sup>T</sup>&middot;<b>e</b>.");
-                reason_simple=QObject::tr("stopped by small gradient J<sup>T</sup>&middot;<b>e</b>.");
+                reason_simple=QObject::tr("stopped by small gradient J_T*e.");
                 break;
         case 2: reason=QObject::tr("stopped by small &delta;<sub><b>p</b></sub>.");
                 reason_simple=QObject::tr("stopped by small delta_p.");
@@ -90,7 +91,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     printf("Levenberg-Marquardt returned in %g iter, reason %s, sumsq %g [%g]\n", info[5], reason.toStdString().c_str(), info[1], info[0]);
 
     result.message=QObject::tr("<b>levmar</b> returned after %1 iterations.<br>reason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason).arg(info[1]).arg(info[0]);
-    result.messageSimple=QObject::tr("levmar returned after %1 iterations.\nreason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason_simple).arg(info[1]).arg(info[0]);
+    result.messageSimple=QObject::tr("levmar returned after %1 iterations. reason: '%2' new_SES = %3  [old_SES = %4]").arg(info[5]).arg(reason_simple).arg(info[1]).arg(info[0]);
 
     for (unsigned int i=0; i<paramCount; i++) {
         paramErrorsOut[i]=sqrt(covar[i*paramCount+i]);
@@ -103,7 +104,29 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     return result;
 }
 
+bool QFFitAlgorithmLevmar::displayConfig() {
+    LevmarConfigDialog* dlg=new LevmarConfigDialog(0);
+    dlg->setMaxIterations(getParameter("max_iterations").toInt());
+    dlg->setMu(getParameter("mu").toDouble());
+    dlg->setEpsilon1(getParameter("epsilon1").toDouble());
+    dlg->setEpsilon2(getParameter("epsilon2").toDouble());
+    dlg->setEpsilon3(getParameter("epsilon3").toDouble());
+    dlg->setGradDelta(getParameter("gradient_delta").toDouble());
 
+    if (dlg->exec()==QDialog::Accepted) {
+        setParameter("max_iterations", dlg->getMaxIterations());
+        setParameter("mu", dlg->getMu());
+        setParameter("epsilon1", dlg->getEpsilon1());
+        setParameter("epsilon2", dlg->getEpsilon2());
+        setParameter("epsilon3", dlg->getEpsilon3());
+        setParameter("gradient_delta", dlg->getGradDelta());
+        delete dlg;
+        return true;
+    } else {
+        delete dlg;
+        return false;
+    }
+}
 
 
 Q_EXPORT_PLUGIN2(fitalgorithm_levmar, QFPFitAlgorithmLevmar)

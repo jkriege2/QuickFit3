@@ -13,7 +13,7 @@
 #include <QAbstractTableModel>
 #include "datacutslider.h"
 
-/*! \briefe ditor for FCS correlation curves
+/*! \brief editor for FCS correlation curves
     \ingroup qf3rdrdp_fcs
 */
 class QFRDRFCSCorrelationEditor : public QFRawDataEditor {

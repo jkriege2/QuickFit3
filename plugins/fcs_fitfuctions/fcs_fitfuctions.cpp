@@ -193,38 +193,6 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         erho1=erho2;
         rho3=0;
         erho3=0;
-        // sort diffusion times in ascending order
-        /*if (tauD1>tauD2) {
-            data[FCSDiff_diff_tau1]=tauD2;
-            data[FCSDiff_diff_rho1]=rho2;
-            data[FCSDiff_diff_tau2]=tauD1;
-            data[FCSDiff_diff_rho2]=rho1;
-            data[FCSDiff_diff_tau3]=tauD3;
-            data[FCSDiff_diff_rho3]=rho3;
-            if (error) {
-                error[FCSDiff_diff_tau1]=etauD2;
-                error[FCSDiff_diff_rho1]=erho2;
-                error[FCSDiff_diff_tau2]=etauD1;
-                error[FCSDiff_diff_rho2]=erho1;
-                error[FCSDiff_diff_tau3]=etauD3;
-                error[FCSDiff_diff_rho3]=erho3;
-            }
-        } else {
-            data[FCSDiff_diff_tau1]=tauD1;
-            data[FCSDiff_diff_rho1]=rho1;
-            data[FCSDiff_diff_tau2]=tauD2;
-            data[FCSDiff_diff_rho2]=rho2;
-            data[FCSDiff_diff_tau3]=tauD3;
-            data[FCSDiff_diff_rho3]=rho3;
-            if (error) {
-                error[FCSDiff_diff_tau1]=etauD1;
-                error[FCSDiff_diff_rho1]=erho1;
-                error[FCSDiff_diff_tau2]=etauD2;
-                error[FCSDiff_diff_rho2]=erho2;
-                error[FCSDiff_diff_tau3]=etauD3;
-                error[FCSDiff_diff_rho3]=erho3;
-            }
-        //}*/
     } else if (comp==3) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
@@ -236,106 +204,6 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         }
         rho1=1.0-rho2-rho3;
         erho1=sqrt(erho2*erho2+erho3*erho3);
-        // sort diffusion times in ascending order
-        /*if (tauD1<tauD2) {
-            if (tauD2<tauD3) { // tauD1<tauD2<tauD3
-                data[FCSDiff_diff_tau1]=tauD1;
-                data[FCSDiff_diff_rho1]=rho1;
-                data[FCSDiff_diff_tau2]=tauD2;
-                data[FCSDiff_diff_rho2]=rho2;
-                data[FCSDiff_diff_tau3]=tauD3;
-                data[FCSDiff_diff_rho3]=rho3;
-                if (error) {
-                    error[FCSDiff_diff_tau1]=etauD1;
-                    error[FCSDiff_diff_rho1]=erho1;
-                    error[FCSDiff_diff_tau2]=etauD2;
-                    error[FCSDiff_diff_rho2]=erho2;
-                    error[FCSDiff_diff_tau3]=etauD3;
-                    error[FCSDiff_diff_rho3]=erho3;
-                }
-            } else { // tauD3<tauD2
-                if (tauD1<tauD3) { // tauD1<tauD3<tauD2
-                    data[FCSDiff_diff_tau1]=tauD1;
-                    data[FCSDiff_diff_rho1]=rho1;
-                    data[FCSDiff_diff_tau2]=tauD3;
-                    data[FCSDiff_diff_rho2]=rho3;
-                    data[FCSDiff_diff_tau3]=tauD2;
-                    data[FCSDiff_diff_rho3]=rho2;
-                    if (error) {
-                        error[FCSDiff_diff_tau1]=etauD1;
-                        error[FCSDiff_diff_rho1]=erho1;
-                        error[FCSDiff_diff_tau2]=etauD3;
-                        error[FCSDiff_diff_rho2]=erho3;
-                        error[FCSDiff_diff_tau3]=etauD2;
-                        error[FCSDiff_diff_rho3]=erho2;
-                    }
-                } else { // tauD3<tauD1<tauD2
-                    data[FCSDiff_diff_tau1]=tauD3;
-                    data[FCSDiff_diff_rho1]=rho3;
-                    data[FCSDiff_diff_tau2]=tauD1;
-                    data[FCSDiff_diff_rho2]=rho1;
-                    data[FCSDiff_diff_tau3]=tauD2;
-                    data[FCSDiff_diff_rho3]=rho2;
-                    if (error) {
-                        error[FCSDiff_diff_tau1]=etauD3;
-                        error[FCSDiff_diff_rho1]=erho3;
-                        error[FCSDiff_diff_tau2]=etauD1;
-                        error[FCSDiff_diff_rho2]=erho1;
-                        error[FCSDiff_diff_tau3]=etauD2;
-                        error[FCSDiff_diff_rho3]=erho2;
-                    }
-                }
-            }
-        } else { //tauD2<tauD1
-            if (tauD1<tauD3) { // tauD2<tauD1<tauD3
-                data[FCSDiff_diff_tau1]=tauD2;
-                data[FCSDiff_diff_rho1]=rho2;
-                data[FCSDiff_diff_tau2]=tauD1;
-                data[FCSDiff_diff_rho2]=rho1;
-                data[FCSDiff_diff_tau2]=tauD3;
-                data[FCSDiff_diff_rho2]=rho3;
-                if (error) {
-                    error[FCSDiff_diff_tau1]=etauD2;
-                    error[FCSDiff_diff_rho1]=erho2;
-                    error[FCSDiff_diff_tau2]=etauD1;
-                    error[FCSDiff_diff_rho2]=erho1;
-                    error[FCSDiff_diff_tau3]=etauD3;
-                    error[FCSDiff_diff_rho3]=erho3;
-                }
-            } else { // tauD3<tauD1
-                if (tauD3<tauD2) { // tauD3<tauD2<tauD1
-                    data[FCSDiff_diff_tau1]=tauD3;
-                    data[FCSDiff_diff_rho1]=rho3;
-                    data[FCSDiff_diff_tau2]=tauD2;
-                    data[FCSDiff_diff_rho2]=rho2;
-                    data[FCSDiff_diff_tau3]=tauD1;
-                    data[FCSDiff_diff_rho3]=rho1;
-                    if (error) {
-                        error[FCSDiff_diff_tau1]=etauD3;
-                        error[FCSDiff_diff_rho1]=erho3;
-                        error[FCSDiff_diff_tau2]=etauD2;
-                        error[FCSDiff_diff_rho2]=erho2;
-                        error[FCSDiff_diff_tau3]=etauD1;
-                        error[FCSDiff_diff_rho3]=erho1;
-                    }
-                } else { // tauD2<tauD3<tauD1
-                    data[FCSDiff_diff_tau1]=tauD2;
-                    data[FCSDiff_diff_rho1]=rho2;
-                    data[FCSDiff_diff_tau2]=tauD3;
-                    data[FCSDiff_diff_rho2]=rho3;
-                    data[FCSDiff_diff_tau3]=tauD1;
-                    data[FCSDiff_diff_rho3]=rho1;
-                    if (error) {
-                        error[FCSDiff_diff_tau1]=etauD2;
-                        error[FCSDiff_diff_rho1]=erho2;
-                        error[FCSDiff_diff_tau2]=etauD3;
-                        error[FCSDiff_diff_rho2]=erho3;
-                        error[FCSDiff_diff_tau3]=etauD1;
-                        error[FCSDiff_diff_rho3]=erho1;
-                    }
-                }
-            }
-        }*/
     }
 
     data[FCSDiff_diff_rho1]=rho1;
@@ -611,23 +479,6 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         erho1=erho2;
         rho3=0;
         erho3=0;
-        // sort diffusion times in ascending order
-        /*if (tauD1>tauD2) {
-            data[FCSADiff_diff_tau1]=tauD2;
-            data[FCSADiff_diff_rho1]=rho2;
-            data[FCSADiff_diff_alpha1]=alpha2;
-            data[FCSADiff_diff_tau2]=tauD1;
-            data[FCSADiff_diff_rho2]=rho1;
-            data[FCSADiff_diff_alpha2]=alpha1;
-            if (error) {
-                error[FCSADiff_diff_tau1]=etauD2;
-                error[FCSADiff_diff_rho1]=erho2;
-                error[FCSADiff_diff_alpha1]=alpha2;
-                error[FCSADiff_diff_tau2]=etauD1;
-                error[FCSADiff_diff_rho2]=erho1;
-                error[FCSADiff_diff_alpha2]=alpha1;
-            }
-        }*/
     } else if (comp==3) {
         if (rho2>1.0) rho2=1.0;
         if (rho2<0.0) rho2=0.0;
@@ -639,141 +490,15 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         }
         rho1=1.0-rho2-rho3;
         erho1=sqrt(erho2*erho2+erho3*erho3);
-        // sort diffusion times in ascending order
-        /*if (tauD1<tauD2) {
-            if (tauD2<tauD3) { // tauD1<tauD2<tauD3
-                data[FCSADiff_diff_tau1]=tauD1;
-                data[FCSADiff_diff_rho1]=rho1;
-                data[FCSADiff_diff_alpha1]=alpha1;
-                data[FCSADiff_diff_tau2]=tauD2;
-                data[FCSADiff_diff_rho2]=rho2;
-                data[FCSADiff_diff_alpha2]=alpha2;
-                data[FCSADiff_diff_tau3]=tauD3;
-                data[FCSADiff_diff_rho3]=rho3;
-                data[FCSADiff_diff_alpha3]=alpha3;
-            } else { // tauD3<tauD2
-                if (tauD1<tauD3) { // tauD1<tauD3<tauD2
-                    data[FCSADiff_diff_tau1]=tauD1;
-                    data[FCSADiff_diff_rho1]=rho1;
-                    data[FCSADiff_diff_alpha1]=alpha1;
-                    data[FCSADiff_diff_tau2]=tauD3;
-                    data[FCSADiff_diff_rho2]=rho3;
-                    data[FCSADiff_diff_alpha2]=alpha3;
-                    data[FCSADiff_diff_tau3]=tauD2;
-                    data[FCSADiff_diff_rho3]=rho2;
-                    data[FCSADiff_diff_alpha3]=alpha2;
-                    if (error) {
-                        error[FCSADiff_diff_tau1]=etauD1;
-                        error[FCSADiff_diff_rho1]=erho1;
-                        error[FCSADiff_diff_tau2]=etauD3;
-                        error[FCSADiff_diff_rho2]=erho3;
-                        error[FCSADiff_diff_tau3]=etauD2;
-                        error[FCSADiff_diff_rho3]=erho2;
-
-                        error[FCSADiff_diff_alpha1]=ealpha1;
-                        error[FCSADiff_diff_alpha2]=ealpha3;
-                        error[FCSADiff_diff_alpha3]=ealpha2;
-                    }
-                } else { // tauD3<tauD1<tauD2
-                    data[FCSADiff_diff_tau1]=tauD3;
-                    data[FCSADiff_diff_rho1]=rho3;
-                    data[FCSADiff_diff_tau2]=tauD1;
-                    data[FCSADiff_diff_rho2]=rho1;
-                    data[FCSADiff_diff_tau3]=tauD2;
-                    data[FCSADiff_diff_rho3]=rho2;
-                    data[FCSADiff_diff_alpha1]=alpha3;
-                    data[FCSADiff_diff_alpha1]=alpha1;
-                    data[FCSADiff_diff_alpha1]=alpha2;
-                    if (error) {
-                        error[FCSADiff_diff_tau1]=etauD3;
-                        error[FCSADiff_diff_rho1]=erho3;
-                        error[FCSADiff_diff_tau2]=etauD1;
-                        error[FCSADiff_diff_rho2]=erho1;
-                        error[FCSADiff_diff_tau3]=etauD2;
-                        error[FCSADiff_diff_rho3]=erho2;
-                        error[FCSADiff_diff_alpha1]=ealpha3;
-                        error[FCSADiff_diff_alpha2]=ealpha1;
-                        error[FCSADiff_diff_alpha3]=ealpha2;
-                    }
-                }
-            }
-        } else { //tauD2<tauD1
-            if (tauD1<tauD3) { // tauD2<tauD1<tauD3
-                data[FCSADiff_diff_tau1]=tauD2;
-                data[FCSADiff_diff_rho1]=rho2;
-                data[FCSADiff_diff_tau2]=tauD1;
-                data[FCSADiff_diff_rho2]=rho1;
-                data[FCSADiff_diff_tau2]=tauD3;
-                data[FCSADiff_diff_rho2]=rho3;
-                data[FCSADiff_diff_alpha1]=alpha2;
-                data[FCSADiff_diff_alpha1]=alpha1;
-                data[FCSADiff_diff_alpha1]=alpha3;
-                if (error) {
-                    error[FCSADiff_diff_tau1]=etauD2;
-                    error[FCSADiff_diff_rho1]=erho2;
-                    error[FCSADiff_diff_tau2]=etauD1;
-                    error[FCSADiff_diff_rho2]=erho1;
-                    error[FCSADiff_diff_tau3]=etauD3;
-                    error[FCSADiff_diff_rho3]=erho3;
-                    error[FCSADiff_diff_alpha1]=ealpha2;
-                    error[FCSADiff_diff_alpha2]=ealpha1;
-                    error[FCSADiff_diff_alpha3]=ealpha3;
-                }
-            } else { // tauD3<tauD1
-                if (tauD3<tauD2) { // tauD3<tauD2<tauD1
-                    data[FCSADiff_diff_tau1]=tauD3;
-                    data[FCSADiff_diff_rho1]=rho3;
-                    data[FCSADiff_diff_tau2]=tauD2;
-                    data[FCSADiff_diff_rho2]=rho2;
-                    data[FCSADiff_diff_tau3]=tauD1;
-                    data[FCSADiff_diff_rho3]=rho1;
-                    data[FCSADiff_diff_alpha1]=alpha3;
-                    data[FCSADiff_diff_alpha1]=alpha2;
-                    data[FCSADiff_diff_alpha1]=alpha1;
-                    if (error) {
-                        error[FCSADiff_diff_tau1]=etauD3;
-                        error[FCSADiff_diff_rho1]=erho3;
-                        error[FCSADiff_diff_tau2]=etauD2;
-                        error[FCSADiff_diff_rho2]=erho2;
-                        error[FCSADiff_diff_tau3]=etauD1;
-                        error[FCSADiff_diff_rho3]=erho1;
-                        error[FCSADiff_diff_alpha1]=ealpha3;
-                        error[FCSADiff_diff_alpha2]=ealpha2;
-                        error[FCSADiff_diff_alpha3]=ealpha1;
-                    }
-                } else { // tauD2<tauD3<tauD1
-                    data[FCSADiff_diff_tau1]=tauD2;
-                    data[FCSADiff_diff_rho1]=rho2;
-                    data[FCSADiff_diff_tau2]=tauD3;
-                    data[FCSADiff_diff_rho2]=rho3;
-                    data[FCSADiff_diff_tau3]=tauD1;
-                    data[FCSADiff_diff_rho3]=rho1;
-                    data[FCSADiff_diff_alpha1]=alpha2;
-                    data[FCSADiff_diff_alpha1]=alpha3;
-                    data[FCSADiff_diff_alpha1]=alpha1;
-                    if (error) {
-                        error[FCSADiff_diff_tau1]=etauD2;
-                        error[FCSADiff_diff_rho1]=erho2;
-                        error[FCSADiff_diff_tau2]=etauD3;
-                        error[FCSADiff_diff_rho2]=erho3;
-                        error[FCSADiff_diff_tau3]=etauD1;
-                        error[FCSADiff_diff_rho3]=erho1;
-                        error[FCSADiff_diff_alpha1]=ealpha2;
-                        error[FCSADiff_diff_alpha2]=ealpha3;
-                        error[FCSADiff_diff_alpha3]=ealpha1;
-                    }
-                }
-            }
-        }*/
     }
 
-    data[FCSDiff_diff_rho1]=rho1;
-    data[FCSDiff_diff_rho2]=rho2;
-    data[FCSDiff_diff_rho3]=rho3;
+    data[FCSADiff_diff_rho1]=rho1;
+    data[FCSADiff_diff_rho2]=rho2;
+    data[FCSADiff_diff_rho3]=rho3;
     if (error) {
-        error[FCSDiff_diff_rho1]=erho1;
-        error[FCSDiff_diff_rho2]=erho2;
-        error[FCSDiff_diff_rho3]=erho3;
+        error[FCSADiff_diff_rho1]=erho1;
+        error[FCSADiff_diff_rho2]=erho2;
+        error[FCSADiff_diff_rho3]=erho3;
     }
 
 
