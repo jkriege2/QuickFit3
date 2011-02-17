@@ -287,7 +287,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     widResults=new QWidget(this);
     QVBoxLayout* rwvlayout=new QVBoxLayout(this);
     widResults->setLayout(rwvlayout);
-    tvResults=new QTableView(widResults);
+    tvResults=new QEnhancedTableView(widResults);
     tvResults->setAlternatingRowColors(true);
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     rwvlayout->addWidget(tvResults);

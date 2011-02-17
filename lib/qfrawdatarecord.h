@@ -213,33 +213,40 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /*! \brief return a specified result as a QVariant
 
             The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
-            a double (qfrdreNumber, qfrdreNumberError) or a QList<QVariant> (qfrdreNumberList).
+            a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberList).
         */
         QVariant resultsGetAsQVariant(QString evalName, QString resultName);
-        /** \brief return a specified result as double (or 0 if not possible!) */
-        double resultsGetAsDouble(QString evalName, QString resultName);
-        /** \brief return a specified result as integer (or 0 if not possible!) */
-        int64_t resultsGetAsInteger(QString evalName, QString resultName);
-        /** \brief return a specified result as double (or 0 if not possible!) */
-        QVector<double> resultsGetAsDoubleList(QString evalName, QString resultName);
-        /** \brief return a specified result's error as double (or 0 if not possible!) */
-        double resultsGetErrorAsDouble(QString evalName, QString resultName);
+        /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
+        double resultsGetAsDouble(QString evalName, QString resultName, bool* ok=NULL);
+        /** \brief return a specified result as integer (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        int64_t resultsGetAsInteger(QString evalName, QString resultName, bool* ok=NULL);
+        /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        QVector<double> resultsGetAsDoubleList(QString evalName, QString resultName, bool* ok=NULL);
+        /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        double resultsGetErrorAsDouble(QString evalName, QString resultName, bool* ok=NULL);
         /** \brief get number of results for a specified evaluation */
-        inline unsigned int resultsGetCount(QString evalName) {
+        inline int resultsGetCount(QString evalName) {
             if (results.contains(evalName)) return results[evalName].size();
             return 0;
         };
         /** \brief get number of evaluations in this object */
-        inline unsigned int resultsGetEvaluationCount() {
+        inline int resultsGetEvaluationCount() {
             return results.size();
         };
         /** \brief get the i-th evaluation name */
-        inline QString resultsGetEvaluationName(unsigned int i) {
+        inline QString resultsGetEvaluationName(int i) {
             if ((long)i<results.size()) return results.keys().at(i);
             return QString("");
         };
         /** \brief get the i-th result name */
-        QString resultsGetResultName(QString evaluationName, unsigned int i);
+        QString resultsGetResultName(QString evaluationName, int i);
+
+        /*! \brief save a copy of all results with the given \a oldEvalName to the given \a newEvalName
+            \param oldEvalName name of the evaluation results section to copy
+            \param newEvalName name of the target evaluation results section
+            \note if \a newEvalName already exists, the additional results will be added to \a newEvalName
+         */
+        void resultsCopy(QString oldEvalName, QString newEvalName);
 
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel() { return resultsmodel; };

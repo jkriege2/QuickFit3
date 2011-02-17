@@ -14,6 +14,7 @@ QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
     m_fitAlgorithm="";
     m_fitFunction="";
     m_weighting=EqualWeighting;
+    m_currentRun=-1;
 
 
     // get list of applicable fit functions
@@ -197,15 +198,21 @@ bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
-bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r) {
+bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r1) {
+    //std::cout<<"hasFit():"<<"\n";
+    QFRawDataRecord* r=r1;
     if (getFitFunction()==NULL) return false;
+    //std::cout<<"   ffunc="<<getFitFunction()->id().toStdString()<<"\n";
     if (r==NULL) r=getHighlightedRecord();
     if (r==NULL) return false;
+    //std::cout<<"   highlight="<<r->getName().toStdString()<<"\n";
     QString rsid=getEvaluationResultID();
+    //std::cout<<"   rsid="<<rsid.toStdString()<<"\n";
     return r->resultsExistsFromEvaluation(rsid);
 }
 
-bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r, int run) {
+bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r1, int run) {
+    QFRawDataRecord* r=r1;
     if (getFitFunction()==NULL) return false;
     if (r==NULL) r=getHighlightedRecord();
     if (r==NULL) return false;
@@ -824,21 +831,35 @@ void QFFCSFitEvaluation::setCurrentRun(int run) {
     if ((r!=NULL)) {
         if (run<=-1) m_currentRun=-1;
         if (run<fcs->getCorrelationRuns()) m_currentRun=run;
+        if (fcs->getCorrelationRuns()<=1) m_currentRun=-1;
         r->setQFProperty(getType()+QString::number(getID())+"_last_run", m_currentRun);
-        std::cout<<"m_currentRun = "<<m_currentRun<<std::endl;
+        //std::cout<<"m_currentRun = "<<m_currentRun<<std::endl;
     }
 }
 
 int QFFCSFitEvaluation::getCurrentRun() {
     QFRawDataRecord* r=getHighlightedRecord();
     QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(r);
+    //std::cout<<"getCurrentRun()\n";
+    //std::cout<<"   r="<<r<<"\n";
     int run=m_currentRun;
     if ((r!=NULL)&&(fcs!=NULL)) {
-        run=r->getProperty(getType()+QString::number(getID())+"_last_run", run).toInt();
+        m_currentRun=run=r->getProperty(getType()+QString::number(getID())+"_last_run", run).toInt();
+        //std::cout<<"   m_currentRun="<<m_currentRun<<"   corrRuns="<<fcs->getCorrelationRuns()<<"\n";
     }
-    if (run<-1) run=-1;
+    if (run<-1) {
+        m_currentRun=run=-1;
+        //setCurrentRun(run);
+    }
     if (fcs) {
-        if (run>=fcs->getCorrelationRuns()) run=-1;
+        if (run>=(int)fcs->getCorrelationRuns()) {
+            m_currentRun=run=-1;
+            //setCurrentRun(run);
+        }
+        if (fcs->getCorrelationRuns()<=1) {
+            m_currentRun=run=-1;
+            //setCurrentRun(run);
+        }
     }
     return run;
 }
@@ -970,7 +991,7 @@ void QFFCSFitEvaluation::resetAllFitResultsCurrent() {
     QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(re);
     QString en=getEvaluationResultID(-1);
     re->resultsClear(en);
-    for(int r=0; r<rec->getCorrelationRuns(); r++) {
+    for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
         en=getEvaluationResultID(r);
         re->resultsClear(en);
     }
@@ -997,7 +1018,7 @@ void QFFCSFitEvaluation::resetAllFitResults() {
         QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
         recs[i]->resultsClear(en);
-        for(int r=0; r<rec->getCorrelationRuns(); r++) {
+        for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             recs[i]->resultsClear(en);
         }
@@ -1016,7 +1037,7 @@ void QFFCSFitEvaluation::resetAllFitValue()  {
             QString id=f->getParameterID(j);
             if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
         }
-        for(int r=0; r<rec->getCorrelationRuns(); r++) {
+        for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             for (int j=0; j<f->paramCount(); j++) {
                 QString id=f->getParameterID(j);
@@ -1038,7 +1059,7 @@ void QFFCSFitEvaluation::resetAllFitFix() {
             QString id=f->getParameterID(j)+"_fix";
             if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
         }
-        for(int r=0; r<rec->getCorrelationRuns(); r++) {
+        for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             for (int j=0; j<f->paramCount(); j++) {
                 QString id=f->getParameterID(j)+"_fix";
@@ -1061,7 +1082,7 @@ void QFFCSFitEvaluation::setAllFitValues(QString id, double value, double error)
         QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
         if (hasFit(recs[i], -1)) recs[i]->resultsSetNumberError(en, id, value, error, unit);
-        for(int r=0; r<rec->getCorrelationRuns(); r++) {
+        for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             if (hasFit(recs[i], r)) recs[i]->resultsSetNumberError(en, id, value, error, unit);
         }
@@ -1081,7 +1102,7 @@ void QFFCSFitEvaluation::setAllFitFixes(QString id, bool fix) {
         QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
         if (hasFit(recs[i], -1)) recs[i]->resultsSetBoolean(en, id+"_fix", fix);
-        for(int r=0; r<rec->getCorrelationRuns(); r++) {
+        for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             if (hasFit(recs[i], r)) recs[i]->resultsSetBoolean(en, id+"_fix", fix);
         }

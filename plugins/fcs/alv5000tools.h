@@ -9,7 +9,7 @@
 
 #include <exception>
 #include <cstdio>
-#include <vector>
+#include <QVector>
 
 #include "tools.h"
 
@@ -112,7 +112,7 @@ QTime ALV_toTime(QString d);
  * This function returns the last read token which is the first token which does not belong to the
  * correlation data. You can use this return value in a token evaluation loop!
  */
-ALV_TOKEN ALV_readNumberMatrix(FILE* alv_file, std::vector<std::vector<double> >* datm);
+ALV_TOKEN ALV_readNumberMatrix(FILE* alv_file, QVector<QVector<double> >* datm);
 
 /** \brief read some parameters from the given ALV5000 file
  *  \ingroup quickfit2ALV

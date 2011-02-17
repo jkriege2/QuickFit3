@@ -87,11 +87,11 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,
          *         but only one channel is represented by one object. This is saved in the property
          *         CHANNEL. */
-        inline virtual unsigned int getChannel() { return getProperty("CHANNEL", QVariant((int)0)).toUInt(); }
+        inline virtual int getChannel() { return getProperty("CHANNEL", QVariant((int)0)).toUInt(); }
         /** \brief number of correlation runs in this object */
-        inline virtual unsigned int getCorrelationRuns() { return correlationRuns; };
+        inline virtual int getCorrelationRuns() { return correlationRuns; };
         /** \brief number of datapoints in every correlation curve */
-        inline virtual unsigned long long getCorrelationN() { return correlationN; }
+        inline virtual long long getCorrelationN() { return correlationN; }
         /** \brief sample points (times \f$ \tau \f$ ) of the correlation function.
          *         This is a 1D array of size correlationN */
         inline virtual double* getCorrelationT() { return correlationT; };
@@ -104,7 +104,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        inline virtual double* getCorrelationRun(unsigned int run) { return &(correlation[run*correlationN]); };
+        inline virtual double* getCorrelationRun(int run) { return &(correlation[run*correlationN]); };
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
         inline virtual double* getCorrelationMean() { return correlationMean; };
@@ -114,9 +114,9 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
 
 
         /** \brief number of countrate runs in this object */
-        inline virtual unsigned int getRateRuns() { return rateRuns; };
+        inline virtual int getRateRuns() { return rateRuns; };
         /** \brief number of datapoints in every count rate curve */
-        inline virtual unsigned long long getRateN() { return rateN; };
+        inline virtual long long getRateN() { return rateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the count rate
          *         This is a 1D array of size rateN */
         inline virtual double* getRateT() { return rateT; };
@@ -131,13 +131,13 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRateRun (unsigned int run) { return &(rate[run*rateN]); };
+        inline virtual double* getRateRun (int run) { return &(rate[run*rateN]); };
 
 
         /** \brief number of binned count rate runs in this object */
-        inline virtual unsigned int getBinnedRateRuns() { return rateRuns; };
+        inline virtual int getBinnedRateRuns() { return rateRuns; };
         /** \brief number of datapoints in every binned count rate */
-        inline virtual unsigned long long getBinnedRateN() { return binnedRateN; };
+        inline virtual long long getBinnedRateN() { return binnedRateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate
          *         This is a 1D array of size binnedRateN */
         inline virtual double* getBinnedRateT() { return binnedRateT; };
@@ -152,15 +152,15 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline virtual double* getBinnedRateRun (unsigned int run) { return &(binnedRate[run*binnedRateN]); };
+        inline virtual double* getBinnedRateRun (int run) { return &(binnedRate[run*binnedRateN]); };
 
 
         /** \brief calculate the mean value of the count rate */
-        virtual double calcRateMean(unsigned int run=0);
+        virtual double calcRateMean(int run=0);
         /** \brief calculate the standard deviation of the count rate */
-        virtual double calcRateStdDev(unsigned int run=0);
+        virtual double calcRateStdDev(int run=0);
         /** \brief calculate minimum and maximum count rates */
-        virtual void calcRateMinMax(unsigned int run, double& min, double& max);
+        virtual void calcRateMinMax(int run, double& min, double& max);
         /** \brief recalculate correlation curve mean and standard deviation */
         virtual void recalculateCorrelations();
 
@@ -176,11 +176,11 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         virtual void calcBinnedRate();
 
         /** \brief returns whether to leave out a run */
-        inline virtual bool leaveoutRun(unsigned int run) { return leaveout.contains(run); };
+        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); };
         /** \brief add a run to the leaveouts */
-        inline virtual void leaveoutAddRun(unsigned int run) { leaveout.append(run); }
+        inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
         /** \brief remove a run from the leaveouts */
-        inline virtual void leaveoutRemoveRun(unsigned int run) { leaveout.removeAll(run); }
+        inline virtual void leaveoutRemoveRun(int run) { leaveout.removeAll(run); }
         /** \brief clear all leaveouts */
         inline virtual void leaveoutClear() { leaveout.clear(); }
 
@@ -204,32 +204,32 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
 
         /** \brief resize the correlation curve data. Afterwards the correlation curves do not contain
          *         valid adat anymore. */
-        void resizeCorrelations(unsigned long long N, unsigned int runs);
+        void resizeCorrelations(long long N, int runs);
         /** \brief resize the rate curve data. Afterwards the rate curves do not contain
          *         valid adat anymore.
          *
          * \param N number of datapoints in every count rate run
          * \param runs number of runs of the count rate
          */
-        void resizeRates(unsigned long long N, unsigned int runs);
+        void resizeRates(long long N, int runs);
         /** \brief resize the binned rate curve data. Afterwards the binned rate curves do not contain
          *         valid adat anymore.
          *
          * \param N number of datapoints in every binned count rate run
          */
-        void resizeBinnedRates(unsigned long long N);
+        void resizeBinnedRates(long long N);
 
 
         /** \brief the leaveout list */
-        QList<unsigned int> leaveout;
+        QList<int> leaveout;
 
         /** \brief rund visible */
         QList<bool> runsVisibleList;
 
         /** \brief number of correlation runs in this object */
-        unsigned int correlationRuns;
+        int correlationRuns;
         /** \brief number of datapoints in every correlation curve */
-        unsigned long long correlationN;
+        long long correlationN;
         /** \brief sample points (times \f$ \tau \f$ ) of the correlation function.
          *         This is a 1D array of size correlationN */
         double* correlationT;
@@ -248,9 +248,9 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
 
 
         /** \brief number of countrate runs in this object */
-        unsigned int rateRuns;
+        int rateRuns;
         /** \brief number of datapoints in every count rate curve */
-        unsigned long long rateN;
+        long long rateN;
         /** \brief sample points (times \f$ \tau \f$ ) of the count rate.
          *         This is a 1D array of size rateN */
         double* rateT;
@@ -265,7 +265,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
          *         shall be binned in the binnedRate field. */
         int autoCalcRateN;
         /** \brief number of datapoints in every binned count rate curve */
-        unsigned long long binnedRateN;
+        long long binnedRateN;
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate curve.
          *         This is a 1D array of size binnedRateN */
         double* binnedRateT;

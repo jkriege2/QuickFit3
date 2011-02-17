@@ -8,6 +8,7 @@
 #include "programoptions.h"
 #include "qfpluginservices.h"
 #include "qftools.h"
+#include "qenhancedtableview.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -90,7 +91,7 @@ class QFRawDataPropertyEditor : public QWidget {
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief tabel display the evaluation results associated with this file  */
-        QTableView* tvResults;
+        QEnhancedTableView* tvResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
 

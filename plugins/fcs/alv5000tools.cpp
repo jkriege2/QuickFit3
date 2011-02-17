@@ -68,12 +68,12 @@ void ALV_analyze(QString filename, QString& mode, unsigned int& channelCount, un
 }
 
 
-ALV_TOKEN ALV_readNumberMatrix(FILE* alv_file, std::vector<std::vector<double> >* datm) {
+ALV_TOKEN ALV_readNumberMatrix(FILE* alv_file, QVector<QVector<double> >* datm) {
     //std::cout<<"<<<entered ALV_readNumberMatrix>>>\n";
 
-    std::vector<double> data; // a single row may contain 1024 columns at the most
+    QVector<double> data; // a single row may contain 1024 columns at the most
                        // this field is used to temporarily save the read data
-    std::vector<std::vector<double> > dat;
+    QVector<QVector<double> > dat;
     // we do not already know how many rows make up the correlation data, so we first read all rows into
     // a buffer (vector dat). Then we can determine the number of data rows and get an according amount
     // of memory in item1.

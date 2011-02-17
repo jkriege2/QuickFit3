@@ -320,25 +320,25 @@ QFFitFunctionFCSADiff::QFFitFunctionFCSADiff() {
     #define FCSADiff_diff_rho1 8
     addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 30,           1,        1e5,      1,   0        );
     #define FCSADiff_diff_tau1 9
-    addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of first component",                "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-5,     1e5,      0.1, 0        );
+    addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of first component",                "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            0.01,     100,      0.1, 0        );
     #define FCSADiff_diff_alpha1 10
     addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSADiff_diff_rho2 11
     addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1,        1e8,      1,   0    );
     #define FCSADiff_diff_tau2 12
-    addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of second component",               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-5,     1e5,      0.1, 0        );
+    addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of second component",               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            0.01,      10,      0.1, 0        );
     #define FCSADiff_diff_alpha2 13
     addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSADiff_diff_rho3 14
     addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 300,          1,        1e8,      1    );
     #define FCSADiff_diff_tau3 15
-    addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of third component",                "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-5,     1e5,      0.1, 0        );
+    addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of third component",                "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            0.01,      10,      0.1, 0        );
     #define FCSADiff_diff_alpha3 16
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 0,            -10,      10,       0.1  );
     #define FCSADiff_offset 17
-    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 6,            0.01,     100,      0.5  );
+    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    6,            0.01,      10,      0.5  );
     #define FCSADiff_focus_struct_fac 18
-    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     false,     true,        false,              QFFitFunction::DisplayError, 250,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     false,     true,        false,              QFFitFunction::EditError,    250,          0,        1e4,      1    );
     #define FCSADiff_focus_width 19
     addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, 0.5,          0,        1e50,     1    );
     #define FCSADiff_focus_volume 20

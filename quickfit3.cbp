@@ -97,6 +97,8 @@
 		<Unit filename="lib\lib.pro" />
 		<Unit filename="lib\programoptions.cpp" />
 		<Unit filename="lib\programoptions.h" />
+		<Unit filename="lib\qenhancedtableview.cpp" />
+		<Unit filename="lib\qenhancedtableview.h" />
 		<Unit filename="lib\qfevaluationeditor.cpp" />
 		<Unit filename="lib\qfevaluationeditor.h" />
 		<Unit filename="lib\qfevaluationitem.cpp" />

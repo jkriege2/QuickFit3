@@ -94,6 +94,10 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QComboBox* cmbPlotStyle;
         /** \brief combobox to select a plotting style for the data errors */
         QComboBox* cmbErrorStyle;
+        /** \brief combobox to select a plotting style for the residulas */
+        QComboBox* cmbResidualStyle;
+        /** \brief combobox to select a type for the residulas */
+        QCheckBox* chkWeightedResiduals;
         /** \brief checkbox for x logscale */
         QCheckBox* chkXLogScale;
         /** \brief checkbox to display grid */
@@ -166,6 +170,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         bool dataEventsEnabled;
         /** \brief current save directory */
         QString currentSaveDirectory;
+        /** \brief stores the last fit statistics report, created in updateFitFunction() */
+        QString fitStatisticsReport;
 
         /*! \brief execute a fit for the given record and run
 
@@ -236,7 +242,12 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void plotStyleChanged(int style);
         /** \brief emitted when the error plot style changes */
         void errorStyleChanged(int style);
-
+        /** \brief emitted when the residual plot style changes */
+        void residualStyleChanged(int style);
+        /** \brief emitted when the weighted residuals checkbox changes its state */
+        void chkWeightedResidualsToggled(bool checked);
+        /** \brief called when number of residual histogram bins changes */
+        void residualHistogramBinsChanged(int bins);
         /** \brief executed when a parameter is changed by the user */
         void parameterValueChanged();
         /** \brief executed when a parameter fix is changed by the user */
@@ -261,6 +272,10 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void copyToAllCurrentRun();
         /** \brief copy to initial values */
         void copyToInitial();
+
+        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
+         *         it with the appropriate values, according to the current settings */
+        double* allocWeights(bool* weightsOK=NULL);
 
     private:
         /** \brief create all widgets on the form */

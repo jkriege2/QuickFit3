@@ -47,7 +47,7 @@ void dlgQFFitAlgorithmProgressDialog::on_btnCancel_clicked() {
 
 void dlgQFFitAlgorithmProgressDialog::reportStatus(const QString& message) {
     labStatus->setText(message);
-
+}
 
 void dlgQFFitAlgorithmProgressDialog::setProgressMax(int max) {
     prgFit->setRange(0,max);

@@ -276,7 +276,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
        // Plot ALL RUNS
        //////////////////////////////////////////////////////////////////////////////////
        if (cmbRunDisplay->currentIndex()==1) {
-            for (unsigned int i=0; i<m->getCorrelationRuns(); i++) {
+            for (int i=0; i<m->getCorrelationRuns(); i++) {
                 size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i).toStdString());
                 JKQTPxyLineGraph* g=new JKQTPxyLineGraph();
                 g->set_lineWidth(1);
@@ -291,7 +291,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
            //////////////////////////////////////////////////////////////////////////////////
            // Plot ALL RUNS (left out runs in gray, standard runs in black, highlighted run in red)
            //////////////////////////////////////////////////////////////////////////////////
-            for (unsigned int i=0; i<m->getCorrelationRuns(); i++) {
+            for (int i=0; i<m->getCorrelationRuns(); i++) {
                 size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i).toStdString());
                 JKQTPxyLineGraph* g=new JKQTPxyLineGraph();
                 g->set_lineWidth(1);
@@ -315,7 +315,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
            //////////////////////////////////////////////////////////////////////////////////
            // Plot only used runs
            //////////////////////////////////////////////////////////////////////////////////
-            for (unsigned int i=0; i<m->getCorrelationRuns(); i++) {
+            for (int i=0; i<m->getCorrelationRuns(); i++) {
                 if (!m->leaveoutRun(i)) {
                     size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i).toStdString());
                     JKQTPxyLineGraph* g=new JKQTPxyLineGraph();
@@ -332,7 +332,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
            //////////////////////////////////////////////////////////////////////////////////
            // Plot only highlighted run
            //////////////////////////////////////////////////////////////////////////////////
-            for (unsigned int i=0; i<m->getCorrelationRuns(); i++) {
+            for (int i=0; i<m->getCorrelationRuns(); i++) {
                 if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                     size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i).toStdString());
                     JKQTPxyLineGraph* g=new JKQTPxyLineGraph();

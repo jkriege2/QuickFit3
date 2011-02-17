@@ -2,7 +2,7 @@
 #define QFRDRRESULTSMODEL_H
 
 #include <QAbstractTableModel>
-
+#include <QStringList>
 
 // forward declaration
 class QFRawDataRecord;
@@ -37,8 +37,14 @@ class QFRDRResultsModel : public QAbstractTableModel {
     protected:
         QFRawDataRecord* record;
     private:
-        QList<QString> calcResultNames() const;
-        QList<QString> lastResultNames;
+        /** \brief return a list of all result names shown in this model */
+        virtual QList<QString> calcResultNames() const;
+
+        /** \brief calculate average and standard deviation over all result for a given result name */
+        void calcStatistics(QString resultName, double& average, double& stddev) const;
+
+        /** \brief current list of all shown result names (updated on model reset, using calcResultNames() */
+        QStringList lastResultNames;
 };
 
 #endif // QFRDRRESULTSMODEL_H

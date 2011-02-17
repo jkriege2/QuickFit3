@@ -5,7 +5,9 @@ DEPENDPATH += . \
                ../libqf3widgets/
 INCLUDEPATH += . \
                ../lib/ \
-               ../libqf3widgets/
+               ../libqf3widgets/ \
+               ../../../../LIB/trunk/ \
+               ../../../../LIB/trunk/qt
 DESTDIR = ../output
 
 LIBS += -L../output/ -lquickfit3lib -lquickfit3widgets

@@ -303,7 +303,7 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultN
     switch(r.type) {
         case qfrdreBoolean: result=r.bvalue; break;
         case qfrdreInteger: result=r.ivalue; break;
-        case qfrdreNumberError:
+        case qfrdreNumberError: result=QPointF(r.dvalue, r.derror); break;
         case qfrdreNumber: result=r.dvalue; break;
         case qfrdreNumberList: {
             QList<QVariant> data;
@@ -314,6 +314,7 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultN
             break;
         }
         case qfrdreString: result=r.svalue; break;
+        default: result=QVariant(); break;
     }
     return result;
 }
@@ -334,54 +335,83 @@ QString QFRawDataRecord::resultsGetAsString(QString evalName, QString resultName
         }
         case qfrdreNumberError: return tr("(%1 +/- %2) %3").arg(r.dvalue).arg(r.derror).arg(r.unit);
         case qfrdreString: return r.svalue;
+        default: return ("");
     }
     return QString("");
 }
 
-double QFRawDataRecord::resultsGetAsDouble(QString evalName, QString resultName) {
+double QFRawDataRecord::resultsGetAsDouble(QString evalName, QString resultName, bool* ok) {
     evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
     switch(r.type) {
         case qfrdreBoolean: if (r.bvalue) return 1; else return 0;
         case qfrdreInteger: return r.ivalue;
         case qfrdreNumber: case qfrdreNumberError: return r.dvalue;
-        case qfrdreString: return r.svalue.toDouble();
+        case qfrdreString: return r.svalue.toDouble(ok);
+        default: if (ok) *ok=false;
+                 return 0.0;
+
     }
+    if (ok) *ok=false;
     return 0.0;
 }
 
-int64_t QFRawDataRecord::resultsGetAsInteger(QString evalName, QString resultName) {
+int64_t QFRawDataRecord::resultsGetAsInteger(QString evalName, QString resultName, bool* ok) {
     evaluationResult r=resultsGet(evalName, resultName);
-    switch(r.type) {
+    if (ok) *ok=true;
+     switch(r.type) {
         case qfrdreBoolean: if (r.bvalue) return 1; else return 0;
         case qfrdreInteger: return r.ivalue;
         case qfrdreNumber: case qfrdreNumberError: return r.dvalue;
-        case qfrdreString: return r.svalue.toInt();
+        case qfrdreString: return r.svalue.toInt(ok);
+        default: if (ok) *ok=false;
+                 return 0.0;
     }
+    if (ok) *ok=false;
     return 0.0;
 }
 
-QVector<double> QFRawDataRecord::resultsGetAsDoubleList(QString evalName, QString resultName) {
+QVector<double> QFRawDataRecord::resultsGetAsDoubleList(QString evalName, QString resultName, bool* ok) {
     evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
     switch(r.type) {
         case qfrdreNumberList: return r.dvec;
+        default: if (ok) *ok=false;
+                 return QVector<double>();
     }
+    if (ok) *ok=false;
     return QVector<double>();
 }
 
-double QFRawDataRecord::resultsGetErrorAsDouble(QString evalName, QString resultName) {
+double QFRawDataRecord::resultsGetErrorAsDouble(QString evalName, QString resultName, bool* ok) {
     evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
     switch(r.type) {
         case qfrdreNumber: case qfrdreNumberError: return r.derror;
+        default: if (ok) *ok=false;
+                 return 0.0;
     }
+    if (ok) *ok=false;
     return 0.0;
 };
 
-QString QFRawDataRecord::resultsGetResultName(QString evaluationName, unsigned int i) {
+QString QFRawDataRecord::resultsGetResultName(QString evaluationName, int i) {
     if (results.contains(evaluationName)) {
-        if (i<results[evaluationName].size()) {
-            return results[evaluationName].keys().at(i);
+        QList<QString> r=results[evaluationName].keys();
+        if (i<r.size()) {
+            return r.at(i);
         }
     }
     return QString("");
 }
 
+void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
+    if (resultsExistsFromEvaluation(oldEvalName)) {
+        QMapIterator<QString, evaluationResult> i(results[oldEvalName]);
+        while (i.hasNext()) {
+            i.next();
+            results[newEvalName].insert(i.key(), i.value());
+        }
+        emit resultsChanged();
+    }
+}

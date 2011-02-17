@@ -2,7 +2,9 @@ TEMPLATE = lib
 TARGET = quickfit3lib
 DEPENDPATH += .
 
-INCLUDEPATH += ../../../../LIB/trunk/
+INCLUDEPATH +=
+#../../../../LIB/trunk/ \
+               #../../../../LIB/trunk/qt
 
 QT += gui xml
 DESTDIR = ../output/
@@ -11,6 +13,7 @@ DESTDIR = ../output/
 # Input
 HEADERS += dlgnewproperty.h \
            dlgqffitalgorithmprogressdialog.h \
+           qenhancedtableview.h \
            programoptions.h \
            qfevaluationeditor.h \
            qfevaluationitem.h \
@@ -40,6 +43,7 @@ HEADERS += dlgnewproperty.h \
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
+           qenhancedtableview.cpp \
            programoptions.cpp \
            qfevaluationeditor.cpp \
            qfevaluationitem.cpp \

@@ -9,11 +9,11 @@ class QFRDRFCSDataInterface {
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,
          *         but only one channel is represented by one object. This is saved in the property
          *         CHANNEL. */
-        virtual unsigned int getChannel()=0;
+        virtual int getChannel()=0;
         /** \brief number of correlation runs in this object */
-        virtual unsigned int getCorrelationRuns()=0;
+        virtual int getCorrelationRuns()=0;
         /** \brief number of datapoints in every correlation curve */
-        virtual unsigned long long getCorrelationN()=0;
+        virtual long long getCorrelationN()=0;
         /** \brief sample points (times \f$ \tau \f$ ) of the correlation function.
          *         This is a 1D array of size correlationN */
         virtual double* getCorrelationT()=0;
@@ -26,7 +26,7 @@ class QFRDRFCSDataInterface {
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        virtual double* getCorrelationRun(unsigned int run)=0;
+        virtual double* getCorrelationRun(int run)=0;
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
         virtual double* getCorrelationMean()=0;
@@ -36,9 +36,9 @@ class QFRDRFCSDataInterface {
 
 
         /** \brief number of countrate runs in this object */
-        virtual unsigned int getRateRuns()=0;
+        virtual int getRateRuns()=0;
         /** \brief number of datapoints in every count rate curve */
-        virtual unsigned long long getRateN()=0;
+        virtual long long getRateN()=0;
         /** \brief sample points (times \f$ \tau \f$ ) of the count rate
          *         This is a 1D array of size rateN */
         virtual double* getRateT()=0;
@@ -53,13 +53,13 @@ class QFRDRFCSDataInterface {
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        virtual double* getRateRun (unsigned int run)=0;
+        virtual double* getRateRun (int run)=0;
 
 
         /** \brief number of binned count rate runs in this object */
-        virtual unsigned int getBinnedRateRuns()=0;
+        virtual int getBinnedRateRuns()=0;
         /** \brief number of datapoints in every binned count rate */
-        virtual unsigned long long getBinnedRateN()=0;
+        virtual long long getBinnedRateN()=0;
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate
          *         This is a 1D array of size binnedRateN */
         virtual double* getBinnedRateT()=0;
@@ -74,15 +74,15 @@ class QFRDRFCSDataInterface {
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        virtual double* getBinnedRateRun (unsigned int run)=0;
+        virtual double* getBinnedRateRun (int run)=0;
 
 
         /** \brief calculate the mean value of the count rate */
-        virtual double calcRateMean(unsigned int run=0)=0;
+        virtual double calcRateMean(int run=0)=0;
         /** \brief calculate the standard deviation of the count rate */
-        virtual double calcRateStdDev(unsigned int run=0)=0;
+        virtual double calcRateStdDev(int run=0)=0;
         /** \brief calculate minimum and maximum count rates */
-        virtual void calcRateMinMax(unsigned int run, double& min, double& max)=0;
+        virtual void calcRateMinMax(int run, double& min, double& max)=0;
         /** \brief recalculate correlation curve mean and standard deviation */
         virtual void recalculateCorrelations()=0;
 
@@ -98,11 +98,11 @@ class QFRDRFCSDataInterface {
         virtual void calcBinnedRate()=0;
 
         /** \brief returns whether to leave out a run */
-        virtual bool leaveoutRun(unsigned int run)=0;
+        virtual bool leaveoutRun(int run)=0;
         /** \brief add a run to the leaveouts */
-        virtual void leaveoutAddRun(unsigned int run)=0;
+        virtual void leaveoutAddRun(int run)=0;
         /** \brief remove a run from the leaveouts */
-        virtual void leaveoutRemoveRun(unsigned int run)=0;
+        virtual void leaveoutRemoveRun(int run)=0;
         /** \brief clear all leaveouts */
         virtual void leaveoutClear()=0;
 

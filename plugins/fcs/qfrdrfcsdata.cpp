@@ -52,7 +52,7 @@ QFRDRFCSData::~QFRDRFCSData()
     rate=NULL;
 }
 
-void QFRDRFCSData::resizeCorrelations(unsigned long long N, unsigned int runs) {
+void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     if (correlationT) free(correlationT);
     if (correlation) free(correlation);
     if (correlationMean) free(correlationMean);
@@ -76,7 +76,7 @@ void QFRDRFCSData::resizeCorrelations(unsigned long long N, unsigned int runs) {
     emit rawDataChanged();
 }
 
-void QFRDRFCSData::resizeRates(unsigned long long N, unsigned int runs) {
+void QFRDRFCSData::resizeRates(long long N, int runs) {
     if (rateT) free(rateT);
     if (rate) free(rate);
     rateRuns=0;
@@ -92,7 +92,7 @@ void QFRDRFCSData::resizeRates(unsigned long long N, unsigned int runs) {
     emit rawDataChanged();
 }
 
-void QFRDRFCSData::resizeBinnedRates(unsigned long long N) {
+void QFRDRFCSData::resizeBinnedRates(long long N) {
     if (binnedRateT) free(binnedRateT);
     if (binnedRate) free(binnedRate);
     binnedRateN=0;
@@ -111,24 +111,24 @@ void QFRDRFCSData::resizeBinnedRates(unsigned long long N) {
 
 void QFRDRFCSData::calcBinnedRate() {
     if (autoCalcRateN<=0) return;
-    unsigned long long d=0;
-    unsigned long N=0;
+    long long d=0;
+    long N=0;
     /*d=ceil((double)rateN/(double)binnedRateN);
     N=ceil((double)rateN/(double)d);
     if (binnedRateN<=0 && autoCalcRateN>0) {*/
-        d=(unsigned long long)ceil((double)rateN/(double)autoCalcRateN);
-        N=(unsigned long long)ceil((double)rateN/(double)d);
+        d=(long long)ceil((double)rateN/(double)autoCalcRateN);
+        N=(long long)ceil((double)rateN/(double)d);
         if ((double)rateN/(double)autoCalcRateN<=1) N=0;
         resizeBinnedRates(N);
     //}
     if (binnedRateN>0) {
         if (N!=binnedRateN) resizeBinnedRates(N);
-        for (unsigned long run=0; run<rateRuns; run++) {
-            for (unsigned long long i=0; i<binnedRateN; i++) {
-                unsigned long long jmin=i*d;
-                unsigned long long jmax=mmin(rateN, (i+1)*d)-1;
+        for (long run=0; run<rateRuns; run++) {
+            for (long long i=0; i<binnedRateN; i++) {
+                long long jmin=i*d;
+                long long jmax=mmin(rateN, (i+1)*d)-1;
                 double sum=0;
-                for (unsigned long long j=jmin; j<=jmax; j++) {
+                for (long long j=jmin; j<=jmax; j++) {
                     sum=sum+rate[run*rateN+j];
                 }
                 binnedRate[run*binnedRateN+i]=sum/(double)(jmax-jmin+1);
@@ -144,11 +144,11 @@ void QFRDRFCSData::recalculateCorrelations() {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return;
     }
-    for (unsigned long long i=0; i<correlationN; i++) {
+    for (long long i=0; i<correlationN; i++) {
         double m=0.0;
         double s=0.0;
         double cnt=0;
-        for (unsigned int run=0; run<correlationRuns; run++) {
+        for (int run=0; run<correlationRuns; run++) {
             if (!leaveoutRun(run)) {
                 double c=correlation[run*correlationN+i];
                 m=m+c;
@@ -164,21 +164,21 @@ void QFRDRFCSData::recalculateCorrelations() {
     emit rawDataChanged();
 }
 
-double QFRDRFCSData::calcRateMean(unsigned int run) {
+double QFRDRFCSData::calcRateMean(int run) {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
     }
     double m=0.0;
     if (run<rateRuns) {
-        for (unsigned long long i=0; i<rateN; i++) {
+        for (long long i=0; i<rateN; i++) {
             m=m+rate[run*rateN+i];
         }
     }
     return m/(double)rateN;
 }
 
-double QFRDRFCSData::calcRateStdDev(unsigned int run) {
+double QFRDRFCSData::calcRateStdDev(int run) {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
@@ -186,7 +186,7 @@ double QFRDRFCSData::calcRateStdDev(unsigned int run) {
     double m=0.0;
     double s=0.0;
     if (run<rateRuns) {
-        for (unsigned long long i=0; i<rateN; i++) {
+        for (long long i=0; i<rateN; i++) {
             double v=rate[run*rateN+i];
             m=m+v;
             s=s+v*v         ;
@@ -195,7 +195,7 @@ double QFRDRFCSData::calcRateStdDev(unsigned int run) {
     return sqrt(s/(double)rateN-m*m/(double)rateN/(double)rateN);
 }
 
-void QFRDRFCSData::calcRateMinMax(unsigned int run, double& min, double& max) {
+void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max) {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return;
@@ -204,7 +204,7 @@ void QFRDRFCSData::calcRateMinMax(unsigned int run, double& min, double& max) {
     if (run<rateRuns) {
         min=rate[run*rateN];
         max=min;
-        for (unsigned long long i=0; i<rateN; i++) {
+        for (long long i=0; i<rateN; i++) {
             double r=rate[run*rateN+i];
             if (r>max) max=r;
             if (r<min) min=r;
@@ -245,7 +245,7 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
         QStringList li=l.split(",");
         for (int i=0; i<li.size(); i++) {
             bool ok=false;
-            unsigned int lo=li[i].toUInt(&ok);
+            int lo=li[i].toUInt(&ok);
             if (ok) leaveout.append(lo);
         }
     }
@@ -282,14 +282,14 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
         tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
-        unsigned long long lines=tab.get_line_count();
-        unsigned long long columns=tab.get_column_count();
+        long long lines=tab.get_line_count();
+        long long columns=tab.get_column_count();
         resizeRates(lines, columns-1);
         //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
-        for (unsigned long long l=0; l<lines; l++) {
+        for (long long l=0; l<lines; l++) {
             rateT[l]=tab.get(0, l)*timefactor;
             //std::cout<<correlationT[l]<<", ";
-            for (unsigned int c=1; c<columns; c++) {
+            for (int c=1; c<columns; c++) {
                 rate[(c-1)*rateN+l]=tab.get(c, l);
                 //std::cout<<correlation[(c-1)*correlationN+l]<<", ";
                 //std::cout<<"c="<<c<<std::endl;
@@ -321,14 +321,14 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
         //std::cout<<"startswith = "<<startswith<<std::endl;
         tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
-        unsigned long long lines=tab.get_line_count();
-        unsigned int columns=tab.get_column_count();
+        long long lines=tab.get_line_count();
+        int columns=tab.get_column_count();
         resizeCorrelations(lines, columns-1);
         //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
-        for (unsigned long long l=0; l<lines; l++) {
+        for (long long l=0; l<lines; l++) {
             correlationT[l]=tab.get(0, l)*timefactor;
             //std::cout<<correlationT[l]<<", ";
-            for (unsigned int c=1; c<columns; c++) {
+            for (int c=1; c<columns; c++) {
                 correlation[(c-1)*correlationN+l]=tab.get(c, l);
                 //std::cout<<correlation[(c-1)*correlationN+l]<<", ";
                 //std::cout<<"c="<<c<<std::endl;
@@ -391,7 +391,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
         return false;
     }
 
-    unsigned int runs=0;
+    int runs=0;
     bool isDual=false;
 
     bool readingHeader=true;
@@ -443,7 +443,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
                 } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
                     setQFProperty("DURATION [s]", token.doubleValue, false, true);
                 } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
-                    runs=(unsigned int)round(token.doubleValue);
+                    runs=(int)round(token.doubleValue);
                 } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
                     setQFProperty("TEMPERATURE [K]", token.doubleValue, false, true);
                 } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
@@ -478,7 +478,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
         if (readingHeader) token=ALV_getToken(alv_file, readingHeader);
     }
 
-    unsigned int channel=0;
+    int channel=0;
     if (isDual) {
         if (propertyExists("CHANNEL")) channel=getProperty("CHANNEL", 0).toInt();
     }
@@ -489,11 +489,11 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
         if (token.type==ALV_QUOTED && token.value.contains("correlation", Qt::CaseInsensitive)) {
             //std::cout<<"  parsing correlation section ..."<<std::endl;
             getNew=false;
-            std::vector<std::vector<double> > dat;
+            QVector<QVector<double> > dat;
             token=ALV_readNumberMatrix(alv_file, &dat);
             resizeCorrelations(dat.size(), runs);
-            for (size_t i=0; i<dat.size(); i++) {
-                std::vector<double>& d=dat[i];
+            for (long long  i=0; i<dat.size(); i++) {
+                QVector<double>& d=dat[i];
                 if (d.size()<=0) {
                     setError(tr("too few columns in line %1 of correlation block.").arg(i));
                     return false;
@@ -512,7 +512,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
                         setError(tr("too few columns in line %1 of correlation block.").arg(i));
                         return false;
                     }
-                    for (size_t j=0; j<runs; j++) {
+                    for (long j=0; j<runs; j++) {
                         correlation[j*correlationN+i]=d[1+channel*(1+runs)+(1+j)];
                     }
                 }
@@ -521,12 +521,12 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
         if (token.type==ALV_QUOTED && token.value.contains("count", Qt::CaseInsensitive)) {
             //std::cout<<"  parsing rate section ..."<<std::endl;
             getNew=false;
-            std::vector<std::vector<double> > dat;
+            QVector<QVector<double> > dat;
             token=ALV_readNumberMatrix(alv_file, &dat);
             resizeRates(dat.size(), runs);
             //std::cout<<"  reading in rate section ... lines="<<dat.size()<<" runs="<<runs<<" channel="<<channel<<std::endl;
-            for (size_t i=0; i<dat.size(); i++) {
-                std::vector<double>& d=dat[i];
+            for (long long i=0; i<dat.size(); i++) {
+                QVector<double>& d=dat[i];
                 if (d.size()<1) {
                     setError(tr("too few columns in line %1 of rate block.").arg(i));
                     return false;

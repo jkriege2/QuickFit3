@@ -37,7 +37,7 @@ int QFRDRResultsModel::rowCount(const QModelIndex &parent ) const {
 int QFRDRResultsModel::columnCount(const QModelIndex &parent) const {
     if (!record) return 0;
     //std::cout<<"result column count="<<record->resultsGetEvaluationCount()<<std::endl;
-    return record->resultsGetEvaluationCount();
+    return record->resultsGetEvaluationCount()+1;
 }
 
 Qt::ItemFlags QFRDRResultsModel::flags(const QModelIndex &index) const {
@@ -49,17 +49,27 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
     if (role==Qt::DisplayRole) {
         //QList<QString>& l=lastResultNames;//calcResultNames();
         if (index.row()<lastResultNames.size()) {
-            QString en=record->resultsGetEvaluationName(index.column());
-            if (record->resultsExists(en, lastResultNames[index.row()])) {
-                QFRawDataRecord::evaluationResult r=record->resultsGet(en, lastResultNames[index.row()]);
-                return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]));
+            if (index.column()<record->resultsGetEvaluationCount()) {
+                QString en=record->resultsGetEvaluationName(index.column());
+                if (record->resultsExists(en, lastResultNames[index.row()])) {
+                    QFRawDataRecord::evaluationResult r=record->resultsGet(en, lastResultNames[index.row()]);
+                    return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]));
+                }
+            } else if (index.column()==record->resultsGetEvaluationCount()) {
+                QString rname=lastResultNames[index.row()];
+                double average=0;
+                double stddev=0;
+                calcStatistics(rname, average, stddev);
+                return QVariant(QString("%1 +/ %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
             }
         }
     } else if (role==ValueRole) {
         if (index.row()<lastResultNames.size()) {
-            QString en=record->resultsGetEvaluationName(index.column());
-            if (record->resultsExists(en, lastResultNames[index.row()])) {
-                return record->resultsGetAsQVariant(en, lastResultNames[index.row()]);
+            if (index.column()<record->resultsGetEvaluationCount()) {
+                QString en=record->resultsGetEvaluationName(index.column());
+                if (record->resultsExists(en, lastResultNames[index.row()])) {
+                    return record->resultsGetAsQVariant(en, lastResultNames[index.row()]);
+                }
             }
         }
     }
@@ -71,7 +81,8 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
     if (!record) return QVariant();
     if (role==Qt::DisplayRole) {
         if (orientation==Qt::Horizontal) {
-            return QVariant(record->resultsGetEvaluationName(section));
+            if (section<record->resultsGetEvaluationCount()) return QVariant(record->resultsGetEvaluationName(section));
+            else return tr("Averga +/- StdDev");
         } else {
             //QList<QString>& l=lastResultNames;//calcResultNames();
             if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
@@ -83,10 +94,10 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
 QList<QString> QFRDRResultsModel::calcResultNames() const {
     QList<QString> l;
     int evalCount=record->resultsGetEvaluationCount();
-    for (unsigned int i=0; i<evalCount; i++) {
+    for (int i=0; i<evalCount; i++) {
         QString en=record->resultsGetEvaluationName(i);
         int jmax=record->resultsGetCount(en);
-        for (unsigned int j=0; j<jmax; j++) {
+        for (int j=0; j<jmax; j++) {
             QString rn=record->resultsGetResultName(en, j);
             if (!l.contains(rn)) {
                 l.append(rn);
@@ -96,3 +107,29 @@ QList<QString> QFRDRResultsModel::calcResultNames() const {
     return l;
 }
 
+void QFRDRResultsModel::calcStatistics(QString resultName, double& average, double& stddev) const {
+    average=0;
+    stddev=0;
+    double sum=0;
+    double sum2=0;
+    double count=0;
+    int evalcnt=record->resultsGetEvaluationCount();
+
+    for (register int i=0; i<evalcnt; i++) {
+        bool ok=false;
+        double value=record->resultsGetAsDouble(record->resultsGetEvaluationName(i), resultName, &ok);
+        if (ok) {
+            sum=sum+value;
+            sum2=sum2+value*value;
+            count=count+1;
+        }
+
+    }
+
+    if (count>0) {
+        average=sum/count;
+        if (count>1) {
+            stddev=sqrt(sum2/count-sum*sum/count/count);
+        }
+    }
+}
