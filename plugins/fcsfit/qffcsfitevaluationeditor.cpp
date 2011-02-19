@@ -10,6 +10,7 @@
 #include <cfloat>
 #include "qffcsfitevaluation.h"
 #include "tools.h"
+#include "statistics_tools.h"
 #include <QThread>
 
 
@@ -108,6 +109,9 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     frame->setMaximumHeight(5);
     vbl->addWidget(frame);*/
 
+    QFont boldfont=font();
+    boldfont.setBold(true);
+
     toolbar=new QToolBar("toolbar_fcs_fit", this);
     vbl->addWidget(toolbar);
     actSaveReport=new QAction(QIcon(":/fcs_fit_savereport.png"), tr("Save Report"), this);
@@ -115,12 +119,14 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     actPrintReport=new QAction(QIcon(":/fcs_fit_printreport.png"), tr("Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     QLabel* lPS=new QLabel(tr("   &Plots: "), toolbar);
+    lPS->setFont(boldfont);
     cmbPlotStyle=new QComboBox(toolbar);
     cmbPlotStyle->addItem(QIcon(":/fcsplot_points.png"), tr("points"));
     cmbPlotStyle->addItem(QIcon(":/fcsplot_lines.png"), tr("lines"));
     cmbPlotStyle->addItem(QIcon(":/fcsplot_pointslines.png"), tr("lines + points"));
     lPS->setBuddy(cmbPlotStyle);
     QLabel* lES=new QLabel(tr("   &Errors: "), toolbar);
+    lES->setFont(boldfont);
     cmbErrorStyle=new QComboBox(toolbar);
     cmbErrorStyle->addItem(QIcon(":/fcsplot_enone.png"), tr("none"));
     cmbErrorStyle->addItem(QIcon(":/fcsplot_elines.png"), tr("lines"));
@@ -129,6 +135,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     lES->setBuddy(cmbErrorStyle);
 
     QLabel* lRS=new QLabel(tr("   &Residuals: "), toolbar);
+    lRS->setFont(boldfont);
     cmbResidualStyle=new QComboBox(toolbar);
     cmbResidualStyle->addItem(QIcon(":/fcsplot_points.png"), tr("points"));
     cmbResidualStyle->addItem(QIcon(":/fcsplot_lines.png"), tr("lines"));
@@ -215,7 +222,8 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     splitFitStatistics=new QSplitter(this);
     splitPlot->addWidget(splitFitStatistics);
     tabResidulas=new QTabWidget(this);
-    tabResidulas->setTabPosition(QTabWidget::West);
+    //tabResidulas->setTabPosition(QTabWidget::West);
+    tabResidulas->setTabPosition(QTabWidget::North);
     tabResidulas->setTabShape(QTabWidget::Triangular);
     tabResidulas->setDocumentMode(true);
     splitFitStatistics->addWidget(tabResidulas);
@@ -247,7 +255,31 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->useExternalDatastore(pltData->getDatastore());
     tabResidulas->addTab(pltResidualHistogram, tr("Histogram"));
-    //layFitStat->addWidget(pltResidualHistogram, 10);
+
+
+    pltResidualCorrelation=new JKQtPlotter(true, this);
+    pltResidualCorrelation->resize(200,200);
+    pltResidualCorrelation->set_displayToolbar(false);
+    pltResidualCorrelation->getXAxis()->set_axisLabel(tr("lag [residual number]"));
+    pltResidualCorrelation->getXAxis()->set_labelFontSize(8);
+    pltResidualCorrelation->getXAxis()->set_tickLabelFontSize(8);
+    pltResidualCorrelation->getXAxis()->set_minTicks(5);
+    pltResidualCorrelation->getYAxis()->set_axisLabel(tr("autocorrelation"));
+    pltResidualCorrelation->getYAxis()->set_labelFontSize(8);
+    pltResidualCorrelation->getYAxis()->set_tickLabelFontSize(8);
+    pltResidualCorrelation->getYAxis()->set_minTicks(3);
+    pltResidualCorrelation->setBorder(0,0,0,0);
+    pltResidualCorrelation->set_useAntiAliasingForSystem(true);
+    pltResidualCorrelation->set_useAntiAliasingForGraphs(true);
+    pltResidualCorrelation->set_displayMousePosition(false);
+    pltResidualCorrelation->set_keyFontSize(8);
+    pltResidualCorrelation->set_keyXMargin(1);
+    pltResidualCorrelation->set_keyYMargin(1);
+    pltResidualCorrelation->getYAxis()->set_minTicks(5);
+    pltResidualCorrelation->getYAxis()->set_minTicks(5);
+    pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
+    tabResidulas->addTab(pltResidualCorrelation, tr("Correlation"));
+
     layResidualAnalysis=new QFormLayout(this);
     layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     QWidget* widResidualParameters=new QWidget(this);
@@ -395,6 +427,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(pltData, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResiduals, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResidualHistogram, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
+    connect(pltResidualCorrelation, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
 
     connect(btnFitCurrent, SIGNAL(clicked()), this, SLOT(fitCurrent()));
     connect(btnFitAll, SIGNAL(clicked()), this, SLOT(fitAll()));
@@ -502,6 +535,7 @@ void QFFCSFitEvaluationEditor::readSettings() {
         pltData->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
         pltResiduals->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
         pltResidualHistogram->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresidualhistogram/");
+        pltResidualCorrelation->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresidualcorrelation/");
         hlpAlgorithm->readSettings(*settings->getQSettings(), "fcsfitevaleditor/algorithm_");
         hlpFunction->readSettings(*settings->getQSettings(), "fcsfitevaleditor/function_");
         loadSplitter(*(settings->getQSettings()), splitPlot, "fcsfitevaleditor/splitter_plot");
@@ -748,6 +782,7 @@ void QFFCSFitEvaluationEditor::replotData() {
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
+    JKQTPdatastore* dsresc=pltResidualCorrelation->getDatastore();
 
     if ((!eval)||(!data)) {
         pltData->clearGraphs();
@@ -764,9 +799,13 @@ void QFFCSFitEvaluationEditor::replotData() {
     pltResidualHistogram->set_doDrawing(false);
     pltResidualHistogram->set_emitSignals(false);
     pltResidualHistogram->clearGraphs();
+    pltResidualCorrelation->set_doDrawing(false);
+    pltResidualCorrelation->set_emitSignals(false);
+    pltResidualCorrelation->clearGraphs();
     dsres->clear();
     ds->clear();
     dsresh->clear();
+    dsresc->clear();
 
     pltResiduals->getXAxis()->set_logAxis(chkXLogScale->isChecked());
     pltData->getXAxis()->set_logAxis(chkXLogScale->isChecked());
@@ -849,6 +888,7 @@ void QFFCSFitEvaluationEditor::replotData() {
         pltResiduals->setX(pltData->getXMin(), pltData->getXMax());
 
         pltResidualHistogram->zoomToFit(true, true);
+        pltResidualCorrelation->zoomToFit(true, true);
     }
 
 
@@ -858,9 +898,12 @@ void QFFCSFitEvaluationEditor::replotData() {
     pltData->set_emitSignals(true);
     pltResidualHistogram->set_doDrawing(true);
     pltResidualHistogram->set_emitSignals(true);
+    pltResidualCorrelation->set_doDrawing(true);
+    pltResidualCorrelation->set_emitSignals(true);
     pltResiduals->update_plot();
     pltData->update_plot();
     pltResidualHistogram->update_plot();
+    pltResidualCorrelation->update_plot();
 }
 
 void QFFCSFitEvaluationEditor::updateFitFunctions() {
@@ -872,6 +915,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
+    JKQTPdatastore* dsresc=pltResidualCorrelation->getDatastore();
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
 
@@ -917,10 +961,19 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 double* fullParams=eval->allocFillParameters();
                 double* errors=eval->allocFillParameterErrors();
+                bool* paramsFix=eval->allocFillFix(record, eval->getCurrentRun());
                 ffunc->calcParameter(fullParams, errors);
+                int fitparamN=0;
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    if (ffunc->isParameterVisible(i, fullParams) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                        fitparamN++;
+                    }
+                }
+                int dataSize=datacut_max-datacut_min;
+                int degFreedom=dataSize-fitparamN-1;
 
                 /////////////////////////////////////////////////////////////////////////////////
-                // calculate model function values, residuals and residual parameters
+                // calculate model function values, residuals and residual parameters/statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 double residSqrSum=0;        // sum of squared residuals
                 double residWeightSqrSum=0;  // sum of squared weighted residuals
@@ -966,11 +1019,16 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
                 double residAverage=residSum/(double)N;
                 double residWeightAverage=residWeightSum/(double)N;
+                double residStdDev=sqrt(residSqrSum/(double)N-residSum*residSum/(double)N/(double)N);
+                double residWeightStdDev=sqrt(residWeightSqrSum/(double)N-residWeightSum*residWeightSum/(double)N/(double)N);
 
                 double residHistBinWidth=(rmax-rmin)/(double)residualHistogramBins;
                 double residHistWBinWidth=(rmaxw-rminw)/(double)residualHistogramBins;
                 //std::cout<<"rmin="<<rmin<<"  rmax="<<rmax<<"    rminw="<<rminw<<"  rmaxw="<<rmaxw<<std::endl;
 
+                /////////////////////////////////////////////////////////////////////////////////
+                // calculate residual histogram
+                /////////////////////////////////////////////////////////////////////////////////
                 double* resHistogram=(double*)calloc(residualHistogramBins, sizeof(double));
                 double resHistogramCount=0;
                 double* resWHistogram=(double*)calloc(residualHistogramBins, sizeof(double));
@@ -997,6 +1055,14 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 if (resWHistogramCount>0) for (int i=0; i<residualHistogramBins; i++) {
                     resWHistogram[i]=resWHistogram[i]/resWHistogramCount;
                 }
+
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // calculate residual correlation
+                /////////////////////////////////////////////////////////////////////////////////
+                double* resCorrelation=statisticsAllocAutocorrelate(&(residuals[datacut_min]), datacut_max-datacut_min);
+                double* resWCorrelation=statisticsAllocAutocorrelate(&(residuals_weighted[datacut_min]), datacut_max-datacut_min);
+                int resN=ceil((double)(datacut_max-datacut_min)/2.0);
 
 
                 size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
@@ -1080,22 +1146,42 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 g_residualsHistogram->set_width(1.0);
                 pltResidualHistogram->addGraph(g_residualsHistogram);
 
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // plot residuals correlations
+                /////////////////////////////////////////////////////////////////////////////////
+                size_t c_residualCorrelationX=dsresc->addLinearColumn(resN-1, 1, resN-1, "residualcorr_x");
+                size_t c_residualCorrelationY=0;
+                if (chkWeightedResiduals->isChecked()) {
+                    c_residualCorrelationY=dsresc->addCopiedColumn(&(resWCorrelation[1]), resN-1, "residualcorr_weighted_y");
+                } else {
+                    c_residualCorrelationY=dsresh->addCopiedColumn(&(resCorrelation[1]), resN-1, "residualcorr_y");
+                }
+                JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation);
+                g_residualsCorrelation->set_xColumn(c_residualCorrelationX);
+                g_residualsCorrelation->set_yColumn(c_residualCorrelationY);
+                pltResidualCorrelation->addGraph(g_residualsCorrelation);
+
                 /////////////////////////////////////////////////////////////////////////////////
                 // update display of fit results
                 /////////////////////////////////////////////////////////////////////////////////
-                QString txtFit="";
+                QString txtFit="<font face=\"Arial\">";
                 QString fitResult=record->resultsGetAsString(eval->getEvaluationResultID(), "fitalg_messageHTML");
 
                 if (!fitResult.isEmpty()) {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>%1</center></div><br>").arg(fitResult);
                 }
-                txtFit+=QString("<b>%1</b><blockquote>").arg(tr("Fit Statistics:"));
+                txtFit+=QString("<b>%1</b><cebter>").arg(tr("Fit Statistics:"));
                 txtFit+=QString("<table border=\"0\" width=\"95%\">");
                 //txtFit+=QString("<tr><td align=\"right\"></td><td align=\"left\"></td><td align=\"right\"></td><td align=\"left\"></td></tr>");
-                txtFit+=QString("<tr><td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td><td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup><sub>weighted</sub></font> =</td><td align=\"left\" valign=\"bottom\">%2</td></tr>").arg(residSqrSum).arg(residWeightSqrSum);
+                txtFit+=QString("<tr><td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td></td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<td><td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td></tr>").arg(residSqrSum).arg(residWeightSqrSum);
+                txtFit+=QString("<tr><td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td></td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<td><td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td></tr>").arg(residAverage).arg(residWeightAverage);
+                txtFit+=QString("<tr><td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td></td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<td><td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td></tr>").arg(residStdDev).arg(residWeightStdDev);
+                txtFit+=QString("<tr><td align=\"right\" valign=\"bottom\">NP=</td><td align=\"left\" valign=\"bottom\">%1</td></td><td><td align=\"right\" valign=\"bottom\">NR=</td><td align=\"left\" valign=\"bottom\">%2</td></tr>").arg(fitparamN).arg(dataSize);
+                txtFit+=QString("<tr><td align=\"right\" valign=\"bottom\">DF=</td><td align=\"left\" valign=\"bottom\">%1</td><td align=\"right\" valign=\"bottom\"></td><td></td><td align=\"left\" valign=\"bottom\"></td></tr>").arg(degFreedom);
 
-                txtFit+=QString("</table");
-                txtFit+=QString("</blockquote>");
+                txtFit+=QString("</table><br><font size=\"-1\"><i>Legend:</i>: &chi;<sup>2</sup>: sum error square, &lang;E&rang;: residual average, &radic;&lang;E2&rang;: residual stddev., <br>NP: number of fit parameters, NR: number of residuals, <b>DF: degrees of freedom </font>");
+                txtFit+=QString("</center></font>");
                 fitStatisticsReport=txtFit;
                 txtFitStatistics->setHtml(txtFit);
 
@@ -1111,6 +1197,9 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 free(weights);
                 free(resHistogram);
                 free(resWHistogram);
+                free(paramsFix);
+                free(resWCorrelation);
+                free(resCorrelation);
             }
         }
     } catch(std::exception& E) {
@@ -1252,34 +1341,48 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 services->log_text(tr("   - output params          (%1)\n").arg(oparams));
                 services->log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
                 //labFitResult->setText(result.message);
-                eval->setFitResultValueInt(record, run, "used_run", run);
-                eval->setFitResultValueString(record, run, "modle_name", ffunc->id());
+/*
+                eval->setFitResultValueInt(record, run, "fit_used_run", run);
+                eval->setFitResultValueString(record, run, "fit_model_name", ffunc->id());
                 eval->setFitResultValueString(record, run, "fitalg_name", falg->id());
                 eval->setFitResultValue(record, run, "fitalg_runtime", thread->getDeltaTime(), "msecs");
                 eval->setFitResultValueBool(record, run, "fitalg_success", result.fitOK);
                 eval->setFitResultValueString(record, run, "fitalg_message", result.messageSimple);
                 eval->setFitResultValueString(record, run, "fitalg_messageHTML", result.message);
-                eval->setFitResultValueInt(record, run, "datapoints", cut_N);
-                eval->setFitResultValueInt(record, run, "cut_low", cut_low);
-                eval->setFitResultValueInt(record, run, "cut_up", cut_up);
+                eval->setFitResultValueInt(record, run, "fit_datapoints", cut_N);
+                eval->setFitResultValueInt(record, run, "fit_cut_low", cut_low);
+                eval->setFitResultValueInt(record, run, "fit_cut_up", cut_up);
+
+*/
+                record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_used_run", run);
+                record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fit_model_name", ffunc->id());
+                record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_name", falg->id());
+                record->resultsSetNumber(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_runtime", thread->getDeltaTime(), "msecs");
+                record->resultsSetBoolean(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_success", result.fitOK);
+                record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_message", result.messageSimple);
+                record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_messageHTML", result.message);
+                record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_datapoints", cut_N);
+                record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_cut_low", cut_low);
+                record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_cut_up", cut_up);
+
                 QMapIterator<QString, QVariant> it(result.params);
                 while (it.hasNext()) {
                     it.next();
                     switch(it.value().type()) {
                         case QVariant::Double:
-                            eval->setFitResultValue(record, run, "fitalg_"+it.key(), it.value().toDouble()); break;
+                            record->resultsSetNumber(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_"+it.key(), it.value().toDouble()); break;
                         case QVariant::Char:
                         case QVariant::Date:
                         case QVariant::DateTime:
                         case QVariant::String:
-                            eval->setFitResultValueString(record, run, "fitalg_"+it.key(), it.value().toString()); break;
+                            record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_"+it.key(), it.value().toString()); break;
                         case QVariant::Int:
                         case QVariant::LongLong:
                         case QVariant::UInt:
                         case QVariant::ULongLong:
-                            eval->setFitResultValueInt(record, run, "fitalg_"+it.key(), it.value().toInt()); break;
+                            record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_"+it.key(), it.value().toInt()); break;
                         case QVariant::Bool:
-                            eval->setFitResultValueBool(record, run, "fitalg_"+it.key(), it.value().toBool()); break;
+                            record->resultsSetBoolean(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_"+it.key(), it.value().toBool()); break;
                         default: break;
                     }
                 }

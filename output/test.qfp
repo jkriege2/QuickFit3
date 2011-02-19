@@ -1,193 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<quickfitproject quickfit_version="3.0" name="Test Project" creator="Jan Krieger">
-    <description><![CDATA[Description of the test project]]></description>
+<quickfitproject quickfit_version="3.0" name="unnamed" creator="">
+    <description><![CDATA[]]></description>
     <properties/>
     <rawdata>
-        <rawdataelement type="table" name="ASCII_correlation.txt" id="8">
+        <rawdataelement type="fcs" name="20nM_488_Day2_04s.asc - CH0" id="0">
             <description><![CDATA[]]></description>
             <properties>
-                <property name="column_separator" type="string" data="," usereditable="false" visible="true"/>
-                <property name="comment_start" type="string" data="#" usereditable="false" visible="true"/>
-                <property name="decimal_separator" type="string" data="." usereditable="false" visible="true"/>
-                <property name="header_start" type="string" data="#!" usereditable="false" visible="true"/>
-            </properties>
-            <results/>
-            <files>
-                <file>testdata/ASCII_correlation.txt</file>
-            </files>
-            <data/>
-        </rawdataelement>
-        <rawdataelement type="fcs" name="qd525_20nM_15ul_al488_20nM_15ul.ASC - CH0" id="9">
-            <description><![CDATA[]]></description>
-            <properties>
-                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
-                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false" visible="false"/>
                 <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
                 <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
-                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false" visible="true"/>
                 <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
-                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false" visible="true"/>
                 <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
                 <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
                 <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
                 <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
                 <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
                 <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
-                <property name="TIME" type="time" data="14:52:17" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="11:02:15" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
-                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="algorithm" type="string" data="fit_levmar" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcscorreditor_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="algorithm" type="string" data="fit_simanneal" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r1_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r2_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r4_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r5_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_max" type="int" data="175" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="4" usereditable="false" visible="false"/>
+                <property name="weights" type="int" data="1" usereditable="false" visible="false"/>
             </properties>
             <results>
-                <evaluation name="fcs_fit_16_fcs_adiff_run0">
-                    <result name="1n_particle" type="number" value="0.19168" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.464618" error="0.0247316" unit=""/>
-                    <result name="diff_rho1" type="numbererror" value="0.95" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_tau1" type="number" value="41.3" unit="usec"/>
-                    <result name="diff_tau1_fix" type="boolean" value="false"/>
-                    <result name="diff_tau2" type="numbererror" value="300" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0279933" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="3" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="518" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0279933" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="5" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="5" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="5" unit=""/>
-                    <result name="fitalg_message" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 5 iterations.&lt;br&gt;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.0279933  [old_SES = 0.0279933]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-47" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="modle_name" type="string" value="fcs_adiff"/>
-                    <result name="n_components" type="number" value="1" unit=""/>
-                    <result name="n_particle" type="number" value="5.2169" unit=""/>
-                    <result name="n_particle_fix" type="boolean" value="false"/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
-                    <result name="1n_particle" type="numbererror" value="0.259678" error="0.0091055" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.464618" error="0.0247316" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="56.5245" error="8.42548" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="3.85092" error="0.135031" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.19168" error="0.00118" unit=""/>
-                    <result name="concentration" type="numbererror" value="16.59" error="5.88" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="378.3" error="40.5" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="24.42" error="2.22" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.5147" error="0.0135" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.4853" error="0.0135" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="41.3" error="2.95" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="639.8" error="27.8" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.000337944" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="393" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.000337945" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="7" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="7" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="7" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 7 iterations.&#10;reason: stopped by small delta_p.&#10;SES = 0.000337944  [old_SES = 0.000337945]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="31" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="2" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522" error="0.185" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="10" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="5.2169" error="0.032" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="1.545" error="0.208" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.1445" error="0.0105" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run1081107335">
-                    <result name="1n_particle" type="numbererror" value="0.203001" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="15.6695" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="721.33" error="0" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="30.9835" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.553408" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="21.6614" error="0" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="504.3" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.000703253" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="10" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="734" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="33.1047" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="49" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="49" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="49" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 49 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.000703253  [old_SES = 33.1047]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-94" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="0" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="4.92608" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="0.165972" error="0" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.748249" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_runavg">
-                    <result name="1n_particle" type="numbererror" value="0.185796" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="10.2723" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="97.1383" error="0" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="52.0833" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="160.853" error="0" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="300" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.00941307" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="11" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="42024" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0348198" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
+                <evaluation name="fcs_fit_14_fcs_adiff_runavg">
+                    <result name="fit_cut_low" type="integer" value="4" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="175" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="171" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_adiff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="43.9024" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
+                    <result name="fitalg_function_evals" type="integer" value="4001" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="43.9024" unit=""/>
+                    <result name="fitalg_iterations" type="integer" value="1000" unit=""/>
                     <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
                     <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 0.00941307  [old_SES = 0.0348198]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-3219" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 4001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 43.9024  [old_SES = 43.9024]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 4001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 43.9024  [old_SES = 43.9024]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="313" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value=" stopped by abortion criterion f_max."/>
                     <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="number" value="6" unit=""/>
-                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
-                    <result name="focus_volume" type="numbererror" value="0.870051" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="0" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="5.38225" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="0.232366" error="0" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.710276" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.188025" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="16.9176" error="0" unit="nM"/>
+                    <result name="fitparam_diff_alpha1" type="numbererror" value="0.99542" error="0" unit=""/>
+                    <result name="fitparam_diff_alpha2" type="numbererror" value="1.02529" error="0" unit=""/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.00110209" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.998898" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="28.0962" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="30.2782" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_struct_fac_fix" type="boolean" value="true"/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="5.31845" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_tau1_fix" type="boolean" value="true"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.176021" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0.0006" unit=""/>
+                    <result name="fitparam_offset_fix" type="boolean" value="true"/>
                 </evaluation>
             </results>
             <files>
-                <file>testdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
+                <file>testdata/20nM_488_Day2_04s.asc</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="al488_20nM_3.ASC - CH0" id="10">
+        <rawdataelement type="fcs" name="al488_20nM_3.ASC - CH0" id="1">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -206,149 +99,44 @@
                 <property name="TIME" type="time" data="15:00:57" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="130" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
-                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16_fcs_adiff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.14074" error="0.00285" unit=""/>
-                    <result name="alpha" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="true"/>
-                    <result name="diff_tau1" type="numbererror" value="27.23" error="2.12" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0210894" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="2" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="523" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0210894" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="25" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="25" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="25" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 25 iterations.&#10;reason: stopped by small delta_p.&#10;SES = 0.0210894  [old_SES = 0.0210894]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-469" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="modle_name" type="string" value="fcs_adiff"/>
-                    <result name="n_particle" type="numbererror" value="7.105" error="0.144" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
-                    <result name="1n_particle" type="numbererror" value="0.140741" error="0.0028542" unit=""/>
-                    <result name="alpha" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="true"/>
-                    <result name="diff_tau1" type="numbererror" value="27.2261" error="2.12129" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="7.10527" error="0.144094" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.119555" error="0.000806" unit=""/>
-                    <result name="concentration" type="numbererror" value="37.5" error="10.1" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="35.2" error="76.9" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="301" error="56.6" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.0158" error="0.0335" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.9842" error="0.0335" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="353" error="770" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="41.3" error="2.32" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="9.94576e-05" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="26996" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0949264" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 9.94576e-05  [old_SES = 0.0949264]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="1828" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.3705" error="0.0997" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="8.3643" error="0.0564" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="1.417" error="0.127" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.2261" error="0.0102" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run1081107335">
-                    <result name="1n_particle" type="numbererror" value="0.14074" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="22.6013" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="573.895" error="0" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="27.5142" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="27.2263" error="0" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="567.889" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0210894" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="10" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="1334" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.13988" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="31" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="31" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="31" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 31 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.0210894  [old_SES = 0.13988]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-63" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="0" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="7.10528" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="5.33169" error="0" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.614423" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_runavg">
-                    <result name="1n_particle" type="numbererror" value="0.102618" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="30.9978" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="268.472" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="58.1998" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0133399" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="9" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="44" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0133399" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="1" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="1" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="1" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 1 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.0133399  [old_SES = 0.0133399]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-16" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="0" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="9.74491" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="3" error="0" unit="usec"/>
-                    <result name="nonfl_tau1_fix" type="boolean" value="true"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.409874" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
                 <file>testdata/al488_20nM_3.ASC</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="DNA_2nM_Al488_0ul_1.ASC - CH0" id="11">
+        <rawdataelement type="fcs" name="beads_1t1000_80pGlycerin_1.ASC - CH0" id="2">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="2009-08-31" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH1" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="17:30:18" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/beads_1t1000_80pGlycerin_1.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_0ul_1.ASC - CH0" id="3">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -367,92 +155,16 @@
                 <property name="TIME" type="time" data="13:49:03" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
-                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16_fcs_adiff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.879045" error="0.0197706" unit=""/>
-                    <result name="alpha" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="true"/>
-                    <result name="diff_tau1" type="numbererror" value="567.89" error="72.3096" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="3.26913" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="2" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="15001" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="3.27158" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 3000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 3.26913  [old_SES = 3.27158]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-1094" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
-                    <result name="modle_name" type="string" value="fcs_adiff"/>
-                    <result name="n_particle" type="numbererror" value="1.1376" error="0.0255857" unit=""/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.8417" error="0.0153" unit=""/>
-                    <result name="concentration" type="numbererror" value="3.7794" error="0.0688" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="895" error="394" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="16.817" error="0.367" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.999888" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.8799" error="0.0115" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="17.46" error="7.68" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="929.1" error="20.3" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0121259" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="7" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="1512" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.012126" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="90" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="90" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="90" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 90 iterations.&#10;reason: stopped by small delta_p.&#10;SES = 0.0121259  [old_SES = 0.012126]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-156" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="1.1881" error="0.0216" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="1.681" error="0.247" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.2007" error="0.0135" unit=""/>
-                    <result name="offset" type="numbererror" value="-0.000371" error="0.000998" unit=""/>
-                    <result name="offset_fix" type="boolean" value="false"/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run1081041137">
-                    <result name="fitalg_error_sum" type="number" value="3.26913" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="13220" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="3.26913" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="1832" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="1832" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="1832" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 1832 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 3.26913  [old_SES = 3.26913]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-328" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
                 <file>testdata/DNA_2nM_Al488_0ul_1.ASC</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="DNA_2nM_Al488_5ul.ASC - CH0" id="12">
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_5ul.ASC - CH0" id="4">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -471,53 +183,16 @@
                 <property name="TIME" type="time" data="12:05:08" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
-                <property name="fcs_fit3_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.441489" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="7.20498" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="2757.81" error="0" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="73.4759" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.531198" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="5.66573" error="0" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="212.655" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.00939893" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="39800" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0882334" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 0.00939893  [old_SES = 0.0882334]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-3828" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="2.26506" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="10" error="0" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
                 <file>testdata/DNA_2nM_Al488_5ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="DNA_2nM_Al488_10ul.ASC - CH0" id="13">
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_10ul.ASC - CH0" id="5">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -536,51 +211,16 @@
                 <property name="TIME" type="time" data="12:06:05" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.24453" error="0.00183" unit=""/>
-                    <result name="concentration" type="numbererror" value="13.0085" error="0.0976" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="404.6" error="19.4" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="22.51" error="2.51" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.1855" error="0.0134" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="38.62" error="1.85" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="694" error="77.4" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.000605029" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="26992" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0932499" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 0.000605029  [old_SES = 0.0932499]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-2688" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="4.0895" error="0.0307" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="1.826" error="0.19" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.18283" error="0.00851" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
                 <file>testdata/DNA_2nM_Al488_10ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="DNA_2nM_Al488_15ul.ASC - CH0" id="14">
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_15ul.ASC - CH0" id="6">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -599,59 +239,72 @@
                 <property name="TIME" type="time" data="12:07:01" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_model" type="string" data="fcs_adiff" usereditable="true" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
-                    <result name="1n_particle" type="numbererror" value="2.94358" error="2.45953" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.259084" error="0.0253665" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="false"/>
-                    <result name="diff_tau1" type="numbererror" value="0.001" error="0.00323451" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="0.339722" error="0.283857" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.15023" error="0.00207" unit=""/>
-                    <result name="concentration" type="numbererror" value="21.174" error="0.292" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="383.3" error="27.1" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="16.71" error="3.62" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.1362" error="0.0175" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="40.76" error="2.88" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="935" error="202" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.000585029" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="27001" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.000585043" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 0.000585029  [old_SES = 0.000585043]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-2640" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="2" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="6.6565" error="0.0916" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="2.423" error="0.302" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.2161" error="0.0109" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
                 <file>testdata/DNA_2nM_Al488_15ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="egfp1_2.ASC - CH0" id="15">
+        <rawdataelement type="fcs" name="DNA_4nM_3.ASC - CH0" id="7">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="13:59:55" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_4nM_3.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="egfp1_1.ASC - CH0" id="8">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="15:20:38" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/egfp1_1.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="egfp1_2.ASC - CH0" id="9">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -670,269 +323,164 @@
                 <property name="TIME" type="time" data="15:23:50" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_datacut_min" type="int" data="10" usereditable="false" visible="false"/>
-                <property name="fcs_fit16_last_model" type="string" data="fcs_diff" usereditable="true" visible="true"/>
-                <property name="fcs_fit16_last_run" type="int" data="0" usereditable="true" visible="true"/>
-                <property name="fcscorreditor_datacut_max" type="int" data="183" usereditable="false" visible="false"/>
-                <property name="fcscorreditor_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
-                <property name="weights" type="int" data="1" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r1_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r2_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r3_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r4_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r5_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16">
-                    <result name="1n_particle" type="numbererror" value="0.0640282" error="0.0013841" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.832561" error="0.0227291" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="false"/>
-                    <result name="diff_tau1" type="numbererror" value="117.257" error="7.30012" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="15.6181" error="0.337617" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.0641846" error="0.00133609" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.826714" error="0.0217337" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="120.809" error="7.27869" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0103848" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="3" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="1901" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.0162683" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="89" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="89" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="89" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 89 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.0103848  [old_SES = 0.0162683]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-141" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="modle_name" type="string" value="fcs_adiff"/>
-                    <result name="n_particle" type="numbererror" value="15.5801" error="0.324321" unit=""/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_run1">
-                    <result name="1n_particle" type="numbererror" value="0.063437" error="0.00138853" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.827304" error="0.02279" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="118.503" error="7.49484" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="15.7637" error="0.345042" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_run2">
-                    <result name="1n_particle" type="numbererror" value="0.06374" error="0.00134" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.8335" error="0.0222" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="false"/>
-                    <result name="diff_tau1" type="numbererror" value="119.73" error="7.24" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="7387.98" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="3" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="671" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="7387.98" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="4" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="4" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="4" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 4 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 7387.98  [old_SES = 7387.98]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-47" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="modle_name" type="string" value="fcs_adiff"/>
-                    <result name="n_particle" type="numbererror" value="15.689" error="0.329" unit=""/>
-                    <result name="used_run" type="integer" value="2" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_run3">
-                    <result name="1n_particle" type="numbererror" value="0.0640282" error="0.0013841" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.832561" error="0.0227291" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="117.257" error="7.30012" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="15.6181" error="0.337617" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_run4">
-                    <result name="1n_particle" type="numbererror" value="0.0632084" error="0.00137393" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.819208" error="0.0221334" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="116.573" error="7.34116" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="15.8207" error="0.343886" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_run5">
-                    <result name="1n_particle" type="numbererror" value="0.0635377" error="0.00135178" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.835818" error="0.0227355" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="122.112" error="7.4932" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="15.7387" error="0.334846" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
-                    <result name="1n_particle" type="numbererror" value="0.05722" error="0.000712" unit=""/>
-                    <result name="alpha" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="true"/>
-                    <result name="diff_tau1" type="numbererror" value="164.85" error="5.26" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="9016.5" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="2" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="441" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="9016.5" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="9" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="9" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="9" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 9 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 9016.5  [old_SES = 9016.5]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-31" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="modle_name" type="string" value="fcs_adiff"/>
-                    <result name="n_particle" type="numbererror" value="17.476" error="0.217" unit=""/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.056118" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="56.6827" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="88.8921" error="0" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="89.8887" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.371846" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="175.775" error="0" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="173.826" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="1213.61" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="10" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="683" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="1214.35" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="21" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="21" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="21" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 21 iterations.&#10;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 1213.61  [old_SES = 1214.35]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-63" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="17.8196" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="0.217696" error="0" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.842499" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0" error="0" unit=""/>
-                    <result name="offset_fix" type="boolean" value="true"/>
-                    <result name="used_run" type="integer" value="0" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
                 <file>testdata/egfp1_2.ASC</file>
             </files>
-            <data>
-                <leaveout list="4"/>
-            </data>
+            <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="101213_helas3_braf_1_2.iss.csv" id="17">
+        <rawdataelement type="fcs" name="Hela_16_39d.asc - CH0" id="10">
             <description><![CDATA[]]></description>
             <properties>
-                <property name="FILETYPE" type="string" data="ISS_ALBA" usereditable="false" visible="true"/>
-                <property name="fcs_fit16_last_run" type="int" data="-1" usereditable="true" visible="true"/>
-                <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="2008-08-22" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="true" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="3" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="14:13:31" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r1_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
             </properties>
-            <results>
-                <evaluation name="fcs_fit_16_fcs_adiff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.0749683" error="0.000615294" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.808976" error="0.0118433" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="false"/>
-                    <result name="diff_tau1" type="numbererror" value="540.333" error="13.8217" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="8" error="0" unit=""/>
-                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
-                    <result name="n_particle" type="numbererror" value="13.339" error="0.109478" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_adiff_runavg">
-                    <result name="1n_particle" type="numbererror" value="0.075327" error="0.000633425" unit=""/>
-                    <result name="alpha" type="numbererror" value="0.793118" error="0.0119137" unit=""/>
-                    <result name="alpha_fix" type="boolean" value="false"/>
-                    <result name="diff_tau1" type="numbererror" value="550.122" error="13.9589" unit="usec"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="13.2754" error="0.111633" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run0">
-                    <result name="1n_particle" type="numbererror" value="0.068161" error="0" unit=""/>
-                    <result name="concentration" type="numbererror" value="46.6678" error="0" unit="nM"/>
-                    <result name="diff_coeff1" type="numbererror" value="24.1797" error="0" unit="micron^2/s"/>
-                    <result name="diff_coeff2" type="numbererror" value="27.5088" error="0" unit="micron^2/s"/>
-                    <result name="diff_rho1" type="numbererror" value="0.05" error="0" unit=""/>
-                    <result name="diff_rho2" type="numbererror" value="0.99999" error="0" unit=""/>
-                    <result name="diff_tau1" type="numbererror" value="646.202" error="0" unit="usec"/>
-                    <result name="diff_tau2" type="numbererror" value="568.001" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.000239805" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="11" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="42038" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.000240731" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 0.000239805  [old_SES = 0.000240731]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-2015" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
-                    <result name="focus_struct_fac_fix" type="boolean" value="true"/>
-                    <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
-                    <result name="focus_width" type="numbererror" value="250" error="30" unit="nm"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="n_components" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
-                    <result name="n_particle" type="numbererror" value="14.6711" error="0" unit=""/>
-                    <result name="nonfl_tau1" type="numbererror" value="10" error="0" unit="usec"/>
-                    <result name="nonfl_theta1" type="numbererror" value="0.0984645" error="0" unit=""/>
-                    <result name="offset" type="numbererror" value="0.000900979" error="0" unit=""/>
-                    <result name="offset_fix" type="boolean" value="false"/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-                <evaluation name="fcs_fit_16_fcs_diff_run1081041137">
-                    <result name="fitalg_error_sum" type="number" value="0.000277054" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="21369" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="13.9106" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="3000" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="3000" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="3000" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 3000 iterations.&#10;reason: stopped by maximum iterations.&#10;SES = 0.000277054  [old_SES = 13.9106]"/>
-                    <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="-297" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
-                    <result name="fitalg_success" type="boolean" value="true"/>
-                    <result name="modle_name" type="string" value="fcs_diff"/>
-                    <result name="used_run" type="integer" value="-1" unit=""/>
-                </evaluation>
-            </results>
+            <results/>
             <files>
-                <file>testdata/101213_helas3_braf_1_2.iss.csv</file>
+                <file>testdata/Hela_16_39d.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="Hela_16_39d.asc - CH1" id="11">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="CHANNEL" type="uint" data="1" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="2008-08-22" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="true" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="3" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="DUAL AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="14:13:31" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_r1_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/Hela_16_39d.asc</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="qd525_20nM.ASC - CH0" id="12">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="14:02:41" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/qd525_20nM.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="qd525_20nM_15ul_al488_20nM_15ul.ASC - CH0" id="13">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="14:52:17" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+                <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
     </rawdata>
     <evaluations>
-        <evaluationelement type="fcs_fit" name="FCS Fit" id="16">
+        <evaluationelement type="fcs_fit" name="FCS Fit" id="14">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="plot_errorstyle" type="int" data="2" usereditable="false" visible="false"/>
                 <property name="plot_grid" type="bool" data="true" usereditable="false" visible="false"/>
-                <property name="plot_style" type="int" data="0" usereditable="false" visible="false"/>
-                <property name="plot_taulog" type="bool" data="true" usereditable="false" visible="false"/>
+                <property name="plot_residualshistogrambins" type="int" data="45" usereditable="false" visible="false"/>
+                <property name="weighted_residuals" type="bool" data="false" usereditable="false" visible="false"/>
             </properties>
             <data>
-                <algorithms current="fit_levmar" weighting="equal"/>
-                <functions current="fcs_diff">
-                    <parameter id="fcs_adiff___alpha" value="1" fix="0"/>
-                    <parameter id="fcs_adiff___diff_tau1" value="567.889907203" min="0.001" fix="0"/>
-                    <parameter id="fcs_adiff___focus_struct_fac" value="6" max="10" fix="1"/>
-                    <parameter id="fcs_adiff___n_particle" value="1.13759764169" min="1e-11" max="1000000" fix="0"/>
-                    <parameter id="fcs_diff___diff_rho2" value="0.05"/>
-                    <parameter id="fcs_diff___diff_tau1" value="567.889907203" min="0.001" fix="0"/>
-                    <parameter id="fcs_diff___diff_tau2" value="300" min="0"/>
-                    <parameter id="fcs_diff___focus_struct_fac" value="6" error="0" max="10" fix="1"/>
-                    <parameter id="fcs_diff___focus_width" value="250"/>
-                    <parameter id="fcs_diff___n_components" value="2"/>
-                    <parameter id="fcs_diff___n_particle" value="10" min="1e-11" max="1000000" fix="0"/>
-                    <parameter id="fcs_diff___nonfl_tau1" fix="0"/>
-                    <parameter id="fcs_diff___nonfl_theta1" value="0.1"/>
-                    <parameter id="fcs_diff___offset" fix="1"/>
-                </functions>
+                <algorithms current="fit_simanneal" weighting="stddev">
+                    <algorithm id="fit_levmar">
+                        <parameter id="epsilon1" type="double" data="1e-17"/>
+                        <parameter id="epsilon2" type="double" data="1e-17"/>
+                        <parameter id="epsilon3" type="double" data="1e-17"/>
+                        <parameter id="gradient_delta" type="double" data="1e-06"/>
+                        <parameter id="max_iterations" type="int" data="3000"/>
+                        <parameter id="mu" type="double" data="0.001"/>
+                    </algorithm>
+                    <algorithm id="fit_simanneal">
+                        <parameter id="c" type="int" data="2"/>
+                        <parameter id="fmax" type="int" data="1"/>
+                        <parameter id="max_iterations" type="int" data="50000"/>
+                        <parameter id="nepsilon" type="int" data="4"/>
+                        <parameter id="ns" type="int" data="20"/>
+                        <parameter id="nt" type="int" data="50"/>
+                        <parameter id="rt" type="double" data="0.5"/>
+                        <parameter id="t0" type="double" data="0.001"/>
+                    </algorithm>
+                </algorithms>
+                <functions current="fcs_adiff"/>
             </data>
         </evaluationelement>
     </evaluations>

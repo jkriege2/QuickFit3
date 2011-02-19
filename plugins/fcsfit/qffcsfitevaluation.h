@@ -634,6 +634,16 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             return getEvaluationResultID(m_fitFunction, currentRun);
         }
 
+        /** \brief returns an ID for a given fit parameter (i.e. prepends \c fitparam_ and if \a fix is \c true, also appends \c _fix ) */
+        inline QString getFitParamID(QString fitparam) {
+            return "fitparam_"+fitparam;
+        }
+
+        /** \brief returns an ID for a given fit parameter fix (i.e. prepends \c fitparam_ and appends \c _fix ) */
+        inline QString getFitParamFixID(QString fitparam) {
+            return getFitParamID(fitparam)+"_fix";
+        }
+
         /*! \brief save all parameters of a given QFFitAlgorithm to the internal fit algorithm parameter store algorithm_parameterstore
         */
         void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);

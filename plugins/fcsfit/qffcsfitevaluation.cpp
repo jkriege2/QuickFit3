@@ -199,15 +199,11 @@ bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
 }
 
 bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r1) {
-    //std::cout<<"hasFit():"<<"\n";
     QFRawDataRecord* r=r1;
     if (getFitFunction()==NULL) return false;
-    //std::cout<<"   ffunc="<<getFitFunction()->id().toStdString()<<"\n";
     if (r==NULL) r=getHighlightedRecord();
     if (r==NULL) return false;
-    //std::cout<<"   highlight="<<r->getName().toStdString()<<"\n";
     QString rsid=getEvaluationResultID();
-    //std::cout<<"   rsid="<<rsid.toStdString()<<"\n";
     return r->resultsExistsFromEvaluation(rsid);
 }
 
@@ -223,15 +219,6 @@ bool QFFCSFitEvaluation::hasFit(QFRawDataRecord* r1, int run) {
 
 
 
-
-
-
-
-
-
-
-
-
 void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString id, double value) {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
@@ -240,13 +227,13 @@ void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString 
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetNumber(getEvaluationResultID(run), id, value, unit);
+        r->resultsSetNumber(getEvaluationResultID(run), getFitParamID(id), value, unit);
     }
 }
 void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString id, double value, QString unit) {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
-        r->resultsSetNumber(getEvaluationResultID(run), id, value, unit);
+        r->resultsSetNumber(getEvaluationResultID(run), getFitParamID(id), value, unit);
     }
 }
 
@@ -258,7 +245,7 @@ void QFFCSFitEvaluation::setFitResultValueString(QFRawDataRecord* r, int run, QS
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetString(getEvaluationResultID(run), id, value);
+        r->resultsSetString(getEvaluationResultID(run), getFitParamID(id), value);
     }
 }
 
@@ -270,7 +257,7 @@ void QFFCSFitEvaluation::setFitResultValueBool(QFRawDataRecord* r, int run, QStr
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetBoolean(getEvaluationResultID(run), id, value);
+        r->resultsSetBoolean(getEvaluationResultID(run), getFitParamID(id), value);
     }
 }
 
@@ -282,14 +269,14 @@ void QFFCSFitEvaluation::setFitResultValueInt(QFRawDataRecord* r, int run, QStri
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetInteger(getEvaluationResultID(run), id, value, unit);
+        r->resultsSetInteger(getEvaluationResultID(run), getFitParamID(id), value, unit);
     }
 }
 
 void QFFCSFitEvaluation::setFitResultValueInt(QFRawDataRecord* r, int run, QString id, int64_t value, QString unit) {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
-        r->resultsSetInteger(getEvaluationResultID(run), id, value, unit);
+        r->resultsSetInteger(getEvaluationResultID(run), getFitParamID(id), value, unit);
     }
 }
 
@@ -341,7 +328,7 @@ void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString 
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetNumberError(getEvaluationResultID(run), id, value, error, unit);
+        r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(id), value, error, unit);
     }
 }
 
@@ -353,7 +340,7 @@ void QFFCSFitEvaluation::setFitResultError(QFRawDataRecord* r, int run, QString 
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetNumberError(getEvaluationResultID(run), id, getFitValue(id), error, unit);
+        r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(id), getFitValue(id), error, unit);
     }
 }
 
@@ -365,7 +352,7 @@ void QFFCSFitEvaluation::setFitResultValues(QFRawDataRecord* r, int run, double*
                 QString pid=f->getParameterID(i);
                 //setFitResultValue(pid, values[i], errors[i]);
                 QString unit=f->getDescription(pid).unit;
-                r->resultsSetNumberError(getEvaluationResultID(run), pid, values[i], errors[i], unit);
+                r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(pid), values[i], errors[i], unit);
             }
             emit propertiesChanged();
         }
@@ -382,7 +369,7 @@ void QFFCSFitEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int run, 
                     QString pid=f->getParameterID(i);
                     //setFitResultValue(pid, values[i], errors[i]);
                     QString unit=f->getDescription(pid).unit;
-                    r->resultsSetNumberError(getEvaluationResultID(run), pid, values[i], errors[i], unit);
+                    r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(pid), values[i], errors[i], unit);
                 }
             }
             emit propertiesChanged();
@@ -408,7 +395,8 @@ double QFFCSFitEvaluation::getFitValue(QFRawDataRecord* r, int run, QString id) 
     }
     if (hasFit(r, run)) {
         QString en=getEvaluationResultID(run);
-        if (r->resultsExists(en, id)) res=r->resultsGetAsDouble(en, id);
+        QString pid=getFitParamID(id);
+        if (r->resultsExists(en, pid)) res=r->resultsGetAsDouble(en, pid);
     }
     return res;
 }
@@ -416,7 +404,7 @@ double QFFCSFitEvaluation::getFitValue(QFRawDataRecord* r, int run, QString id) 
 double QFFCSFitEvaluation::getFitError(QFRawDataRecord* r, int run, QString id)  {
     if (hasFit(r, run)) {
         if (r!=NULL) {
-            return r->resultsGetErrorAsDouble(getEvaluationResultID(run), id);
+            return r->resultsGetErrorAsDouble(getEvaluationResultID(run), getFitParamID(id));
         }
     }
     QString psID=getParameterStoreID(id);
@@ -456,7 +444,7 @@ void QFFCSFitEvaluation::setFitResultFix(QFRawDataRecord* r, int run, QString id
             int pid=f->getParameterNum(id);
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
-        r->resultsSetBoolean(getEvaluationResultID(run), id+"_fix", fix);
+        r->resultsSetBoolean(getEvaluationResultID(run), getFitParamFixID(id), fix);
     }
 }
 
@@ -473,7 +461,8 @@ bool QFFCSFitEvaluation::getFitFix(QFRawDataRecord* r, int run, QString id) {
     }
     if (hasFit(r, run)) {
         QString en=getEvaluationResultID(run);
-        if (r->resultsExists(en, id+"_fix")) res=r->resultsGetAsDouble(en, id+"_fix");
+        QString pid=getFitParamFixID(id);
+        if (r->resultsExists(en, pid)) res=r->resultsGetAsDouble(en, pid);
     }
     return res;
 }
@@ -832,7 +821,7 @@ void QFFCSFitEvaluation::setCurrentRun(int run) {
         if (run<=-1) m_currentRun=-1;
         if (run<fcs->getCorrelationRuns()) m_currentRun=run;
         if (fcs->getCorrelationRuns()<=1) m_currentRun=-1;
-        r->setQFProperty(getType()+QString::number(getID())+"_last_run", m_currentRun);
+        r->setQFProperty(getType()+QString::number(getID())+"_last_run", m_currentRun, false, false);
         //std::cout<<"m_currentRun = "<<m_currentRun<<std::endl;
     }
 }
@@ -942,7 +931,8 @@ void QFFCSFitEvaluation::resetDefaultFitValue(QString id) {
     if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
         QString en=getEvaluationResultID();
-        if (r->resultsExists(en, id)) r->resultsRemove(en, id);
+        QString pid=getFitParamID(id);
+        if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
     }
 }
 
@@ -951,7 +941,8 @@ void QFFCSFitEvaluation::resetDefaultFitFix(QString id) {
     if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
         QString en=getEvaluationResultID();
-        if (r->resultsExists(en, id+"_fix")) r->resultsRemove(en, id+"_fix");
+        QString pid=getFitParamFixID(id);
+        if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
     }
 }
 
@@ -964,7 +955,8 @@ void QFFCSFitEvaluation::resetAllFitValueCurrent() {
         QString en=getEvaluationResultID();
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            if (r->resultsExists(en, id)) r->resultsRemove(en, id);
+            QString pid=getFitParamID(id);
+            if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
         }
     }
 }
@@ -978,7 +970,8 @@ void QFFCSFitEvaluation::resetAllFitFixCurrent() {
         QString en=getEvaluationResultID();
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            if (r->resultsExists(en, id+"_fix")) r->resultsRemove(en, id+"_fix");
+            QString pid=getFitParamFixID(id);
+            if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
         }
     }
 }
@@ -1035,13 +1028,15 @@ void QFFCSFitEvaluation::resetAllFitValue()  {
         QString en=getEvaluationResultID(-1);
         for (int j=0; j<f->paramCount(); j++) {
             QString id=f->getParameterID(j);
-            if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
+            QString pid=getFitParamID(id);
+            if (recs[i]->resultsExists(en, pid)) recs[i]->resultsRemove(en, pid);
         }
         for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             for (int j=0; j<f->paramCount(); j++) {
                 QString id=f->getParameterID(j);
-                if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
+                QString pid=getFitParamID(id);
+                if (recs[i]->resultsExists(en, pid)) recs[i]->resultsRemove(en, pid);
             }
         }
     }
@@ -1056,14 +1051,16 @@ void QFFCSFitEvaluation::resetAllFitFix() {
         QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
         for (int j=0; j<f->paramCount(); j++) {
-            QString id=f->getParameterID(j)+"_fix";
-            if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
+            QString id=f->getParameterID(j);
+            QString pid=getFitParamFixID(id);
+            if (recs[i]->resultsExists(en, pid)) recs[i]->resultsRemove(en, pid);
         }
         for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
             for (int j=0; j<f->paramCount(); j++) {
-                QString id=f->getParameterID(j)+"_fix";
-                if (recs[i]->resultsExists(en, id)) recs[i]->resultsRemove(en, id);
+                QString id=f->getParameterID(j);
+                QString pid=getFitParamFixID(id);
+                if (recs[i]->resultsExists(en, pid)) recs[i]->resultsRemove(en, pid);
             }
         }
     }
@@ -1081,10 +1078,10 @@ void QFFCSFitEvaluation::setAllFitValues(QString id, double value, double error)
     for (int i=0; i<recs.size(); i++) {
         QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
-        if (hasFit(recs[i], -1)) recs[i]->resultsSetNumberError(en, id, value, error, unit);
+        if (hasFit(recs[i], -1)) recs[i]->resultsSetNumberError(en, getFitParamID(id), value, error, unit);
         for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
-            if (hasFit(recs[i], r)) recs[i]->resultsSetNumberError(en, id, value, error, unit);
+            if (hasFit(recs[i], r)) recs[i]->resultsSetNumberError(en, getFitParamID(id), value, error, unit);
         }
     }
 }
@@ -1101,10 +1098,10 @@ void QFFCSFitEvaluation::setAllFitFixes(QString id, bool fix) {
     for (int i=0; i<recs.size(); i++) {
         QFRDRFCSDataInterface* rec=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
-        if (hasFit(recs[i], -1)) recs[i]->resultsSetBoolean(en, id+"_fix", fix);
+        if (hasFit(recs[i], -1)) recs[i]->resultsSetBoolean(en, getFitParamFixID(id), fix);
         for(int r=0; r<(int)rec->getCorrelationRuns(); r++) {
             en=getEvaluationResultID(r);
-            if (hasFit(recs[i], r)) recs[i]->resultsSetBoolean(en, id+"_fix", fix);
+            if (hasFit(recs[i], r)) recs[i]->resultsSetBoolean(en, getFitParamFixID(id), fix);
         }
     }
 }

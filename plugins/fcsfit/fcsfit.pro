@@ -12,11 +12,13 @@ LIBS += -lgsl -lgslcblas -L../../output/ -lquickfit3lib -lquickfit3widgets
 HEADERS += qfpevalfcsfit.h \
            qffcsfitevaluation.h \
            qffcsfitevaluationeditor.h \
-           ../fcs/qfrdrfcsdatainterface.h
+           ../fcs/qfrdrfcsdatainterface.h \
+           ../../../../../LIB/trunk/statistics_tools.h
 
 SOURCES += qfpevalfcsfit.cpp \
            qffcsfitevaluation.cpp \
-           qffcsfitevaluationeditor.cpp
+           qffcsfitevaluationeditor.cpp \
+           ../../../../../LIB/trunk/statistics_tools.cpp
 
 FORMS =
 

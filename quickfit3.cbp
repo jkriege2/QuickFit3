@@ -220,6 +220,8 @@
 		<Unit filename="..\..\..\LIB\trunk\qt\qtshortcutwidgets.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="..\..\..\LIB\trunk\statistics_tools.cpp" />
+		<Unit filename="..\..\..\LIB\trunk\statistics_tools.h" />
 		<Unit filename="..\..\..\lib\trunk\datatable2.cpp" />
 		<Unit filename="..\..\..\lib\trunk\datatable2.h" />
 		<Unit filename="..\..\..\lib\trunk\qt\jkqtmathtext.cpp" />

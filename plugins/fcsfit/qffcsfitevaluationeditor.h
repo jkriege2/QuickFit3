@@ -116,6 +116,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnEditRanges;
         /** \brief plotter for residual distribution histogram */
         JKQtPlotter* pltResidualHistogram;
+        /** \brief plotter for residual autocorrelation */
+        JKQtPlotter* pltResidualCorrelation;
         /** \brief label for fit statistics */
         QTextEdit* txtFitStatistics;
         /** \brief label for fit statistics */

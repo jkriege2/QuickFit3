@@ -1,0 +1,1 @@
+.\quickfit3.exe 1> quickfit3_stdout.log 2>quickfit3_stderr.log
