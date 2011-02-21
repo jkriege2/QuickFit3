@@ -8,6 +8,7 @@
 #include "programoptions.h"
 #include "qfpluginservices.h"
 #include "qftools.h"
+#include "qfhtmlhelpwindow.h"
 
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
@@ -139,6 +140,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         int id;
         /** \brief pointer that allows for access to central QuickFit services */
         QFPluginServices* services;
+        /** \brief help widget for evaluation */
+        QFHTMLHelpWindow* helpWidget;
 };
 
 #endif // QFEVALUATIONPROPERTYEDITOR_H

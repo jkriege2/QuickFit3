@@ -26,3 +26,7 @@ SUBDIRS += fitalgorithm_simanneal
 fitalgorithm_simanneal.subdir=./plugins/fitalgorithm_simanneal
 fitalgorithm_simanneal.depends = lib libqf3widgets
 
+SUBDIRS += spimb040
+spimb040.subdir=./plugins/spimb040
+spimb040.depends = lib libqf3widgets
+

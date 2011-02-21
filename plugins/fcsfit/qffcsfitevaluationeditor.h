@@ -216,7 +216,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
         /** \brief emitted when the pltData rezooms */
-        void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, QWidget* sender);
+        void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender);
 
         /** \brief display fit function help */
         void displayFitFunctionHelp();

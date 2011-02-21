@@ -12,6 +12,7 @@ MainWindow::MainWindow(QSplashScreen* splash)
     evaluationFactory=new QFEvaluationItemFactory(this);
     fitFunctionManager=new QFFitFunctionManager(this);
     fitAlgorithmManager=new QFFitAlgorithmManager(this);
+    extensionManager=new QFExtensionManager(this);
 
     settings=NULL;
     project=NULL;
@@ -34,11 +35,13 @@ MainWindow::MainWindow(QSplashScreen* splash)
     connect(evaluationFactory, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(fitAlgorithmManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(fitFunctionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+    connect(extensionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
 
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitFunctionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitAlgorithmManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
+    connect(extensionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
     connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
 
@@ -46,9 +49,18 @@ MainWindow::MainWindow(QSplashScreen* splash)
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
+    QFile f(QCoreApplication::applicationDirPath()+"/help/plugin_list_autocreate.html");
+    //std::cout<<QString(QCoreApplication::applicationDirPath()+"/help/plugin_list_autocreate.html").toStdString()<<std::endl;
+    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&f);
+        out<<QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><title>%1</title></head><body><h2>%1</h2>").arg(tr("Available Plugins"));
+        out<<createPluginDoc(true);
+        out<<"</body></html>";
+        f.close();
+    }
     logFileMainWidget->dec_indent();
 
-    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()));
+    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()));
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
@@ -65,6 +77,8 @@ MainWindow::~MainWindow() {
     //std::cout<<"deleting MainWindow\n";
     rawDataFactory->distribute(NULL, settings, this, this);
     evaluationFactory->distribute(NULL, settings, this, this);
+    extensionManager->distribute(NULL);
+    extensionManager->deinit();
     if (project) delete project;
     //std::cout<<"deleting MainWindow ... OK\n";
 }
@@ -75,21 +89,27 @@ void MainWindow::searchAndRegisterPlugins() {
     evaluationFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
     fitFunctionManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitfunctions");
     fitAlgorithmManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitalgorithms");
+    extensionManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/extensions");
+
 
     // distribute application hooks
     rawDataFactory->distribute(project, settings, this, this);
     evaluationFactory->distribute(project, settings, this, this);
+    extensionManager->distribute(project);
 
     // register plugins to menus
     QStringList sl=getRawDataRecordFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
-        getRawDataRecordFactory()->registerMenu(sl[i], insertMenu);
+        getRawDataRecordFactory()->registerMenu(sl[i], insertItemMenu);
     }
 
     sl=getEvaluationItemFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
         getEvaluationItemFactory()->registerMenu(sl[i], evaluationMenu);
     }
+
+    // init extensions
+    extensionManager->init(this, this);
 }
 
 void MainWindow::showLogMessage(const QString& message) {
@@ -131,6 +151,7 @@ void MainWindow::closeProject() {
         tvMain->setModel(NULL);
         rawDataFactory->distribute(NULL, settings, this, this);
         evaluationFactory->distribute(NULL, settings, this, this);
+        extensionManager->distribute(NULL);
 
         delete project;
     }
@@ -155,6 +176,7 @@ void MainWindow::newProject() {
 
         rawDataFactory->distribute(project, settings, this, this);
         evaluationFactory->distribute(project, settings, this, this);
+        extensionManager->distribute(project);
     }
 }
 
@@ -198,6 +220,83 @@ void MainWindow::about() {
     delete widget;
 }
 
+QString MainWindow::createPluginDoc(bool docLinks) {
+    QString text=tr("<h2>Raw Data Record Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
+        QString id=getRawDataRecordFactory()->getIDList().at(i);
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/help/%3/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(getRawDataRecordFactory()->getName(id)).arg(getRawDataRecordFactory()->getIconFilename(id)).arg(id);
+        else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(getRawDataRecordFactory()->getName(id)).arg(getRawDataRecordFactory()->getIconFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(getRawDataRecordFactory()->getDescription(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(getRawDataRecordFactory()->getAuthor(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("copyright:")).arg(getRawDataRecordFactory()->getCopyright(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("weblink:")).arg(getRawDataRecordFactory()->getWeblink(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("file:")).arg(getRawDataRecordFactory()->getPluginFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("id:")).arg(id);
+    }
+    text+="</table></center>";
+    text+=tr("<br><br><h2>Data Evaluation Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
+        QString id=getEvaluationItemFactory()->getIDList().at(i);
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/help/%3/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(getEvaluationItemFactory()->getName(id)).arg(getEvaluationItemFactory()->getIconFilename(id)).arg(id);
+        else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(getEvaluationItemFactory()->getName(id)).arg(getEvaluationItemFactory()->getIconFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(getEvaluationItemFactory()->getDescription(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(getEvaluationItemFactory()->getAuthor(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("copyright:")).arg(getEvaluationItemFactory()->getCopyright(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("weblink:")).arg(getEvaluationItemFactory()->getWeblink(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("file:")).arg(getEvaluationItemFactory()->getPluginFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("id:")).arg(id);
+    }
+    text+="</table></center>";
+
+    text+=tr("<br><br><h2>Fit Algorithm Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
+        int id=i;
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/fitalgorithms/help/%2/%2.html\"><b>%1</b></a></td></tr>").arg(fitAlgorithmManager->getName(id)).arg(QFileInfo(fitAlgorithmManager->getFilename(id)).completeBaseName());
+        else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><b>%1</b></td></tr>").arg(fitAlgorithmManager->getName(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(fitAlgorithmManager->getDescription(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(fitAlgorithmManager->getAuthor(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("copyright:")).arg(fitAlgorithmManager->getCopyright(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("weblink:")).arg(fitAlgorithmManager->getWeblink(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("file:")).arg(fitAlgorithmManager->getFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("implemented ids:")).arg(fitAlgorithmManager->getIDList(id).join(", "));
+    }
+    text+="</table></center>";
+    text+=tr("<br><br><h2>Fit Function Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
+        int id=i;
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/fitfunctions/help/%2/%2.html\"><b>%1</b></a></td></tr>").arg(fitFunctionManager->getName(id)).arg(QFileInfo(fitFunctionManager->getFilename(id)).completeBaseName());
+        else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><b>%1</b></td></tr>").arg(fitFunctionManager->getName(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(fitFunctionManager->getDescription(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(fitFunctionManager->getAuthor(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("copyright:")).arg(fitFunctionManager->getCopyright(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("weblink:")).arg(fitFunctionManager->getWeblink(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("file:")).arg(fitFunctionManager->getFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("implemented ids:")).arg(fitFunctionManager->getIDList(id).join(", "));
+    }
+    text+="</table></center>";
+
+    text+=tr("<br><br><h2>Extension Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
+        QString id=getExtensionManager()->getIDList().at(i);
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/extensions/help/%3/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(getExtensionManager()->getName(id)).arg(getExtensionManager()->getIconFilename(id)).arg(id);
+        else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(getExtensionManager()->getName(id)).arg(getExtensionManager()->getIconFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(getExtensionManager()->getDescription(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(getExtensionManager()->getAuthor(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("copyright:")).arg(getExtensionManager()->getCopyright(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("weblink:")).arg(getExtensionManager()->getWeblink(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("file:")).arg(getExtensionManager()->getPluginFilename(id));
+        text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("id:")).arg(id);
+    }
+    text+="</table></center>";
+
+    return text;
+}
+
 
 void MainWindow::aboutPlugins() {
     QDialog *widget = new QDialog(this);
@@ -205,77 +304,9 @@ void MainWindow::aboutPlugins() {
     ui.setupUi(widget);
     QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
 
-    QString text=tr("<b>Raw Data Record Plugins:</b><ul>");
-    // gather information about plugins
-    for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
-        QString id=getRawDataRecordFactory()->getIDList().at(i);
-        text+="<li>";
-        text+=QString("<b><img src=\"%2\">&nbsp;%1</b>:").arg(getRawDataRecordFactory()->getName(id)).arg(getRawDataRecordFactory()->getIconFilename(id));
-        text+="<blockquote>";
-        text+=QString("<i>description:</i> %1<br>").arg(getRawDataRecordFactory()->getDescription(id));
-        text+=QString("<i>author:</i> %1<br>").arg(getRawDataRecordFactory()->getAuthor(id));
-        text+=QString("<i>copyright:</i> %1<br>").arg(getRawDataRecordFactory()->getCopyright(id));
-        text+=QString("<i>weblink:</i> %1<br>").arg(getRawDataRecordFactory()->getWeblink(id));
-        text+=QString("<i>file:</i> %1<br>").arg(getRawDataRecordFactory()->getPluginFilename(id));
-        text+=QString("<i>id:</i> %1<br>").arg(id);
-        text+="</blockquote>";
-        text+="</li>";
-    }
-    text+="</ul>";
-    text+=tr("<br><b>Data Evaluation Plugins:</b><ul>");
-    // gather information about plugins
-    for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
-        QString id=getEvaluationItemFactory()->getIDList().at(i);
-        text+="<li>";
-        text+=QString("<b><img src=\"%2\">&nbsp;%1</b>:").arg(getEvaluationItemFactory()->getName(id)).arg(getEvaluationItemFactory()->getIconFilename(id));
-        text+="<blockquote>";
-        text+=QString("<i>description:</i> %1<br>").arg(getEvaluationItemFactory()->getDescription(id));
-        text+=QString("<i>author:</i> %1<br>").arg(getEvaluationItemFactory()->getAuthor(id));
-        text+=QString("<i>copyright:</i> %1<br>").arg(getEvaluationItemFactory()->getCopyright(id));
-        text+=QString("<i>weblink:</i> %1<br>").arg(getEvaluationItemFactory()->getWeblink(id));
-        text+=QString("<i>file:</i> %1<br>").arg(getEvaluationItemFactory()->getPluginFilename(id));
-        text+=QString("<i>id:</i> %1<br>").arg(id);
-        text+="</blockquote>";
-        text+="</li>";
-    }
-    text+="</ul>";
+    QString text=createPluginDoc(false);
 
-    text+="</ul>";
-    text+=tr("<br><b>Fit Algorithm Plugins:</b><ul>");
-    // gather information about plugins
-    for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
-        int id=i;
-        text+="<li>";
-        text+=QString("<b>%1</b>:").arg(fitAlgorithmManager->getName(id));
-        text+="<blockquote>";
-        text+=QString("<i>description:</i> %1<br>").arg(fitAlgorithmManager->getDescription(id));
-        text+=QString("<i>author:</i> %1<br>").arg(fitAlgorithmManager->getAuthor(id));
-        text+=QString("<i>copyright:</i> %1<br>").arg(fitAlgorithmManager->getCopyright(id));
-        text+=QString("<i>weblink:</i> %1<br>").arg(fitAlgorithmManager->getWeblink(id));
-        text+=QString("<i>file:</i> %1<br>").arg(fitAlgorithmManager->getFilename(id));
-        text+=QString("<i>implemented ids:</i> %1<br>").arg(fitAlgorithmManager->getIDList(id).join(", "));
-        text+="</blockquote>";
-        text+="</li>";
-    }
-    text+="</ul>";
-    text+="</ul>";
-    text+=tr("<br><b>Fit Function Plugins:</b><ul>");
-    // gather information about plugins
-    for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
-        int id=i;
-        text+="<li>";
-        text+=QString("<b>%1</b>:").arg(fitFunctionManager->getName(id));
-        text+="<blockquote>";
-        text+=QString("<i>description:</i> %1<br>").arg(fitFunctionManager->getDescription(id));
-        text+=QString("<i>author:</i> %1<br>").arg(fitFunctionManager->getAuthor(id));
-        text+=QString("<i>copyright:</i> %1<br>").arg(fitFunctionManager->getCopyright(id));
-        text+=QString("<i>weblink:</i> %1<br>").arg(fitFunctionManager->getWeblink(id));
-        text+=QString("<i>file:</i> %1<br>").arg(fitFunctionManager->getFilename(id));
-        text+=QString("<i>implemented ids:</i> %1<br>").arg(fitFunctionManager->getIDList(id).join(", "));
-        text+="</blockquote>";
-        text+="</li>";
-    }
-    text+="</ul>";
+
     ui_textEdit->setText(text);
     widget->exec();
     delete widget;
@@ -324,6 +355,10 @@ void MainWindow::createWidgets() {
 
     prgMainProgress=new QProgressBar(this);
     statusBar()->addPermanentWidget(prgMainProgress);
+
+    helpWindow=new QFHTMLHelpWindow(0);
+    helpWindow->close();
+
 }
 
 
@@ -358,6 +393,10 @@ void MainWindow::createActions() {
     exitAct->setShortcut(tr("Ctrl+Q"));
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+
+
+    helpAct=new QAction(QIcon(":/help.png"), tr("&Help"), this);
+    connect(helpAct, SIGNAL(triggered()), this, SLOT(displayHelp()));
 
 
     aboutAct = new QAction(QIcon(":/about.png"), tr("&About"), this);
@@ -396,22 +435,31 @@ void MainWindow::createMenus() {
     fileMenu->addAction(exitAct);
 
     dataMenu= menuBar()->addMenu(tr("&Data Items"));
-    insertMenu=new QMenu(tr("Insert &Raw Data"), dataMenu);
-    insertMenu->setIcon(QIcon(":/rawdata_insert.png"));
+    insertItemMenu=new QMenu(tr("Insert &Raw Data"), dataMenu);
+    insertItemMenu->setIcon(QIcon(":/rawdata_insert.png"));
     evaluationMenu= new QMenu(tr("Insert &Evaluation"), dataMenu);
     evaluationMenu->setIcon(QIcon(":/evaluation_insert.png"));
 
 
-    dataMenu->addMenu(insertMenu);
+    dataMenu->addMenu(insertItemMenu);
     dataMenu->addMenu(evaluationMenu);
     dataMenu->addAction(delItemAct);
+
+    extensionMenu=menuBar()->addMenu(tr("&Extensions"));
 
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(helpAct);
+    helpMenu->addSeparator();
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutPluginsAct);
     helpMenu->addAction(aboutQtAct);
+
+    menus["file"]=fileMenu;
+    menus["data"]=dataMenu;
+    menus["extensions"]=extensionMenu;
+    menus["help"]=helpMenu;
 }
 
 void MainWindow::insertRawData() {
@@ -446,7 +494,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(saveProjectAct);
     dataToolBar = addToolBar(tr("Data"));
     QToolButton* tb=new QToolButton(dataToolBar);
-    tb->setMenu(insertMenu);
+    tb->setMenu(insertItemMenu);
     tb->setIcon(QIcon(":/rawdata_insert.png"));
     tb->setToolTip(tr("insert a new raw data item ..."));
     tb->setPopupMode(QToolButton::InstantPopup);
@@ -459,6 +507,12 @@ void MainWindow::createToolBars()
     dataToolBar->addWidget(tb);
     dataToolBar->addAction(delItemAct);
     dataToolBar->setObjectName("toolbar_data");
+    extensionToolBar=addToolBar(tr("Extensions"));
+    extensionToolBar->setObjectName("toolbar_extensions");
+
+    toolbars["file"]=fileToolBar;
+    toolbars["data"]=dataToolBar;
+    toolbars["extensions"]=extensionToolBar;
 
 }
 
@@ -491,6 +545,10 @@ void MainWindow::readSettings() {
     logFileMainWidget->readSettings(*(settings->getQSettings()), "mainwindow/logMain");
     logFileProjectWidget->readSettings(*(settings->getQSettings()), "mainwindow/logProject");
 
+    helpWindow->readSettings(*settings->getQSettings(), "mainwindow/help_");
+
+    extensionManager->readPluginSettings(settings);
+
     //std::cout<<"autosave="<<settings->getAutosave()<<"\n";
     if (settings->getAutosave()<=0) {
         timerAutosave->stop();
@@ -520,12 +578,16 @@ void MainWindow::writeSettings() {
 
     settings->getQSettings()->setValue("mainwindow/currentProjectDir", currentProjectDir);
     settings->getQSettings()->setValue("mainwindow/currentRawDataDir", currentRawDataDir);
+
+    helpWindow->writeSettings(*settings->getQSettings(), "mainwindow/help_");
     //settings->getQSettings()->setValue("mainwindow/currentFCSFileFormatFilter", currentFCSFileFormatFilter);
     //settings->getQSettings()->setValue("csvimport/column_separator", column_separator);
     //settings->getQSettings()->setValue("csvimport/decimal_separator", decimal_separator);
     //settings->getQSettings()->setValue("csvimport/comment_start", comment_start);
     //settings->getQSettings()->setValue("csvimport/header_start", header_start);
     settings->getQSettings()->sync();
+
+    extensionManager->writePluginSettings(settings);
 
     for (int i=0; i<rawDataPropEditors.size(); i++) {
         if (rawDataPropEditors[i]) rawDataPropEditors[i]->writeSettings();
@@ -597,6 +659,7 @@ void MainWindow::loadProject(const QString &fileName) {
     tvMain->expandToDepth(2);
     rawDataFactory->distribute(project, settings, this, this);
     evaluationFactory->distribute(project, settings, this, this);
+    extensionManager->distribute(project);
     QApplication::restoreOverrideCursor();
 
     setCurrentProject(fileName);
@@ -736,6 +799,27 @@ void MainWindow::modelReset() {
     tvMain->expandToDepth(2);
 }
 
+void MainWindow::log_global_indent() {
+    logFileMainWidget->inc_indent();
+    QApplication::processEvents();
+}
+
+void MainWindow::log_global_unindent() {
+    logFileMainWidget->dec_indent();
+    QApplication::processEvents();
+}
+
+void MainWindow::log_indent() {
+    logFileProjectWidget->inc_indent();
+    QApplication::processEvents();
+}
+
+void MainWindow::log_unindent() {
+    logFileProjectWidget->dec_indent();
+    QApplication::processEvents();
+}
+
+
 void MainWindow::log_text(QString message) {
     logFileProjectWidget->log_text(message);
     QApplication::processEvents();
@@ -748,6 +832,21 @@ void MainWindow::log_warning(QString message) {
 
 void MainWindow::log_error(QString message) {
     logFileProjectWidget->log_error(message);
+    QApplication::processEvents();
+}
+
+void MainWindow::log_global_text(QString message) {
+    logFileMainWidget->log_text(message);
+    QApplication::processEvents();
+}
+
+void MainWindow::log_global_warning(QString message) {
+    logFileMainWidget->log_warning(message);
+    QApplication::processEvents();
+}
+
+void MainWindow::log_global_error(QString message) {
+    logFileMainWidget->log_error(message);
     QApplication::processEvents();
 }
 
@@ -816,4 +915,34 @@ void MainWindow::autosaveProject() {
     logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
     project->writeXML(autosaveFilename, false);
 
+}
+
+void MainWindow::displayHelp() {
+    helpWindow->clear();
+    helpWindow->updateHelp(QApplication::applicationDirPath()+QString("/help/quickfit.html"));
+    helpWindow->show();
+}
+
+QMenu* MainWindow::getMenu(QString menu) {
+    if (menus.contains(menu)) return menus[menu];
+    return NULL;
+}
+
+QToolBar* MainWindow::getToolbar(QString toolbar) {
+    if (toolbars.contains(toolbar)) return toolbars[toolbar];
+    return NULL;
+}
+
+void MainWindow::insertMenu(QString menuname, QMenu* newMenu, QMenu* before) {
+    menus[menuname]=newMenu;
+    menuBar()->insertMenu(before->menuAction(), newMenu);
+}
+
+void MainWindow::insertToolBar(QString toolbarname, QToolBar* newToolbar) {
+    toolbars[toolbarname]=newToolbar;
+    addToolBar(newToolbar);
+}
+
+QFExtensionManager* MainWindow::getExtensionManager() {
+    return extensionManager;
 }

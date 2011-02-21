@@ -32,7 +32,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.h \
            qehtreeview.h \
            datacutslider.h \
-           qfhtmlhelpwindow.h \
            qffitparameterbasicinterface.h \
            qffitparameterwidget.h \
            qfdlgcsvparameters.h
@@ -57,7 +56,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
-           qfhtmlhelpwindow.cpp \
            qffitparameterwidget.cpp \
            qfdlgcsvparameters.cpp
 

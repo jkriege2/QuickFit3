@@ -120,8 +120,6 @@ class QFFitAlgorithmSimAnneal: public QFFitAlgorithm {
         virtual QString name() const { return QObject::tr("Simulated Annealing with box constraints"); };
         /** \copydoc QFFitAlgorithm::id() */
         virtual QString id() const { return QString("fit_simanneal"); };
-        /** \copydoc QFFitAlgorithm::helpFile() */
-        virtual QString helpFile() const { return id()+".html"; };
         /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
         virtual bool get_supportsBoxConstraints() const { return true; };
         /** \copydoc QFFitAlgorithm::displayConfig() */

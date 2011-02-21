@@ -80,8 +80,6 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
         virtual QString name() const { return QObject::tr("levmar: Levenberg-Marquardt Fitting Algorithm with box constraints"); };
         /** \copydoc QFFitAlgorithm::id() */
         virtual QString id() const { return QString("fit_levmar"); };
-        /** \copydoc QFFitAlgorithm::helpFile() */
-        virtual QString helpFile() const { return id()+".html"; };
         /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
         virtual bool get_supportsBoxConstraints() const { return true; };
         /** \copydoc QFFitAlgorithm::displayConfig() */

@@ -9,6 +9,11 @@
 #include "qffitalgorithm.h"
 #include "qfpluginfitalgorithm.h"
 
+/*! \brief this class manages the available fitting algorithms
+    \ingroup qf3lib_fitting
+
+
+*/
 class QFFitAlgorithmManager : public QObject {
         Q_OBJECT
     public:

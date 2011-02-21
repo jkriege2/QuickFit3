@@ -200,6 +200,9 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
 
 
+        helpWidget->clear();
+        helpWidget->updateHelp(QString(QApplication::applicationDirPath()+QString("/plugins/help/")+current->getType()+QString("/"))+current->getType()+".html");
+
     } else {
         edtName->setText("");
         edtName->setEnabled(false);
@@ -312,6 +315,9 @@ void QFEvaluationPropertyEditor::createWidgets() {
     //QItemSelectionModel::SelectCurrent
 
     tabMain->addTab(splitMain, tr("&Evaluation"));
+
+    helpWidget=new QFHTMLHelpWindow(this);
+    tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
 }
 
 void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
@@ -332,6 +338,7 @@ void QFEvaluationPropertyEditor::readSettings() {
     settings->getQSettings()->sync();
     if (tabMain) {
         int idx=settings->getQSettings()->value("evalpropeditor/currentTab", 0).toInt();
+        //helpWidget->readSettings(*settings->getQSettings(), "evalpropeditor/help_");
         //if ((idx>=0) && (idx<tabMain->count())) tabMain->setCurrentIndex(idx);
     }
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(10, 10), QSize(800, 600), "evalpropeditor/");
@@ -343,7 +350,10 @@ void QFEvaluationPropertyEditor::writeSettings() {
     if (!settings) return;
     saveWidgetGeometry(*(settings->getQSettings()), this, "evalpropeditor/");
     saveSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
-    if (tabMain) settings->getQSettings()->setValue("evalpropeditor/currentTab", tabMain->currentIndex());
+    if (tabMain) {
+        settings->getQSettings()->setValue("evalpropeditor/currentTab", tabMain->currentIndex());
+        //helpWidget->writeSettings(*settings->getQSettings(), "evalpropeditor/help_");
+    }
     /*for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) editorList[i]->writeSettings();
     }*/

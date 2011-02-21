@@ -1,0 +1,1 @@
+store in this directory common C++ interfaces, that may be used by different plugins (i.e. to define common data access schemes)

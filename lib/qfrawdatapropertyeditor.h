@@ -9,6 +9,7 @@
 #include "qfpluginservices.h"
 #include "qftools.h"
 #include "qenhancedtableview.h"
+#include "qfhtmlhelpwindow.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -94,6 +95,8 @@ class QFRawDataPropertyEditor : public QWidget {
         QEnhancedTableView* tvResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
+        /** \brief help widget for evaluation */
+        QFHTMLHelpWindow* helpWidget;
 
         QList<QPointer<QFRawDataEditor> > editorList;
         int id;

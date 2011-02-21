@@ -5,7 +5,7 @@
 #include <QSettings>
 
 #include "qfevaluationitem.h"
-#include "../fcs/qfrdrfcsdata.h"
+#include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qfevaluationitemfactory.h"
 #include "qffitfunction.h"
 #include "qffitalgorithm.h"

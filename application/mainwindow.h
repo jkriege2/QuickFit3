@@ -17,6 +17,9 @@
 #include "../lib/qfpluginservices.h"
 #include "../lib/qffitfunctionmanager.h"
 #include "../lib/qffitalgorithmmanager.h"
+#include "../lib/qfhtmlhelpwindow.h"
+#include "../lib/qfextensionmanager.h"
+#include "../lib/qfextension.h"
 
 
 #define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm"
@@ -25,7 +28,7 @@
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFPluginServices {
+class MainWindow : public QMainWindow, public QFExtensionServices {
         Q_OBJECT
 
     public:
@@ -48,6 +51,22 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         virtual void log_warning(QString message);
         /** \copydoc QFPluginServices::log_error()  */
         virtual void log_error(QString message);
+        /** \copydoc QFPluginServices::log_indent() */
+        virtual void log_indent();
+        /** \copydoc QFPluginServices::log_unindent() */
+        virtual void log_unindent();
+
+        /** \copydoc QFExtensionServices::log_global_text() */
+        virtual void log_global_text(QString message);
+        /** \copydoc QFExtensionServices::log_global_warning() */
+        virtual void log_global_warning(QString message);
+        /** \copydoc QFExtensionServices::log_global_error() */
+        virtual void log_global_error(QString message);
+        /** \copydoc QFExtensionServices::log_global_indent() */
+        virtual void log_global_indent();
+        /** \copydoc QFExtensionServices::log_global_unindent() */
+        virtual void log_global_unindent();
+
         /** \copydoc QFPluginServices::setStatusMessage()  */
         virtual void setStatusMessage(QString message);
         /** \copydoc QFPluginServices::setProgressRange()  */
@@ -65,6 +84,21 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         /** \copydoc QFPluginServices::getOptions() */
         virtual ProgramOptions* getOptions();
 
+
+        /** \copydoc QFExtensionServices::getMenu() */
+        virtual QMenu* getMenu(QString menu);
+
+        /** \copydoc QFExtensionServices::getToolbar() */
+        virtual QToolBar* getToolbar(QString toolbar);
+
+        /** \copydoc QFExtensionServices::insertMenu() */
+        virtual void insertMenu(QString menuname, QMenu* newMenu, QMenu* before=NULL);
+
+        /** \copydoc QFExtensionServices::insertToolBar() */
+        virtual void insertToolBar(QString toolbarname, QToolBar* newToolbar);
+
+        /** \copydoc QFExtensionServices::getExtensionManager() */
+        virtual QFExtensionManager* getExtensionManager();
     protected:
         void closeEvent(QCloseEvent *event);
 
@@ -122,6 +156,9 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief autosave the current project */
         void autosaveProject();
+
+        /** \brief display help */
+        void displayHelp();
     private:
         void createWidgets();
         void createActions();
@@ -132,6 +169,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         void readSettings();
         void writeSettings();
         bool maybeSave();
+        QString createPluginDoc(bool docLinks=false);
         void loadProject(const QString &fileName);
         bool saveProject(const QString &fileName);
         void setCurrentProject(const QString &fileName);
@@ -144,9 +182,11 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QMenu *dataMenu;
         QMenu *evaluationMenu;
         QMenu *helpMenu;
-        QMenu* insertMenu;
+        QMenu* insertItemMenu;
+        QMenu* extensionMenu;
         QToolBar *fileToolBar;
         QToolBar *dataToolBar;
+        QToolBar* extensionToolBar;
         QAction *newProjectAct;
         QAction *openProjectAct;
         QAction *saveProjectAct;
@@ -155,6 +195,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QAction *aboutAct;
         QAction *aboutQtAct;
         QAction *aboutPluginsAct;
+        QAction* helpAct;
         QAction* optionsAct;
         QProgressBar* prgMainProgress;
 
@@ -178,6 +219,9 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         QTimer* timerAutosave;
 
+        QMap<QString, QPointer<QMenu> > menus;
+        QMap<QString, QPointer<QToolBar> > toolbars;
+
 
         QList<QPointer<QFRawDataPropertyEditor> > rawDataPropEditors;
         QList<QPointer<QFEvaluationPropertyEditor> > evaluationPropEditors;
@@ -196,6 +240,11 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QFFitFunctionManager* fitFunctionManager;
         /** \brief fit algorithm manager class */
         QFFitAlgorithmManager* fitAlgorithmManager;
+        /** \brief QFExtension manager */
+        QFExtensionManager* extensionManager;
+
+        /** \brief help display widget */
+        QFHTMLHelpWindow* helpWindow;
 
         /** \brief return a pointer to the raw data record factry object */
         inline QFRawDataRecordFactory* getRawDataRecordFactory() { return rawDataFactory; };

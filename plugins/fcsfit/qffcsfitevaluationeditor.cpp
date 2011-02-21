@@ -5,7 +5,7 @@
 #include <QFormLayout>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
-#include "../fcs/qfrdrfcsdatainterface.h"
+#include "../interfaces/qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
 #include "qffcsfitevaluation.h"
@@ -180,8 +180,8 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltResiduals->resize(300,50);
     vbl->addWidget(pltResiduals,1);
 
-    pltData->set_gridPrinting(true);
-    pltData->addGridPrintingPlotter(0,1,pltResiduals);
+    pltData->get_plotter()->set_gridPrinting(true);
+    pltData->get_plotter()->addGridPrintingPlotter(0,1,pltResiduals->get_plotter());
     pltData->set_displayToolbar(false);
     pltResiduals->set_displayToolbar(false);
     pltResiduals->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [{\\mu}s]"));
@@ -197,21 +197,21 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltData->getXAxis()->set_drawMode1(JKQTPCADMticks);
     pltData->getXAxis()->set_tickLabelFontSize(10);
     pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
-    pltResiduals->setBorder(1,1,1,1);
-    pltData->setBorder(1,1,1,1);
+    pltResiduals->get_plotter()->setBorder(1,1,1,1);
+    pltData->get_plotter()->setBorder(1,1,1,1);
     pltResiduals->synchronizeToMaster(pltData, true, false);
-    pltData->set_useAntiAliasingForSystem(true);
-    pltData->set_useAntiAliasingForGraphs(true);
-    pltResiduals->set_useAntiAliasingForSystem(true);
-    pltResiduals->set_useAntiAliasingForGraphs(true);
+    pltData->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltData->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltResiduals->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltResiduals->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltData->set_displayMousePosition(false);
     pltResiduals->set_displayMousePosition(false);
-    pltData->set_keyFontSize(9);
-    pltData->set_keyXMargin(2);
-    pltData->set_keyYMargin(2);
-    pltResiduals->set_keyFontSize(9);
-    pltResiduals->set_keyXMargin(2);
-    pltResiduals->set_keyYMargin(2);
+    pltData->get_plotter()->set_keyFontSize(9);
+    pltData->get_plotter()->set_keyXMargin(2);
+    pltData->get_plotter()->set_keyYMargin(2);
+    pltResiduals->get_plotter()->set_keyFontSize(9);
+    pltResiduals->get_plotter()->set_keyXMargin(2);
+    pltResiduals->get_plotter()->set_keyYMargin(2);
     pltResiduals->useExternalDatastore(pltData->getDatastore());
 
 
@@ -244,13 +244,13 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltResidualHistogram->getYAxis()->set_labelFontSize(8);
     pltResidualHistogram->getYAxis()->set_tickLabelFontSize(8);
     pltResidualHistogram->getYAxis()->set_minTicks(5);
-    pltResidualHistogram->setBorder(0,0,0,0);
-    pltResidualHistogram->set_useAntiAliasingForSystem(true);
-    pltResidualHistogram->set_useAntiAliasingForGraphs(true);
+    pltResidualHistogram->get_plotter()->setBorder(0,0,0,0);
+    pltResidualHistogram->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltResidualHistogram->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltResidualHistogram->set_displayMousePosition(false);
-    pltResidualHistogram->set_keyFontSize(8);
-    pltResidualHistogram->set_keyXMargin(1);
-    pltResidualHistogram->set_keyYMargin(1);
+    pltResidualHistogram->get_plotter()->set_keyFontSize(8);
+    pltResidualHistogram->get_plotter()->set_keyXMargin(1);
+    pltResidualHistogram->get_plotter()->set_keyYMargin(1);
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->useExternalDatastore(pltData->getDatastore());
@@ -268,13 +268,13 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     pltResidualCorrelation->getYAxis()->set_labelFontSize(8);
     pltResidualCorrelation->getYAxis()->set_tickLabelFontSize(8);
     pltResidualCorrelation->getYAxis()->set_minTicks(3);
-    pltResidualCorrelation->setBorder(0,0,0,0);
-    pltResidualCorrelation->set_useAntiAliasingForSystem(true);
-    pltResidualCorrelation->set_useAntiAliasingForGraphs(true);
+    pltResidualCorrelation->get_plotter()->setBorder(0,0,0,0);
+    pltResidualCorrelation->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltResidualCorrelation->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltResidualCorrelation->set_displayMousePosition(false);
-    pltResidualCorrelation->set_keyFontSize(8);
-    pltResidualCorrelation->set_keyXMargin(1);
-    pltResidualCorrelation->set_keyYMargin(1);
+    pltResidualCorrelation->get_plotter()->set_keyFontSize(8);
+    pltResidualCorrelation->get_plotter()->set_keyXMargin(1);
+    pltResidualCorrelation->get_plotter()->set_keyYMargin(1);
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
@@ -399,12 +399,12 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_actSavePlot()); pltData->get_actSavePlot()->setIcon(QIcon(":/fcsplot_saveplot.png"));
-    toolbar->addAction(pltData->get_actSaveData()); pltData->get_actSaveData()->setIcon(QIcon(":/fcsplot_savedata.png"));
-    toolbar->addAction(pltData->get_actPrint()); pltData->get_actPrint()->setIcon(QIcon(":/fcsplot_print.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSavePlot()); pltData->get_plotter()->get_actSavePlot()->setIcon(QIcon(":/fcsplot_saveplot.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsplot_savedata.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actPrint()); pltData->get_plotter()->get_actPrint()->setIcon(QIcon(":/fcsplot_print.png"));
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_actZoomAll()); pltData->get_actZoomAll()->setIcon(QIcon(":/fcsplot_zoomall.png"));
-    connect(pltData->get_actZoomAll(), SIGNAL(triggered()), pltResiduals, SLOT(zoomToFit()));
+    toolbar->addAction(pltData->get_plotter()->get_actZoomAll()); pltData->get_plotter()->get_actZoomAll()->setIcon(QIcon(":/fcsplot_zoomall.png"));
+    connect(pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), pltResiduals, SLOT(zoomToFit()));
     toolbar->addSeparator();
     toolbar->addWidget(lPS);
     toolbar->addWidget(cmbPlotStyle);
@@ -423,7 +423,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(btnAlgorithmHelp, SIGNAL(clicked()), this, SLOT(displayFitAlgorithmHelp()));
     connect(btnConfigAlgorithm, SIGNAL(clicked()), this, SLOT(configFitAlgorithm()));
     connect(btnModelHelp, SIGNAL(clicked()), this, SLOT(displayFitFunctionHelp()));
-    connect(pltData, SIGNAL(zoomChangedLocally(double, double, double, double, QWidget*)), this, SLOT(zoomChangedLocally(double, double, double, double, QWidget*)));
+    connect(pltData, SIGNAL(zoomChangedLocally(double, double, double, double, JKQtPlotter*)), this, SLOT(zoomChangedLocally(double, double, double, double, JKQtPlotter*)));
     connect(pltData, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResiduals, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResidualHistogram, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
@@ -856,8 +856,8 @@ void QFFCSFitEvaluationEditor::replotData() {
             case 3: styl=JKQTPerrorBarsLines; break;
         }
 
-        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(pltData);
-        QColor gcolor=pltData->get_graphColor();
+        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(pltData->get_plotter());
+        QColor gcolor=pltData->get_plotter()->get_graphColor();
         g->set_color(gcolor);
         g->set_errorColor(gcolor.lighter());
         g->set_lineWidth(2);
@@ -1070,7 +1070,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot fit model and additional function graphs
                 /////////////////////////////////////////////////////////////////////////////////
-                JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData);
+                JKQTPxyLineGraph* g_fit=new JKQTPxyLineGraph(pltData->get_plotter());
                 g_fit->set_drawLine(true);
                 g_fit->set_title("fit function");
                 g_fit->set_xColumn(c_tau);
@@ -1085,7 +1085,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                         afitfunc[j]=ffunc->evaluate(tauvals[j], params);
                     }
                     size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i).toStdString());
-                    JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData);
+                    JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData->get_plotter());
                     g_afit->set_drawLine(true);
                     g_afit->set_title(name);
                     g_afit->set_xColumn(c_tau);
@@ -1104,7 +1104,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 size_t c_taures=c_tau;//dsres->addCopiedColumn(data->getCorrelationT(), N, "tau");
                 size_t c_residuals=0;
-                JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals);
+                JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals->get_plotter());
                 if (chkWeightedResiduals->isChecked()) {
                     c_residuals=dsres->addCopiedColumn(residuals_weighted, N, "residuals_weighted");
                     g_residuals->set_title("weighted residuals");
@@ -1139,7 +1139,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, rmin+residHistBinWidth/2.0, rmax-residHistBinWidth/2.0, "residualhist_x");
                     c_residualHistogramY=dsresh->addCopiedColumn(resHistogram, residualHistogramBins, "residualhist_y");
                 }
-                JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram);
+                JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram->get_plotter());
                 g_residualsHistogram->set_xColumn(c_residualHistogramX);
                 g_residualsHistogram->set_yColumn(c_residualHistogramY);
                 g_residualsHistogram->set_shift(0);
@@ -1157,7 +1157,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 } else {
                     c_residualCorrelationY=dsresh->addCopiedColumn(&(resCorrelation[1]), resN-1, "residualcorr_y");
                 }
-                JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation);
+                JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation->get_plotter());
                 g_residualsCorrelation->set_xColumn(c_residualCorrelationX);
                 g_residualsCorrelation->set_yColumn(c_residualCorrelationY);
                 pltResidualCorrelation->addGraph(g_residualsCorrelation);
@@ -1783,7 +1783,7 @@ void QFFCSFitEvaluationEditor::saveReport() {
         printer->setOutputFileName(fn);
         QPainter painter;
         painter.begin(printer);
-        pltData->draw(painter, printer->pageRect());
+        pltData->get_plotter()->draw(painter, printer->pageRect());
         painter.end();
         delete printer;
         QApplication::restoreOverrideCursor();
@@ -1805,7 +1805,7 @@ void QFFCSFitEvaluationEditor::printReport() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QPainter painter;
     painter.begin(p);
-    pltData->draw(painter, p->pageRect());
+    pltData->get_plotter()->draw(painter, p->pageRect());
     painter.end();
 
     delete p;
@@ -1886,10 +1886,7 @@ void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
     QString ppid=cmbModel->itemData(cmbModel->currentIndex()).toString();
     int pid=services->getFitFunctionManager()->getPluginForID(ppid);
     QString dll=services->getFitFunctionManager()->getFilename(pid);
-    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).baseName()+QString("/");
-    //std::cout<<sl[1].toStdString()<<std::endl;
-    hlpFunction->setSearchPath(sl);
-    if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), data->getFitFunction(ppid)->id()+".html");
+    if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), QString(QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).baseName()+QString("/"))+data->getFitFunction(ppid)->id()+".html");
     else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), data->getFitFunction(ppid)->helpFile());
     hlpFunction->show();
 }
@@ -1904,12 +1901,9 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     int ppid=services->getFitAlgorithmManager()->getPluginForID(pid);
     //std::cout<<pid.toStdString()<<"   "<<ppid<<std::endl;
     QString dll=services->getFitAlgorithmManager()->getFilename(ppid);
-    sl<<QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).baseName()+QString("/");
-    //std::cout<<sl[1].toStdString()<<std::endl;
-    hlpAlgorithm->setSearchPath(sl);
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
     if (algorithm) {
-        if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), algorithm->id()+".html");
+        if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), QString(QFileInfo(dll).absolutePath()+QString("/help/")+QFileInfo(dll).baseName()+QString("/"))+algorithm->id()+".html");
         else hlpAlgorithm->updateHelp(algorithm->name(), algorithm->helpFile());
         hlpAlgorithm->show();
     }
@@ -2061,7 +2055,7 @@ void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
     QApplication::restoreOverrideCursor();
 }
 
-void QFFCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, QWidget* sender) {
+void QFFCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
     if (!dataEventsEnabled) return;
     if (sender==pltData) {
         pltResiduals->setX(newxmin, newxmax);

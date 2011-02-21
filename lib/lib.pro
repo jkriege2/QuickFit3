@@ -39,7 +39,10 @@ HEADERS += dlgnewproperty.h \
            qfpluginfitfunction.h \
            qfpluginfitalgorithm.h \
            qftools.h \
-           qffitalgorithmthreaddedfit.h
+           qfhtmlhelpwindow.h \
+           qffitalgorithmthreaddedfit.h \
+           qfextension.h \
+           qfextensionmanager.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -63,7 +66,9 @@ SOURCES += dlgnewproperty.cpp \
            qffitfunctionmanager.cpp \
            qffitalgorithmmanager.cpp \
            qftools.cpp \
-           qffitalgorithmthreaddedfit.cpp
+           qfhtmlhelpwindow.cpp \
+           qffitalgorithmthreaddedfit.cpp \
+           qfextensionmanager.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui

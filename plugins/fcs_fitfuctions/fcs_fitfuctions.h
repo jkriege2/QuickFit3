@@ -51,8 +51,6 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
         virtual QString name() const { return QString("FCS: Normal Diffusion 3D"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diff"); };
-        /*! \copydoc QFFitFunction::helpFile()   */
-        virtual QString helpFile() const { return id()+".html"; };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
@@ -111,10 +109,8 @@ class QFFitFunctionFCSADiff: public QFFitFunction {
         virtual QString name() const { return QString("FCS: Anomalous Diffusion 3D"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_adiff"); };
-        /*! \copydoc QFFitFunction::helpFile()   */
-        virtual QString helpFile() const { return id()+".html"; };
 
-       /*! \copydoc QFFitFunction::evaluate()   */
+        /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 
         /*! \copydoc QFFitFunction::calcParameter()   */

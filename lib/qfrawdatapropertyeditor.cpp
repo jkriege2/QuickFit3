@@ -72,6 +72,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
                 }
                 editorList.clear();
                 tabMain->removeTab(tabMain->indexOf(widResults));
+                tabMain->removeTab(tabMain->indexOf(helpWidget));
             }
         }
     }
@@ -94,6 +95,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
                 }
             }
             tabMain->addTab(widResults, tr("Evaluation &Results"));
+            tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("Online-&Help"));
         } else {
             for (int i=0; i<editorList.size(); i++) {
                 editorList[i]->setCurrent(current, id);
@@ -135,6 +137,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         move(pos);
         */
 
+        helpWidget->clear();
+        helpWidget->updateHelp(QString(QApplication::applicationDirPath()+QString("/plugins/help/")+current->getType()+QString("/"))+current->getType()+".html");
 
     } else {
         edtName->setText("");
@@ -293,6 +297,9 @@ void QFRawDataPropertyEditor::createWidgets() {
     rwvlayout->addWidget(tvResults);
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
+    helpWidget=new QFHTMLHelpWindow(this);
+    tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
+
 }
 
 void QFRawDataPropertyEditor::newPropClicked() {
@@ -366,6 +373,7 @@ void QFRawDataPropertyEditor::readSettings() {
     if (!settings) return;
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(20, 20), QSize(800, 600), "rawdatapropeditor/");
     if (tabMain) {
+        //helpWidget->readSettings(*settings->getQSettings(), "rawdatapropeditor/help_");
         int idx=settings->getQSettings()->value("rawdatapropeditor/currentTab", 0).toInt();
         //if ((idx>=0) && (idx<tabMain->count())) tabMain->setCurrentIndex(idx);
     }
@@ -379,7 +387,10 @@ void QFRawDataPropertyEditor::readSettings() {
 void QFRawDataPropertyEditor::writeSettings() {
     if (!settings) return;
     saveWidgetGeometry(*(settings->getQSettings()), this, "rawdatapropeditor/");
-    if (tabMain) settings->getQSettings()->setValue("rawdatapropeditor/currentTab", tabMain->currentIndex());
+    if (tabMain) {
+        settings->getQSettings()->setValue("rawdatapropeditor/currentTab", tabMain->currentIndex());
+        //helpWidget->writeSettings(*settings->getQSettings(), "rawdatapropeditor/help_");
+    }
     for (int i=0; i<editorList.size(); i++) {
         if (editorList[i]) {
             editorList[i]->writeSettings();

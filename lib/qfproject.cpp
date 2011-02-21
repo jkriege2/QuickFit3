@@ -5,6 +5,7 @@
 #include "qfprojecttreemodel.h"
 #include "qfevaluationitemfactory.h"
 #include "qfrawdatarecordfactory.h"
+#include "qfpluginservices.h"
 
 #include <QTemporaryFile>
 

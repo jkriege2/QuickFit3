@@ -1,6 +1,6 @@
 #include "qffcsfitevaluation.h"
 #include "qffcsfitevaluationeditor.h"
-#include "../fcs/qfrdrfcsdatainterface.h"
+#include "../interfaces/qfrdrfcsdatainterface.h"
 
 
 

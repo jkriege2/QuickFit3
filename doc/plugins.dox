@@ -14,6 +14,9 @@
     \defgroup qf3fitfunplugins Fitting Function Plugins
     \ingroup qf3plugins
 
+    \defgroup qf3extensionplugins QuickFit Extension Plugins
+    \ingroup qf3plugins
+
     \defgroup qf3plugintools Plugin programming Tools
     \ingroup qf3plugins
 */
@@ -22,39 +25,18 @@
     \ingroup qf3plugins
 
     QuickFit 3 is in itself not a fitting application (as the name may suggest), but more or less just a
-    data manager. It is based on a very simple and versatile data model:
-      -# All data is organized in projects (QFProject) and at every time one project is loaded
-         in QuickFit. A project is saved in a XML file which describes the object inside the project.
-         Usually it does not contain the raw data (although saving data to the project is possible).
-      -# There are only few basic types of objects in a project:
-         - a raw data record (QFRawDataRecord) which represents any type of data. There is no interface
-           to the data that you HAVE to use, so a raw data record may represent any data type (an image,
-           a dataseries, a curve, single values, a table, an image series, ...). There are only some basic
-           properties for each data object implemented, that are general enough to be used by any object:
-           a name, a description, a list of files (which you do not have to use) and a set of properties
-           (<key, value> pairs). There is also an API to store evaluation results in this raw data record.
-         - data evaluations (QFEvaluationItem) which work on one or more data objects from the list of
-           raw data records. The results may either be saved in the evaluation, or written back to the
-           raw data record.
-         .
-       -# QuickFit provieds a library that bundles all classes needed to write plugins. This library is
-          documented in \link qf3lib QuickFIt Library \endlink. All plugins have to link to this library
-          in order to work properly together with QuickFit.
-       -# QuickFit defines a range of specialized interfaces that QFRawDataRecord classes may wish to implement.
-          They are not necessary, but if you implement them, you can give your QFRawDataRecord descendent a
-          generic interface which some more general evaluations may access. Note that evaluations will have
-          to find out by RTTI which interfaces are implemented. All these interfaces are also registered with
-          the <a href="http://doc.qt.nokia.com/4.6/plugins-howto.html">QT Interface system</a>, so you can use
-		  the QT tools for RTTI. Of course you may also add you own interfaces, but then you will have to make
-		  sure that they are available and known to the evaluations working on them.
+    data manager (see \link qf3app QuickFit Application \endlink ). The datatypes managed by QuickFit together
+    with a variety of other features (like fit algorithms and functions, as well as data evaluations) are
+    implemented by plugins.
 
-    .
-
-    QuickFit is implemented in a way, that you may add new datatypes and evaluations as plugins. It uses
-    the <a href="http://doc.qt.nokia.com/4.6/plugins-howto.html">Qt plugin lower-level API</a>. You will
-    find more details about implementing plugins here:
-      - \link pluginsrdr Writing QFRawDataRecord Plugins\endlink
-      - \link pluginseval Writing QFEvaluationItem Plugins\endlink
+    QuickFit uses the <a href="http://doc.qt.nokia.com/4.6/plugins-howto.html">Qt plugin lower-level API</a>
+    to implement the different extensions, mentioned above. You will find more details about implementing plugins
+    here:
+      - \link pluginsrdr Writing QFRawDataRecord Plugins \endlink
+      - \link pluginseval Writing QFEvaluationItem Plugins \endlink
+      - \link pluginsfitalg Writing Fit Algorithm Plugins \endlink
+      - \link pluginsfitfunc Writing Fit Functions Plugins \endlink
+      - \link pluginsextensions Writing QFExtension Plugins \endlink
     .
 */
 
@@ -79,4 +61,82 @@
 /*! \page pluginseval Writing QFEvaluationItem Plugins
     \ingroup qf3plugins
 
+
+    When implementing a new type of evaluation, you will have to follow these steps:
+      - create a new Qt plugin project
+      - implement a descendent of QFEvaluationItem which implements the parameter storage for the
+        evaluation. Also the logic of the evaluation may be implemented here. You should only store
+        the global parameters here, as evaluation results that apply to only single files may be stored
+        using the \c results*() functions of QFRawDataRecord together with the raw data.
+      - implement a plugin class, derived from QFPluginEvaluationItemBase which describes
+        the plugin (name, ID, ...) and provides methods that allow to register hooks used to create
+        new objects (menu entries ...). Export this class in the plugin.
+    .
+
+    QuickFit 3 provides a menu that allows to add new data objects. The plugin class provides
+    a register method that allows to add new entries/submenus to this menu. When doing so, you
+    can hook those entries to methods in the plugin class that load data files, ...
+
+*/
+
+/*! \page pluginsfitalg Writing Fit Algorithm Plugins
+    \ingroup qf3plugins
+
+
+    Fit Algorithm plugins are somewhat simpler than \link pluginseval evaluation plugins \endlink and
+    \link pluginsrdr raw data plugins \endlink . They consist only of one (or more) QFFitAlgorithm
+    descendents which implements the fit algorithm as an optimization problem
+      \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\| \f]
+    in a single function QFFitAlgorithm::intFit(). In addition some  plugin description  methdos, like
+    QFFitAlgorithm::name(), QFFitAlgorithm::id(), ... are implemented.
+
+    For a detailed description of the possibilities of implementation, see the QFFitAlgorithm documentation.
+
+    The Qt Plugin is implemented using the interface QFPluginFitAlgorithm. It is possible to implement
+    different fitting algorithms in one plugin. Then you have to implement each algorithm in a separate
+    QFFitAlgorithm plugin and return in QFPluginFitAlgorithm::getIDs() an ID for every algorithm. The method
+    QFPluginFitAlgorithm::get() then returns an instance of the QFFitAlgorithm for a given id.
+
+*/
+
+/*! \page pluginsfitfunc Writing Fit Function Plugins
+    \ingroup qf3plugins
+
+    This class of plugins are fit functions designed to work together with QFFitAlgorithm fit routines.
+
+    Fit Functions plugins are somewhat simpler than \link pluginseval evaluation plugins \endlink and
+    \link pluginsrdr raw data plugins \endlink . They consist only of one (or more) QFFitFunction
+    descendents which implements the fit function, possibly together with an implementation of analytical
+    derivatives of the fucntion. In addition some plugin description  methdos, like QFFitFunction::name(),
+    QFFitFunction::id(), ... are implemented.
+
+    For a detailed description of the possibilities of implementation, see the QFFitFunction documentation.
+
+    The Qt Plugin is implemented using the interface QFPluginFitFunction. It is possible to implement
+    different fitting algorithms in one plugin. Then you have to implement each function in a separate
+    QFFitFunction plugin and return in QFPluginFitFunction::getIDs() an ID for every function. The method
+    QFPluginFitFunction::get() then returns an instance of the QFFitAlgorithm for a given id.
+
+*/
+
+/*! \page pluginsextensions Writing QFExtension Plugins
+    \ingroup qf3plugins
+
+    These plugins allow to write a wide variety of extensions to QuickFit 3. They are NOT used as part of the
+    project tree, but extend the application directly. You may use them to use QuickFit as basis for Experiment
+    control systems. As QFExtension plugins are informed about the current project, you my use them to alter the
+    project or store data in it.
+
+    If you want to write such plugins, you simply have to implement the interface QFExtension. Better derive your
+    plugin from QFExtensionBase, as this already implements some functionality.
+
+    Of each extension QuickFit creates one instance which is stored internally. After loading the plugin the instance
+    is initialized using QFExtension::init() (if you want to react to it overload QFExtensionBase::initExtension() ).
+    When the plugin is unloaded QFExtension::deinit() is called. You may use QFExtension::init() to register the
+    extension to menus and toolbars (using QFExtensionServices). In addition the plugin is informed about every
+    change of the current project (QFProject). In that case QuickFit calls QFExtension::setProject() (when reacting
+    to this, overload QFExtensionBase::projectChanged(), or simply access QFExtensionBase::project).
+
+    After QFExtension::init() has been called you my access the QFExtensionServices at every time, using
+    QFExtensionBase::services. This may also be used to interface all other QFExtension s, currently loaded.
 */

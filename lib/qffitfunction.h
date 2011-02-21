@@ -27,10 +27,10 @@
       - \c type: the type of the widget used to edit the parameter
       - \c id: a uniquie (in the scope of the function) ID for the parameter. Do not use whitespaces int his ID. It will
                be used to store the parameter values in then project file and to reference the parameter internally
-      - \c name: description of the parameter, e.g. "particle number N"
-      - \c label: a label for the parameter, e.g. "<i>N</i>" You may use HTML markup for this
-      - \c unit: unit of the parameter, e.g. "usec", "g"
-      - \c unitLabel: unit of the parameter, e.g. "&mu;s", "g" as HTML markupped label
+      - \c name: description of the parameter, e.g. \verbatim "particle number N" \endverbatim
+      - \c label: a label for the parameter, e.g. \verbatim "<i>N</i>" \endverbatim You may use HTML markup for this
+      - \c unit: unit of the parameter, e.g. \verbatim "usec", "g" \endverbatim
+      - \c unitLabel: unit of the parameter, e.g. \verbatim "&mu;s", "g" \endverbatim as HTML markupped label
       - \c fit: \c true if this parameter is a fit parameter
       - \c userEditable: \c true if the parameter may be edited by the user
       - \c displayError: \c true if a widget shall be displayed that shows the error associated with this parameter
@@ -50,7 +50,6 @@
     The first function should return the number of additional plots whereas the second transforms the plot parameters so they may be used to
     plot the additional function by calling evaluate().
 
-    \todo add possibility to make fit function editable by user (math parser)
 
 */
 class QFFitFunction {
@@ -137,7 +136,7 @@ class QFFitFunction {
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
         /** \brief return a HTML file to be displayed as model help. This file has to be positioned in \verbatim plugins/fitfunctions/help/<plugin_id> \endverbatim */
-        virtual QString helpFile() const { return QString(""); };
+        virtual QString helpFile() const { return id()+".html"; };
 
         /*! \brief evaluate the fitting function \f$ f(x, \vec{p}) \f$ at the position \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
             \param x position \f$ x \f$ where to evaluate the fit function

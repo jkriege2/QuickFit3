@@ -93,7 +93,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     result.message=QObject::tr("<b>levmar</b> returned after %1 iterations.<br>reason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason).arg(info[1]).arg(info[0]);
     result.messageSimple=QObject::tr("levmar returned after %1 iterations. reason: '%2' new_SES = %3  [old_SES = %4]").arg(info[5]).arg(reason_simple).arg(info[1]).arg(info[0]);
 
-    for (unsigned int i=0; i<paramCount; i++) {
+    for (int i=0; i<paramCount; i++) {
         paramErrorsOut[i]=sqrt(covar[i*paramCount+i]);
         //printf("  o.param %d:   (%lg +/- %lg)\n", i, paramsOut[i], paramErrorsOut[i]);
     }

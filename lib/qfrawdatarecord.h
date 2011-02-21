@@ -27,6 +27,12 @@
     Errors are reported by the methods error() which returns \c true if an error has occured and the method
     errorDescription() which returns a textual description of the error. The protected method setError() may be
     used to indicate that an error has occured to the class.
+
+
+    \section QFRawDataRecord_Help Online-Help
+    The user may supply an Online-Help for the QFRawDataRecord and QFRawDataEditor. The Help has to be written
+    as HTML page (or a set of these) and has to be stored as \verbatim plugins/help/<plugin_id>/<plugin_id>.html \endverbatim.
+
  */
 class QFRawDataRecord : public QObject, public QFProperties {
         Q_OBJECT

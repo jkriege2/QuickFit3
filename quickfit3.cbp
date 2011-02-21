@@ -66,6 +66,7 @@
 			<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 		</ExtraCommands>
 		<Unit filename="application\about.ui" />
+		<Unit filename="application\aboutplugins.ui" />
 		<Unit filename="application\application.pro" />
 		<Unit filename="application\main.cpp" />
 		<Unit filename="application\mainwindow.cpp" />
@@ -88,6 +89,7 @@
 		<Unit filename="doc\plugins.dox">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="doc\todo.dox" />
 		<Unit filename="lib\dlg_fitalgorithmprogress.ui" />
 		<Unit filename="lib\dlg_newproperty.ui" />
 		<Unit filename="lib\dlgnewproperty.cpp" />
@@ -107,6 +109,9 @@
 		<Unit filename="lib\qfevaluationitemfactory.h" />
 		<Unit filename="lib\qfevaluationpropertyeditor.cpp" />
 		<Unit filename="lib\qfevaluationpropertyeditor.h" />
+		<Unit filename="lib\qfextension.h" />
+		<Unit filename="lib\qfextensionmanager.cpp" />
+		<Unit filename="lib\qfextensionmanager.h" />
 		<Unit filename="lib\qffitalgorithm.cpp" />
 		<Unit filename="lib\qffitalgorithm.h" />
 		<Unit filename="lib\qffitalgorithmmanager.cpp" />
@@ -116,6 +121,8 @@
 		<Unit filename="lib\qffitfunction.h" />
 		<Unit filename="lib\qffitfunctionmanager.cpp" />
 		<Unit filename="lib\qffitfunctionmanager.h" />
+		<Unit filename="lib\qfhtmlhelpwindow.cpp" />
+		<Unit filename="lib\qfhtmlhelpwindow.h" />
 		<Unit filename="lib\qfpluginevaluation.h" />
 		<Unit filename="lib\qfpluginfitalgorithm.h" />
 		<Unit filename="lib\qfpluginfitfunction.h" />
@@ -154,8 +161,6 @@
 		<Unit filename="libqf3widgets\qffitparameterbasicinterface.h" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.cpp" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.h" />
-		<Unit filename="libqf3widgets\qfhtmlhelpwindow.cpp" />
-		<Unit filename="libqf3widgets\qfhtmlhelpwindow.h" />
 		<Unit filename="plugins\fcs\alv5000tools.cpp" />
 		<Unit filename="plugins\fcs\alv5000tools.h" />
 		<Unit filename="plugins\fcs\dlg_csvparameters.ui" />
@@ -169,7 +174,6 @@
 		<Unit filename="plugins\fcs\qfrdrfcscorrelationeditor.h" />
 		<Unit filename="plugins\fcs\qfrdrfcsdata.cpp" />
 		<Unit filename="plugins\fcs\qfrdrfcsdata.h" />
-		<Unit filename="plugins\fcs\qfrdrfcsdatainterface.h" />
 		<Unit filename="plugins\fcs\qfrdrfcsrateeditor.cpp" />
 		<Unit filename="plugins\fcs\qfrdrfcsrateeditor.h" />
 		<Unit filename="plugins\fcs_fitfuctions\fcs_fitfuctions.cpp" />
@@ -193,6 +197,11 @@
 		<Unit filename="plugins\fitalgorithm_simanneal\fitalgorithm_simanneal.pro" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.cpp" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.h" />
+		<Unit filename="plugins\interfaces\qfrdrfcsdatainterface.h" />
+		<Unit filename="plugins\spimb040\spimb040.cpp" />
+		<Unit filename="plugins\spimb040\spimb040.h" />
+		<Unit filename="plugins\spimb040\spimb040.pro" />
+		<Unit filename="plugins\spimb040\spimb040.qrc" />
 		<Unit filename="plugins\table\dlg_csvparameters.ui" />
 		<Unit filename="plugins\table\dlgcsvparameters.cpp" />
 		<Unit filename="plugins\table\dlgcsvparameters.h" />

@@ -269,7 +269,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
             for (unsigned int i=0; i<rateRuns; i++) {
                 size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3: %2run %1").arg(i).arg(binned).arg(name).toStdString());
 
-                JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter);
+                JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_run);
@@ -283,14 +283,16 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                     labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name);
 
                     if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter);
-                            r->set_color(g->get_color().darker().darker());
+                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                            QColor c=g->get_color().darker().darker();
+                            r->set_color(c);
                             r->set_centerColor(g->get_color().darker());
                             r->set_rangeMin(mean-stddev);
                             r->set_rangeMax(mean+stddev);
                             r->set_plotCenterLine(true);
                             r->set_rangeCenter(mean);
-                            r->set_fillStyle(Qt::NoBrush);
+                            c.setAlphaF(0.2);
+                            r->set_fillColor(c);
                             //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
                             plotter->addGraph(r);
 
@@ -301,7 +303,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
             for (unsigned int i=0; i<rateRuns; i++) {
                 size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned).toStdString());
                 if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter);
+                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                     g->set_lineWidth(1);
                     g->set_color(QColor("red"));
                     g->set_xColumn(c_tau);
@@ -316,23 +318,25 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                         labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg("red").arg(name);
 
                         if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter);
+                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                            QColor c=g->get_color().darker().darker();
                             r->set_color(g->get_color().darker().darker());
                             r->set_centerColor(g->get_color().darker());
                             r->set_rangeMin(mean-stddev);
                             r->set_rangeMax(mean+stddev);
                             r->set_plotCenterLine(true);
                             r->set_rangeCenter(mean);
-                            r->set_fillStyle(Qt::NoBrush);
+                            c.setAlphaF(0.2);
+                            r->set_fillColor(c);
                             //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
                             plotter->addGraph(r);
                         }
                     }
                 } else {
                     if (!m->leaveoutRun(i)) {
-                        plotter->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        plotter->get_plotter()->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
                     } else {
-                        plotter->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("grey"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        plotter->get_plotter()->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("grey"), JKQTPnoSymbol, Qt::SolidLine, 1);
                     }
                 }
             }
@@ -341,7 +345,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                 if (!m->leaveoutRun(i)) {
                     size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned).toStdString());
 
-                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter);
+                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                     g->set_lineWidth(1);
                     g->set_xColumn(c_tau);
                     g->set_yColumn(c_run);
@@ -354,14 +358,16 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                         m->calcRateMinMax(i, mi, ma);
                         labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name);
                         if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter);
+                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                            QColor c=g->get_color().darker().darker();
                             r->set_color(g->get_color().darker().darker());
                             r->set_centerColor(g->get_color().darker());
                             r->set_rangeMin(mean-stddev);
                             r->set_rangeMax(mean+stddev);
                             r->set_plotCenterLine(true);
                             r->set_rangeCenter(mean);
-                            r->set_fillStyle(Qt::NoBrush);
+                            c.setAlphaF(0.2);
+                            r->set_fillColor(c);
                             //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
                             plotter->addGraph(r);
 

@@ -7,6 +7,10 @@
 #include <QString>
 #include <QSettings>
 #include <QStringList>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QStack>
+#include <QUrl>
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
@@ -25,11 +29,6 @@ class QFHTMLHelpWindow : public QWidget {
         /** \brief write widget size and position to a QSettings object where prefix is prepended to all keys */
         void writeSettings(QSettings& settings, QString prefix=QString(""));
 
-        /** \brief set the current search directory */
-        void setSearchPath(QStringList path) { searchPath=path; };
-
-        /** \brief return the current search path */
-        QStringList& getSearchPath() { return searchPath; }
 
         /** \brief return a reference to the font of the title line */
         QFont& titleFont() { return m_titleFont; }
@@ -40,22 +39,43 @@ class QFHTMLHelpWindow : public QWidget {
     public slots:
         /** \brief updates the information in the window */
         void updateHelp(QString title, QString filename);
+        /** \brief updates the information in the window. The title is taken from the HTML page */
+        void updateHelp(QString filename);
         /** \brief clear contents of window */
         void clear();
     private:
         /** \brief a label for the model name */
         QLabel* labelTitle;
 
+        QPushButton* btnPrevious;
+        QPushButton* btnNext;
+        QPushButton* btnHome;
+
+
         /** \brief a text edit for the model information/description */
         QTextBrowser* descriptionBrowser;
 
         /** \brief current searchPath for assets */
-        QStringList searchPath;
+        QString searchPath;
 
         /** \brief font of the title line */
         QFont m_titleFont;
         /** \brief base font of the main text */
         QFont m_baseFont;
+
+        QString m_home;
+
+        QStack<QString> history;
+
+        int history_idx;
+
+    private slots:
+        void displayTitle();
+        void anchorClicked(const QUrl& link);
+        void previous();
+        void next();
+        void home();
+        void showFile(QString filename);
 };
 
 #endif // QFHTMLHelpWindow_H

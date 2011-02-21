@@ -18,7 +18,7 @@
 #include "tools.h"
 #include "alv5000tools.h"
 #include "qfrawdatarecordfactory.h"
-#include "qfrdrfcsdatainterface.h"
+#include "../interfaces/qfrdrfcsdatainterface.h"
 
 /*! \brief manages a FCS dataset
     \ingroup qf3rdrdp_fcs

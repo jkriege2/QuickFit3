@@ -3,6 +3,11 @@
     <file alias="splash.png">../images/splash.png</file>
     <file alias="icon.png">../images/qf3icon.png</file>
 
+    <file alias="help.png">../images/16x16/help.png</file>
+    <file alias="help_next.png">../images/16x16/help_next.png</file>
+    <file alias="help_previous.png">../images/16x16/help_previous.png</file>
+    <file alias="help_home.png">../images/16x16/help_home.png</file>
+
     <file alias="configure.png">../images/22x22/configure_alt.png</file>
     <file alias="exit.png">../images/22x22/window_close.png</file>
     <file alias="about.png">../images/22x22/help_about.png</file>

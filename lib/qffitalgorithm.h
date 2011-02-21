@@ -316,8 +316,9 @@ class QFFitAlgorithm {
         virtual QString name() const=0;
         /** \brief return a short unique algorithm ID string */
         virtual QString id() const=0;
-        /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in \verbatim plugins/fitalgorithms/help/<plugin_id> \endverbatim */
-        virtual QString helpFile() const { return QString(""); };
+        /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in
+         *         \verbatim plugins/fitalgorithms/help/<plugin_id> \endverbatim */
+        virtual QString helpFile() const { return id()+".html"; };;
         /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
         virtual bool get_supportsBoxConstraints() const =0;
 };

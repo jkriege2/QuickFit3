@@ -6,13 +6,13 @@ TARGET = qfevalfcsfit
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins
 #DLLDESTDIR = $$DESTDIR
-LIBS += -lgsl -lgslcblas -L../../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += qfpevalfcsfit.h \
            qffcsfitevaluation.h \
            qffcsfitevaluationeditor.h \
-           ../fcs/qfrdrfcsdatainterface.h \
+           ../interfaces/qfrdrfcsdatainterface.h \
            ../../../../../LIB/trunk/statistics_tools.h
 
 SOURCES += qfpevalfcsfit.cpp \

@@ -81,7 +81,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
     // step vector, this vector holds the current maximúm step sizes */
     double* v=(double*)calloc(fitParamCount,sizeof(double));
     // init step vector v
-    for (unsigned int i=0; i<fitParamCount; i++) {
+    for (int i=0; i<fitParamCount; i++) {
         v[i]=fabs(paramsMax[i]-paramsMin[i])/1000.0;
     };
 
@@ -132,7 +132,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
 
             for (register unsigned int stepVariations=0; stepVariations<NS; stepVariations++) {
                 iterations++;
-                for (register unsigned int h=0; h<fitParamCount; h++) {
+                for (register int h=0; h<fitParamCount; h++) {
 
                     // x' = x + r*v[h] * eh
                     //     where eh is the unit vector in direction h
@@ -171,7 +171,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
             }
 
             // update the step vector
-            for (register unsigned int h=0; h<fitParamCount; h++) {
+            for (register int h=0; h<fitParamCount; h++) {
                 if (dirVariations[h]>0.6*(double)NS) {
                     v[h]=v[h]*(1.0+c*(dirVariations[h]/(double)NS-0.6)/0.4);
                     if (v[h]>fabs(paramsMax[h]-paramsMin[h])/2.0) v[h]=fabs(paramsMax[h]-paramsMin[h])/2.0;
@@ -195,7 +195,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
         f_asterisk[k]=currentChi2;
         finished=true;
         //std::cout<<"  fmax="<<fmax<<"     ";
-        for (register unsigned int u=0; (u<Nepsilon) && (finished); u++) {
+        for (register int u=0; (u<Nepsilon) && (finished); u++) {
             finished=finished && (fabs(currentChi2-f_asterisk[u])<=fmax);
             //std::cout<<"   |"<<currentChi2<<"-"<<f_asterisk[u]<<"|="<<fabs(currentChi2-f_asterisk[u]);
         }
@@ -210,7 +210,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
         if ((iterations%iterations_progress_step)==0) {
             incProgress();
         }
-    } while (!finished && error==0 && iterations<iterationsMax);
+    } while ((!finished) && (error==0) && (iterations<iterationsMax));
 
 
 
@@ -246,7 +246,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
 
 
 
-    for (unsigned int i=0; i<fitParamCount; i++) {
+    for (int i=0; i<fitParamCount; i++) {
         paramErrorsOut[i]=0;
     }
 

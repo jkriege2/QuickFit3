@@ -10,7 +10,6 @@
 #include <QProgressBar>
 #include <QStringList>
 #include "qfproperties.h"
-#include "qfpluginservices.h"
 
 // forward declaration
 class QFRawDataRecord;
@@ -19,6 +18,7 @@ class QFProjectRawDataModel;
 class QFProjectTreeModel;
 class QFEvaluationItemFactory;
 class QFRawDataRecordFactory;
+class QFPluginServices;
 
 typedef QMap<QString, QVariant> qfp_param_type;
 
