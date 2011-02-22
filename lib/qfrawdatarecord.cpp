@@ -302,7 +302,7 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultN
     evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreBoolean: result=r.bvalue; break;
-        case qfrdreInteger: result=r.ivalue; break;
+        case qfrdreInteger: result=(qlonglong)r.ivalue; break;
         case qfrdreNumberError: result=QPointF(r.dvalue, r.derror); break;
         case qfrdreNumber: result=r.dvalue; break;
         case qfrdreNumberList: {
