@@ -4,7 +4,8 @@
 QFESPIMB040::QFESPIMB040(QObject* parent):
     QObject(parent)
 {
-    //ctor
+    main=NULL;
+
 }
 
 QFESPIMB040::~QFESPIMB040()
@@ -14,6 +15,7 @@ QFESPIMB040::~QFESPIMB040()
 
 
 void QFESPIMB040::deinit() {
+    if (settings && main) main->storeSettings(settings);
 }
 
 void QFESPIMB040::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -35,13 +37,21 @@ void QFESPIMB040::initExtension() {
 }
 
 void QFESPIMB040::loadSettings(ProgramOptions* settings) {
+    if (main) main->loadSettings(settings);
 }
 
 void QFESPIMB040::storeSettings(ProgramOptions* settings) {
+    if (main) main->storeSettings(settings);
 }
 
 void QFESPIMB040::startPlugin() {
-    QMessageBox::information(parentWidget, getName(), getDescription());
+    //QMessageBox::information(parentWidget, getName(), getDescription());
+    if (!main) {
+        main=new QFESPIMB040MainWindow(services->getExtensionManager(), NULL);
+    }
+    if (settings) main->loadSettings(settings);
+    main->show();
+
 }
 
 

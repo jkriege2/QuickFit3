@@ -40,6 +40,7 @@
 */
 class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         Q_OBJECT
+        Q_INTERFACES(QFRDRFCSDataInterface)
     public:
         /** Default constructor */
         QFRDRFCSData(QFProject* parent);

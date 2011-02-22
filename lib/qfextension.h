@@ -84,7 +84,7 @@ class QFExtensionBase: public QFExtension {
 
         /** \copydoc QFExtension::setProject() */
         virtual void setProject(QFProject* project) {
-            QFProject* oldp;
+            QFProject* oldp=this->project;
             this->project=project;
             projectChanged(oldp, project);
         };

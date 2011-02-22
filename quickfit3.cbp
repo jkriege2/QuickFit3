@@ -197,7 +197,12 @@
 		<Unit filename="plugins\fitalgorithm_simanneal\fitalgorithm_simanneal.pro" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.cpp" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.h" />
+		<Unit filename="plugins\interfaces\qfextensioncamera.h" />
 		<Unit filename="plugins\interfaces\qfrdrfcsdatainterface.h" />
+		<Unit filename="plugins\spimb040\qfespimb040cameraview.cpp" />
+		<Unit filename="plugins\spimb040\qfespimb040cameraview.h" />
+		<Unit filename="plugins\spimb040\qfespimb040mainwindow.cpp" />
+		<Unit filename="plugins\spimb040\qfespimb040mainwindow.h" />
 		<Unit filename="plugins\spimb040\spimb040.cpp" />
 		<Unit filename="plugins\spimb040\spimb040.h" />
 		<Unit filename="plugins\spimb040\spimb040.pro" />
@@ -216,6 +221,9 @@
 		<Unit filename="plugins\table\qftablemodel.h" />
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
+		<Unit filename="..\..\..\LIB\trunk\jkimage.h" />
+		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.cpp" />
+		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkdoubleedit.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkdoubleedit.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkqtfastplotter.cpp" />

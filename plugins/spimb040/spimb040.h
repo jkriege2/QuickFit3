@@ -2,6 +2,7 @@
 #define SPIMB040_H
 
 #include "qfextension.h"
+#include "qfespimb040mainwindow.h"
 #include <QAction>
 
 /*!
@@ -11,8 +12,7 @@
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) plugin class
     \ingroup qf3ext_spimb040
-    */
-
+ */
 class QFESPIMB040 : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
@@ -49,6 +49,8 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
 
     protected:
         QAction* actStartPlugin;
+
+        QFESPIMB040MainWindow* main;
 
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);

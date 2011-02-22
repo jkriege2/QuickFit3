@@ -30,6 +30,7 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/numberedit.h \
            ../../../../LIB/trunk/qt/jkdoubleedit.h \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.h \
+           ../../../../LIB/trunk/qt/colorcombobox.h \
            qehtreeview.h \
            datacutslider.h \
            qffitparameterbasicinterface.h \
@@ -54,6 +55,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/qt/numberedit.cpp \
            ../../../../LIB/trunk/qt/jkdoubleedit.cpp \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.cpp \
+           ../../../../LIB/trunk/qt/colorcombobox.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \

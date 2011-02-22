@@ -64,6 +64,11 @@ class QFExtensionManager : public QObject {
         /** \brief returns the plugins filename for a specified QFRawDataRecord ID. */
         QString getPluginFilename(QString ID);
 
+        /** \brief return a pointer to the given QFExtension instance */
+        QFExtension* getInstance(QString id);
+        /** \brief return a pointer to the given Object instance */
+        QObject* getQObjectInstance(QString id);
+
 
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
@@ -75,6 +80,10 @@ class QFExtensionManager : public QObject {
          *         It maps from  the ID to the internal description.
          */
         QMap<QString, QFExtension*> items;
+        /** \brief this map is used to internally manage the available QFRawDataRecord s.
+         *         It maps from  the ID to the internal description.
+         */
+        QMap<QString, QObject*> itemobjects;
 
         /** \brief this map contains the filenames of the plugin DLLs */
         QMap<QString, QString> filenames;

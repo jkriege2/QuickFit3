@@ -50,6 +50,8 @@ class QFRDRFCSDataInterface {
 
 };
 
+Q_DECLARE_INTERFACE( QFRDRFCSDataInterface,
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRFCSDataInterface/1.0")
 
 
 
@@ -135,8 +137,6 @@ class QFRDRFCSDataInterface {
 //        /** \brief set whether the given run is visible. the average run is indicated by -1 */
 //        virtual void setRunVisible(int run, bool vis)=0;
 
-//Q_DECLARE_INTERFACE(QFPluginRawDataRecord,
-//                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRFCSDataInterface/1.0")
 
 
 #endif // QFRDRFCSDATAINTERFACE_H

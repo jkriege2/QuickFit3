@@ -28,6 +28,7 @@ void QFExtensionManager::searchPlugins(QString directory) {
             QFExtension* iRecord = qobject_cast<QFExtension*>(plugin);
             if (iRecord) {
                 items[iRecord->getID()]=iRecord;
+                itemobjects[iRecord->getID()]=plugin;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
                 emit showMessage(tr("loaded extension plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
                 emit showLongMessage(tr("loaded extension plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[iRecord->getID()]).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
@@ -117,3 +118,13 @@ QString QFExtensionManager::getPluginFilename(QString ID) {
     if (items.contains(ID)) return filenames[ID];
     return QString("");
 };
+
+QFExtension* QFExtensionManager::getInstance(QString ID) {
+    if (items.contains(ID)) return items[ID];
+    return NULL;
+}
+
+QObject* QFExtensionManager::getQObjectInstance(QString ID) {
+    if (itemobjects.contains(ID)) return itemobjects[ID];
+    return NULL;
+}

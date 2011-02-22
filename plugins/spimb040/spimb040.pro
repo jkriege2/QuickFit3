@@ -7,14 +7,20 @@ DEPENDPATH += ./
 DESTDIR = ../../output/plugins/extensions/
 #DLLDESTDIR = $$DESTDIR
 # ./
-LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -ltiff -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
-HEADERS += spimb040.h
+HEADERS += spimb040.h \
+           qfespimb040mainwindow.h \
+           qfespimb040cameraview.h \
+           ../interfaces/qfextensioncamera.h \
+           ../../../../../LIB/trunk/jkimage.h
 
-SOURCES += spimb040.cpp
+SOURCES += spimb040.cpp \
+           qfespimb040mainwindow.cpp \
+           qfespimb040cameraview.cpp
 
-FORMS = 
+FORMS =
 
 RESOURCES += spimb040.qrc
 
