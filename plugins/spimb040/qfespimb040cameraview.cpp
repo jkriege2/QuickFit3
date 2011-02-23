@@ -781,21 +781,7 @@ void QFESPIMB040CameraView::configCamera() {
     //std::cout<<"acquireSingle()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
 
     if (cam) {
-        QDialog* dlg=new QDialog(NULL);
-
-        QVBoxLayout* lay=new QVBoxLayout(dlg);
-        dlg->setLayout(lay);
-
-        lay->addWidget(cam->createSettingsWidget(camIdx, dlg));
-
-        QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
-        lay->addWidget(buttonBox);
-
-        connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
-        connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
-
-        dlg->exec();
-        delete dlg;
+        cam->showSettingsWidget(camIdx, this);
     }
 }
 

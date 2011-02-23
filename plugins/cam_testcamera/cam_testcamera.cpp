@@ -129,10 +129,14 @@ unsigned int QFECamTestCamera::getCameraCount() {
     return 2;
 }
 
-QWidget* QFECamTestCamera::createSettingsWidget(unsigned int camera, QWidget* parent) {
+void QFECamTestCamera::showSettingsWidget(unsigned int camera, QWidget* parent) {
+    QDialog* dlg=new QDialog(parent);
+
+    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    dlg->setLayout(lay);
 
     QSpinBox* spin;
-    QWidget* r=new QWidget(parent);
+    QWidget* r=new QWidget(dlg);
     QFormLayout* fl=new QFormLayout(r);
     r->setLayout(fl);
     QComboBox* cmb=new QComboBox(r);
@@ -273,7 +277,16 @@ QWidget* QFECamTestCamera::createSettingsWidget(unsigned int camera, QWidget* pa
     cmb->setCurrentIndex(testpattern[camera]);
 
 
-    return r;
+    lay->addWidget(r);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
+    lay->addWidget(buttonBox);
+
+    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
+
+    dlg->exec();
+    delete dlg;
 }
 
 int QFECamTestCamera::getImageWidth(unsigned int camera) {

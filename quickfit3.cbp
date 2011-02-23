@@ -86,6 +86,7 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="doc\plugin_template_projects\plugin_template_projects.dox" />
 		<Unit filename="doc\plugins.dox">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

@@ -26,7 +26,7 @@ class QFExtensionCamera {
             \param camera the camera the settings widget should apply to
             \param parent parent widget for the returned QWidget
          */
-         virtual QWidget* createSettingsWidget(unsigned int camera, QWidget* parent=NULL)=0;
+         virtual void showSettingsWidget(unsigned int camera, QWidget* parent=NULL)=0;
          /** \brief return the width of images */
          virtual int getImageWidth(unsigned int camera)=0;
          /** \brief return the height of images */
