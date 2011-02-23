@@ -23,9 +23,10 @@ class QFExtensionCamera {
             It should contain widgets to set parameters like exposure time, shutter,
             color channel, ...
 
+            \param camera the camera the settings widget should apply to
             \param parent parent widget for the returned QWidget
          */
-         virtual QWidget* createSettingsWidget(QWidget* parent=NULL)=0;
+         virtual QWidget* createSettingsWidget(unsigned int camera, QWidget* parent=NULL)=0;
          /** \brief return the width of images */
          virtual int getImageWidth(unsigned int camera)=0;
          /** \brief return the height of images */
@@ -45,10 +46,8 @@ class QFExtensionCamera {
          virtual bool connectDevice(unsigned int camera)=0;
          /** \brief connect to the device/sctivate it */
          virtual void disconnectDevice(unsigned int camera)=0;
-         /** \brief read settings from QSettings object */
-         virtual void readSettings(QSettings& settings)=0;
-         /** \brief write settings to QSettings object */
-         virtual void writeSettings(QSettings& settings)=0;
+         /** \brief returns the acquisition time (time the camera is open) in seconds */
+         virtual double getAcquisitionTime(unsigned int camera)=0;
 
 };
 

@@ -26,6 +26,7 @@
 #include "qfextensionmanager.h"
 #include "../interfaces/qfextensioncamera.h"
 #include "qfextension.h"
+#include "tools.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) camera widget
     \ingroup qf3ext_spimb040
@@ -54,7 +55,12 @@ class QFESPIMB040CameraView : public QWidget {
         QTabWidget* tabSettings;
         QTabWidget* tabResults;
 
-        /** \brief combobox to select an acquisition device */
+        /*! \brief combobox to select an acquisition device
+
+            The data() property of this QComboBox is used to store/specify the device (and item therein) to use.
+            It contains a QPoint, where x specifies the device in cameras and y the camera inside the selected
+            device.
+        */
         QComboBox* cmbAcquisitionDevice;
         /** \brief spinbox to select delay between two subsequent frames */
         QDoubleSpinBox* spinAcquisitionDelay;
@@ -97,14 +103,11 @@ class QFESPIMB040CameraView : public QWidget {
         QComboBox* cmbColorscale;
         /** \brief color combobox for the overlay color */
         ColorComboBox* cmbMaskColor;
-        /** \brief check box to enable background image removal */
-        QCheckBox* chkRemoveBackground;
-        /** \brief check box to enable gamma transformation of the image */
-        QCheckBox* chkGammaTransform;
-        /** \brief check box to enable gamma transformation of the image */
-        QDoubleSpinBox* spinGamma;
         /** \brief combobox for rotation of the image */
         QComboBox* cmbRotation;
+
+        /** \brief label for image sie and framerate */
+        QLabel* labVideoSettings;
 
 
 
@@ -115,6 +118,8 @@ class QFESPIMB040CameraView : public QWidget {
         QAction* actStartStopAcquisition;
         /** \brief action to acquire a single frame */
         QAction* actAcquireSingle;
+        /** \brief action to display a camera configuration dialog */
+        QAction* actCameraConfig;
         /** \brief action to save the current raw image */
         QAction* actSaveRaw;
         /** \brief action to activate/disactivate mask editing mode */
@@ -174,6 +179,12 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief filter last used to save images */
         QString lastImagefilter;
 
+        /** \brief number of acquired frames for frames/second calculation (is reset every 10 seconds!!!) */
+        uint64_t acqFramesQR;
+        /** \brief number of acquired frames  */
+        uint64_t acqFrames;
+        /** \brief length of the last acquisition time in seconds */
+        double acqTime;
 
 
         /** \brief when has the last continuous acquisition been started */
@@ -233,8 +244,12 @@ class QFESPIMB040CameraView : public QWidget {
         void acquireSingle();
         /** \brief acquire single frame from a continuous series */
         void acquireContinuous();
-        /** \brief connect to a given acquisition device */
-        void connectDevice(int device);
+        /** \brief connect to a given acquisition device and camera therein */
+        void connectDevice(int device, int camera);
+        /** \brief make sure all images/arrays have the same/right size */
+        void ensureImageSizes();
+        /** \brief display a configuration dialog for the current camera */
+        void configCamera();
 };
 
 #endif // QFESPIMB040CAMERAVIEW_H

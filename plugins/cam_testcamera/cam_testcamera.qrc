@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="cam_testcamera_logo.png">../../images/16x16/wizard.png</file>
+
+</qresource>
+</RCC>

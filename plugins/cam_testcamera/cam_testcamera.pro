@@ -2,29 +2,23 @@ TEMPLATE = lib
 CONFIG += plugin
 
 
-TARGET = spimb040
+TARGET = cam_testcamera
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/extensions/
-#DLLDESTDIR = $$DESTDIR
-# ./
-LIBS += -ltiff -L../../output/ -lquickfit3lib -lquickfit3widgets
+
+LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
-HEADERS += spimb040.h \
-           qfespimb040mainwindow.h \
-           qfespimb040cameraview.h \
+HEADERS += cam_testcamera.h \
            ../interfaces/qfextensioncamera.h \
-           ../../../../../LIB/trunk/jkimage.h  \
            ../../../../../LIB/trunk/highrestimer.h
 
-SOURCES += spimb040.cpp \
-           qfespimb040mainwindow.cpp \
-           qfespimb040cameraview.cpp \
+SOURCES += cam_testcamera.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp
 
 FORMS =
 
-RESOURCES += spimb040.qrc
+RESOURCES += cam_testcamera.qrc
 
 TRANSLATIONS= ../../output/translations/de.ts
 

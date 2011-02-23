@@ -161,6 +161,10 @@
 		<Unit filename="libqf3widgets\qffitparameterbasicinterface.h" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.cpp" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.h" />
+		<Unit filename="plugins\cam_testcamera\cam_testcamera.cpp" />
+		<Unit filename="plugins\cam_testcamera\cam_testcamera.h" />
+		<Unit filename="plugins\cam_testcamera\cam_testcamera.pro" />
+		<Unit filename="plugins\cam_testcamera\cam_testcamera.qrc" />
 		<Unit filename="plugins\fcs\alv5000tools.cpp" />
 		<Unit filename="plugins\fcs\alv5000tools.h" />
 		<Unit filename="plugins\fcs\dlg_csvparameters.ui" />
