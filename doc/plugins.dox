@@ -139,4 +139,7 @@
 
     After QFExtension::init() has been called you my access the QFExtensionServices at every time, using
     QFExtensionBase::services. This may also be used to interface all other QFExtension s, currently loaded.
+	
+	
+	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.cpp
 */
