@@ -29,14 +29,22 @@ void QFExtensionCameraImplementation::initExtension() {
 }
 
 void QFExtensionCameraImplementation::loadSettings(ProgramOptions* settingspo) {
-    QSettings& settings=*(settingspo->getQSettings());
 	/* here you could read config information from the quickfit.ini file using settings object */
+    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+	
+	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	
 }
 
 void QFExtensionCameraImplementation::storeSettings(ProgramOptions* settingspo) {
-    QSettings& settings=*(settingspo->getQSettings());
 	/* here you could write config information to the quickfit.ini file using settings object */
-}
+    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+
+	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+
+	}
 
 unsigned int QFExtensionCameraImplementation::getCameraCount() {
     return 1;
@@ -85,9 +93,9 @@ void QFExtensionCameraImplementation::disconnectDevice(unsigned int camera) {
     /* disconnect from the given camera */
 }
 
-double QFExtensionCameraImplementation::getAcquisitionTime(unsigned int camera) {
-    return /* acquisition time of the last image */;
+double QFExtensionCameraImplementation::getExposureTime(unsigned int camera) {
+    return /* exposure time of the last image */;
 }
 
 
-Q_EXPORT_PLUGIN2(/* replace with the TARGET from the .pro file (e.g. cam_testcamera) */, QFExtensionCameraImplementation)
+Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraImplementation)

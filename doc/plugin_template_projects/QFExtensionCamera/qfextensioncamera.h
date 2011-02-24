@@ -28,7 +28,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return tr(/* unique ID for the camera ... eg cam_mycamname*/ ); };
+        virtual QString getID() const  { return QString(QF_TOSTR(TARGETNAME)); };
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr(/* human readable name for plugin */); };
         /** \copydoc QFExtension::getDescription() */
@@ -62,7 +62,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         /** \copydoc QFExtensionCamera::getCameraCount() */
         virtual unsigned int getCameraCount();
         /** \copydoc QFExtensionCamera::createSettingsWidget() */
-        virtual QWidget* createSettingsWidget(unsigned int camera, QWidget* parent=NULL);
+        virtual void showSettingsWidget(unsigned int camera, QWidget* parent=NULL);
         /** \copydoc QFExtensionCamera::getImageWidth() */
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
@@ -75,8 +75,8 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         virtual bool connectDevice(unsigned int camera);
         /** \copydoc QFExtensionCamera::disconnectDevice() */
         virtual void disconnectDevice(unsigned int camera);
-        /** \copydoc QFExtensionCamera::getAcquisitionTime() */
-        virtual double getAcquisitionTime(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getExposureTime() */
+        virtual double getExposureTime(unsigned int camera);
 
 
 };

@@ -32,16 +32,17 @@
     QuickFit uses the <a href="http://doc.qt.nokia.com/4.6/plugins-howto.html">Qt plugin lower-level API</a>
     to implement the different extensions, mentioned above. You will find more details about implementing plugins
     here:
-      - \link pluginsrdr Writing QFRawDataRecord Plugins \endlink
-      - \link pluginseval Writing QFEvaluationItem Plugins \endlink
-      - \link pluginsfitalg Writing Fit Algorithm Plugins \endlink
-      - \link pluginsfitfunc Writing Fit Functions Plugins \endlink
-      - \link pluginsextensions Writing QFExtension Plugins \endlink
+      - \subpage pluginsrdr
+      - \subpage pluginseval
+      - \subpage pluginsfitalg
+      - \subpage pluginsfitfunc
+      - \subpage pluginsextensions
+	    - \subpage pluginsextensionscamera
+	  .	
     .
 */
 
 /*! \page pluginsrdr Writing QFRawDataRecord Plugins
-    \ingroup qf3plugins
 
     When implementing a new type of raw data record, you will have to follow these steps:
       - create a new Qt plugin project
@@ -59,7 +60,6 @@
 
 
 /*! \page pluginseval Writing QFEvaluationItem Plugins
-    \ingroup qf3plugins
 
 
     When implementing a new type of evaluation, you will have to follow these steps:
@@ -80,7 +80,6 @@
 */
 
 /*! \page pluginsfitalg Writing Fit Algorithm Plugins
-    \ingroup qf3plugins
 
 
     Fit Algorithm plugins are somewhat simpler than \link pluginseval evaluation plugins \endlink and
@@ -100,7 +99,6 @@
 */
 
 /*! \page pluginsfitfunc Writing Fit Function Plugins
-    \ingroup qf3plugins
 
     This class of plugins are fit functions designed to work together with QFFitAlgorithm fit routines.
 
@@ -120,7 +118,6 @@
 */
 
 /*! \page pluginsextensions Writing QFExtension Plugins
-    \ingroup qf3plugins
 
     These plugins allow to write a wide variety of extensions to QuickFit 3. They are NOT used as part of the
     project tree, but extend the application directly. You may use them to use QuickFit as basis for Experiment
@@ -140,6 +137,50 @@
     After QFExtension::init() has been called you my access the QFExtensionServices at every time, using
     QFExtensionBase::services. This may also be used to interface all other QFExtension s, currently loaded.
 	
-	
-	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.cpp
 */
+
+/*! \page pluginsextensionscamera Writing QFExtensionCamera Plugins
+
+    This is	a special QFExtension plugin which also implements the QFExtensionCamera interface. Thus it allows to access
+	a camera or any other imaging device in the system. In addition to the methods in QFExtension you will also have to
+	implement the methods from QFExtensionCamera. 
+	
+	If you want to implement such a plugin, just copy the files from the directory \c plugin_template_projects/QFExtensionCamera/ 
+	into a new directory and fill in the functions. In addition you should rename some of the files/classes:
+	  - rename the directory to \c \<PLUGIN_NAME\> and the project name to \c \<PLUGIN_NAME\>.pro where \c \<PLUGIN_NAME\> is 
+	    a name you selected for the plugin. 
+	  - in 	\c \<PLUGIN_NAME\>.pro, change the \c TARGET to \c \<PLUGIN_NAME\>
+      - the plugin ID will be automatically set to be \c "cam_\<PLUGIN_NAME\>" using the TARGETNAME macro defined in the .pro file!
+	  - \b optionally you may rename the \c .cpp and \c .h	file and also the plugin class to a new name.
+	.  
+	
+	Here are the files of the template project:
+	
+	In \c plugin_template_projects/QFExtensionCamera/qfextensioncamera.pro you will have to set the \c TARGET to a new name
+	which will the also be the name of the plugin shared library:
+	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.pro
+	
+	In the Resource file you should give an icon for your plugin. To do so, rename qfextensioncamera_logo.png to a plugin-specific 
+	name and also return this filename in \c plugin_template_projects/QFExtensionCamera/qfextensioncamera.h in the \c getIconFilename()
+	function:
+	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.qrc
+	
+	Here you will have to set the plugin-description. Especially in getID() you will have to care to give a unique name which is not used
+	by any other plugin (the currently used IDs may be seen in the Plugin Info dialog of QuickFit (which is situated in the Help menu).
+	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.h
+	
+	Implement your plugin here:
+	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.cpp
+	
+	If you are a DKFZ internal developer, you may add your plugin to the \c quickitf3.pro by inserting these lines:
+	\code
+SUBDIRS += plg_<PLUGIN_NAME>
+plg_<PLUGIN_NAME>.subdir=./plugins/<PLUGIN_NAME>
+plg_<PLUGIN_NAME>.depends = lib 
+	\endcode
+	now calling \code qmake && make \endcode will also build your new plugin.
+*/
+
+
+
+
