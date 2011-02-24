@@ -30,7 +30,7 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
     /////////////////////////////////////////////////////////////////////////////
 
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return tr("ext_testcamera"); };
+        virtual QString getID() const  { return QString(QF_TOSTR(TARGETNAME)); };
 
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr("Test Image Camera Device"); };
@@ -93,8 +93,8 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         virtual bool connectDevice(unsigned int camera);
         /** \copydoc QFExtensionCamera::disconnectDevice() */
         virtual void disconnectDevice(unsigned int camera);
-        /** \copydoc QFExtensionCamera::getAcquisitionTime() */
-        virtual double getAcquisitionTime(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getExposureTime() */
+        virtual double getExposureTime(unsigned int camera);
 
 
     protected:

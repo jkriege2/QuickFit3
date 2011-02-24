@@ -47,7 +47,7 @@ class QFExtensionCamera {
          /** \brief connect to the device/sctivate it */
          virtual void disconnectDevice(unsigned int camera)=0;
          /** \brief returns the acquisition time (time the camera is open) in seconds */
-         virtual double getAcquisitionTime(unsigned int camera)=0;
+         virtual double getExposureTime(unsigned int camera)=0;
 
 };
 

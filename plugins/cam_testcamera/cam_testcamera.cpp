@@ -409,7 +409,7 @@ void QFECamTestCamera::disconnectDevice(unsigned int camera) {
     conn[camera] = false;
 }
 
-double QFECamTestCamera::getAcquisitionTime(unsigned int camera) {
+double QFECamTestCamera::getExposureTime(unsigned int camera) {
     if (camera==0) return 1;
     return 1e-3;
 }

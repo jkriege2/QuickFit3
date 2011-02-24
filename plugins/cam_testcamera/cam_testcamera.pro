@@ -3,6 +3,9 @@ CONFIG += plugin
 
 
 TARGET = cam_testcamera
+
+DEFINES += TARGETNAME=$$TARGET
+
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/extensions/
 

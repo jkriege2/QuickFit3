@@ -803,7 +803,7 @@ void QFESPIMB040CameraView::acquireSingle() {
         actStartStopAcquisition->setText(tr("&Start Acquisition"));
         if (cam->isConnected(camIdx)) {
             ensureImageSizes();
-            acqTime=cam->getAcquisitionTime(camIdx);
+            acqTime=cam->getExposureTime(camIdx);
             cam->acquire(camIdx, rawImage.data(), &imageTimeindex);
             imageStatisticsCalculated=false;
         } else {
@@ -845,7 +845,7 @@ void QFESPIMB040CameraView::acquireContinuous() {
                 continuous_is_first=false;
             }
             ensureImageSizes();
-            acqTime=cam->getAcquisitionTime(camIdx);
+            acqTime=cam->getExposureTime(camIdx);
             cam->acquire(camIdx, rawImage.data(), &imageTimeindex);
             imageStatisticsCalculated=false;
         } else {
