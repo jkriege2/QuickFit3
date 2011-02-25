@@ -40,7 +40,11 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         void loadSettings(ProgramOptions* settings, QString prefix);
         /** \brief save settings */
         void storeSettings(ProgramOptions* settings, QString prefix);
+	/** \brief disconnect camera */
+	void diconnectCurrentCamra();
     protected:
+        void closeEvent ( QCloseEvent * event );
+      
         /** \brief create main widgets */
         void createMainWidgets(const QString& logfile);
         /** \brief create actions and register them to toolbar */
@@ -174,6 +178,8 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         /** \brief when was the size of the count rate histogram updated the last time */
         QTime histogramUpdateTime;
 
+        /** \brief path last used to save/load masks (*.msk) */
+        QString lastMaskpath;
         /** \brief path last used to save images */
         QString lastImagepath;
         /** \brief filter last used to save images */

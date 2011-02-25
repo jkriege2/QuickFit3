@@ -66,6 +66,11 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
     free(histogram_y);
 }
 
+void QFESPIMB040CameraView::closeEvent ( QCloseEvent * event ) {
+    actDisConnectAcquisition->setChecked(false);
+    event->accept();
+}
+
 void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
 
     ///////////////////////////////////////////////////////////////
@@ -347,6 +352,7 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
 
 
     lastImagepath=(settings->getQSettings())->value(prefix+"last_imagepath", lastImagepath).toString();
+    lastMaskpath=(settings->getQSettings())->value(prefix+"last_maskpath", lastMaskpath).toString();
     lastImagefilter=(settings->getQSettings())->value(prefix+"last_imagefilter", lastImagefilter).toString();
 }
 
@@ -357,6 +363,7 @@ void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString pref
     (settings->getQSettings())->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     (settings->getQSettings())->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
     (settings->getQSettings())->setValue(prefix+"last_imagepath", lastImagepath);
+    (settings->getQSettings())->setValue(prefix+"last_maskpath", lastMaskpath);
     (settings->getQSettings())->setValue(prefix+"last_imagefilter", lastImagefilter);
 
     (settings->getQSettings())->setValue(prefix+"histogram.min", spinCountsLower->value());
@@ -561,9 +568,10 @@ void QFESPIMB040CameraView::clearMask() {
 
 void QFESPIMB040CameraView::saveMask() {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Mask Data"),
-                            lastImagepath,
+                            lastMaskpath,
                             tr("Image Mask (*.msk)"));
     if (fileName.isEmpty()) return;
+    lastMaskpath=QFileInfo(fileName).absolutePath();
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (!mask.save_nonzero_list(fileName.toStdString())) {
         QApplication::restoreOverrideCursor();
@@ -577,9 +585,10 @@ void QFESPIMB040CameraView::saveMask() {
 
 void QFESPIMB040CameraView::loadMask() {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Mask Data"),
-                            lastImagepath,
+                            lastMaskpath,
                             tr("Image Mask (*.msk)"));
     if (fileName.isEmpty()) return;
+    lastMaskpath=QFileInfo(fileName).absolutePath();
     if (QMessageBox::question(this, tr("QuickFit SPIM Control"), tr("Do your really want to replace the mask with the file contents?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes )==QMessageBox::No ) return;
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -903,4 +912,6 @@ void QFESPIMB040CameraView::connectDevice(int device, int camera) {
     }
 }
 
-
+void QFESPIMB040CameraView::diconnectCurrentCamra() {
+    actDisConnectAcquisition->setChecked(false);
+}

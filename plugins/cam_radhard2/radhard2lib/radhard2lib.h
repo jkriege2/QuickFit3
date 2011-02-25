@@ -418,8 +418,9 @@ defaulted to the maximum count of the image.
 
 // MACROS
 
-#define FDEBUG
-#define FVERBOSE
+
+#undef FDEBUG
+#undef FVERBOSE
 
 /*! \def DEBUG(x)
 \ingroup radhard2

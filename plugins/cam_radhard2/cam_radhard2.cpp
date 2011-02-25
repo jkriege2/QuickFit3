@@ -38,7 +38,7 @@ void QFExtensionCameraRadhard2::initExtension() {
 
 void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
     //QSettings& settings=*(settingspo->getQSettings());
-    QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+".ini", QSettings::IniFormat);
+    QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
     iterations=settings.value("radhard2/iterations", iterations).toInt();
     divider=settings.value("radhard2/divider", divider).toInt();
     subtractOne=settings.value("radhard2/subtract_one", subtractOne).toBool();
@@ -148,15 +148,15 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
 	// Ask for the pictures
     radhard2->SendCommand(CMD_START_ACQUISITION);
     radhard2->ReadData(&result);
-	if(result != OPERATION_DONE) {
-		log_error(tr("Radhard2: Received wrong ack constant after START_ACQUISITION command.\n"));
+    if(result != OPERATION_DONE) {
+		log_error(tr("Radhard2: Received wrong ack constant after START_ACQUISITION (result was %1) command.\n").arg(8,16));
     }
 
     usleep(20000 + 2* int(exposureT));
 
 	// Get the pictures
     radhard2->SendCommand(CMD_GET_MEMORY);
-    radhard2->ReadData(data);
+    radhard2->ReadImage(data);
 
     if (subtractOne) {
         register int imagesize=getImageWidth(camera)*getImageHeight(camera);
@@ -208,7 +208,7 @@ void QFExtensionCameraRadhard2::updateAcquisitionTime() {
 void QFExtensionCameraRadhard2::sendDivider() {
     if (conn) {
         radhard2->SendCommand(CMD_SET_DIVIDER, divider);
-        log_text(tr("Radhard2: setting DIVIDER = %1\n").arg(divider));
+        //log_text(tr("Radhard2: setting DIVIDER = %1\n").arg(divider));
     }
 }
 
@@ -218,7 +218,7 @@ void QFExtensionCameraRadhard2::sendIterations() {
         unsigned int result;
         radhard2->ReadData(&result);
         if(result == OPERATION_DONE) {
-            log_text(tr("Radhard2: setting ITERATIONS = %1\n").arg(iterations));
+            //log_text(tr("Radhard2: setting ITERATIONS = %1\n").arg(iterations));
         } else {
             log_error(tr("Radhard2: setting ITERATIONS = %1 failed! (result = %2)\n").arg(iterations).arg(QString::number(result, 16)));
         }

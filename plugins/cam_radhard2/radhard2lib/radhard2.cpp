@@ -223,7 +223,7 @@ bool Radhard2::ReadImage(uint32_t* destination)
     // Read values.
     int result;
 
-    DEBUG("RHCS     >> DEBUG(Radhard2::ReadData) -- Reading packets.");
+    DEBUG("RHCS     >> DEBUG(Radhard2::ReadImage) -- Reading packets.");
 
     // Read packet.
     result = usb_bulk_read(device, EP_IN, (char *)buffer, 8*MAX_USB_PACKET_SIZE, 4*USB_TIMEOUT);
@@ -235,13 +235,13 @@ bool Radhard2::ReadImage(uint32_t* destination)
     if( result != 8*MAX_USB_PACKET_SIZE )
     {
         cout << "RHCS     >> ERROR. Usb transmission falied to receive " << dec << 8*MAX_USB_PACKET_SIZE << "." << endl;
-        DEBUG("RHCS     >> DEBUG(Radhard2::ReadData) -- Radhard2 received " << dec << result << " bytes corresponding to " << dec << static_cast<unsigned int>(result/4) << " pixels.");
+        DEBUG("RHCS     >> DEBUG(Radhard2::ReadImage) -- Radhard2 received " << dec << result << " bytes corresponding to " << dec << static_cast<unsigned int>(result/4) << " pixels.");
 
         return false;
     }
 
-    DEBUG("RHCS     >> DEBUG(Radhard2::ReadData) -- Radhard2 received " << dec << result << " bytes corresponding to " << dec << static_cast<unsigned int>(result/4) << " pixels.");
-    DEBUG("RHCS     >> DEBUG(Radhard2::ReadData) -- Starting conversion.");
+    DEBUG("RHCS     >> DEBUG(Radhard2::ReadImage) -- Radhard2 received " << dec << result << " bytes corresponding to " << dec << static_cast<unsigned int>(result/4) << " pixels.");
+    DEBUG("RHCS     >> DEBUG(Radhard2::ReadImage) -- Starting conversion.");
 
 
     // Build the result.
@@ -259,7 +259,7 @@ bool Radhard2::ReadImage(uint32_t* destination)
     }
 
     DEBUG("");
-    DEBUG("RHCS     >> DEBUG(Radhard2::ReadData) -- Partial conversion done.");
+    DEBUG("RHCS     >> DEBUG(Radhard2::ReadImage) -- Partial conversion done.");
     VERB("RHCS     >> INFO -- Reception successful.");
 
     return true;

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <stdint.h>
 
 #undef FDEBUG
 #undef FVERBOSE

@@ -37,7 +37,7 @@ class QFESPIMB040MainWindow : public QWidget {
         /** \brief save settings */
         void storeSettings(ProgramOptions* settings);
     protected:
-
+	void closeEvent ( QCloseEvent * event );
         QTabWidget* tabMain;
         QFESPIMB040CameraView* camView1;
 

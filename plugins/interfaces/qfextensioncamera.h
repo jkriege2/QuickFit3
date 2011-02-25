@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QSettings>
 #include "qfpluginservices.h"
+#include <stdint.h>
 
 
 /*! \brief QuickFit QFExtension to control black \& white cameras

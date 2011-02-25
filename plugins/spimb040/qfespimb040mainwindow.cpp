@@ -31,3 +31,7 @@ void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     if (camView1) camView1->storeSettings(settings, "plugin_spim_b040/cam_view1_");
 }
+
+void QFESPIMB040MainWindow::closeEvent ( QCloseEvent * event ) {
+    if (camView1) camView1->diconnectCurrentCamra();
+}
