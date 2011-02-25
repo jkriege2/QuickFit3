@@ -30,7 +30,7 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
     /////////////////////////////////////////////////////////////////////////////
 
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString(QF_TOSTR(TARGETNAME)); };
+        virtual QString getID() const  { return QString("cam_testcamera"); };
 
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr("Test Image Camera Device"); };
@@ -95,9 +95,29 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         virtual void disconnectDevice(unsigned int camera);
         /** \copydoc QFExtensionCamera::getExposureTime() */
         virtual double getExposureTime(unsigned int camera);
+        /** \copydoc QFExtensionCamera::setLogging() */
+        virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
+        /** \brief indent all following lines in the logging pane */
+        virtual void log_indent();
+        /** \brief undo former log_indent() */
+        virtual void log_unindent();
+
+        /** \brief log project text message
+         *  \param message the message to log
+         */
+        virtual void log_text(QString message);
+        /** \brief log project warning message
+         *  \param message the warning message to log
+         */
+        virtual void log_warning(QString message);
+        /** \brief log project error message
+         *  \param message the error message to log
+         */
+        virtual void log_error(QString message);
 
     protected:
+        QFPluginLogService* logService;
         /** \brief are we connected? */
         bool conn[2];
         /** \brief image counter */

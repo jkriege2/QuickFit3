@@ -13,7 +13,7 @@ QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFExtensionManager* extManager, QWi
     hbl->addWidget(tabMain);
 
 
-    camView1=new QFESPIMB040CameraView(extManager, this);
+    camView1=new QFESPIMB040CameraView(QString(QApplication::applicationDirPath()+"/spimb040_cam1.log"), extManager, this);
     tabMain->addTab(camView1, tr("Camera &1"));
 }
 

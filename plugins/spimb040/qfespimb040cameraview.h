@@ -31,10 +31,10 @@
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) camera widget
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040CameraView : public QWidget {
+class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         Q_OBJECT
     public:
-        QFESPIMB040CameraView(QFExtensionManager* extManager, QWidget* parent=NULL);
+        QFESPIMB040CameraView(const QString& logfile, QFExtensionManager* extManager, QWidget* parent=NULL);
         virtual ~QFESPIMB040CameraView();
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings, QString prefix);
@@ -42,7 +42,7 @@ class QFESPIMB040CameraView : public QWidget {
         void storeSettings(ProgramOptions* settings, QString prefix);
     protected:
         /** \brief create main widgets */
-        void createMainWidgets();
+        void createMainWidgets(const QString& logfile);
         /** \brief create actions and register them to toolbar */
         void createActions();
 
@@ -250,6 +250,24 @@ class QFESPIMB040CameraView : public QWidget {
         void ensureImageSizes();
         /** \brief display a configuration dialog for the current camera */
         void configCamera();
+
+        /** \brief indent all following lines in the logging pane */
+        virtual void log_indent() { logMain->inc_indent(); };
+        /** \brief undo former log_indent() */
+        virtual void log_unindent() { logMain->dec_indent(); };
+
+        /** \brief log project text message
+         *  \param message the message to log
+         */
+        virtual void log_text(QString message) { logMain->log_text(message); };
+        /** \brief log project warning message
+         *  \param message the warning message to log
+         */
+        virtual void log_warning(QString message) { logMain->log_warning(message); };
+        /** \brief log project error message
+         *  \param message the error message to log
+         */
+        virtual void log_error(QString message) { logMain->log_error(message); };
 };
 
 #endif // QFESPIMB040CAMERAVIEW_H

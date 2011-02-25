@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="cam_radhard2_logo.png">cam_radhard2.png</file>
+</qresource>
+</RCC>

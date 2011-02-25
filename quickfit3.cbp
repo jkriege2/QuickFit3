@@ -162,6 +162,13 @@
 		<Unit filename="libqf3widgets\qffitparameterbasicinterface.h" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.cpp" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.h" />
+		<Unit filename="plugins\cam_radhard2\cam_radhard2.cpp" />
+		<Unit filename="plugins\cam_radhard2\cam_radhard2.h" />
+		<Unit filename="plugins\cam_radhard2\cam_radhard2.pro" />
+		<Unit filename="plugins\cam_radhard2\cam_radhard2.qrc" />
+		<Unit filename="plugins\cam_radhard2\radhard2lib\radhard2.cpp" />
+		<Unit filename="plugins\cam_radhard2\radhard2lib\radhard2.h" />
+		<Unit filename="plugins\cam_radhard2\radhard2lib\radhard2lib.h" />
 		<Unit filename="plugins\cam_testcamera\cam_testcamera.cpp" />
 		<Unit filename="plugins\cam_testcamera\cam_testcamera.h" />
 		<Unit filename="plugins\cam_testcamera\cam_testcamera.pro" />

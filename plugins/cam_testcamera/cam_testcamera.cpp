@@ -6,6 +6,7 @@
 QFECamTestCamera::QFECamTestCamera(QObject* parent):
     QObject(parent)
 {
+    logService=NULL;
     conn[0]=conn[1]=false;
     counter[0]=counter[1]=0;
     width[0]=width[1]=100;
@@ -505,6 +506,32 @@ void QFECamTestCamera::setParticlePSF1(double psf) {
 }
 void QFECamTestCamera::setHotpixels1(int num) {
     this->hotpixels[1]=num;
+}
+
+
+void QFECamTestCamera::log_indent() {
+	if (logService) logService->log_indent();
+	else if (services) services->log_indent();
+}
+
+void QFECamTestCamera::log_unindent() {
+	if (logService) logService->log_unindent();
+	else if (services) services->log_unindent();
+}
+
+void QFECamTestCamera::log_text(QString message) {
+	if (logService) logService->log_text(message);
+	else if (services) services->log_text(message);
+}
+
+void QFECamTestCamera::log_warning(QString message) {
+	if (logService) logService->log_warning(message);
+	else if (services) services->log_warning(message);
+}
+
+void QFECamTestCamera::log_error(QString message) {
+	if (logService) logService->log_error(message);
+	else if (services) services->log_error(message);
 }
 
 

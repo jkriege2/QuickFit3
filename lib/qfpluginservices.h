@@ -8,6 +8,33 @@
 #include "programoptions.h"
 #include "qfextensionmanager.h"
 
+/*! \brief wrapper class that allows plugins to access basic logging services
+    \ingroup qf3plugintools
+*/
+class QFPluginLogService {
+    public:
+        /** Default destructor */
+        virtual ~QFPluginLogService() {}
+
+        /** \brief indent all following lines in the logging pane */
+        virtual void log_indent()=0;
+        /** \brief undo former log_indent() */
+        virtual void log_unindent()=0;
+
+        /** \brief log project text message
+         *  \param message the message to log
+         */
+        virtual void log_text(QString message)=0;
+        /** \brief log project warning message
+         *  \param message the warning message to log
+         */
+        virtual void log_warning(QString message)=0;
+        /** \brief log project error message
+         *  \param message the error message to log
+         */
+        virtual void log_error(QString message)=0;
+};
+
 /*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
     \ingroup qf3plugintools
 */
@@ -119,4 +146,6 @@ class QFExtensionServices: public QFPluginServices {
         /** \brief returns a QFExtensionManager object that allows access to all currently loaded QFExtensions */
         virtual QFExtensionManager* getExtensionManager()=0;
 };
+
+
 #endif // QFPLUGINSERVICES_H

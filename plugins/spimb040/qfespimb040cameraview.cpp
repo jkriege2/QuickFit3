@@ -2,7 +2,7 @@
 
 #include <QtGui>
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(QFExtensionManager* extManager, QWidget* parent):
+QFESPIMB040CameraView::QFESPIMB040CameraView(const QString& logfile, QFExtensionManager* extManager, QWidget* parent):
     QWidget(parent)
 {
     setWindowIcon(QIcon(":/spimb040_logo.png"));
@@ -46,7 +46,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QFExtensionManager* extManager, QWi
 
 
     // create widgets and actions
-    createMainWidgets();
+    createMainWidgets(logfile);
     createActions();
 
 
@@ -66,7 +66,7 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
     free(histogram_y);
 }
 
-void QFESPIMB040CameraView::createMainWidgets() {
+void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
 
     ///////////////////////////////////////////////////////////////
     // create main layout, toolbar and Splitters
@@ -135,7 +135,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     // create log widget
     ///////////////////////////////////////////////////////////////
     logMain=new QtLogFile(this);
-    logMain->open_logfile(QString(QApplication::applicationDirPath()+"/spimb040.log"), true);
+    logMain->open_logfile(logfile, true);
     tabResults->addTab(logMain, tr("&Logging"));
 
 
@@ -704,6 +704,7 @@ void QFESPIMB040CameraView::disConnectAcquisition() {
             actCameraConfig->setEnabled(false);
             if (cam->isConnected(camIdx))  {
                 cam->disconnectDevice(camIdx);
+                cam->setLogging(NULL);
             }
             logMain->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
         }
@@ -890,8 +891,10 @@ void QFESPIMB040CameraView::connectDevice(int device, int camera) {
 
     if (cam) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        cam->setLogging(this);
         bool s=cam->connectDevice(camera);
         if (!s) {
+            cam->setLogging(NULL);
             logMain->log_error(tr("error connecting to device %1, camera %2 ...\n").arg(extension->getName()).arg(camera));
         } else {
             acquireSingle();

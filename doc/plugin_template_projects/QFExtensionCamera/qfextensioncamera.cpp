@@ -6,7 +6,7 @@
 QFExtensionCameraImplementation::QFExtensionCameraImplementation(QObject* parent):
     QObject(parent)
 {
-
+	logService=NULL;
 }
 
 QFExtensionCameraImplementation::~QFExtensionCameraImplementation() {
@@ -53,11 +53,42 @@ unsigned int QFExtensionCameraImplementation::getCameraCount() {
 
 void QFExtensionCameraImplementation::showSettingsWidget(unsigned int camera, QWidget* parent) {
 	/* open a dialog that configures the camera.
-	   
+
 	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK
-	   
+
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
+	*/
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////
+	// if you want the settings dialog to be modal, you may uncomment the next lines
+	// and add implementations
+	/////////////////////////////////////////////////////////////////////////////////
+    /*
+	QDialog* dlg=new QDialog(parent);
+
+    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    dlg->setLayout(lay);
+
+    QFormLayout* formlayout=new QFormLayout(dlg);
+
+
+    //  create your widgets here, do not to initialize them with the current settings 
+
+
+    lay->addLayout(formlayout);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
+    lay->addWidget(buttonBox);
+
+    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
+
+    if ( dlg->exec()==QDialog::Accepted ) {
+         //  read back values entered into the widgets
+    }
+    delete dlg;
 	*/
 }
 
@@ -96,6 +127,32 @@ void QFExtensionCameraImplementation::disconnectDevice(unsigned int camera) {
 double QFExtensionCameraImplementation::getExposureTime(unsigned int camera) {
     return /* exposure time of the last image */;
 }
+
+void QFExtensionCameraImplementation::log_indent() {
+	if (logService) logService->log_indent();
+	else if (services) services->log_indent();
+}
+
+void QFExtensionCameraImplementation::log_unindent() {
+	if (logService) logService->log_unindent();
+	else if (services) services->log_unindent();
+}
+
+void QFExtensionCameraImplementation::log_text(QString message) {
+	if (logService) logService->log_text(message);
+	else if (services) services->log_text(message);
+}
+
+void QFExtensionCameraImplementation::log_warning(QString message) {
+	if (logService) logService->log_warning(message);
+	else if (services) services->log_warning(message);
+}
+
+void QFExtensionCameraImplementation::log_error(QString message) {
+	if (logService) logService->log_error(message);
+	else if (services) services->log_error(message);
+}
+
 
 
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraImplementation)
