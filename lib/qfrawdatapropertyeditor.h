@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QPointer>
+#include <QMap>
 #include "qfproject.h"
 #include "qfrawdatarecord.h"
 #include "programoptions.h"
@@ -58,6 +59,8 @@ class QFRawDataPropertyEditor : public QWidget {
         void deletePropClicked();
         /** \brief resize the cells in the properties table */
         void resizePropertiesTable();
+
+        void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -93,6 +96,8 @@ class QFRawDataPropertyEditor : public QWidget {
         ProgramOptions* settings;
         /** \brief tabel display the evaluation results associated with this file  */
         QEnhancedTableView* tvResults;
+        /** \brief label for averaging over selected values in tvResults */
+        QLabel* labAveragedresults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
         /** \brief help widget for evaluation */

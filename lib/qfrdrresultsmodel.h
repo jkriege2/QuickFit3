@@ -30,7 +30,8 @@ class QFRDRResultsModel : public QAbstractTableModel {
         QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
         enum {
-            ValueRole=Qt::UserRole
+            ValueRole=Qt::UserRole,
+            NameRole=Qt::UserRole+1
         };
     private slots:
         void resultsChanged();

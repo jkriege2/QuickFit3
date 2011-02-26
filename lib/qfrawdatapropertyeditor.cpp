@@ -55,6 +55,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         disconnect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesTable()));
         disconnect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
+        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         if (c) {
             if (c->getType()!=oldType) {
                 for (int i=editorList.size()-1; i>=0; i--) {
@@ -116,7 +117,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         tvProperties->setModel(current->getPropertyModel());
         tvProperties->setEnabled(true);
         tvResults->setModel(current->resultsGetModel());
-        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
@@ -296,6 +297,10 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     rwvlayout->addWidget(tvResults);
     tabMain->addTab(widResults, tr("Evaluation &Results"));
+    labAveragedresults=new QLabel(widResults);
+    labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    rwvlayout->addWidget(labAveragedresults);
 
     helpWidget=new QFHTMLHelpWindow(this);
     tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
@@ -398,7 +403,54 @@ void QFRawDataPropertyEditor::writeSettings() {
     }
 }
 
-
+void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+    QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
+    QMap<int, QString> names;
+    QMap<int, double> sum, sum2, count;
+    for (int i=0; i<sel.size(); i++) {
+        int r=sel[i].row();
+        int c=sel[i].column();
+        QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
+        QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
+        double d=0;
+        bool ok=false;
+        if (data.canConvert(QVariant::Double)) {
+            d=data.toDouble();
+            ok=true;
+        }
+        if (data.canConvert(QVariant::PointF)) {
+            d=data.toPointF().x();
+            ok=true;
+        }
+        if (data.type()==QVariant::String) { ok=false; }
+        if (ok) {
+            if (names.contains(r)) {
+                sum[r] = sum[r]+d;
+                sum2[r] = sum2[r]+d*d;
+                count[r] = count[r]+1;
+            } else {
+                sum[r] = d;
+                sum2[r] = d*d;
+                count[r] = 1;
+                names[r] = name;
+            }
+        }
+    }
+    QString results=tr("<table border=\"1\"><tr><td><b>Field</b></td><td><b>Average +/- StdDev</b></td></tr>");
+    QMapIterator<int, QString> it(names);
+    while (it.hasNext()) {
+        it.next();
+        QString name=it.value();
+        int i=it.key();
+        if (count[i]>0) {
+            double avg=sum[i]/count[i];
+            double error=sqrt(sum2[i]/count[i]-sum[i]*sum[i]/count[i]/count[i]);
+            results+=QString("<tr><td><b>%1</b></td><td>%2 &plusmn; %3</td></tr>").arg(name).arg(roundWithError(avg, error)).arg(roundError(error));
+        }
+    }
+    results+=tr("</table>");
+    labAveragedresults->setText(results);
+}
 
 
 

@@ -31,6 +31,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/jkdoubleedit.h \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.h \
            ../../../../LIB/trunk/qt/colorcombobox.h \
+           ../../../../LIB/trunk/qt/jkstyledbutton.h \
+           ../../../../LIB/trunk/qt/qenhancedlineedit.h \
+           ../../../../LIB/trunk/qt/qspecialtoolbutton.h \
            qehtreeview.h \
            datacutslider.h \
            qffitparameterbasicinterface.h \
@@ -56,6 +59,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/qt/jkdoubleedit.cpp \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.cpp \
            ../../../../LIB/trunk/qt/colorcombobox.cpp \
+           ../../../../LIB/trunk/qt/jkstyledbutton.cpp \
+           ../../../../LIB/trunk/qt/qenhancedlineedit.cpp \
+           ../../../../LIB/trunk/qt/qspecialtoolbutton.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
@@ -63,7 +69,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
 
 FORMS += qfdlg_csvparameters.ui
 
-RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc
+RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
+             ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
+             ../../../../LIB/trunk/qt/jkstyledbutton.qrc
 
 TRANSLATIONS= ../output/translations/de.ts
 

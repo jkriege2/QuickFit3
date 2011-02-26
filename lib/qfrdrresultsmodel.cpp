@@ -63,7 +63,7 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                 return QVariant(QString("%1 +/ %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
             }
         }
-    } else if (role==ValueRole) {
+    } else if ((role==ValueRole)||(role==Qt::EditRole)) {
         if (index.row()<lastResultNames.size()) {
             if (index.column()<record->resultsGetEvaluationCount()) {
                 QString en=record->resultsGetEvaluationName(index.column());
@@ -71,6 +71,10 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                     return record->resultsGetAsQVariant(en, lastResultNames[index.row()]);
                 }
             }
+        }
+    } else if (role==NameRole) {
+        if (index.row()<lastResultNames.size()) {
+            return QVariant(lastResultNames[index.row()]);
         }
     }
 

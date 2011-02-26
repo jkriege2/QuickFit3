@@ -10,7 +10,6 @@
     \section qf3todo_widgetlib QuickFit Widgets Library
 
     \section qf3todo_rdrplugins Raw Data Plugins
-    \todo implement averaging over selected values in QFRawDataPropertyEditor (results pane)
     \todo delete fit results in QFRawDataPropertyEditor
     \todo save fit results in QFRawDataPropertyEditor to CSV (DIF, SYLK, ..) file
     \todo implement RDR plugin for images and image series

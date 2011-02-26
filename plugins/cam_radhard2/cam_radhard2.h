@@ -7,7 +7,10 @@
 #include "../interfaces/qfextensioncamera.h"
 #include "radhard2lib/radhard2.h"
 #include "radhard2lib/radhard2lib.h"
+#include "radhard2lib/radhard2flash.h"
 #include "highrestimer.h"
+#include "qenhancedlineedit.h"
+#include "jkstyledbutton.h"
 
 
 
@@ -22,6 +25,16 @@
 
 /*! \brief QFExtensionCamera implementation for Radhard2 SPAD array
     \ingroup qf3ext_radhard2
+
+    This extensions allows access to data from the Radhard2 SPAD array. The array is produced by the
+    group of Prof. Edoardo Charbon from the EPF Lausanne and TU Delft. It features 32x32 pixels and a readout
+    time of at least 100kFrames/sec. This plugin operates together with the original firmware, which
+    may be loaded, using the menu entry this plugin creates.
+
+    This plugin reads/write configuration data to an INI file: \c plugins/extension/cam_radhard2/cam_radhard2.ini
+
+    Loading a new Firmware into the FPGA uses code provided by E.Charbon, which may be found in SVN:
+    \c B040/SPIM/trunk/docs_from_edoardo/radhard_stuff/radhard/software/usbflashloader
  */
 class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public QFExtensionCamera {
         Q_OBJECT
@@ -55,6 +68,9 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
 
     protected:
         QFPluginLogService* logService;
+        /** \brief QAction used to program the FPGA */
+        QAction* actProgramFPGA;
+
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
         /** \copydoc QFExtensionBase::initExtension() */
@@ -121,6 +137,11 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         void sendDivider();
         /** \brief send the iterations to the hardware */
         void sendIterations();
+        /** \brief program the FPGA */
+        void programFPGA();
+        void programFPGAClicked();
+        /** \brief program the given \a bitfile into the FPGA (m for master or s for slave) */
+        QString flashFPGA(QString bitfile, char fpga='m');
 
     protected:
         /** \brief are we connected? */
@@ -139,6 +160,12 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
 
         /** \brief subtract an offset of 1 */
         bool subtractOne;
+
+        /** \brief Bitfile for programming */
+        QString bitfile;
+
+        QEnhancedLineEdit* edtBitfile;
+        QLabel* labFlashSuccess;
 
 };
 

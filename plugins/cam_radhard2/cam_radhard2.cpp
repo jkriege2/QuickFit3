@@ -14,6 +14,9 @@ QFExtensionCameraRadhard2::QFExtensionCameraRadhard2(QObject* parent):
     iterations=100;
     divider=1;
     logService=NULL;
+    edtBitfile=NULL;
+    labFlashSuccess=NULL;
+    bitfile=QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/radhard2_top_cell.bit";
 }
 
 QFExtensionCameraRadhard2::~QFExtensionCameraRadhard2() {
@@ -32,9 +35,72 @@ void QFExtensionCameraRadhard2::projectChanged(QFProject* oldProject, QFProject*
 }
 
 void QFExtensionCameraRadhard2::initExtension() {
-    /* do initializations here but do not yet connect to the camera! */
+    services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
+    actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
+    connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
+    QMenu* extm=services->getMenu("extensions");
+    QMenu* subMenu=extm->addMenu(tr("Radhard 2 Tools"))
+    if (extm) {
+        subMenu->addAction(actProgramFPGA);
+    }
+
     loadSettings(NULL);
+
+    services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 }
+
+void QFExtensionCameraRadhard2::programFPGA() {
+    QDialog* dlg=new QDialog(this);
+
+    QGridLayout* lay=new QGridLayout(dlg);
+    dlg->setLayout(lay);
+
+    edtBitfile=new QEnhancedLineEdit(dlg);
+    QLabel* l=new QLabel(tr("&Bitfile:"), dlg);
+    l->setBuddy(edtBitfile);
+    JKStyledButton* btnSelect=new JKStyledButton(JKStyledButton::SelectFile, edtBitfile, dlg);
+    edtBitfile->addButton(btnSelect);
+    edtBitfile->setText(bitfile);
+
+    QPushButton* btnFlash=new QPushButton(tr("&Flash"), this);
+    connect(btnFlash, SIGNAL(clicked()), this, SLOT(programFPGAClicked()));
+
+    labFlashSuccess=new QLabel(this);
+    labFlashSuccess->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
+
+    QPushButton* btnClose=new QPushButton(tr("&Close"), this);
+    connect(btnClose, SIGNAL(clicked()), dlg, SLOT(accept()));
+
+    lay->addWidget(l, 0, 0);
+    lay->addWidget(edtBitfile, 0, 1, 1, 3);
+    lay->addWidget(btnFlash, 1, 1, 1, 1);
+    lay->addWidget(labFlashSuccess, 2, 1, 1, 3);
+    lay->addWidget(btnClose, 3, 3);
+
+    dlg->resize(500,200);
+    dlg->exec();
+    bitfile=edtBitfile->text();
+    storeSettings(NULL);
+    delete dlg;
+    edtBitfile=NULL;
+    labFlashSuccess=NULL;
+}
+
+void QFExtensionCameraRadhard2::programFPGAClicked() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    if (edtBitfile) {
+        QString message=flashFPGA(edtBitfile->text(), 'm');
+        if (labFlashSuccess) labFlashSuccess->setText(message);
+    }
+    QApplication::restoreOverrideCursor();
+}
+
+QString QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga) {
+    char message[1024];
+    flash_bitfile(bitfile.toAscii().data(), message, fpga);
+    return QString(message);
+}
+
 
 void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
     //QSettings& settings=*(settingspo->getQSettings());
@@ -42,6 +108,7 @@ void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
     iterations=settings.value("radhard2/iterations", iterations).toInt();
     divider=settings.value("radhard2/divider", divider).toInt();
     subtractOne=settings.value("radhard2/subtract_one", subtractOne).toBool();
+    bitfile=settings.value("radhard2/bitfile", bitfile).toString();
 }
 
 void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
@@ -50,6 +117,7 @@ void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
     settings.setValue("radhard2/iterations", iterations);
     settings.setValue("radhard2/divider", divider);
     settings.setValue("radhard2/subtract_one", subtractOne);
+    settings.setValue("radhard2/bitfile", bitfile);
 }
 
 unsigned int QFExtensionCameraRadhard2::getCameraCount() {

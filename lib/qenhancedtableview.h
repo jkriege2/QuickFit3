@@ -13,7 +13,10 @@ class QEnhancedTableView : public QTableView
     public:
         QEnhancedTableView(QWidget* parent=NULL);
         virtual ~QEnhancedTableView();
+    public slots:
+        void copySelectionToExcel();
     protected:
+        virtual void keyPressEvent(QKeyEvent* event);
     private:
 };
 
