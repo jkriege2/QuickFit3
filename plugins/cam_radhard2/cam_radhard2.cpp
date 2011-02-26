@@ -39,7 +39,7 @@ void QFExtensionCameraRadhard2::initExtension() {
     actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
-    QMenu* subMenu=extm->addMenu(tr("Radhard 2 Tools"))
+    QMenu* subMenu=extm->addMenu(tr("Radhard 2 Tools"));
     if (extm) {
         subMenu->addAction(actProgramFPGA);
     }
@@ -50,7 +50,7 @@ void QFExtensionCameraRadhard2::initExtension() {
 }
 
 void QFExtensionCameraRadhard2::programFPGA() {
-    QDialog* dlg=new QDialog(this);
+    QDialog* dlg=new QDialog(NULL);
 
     QGridLayout* lay=new QGridLayout(dlg);
     dlg->setLayout(lay);
@@ -62,13 +62,13 @@ void QFExtensionCameraRadhard2::programFPGA() {
     edtBitfile->addButton(btnSelect);
     edtBitfile->setText(bitfile);
 
-    QPushButton* btnFlash=new QPushButton(tr("&Flash"), this);
+    QPushButton* btnFlash=new QPushButton(tr("&Flash"), dlg);
     connect(btnFlash, SIGNAL(clicked()), this, SLOT(programFPGAClicked()));
 
-    labFlashSuccess=new QLabel(this);
+    labFlashSuccess=new QLabel(dlg);
     labFlashSuccess->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
 
-    QPushButton* btnClose=new QPushButton(tr("&Close"), this);
+    QPushButton* btnClose=new QPushButton(tr("&Close"), dlg);
     connect(btnClose, SIGNAL(clicked()), dlg, SLOT(accept()));
 
     lay->addWidget(l, 0, 0);
