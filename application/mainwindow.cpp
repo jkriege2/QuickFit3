@@ -729,7 +729,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
         if (nt==QFProjectTreeModel::qfpntRawDataRecord) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(index);
             if (rec) {
-                QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
+                QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 rawDataPropEditors.append(edt);
                 edt->show();
@@ -737,7 +737,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
         } else if (nt==QFProjectTreeModel::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
-                QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
+                QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
                 //QFEvaluationPropertyEditor* edt=rec->createPropertyEditor(settings, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 evaluationPropEditors.append(edt);

@@ -9,6 +9,8 @@ INCLUDEPATH += . \
                ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt
 DESTDIR = ../output
+#QMAKE_LFLAGS_RPATH += .
+QMAKE_RPATHDIR += ../output/
 
 LIBS += -L../output/ -lquickfit3lib -lquickfit3widgets
 # Input
