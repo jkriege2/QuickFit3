@@ -78,6 +78,7 @@ TRANSLATIONS= ../output/translations/de.ts
 INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
+CONFIG += exceptions rtti stl
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

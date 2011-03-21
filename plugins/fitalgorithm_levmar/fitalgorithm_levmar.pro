@@ -6,7 +6,7 @@ TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/fitalgorithms/
 #DLLDESTDIR = $$DESTDIR
-LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -llevmar -llapack -lblas -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += fitalgorithm_levmar.h \
@@ -28,7 +28,7 @@ INCLUDEPATH += ../../lib/ \
 
 
 QT += core
-
+CONFIG += exceptions rtti stl
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/

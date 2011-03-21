@@ -32,7 +32,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/qt/
 
 QT += gui xml svg core
-
+CONFIG += exceptions rtti stl
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/

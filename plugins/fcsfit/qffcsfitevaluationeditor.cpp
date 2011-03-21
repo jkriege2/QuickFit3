@@ -471,6 +471,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
 
     if (fcs) {
+        
         dataEventsEnabled=false;
         chkXLogScale->setChecked(current->getProperty("plot_taulog", true).toBool());
         chkGrid->setChecked(current->getProperty("plot_grid", true).toBool());
@@ -573,10 +574,11 @@ void QFFCSFitEvaluationEditor::writeSettings() {
 
 void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(currentRecord);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
     bool modelChanged=false;
+    std::cout<<"QFFCSFitEvaluationEditor::highlightingChanged("<<formerRecord<<", "<<currentRecord<<")  eval="<<eval<<"   data="<<data<<"\n";
     if (data) {
         //labRecord->setText(tr("<b>current:</b> <i>%1</i>").arg(currentRecord->getName()) );
         connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
@@ -608,8 +610,8 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
 void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     if (!current) return;
     if (!cmbModel) return;
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
     if (!ffunc) {
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -739,8 +741,8 @@ void QFFCSFitEvaluationEditor::parameterRangeChanged() {
 void QFFCSFitEvaluationEditor::updateParameterValues() {
     if (!current) return;
     if (!cmbModel) return;
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
 
     if (!ffunc) return;
@@ -777,8 +779,8 @@ void QFFCSFitEvaluationEditor::replotData() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -910,8 +912,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -1211,8 +1213,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
 
 void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
@@ -1418,8 +1420,8 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
@@ -1454,8 +1456,8 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
@@ -1497,7 +1499,7 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
 void QFFCSFitEvaluationEditor::fitAll() {
     if (!current) return;
     if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
@@ -1526,7 +1528,7 @@ void QFFCSFitEvaluationEditor::fitAll() {
     // iterate through all records and all runs therein and do the fits
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
-        QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
         //std::cout<<"i="<<i<<"   run="<<run<<"   record="<<record<<"   data="<<data<<"\n";
 
         if (record && data) {
@@ -1553,7 +1555,7 @@ void QFFCSFitEvaluationEditor::fitAll() {
 void QFFCSFitEvaluationEditor::fitRunsAll() {
     if (!current) return;
     if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
@@ -1575,7 +1577,7 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
     int items=0;
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
-        QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
 
         if (record && data) {
             int runmax=data->getCorrelationRuns();
@@ -1588,7 +1590,7 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
     // iterate through all records and all runs therein and do the fits
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
-        QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
+        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
 
         if (record && data) {
             int runmax=data->getCorrelationRuns();
@@ -1621,7 +1623,7 @@ void QFFCSFitEvaluationEditor::resetCurrent() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     eval->resetAllFitResultsCurrentCurrentRun();
@@ -1634,7 +1636,7 @@ void QFFCSFitEvaluationEditor::resetAll() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     eval->resetAllFitResults();
@@ -1647,7 +1649,7 @@ void QFFCSFitEvaluationEditor::copyToAll() {
 
     if (!current) return;
     if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     copyToInitial();
 
@@ -1666,7 +1668,7 @@ void QFFCSFitEvaluationEditor::copyToAll() {
         if (ffunc->isParameterVisible(i, params)) {
             for (int i=0; i<recs.size(); i++) {
                 QFRawDataRecord* record=recs[i];
-                QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(record);
+                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
                 if (fcs) {
                     int runmax=fcs->getCorrelationRuns();
                     if (runmax<=1) runmax=0;
@@ -1689,7 +1691,7 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
 
     if (!current) return;
     if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     copyToInitial();
 
@@ -1708,7 +1710,7 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
         if (ffunc->isParameterVisible(i, params)) {
             for (int i=0; i<recs.size(); i++) {
                 QFRawDataRecord* record=recs[i];
-                QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(record);
+                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
                 if (fcs) {
                     int runmax=fcs->getCorrelationRuns();
                     if (runmax<=1) runmax=0;
@@ -1733,8 +1735,8 @@ void QFFCSFitEvaluationEditor::copyToInitial() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     if (!fcs) return;
 
@@ -1815,7 +1817,7 @@ void QFFCSFitEvaluationEditor::printReport() {
 void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1824,7 +1826,7 @@ void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
 void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_grid", chkGrid->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1833,7 +1835,7 @@ void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
 void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_style", cmbPlotStyle->currentIndex(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1842,7 +1844,7 @@ void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
 void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_errorstyle", cmbErrorStyle->currentIndex(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1851,7 +1853,7 @@ void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
 void QFFCSFitEvaluationEditor::residualStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_residualsstyle", cmbResidualStyle->currentIndex(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1860,7 +1862,7 @@ void QFFCSFitEvaluationEditor::residualStyleChanged(int style) {
 void QFFCSFitEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("weighted_residuals", chkWeightedResiduals->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1869,7 +1871,7 @@ void QFFCSFitEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
 void QFFCSFitEvaluationEditor::residualHistogramBinsChanged(int bins) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_residualshistogrambins", spinResidualHistogramBins->value(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -1880,7 +1882,7 @@ void QFFCSFitEvaluationEditor::residualHistogramBinsChanged(int bins) {
 void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
     hlpFunction->clear();
     if (!current) return;
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     QStringList sl;
     sl<<":/";
     QString ppid=cmbModel->itemData(cmbModel->currentIndex()).toString();
@@ -1894,7 +1896,7 @@ void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
 void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     hlpAlgorithm->clear();
     if (!current) return;
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     QStringList sl;
     sl<<":/";
     QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
@@ -1911,7 +1913,7 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
 
 void QFFCSFitEvaluationEditor::configFitAlgorithm() {
     if (!current) return;
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!data) return;
     QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
@@ -1925,7 +1927,7 @@ void QFFCSFitEvaluationEditor::configFitAlgorithm() {
 void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!dataEventsEnabled) return;
     if (!current) return;
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!data) return;
     if (!current->getHighlightedRecord()) return;
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
@@ -1938,14 +1940,14 @@ void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min,
 
 void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
     if (!current) return;
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!data) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     for (int i=0; i<recs.size(); i++) {
         if (current->isApplicable(recs[i])) {
-            QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
+            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
             recs[i]->setQFProperty(resultID+"_ravg_datacut_min", userMin, false, false);
 
             for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
@@ -1963,14 +1965,14 @@ void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
 
 void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
     if (!current) return;
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!data) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     for (int i=0; i<recs.size(); i++) {
         if (current->isApplicable(recs[i])) {
-            QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(recs[i]);
+            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
             recs[i]->setQFProperty(resultID+"_ravg_datacut_max", userMax, false, false);
 
             for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
@@ -1993,8 +1995,8 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     if (!current->getHighlightedRecord()) return;
 
     QFRawDataRecord* currentRecord=current->getHighlightedRecord();
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
-    QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(currentRecord);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
 
     data->setCurrentRun(run);
 
@@ -2020,7 +2022,7 @@ void QFFCSFitEvaluationEditor::modelChanged(int model) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     QString ff=cmbModel->itemData(cmbModel->currentIndex()).toString();
     data->setFitFunction(ff);
     displayModel(true);
@@ -2034,7 +2036,7 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (data) {
         if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
         else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
@@ -2049,7 +2051,7 @@ void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     current->getHighlightedRecord()->setQFProperty("algorithm", cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString(), false, false);
-    QFFCSFitEvaluation* data=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     QString alg=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
     data->setFitAlgorithm(alg);
     QApplication::restoreOverrideCursor();
@@ -2074,8 +2076,8 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK) {
     if (!current) return NULL;
     if (!cmbModel) return NULL;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=dynamic_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=dynamic_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     QFFitFunction* ffunc=eval->getFitFunction();

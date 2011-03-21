@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quickfitproject quickfit_version="3.0" name="unnamed" creator="">
+    <description><![CDATA[]]></description>
+    <properties/>
+    <rawdata>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_0ul_1.ASC - CH0" id="0">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="13:49:03" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_2nM_Al488_0ul_1.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+        <rawdataelement type="fcs" name="DNA_2nM_Al488_10ul.ASC - CH0" id="1">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
+                <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
+                <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
+                <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
+                <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
+                <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
+                <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="12:06:05" usereditable="false" visible="true"/>
+                <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+            </properties>
+            <results/>
+            <files>
+                <file>testdata/DNA_2nM_Al488_10ul.ASC</file>
+            </files>
+            <data/>
+        </rawdataelement>
+    </rawdata>
+    <evaluations>
+        <evaluationelement type="fcs_fit" name="FCS Fit" id="2">
+            <description><![CDATA[]]></description>
+            <properties/>
+            <data>
+                <algorithms current="fit_levmar" weighting="equal">
+                    <algorithm id="fit_levmar">
+                        <parameter id="epsilon1" type="double" data="1e-17"/>
+                        <parameter id="epsilon2" type="double" data="1e-17"/>
+                        <parameter id="epsilon3" type="double" data="1e-17"/>
+                        <parameter id="gradient_delta" type="double" data="1e-06"/>
+                        <parameter id="max_iterations" type="int" data="3000"/>
+                        <parameter id="mu" type="double" data="0.001"/>
+                    </algorithm>
+                    <algorithm id="fit_simanneal">
+                        <parameter id="c" type="int" data="2"/>
+                        <parameter id="fmax" type="int" data="1"/>
+                        <parameter id="max_iterations" type="int" data="50000"/>
+                        <parameter id="nepsilon" type="int" data="4"/>
+                        <parameter id="ns" type="int" data="20"/>
+                        <parameter id="nt" type="int" data="50"/>
+                        <parameter id="rt" type="double" data="0.5"/>
+                        <parameter id="t0" type="double" data="0.001"/>
+                    </algorithm>
+                </algorithms>
+                <functions current="fcs_adiff"/>
+            </data>
+        </evaluationelement>
+    </evaluations>
+</quickfitproject>

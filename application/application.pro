@@ -36,7 +36,7 @@ INCLUDEPATH += ../../../../LIB/trunk/
 RC_FILE = quickfit3.rc
 
 QT += gui xml
-CONFIG += console
+CONFIG += console exceptions rtti stl
 
 
 
