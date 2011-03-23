@@ -50,8 +50,8 @@ class QFExtensionCamera {
          virtual void disconnectDevice(unsigned int camera)=0;
          /** \brief returns the acquisition time (time the camera is open) in seconds */
          virtual double getExposureTime(unsigned int camera)=0;
-        /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
-        virtual void setLogging(QFPluginLogService* logService)=0;
+         /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
+         virtual void setLogging(QFPluginLogService* logService)=0;
 
 
 };

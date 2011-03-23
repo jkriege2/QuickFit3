@@ -19,7 +19,6 @@
     \todo implement FCS correlation curve transform to RMS(tau) curve
 
     \subsection qf3todo_fcsfit Plugin: FCS Fit
-    \todo impement residual statistics
     \todo implement print/export report with all fit parameters and fit statistics data
     \todo implement more estimators for fit data weighting
     \todo possibly implement additional possibilities to estmate parameter confidence intervals (additional to jacobian), like monte-carlo methods

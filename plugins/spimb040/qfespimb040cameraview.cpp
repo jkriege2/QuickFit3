@@ -9,6 +9,8 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(const QString& logfile, QFExtension
 
     acqTime=1;
 
+    cam=NULL;
+
 
     // more variable initialisation
     imageStatisticsCalculated=false;

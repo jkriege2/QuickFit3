@@ -44,7 +44,7 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
 	void diconnectCurrentCamra();
     protected:
         void closeEvent ( QCloseEvent * event );
-      
+
         /** \brief create main widgets */
         void createMainWidgets(const QString& logfile);
         /** \brief create actions and register them to toolbar */
@@ -134,6 +134,14 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         QAction* actMaskSave;
         /** \brief action to load mask */
         QAction* actMaskLoad;
+
+
+        /** \brief the camera extension this class is connected to.
+         *
+         * This is \c NULL if the class is not connected to any device.
+         */
+        QFExtensionCamera* cam;
+
 
 
 

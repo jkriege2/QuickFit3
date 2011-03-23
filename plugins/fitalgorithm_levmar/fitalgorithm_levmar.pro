@@ -6,7 +6,8 @@ TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/fitalgorithms/
 #DLLDESTDIR = $$DESTDIR
-LIBS += -llevmar -llapack -lblas -L../../output/ -lquickfit3lib -lquickfit3widgets
+win:LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
+unix:LIBS += -llapack -lblas -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += fitalgorithm_levmar.h \
@@ -15,7 +16,7 @@ HEADERS += fitalgorithm_levmar.h \
 SOURCES += fitalgorithm_levmar.cpp \
            levmarconfig.cpp
 
-FORMS += 
+FORMS +=
 
 RESOURCES +=
 
