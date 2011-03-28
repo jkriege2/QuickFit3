@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#define LOG_PREFIX "Radhard2:  "
+
 QFExtensionCameraRadhard2::QFExtensionCameraRadhard2(QObject* parent):
     QObject(parent)
 {
@@ -35,7 +37,7 @@ void QFExtensionCameraRadhard2::projectChanged(QFProject* oldProject, QFProject*
 }
 
 void QFExtensionCameraRadhard2::initExtension() {
-    services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
+    services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
     actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
@@ -46,7 +48,7 @@ void QFExtensionCameraRadhard2::initExtension() {
 
     loadSettings(NULL);
 
-    services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
+    services->log_global_text(tr("%2initializing extension '%1' ... DONE\n").arg(getName()).arg(LOG_PREFIX));
 }
 
 void QFExtensionCameraRadhard2::programFPGA() {
@@ -89,16 +91,21 @@ void QFExtensionCameraRadhard2::programFPGA() {
 void QFExtensionCameraRadhard2::programFPGAClicked() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     if (edtBitfile) {
-        QString message=flashFPGA(edtBitfile->text(), 'm');
+        QString message;
+        bool ok=flashFPGA(edtBitfile->text(), 'm', message);
         if (labFlashSuccess) labFlashSuccess->setText(message);
+        if (!ok) {
+            QMessageBox::critical(NULL, tr("Radhard2 driver"), tr("Could not program Radhard2 FPGA, see dialog for error message!"));
+        }
     }
     QApplication::restoreOverrideCursor();
 }
 
-QString QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga) {
-    char message[1024];
-    flash_bitfile(bitfile.toAscii().data(), message, fpga);
-    return QString(message);
+bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& messageOut) {
+    char message[8192];
+    int res=flash_bitfile(bitfile.toAscii().data(), message, fpga);
+    messageOut = QString(message);
+    return res!=0;
 }
 
 
@@ -203,7 +210,7 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
     sendDivider();
 
     if ((!conn) || (!radhard2)) {
-        log_error(tr("Radhard2: not connected to hardware."));
+        log_error(tr("not connected to hardware."));
         return false;
     }
     if (timestamp!=NULL) {
@@ -217,7 +224,7 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
     radhard2->SendCommand(CMD_START_ACQUISITION);
     radhard2->ReadData(&result);
     if(result != OPERATION_DONE) {
-		log_error(tr("Radhard2: Received wrong ack constant after START_ACQUISITION (result was %1) command.\n").arg(8,16));
+		log_error(tr("Received wrong ACK constant after START_ACQUISITION (result was %1) command.\n").arg(8,16));
     }
 
     usleep(20000 + 2* int(exposureT));
@@ -239,14 +246,29 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
 bool QFExtensionCameraRadhard2::connectDevice(unsigned int camera) {
     conn=false;
     if (radhard2) delete radhard2;
+
+    if (QFile(bitfile).exists()) {
+        log_text(tr("flashing Radhard2 FPGAs (bit file: %1)\n").arg(bitfile));
+        QString flashMessage;
+        bool ok=flashFPGA(bitfile, 'm', flashMessage);
+        flashMessage.replace('\n', QString("\n%1  ").arg(LOG_PREFIX));
+        if (ok) {
+            log_text(tr("  %2\nflashing Radhard2 FPGAs (bit file: %1) ... DONE!\n").arg(bitfile).arg(flashMessage));
+        } else {
+            log_error(tr("  %2\nflashing Radhard2 FPGAs (bit file: %1) ... ERROR!\n").arg(bitfile).arg(flashMessage));
+            return false;
+        }
+    } else {
+        log_warning(tr("could not flash Radhard2 FPGAs, as bit file '%1' does not exist!\n").arg(bitfile));
+    }
+
     radhard2=new Radhard2;
-    //radhard2->OpenUsbDevice();
     radhard2->SendCommand(CMD_TEST_COMLINK, 0);
     unsigned int magicn=0;
     radhard2->ReadData(&magicn);
-    log_text(tr("Radhard2: connection initialized\nRadhard2: read: MAGIC_NUMBER = %1\n").arg(QString::number(magicn, 16).toUpper()));
+    log_text(tr("connection initialized\n%2read: MAGIC_NUMBER = %1\n").arg(QString::number(magicn, 16).toUpper()).arg(LOG_PREFIX));
     if (magicn!=MAGIC_NUMBER) {
-        log_error(tr("Radhard2: initialization failed (wrong magic number). Expected: MAGIC_NUMBER = %1\n").arg(QString::number(MAGIC_NUMBER, 16).toUpper()));
+        log_error(tr("initialization failed (wrong magic number). Expected: MAGIC_NUMBER = %1\n").arg(QString::number(MAGIC_NUMBER, 16).toUpper()));
         return false;
     }
     sendDivider();
@@ -259,8 +281,7 @@ bool QFExtensionCameraRadhard2::connectDevice(unsigned int camera) {
 void QFExtensionCameraRadhard2::disconnectDevice(unsigned int camera) {
     if (radhard2) delete radhard2;
     radhard2=NULL;
-    //radhard2->CloseUsbDevice();
-    log_text(tr("Radhard2: disconnected\n"));
+    log_text(tr("disconnected\n"));
     conn = false;
 }
 
@@ -276,7 +297,7 @@ void QFExtensionCameraRadhard2::updateAcquisitionTime() {
 void QFExtensionCameraRadhard2::sendDivider() {
     if (conn) {
         radhard2->SendCommand(CMD_SET_DIVIDER, divider);
-        //log_text(tr("Radhard2: setting DIVIDER = %1\n").arg(divider));
+        //log_text(tr("setting DIVIDER = %1\n").arg(divider));
     }
 }
 
@@ -286,37 +307,27 @@ void QFExtensionCameraRadhard2::sendIterations() {
         unsigned int result;
         radhard2->ReadData(&result);
         if(result == OPERATION_DONE) {
-            //log_text(tr("Radhard2: setting ITERATIONS = %1\n").arg(iterations));
+            //log_text(tr("setting ITERATIONS = %1\n").arg(iterations));
         } else {
-            log_error(tr("Radhard2: setting ITERATIONS = %1 failed! (result = %2)\n").arg(iterations).arg(QString::number(result, 16)));
+            log_error(tr("setting ITERATIONS = %1 failed! (result = %2)\n").arg(iterations).arg(QString::number(result, 16)));
         }
     }
 }
 
 
-void QFExtensionCameraRadhard2::log_indent() {
-	if (logService) logService->log_indent();
-	else if (services) services->log_indent();
-}
-
-void QFExtensionCameraRadhard2::log_unindent() {
-	if (logService) logService->log_unindent();
-	else if (services) services->log_unindent();
-}
-
 void QFExtensionCameraRadhard2::log_text(QString message) {
-	if (logService) logService->log_text(message);
-	else if (services) services->log_text(message);
+	if (logService) logService->log_text(LOG_PREFIX+message);
+	else if (services) services->log_text(LOG_PREFIX+message);
 }
 
 void QFExtensionCameraRadhard2::log_warning(QString message) {
-	if (logService) logService->log_warning(message);
-	else if (services) services->log_warning(message);
+	if (logService) logService->log_warning(LOG_PREFIX+message);
+	else if (services) services->log_warning(LOG_PREFIX+message);
 }
 
 void QFExtensionCameraRadhard2::log_error(QString message) {
-	if (logService) logService->log_error(message);
-	else if (services) services->log_error(message);
+	if (logService) logService->log_error(LOG_PREFIX+message);
+	else if (services) services->log_error(LOG_PREFIX+message);
 }
 
 

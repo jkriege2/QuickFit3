@@ -17,9 +17,9 @@ class QFPluginLogService {
         virtual ~QFPluginLogService() {}
 
         /** \brief indent all following lines in the logging pane */
-        virtual void log_indent()=0;
+        //virtual void log_indent()=0;
         /** \brief undo former log_indent() */
-        virtual void log_unindent()=0;
+        //virtual void log_unindent()=0;
 
         /** \brief log project text message
          *  \param message the message to log

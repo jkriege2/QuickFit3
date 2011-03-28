@@ -106,10 +106,6 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
-        /** \brief indent all following lines in the logging pane */
-        virtual void log_indent();
-        /** \brief undo former log_indent() */
-        virtual void log_unindent();
 
         /** \brief log project text message
          *  \param message the message to log
@@ -141,7 +137,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         void programFPGA();
         void programFPGAClicked();
         /** \brief program the given \a bitfile into the FPGA (m for master or s for slave) */
-        QString flashFPGA(QString bitfile, char fpga='m');
+        bool flashFPGA(QString bitfile, char fpga, QString& messageOut);
 
     protected:
         /** \brief are we connected? */

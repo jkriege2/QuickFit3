@@ -509,15 +509,7 @@ void QFECamTestCamera::setHotpixels1(int num) {
 }
 
 
-void QFECamTestCamera::log_indent() {
-	if (logService) logService->log_indent();
-	else if (services) services->log_indent();
-}
 
-void QFECamTestCamera::log_unindent() {
-	if (logService) logService->log_unindent();
-	else if (services) services->log_unindent();
-}
 
 void QFECamTestCamera::log_text(QString message) {
 	if (logService) logService->log_text(message);

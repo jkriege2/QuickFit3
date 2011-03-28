@@ -7,10 +7,6 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(const QString& logfile, QFExtension
 {
     setWindowIcon(QIcon(":/spimb040_logo.png"));
 
-    acqTime=1;
-
-    cam=NULL;
-
 
     // more variable initialisation
     imageStatisticsCalculated=false;
@@ -37,14 +33,6 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(const QString& logfile, QFExtension
     image.assign(rawImage);
 
 
-    // load available acquisition devices from extManager
-    QStringList ids=extManager->getIDList();
-    for (int i=0; i<ids.size(); i++) {
-        QObject* extobj=extManager->getQObjectInstance(ids[i]);
-        QFExtension* extension=extManager->getInstance(ids[i]);
-        QFExtensionCamera* cam = qobject_cast<QFExtensionCamera*>(extobj);
-        if (cam) cameras.append(extobj);
-    }
 
 
     // create widgets and actions
@@ -54,11 +42,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(const QString& logfile, QFExtension
 
 
     // display test images set above
-    prepareImage();
-    displayImageStatistics();
-    redrawFrame();
-    startStopAcquisition();
-    disConnectAcquisition();
+    clearImage();
 
 }
 
@@ -66,11 +50,6 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
 {
     free(histogram_x);
     free(histogram_y);
-}
-
-void QFESPIMB040CameraView::closeEvent ( QCloseEvent * event ) {
-    actDisConnectAcquisition->setChecked(false);
-    event->accept();
 }
 
 void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
@@ -138,13 +117,6 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     wPltMain->setLayout(vbl);
 
 
-    ///////////////////////////////////////////////////////////////
-    // create log widget
-    ///////////////////////////////////////////////////////////////
-    logMain=new QtLogFile(this);
-    logMain->open_logfile(logfile, true);
-    tabResults->addTab(logMain, tr("&Logging"));
-
 
 
     /////////////////////////////////////////////////////////////////////
@@ -161,7 +133,7 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     pltCountsHistogram->addPlot(plteHistogramRange);
     pltCountsHistogram->addPlot(plteHistogram);
     pltCountsHistogram->set_xAxisLabel("grayvalue");
-    pltCountsHistogram->set_yAxisLabel("frequency");
+    pltCountsHistogram->set_yAxisLabel("# pixels");
 
     vbl->addWidget(pltCountsHistogram);
     QHBoxLayout* hbl=new QHBoxLayout(w);
@@ -269,19 +241,6 @@ void QFESPIMB040CameraView::createActions() {
     actMaskEdit = new QAction(QIcon(":/spimb040/maskedit.png"), tr("&Edit mask (broken pixels)"), this);
     actMaskEdit->setCheckable(true);
 
-    actDisConnectAcquisition = new QAction(QIcon(":/spimb040/acquisitionconnect.png"), tr("&Connect"), this);
-    actDisConnectAcquisition->setCheckable(true);
-    connect(actDisConnectAcquisition, SIGNAL(triggered()), this, SLOT(disConnectAcquisition()));
-
-    actStartStopAcquisition = new QAction(QIcon(":/spimb040/acquisitionstart.png"), tr("&Start acquisition"), this);
-    actStartStopAcquisition->setCheckable(true);
-    connect(actStartStopAcquisition, SIGNAL(triggered()), this, SLOT(startStopAcquisition()));
-
-    actAcquireSingle = new QAction(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acquire single image"), this);
-    connect(actAcquireSingle, SIGNAL(triggered()), this, SLOT(acquireSingle()));
-
-    actCameraConfig = new QAction(QIcon(":/spimb040/acquisitionsettings.png"), tr("&Configure Camera"), this);
-    connect(actCameraConfig, SIGNAL(triggered()), this, SLOT(configCamera()));
 
     toolbar->addAction(actSaveRaw);
     toolbar->addSeparator();
@@ -291,31 +250,6 @@ void QFESPIMB040CameraView::createActions() {
     toolbar->addAction(actMaskClear);
     toolbar->addSeparator();
 
-    cmbAcquisitionDevice=new QComboBox(this);
-    for (int i=0; i<cameras.size(); i++) {
-        QFExtension* extension=qobject_cast<QFExtension*>(cameras[i]);
-        QFExtensionCamera* cam = qobject_cast<QFExtensionCamera*>(cameras[i]);
-        for (unsigned int j=0; j<cam->getCameraCount(); j++) {
-            QPoint sl(i, j);
-            QString name=extension->getName();
-            if (cam->getCameraCount()>0) name=name+QString(" #%1").arg(j);
-            cmbAcquisitionDevice->addItem(QIcon(extension->getIconFilename()), name, sl);
-        }
-    }
-    toolbar->addWidget(cmbAcquisitionDevice);
-    toolbar->addAction(actDisConnectAcquisition);
-    toolbar->addAction(actCameraConfig);
-    toolbar->addSeparator();
-    spinAcquisitionDelay=new QDoubleSpinBox(toolbar);
-    spinAcquisitionDelay->setMinimum(0);
-    spinAcquisitionDelay->setSuffix(tr("ms"));
-    spinAcquisitionDelay->setMaximum(10000);
-    spinAcquisitionDelay->setSingleStep(1);
-    spinAcquisitionDelay->setDecimals(0);
-    spinAcquisitionDelay->setEnabled(false);
-    toolbar->addWidget(spinAcquisitionDelay);
-    toolbar->addAction(actStartStopAcquisition);
-    toolbar->addAction(actAcquireSingle);
 }
 
 
@@ -349,10 +283,6 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
     cmbMaskColor->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.mask_color", 0).toInt());
     cmbRotation->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.rotation", 0).toInt());
 
-    cmbAcquisitionDevice->setCurrentIndex((settings->getQSettings())->value(prefix+"last_device", 0).toInt());
-    spinAcquisitionDelay->setValue((settings->getQSettings())->value(prefix+"acquisition_delay", 0).toDouble());
-
-
     lastImagepath=(settings->getQSettings())->value(prefix+"last_imagepath", lastImagepath).toString();
     lastMaskpath=(settings->getQSettings())->value(prefix+"last_maskpath", lastMaskpath).toString();
     lastImagefilter=(settings->getQSettings())->value(prefix+"last_imagefilter", lastImagefilter).toString();
@@ -362,8 +292,6 @@ void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString pref
     jksaveSplitter((*settings->getQSettings()), splitHor,  prefix+"split_hor/");
     jksaveSplitter((*settings->getQSettings()), splitVert, prefix+"split_vert/");
 
-    (settings->getQSettings())->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
     (settings->getQSettings())->setValue(prefix+"last_imagepath", lastImagepath);
     (settings->getQSettings())->setValue(prefix+"last_maskpath", lastMaskpath);
     (settings->getQSettings())->setValue(prefix+"last_imagefilter", lastImagefilter);
@@ -558,7 +486,7 @@ void QFESPIMB040CameraView::displayImageStatistics() {
     pltCountsHistogram->set_doDrawing(true);
     pltCountsHistogram->update_plot();
 
-    QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>").arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str()).arg(floattohtmlstr(imageSum/acqTime/1000.0).c_str()).arg(imageMean).arg(imageStddev).arg(imageMean/acqTime/1000.0).arg(imageStddev/acqTime/1000.0).arg(imageImin).arg(imageImax).arg(imageImin/acqTime/1000.0).arg(imageImax/acqTime/1000.0);
+    QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>").arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str()).arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str()).arg(imageMean).arg(imageStddev).arg(imageMean/imageExposureTime/1000.0).arg(imageStddev/imageExposureTime/1000.0).arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0);
     labImageStatistics->setText(s);
 }
 
@@ -605,6 +533,9 @@ void QFESPIMB040CameraView::loadMask() {
 
 void QFESPIMB040CameraView::prepareImage() {
     image.assign(rawImage);
+    if (image.sizeDiffersFrom(mask)) {
+        mask.assign(image.width(), image.height(), false);
+    }
 }
 
 void QFESPIMB040CameraView::saveRaw() {
@@ -659,261 +590,30 @@ void QFESPIMB040CameraView::saveRaw() {
 
 }
 
-void QFESPIMB040CameraView::disConnectAcquisition() {
-    if (cmbAcquisitionDevice->currentIndex()<0) {
-        // if there are no devices registered: deactivate everything!
-        actDisConnectAcquisition->setIcon(QIcon(":/spimb040/acquisitionconnect.png"));
-        actDisConnectAcquisition->setText(tr("&Connect"));
-        actStartStopAcquisition->setEnabled(false);
-        actAcquireSingle->setEnabled(false);
-        actDisConnectAcquisition->setEnabled(false);
-        cmbAcquisitionDevice->setEnabled(false);
-        actCameraConfig->setEnabled(false);
-        return;
-    }
 
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-    //std::cout<<"disConnectAcquisition()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
-
-    if (cam) {
-        if (actDisConnectAcquisition->isChecked()) {
-            // connect to a device
-
-            connectDevice(p.x(), p.y());
-            if (!cam->isConnected(camIdx)) {
-                actDisConnectAcquisition->setChecked(false);
-                logMain->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
-            } else {
-                actDisConnectAcquisition->setIcon(QIcon(":/spimb040/acquisitiondisconnect.png"));
-                actDisConnectAcquisition->setText(tr("&Disconnect"));
-                actStartStopAcquisition->setEnabled(true);
-                actStartStopAcquisition->setChecked(false);
-                actAcquireSingle->setEnabled(true);
-                actCameraConfig->setEnabled(true);
-                cmbAcquisitionDevice->setEnabled(false);
-                spinAcquisitionDelay->setEnabled(true);
-                logMain->log_text(tr("connected to device %1, camer %2!\n").arg(extension->getName()).arg(camIdx));
-            }
-        } else {
-            //disconnect from the current device and delete the settings widget
-            actDisConnectAcquisition->setIcon(QIcon(":/spimb040/acquisitionconnect.png"));
-            actDisConnectAcquisition->setText(tr("&Connect"));
-            actStartStopAcquisition->setEnabled(false);
-            actStartStopAcquisition->setChecked(false);
-            actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
-            actStartStopAcquisition->setText(tr("&Start Acquisition"));
-            actAcquireSingle->setEnabled(false);
-            cmbAcquisitionDevice->setEnabled(true);
-            spinAcquisitionDelay->setEnabled(false);
-            actCameraConfig->setEnabled(false);
-            if (cam->isConnected(camIdx))  {
-                cam->disconnectDevice(camIdx);
-                cam->setLogging(NULL);
-            }
-            logMain->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
-        }
-    }
+void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& image, double timeindex, double exposuretime) {
+    rawImage.assign(image);
+    imageTimeindex=timeindex;
+    imageExposureTime=exposuretime;
+    redrawFrameRecalc();
 }
 
-void QFESPIMB040CameraView::startStopAcquisition() {
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-    //std::cout<<"startStopAcquisition()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
-
-    if (cam) {
-        if (actStartStopAcquisition->isChecked()) {
-            actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstop.png"));
-            actStartStopAcquisition->setText(tr("&Stop Acquisition"));
-            actAcquireSingle->setEnabled(false);
-            actCameraConfig->setEnabled(false);
-            acqFrames=0;
-            acqFramesQR=0;
-            acqStarted.start();
-            abort_continuous_acquisition=false;
-            continuous_is_first=true;
-            histogramUpdateTime.start();
-            histogramUpdateTime.addMSecs(-1000);
-            acquireContinuous();
-        } else {
-            actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
-            actStartStopAcquisition->setText(tr("&Start Acquisition"));
-            actAcquireSingle->setEnabled(true);
-            actCameraConfig->setEnabled(true);
-        }
-    }
+void QFESPIMB040CameraView::clearImage() {
+    rawImage.assign(100, 100, 0);
+    imageTimeindex=0;
+    imageExposureTime=1;
+    redrawFrameRecalc();
 }
 
-void QFESPIMB040CameraView::ensureImageSizes() {
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-
-    if (cam) {
-        int dw=cam->getImageWidth(camIdx);
-        int dh=cam->getImageHeight(camIdx);
-
-        if ((dw!=image.width()) || (dh!=image.height())) {
-            //std::cout<<"resizing images to    "<<dw<<" x "<<dh<<std::endl;
-            logMain->log_text(tr("resizing internal images to %1x%2 pixels\n").arg(dw).arg(dh));
-            image.resize(dw, dh);
-            rawImage.resize(dw, dh);
-            mask.resize(dw, dh);
-            imageStatisticsCalculated=false;
-        }
-    }
+void QFESPIMB040CameraView::displayCameraConfig(QString camera, double framerate) {
+    labVideoSettings->setText(tr("<div align=\"right\"><b>camera:</b> %1<br><b>framerate:</b> %2 fps&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>size:</b> %3&times;%4</div>").arg(camera).arg(framerate).arg(rawImage.width()).arg(rawImage.height()));
 }
 
-void QFESPIMB040CameraView::configCamera() {
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-    //std::cout<<"acquireSingle()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
 
-    if (cam) {
-        cam->showSettingsWidget(camIdx, this);
-    }
+void QFESPIMB040CameraView::addUserAction(QAction* action) {
+    toolbar->addAction(action);
 }
 
-void QFESPIMB040CameraView::acquireSingle() {
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-    //std::cout<<"acquireSingle()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
-
-    if (cam) {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        actStartStopAcquisition->setChecked(false);
-        actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
-        actStartStopAcquisition->setText(tr("&Start Acquisition"));
-        if (cam->isConnected(camIdx)) {
-            ensureImageSizes();
-            acqTime=cam->getExposureTime(camIdx);
-            cam->acquire(camIdx, rawImage.data(), &imageTimeindex);
-            imageStatisticsCalculated=false;
-        } else {
-            logMain->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
-        }
-        labVideoSettings->setText(tr("%1 x %2     ").arg(image.width()).arg(image.height()));
-        logMain->log_text(tr("acquired single %1x%2 pixel frame\n").arg(image.width()).arg(image.height()));
-        histogramUpdateTime.start();
-        histogramUpdateTime.addMSecs(-10000);
-        redrawFrameRecalc();
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-void QFESPIMB040CameraView::acquireContinuous() {
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-    //std::cout<<"acquireContinuous()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
-
-
-    if (cam) {
-        if (abort_continuous_acquisition) {
-            actStartStopAcquisition->setChecked(false);
-            actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
-            actStartStopAcquisition->setText(tr("&Start Acquisition"));
-            actAcquireSingle->setEnabled(true);
-            actCameraConfig->setEnabled(true);
-            return;
-        }
-
-        if (cam->isConnected(camIdx)) {
-            if (continuous_is_first) {
-                continuous_is_first=false;
-            }
-            ensureImageSizes();
-            acqTime=cam->getExposureTime(camIdx);
-            cam->acquire(camIdx, rawImage.data(), &imageTimeindex);
-            imageStatisticsCalculated=false;
-        } else {
-            logMain->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
-        }
-        redrawFrameRecalc();
-        acqFrames++;
-        acqFramesQR++;
-
-        if (acqFramesQR%5==0) {
-            double framerate=(double)acqFramesQR/(double)(acqStarted.elapsed()/1000.0);
-            labVideoSettings->setText(tr("%1 x %2 : %3 fps     ").arg(image.width()).arg(image.height()).arg(framerate));
-            if (acqStarted.elapsed()>10000) {
-                acqStarted.start();
-                acqFramesQR=0;
-            }
-        }
-        abort_continuous_acquisition=false;
-
-
-        // start timer till next acquisition
-        if (actStartStopAcquisition->isChecked()) {
-            QTimer::singleShot(spinAcquisitionDelay->value(), this, SLOT(acquireContinuous()));
-        }
-    } else {
-        actStartStopAcquisition->setChecked(false);
-        actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
-        actStartStopAcquisition->setText(tr("&Start Acquisition"));
-        actStartStopAcquisition->setEnabled(false);
-        actAcquireSingle->setEnabled(false);
-        actCameraConfig->setEnabled(false);
-    }
-}
-
-void QFESPIMB040CameraView::connectDevice(int device, int camera) {
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    if ((device>=0)&&(device<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[device]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[device]);
-    }
-
-    if (cam) {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        cam->setLogging(this);
-        bool s=cam->connectDevice(camera);
-        if (!s) {
-            cam->setLogging(NULL);
-            logMain->log_error(tr("error connecting to device %1, camera %2 ...\n").arg(extension->getName()).arg(camera));
-        } else {
-            acquireSingle();
-        }
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-void QFESPIMB040CameraView::diconnectCurrentCamra() {
-    actDisConnectAcquisition->setChecked(false);
+void QFESPIMB040CameraView::deleteUserAction(QAction* action) {
+    toolbar->removeAction(action);
 }

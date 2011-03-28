@@ -13,8 +13,9 @@
 #define ID_PRODUCT_SLAVE  0x1003
 
 
-unsigned int check_bit_header(FILE * infile) {
+unsigned int check_bit_header(FILE * infile, char* message) {
       char kar,str[256];
+      char designName[1024], designName2[1024], creationDate[256], creationTime[256];
   const char header[9] = {(char)0x0f, (char)0xf0, (char)0x0f,(char)0xf0,
 			  (char)0x0f, (char)0xf0, (char)0x0f, (char)0xf0, 0};
   unsigned int length, loop;
@@ -22,7 +23,8 @@ unsigned int check_bit_header(FILE * infile) {
   length = fgetc(infile) * 256 + fgetc(infile);
   if (length != 9)
   {
-    fprintf(stderr, "\nField 1 length error, is this a valid bit-file?\n\n");
+    sprintf(message, "\nField 1 length error, is this a valid bit-file?\n\n");
+    fprintf(stderr, "%s\n", message);
     return 0;
   }
   for (loop = 0; loop < length; loop ++)
@@ -30,32 +32,35 @@ unsigned int check_bit_header(FILE * infile) {
     kar = fgetc(infile);
     if (kar != header[loop])
     {
-     fprintf(stderr,
-	     "\nThe header data does not match, is this a valid bit-file?\n\n");
+      sprintf(message, "\nThe header data does not match, is this a valid bit-file?\n\n");
+      fprintf(stderr, "%s\n", message);
       return 0;
     }
   }
   length = fgetc(infile) * 256 + fgetc(infile);
   if (length != 1)
   {
-    fprintf(stderr, "\nField 2 length error, is this a valid bit-file?\n\n");
+    sprintf(message, "\nField 2 length error, is this a valid bit-file?\n\n");
+    fprintf(stderr, "%s\n", message);
     return 0;
   }
   kar = fgetc(infile);
   if (kar != 'a')
   {
-    fprintf(stderr,
+    sprintf(message,
 	    "\nThe field 2 data does not match, is this a valid bit-file?\n\n");
+    fprintf(stderr, "%s\n", message);
     return 0;
   }
   length = fgetc(infile) * 256 + fgetc(infile);
   for (loop = 0; loop < length; loop ++)
     str[loop] = fgetc(infile);
   printf("Design Name : \"%s\"\n" , str);
+  strcpy(designName, str);
   kar = fgetc(infile);
   if (kar != 'b')
   {
-    fprintf(stderr,
+    sprintf(message,
 	    "\nThe field 4 data does not match, is this a valid bit-file?\n\n");
     return 0;
   }
@@ -63,6 +68,7 @@ unsigned int check_bit_header(FILE * infile) {
   for (loop = 0 ;loop < length; loop ++)
     str[loop] = fgetc(infile);
   printf("Device Name : \"%s\"\n" , str);
+  strcpy(designName2, str);
   kar = fgetc(infile);
   if (kar != 'c')
   {
@@ -74,6 +80,7 @@ unsigned int check_bit_header(FILE * infile) {
   for (loop = 0; loop < length; loop ++)
     str[loop] = fgetc(infile);
   printf("Creation Date : \"%s\"\n" , str);
+  strcpy(creationDate, str);
   kar = fgetc(infile);
   if (kar != 'd')
   {
@@ -85,6 +92,7 @@ unsigned int check_bit_header(FILE * infile) {
   for (loop = 0; loop < length; loop ++)
     str[loop] = fgetc(infile);
   printf("Creation Time : \"%s\"\n" , str);
+  strcpy(creationTime, str);
   kar = fgetc(infile);
   if (kar != 'e')
   {
@@ -95,6 +103,9 @@ unsigned int check_bit_header(FILE * infile) {
   length = (fgetc(infile) <<24) + (fgetc(infile)<<16) +
 	   (fgetc(infile) <<8)  +  fgetc(infile);
   printf("Stream length = 0x%08X Bytes\n", length);
+
+  sprintf(message, "Design Name:  '%s'\n              '%s'\nCreation Date: %s\nCreation Time: %s\nStream Length: %u = 0x%08X Bytes\n", designName, designName2, creationDate, creationTime, length, length);
+
   return length;
 }
 
@@ -104,6 +115,8 @@ unsigned int check_bit_header(FILE * infile) {
 
 
 int flash_bitfile(char * infilename, char* message, char fpga) {
+  char tmpMessage[1024];
+
   // usb related variables
   int                rv;
   int                flag;
@@ -119,10 +132,13 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   int                i, j;
   char               byte, inv_byte;
 
-  if ((fpga=='m')||(fpga='M'))
+  if ((fpga=='m')||(fpga='M')) {
      id_product = ID_PRODUCT_MASTER;
-  else
+     sprintf(message, "programming master FPGA");
+  } else {
      id_product = ID_PRODUCT_SLAVE;
+     sprintf(message, "programming slave FPGA");
+  }
 
   // board detection
   usb_init();
@@ -147,7 +163,8 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   }
   if (!device)
   {
-    sprintf(message, "No board detected!");
+    sprintf(tmpMessage, "\n\nNo board detected!");
+    strcat(message, tmpMessage);
     return 0;
   }
 
@@ -155,19 +172,23 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   infile = fopen(infilename, "r");
   if (!infile)
   {
-    sprintf(message, "Error opening file \"%s\" for reading!", infilename);
+    sprintf(tmpMessage, "\n\nError opening file \"%s\" for reading!", infilename);
+    strcat(message, tmpMessage);
     return 0;
   }
   printf("\n");
-  flen = check_bit_header(infile);
+  flen = check_bit_header(infile, tmpMessage);
+  strcat(message, tmpMessage);
   if (!flen) {
-    sprintf(message, "Error checking header of bitfile \"%s\".", infilename);
+    sprintf(tmpMessage, "\n\nError checking header of bitfile \"%s\".", infilename);
+    strcat(message, tmpMessage);
     return 0;
   }
   buffer = (char*)malloc(flen * sizeof(char));
   if (!buffer)
   {
-    sprintf(message, "Memory allocation failed!");
+    sprintf(tmpMessage, "\n\nMemory allocation failed!");
+    strcat(message, tmpMessage);
     return 0;
   }
   for (i = 0; i < flen; i++)
@@ -188,7 +209,8 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   if (usb_set_configuration(h_device,
 			    device->config->bConfigurationValue))
   {
-    sprintf(message, "Could not set the USB configuration 0x%08X" , device->config->bConfigurationValue );
+    sprintf(tmpMessage, "\n\nCould not set the USB configuration 0x%08X" , device->config->bConfigurationValue );
+    strcat(message, tmpMessage);
     free(buffer);
     usb_close(h_device);
     return 0;
@@ -205,11 +227,14 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   free(buffer);
   if (rv < 0)
   {
-    sprintf(message, "Failed to send the bitstream!");
+    sprintf(tmpMessage, "\n\nFailed to send the bitstream!");
+    strcat(message, tmpMessage);
     return 0;
   }
-  else
-    sprintf(message, "Sent: 0x%.8x Bytes", rv);
+  else {
+    sprintf(tmpMessage, "\n\nSent: 0x%.8x Bytes", rv);
+    strcat(message, tmpMessage);
+  }
 
   return 1;
 }

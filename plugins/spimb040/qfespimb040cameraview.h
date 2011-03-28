@@ -22,16 +22,16 @@
 #include "jkqtfastplotter.h"
 #include "jkqttools.h"
 #include "colorcombobox.h"
-#include "qtlogfile.h"
-#include "qfextensionmanager.h"
-#include "../interfaces/qfextensioncamera.h"
-#include "qfextension.h"
 #include "tools.h"
+#include "qfextensionmanager.h"
 
-/*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) camera widget
+/*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) camera view widget
     \ingroup qf3ext_spimb040
+
+    This widget displays a single image + some image statistics (histograms ...). To display a new image, call
+    displayImage(). This triggers the display of a new image.
  */
-class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
+class QFESPIMB040CameraView : public QWidget {
         Q_OBJECT
     public:
         QFESPIMB040CameraView(const QString& logfile, QFExtensionManager* extManager, QWidget* parent=NULL);
@@ -40,18 +40,36 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         void loadSettings(ProgramOptions* settings, QString prefix);
         /** \brief save settings */
         void storeSettings(ProgramOptions* settings, QString prefix);
-	/** \brief disconnect camera */
-	void diconnectCurrentCamra();
+
+    public slots:
+        /** \brief display a new image in the widget
+
+            \param image points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
+            \param width width of \a image
+            \param height height of \a image
+            \param timeindex time index of image \a image in seconds
+            \param exposuretime exposure time of the image in seconds (used to calculate count rates in units of kHz).
+        */
+        void displayImage(JKImage<uint32_t>& image, double timeindex, double exposuretime);
+        /** \brief clear the display */
+        void clearImage();
+        /*! \brief display the current camera data/config
+            \param camera name of the current camera
+            \param framerate current framerate in frames per second
+         */
+        void displayCameraConfig(QString camera, double framerate);
+
+        /** \brief add a QAction to the main toolbar */
+        void addUserAction(QAction* action);
+        /** \brief delete a QAction from the main toolbar */
+        void deleteUserAction(QAction* action);
     protected:
-        void closeEvent ( QCloseEvent * event );
 
         /** \brief create main widgets */
         void createMainWidgets(const QString& logfile);
         /** \brief create actions and register them to toolbar */
         void createActions();
 
-        /** \brief list of all available QFExtensionCamera plugins */
-        QList<QObject*> cameras;
 
         QSplitter* splitHor;
         QSplitter* splitVert;
@@ -59,18 +77,8 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         QTabWidget* tabSettings;
         QTabWidget* tabResults;
 
-        /*! \brief combobox to select an acquisition device
 
-            The data() property of this QComboBox is used to store/specify the device (and item therein) to use.
-            It contains a QPoint, where x specifies the device in cameras and y the camera inside the selected
-            device.
-        */
-        QComboBox* cmbAcquisitionDevice;
-        /** \brief spinbox to select delay between two subsequent frames */
-        QDoubleSpinBox* spinAcquisitionDelay;
 
-        /** \brief main log widget */
-        QtLogFile* logMain;
 
         /** \brief main image plotter widget */
         JKQTFastPlotter* pltMain;
@@ -116,14 +124,6 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
 
 
 
-        /** \brief action to connect/disconnect to acquisition device */
-        QAction* actDisConnectAcquisition;
-        /** \brief action to start/stop continuous acquisition */
-        QAction* actStartStopAcquisition;
-        /** \brief action to acquire a single frame */
-        QAction* actAcquireSingle;
-        /** \brief action to display a camera configuration dialog */
-        QAction* actCameraConfig;
         /** \brief action to save the current raw image */
         QAction* actSaveRaw;
         /** \brief action to activate/disactivate mask editing mode */
@@ -136,27 +136,26 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         QAction* actMaskLoad;
 
 
-        /** \brief the camera extension this class is connected to.
-         *
-         * This is \c NULL if the class is not connected to any device.
-         */
-        QFExtensionCamera* cam;
+        /*! \brief image data
 
-
-
-
-
-        /** \brief image data
-         *
-         * This is the image all calculations are done with, while rawImage is the data taken directly from the
-         * sensor/camera. So if e.g. a background image should be removed, you will have to do something like
-         * <code>image = rawImage-backgroundImage</code>
-         *
+            The image in this data member is drawn by redrawFrame(). The function prepareImage() copies the contents of
+            \a rawImage (which represents the raw data read from the camera) into \a image and may possibly apply some
+            filtering or data transformations!
          */
         JKImage<double> image;
-        /** \brief the raw image data */
+        /*! \brief the raw image data
+
+            The image in this data member is NOT directly drawn by redrawFrame(). The function prepareImage() copies the contents of
+            \a rawImage (which represents the raw data read from the camera) into \a image and may possibly apply some
+            filtering or data transformations!
+        */
         JKImage<uint32_t> rawImage;
-        /** \brief the mask image */
+        /*! \brief the mask image
+
+            The pixels set to \c true in this image (which has to have the same size, as image and rawImage are used to mask
+            broken pixels etc. when calculating image statistics, color scaling ... Note that when a call to prepareImage()
+            implies a different image size, this image will be set to all \c false!
+        */
         JKImage<bool> mask;
 
         /** \brief indicates whether the statistics of the raw image have already been calculated */
@@ -173,8 +172,10 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         double imageImin;
         /** \brief image statistics: maximum pixel value */
         double imageImax;
-        /** \brief time index of the last frame */
-        uint64_t imageTimeindex;
+        /** \brief time index of the last frame in seconds */
+        double imageTimeindex;
+        /** \brief exposure time of the last frame in seconds */
+        double imageExposureTime;
 
 
         /** \brief histogram x-values */
@@ -183,7 +184,7 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         double* histogram_y;
         /** \brief number of entries in the histogram */
         uint32_t histogram_n;
-        /** \brief when was the size of the count rate histogram updated the last time */
+        /** \brief when was the count rate histogram updated the last time */
         QTime histogramUpdateTime;
 
         /** \brief path last used to save/load masks (*.msk) */
@@ -193,20 +194,6 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         /** \brief filter last used to save images */
         QString lastImagefilter;
 
-        /** \brief number of acquired frames for frames/second calculation (is reset every 10 seconds!!!) */
-        uint64_t acqFramesQR;
-        /** \brief number of acquired frames  */
-        uint64_t acqFrames;
-        /** \brief length of the last acquisition time in seconds */
-        double acqTime;
-
-
-        /** \brief when has the last continuous acquisition been started */
-        QTime acqStarted;
-        /** \brief internal flag: if \c true the current acquireContinuous() call will be aborted. */
-        bool abort_continuous_acquisition;
-        /** \brief internal flag: marks the first image (\c true ) within a continuous acquisition series */
-        bool continuous_is_first;
 
     protected slots:
         /** \brief called when the mouse moves over the image plot window */
@@ -225,13 +212,14 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
          * the input fields are only en-/disabled and the values are not changed, so the display should be up to date!
          */
         void setHistogramBinsAutoscale(bool autoscale);
-        /** \brief redraws the frame with the current settings for color scale ...
+        /** \brief redraws the frame with the current settings for color scale ... This reads data from the data member \a image
          *  \note this does NOT recalculate the statistics. For a full recalc/redraw, call displayImageStatistics() first, or
          *        call redrawFrameRecalc().
          */
         void redrawFrame();
-        /** \brief this function prepares the image property, i.e. it copies the contents of rawImage
-         *         and possibly applies some math to it (background removal ...) */
+        /** \brief this function prepares the \a image data memeber, i.e. it copies the contents of rawImage
+         *         and possibly applies some math to it (background removal ...)
+         */
         void prepareImage();
         /** \brief redraws the frame with the current settings for color scale ... and recalculate statistics and transforms */
         void redrawFrameRecalc();
@@ -246,42 +234,6 @@ class QFESPIMB040CameraView : public QWidget, public QFPluginLogService {
         /** \brief save the current image */
         void saveRaw();
 
-
-        /** \brief connect/disconnect to acquisition device
-         *
-         * This method mainly sets the enabled properties of the QActions and widgets that play a role in device control.
-         */
-        void disConnectAcquisition();
-        /** \brief start/stop image continuous acquisition (depending on actStartStopAcquisition) */
-        void startStopAcquisition();
-        /** \brief acquire single frame */
-        void acquireSingle();
-        /** \brief acquire single frame from a continuous series */
-        void acquireContinuous();
-        /** \brief connect to a given acquisition device and camera therein */
-        void connectDevice(int device, int camera);
-        /** \brief make sure all images/arrays have the same/right size */
-        void ensureImageSizes();
-        /** \brief display a configuration dialog for the current camera */
-        void configCamera();
-
-        /** \brief indent all following lines in the logging pane */
-        virtual void log_indent() { logMain->inc_indent(); };
-        /** \brief undo former log_indent() */
-        virtual void log_unindent() { logMain->dec_indent(); };
-
-        /** \brief log project text message
-         *  \param message the message to log
-         */
-        virtual void log_text(QString message) { logMain->log_text(message); };
-        /** \brief log project warning message
-         *  \param message the warning message to log
-         */
-        virtual void log_warning(QString message) { logMain->log_warning(message); };
-        /** \brief log project error message
-         *  \param message the error message to log
-         */
-        virtual void log_error(QString message) { logMain->log_error(message); };
 };
 
 #endif // QFESPIMB040CAMERAVIEW_H

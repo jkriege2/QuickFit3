@@ -98,10 +98,6 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
-        /** \brief indent all following lines in the logging pane */
-        virtual void log_indent();
-        /** \brief undo former log_indent() */
-        virtual void log_unindent();
 
         /** \brief log project text message
          *  \param message the message to log

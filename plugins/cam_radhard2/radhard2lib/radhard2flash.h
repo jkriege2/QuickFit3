@@ -43,7 +43,7 @@
     \param infile bitstream file
     \return  length of the bitstream (without header) if the file is correct, else 0
 */
-unsigned int check_bit_header(FILE * infile);
+unsigned int check_bit_header(FILE * infile, char* message);
 
 
 /*! \brief flash a bitfile bitfile
