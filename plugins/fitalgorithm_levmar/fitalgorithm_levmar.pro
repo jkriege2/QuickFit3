@@ -6,7 +6,7 @@ TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/fitalgorithms/
 #DLLDESTDIR = $$DESTDIR
-win:LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
+win32:LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
 unix:LIBS += -llapack -lblas -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
