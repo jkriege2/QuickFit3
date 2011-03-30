@@ -20,7 +20,7 @@ void QFProjectTreeModel::init(QFProject* p) {
 }
 
 int QFProjectTreeModel::columnCount ( const QModelIndex & parent ) const {
-    //std::cout<<"columnCount(???)=1\n";
+    std::cout<<"columnCount(???)=1\n";
     return 1;
 }
 
@@ -28,31 +28,31 @@ int QFProjectTreeModel:: rowCount ( const QModelIndex & parent) const {
     if (!current) return 0;
 
     nodeType nt=classifyIndex(parent);
-    //std::cout<<"rowCount(parent_index="<<nodeType2String(nt).toStdString()<<", parent_row="<<parent.row()<<")\n";
+    std::cout<<"rowCount(parent_index="<<nodeType2String(nt).toStdString()<<", parent_row="<<parent.row()<<")\n";
     switch(nt) {
         case qfpntUnknown:
-            //std::cout<<"=0\n";
+            std::cout<<"=0\n";
             return 0;
         case qfpntRoot:
-            //std::cout<<"=1\n";
+            std::cout<<"=1\n";
             return 1;
         case qfpntProject: //
-            //std::cout<<"=1\n";
+            std::cout<<"=2\n";
             return 2;
         case qfpntRawDataDir:
-            //std::cout<<tr("=%1\n").arg(rawData.size()).toStdString();
+            std::cout<<tr("=%1\n").arg(current->getRawDataCount()).toStdString();
             return current->getRawDataCount(); //rawData.size();
         case qfpntRawDataRecord:
-            //std::cout<<"=1\n";
+            std::cout<<"=0\n";
             return 0;
         case qfpntEvaluationDir:
-            //std::cout<<tr("=%1\n").arg(rawData.size()).toStdString();
+            std::cout<<tr("=%1\n").arg(current->getEvaluationCount()).toStdString();
             return current->getEvaluationCount(); //evaluations.size();
         case qfpntEvaluationRecord:
-            //std::cout<<"=1\n";
+            std::cout<<"=0\n";
             return 0;//getEvaluationByIndex(parent)->getDataRecordCount();
     };
-    //std::cout<<"=0\n";
+    std::cout<<"=0\n";
     return 0;
 }
 
@@ -84,7 +84,7 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
     if (!current) return QVariant();
 
     nodeType nt=classifyIndex(index);
-    //std::cout<<"data(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
+    std::cout<<"data(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<", rol="<<role<<")\n";
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch(nt) {
@@ -167,7 +167,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
 QFRawDataRecord* QFProjectTreeModel::getRawDataByIndex(const QModelIndex& index) const {
     if (!current) return NULL;
     nodeType nt=classifyIndex(index);
-    //std::cout<<"getRawDataByIndex(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
+    std::cout<<"getRawDataByIndex(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
     if (nt==qfpntRawDataRecord) {
         return current->getRawDataByNum(index.row());
     }
@@ -177,7 +177,7 @@ QFRawDataRecord* QFProjectTreeModel::getRawDataByIndex(const QModelIndex& index)
 QFEvaluationItem* QFProjectTreeModel::getEvaluationByIndex(const QModelIndex& index) const {
     if (!current) return NULL;
     nodeType nt=classifyIndex(index);
-    //std::cout<<"getEvaluationByIndex(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
+    std::cout<<"getEvaluationByIndex(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
     if (nt==qfpntEvaluationRecord) {
         return current->getEvaluationByNum(index.row());
     }
@@ -187,7 +187,7 @@ QFEvaluationItem* QFProjectTreeModel::getEvaluationByIndex(const QModelIndex& in
 QModelIndex QFProjectTreeModel::index ( int row, int column, const QModelIndex & parent) const {
     if (!current) return QModelIndex();
     nodeType nt=classifyIndex(parent);
-    //std::cout<<tr("index(row=%1, column=%2, parent=%3)\n").arg(row).arg(column).arg(nodeType2String(nt)).toStdString();
+    std::cout<<tr("index(row=%1, column=%2, parent=%3)\n").arg(row).arg(column).arg(nodeType2String(nt)).toStdString();
     switch(nt) {
         case qfpntUnknown: return QModelIndex();
         case qfpntRoot: return createIndex(0,0,qfpntProject);
@@ -218,7 +218,7 @@ QModelIndex QFProjectTreeModel::index ( QFEvaluationItem* record, int column ) c
 QModelIndex QFProjectTreeModel::parent ( const QModelIndex & index ) const {
     if (!current) return QModelIndex();
     nodeType nt=classifyIndex(index);
-    //std::cout<<"parent(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
+    std::cout<<"parent(index="<<nodeType2String(nt).toStdString()<<", row="<<index.row()<<")\n";
     switch(nt) {
         case qfpntUnknown: return QModelIndex();
         case qfpntRoot: return QModelIndex();

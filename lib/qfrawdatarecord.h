@@ -98,9 +98,14 @@ class QFRawDataRecord : public QObject, public QFProperties {
         void resultsChanged();
         /** \brief emitted whenever the data in this object changes */
         void rawDataChanged();
-    protected:
+    public:
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged() { emit propertiesChanged(); };
+        /** \brief this function emits a resultsChanged() signal. */
+        virtual void emitResultsChanged() { emit resultsChanged(); };
+        /** \brief this function emits a rawDataChanged() signal. */
+        virtual void emitRawDataChanged() { emit rawDataChanged(); };
+    protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message) { setError(message); };
 
@@ -214,8 +219,16 @@ class QFRawDataRecord : public QObject, public QFProperties {
         };
         /** \brief return a specified result as string */
         QString  resultsGetAsString(QString evalName, QString resultName);
-        /** \brief remove the value stored in the given position */
-        void resultsRemove(QString evalName, QString resultName);
+        /** \brief remove the value stored in the given position
+         *
+         *  If the results for the given \a evalName are empty after the delete, the entry for the
+         *  \a evalName is also removed.
+         *
+         *  \param evalName the evaluation result set in which to search for the result to be deleted
+         *  \param resultName the name of the result to be deleted in the evaluation result set \a evalName
+         *  \param emitChangedSignal if set \c false (default is \c true ) this function will NOT emit a resultsChanged() signal.
+         */
+        void resultsRemove(QString evalName, QString resultName, bool emitChangedSignal=true);
         /*! \brief return a specified result as a QVariant
 
             The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),

@@ -234,9 +234,15 @@ void QFRawDataRecord::resultsSetNumber(QString evaluationName, QString resultNam
     emit resultsChanged();
 };
 
-void QFRawDataRecord::resultsRemove(QString evalName, QString resultName) {
+void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool emitChangedSignal) {
     if (results.contains(evalName)) {
-        if (results[evalName].remove(resultName)>0) emit resultsChanged();
+        bool changed=false;
+        if (results[evalName].remove(resultName)>0) changed=true;
+        if (results[evalName].isEmpty()) {
+            results.remove(evalName);
+            changed=true;
+        }
+        if (changed && emitChangedSignal) emit resultsChanged();
     }
 }
 

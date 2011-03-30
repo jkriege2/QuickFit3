@@ -28,15 +28,21 @@ void QFRDRResultsModel::init(QFRawDataRecord* record) {
 }
 
 int QFRDRResultsModel::rowCount(const QModelIndex &parent ) const {
-    if (!record) return 0;
+    if (!record) {
+        std::cout<<"result row count=0\n";
+        return 0;
+    }
     //QList<QString>& l=lastResultNames;
-    //std::cout<<"result row count="<<l.size()<<std::endl;
+    std::cout<<"result row count="<<lastResultNames.size()<<std::endl;
     return lastResultNames.size();
 }
 
 int QFRDRResultsModel::columnCount(const QModelIndex &parent) const {
-    if (!record) return 0;
-    //std::cout<<"result column count="<<record->resultsGetEvaluationCount()<<std::endl;
+    if (!record) {
+        std::cout<<"result column count=0\n" ;
+        return 0;
+    }
+    std::cout<<"result column count="<<record->resultsGetEvaluationCount()<<std::endl;
     return record->resultsGetEvaluationCount()+1;
 }
 
@@ -86,7 +92,7 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
     if (role==Qt::DisplayRole) {
         if (orientation==Qt::Horizontal) {
             if (section<record->resultsGetEvaluationCount()) return QVariant(record->resultsGetEvaluationName(section));
-            else return tr("Averga +/- StdDev");
+            else return tr("Average +/- StdDev");
         } else {
             //QList<QString>& l=lastResultNames;//calcResultNames();
             if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
@@ -96,18 +102,21 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
 }
 
 QList<QString> QFRDRResultsModel::calcResultNames() const {
-    QList<QString> l;
-    int evalCount=record->resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=record->resultsGetEvaluationName(i);
-        int jmax=record->resultsGetCount(en);
-        for (int j=0; j<jmax; j++) {
-            QString rn=record->resultsGetResultName(en, j);
-            if (!l.contains(rn)) {
-                l.append(rn);
+    QStringList l;
+    //if (record) {
+        int evalCount=record->resultsGetEvaluationCount();
+        for (int i=0; i<evalCount; i++) {
+            QString en=record->resultsGetEvaluationName(i);
+            int jmax=record->resultsGetCount(en);
+            for (int j=0; j<jmax; j++) {
+                QString rn=record->resultsGetResultName(en, j);
+                if (!l.contains(rn)) {
+                    l.append(rn);
+                }
             }
         }
-    }
+    //}
+    if (l.size()>0) l.sort();
     return l;
 }
 

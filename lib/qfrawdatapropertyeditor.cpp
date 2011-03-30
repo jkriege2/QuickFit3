@@ -27,6 +27,98 @@ QFRawDataPropertyEditor::~QFRawDataPropertyEditor()
     writeSettings();
 }
 
+void QFRawDataPropertyEditor::createWidgets() {
+    QVBoxLayout* ml=new QVBoxLayout(this);
+    setLayout(ml);
+    ml->setContentsMargins(2,2,2,2);
+    QHBoxLayout* vl=new QHBoxLayout(this);
+    ml->addLayout(vl);
+    btnPrevious=new QPushButton(QIcon(":/prop_previous.png"), tr("&previous"), this);
+    btnPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    vl->addWidget(btnPrevious);
+    connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previousPressed()));
+    btnNext=new QPushButton(QIcon(":/prop_next.png"), tr("&next"), this);
+    btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    vl->addWidget(btnNext);
+    labTopIcon=new QLabel(this);
+    vl->addWidget(labTopIcon);
+    labTop=new QLabel(this);
+    vl->addWidget(labTop);
+    vl->addStretch();
+    connect(btnNext, SIGNAL(clicked()), this, SLOT(nextPressed()));
+    tabMain=new QTabWidget(this);
+    ml->addWidget(tabMain);
+
+    QWidget* w=new QWidget(tabMain);
+    QFormLayout* fl=new QFormLayout(w);
+    w->setLayout(fl);
+    tabMain->addTab(w, tr("&Properties"));
+    labID=new QLabel(w);
+    fl->addRow(tr("ID:"), labID);
+    labType=new QLabel(w);
+    labTypeIcon=new QLabel(w);
+    QHBoxLayout* ptl=new QHBoxLayout(this);
+    ptl->setContentsMargins(0,0,0,0);
+    ptl->addWidget(labTypeIcon);
+    ptl->addWidget(labType);
+    ptl->addStretch();
+    fl->addRow(tr("Type:"), ptl);
+    edtName=new QLineEdit(w);
+    fl->addRow(tr("&Name:"), edtName);
+    pteDescription=new QPlainTextEdit(w);
+    fl->addRow(tr("&Description:"), pteDescription);
+    lstFiles=new QListWidget(w);
+    fl->addRow(tr("&Files:"), lstFiles);
+    tvProperties=new QTableView(w);
+    QFontMetrics fm(font());
+    tvProperties->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.1));
+    tvProperties->horizontalHeader()->setStretchLastSection(true);
+
+    QHBoxLayout* pl1=new QHBoxLayout(this);
+    pl1->setContentsMargins(0,0,0,0);
+    pl1->addWidget(tvProperties);
+    QVBoxLayout* pl2=new QVBoxLayout(this);
+    pl1->addLayout(pl2);
+    btnNewProperty=new QPushButton(QIcon(":/prop_add.png"), tr("In&sert Property"), this);
+    connect(btnNewProperty, SIGNAL(clicked()), this, SLOT(newPropClicked()));
+    pl2->addWidget(btnNewProperty);
+    btnDeleteProperty=new QPushButton(QIcon(":/prop_delete.png"), tr("&Delete Property"), this);
+    connect(btnDeleteProperty, SIGNAL(clicked()), this, SLOT(deletePropClicked()));
+    pl2->addWidget(btnDeleteProperty);
+    pl2->addStretch();
+    fl->addRow(tr("Properties:"), pl1);
+
+    widResults=new QWidget(this);
+    QVBoxLayout* rwvlayout=new QVBoxLayout(this);
+    widResults->setLayout(rwvlayout);
+    tbResults=new QToolBar("toolbar_rdr_results", this);
+    rwvlayout->addWidget(tbResults);
+    actCopyResults=new QAction(QIcon(":/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    tbResults->addAction(actCopyResults);
+
+    tbResults->addSeparator();
+    actDeleteResults=new QAction(QIcon(":/delete16.png"), tr("Delete Selection"), this);
+    tbResults->addAction(actDeleteResults);
+
+    tvResults=new QEnhancedTableView(widResults);
+    tvResults->setAlternatingRowColors(true);
+    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
+    rwvlayout->addWidget(tvResults);
+    tabMain->addTab(widResults, tr("Evaluation &Results"));
+    labAveragedresults=new QLabel(widResults);
+    labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    labAveragedresults->setMaximumHeight(200);
+    rwvlayout->addWidget(labAveragedresults);
+
+    connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
+
+    helpWidget=new QFHTMLHelpWindow(this);
+    tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
+
+}
+
 void QFRawDataPropertyEditor::closeEvent ( QCloseEvent * event ) {
     writeSettings();
     event->accept();
@@ -228,84 +320,6 @@ void QFRawDataPropertyEditor::propsChanged() {
 }
 
 
-void QFRawDataPropertyEditor::createWidgets() {
-    QVBoxLayout* ml=new QVBoxLayout(this);
-    setLayout(ml);
-    ml->setContentsMargins(2,2,2,2);
-    QHBoxLayout* vl=new QHBoxLayout(this);
-    ml->addLayout(vl);
-    btnPrevious=new QPushButton(QIcon(":/prop_previous.png"), tr("&previous"), this);
-    btnPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    vl->addWidget(btnPrevious);
-    connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previousPressed()));
-    btnNext=new QPushButton(QIcon(":/prop_next.png"), tr("&next"), this);
-    btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    vl->addWidget(btnNext);
-    labTopIcon=new QLabel(this);
-    vl->addWidget(labTopIcon);
-    labTop=new QLabel(this);
-    vl->addWidget(labTop);
-    vl->addStretch();
-    connect(btnNext, SIGNAL(clicked()), this, SLOT(nextPressed()));
-    tabMain=new QTabWidget(this);
-    ml->addWidget(tabMain);
-
-    QWidget* w=new QWidget(tabMain);
-    QFormLayout* fl=new QFormLayout(w);
-    w->setLayout(fl);
-    tabMain->addTab(w, tr("&Properties"));
-    labID=new QLabel(w);
-    fl->addRow(tr("ID:"), labID);
-    labType=new QLabel(w);
-    labTypeIcon=new QLabel(w);
-    QHBoxLayout* ptl=new QHBoxLayout(this);
-    ptl->setContentsMargins(0,0,0,0);
-    ptl->addWidget(labTypeIcon);
-    ptl->addWidget(labType);
-    ptl->addStretch();
-    fl->addRow(tr("Type:"), ptl);
-    edtName=new QLineEdit(w);
-    fl->addRow(tr("&Name:"), edtName);
-    pteDescription=new QPlainTextEdit(w);
-    fl->addRow(tr("&Description:"), pteDescription);
-    lstFiles=new QListWidget(w);
-    fl->addRow(tr("&Files:"), lstFiles);
-    tvProperties=new QTableView(w);
-    QFontMetrics fm(font());
-    tvProperties->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.1));
-    tvProperties->horizontalHeader()->setStretchLastSection(true);
-
-    QHBoxLayout* pl1=new QHBoxLayout(this);
-    pl1->setContentsMargins(0,0,0,0);
-    pl1->addWidget(tvProperties);
-    QVBoxLayout* pl2=new QVBoxLayout(this);
-    pl1->addLayout(pl2);
-    btnNewProperty=new QPushButton(QIcon(":/prop_add.png"), tr("In&sert Property"), this);
-    connect(btnNewProperty, SIGNAL(clicked()), this, SLOT(newPropClicked()));
-    pl2->addWidget(btnNewProperty);
-    btnDeleteProperty=new QPushButton(QIcon(":/prop_delete.png"), tr("&Delete Property"), this);
-    connect(btnDeleteProperty, SIGNAL(clicked()), this, SLOT(deletePropClicked()));
-    pl2->addWidget(btnDeleteProperty);
-    pl2->addStretch();
-    fl->addRow(tr("Properties:"), pl1);
-
-    widResults=new QWidget(this);
-    QVBoxLayout* rwvlayout=new QVBoxLayout(this);
-    widResults->setLayout(rwvlayout);
-    tvResults=new QEnhancedTableView(widResults);
-    tvResults->setAlternatingRowColors(true);
-    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
-    rwvlayout->addWidget(tvResults);
-    tabMain->addTab(widResults, tr("Evaluation &Results"));
-    labAveragedresults=new QLabel(widResults);
-    labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
-    rwvlayout->addWidget(labAveragedresults);
-
-    helpWidget=new QFHTMLHelpWindow(this);
-    tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
-
-}
 
 void QFRawDataPropertyEditor::newPropClicked() {
     if (current) {
@@ -336,6 +350,7 @@ void QFRawDataPropertyEditor::newPropClicked() {
                 case 2: v.convert(QVariant::LongLong); break;
                 case 3: v.convert(QVariant::Bool); break;
                 case 4: v.convert(QVariant::DateTime); break;
+                default: break;
             }
             current->setQFProperty(d->cmbName->currentText(), v);
         }
@@ -362,7 +377,7 @@ void QFRawDataPropertyEditor::deletePropClicked() {
 }
 
 void QFRawDataPropertyEditor::setSettings(ProgramOptions* settings) {
-    std::cout<<"QFRawDataPropertyEditor::setSettings("<<settings<<")\n";
+    //std::cout<<"QFRawDataPropertyEditor::setSettings("<<settings<<")\n";
     this->settings=settings;
     if (current && tabMain) {
         for (int i=0; i<current->getEditorCount(); i++) {
@@ -436,7 +451,11 @@ void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& se
             }
         }
     }
-    QString results=tr("<table border=\"1\"><tr><td><b>Field</b></td><td><b>Average +/- StdDev</b></td></tr>");
+
+    int lineHeight=labAveragedresults->fontMetrics().lineSpacing();
+    int maxheight=labAveragedresults->maximumHeight();
+    int linespercol=maxheight/(2*lineHeight)-1;
+    QStringList datalist;
     QMapIterator<int, QString> it(names);
     while (it.hasNext()) {
         it.next();
@@ -445,14 +464,62 @@ void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& se
         if (count[i]>0) {
             double avg=sum[i]/count[i];
             double error=sqrt(sum2[i]/count[i]-sum[i]*sum[i]/count[i]/count[i]);
-            results+=QString("<tr><td><b>%1</b></td><td>%2 &plusmn; %3</td></tr>").arg(name).arg(roundWithError(avg, error)).arg(roundError(error));
+            datalist.append(QString("<td align=\"right\"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1:&nbsp;</b></td><td>&nbsp;&nbsp;%2 &plusmn; %3&nbsp;</td>").arg(name).arg(roundWithError(avg, error)).arg(roundError(error)));
         }
+    }
+    QString results=tr("<table border=\"1\" cellspacing=\"0\"><tr>");
+    int cols=(int)ceil((double)datalist.size()/(double)linespercol);
+    for (int i=0; i<cols; i++) {
+        results+=tr("<th align=\"right\"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Field:&nbsp;</b></th><th><b>&nbsp;&nbsp;Average &plusmn; StdDev&nbsp;</b></th>");
+    }
+    results+=tr("</th>");
+    for (int r=0; r<linespercol; r++) {
+        results+=tr("<tr>");
+        for (int c=0; c<cols; c++) {
+            int idx=c*linespercol+r;
+            if ((idx>=0)&&(idx<datalist.size())) {
+                results+=datalist[idx];
+            } else {
+                results+=tr("<td></td><td></td>");
+            }
+        }
+        results+=tr("</tr>");
     }
     results+=tr("</table>");
     labAveragedresults->setText(results);
 }
 
-
+void QFRawDataPropertyEditor::deleteSelectedResults() {
+    QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
+    if (sel.size()>0) {
+        QMessageBox::StandardButton ret;
+        ret = QMessageBox::question(this, tr("QuickFit 3.0"),
+                     tr("Do you really want to delete the selected results?"),
+                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        if (ret == QMessageBox::Yes) {
+            // first we store a list of all items to be deleted (one list for the evaluation name (col)
+            // and one list for the result name (row).
+            std::cout<<"\n\n-- deleteing "<<sel.size()<<" items:\n";
+            QStringList row, col;
+            for (int i=0; i<sel.size(); i++) {
+                QString hh=tvResults->model()->headerData(sel[i].column(), Qt::Horizontal).toString();
+                QString vh=tvResults->model()->headerData(sel[i].row(), Qt::Vertical).toString();
+                std::cout<<"hh="<<hh.toStdString()<<"   vh="<<vh.toStdString()<<"\n";
+                row.append(vh);
+                col.append(hh);
+            }
+            //QAbstractItemModel* m=tvResults->model();
+            //tvResults->setModel(NULL);
+            for (int i=0; i<qMin(row.size(), col.size()); i++) {
+                QString hh=col[i];
+                QString vh=row[i];
+                current->resultsRemove(hh, vh, false);
+            }
+            current->emitResultsChanged();
+            //tvResults->setModel(m);
+        }
+    }
+}
 
 
 

@@ -45,6 +45,7 @@ QFProject::QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QF
     this->services=services;
     this->rdrFactory=rdrFactory;
     this->evalFactory=evalFactory;
+    IDs.clear();
     dataChange=false;
     name="unnamed";
     file="";
@@ -166,17 +167,18 @@ int QFProject::getNewID() {
 
 bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     if (!rec) return false;
-    if (rawData.contains(rec->getID())) return false;
-    if (rec->getID()>highestID) highestID=rec->getID();
-    rawData[rec->getID()]=rec;
-    IDs.insert(rec->getID());
+    int newID=rec->getID();
+    if (rawData.contains(newID)) return false;
+    if (newID>highestID) highestID=newID;
+    rawData[newID]=rec;
+    IDs.insert(newID);
+    dataChange=true;
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
-    dataChange=true;
     emit wasChanged(dataChange);
     return true;
 }

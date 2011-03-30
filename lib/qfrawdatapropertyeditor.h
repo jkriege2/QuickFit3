@@ -61,6 +61,9 @@ class QFRawDataPropertyEditor : public QWidget {
         void resizePropertiesTable();
 
         void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+
+        /** \brief delete selected results */
+        void deleteSelectedResults();
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -98,6 +101,14 @@ class QFRawDataPropertyEditor : public QWidget {
         QEnhancedTableView* tvResults;
         /** \brief label for averaging over selected values in tvResults */
         QLabel* labAveragedresults;
+        /** \brief toolbar to access functions of tvResults */
+        QToolBar* tbResults;
+        /** \brief action used to copy selection in tvResults to clipbord */
+        QAction* actCopyResults;
+        /** \brief action used to save selection in tvResults to file */
+        QAction* actSaveResults;
+        /** \brief action used to delete selection in tvResults */
+        QAction* actDeleteResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
         /** \brief help widget for evaluation */

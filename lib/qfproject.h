@@ -163,9 +163,11 @@ class QFProject : public QObject, public QFProperties {
         }
         /** \brief return the i-th raw data record, or \c NULL */
         inline QFRawDataRecord* getRawDataByNum(int i) const {
-            if (i>=rawData.size() || i<0) return NULL;
-            int ID=rawData.keys().at(i);
-            return rawData[ID];
+            QList<int> keys=rawData.keys();
+            if ((i>=keys.size()) || (i<0)) return NULL;
+            int ID=keys.at(i);
+            if (rawData.contains(ID)) return rawData[ID];
+            else return NULL;
         }
         /** \brief return the next sibling rawdata record, or NULL if none */
         QFRawDataRecord* getNextRawData(QFRawDataRecord* current);
@@ -182,9 +184,11 @@ class QFProject : public QObject, public QFProperties {
         }
         /** \brief return the i-th raw data record, or \c NULL */
         inline QFEvaluationItem* getEvaluationByNum(int i) const {
-            if (i>=evaluations.size() || i<0) return NULL;
-            int ID=evaluations.keys().at(i);
-            return evaluations[ID];
+            QList<int> keys=evaluations.keys();
+            if ((i>=keys.size()) || (i<0)) return NULL;
+            int ID=keys.at(i);
+            if (evaluations.contains(ID)) { return evaluations[ID]; }
+            else return NULL;
         }
         /** \brief return the next sibling rawdata record, or NULL if none */
         QFEvaluationItem* getNextEvaluation(QFEvaluationItem* current);
