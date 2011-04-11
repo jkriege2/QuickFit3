@@ -61,8 +61,10 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
     public:
         /** \copydoc QFExtensionCamera::getCameraCount() */
         virtual unsigned int getCameraCount();
-        /** \copydoc QFExtensionCamera::createSettingsWidget() */
-        virtual void showSettingsWidget(unsigned int camera, QWidget* parent=NULL);
+        /** \copydoc QFExtensionCamera::showCameraSettingsWidget() */
+        virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
+        /** \copydoc QFExtensionCamera::useCameraSettings() */
+        virtual void useCameraSettings(unsigned int camera, const QSettings& settings);
         /** \copydoc QFExtensionCamera::getImageWidth() */
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
@@ -79,7 +81,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         virtual double getExposureTime(unsigned int camera);
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
-		
+
         /** \brief indent all following lines in the logging pane */
         virtual void log_indent();
         /** \brief undo former log_indent() */
@@ -96,7 +98,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         /** \brief log project error message
          *  \param message the error message to log
          */
-        virtual void log_error(QString message);		
+        virtual void log_error(QString message);
 
 	protected:
         QFPluginLogService* logService;

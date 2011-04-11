@@ -130,7 +130,10 @@ unsigned int QFECamTestCamera::getCameraCount() {
     return 2;
 }
 
-void QFECamTestCamera::showSettingsWidget(unsigned int camera, QWidget* parent) {
+void QFECamTestCamera::useCameraSettings(unsigned int camera, const QSettings& settings) {
+}
+
+void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
     QDialog* dlg=new QDialog(parent);
 
     QVBoxLayout* lay=new QVBoxLayout(dlg);

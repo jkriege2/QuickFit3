@@ -79,8 +79,10 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         /** \copydoc QFExtensionCamera::getCameraCount() */
         virtual unsigned int getCameraCount();
 
-        /** \copydoc QFExtensionCamera::showSettingsWidget() */
-        virtual void showSettingsWidget(unsigned int camera, QWidget* parent=NULL);
+        /** \copydoc QFExtensionCamera::showCameraSettingsWidget() */
+        virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
+        /** \copydoc QFExtensionCamera::useCameraSettings() */
+        virtual void useCameraSettings(unsigned int camera, const QSettings& settings);
         /** \copydoc QFExtensionCamera::getImageWidth() */
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */

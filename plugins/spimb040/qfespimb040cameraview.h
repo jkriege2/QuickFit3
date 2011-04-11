@@ -17,6 +17,8 @@
 #include <QTime>
 #include <QTabWidget>
 
+#include "../../extlibs/cimg.h"
+
 #include "programoptions.h"
 #include "jkimage.h"
 #include "jkqtfastplotter.h"

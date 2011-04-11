@@ -491,7 +491,8 @@ void QFESPIMB040MainWindow::configCamera1() {
     if (viewData[0]->camera) {
         int camIdx=viewData[0]->usedCamera;
         if (viewData[0]->camera->isConnected(camIdx)) {
-            viewData[0]->camera->showSettingsWidget(camIdx, this);
+            QSettings set; // TODO: remove this workaround am implement usage of camera settings!
+            viewData[0]->camera->showCameraSettingsDialog(camIdx, set, this);
         }
     }
 }
@@ -501,7 +502,8 @@ void QFESPIMB040MainWindow::configCamera2() {
     if (viewData[1]->camera) {
         int camIdx=viewData[1]->usedCamera;
         if (viewData[1]->camera->isConnected(camIdx)) {
-            viewData[1]->camera->showSettingsWidget(camIdx, this);
+            QSettings set; // TODO: remove this workaround am implement usage of camera settings!
+            viewData[1]->camera->showCameraSettingsDialog(camIdx, set, this);
         }
     }
 }

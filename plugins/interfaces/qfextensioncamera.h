@@ -8,8 +8,17 @@
 #include <stdint.h>
 
 
+
 /*! \brief QuickFit QFExtension to control black \& white cameras
     \ingroup qf3extensionplugins
+
+    \section QFExtensionCamera_settings Camera settings
+    Each camera may be configured (i.e. resolution, exposure time, modes ...). This class implements an interface to work with
+    such configurations. Each set of configurations is stored in a  QSettings object. This interfaces defines some methods
+    to work with configurations:
+      - showSettingsDialog() displays a modal dialog where the user may enter settings
+      - useCameraSettings() sets the camera settings from a given QSettings object
+
  */
 class QFExtensionCamera {
     public:
@@ -19,16 +28,24 @@ class QFExtensionCamera {
         virtual unsigned int getCameraCount()=0;
 
 
-        /*! \brief return a QWidget which contains controls to set the device parameters
+        /*! \brief displays a modal dialog which allows the user to set the properties of a camera
 
-            This QWidget may e.g. be placed as a QDockWidget on the application screen.
-            It should contain widgets to set parameters like exposure time, shutter,
-            color channel, ...
+            The initial settings are stored in the settings attribute. When the user clicks "OK" (or any
+            equivalent action) the new settings will also be stored in this structure. See the section on
+            \link QFExtensionCamera_settings Camera Settings \endlink for details on the \a settings argument.
 
-            \param camera the camera the settings widget should apply to
-            \param parent parent widget for the returned QWidget
+            \param[in] camera the camera the settings widget should apply to
+            \param[in,out] settings initially this contains the current settings which should be displayed in the
+                                    dialog. After a successfull call this the new settings will be returned in this
+                                    argument.
+            \param[in] parent parent widget for the returned QWidget
          */
-         virtual void showSettingsWidget(unsigned int camera, QWidget* parent=NULL)=0;
+         virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL)=0;
+         /*! \brief set camera settings from the specified QSettings object
+            \param[in] camera the camera the settings widget should apply to
+            \param[in] settings
+          */
+         virtual void useCameraSettings(unsigned int camera, const QSettings& settings)=0;
          /** \brief return the width of images */
          virtual int getImageWidth(unsigned int camera)=0;
          /** \brief return the height of images */

@@ -131,7 +131,10 @@ unsigned int QFExtensionCameraRadhard2::getCameraCount() {
     return 1;
 }
 
-void QFExtensionCameraRadhard2::showSettingsWidget(unsigned int camera, QWidget* parent) {
+void QFExtensionCameraRadhard2::useCameraSettings(unsigned int camera, const QSettings& settings) {
+}
+
+void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.
 
 	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK

@@ -87,8 +87,10 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
     public:
         /** \copydoc QFExtensionCamera::getCameraCount() */
         virtual unsigned int getCameraCount();
-        /** \copydoc QFExtensionCamera::createSettingsWidget() */
-        virtual void showSettingsWidget(unsigned int camera, QWidget* parent=NULL);
+        /** \copydoc QFExtensionCamera::showCameraSettingsDialog() */
+        virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
+        /** \copydoc QFExtensionCamera::useCameraSettings() */
+        virtual void useCameraSettings(unsigned int camera, const QSettings& settings);
         /** \copydoc QFExtensionCamera::getImageWidth() */
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */

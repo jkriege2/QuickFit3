@@ -35,6 +35,13 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl
+
+# DEFINITION FOR CImg Library
+include( ../../extlibs/cimg.pri )
+PRECOMPILED_HEADER += ../../extlibs/cimg.h
+
+
+
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/

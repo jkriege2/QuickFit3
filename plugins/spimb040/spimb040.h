@@ -4,6 +4,7 @@
 #include "qfextension.h"
 #include "qfespimb040mainwindow.h"
 #include <QAction>
+#include "../../extlibs/cimg.h"
 
 /*!
     \defgroup qf3ext_spimb040 SPIM Control Extension (B040, DKFZ Heidelberg)

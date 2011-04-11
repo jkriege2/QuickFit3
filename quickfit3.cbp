@@ -91,6 +91,7 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="doc\todo.dox" />
+		<Unit filename="extlibs\cimg\CImg.h" />
 		<Unit filename="lib\dlg_fitalgorithmprogress.ui" />
 		<Unit filename="lib\dlg_newproperty.ui" />
 		<Unit filename="lib\dlgnewproperty.cpp" />
@@ -235,6 +236,7 @@
 		<Unit filename="plugins\table\qftablemodel.h" />
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
+		<Unit filename="quicktif3.pri" />
 		<Unit filename="..\..\..\LIB\trunk\jkimage.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.h" />
@@ -308,7 +310,7 @@
 			<lib_finder disable_auto="1" />
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
-				<Settings autoincrement="0" date_declarations="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application\version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="3" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application\version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

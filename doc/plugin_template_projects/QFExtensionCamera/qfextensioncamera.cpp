@@ -19,7 +19,7 @@ void QFExtensionCameraImplementation::deinit() {
 }
 
 void QFExtensionCameraImplementation::projectChanged(QFProject* oldProject, QFProject* project) {
-	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here 
+	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */
 }
@@ -31,10 +31,10 @@ void QFExtensionCameraImplementation::initExtension() {
 void QFExtensionCameraImplementation::loadSettings(ProgramOptions* settingspo) {
 	/* here you could read config information from the quickfit.ini file using settings object */
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
-	
+
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
 	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
-	
+
 }
 
 void QFExtensionCameraImplementation::storeSettings(ProgramOptions* settingspo) {
@@ -50,8 +50,11 @@ unsigned int QFExtensionCameraImplementation::getCameraCount() {
     return 1;
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }
+void QFExtensionCameraImplementation::useCameraSettings(unsigned int camera, const QSettings& settings) {
+    /* set the camera settings to the values specified in settings parameter */
+}
 
-void QFExtensionCameraImplementation::showSettingsWidget(unsigned int camera, QWidget* parent) {
+void QFExtensionCameraImplementation::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.
 
 	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK
@@ -59,8 +62,8 @@ void QFExtensionCameraImplementation::showSettingsWidget(unsigned int camera, QW
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-	
-	
+
+
 	/////////////////////////////////////////////////////////////////////////////////
 	// if you want the settings dialog to be modal, you may uncomment the next lines
 	// and add implementations
@@ -74,7 +77,7 @@ void QFExtensionCameraImplementation::showSettingsWidget(unsigned int camera, QW
     QFormLayout* formlayout=new QFormLayout(dlg);
 
 
-    //  create your widgets here, do not to initialize them with the current settings 
+    //  create your widgets here, do not to initialize them with the current settings
 
 
     lay->addLayout(formlayout);
@@ -108,7 +111,7 @@ bool QFExtensionCameraImplementation::acquire(unsigned int camera, uint32_t* dat
     if (timestamp!=NULL) {
         *timestamp=/* store a timestamp information */;
     }
-	
+
 	/*
 	    acquire a new image from the given camera and store it to data
 		You may expect that data is at least as large as getImageWidth(camera)*getImageHeight(camera)
