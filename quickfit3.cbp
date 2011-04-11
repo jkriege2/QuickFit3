@@ -91,6 +91,8 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="doc\todo.dox" />
+		<Unit filename="extlibs\cimg.h" />
+		<Unit filename="extlibs\cimg.pri" />
 		<Unit filename="extlibs\cimg\CImg.h" />
 		<Unit filename="lib\dlg_fitalgorithmprogress.ui" />
 		<Unit filename="lib\dlg_newproperty.ui" />
@@ -236,7 +238,6 @@
 		<Unit filename="plugins\table\qftablemodel.h" />
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
-		<Unit filename="quicktif3.pri" />
 		<Unit filename="..\..\..\LIB\trunk\jkimage.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.h" />
