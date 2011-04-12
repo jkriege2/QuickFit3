@@ -2,9 +2,10 @@
 
 #include <QtGui>
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(const QString& logfile, QFExtensionManager* extManager, QWidget* parent):
+QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionManager* extManager, QWidget* parent):
     QWidget(parent)
 {
+    setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
     setWindowIcon(QIcon(":/spimb040_logo.png"));
 
 
@@ -254,6 +255,7 @@ void QFESPIMB040CameraView::createActions() {
 
 
 void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefix) {
+    jkloadWidgetGeometry((*settings->getQSettings()), this, prefix+"geometry/");
     jkloadSplitter((*settings->getQSettings()), splitHor,  prefix+"split_hor/");
     jkloadSplitter((*settings->getQSettings()), splitVert, prefix+"split_vert/");
 
@@ -289,6 +291,7 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
 }
 
 void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString prefix) {
+    jksaveWidgetGeometry((*settings->getQSettings()), this, prefix+"geometry/");
     jksaveSplitter((*settings->getQSettings()), splitHor,  prefix+"split_hor/");
     jksaveSplitter((*settings->getQSettings()), splitVert, prefix+"split_vert/");
 

@@ -13,6 +13,7 @@ LIBS += -ltiff -L../../output/ -lquickfit3lib -lquickfit3widgets
 HEADERS += spimb040.h \
            qfespimb040mainwindow.h \
            qfespimb040cameraview.h \
+           qfespimb040cameraconfig.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
            ../../../../../LIB/trunk/highrestimer.h
@@ -20,6 +21,7 @@ HEADERS += spimb040.h \
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
            qfespimb040cameraview.cpp \
+           qfespimb040cameraconfig.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp
 
 FORMS =

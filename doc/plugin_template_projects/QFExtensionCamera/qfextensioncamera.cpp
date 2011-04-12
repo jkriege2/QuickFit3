@@ -30,6 +30,8 @@ void QFExtensionCameraImplementation::initExtension() {
 
 void QFExtensionCameraImplementation::loadSettings(ProgramOptions* settingspo) {
 	/* here you could read config information from the quickfit.ini file using settings object */
+    if (!settingspo) return;
+	if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
@@ -39,6 +41,8 @@ void QFExtensionCameraImplementation::loadSettings(ProgramOptions* settingspo) {
 
 void QFExtensionCameraImplementation::storeSettings(ProgramOptions* settingspo) {
 	/* here you could write config information to the quickfit.ini file using settings object */
+    if (!settingspo) return;
+	if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
@@ -78,6 +82,9 @@ void QFExtensionCameraImplementation::showCameraSettingsDialog(unsigned int came
 
 
     //  create your widgets here, do not to initialize them with the current settings
+    // QWidget* widget=new QWidget(dlg);
+    // lay->addRow(tr("Name"), widget);
+    // lay->setValue(settings.value(QString("device/name%1").arg(camera), devfaultValue ).toInt());
 
 
     lay->addLayout(formlayout);
@@ -89,7 +96,8 @@ void QFExtensionCameraImplementation::showCameraSettingsDialog(unsigned int came
     connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
 
     if ( dlg->exec()==QDialog::Accepted ) {
-         //  read back values entered into the widgets
+         //  read back values entered into the widgets and store in settings
+         // settings.setValue(QString("device/name%1").arg(camera), widget->value() );
     }
     delete dlg;
 	*/

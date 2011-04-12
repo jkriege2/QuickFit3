@@ -48,64 +48,12 @@ void QFECamTestCamera::initExtension() {
 void QFECamTestCamera::loadSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings());
 
-    width[0]=settings.value("testdevice/width0", width[0]).toInt();
-    height[0]=settings.value("testdevice/height0", height[0]).toInt();
-    testpattern[0]=settings.value("testdevice/testpattern0", testpattern[0]).toInt();
-    noise[0]=settings.value("testdevice/noise0", noise[0]).toDouble();
-    particleN[0]=settings.value("testdevice/particle_n0", particleN[0]).toInt();
-    particleBrightnes[0]=settings.value("testdevice/particle_brightnes0", particleBrightnes[0]).toDouble();
-    particlePSF[0]=settings.value("testdevice/particle_psf0", particlePSF[0]).toDouble();
-    particleBackground[0]=settings.value("testdevice/particle_background0", particleBackground[0]).toDouble();
-    hotpixels[0]=settings.value("testdevice/hotpixels0", particleBackground[0]).toInt();
-
-    initParticles(0, 10);
-
-
-    if (width[0]<=0) width[0]=100;
-    if (height[0]<=0) height[0]=100;
-
-    emit displayParticleN0(particleN[0]);
-    emit displayParticleBrightnes0(particleBrightnes[0]);
-    emit displayNoise0(noise[0]);
-    emit displayWidth0(width[0]);
-    emit displayHeight0(height[0]);
-    emit displayParticlePSF0(particlePSF[0]);
-    emit displayParticleBackground0(particleBackground[0]);
-    emit displayTestPattern0(testpattern[0]);
-    emit displayHotpixels0(hotpixels[0]);
-
-
-    width[1]=settings.value("testdevice/width1", width[1]).toInt();
-    height[1]=settings.value("testdevice/height1", height[1]).toInt();
-    testpattern[1]=settings.value("testdevice/testpattern1", testpattern[1]).toInt();
-    noise[1]=settings.value("testdevice/noise1", noise[1]).toDouble();
-    particleN[1]=settings.value("testdevice/particle_n1", particleN[1]).toInt();
-    particleBrightnes[1]=settings.value("testdevice/particle_brightnes1", particleBrightnes[1]).toDouble();
-    particlePSF[1]=settings.value("testdevice/particle_psf1", particlePSF[1]).toDouble();
-    particleBackground[1]=settings.value("testdevice/particle_background1", particleBackground[1]).toDouble();
-    hotpixels[1]=settings.value("testdevice/hotpixels1", particleBackground[1]).toInt();
-
-    initParticles(0, 10);
-
-
-    if (width[1]<=0) width[1]=100;
-    if (height[1]<=0) height[1]=100;
-
-    emit displayParticleN1(particleN[1]);
-    emit displayParticleBrightnes1(particleBrightnes[1]);
-    emit displayNoise1(noise[1]);
-    emit displayWidth1(width[1]);
-    emit displayHeight1(height[1]);
-    emit displayParticlePSF1(particlePSF[1]);
-    emit displayParticleBackground1(particleBackground[1]);
-    emit displayTestPattern1(testpattern[1]);
-    emit displayHotpixels1(hotpixels[1]);
 }
 
 void QFECamTestCamera::storeSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings());
 
-    settings.setValue("testdevice/width0", width[0]);
+    /*settings.setValue("testdevice/width0", width[0]);
     settings.setValue("testdevice/height0", height[0]);
     settings.setValue("testdevice/testpattern0", testpattern[0]);
     settings.setValue("testdevice/noise0", noise[0]);
@@ -123,7 +71,7 @@ void QFECamTestCamera::storeSettings(ProgramOptions* settingspo) {
     settings.setValue("testdevice/particle_brightnes1", particleBrightnes[1]);
     settings.setValue("testdevice/particle_psf1", particlePSF[1]);
     settings.setValue("testdevice/particle_background1", particleBackground[1]);
-    settings.setValue("testdevice/hotpixels1", hotpixels[1]);
+    settings.setValue("testdevice/hotpixels1", hotpixels[1]);*/
 }
 
 unsigned int QFECamTestCamera::getCameraCount() {
@@ -131,154 +79,94 @@ unsigned int QFECamTestCamera::getCameraCount() {
 }
 
 void QFECamTestCamera::useCameraSettings(unsigned int camera, const QSettings& settings) {
+
+    width[camera]=               settings.value(QString("testdevice/width"), 100).toInt();
+    height[camera]=              settings.value(QString("testdevice/height"), 100).toInt();
+    testpattern[camera]=         settings.value(QString("testdevice/testpattern"), 0).toInt();
+    noise[camera]=               settings.value(QString("testdevice/noise"), 0.1).toDouble();
+    particleN[camera]=           settings.value(QString("testdevice/particle_n"), 5).toInt();
+    particleBrightnes[camera]=   settings.value(QString("testdevice/particle_brightnes"), 10).toDouble();
+    particlePSF[camera]=         settings.value(QString("testdevice/particle_psf"), 2).toDouble();
+    particleBackground[camera]=  settings.value(QString("testdevice/particle_background"), 0.2).toDouble();
+    hotpixels[camera]=           settings.value(QString("testdevice/hotpixels"), 0).toInt();
+
+    initParticles(camera, particleN[camera]);
+
+
+    if (width[camera]<=0) width[camera]=100;
+    if (height[camera]<=0) height[camera]=100;
+
+
+
 }
 
 void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
     QDialog* dlg=new QDialog(parent);
+    dlg->setWindowTitle(tr("Configuration for Testcamera #%1").arg(camera));
 
     QVBoxLayout* lay=new QVBoxLayout(dlg);
     dlg->setLayout(lay);
 
-    QSpinBox* spin;
     QWidget* r=new QWidget(dlg);
     QFormLayout* fl=new QFormLayout(r);
     r->setLayout(fl);
-    QComboBox* cmb=new QComboBox(r);
-    cmb->addItem(tr("many moving rings"));
-    cmb->addItem(tr("blinking rings"));
-    cmb->addItem(tr("few moving rings"));
-    cmb->addItem(tr("particles"));
-    cmb->setCurrentIndex(testpattern[camera]);
-    fl->addRow(tr("pattern:"), cmb);
-    if (camera==1) {
-        connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(setTestPattern1(int)));
-        connect(this, SIGNAL(displayTestPattern1(int)), cmb, SLOT(setCurrentIndex(int)));
-    } else {
-        connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(setTestPattern0(int)));
-        connect(this, SIGNAL(displayTestPattern0(int)), cmb, SLOT(setCurrentIndex(int)));
-    }
+    QComboBox* cmbPattern=new QComboBox(r);
+    cmbPattern->addItem(tr("many moving rings"));
+    cmbPattern->addItem(tr("blinking rings"));
+    cmbPattern->addItem(tr("few moving rings"));
+    cmbPattern->addItem(tr("particles"));
+    cmbPattern->setCurrentIndex(settings.value(QString("testdevice/testpattern"), testpattern[camera]).toInt());
+    fl->addRow(tr("pattern:"), cmbPattern);
 
+    //
 
+    QDoubleSpinBox* spindNoise=new QDoubleSpinBox(r);
+    fl->addRow(tr("noise:"), spindNoise);
+    spindNoise->setMinimum(0);
+    spindNoise->setMaximum(10);
+    spindNoise->setValue(settings.value(QString("testdevice/noise"), noise[camera]).toInt());
 
-    QDoubleSpinBox* spind=new QDoubleSpinBox(r);
-    fl->addRow(tr("noise:"), spind);
-    spind->setMinimum(0);
-    spind->setMaximum(10);
-    spind->setValue(noise[camera]);
-    if (camera==1) {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setNoise1(double)));
-        connect(this, SIGNAL(displayNoise1(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableDefault1(bool)), spind, SLOT(setEnabled(bool)));
-    } else {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setNoise0(double)));
-        connect(this, SIGNAL(displayNoise0(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableDefault0(bool)), spind, SLOT(setEnabled(bool)));
-    }
+    QSpinBox* spinParticles=new QSpinBox(r);
+    fl->addRow(tr("# particles:"), spinParticles);
+    spinParticles->setMinimum(1);
+    spinParticles->setMaximum(1000);
+    spinParticles->setValue(settings.value(QString("testdevice/particle_n"), particleN[camera]).toInt());
 
-    spin=new QSpinBox(r);
-    fl->addRow(tr("# particles:"), spin);
-    spin->setMinimum(1);
-    spin->setMaximum(1000);
-    spin->setValue(particleN[camera]);
-    if (camera==1) {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setParticleN1(int)));
-        connect(this, SIGNAL(displayParticleN1(int)), spin, SLOT(setValue(int)));
-        connect(this, SIGNAL(enableParticles1(bool)), spin, SLOT(setEnabled(bool)));
-    } else {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setParticleN0(int)));
-        connect(this, SIGNAL(displayParticleN0(int)), spin, SLOT(setValue(int)));
-        connect(this, SIGNAL(enableParticles0(bool)), spin, SLOT(setEnabled(bool)));
-    }
+    QDoubleSpinBox* spindBrightnes=new QDoubleSpinBox(r);
+    fl->addRow(tr("particle brightnes:"), spindBrightnes);
+    spindBrightnes->setMinimum(0);
+    spindBrightnes->setMaximum(100000);
+    spindBrightnes->setValue(settings.value(QString("testdevice/particle_brightnes"), particleBrightnes[camera]).toDouble());
 
-    spind=new QDoubleSpinBox(r);
-    fl->addRow(tr("particle brightnes:"), spind);
-    spind->setMinimum(0);
-    spind->setMaximum(100000);
-    spind->setValue(particleBrightnes[camera]);
-    if (camera==1) {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setParticleBrightnes1(double)));
-        connect(this, SIGNAL(displayParticleBrightnes1(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableParticles1(bool)), spind, SLOT(setEnabled(bool)));
-    } else {
-        connect(this, SIGNAL(displayParticleBrightnes0(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableParticles0(bool)), spind, SLOT(setEnabled(bool)));
-        connect(this, SIGNAL(enableParticles0(bool)), spind, SLOT(setEnabled(bool)));
-    }
+    QDoubleSpinBox* spindPSF=new QDoubleSpinBox(r);
+    fl->addRow(tr("particle PSF:"), spindPSF);
+    spindPSF->setMinimum(0);
+    spindPSF->setMaximum(100000);
+    spindPSF->setValue(settings.value(QString("testdevice/particle_psf"), particlePSF[camera]).toDouble());
 
-    spind=new QDoubleSpinBox(r);
-    fl->addRow(tr("particle PSF:"), spind);
-    spind->setMinimum(0);
-    spind->setMaximum(100000);
-    spind->setValue(particlePSF[camera]);
-    if (camera==1) {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setParticlePSF1(double)));
-        connect(this, SIGNAL(displayParticlePSF1(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableParticles1(bool)), spind, SLOT(setEnabled(bool)));
-    } else {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setParticlePSF0(double)));
-        connect(this, SIGNAL(displayParticlePSF0(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableParticles0(bool)), spind, SLOT(setEnabled(bool)));
-    }
+    QDoubleSpinBox* spindBackground=new QDoubleSpinBox(r);
+    fl->addRow(tr("particle background:"), spindBackground);
+    spindBackground->setMinimum(0);
+    spindBackground->setMaximum(100000);
+    spindBackground->setValue(settings.value(QString("testdevice/particle_background"), particleBackground[camera]).toDouble());
 
-    spind=new QDoubleSpinBox(r);
-    fl->addRow(tr("particle background:"), spind);
-    spind->setMinimum(0);
-    spind->setMaximum(100000);
-    spind->setValue(particleBackground[camera]);
-    if (camera==1) {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setParticleBackground1(double)));
-        connect(this, SIGNAL(displayParticleBackground1(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableParticles1(bool)), spind, SLOT(setEnabled(bool)));
-    } else {
-        connect(spind, SIGNAL(valueChanged(double)), this, SLOT(setParticleBackground0(double)));
-        connect(this, SIGNAL(displayParticleBackground0(double)), spind, SLOT(setValue(double)));
-        connect(this, SIGNAL(enableParticles0(bool)), spind, SLOT(setEnabled(bool)));
-    }
+    QSpinBox* spinWidth=new QSpinBox(r);
+    fl->addRow(tr("width:"), spinWidth);
+    spinWidth->setMinimum(10);
+    spinWidth->setMaximum(10000);
+    spinWidth->setValue(settings.value(QString("testdevice/width"), width[camera]).toInt());
 
+    QSpinBox* spinHeight=new QSpinBox(r);
+    fl->addRow(tr("height:"), spinHeight);
+    spinHeight->setMinimum(10);
+    spinHeight->setMaximum(10000);
+    spinHeight->setValue(settings.value(QString("testdevice/height"), height[camera]).toInt());
 
-
-    spin=new QSpinBox(r);
-    fl->addRow(tr("width:"), spin);
-    spin->setMinimum(10);
-    spin->setMaximum(10000);
-    spin->setValue(width[camera]);
-    if (camera==1) {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setWidth1(int)));
-        connect(this, SIGNAL(displayWidth1(int)), spin, SLOT(setValue(int)));
-    } else {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setWidth0(int)));
-        connect(this, SIGNAL(displayWidth0(int)), spin, SLOT(setValue(int)));
-    }
-
-
-    spin=new QSpinBox(r);
-    fl->addRow(tr("height:"), spin);
-    spin->setMinimum(10);
-    spin->setMaximum(10000);
-    spin->setValue(height[camera]);
-    if (camera==1) {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setHeight1(int)));
-        connect(this, SIGNAL(displayHeight1(int)), spin, SLOT(setValue(int)));
-    } else {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setHeight0(int)));
-        connect(this, SIGNAL(displayHeight0(int)), spin, SLOT(setValue(int)));
-    }
-
-    spin=new QSpinBox(r);
-    fl->addRow(tr("hotpixels:"), spin);
-    spin->setMinimum(0);
-    spin->setMaximum(1000);
-    spin->setValue(hotpixels[camera]);
-    if (camera==1) {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setHotpixels1(int)));
-        connect(this, SIGNAL(displayHotpixels1(int)), spin, SLOT(setValue(int)));
-    } else {
-        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(setHotpixels0(int)));
-        connect(this, SIGNAL(displayHotpixels0(int)), spin, SLOT(setValue(int)));
-    }
-
-
-    cmb->setCurrentIndex(testpattern[camera]);
+    QSpinBox* spinHotpixels=new QSpinBox(r);
+    fl->addRow(tr("hotpixels:"), spinHotpixels);
+    spinHotpixels->setMinimum(0);
+    spinHotpixels->setMaximum(1000);
+    spinHotpixels->setValue(settings.value(QString("testdevice/hotpixels"), particleBackground[camera]).toInt());
 
 
     lay->addWidget(r);
@@ -289,7 +177,17 @@ void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& 
     connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
 
-    dlg->exec();
+    if ( dlg->exec()==QDialog::Accepted ) {
+        settings.setValue(QString("testdevice/testpattern"), cmbPattern->currentIndex());
+        settings.setValue(QString("testdevice/noise"), spindNoise->value());
+        settings.setValue(QString("testdevice/particle_n"), spinParticles->value());
+        settings.setValue(QString("testdevice/particle_brightnes"), spindBrightnes->value());
+        settings.setValue(QString("testdevice/particle_psf"), spindPSF->value());
+        settings.setValue(QString("testdevice/particle_background"), spindBackground->value());
+        settings.setValue(QString("testdevice/width"), spinWidth->value());
+        settings.setValue(QString("testdevice/height"), spinHeight->value());
+        settings.setValue(QString("testdevice/hotpixels"), spinHotpixels->value());
+    }
     delete dlg;
 }
 
@@ -451,65 +349,6 @@ void QFECamTestCamera::stepParticles(int camera) {
 
 
 
-
-
-
-void QFECamTestCamera::setWidth0(int width) {
-    this->width[0]=width;
-}
-void QFECamTestCamera::setHeight0(int height) {
-    this->height[0]=height;
-}
-void QFECamTestCamera::setTestPattern0(int pattern) {
-    this->testpattern[0]=pattern;
-}
-void QFECamTestCamera::setNoise0(double n) {
-    this->noise[0]=n;
-}
-void QFECamTestCamera::setParticleN0(int n) {
-    initParticles(0, n);
-}
-void QFECamTestCamera::setParticleBrightnes0(double b) {
-    this->particleBrightnes[0]=b;
-}
-void QFECamTestCamera::setParticleBackground0(double b) {
-    this->particleBackground[0]=b;
-}
-void QFECamTestCamera::setParticlePSF0(double psf) {
-    this->particlePSF[0]=psf;
-}
-void QFECamTestCamera::setHotpixels0(int num) {
-    this->hotpixels[0]=num;
-}
-
-
-void QFECamTestCamera::setWidth1(int width) {
-    this->width[1]=width;
-}
-void QFECamTestCamera::setHeight1(int height) {
-    this->height[1]=height;
-}
-void QFECamTestCamera::setTestPattern1(int pattern) {
-    this->testpattern[1]=pattern;
-}
-void QFECamTestCamera::setNoise1(double n) {
-    this->noise[1]=n;
-}
-void QFECamTestCamera::setParticleN1(int n) {
-    initParticles(1, n);
-}
-void QFECamTestCamera::setParticleBrightnes1(double b) {
-    this->particleBrightnes[1]=b;
-}
-void QFECamTestCamera::setParticleBackground1(double b) {
-    this->particleBackground[1]=b;
-}
-void QFECamTestCamera::setParticlePSF1(double psf) {
-    this->particlePSF[1]=psf;
-}
-void QFECamTestCamera::setHotpixels1(int num) {
-    this->hotpixels[1]=num;
-}
 
 
 

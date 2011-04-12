@@ -90,7 +90,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
             emit propertiesChanged();
         };
         /** \brief returns a model which may be used to access and edit the properties in this object  */
-        inline QFRDRPropertyModel* getPropertyModel() { return propModel; }
+        QFRDRPropertyModel* getPropertyModel();
     signals:
         /** \brief emitted whenever at least one of the properties changes */
         void propertiesChanged();
@@ -249,16 +249,16 @@ class QFRawDataRecord : public QObject, public QFProperties {
             return 0;
         };
         /** \brief get number of evaluations in this object */
-        inline int resultsGetEvaluationCount() {
+        inline int resultsGetEvaluationCount() const {
             return results.size();
         };
         /** \brief get the i-th evaluation name */
-        inline QString resultsGetEvaluationName(int i) {
+        inline QString resultsGetEvaluationName(int i) const {
             if ((long)i<results.size()) return results.keys().at(i);
             return QString("");
         };
         /** \brief get the i-th result name */
-        QString resultsGetResultName(QString evaluationName, int i);
+        QString resultsGetResultName(QString evaluationName, int i) const;
 
         /*! \brief save a copy of all results with the given \a oldEvalName to the given \a newEvalName
             \param oldEvalName name of the evaluation results section to copy
@@ -268,7 +268,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
         void resultsCopy(QString oldEvalName, QString newEvalName);
 
         /** \brief return a table model which may be used to display the results */
-        QFRDRResultsModel* resultsGetModel() { return resultsmodel; };
+        QFRDRResultsModel* resultsGetModel();
 
     public:
         /** \brief return type (short type string) */

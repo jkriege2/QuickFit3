@@ -8,13 +8,26 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     errorDesc="";
     name="";
     description="";
-    resultsmodel=new QFRDRResultsModel();
-    resultsmodel->init(this);
-    propModel=new QFRDRPropertyModel();
-    propModel->init(this);
+    resultsmodel=NULL;
+    propModel=NULL;
 }
 
 
+QFRDRPropertyModel* QFRawDataRecord::getPropertyModel() {
+    if (propModel==NULL) {
+        propModel=new QFRDRPropertyModel();
+        propModel->init(this);
+    }
+    return propModel;
+}
+
+QFRDRResultsModel* QFRawDataRecord::resultsGetModel() {
+    if (resultsmodel==NULL) {
+        resultsmodel=new QFRDRResultsModel();
+        resultsmodel->init(this);
+    }
+    return resultsmodel;
+};
 
 void QFRawDataRecord::init(QString name, QStringList inputFiles) {
     this->ID=project->getNewID();
@@ -129,7 +142,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
         emit propertiesChanged();
         emit rawDataChanged();
     }
-    resultsmodel->init(this);
+    if (resultsmodel) resultsmodel->init(this);
 }
 
 
@@ -401,7 +414,7 @@ double QFRawDataRecord::resultsGetErrorAsDouble(QString evalName, QString result
     return 0.0;
 };
 
-QString QFRawDataRecord::resultsGetResultName(QString evaluationName, int i) {
+QString QFRawDataRecord::resultsGetResultName(QString evaluationName, int i) const {
     if (results.contains(evaluationName)) {
         QList<QString> r=results[evaluationName].keys();
         if (i<r.size()) {

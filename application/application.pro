@@ -38,6 +38,10 @@ RC_FILE = quickfit3.rc
 QT += gui xml
 CONFIG += console exceptions rtti stl
 
+# DEFINITION FOR CImg Library
+include( ../extlibs/cimg.pri )
+PRECOMPILED_HEADER += ../extlibs/cimg.h
+
 
 
 MOC_DIR = ./.mocs/

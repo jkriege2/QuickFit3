@@ -128,7 +128,11 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
 
     protected slots:
 
-        /** \brief slot which is called when the user edits a parameter in the configuration dialog
+        /*! \brief slot which is called when the user edits a parameter in the configuration dialog
+
+            This procedure clalculates the exposure time and frame rate and displays it emitting
+            displayAcquisitionTime(). Note that this may only be called when spIterations and
+            spDivider point to existing objects!!!
          */
         void updateAcquisitionTime();
         /** \brief send the divider to the hardware */
@@ -138,8 +142,15 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         /** \brief program the FPGA */
         void programFPGA();
         void programFPGAClicked();
-        /** \brief program the given \a bitfile into the FPGA (m for master or s for slave) */
-        bool flashFPGA(QString bitfile, char fpga, QString& messageOut);
+        /*! \brief program the given \a bitfile into the FPGA (m for master or s for slave)
+
+            \param bitfile which file to flash
+            \param fpga \c 'm' to program master FPGA or \c 's' to program slave FPGA
+            \param[out] messageOut contains the messages output by the flashing procedure
+            \param retries number of retries when programming was not successfull
+            \return \c true on successfull programming
+        */
+        bool flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries=10);
 
     protected:
         /** \brief are we connected? */
@@ -161,9 +172,17 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
 
         /** \brief Bitfile for programming */
         QString bitfile;
+        /** \brief Bitfile for programming when connecting */
+        QString autoflashbitfile;
+        /** \brief indicates if the driver should try to download a bitfile to the FPGA on connecting */
+        bool autoflash;
 
         QEnhancedLineEdit* edtBitfile;
         QLabel* labFlashSuccess;
+        QSpinBox* spIterations;
+        QSpinBox* spDivider;
+
+        double calcExposureTime(double iterations, double divider);
 
 };
 

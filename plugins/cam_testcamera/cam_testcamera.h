@@ -150,50 +150,6 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         void initParticles(int camera, int n);
         void stepParticles(int camera);
 
-    public slots:
-        void setWidth0(int width);
-        void setHeight0(int height);
-        void setTestPattern0(int pattern);
-        void setNoise0(double n);
-        void setParticleN0(int n);
-        void setParticleBrightnes0(double b);
-        void setParticleBackground0(double b);
-        void setParticlePSF0(double psf);
-        void setHotpixels0(int num);
-
-        void setWidth1(int width);
-        void setHeight1(int height);
-        void setTestPattern1(int pattern);
-        void setNoise1(double n);
-        void setParticleN1(int n);
-        void setParticleBrightnes1(double b);
-        void setParticleBackground1(double b);
-        void setParticlePSF1(double psf);
-        void setHotpixels1(int num);
-    signals:
-        void displayNoise0(double n);
-        void displayWidth0(int width);
-        void displayHeight0(int height);
-        void displayParticleN0(int n);
-        void displayParticleBrightnes0(double brightnes);
-        void displayParticleBackground0(double background);
-        void displayParticlePSF0(double psf);
-        void displayTestPattern0(int pattern);
-        void enableParticles0(bool en);
-        void enableDefault0(bool en);
-        void displayHotpixels0(int num);
-
-        void displayNoise1(double n);
-        void displayWidth1(int width);
-        void displayHeight1(int height);
-        void displayParticleN1(int n);
-        void displayParticleBrightnes1(double brightnes);
-        void displayParticleBackground1(double background);
-        void displayParticlePSF1(double psf);
-        void displayTestPattern1(int pattern);
-        void enableParticles1(bool en);
-        void enableDefault1(bool en);
-        void displayHotpixels1(int num);
 
 };
 

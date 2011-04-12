@@ -15,7 +15,13 @@ QFESPIMB040::~QFESPIMB040()
 
 
 void QFESPIMB040::deinit() {
-    if (settings && main) main->storeSettings(settings);
+    if (settings && main) {
+        main->storeSettings(settings);
+    }
+    if (main) {
+        main->close();
+        delete main;
+    }
 }
 
 void QFESPIMB040::projectChanged(QFProject* oldProject, QFProject* project) {

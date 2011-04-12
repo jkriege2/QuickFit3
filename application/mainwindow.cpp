@@ -3,6 +3,7 @@
 #include "ui_about.h"
 #include "ui_aboutplugins.h"
 #include "qftools.h"
+#include "../extlibs/cimg.h"
 
 MainWindow::MainWindow(QSplashScreen* splash)
 {
@@ -75,10 +76,6 @@ MainWindow::MainWindow(QSplashScreen* splash)
 
 MainWindow::~MainWindow() {
     //std::cout<<"deleting MainWindow\n";
-    rawDataFactory->distribute(NULL, settings, this, this);
-    evaluationFactory->distribute(NULL, settings, this, this);
-    extensionManager->distribute(NULL);
-    extensionManager->deinit();
     if (project) delete project;
     //std::cout<<"deleting MainWindow ... OK\n";
 }
@@ -120,6 +117,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     if (maybeSave()) {
         writeSettings();
         closeProject();
+        rawDataFactory->distribute(NULL, settings, this, this);
+        evaluationFactory->distribute(NULL, settings, this, this);
+        extensionManager->distribute(NULL);
+        extensionManager->deinit();
         event->accept();
     } else {
         event->ignore();
@@ -215,7 +216,7 @@ void MainWindow::about() {
     QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li><li>Qt %4 (<a href=\"http://cimg.sourceforge.net/\">http://cimg.sourceforge.net/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(cimg_version));
     widget->exec();
     delete widget;
 }
@@ -642,7 +643,9 @@ void MainWindow::loadProject(const QString &fileName) {
     QString fn=fileName;
     logFileProjectWidget->open_logfile(tr("%1.log").arg(fn), false);
     logFileProjectWidget->clearLogStore();
-    project=new QFProject(fn, getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
+    //project=new QFProject(fn, getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
+    project=new QFProject(getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
+    project->readXML(fn);
     prgMainProgress->reset();
     prgMainProgress->setRange(0,1);
     prgMainProgress->setValue(0);

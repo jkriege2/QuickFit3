@@ -25,11 +25,12 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     rawData.clear();
     errorOcc=false;
     errorDesc="";
-    rdModel=new QFProjectRawDataModel(this);
-    rdModel->setParent(this);
-
-    treeModel=new QFProjectTreeModel(this);
-    treeModel->init(this);
+    //rdModel=new QFProjectRawDataModel(this);
+    //rdModel->setParent(this);
+    rdModel=NULL;
+    treeModel=NULL;
+    //treeModel=new QFProjectTreeModel(this);
+    //treeModel->init(this);
     //std::cout<<QModelIndex().internalId()<<std::endl;
     //addRawData("unknown", "testRawData0");
     //addRawData("fcs", "testRawData1");
@@ -39,28 +40,6 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     //addEvaluation("unknown", "eval2");
 }
 
-QFProject::QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
-    QObject(parent)
-{
-    this->services=services;
-    this->rdrFactory=rdrFactory;
-    this->evalFactory=evalFactory;
-    IDs.clear();
-    dataChange=false;
-    name="unnamed";
-    file="";
-    description="";
-    creator="";
-    highestID=-1;
-    rawData.clear();
-    errorOcc=false;
-    errorDesc="";
-    rdModel=new QFProjectRawDataModel(this);
-    rdModel->setParent(this);
-    treeModel=new QFProjectTreeModel(this);
-    treeModel->init(this);
-    readXML(filename);
-}
 
 QFProject::~QFProject()
 {
@@ -74,6 +53,22 @@ QFProject::~QFProject()
     rawData.clear();
     //std::cout<<"deleting QFProject ... OK\n";
 }
+
+QFProjectRawDataModel* QFProject::getRawDataModel() {
+    if (rdModel==NULL) {
+        rdModel=new QFProjectRawDataModel(this);
+        rdModel->setParent(this);
+    }
+    return rdModel;
+};
+
+QFProjectTreeModel* QFProject::getTreeModel() {
+    if (treeModel==NULL) {
+        treeModel=new QFProjectTreeModel(this);
+        treeModel->init(this);
+    }
+    return treeModel;
+};
 
 QFRawDataRecord* QFProject::getNextRawData(QFRawDataRecord* current) {
     if (!current || rawData.size()<=0) return NULL;

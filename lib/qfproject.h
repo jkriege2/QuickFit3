@@ -85,8 +85,6 @@ class QFProject : public QObject, public QFProperties {
     public:
         /** Default constructor */
         QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
-        /** Default constructor which loads a project */
-        QFProject(QString& filename, QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
         /** Default destructor */
         virtual ~QFProject();
 
@@ -249,10 +247,10 @@ class QFProject : public QObject, public QFProperties {
         inline bool hasChanged() { return dataChange; };
         /** \brief returns a data model which may be used to display a list of all
          *         contained raw data items. This model is dragf-enabled! */
-        inline QFProjectRawDataModel* getRawDataModel() const { return rdModel; };
+        QFProjectRawDataModel* getRawDataModel();
         /** \brief data model representing the items in the model as a tree.
          * This model is used to display the project tree */
-        inline QFProjectTreeModel* getTreeModel() const { return treeModel; };
+        QFProjectTreeModel* getTreeModel();
 
     signals:
         /** \brief emitted when the data changed state of the project is modified */
