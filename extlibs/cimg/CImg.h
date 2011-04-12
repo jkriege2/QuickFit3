@@ -137,7 +137,6 @@
 #define cimg_vsnprintf vsnprintf
 #endif
 
-
 // Filename separator configuration.
 //
 // Default separator is '/' for Unix-based OS, and '\' or Windows.
