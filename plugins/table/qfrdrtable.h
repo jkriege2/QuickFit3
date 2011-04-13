@@ -24,11 +24,9 @@ class QFRDRTable : public QFRawDataRecord {
         virtual ~QFRDRTable();
 
         /** \brief returns the used datamodel */
-        QFTableModel* model() { return datamodel; };
+        QFTableModel* model() ;
         /** \brief returns the table contents at the given position */
-        QVariant getModelData(quint16 row, quint16 column) {
-            return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
-        };
+        QVariant getModelData(quint16 row, quint16 column);
 
 
         /** \brief return type (short type string) */

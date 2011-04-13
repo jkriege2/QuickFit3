@@ -11,11 +11,9 @@
 
 
 QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
-    datamodel(NULL), QFRawDataRecord(parent)//, name, QStringList(inputFile))
+    QFRawDataRecord(parent)//, name, QStringList(inputFile))
 {
-    datamodel=new QFTableModel(this);
-    connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
-    connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
+    datamodel=NULL;
 }
 
 
@@ -23,6 +21,24 @@ QFRDRTable::~QFRDRTable()
 {
     //dtor
 }
+
+QFTableModel* QFRDRTable::model() {
+    if (!datamodel) {
+        datamodel=new QFTableModel(this);
+        connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
+        connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
+    }
+    return datamodel;
+};
+
+QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
+    if (!datamodel) {
+        datamodel=new QFTableModel(this);
+        connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
+        connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
+    }
+    return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
+};
 
 
 void QFRDRTable::exportData(const QString& format, const QString& filename)const  {
@@ -41,7 +57,11 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
 
 
 void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
-    if (!datamodel) return;
+    if (!datamodel) {
+        datamodel=new QFTableModel(this);
+        connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
+        connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
+    }
     if (files.size()>0) {
         if (datamodel->hasChanged()) datamodel->saveCSV(files[0]);
     } else {

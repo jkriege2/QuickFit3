@@ -1,7 +1,7 @@
 #include "qfrawdatarecord.h"
 
 QFRawDataRecord::QFRawDataRecord(QFProject* parent):
-    QObject(parent)
+    QObject(parent), QFProperties()
 {
     project=parent;
     errorOcc=false;

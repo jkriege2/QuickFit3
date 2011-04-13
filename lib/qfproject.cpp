@@ -22,7 +22,7 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     description="";
     creator="";
     highestID=-1;
-    rawData.clear();
+    //rawData.clear();
     errorOcc=false;
     errorDesc="";
     //rdModel=new QFProjectRawDataModel(this);
@@ -51,6 +51,14 @@ QFProject::~QFProject()
         delete i.value();
     }
     rawData.clear();
+
+    QMapIterator<int, QFEvaluationItem*> j(evaluations);
+    while (j.hasNext()) {
+        j.next();
+        //emit recordAboutToBeDeleted(i.value());
+        delete j.value();
+    }
+    evaluations.clear();
     //std::cout<<"deleting QFProject ... OK\n";
 }
 
@@ -71,17 +79,17 @@ QFProjectTreeModel* QFProject::getTreeModel() {
 };
 
 QFRawDataRecord* QFProject::getNextRawData(QFRawDataRecord* current) {
-    if (!current || rawData.size()<=0) return NULL;
+    if ( (!current) || (rawData.size()<=0) ) return NULL;
     int i=rawData.values().indexOf(current);
-    if (i+1>0 && i+1<rawData.size()) return rawData.values().at(i+1);
+    if ((i+1>0) && (i+1<rawData.size())) return rawData.values().at(i+1);
     if (i==rawData.size()-1) return rawData.values().at(0);
     return NULL;
 }
 
 QFRawDataRecord* QFProject::getPreviousRawData(QFRawDataRecord* current) {
-    if (!current || rawData.size()<=0) return NULL;
+    if ( (!current) || (rawData.size()<=0) ) return NULL;
     int i=rawData.values().indexOf(current);
-    if (i-1>=0 && i-1<rawData.size()) return rawData.values().at(i-1);
+    if ((i-1>=0) && (i-1<rawData.size()) ) return rawData.values().at(i-1);
     if (i==0) return rawData.values().at(rawData.size()-1);
     return NULL;
 }
@@ -165,7 +173,8 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     int newID=rec->getID();
     if (rawData.contains(newID)) return false;
     if (newID>highestID) highestID=newID;
-    rawData[newID]=rec;
+    //rawData[newID]=rec;
+    rawData.insert(newID, rec);
     IDs.insert(newID);
     dataChange=true;
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(projectChanged()));
@@ -180,10 +189,12 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
 
 bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
     if (!rec) return false;
-    if (evaluations.contains(rec->getID())) return false;
-    if (rec->getID()>highestID) highestID=rec->getID();
-    evaluations[rec->getID()]=rec;
-    IDs.insert(rec->getID());
+    int newID=rec->getID();
+    if (evaluations.contains(newID)) return false;
+    if (newID>highestID) highestID=newID;
+    //evaluations[rec->getID()]=rec;
+    evaluations.insert(newID, rec);
+    IDs.insert(newID);
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));

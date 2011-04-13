@@ -1,6 +1,7 @@
 #ifndef QFPROJECT_H
 #define QFPROJECT_H
 
+#include <map>
 #include <QObject>
 #include <QMap>
 #include <QSet>

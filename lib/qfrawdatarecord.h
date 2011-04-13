@@ -81,13 +81,13 @@ class QFRawDataRecord : public QObject, public QFProperties {
         inline void setName(const QString n) {
             name=n;
             //emit dataChanged(propModel->index(project->getRawDataIndex(this), 0), index(project->getRawDataIndex(this), 2));
-            emit propertiesChanged();
+            emitPropertiesChanged();
         }
         /** \brief set the description  */
         inline void setDescription(const QString& d) {
             description=d;
             //emit dataChanged(index(project->getRawDataIndex(this), 0), index(project->getRawDataIndex(this), 2));
-            emit propertiesChanged();
+            emitPropertiesChanged();
         };
         /** \brief returns a model which may be used to access and edit the properties in this object  */
         QFRDRPropertyModel* getPropertyModel();

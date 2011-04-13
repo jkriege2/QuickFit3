@@ -192,7 +192,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
             else return true;
         }
         /** \brief set whether the given run is visible. the average run is indicated by -1 */
-        inline virtual void setRunVisible(int run, bool vis) { if (run+1<runsVisibleList.size() && run>=-1) {runsVisibleList[run+1]=vis; emit propertiesChanged();} }
+        inline virtual void setRunVisible(int run, bool vis) { if (run+1<runsVisibleList.size() && run>=-1) {runsVisibleList[run+1]=vis; emitPropertiesChanged();} }
 
     protected:
         /** \brief write the contents of the object to a XML file */

@@ -8,8 +8,8 @@
 
 */
 
-class QEnhancedTableView : public QTableView
-{
+class QEnhancedTableView : public QTableView {
+        Q_OBJECT
     public:
         QEnhancedTableView(QWidget* parent=NULL);
         virtual ~QEnhancedTableView();

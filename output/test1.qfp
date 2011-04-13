@@ -323,18 +323,41 @@
                     <result name="diff_tau1" type="numbererror" value="24.127" error="0.732" unit="usec"/>
                     <result name="diff_tau2" type="numbererror" value="300" error="0" unit="usec"/>
                     <result name="diff_tau3" type="numbererror" value="300" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.0046909" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="1289" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.237055" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="101" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="101" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="101" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 101 iterations.&#10;reason: stopped by small delta_p.&#10;SES = 0.0046909  [old_SES = 0.237055]"/>
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.124362" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9776" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.580424" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.124362  [old_SES = 0.580424]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.124362  [old_SES = 0.580424]"/>
                     <result name="fitalg_name" type="string" value="fit_levmar"/>
-                    <result name="fitalg_runtime" type="number" value="94" unit="msecs"/>
-                    <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
+                    <result name="fitalg_runtime" type="number" value="609" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
                     <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.17819" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="17.8512" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="521.089" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="5.20833" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.991085" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.00891462" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="29.9853" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="3000" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="5.61197" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="9.0084" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
                     <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
                     <result name="focus_width" type="numbererror" value="250" error="0" unit="nm"/>
@@ -678,18 +701,41 @@
                     <result name="diff_tau1" type="numbererror" value="43.321" error="0.41" unit="usec"/>
                     <result name="diff_tau2" type="numbererror" value="300" error="0" unit="usec"/>
                     <result name="diff_tau3" type="numbererror" value="300" error="0" unit="usec"/>
-                    <result name="fitalg_error_sum" type="number" value="0.000103429" unit=""/>
-                    <result name="fitalg_fit_paramcount" type="integer" value="4" unit=""/>
-                    <result name="fitalg_function_evals" type="number" value="638" unit=""/>
-                    <result name="fitalg_initial_error_sum" type="number" value="0.000103429" unit=""/>
-                    <result name="fitalg_iterations" type="number" value="7" unit=""/>
-                    <result name="fitalg_jacobian_evals" type="number" value="7" unit=""/>
-                    <result name="fitalg_linsys_solved" type="number" value="7" unit=""/>
-                    <result name="fitalg_message" type="string" value="levmar returned after 7 iterations.&#10;reason: stopped by small delta_p.&#10;SES = 0.000103429  [old_SES = 0.000103429]"/>
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.000102271" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="681" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.641065" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="23" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="23" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="23" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 23 iterations. reason: 'stopped by small delta_p.' new_SES = 0.000102271  [old_SES = 0.641065]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 23 iterations.&lt;br&gt;reason: stopped by small &amp;delta;&lt;sub&gt;&lt;b&gt;p&lt;/b&gt;&lt;/sub&gt;.&#10;SES = 0.000102271  [old_SES = 0.641065]"/>
                     <result name="fitalg_name" type="string" value="fit_levmar"/>
                     <result name="fitalg_runtime" type="number" value="47" unit="msecs"/>
                     <result name="fitalg_stop_reason" type="string" value="stopped by small delta_p."/>
                     <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.119005" error="0.000501" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="26.7293" error="0.112" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="366.054" error="6.39" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="5.2084" error="17.3" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.99718" error="0.00385" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.00282" error="0.00385" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="42.685" error="0.745" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="2999.94" error="9980" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="8.403" error="0.0354" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="1.4958" error="0.1" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.22441" error="0.00805" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
                     <result name="focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
                     <result name="focus_width" type="numbererror" value="250" error="0" unit="nm"/>
@@ -764,6 +810,7 @@
                 <property name="TIME" type="time" data="17:30:18" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="algorithm" type="string" data="fit_simanneal" usereditable="false" visible="false"/>
                 <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit15_r0_datacut_max" type="int" data="175" usereditable="false" visible="false"/>
@@ -808,6 +855,43 @@
                     <result name="nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.0409677" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9001" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.0409678" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.0409677  [old_SES = 0.0409678]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.0409677  [old_SES = 0.0409678]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="578" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.0648134" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="49.0781" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="529.599" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="5.20823" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="1e-05" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.99999" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="29.5035" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="3000.06" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="15.4289" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="3.15315" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                 </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.0584016" error="0" unit=""/>
@@ -914,6 +998,43 @@
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
                 </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.114343" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9563" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="26.3073" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.114343  [old_SES = 26.3073]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.114343  [old_SES = 26.3073]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="515" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.843445" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="3.77134" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="56.2989" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="7.00363" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.588674" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.411326" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="277.537" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="2230.99" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="1.18561" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="0" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.097834" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
+                </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.795644" error="0" unit=""/>
                     <result name="concentration" type="numbererror" value="5.1342" error="0.67" unit="nM"/>
@@ -1018,6 +1139,43 @@
                     <result name="nonfl_theta1" type="numbererror" value="0.4734" error="0.0392" unit=""/>
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.0020576" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9020" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.824489" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.0020576  [old_SES = 0.824489]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.0020576  [old_SES = 0.824489]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="609" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.3799" error="0.00185" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="8.373" error="0.0407" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="517.243" error="22.6" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="23.0069" error="1.6" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.7129" error="0.0112" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.2871" error="0.0112" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="30.2083" error="1.32" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="679.144" error="47.2" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="2.6323" error="0.0128" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="0.5214" error="0.049" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.4734" error="0.0392" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                 </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.378024" error="0" unit=""/>
@@ -1125,6 +1283,43 @@
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
                 </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.000740755" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="8986" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.129154" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.000740755  [old_SES = 0.129154]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.000740755  [old_SES = 0.129154]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="579" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.23185" error="0.00217" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="13.7198" error="0.128" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="296.785" error="13.5" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="10.9095" error="1.85" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.885" error="0.0109" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.115" error="0.0109" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="52.6475" error="2.4" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="1432.23" error="243" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="4.3132" error="0.0404" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="3.0899" error="0.279" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.19774" error="0.00724" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
+                </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.244527" error="0" unit=""/>
                     <result name="concentration" type="numbererror" value="16.7056" error="2.18" unit="nM"/>
@@ -1229,6 +1424,43 @@
                     <result name="nonfl_theta1" type="numbererror" value="0.2301" error="0.01" unit=""/>
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.000602552" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="8985" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.343775" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.000602552  [old_SES = 0.343775]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.000602552  [old_SES = 0.343775]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="578" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.14555" error="0.00199" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="21.8545" error="0.298" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="323.142" error="19.4" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="9.4558" error="2.44" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.9019" error="0.0129" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.0981" error="0.0129" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="48.3534" error="2.91" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="1652.43" error="426" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="6.8705" error="0.0937" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="2.9874" error="0.325" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.2301" error="0.01" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                 </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.149136" error="0" unit=""/>
@@ -1335,6 +1567,43 @@
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
                 </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.0367192" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9081" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="5.33991" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.0367192  [old_SES = 5.33991]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.0367192  [old_SES = 5.33991]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="485" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.476231" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="6.67936" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="44.6186" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="7.41809" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.650444" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.349556" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="350.19" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="2106.34" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="2.09982" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="0" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.296814" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
+                </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.456834" error="0" unit=""/>
                     <result name="concentration" type="numbererror" value="8.9419" error="1.17" unit="nM"/>
@@ -1439,6 +1708,43 @@
                     <result name="nonfl_theta1" type="numbererror" value="0.118582" error="0" unit=""/>
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.000534082" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="8982" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="1.06549" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.000534082  [old_SES = 1.06549]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.000534082  [old_SES = 1.06549]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="484" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.0610758" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="52.0815" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="157.166" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="8.58995" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.911408" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.088592" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="99.4174" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="1818.99" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="16.3731" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="0" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.118582" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                 </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.0594352" error="0" unit=""/>
@@ -1559,6 +1865,43 @@
                     <result name="nonfl_theta1" type="numbererror" value="0.192337" error="0" unit=""/>
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.000559285" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="8982" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="1.05657" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.000559285  [old_SES = 1.05657]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.000559285  [old_SES = 1.05657]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="485" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.0613432" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="51.8545" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="155.146" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="8.76017" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.89772" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.10228" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="100.711" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="1783.64" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="16.3017" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="0" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.192337" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                 </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_run0">
                     <result name="1n_particle" type="numbererror" value="0.0590348" error="0" unit=""/>
@@ -1877,6 +2220,43 @@
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
                 </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.00791697" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9901" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="1.47147" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.00791697  [old_SES = 1.47147]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.00791697  [old_SES = 1.47147]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="703" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.0245666" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="129.482" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="143.834" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="0.121154" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.824526" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.175474" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="108.632" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="128968" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="40.7057" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="2.40978" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
+                </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_run0">
                     <result name="1n_particle" type="numbererror" value="0.1" error="0" unit=""/>
                     <result name="concentration" type="numbererror" value="40.8498" error="5.33" unit="nM"/>
@@ -2006,6 +2386,7 @@
                 <property name="TIME" type="time" data="14:13:31" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="algorithm" type="string" data="fit_levmar" usereditable="false" visible="false"/>
                 <property name="fcs_fit14_r0_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit14_r1_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
                 <property name="fcs_fit14_ravg_datacut_min" type="int" data="3" usereditable="false" visible="false"/>
@@ -2053,6 +2434,43 @@
                     <result name="nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.00196202" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9972" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="1.71193" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.00196202  [old_SES = 1.71193]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.00196202  [old_SES = 1.71193]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="688" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.00620592" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="512.562" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="15625" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="5.1358" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="1e-05" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.99999" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="1" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="3042.37" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="161.136" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="1.99636" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
                 </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_run0">
                     <result name="1n_particle" type="numbererror" value="0.1" error="0" unit=""/>
@@ -2229,6 +2647,43 @@
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
                 </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.000482619" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="8990" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.723557" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.000482619  [old_SES = 0.723557]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.000482619  [old_SES = 0.723557]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="578" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.279616" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="11.376" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="24.2934" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="5.26043" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="643.179" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="2970.29" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="3.57634" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="1.08954" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.144344" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
+                </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.280877" error="0" unit=""/>
                     <result name="concentration" type="numbererror" value="14.5436" error="1.9" unit="nM"/>
@@ -2334,6 +2789,43 @@
                     <result name="offset" type="numbererror" value="0" error="0" unit=""/>
                     <result name="used_run" type="integer" value="-1" unit=""/>
                 </evaluation>
+                <evaluation name="fcs_fit_14_fcs_diff_runavg">
+                    <result name="fit_cut_low" type="integer" value="3" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="183" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="180" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff"/>
+                    <result name="fit_used_run" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" type="number" value="0.00272517" unit=""/>
+                    <result name="fitalg_fit_paramcount" type="integer" value="6" unit=""/>
+                    <result name="fitalg_function_evals" type="number" value="9843" unit=""/>
+                    <result name="fitalg_initial_error_sum" type="number" value="0.0607332" unit=""/>
+                    <result name="fitalg_iterations" type="number" value="1000" unit=""/>
+                    <result name="fitalg_jacobian_evals" type="number" value="1000" unit=""/>
+                    <result name="fitalg_linsys_solved" type="number" value="1000" unit=""/>
+                    <result name="fitalg_message" type="string" value="levmar returned after 1000 iterations. reason: 'stopped by maximum iterations.' new_SES = 0.00272517  [old_SES = 0.0607332]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;levmar&lt;/b&gt; returned after 1000 iterations.&lt;br&gt;reason: stopped by maximum iterations.&#10;SES = 0.00272517  [old_SES = 0.0607332]"/>
+                    <result name="fitalg_name" type="string" value="fit_levmar"/>
+                    <result name="fitalg_runtime" type="number" value="532" unit="msecs"/>
+                    <result name="fitalg_stop_reason" type="string" value="stopped by maximum iterations."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" type="numbererror" value="0.193634" error="0" unit=""/>
+                    <result name="fitparam_concentration" type="numbererror" value="16.4275" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" type="numbererror" value="210.898" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_coeff2" type="numbererror" value="7.93478" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_rho1" type="numbererror" value="0.755757" error="0" unit=""/>
+                    <result name="fitparam_diff_rho2" type="numbererror" value="0.244243" error="0" unit=""/>
+                    <result name="fitparam_diff_tau1" type="numbererror" value="74.0881" error="0" unit="usec"/>
+                    <result name="fitparam_diff_tau2" type="numbererror" value="1969.18" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" type="numbererror" value="6" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" type="numbererror" value="0.522031" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" type="numbererror" value="250" error="0" unit="nm"/>
+                    <result name="fitparam_n_components" type="numbererror" value="2" error="0" unit=""/>
+                    <result name="fitparam_n_nonfluorescent" type="numbererror" value="1" error="0" unit=""/>
+                    <result name="fitparam_n_particle" type="numbererror" value="5.16438" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" type="numbererror" value="0" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" type="numbererror" value="0.0355214" error="0" unit=""/>
+                    <result name="fitparam_offset" type="numbererror" value="0" error="0" unit=""/>
+                </evaluation>
                 <evaluation name="fcs_fit_15_fcs_diff_runavg">
                     <result name="1n_particle" type="numbererror" value="0.190997" error="0" unit=""/>
                     <result name="concentration" type="numbererror" value="21.3877" error="2.79" unit="nM"/>
@@ -2382,7 +2874,7 @@
             <properties>
                 <property name="plot_errorstyle" type="int" data="2" usereditable="false" visible="false"/>
                 <property name="plot_grid" type="bool" data="true" usereditable="false" visible="false"/>
-                <property name="plot_residualshistogrambins" type="int" data="15" usereditable="false" visible="false"/>
+                <property name="plot_residualshistogrambins" type="int" data="10" usereditable="false" visible="false"/>
                 <property name="plot_residualsstyle" type="int" data="0" usereditable="false" visible="false"/>
                 <property name="weighted_residuals" type="bool" data="false" usereditable="false" visible="false"/>
             </properties>
@@ -2397,7 +2889,7 @@
                         <parameter id="mu" type="double" data="0.001"/>
                     </algorithm>
                 </algorithms>
-                <functions current="fcs_adiff">
+                <functions current="fcs_diff">
                     <parameter id="fcs_adiff___diff_alpha1" value="1" fix="1"/>
                     <parameter id="fcs_adiff___diff_alpha2" value="1" fix="1"/>
                     <parameter id="fcs_adiff___diff_rho2" value="0.5"/>
@@ -2410,7 +2902,12 @@
                     <parameter id="fcs_adiff___nonfl_tau1" value="3"/>
                     <parameter id="fcs_adiff___nonfl_theta1" value="0.22339"/>
                     <parameter id="fcs_adiff___offset" fix="1"/>
-                    <parameter id="fcs_diff___focus_struct_fac" fix="1"/>
+                    <parameter id="fcs_diff___diff_rho3" value="0"/>
+                    <parameter id="fcs_diff___diff_tau2" value="3000"/>
+                    <parameter id="fcs_diff___focus_struct_fac" max="10" fix="1"/>
+                    <parameter id="fcs_diff___n_components" value="2"/>
+                    <parameter id="fcs_diff___n_particle" value="5"/>
+                    <parameter id="fcs_diff___nonfl_theta1" value="0.22339"/>
                     <parameter id="fcs_diff___offset" fix="1"/>
                 </functions>
             </data>
@@ -2442,7 +2939,11 @@
                         <parameter id="t0" type="double" data="0.001"/>
                     </algorithm>
                 </algorithms>
-                <functions current="fcs_diff">
+                <functions current="fcs_adiff">
+                    <parameter id="fcs_adiff___focus_struct_fac" max="100" fix="1"/>
+                    <parameter id="fcs_adiff___focus_width" value="230"/>
+                    <parameter id="fcs_adiff___n_components" value="2"/>
+                    <parameter id="fcs_adiff___offset" fix="1"/>
                     <parameter id="fcs_diff___focus_struct_fac" fix="1"/>
                     <parameter id="fcs_diff___focus_width" value="230" error="10"/>
                     <parameter id="fcs_diff___n_components" value="2"/>
