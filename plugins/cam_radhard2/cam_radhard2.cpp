@@ -356,6 +356,25 @@ void QFExtensionCameraRadhard2::sendIterations() {
 }
 
 
+bool QFExtensionCameraRadhard2::startAcquisition(unsigned int camera, QString filenamePrefix) {
+    return false;
+}
+
+bool QFExtensionCameraRadhard2::cancelAcquisition(unsigned int camera) {
+    return true;
+}
+
+bool QFExtensionCameraRadhard2::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+    return false;
+}
+
+void QFExtensionCameraRadhard2::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+}
+
+bool QFExtensionCameraRadhard2::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+    return false;
+}
+
 void QFExtensionCameraRadhard2::log_text(QString message) {
 	if (logService) logService->log_text(LOG_PREFIX+message);
 	else if (services) services->log_text(LOG_PREFIX+message);

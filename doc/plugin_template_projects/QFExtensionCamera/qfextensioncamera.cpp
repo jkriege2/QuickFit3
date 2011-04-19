@@ -139,6 +139,25 @@ double QFExtensionCameraImplementation::getExposureTime(unsigned int camera) {
     return /* exposure time of the last image */;
 }
 
+bool QFExtensionCameraImplementation::startAcquisition(unsigned int camera, QString filenamePrefix) {
+    return false;
+}
+
+bool QFExtensionCameraImplementation::cancelAcquisition(unsigned int camera) {
+    return true;
+}
+
+bool QFExtensionCameraImplementation::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+    return false;
+}
+
+void QFExtensionCameraImplementation::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+}
+
+bool QFExtensionCameraImplementation::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+    return false;
+}
+
 void QFExtensionCameraImplementation::log_indent() {
 	if (logService) logService->log_indent();
 	else if (services) services->log_indent();
@@ -163,7 +182,6 @@ void QFExtensionCameraImplementation::log_error(QString message) {
 	if (logService) logService->log_error(message);
 	else if (services) services->log_error(message);
 }
-
 
 
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraImplementation)

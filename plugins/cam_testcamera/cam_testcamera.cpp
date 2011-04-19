@@ -348,6 +348,25 @@ void QFECamTestCamera::stepParticles(int camera) {
 }
 
 
+bool QFECamTestCamera::startAcquisition(unsigned int camera, QString filenamePrefix) {
+    return false;
+}
+
+bool QFECamTestCamera::cancelAcquisition(unsigned int camera) {
+    return true;
+}
+
+bool QFECamTestCamera::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+    return false;
+}
+
+void QFECamTestCamera::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+}
+
+bool QFECamTestCamera::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+    return false;
+}
+
 
 
 

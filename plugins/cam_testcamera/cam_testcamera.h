@@ -100,6 +100,16 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
+        /** \copydoc QFExtensionCamera::startAcquisition() */
+        virtual bool startAcquisition(unsigned int camera, QString filenamePrefix=QString(""));
+        /** \copydoc QFExtensionCamera::cancelAcquisition() */
+        virtual bool cancelAcquisition(unsigned int camera);
+        /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
+        virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
+        /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
+        virtual void getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters);
+        /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
+        virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
 
         /** \brief log project text message
          *  \param message the message to log
