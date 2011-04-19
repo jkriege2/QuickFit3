@@ -36,5 +36,5 @@ plg_cam_testcamera.depends = lib libqf3widgets
 
 SUBDIRS += plg_cam_radhard2
 plg_cam_radhard2.subdir=./plugins/cam_radhard2
-plg_cam_radhard2.depends = lib
+plg_cam_radhard2.depends = lib libqf3widgets
 
