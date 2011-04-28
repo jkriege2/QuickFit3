@@ -94,10 +94,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
 
-        /** \brief indent all following lines in the logging pane */
-        virtual void log_indent();
-        /** \brief undo former log_indent() */
-        virtual void log_unindent();
+
 
         /** \brief log project text message
          *  \param message the message to log

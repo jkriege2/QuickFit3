@@ -81,6 +81,8 @@ class QFPluginServices {
         virtual QSettings* getSettings()=0;
         /** \brief return a pointer to the applications ProgramOptions object */
         virtual ProgramOptions* getOptions()=0;
+        /** \brief return a base path under which to store additional configuration files */
+        virtual QString getConfigFileDirectory()=0;
 };
 
 

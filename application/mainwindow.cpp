@@ -949,3 +949,7 @@ void MainWindow::insertToolBar(QString toolbarname, QToolBar* newToolbar) {
 QFExtensionManager* MainWindow::getExtensionManager() {
     return extensionManager;
 }
+
+QString MainWindow::getConfigFileDirectory() {
+    return QApplication::applicationDirPath();
+}

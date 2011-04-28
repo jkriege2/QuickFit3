@@ -215,6 +215,7 @@
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.cpp" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.h" />
 		<Unit filename="plugins\interfaces\qfextensioncamera.h" />
+		<Unit filename="plugins\interfaces\qfextensionlinearstage.h" />
 		<Unit filename="plugins\interfaces\qfrdrfcsdatainterface.h" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraconfig.cpp" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraconfig.h" />
@@ -226,6 +227,11 @@
 		<Unit filename="plugins\spimb040\spimb040.h" />
 		<Unit filename="plugins\spimb040\spimb040.pro" />
 		<Unit filename="plugins\spimb040\spimb040.qrc" />
+		<Unit filename="plugins\stage_pi\stage_pi.cpp" />
+		<Unit filename="plugins\stage_pi\stage_pi.h" />
+		<Unit filename="plugins\stage_pi\stage_pi.png" />
+		<Unit filename="plugins\stage_pi\stage_pi.pro" />
+		<Unit filename="plugins\stage_pi\stage_pi.qrc" />
 		<Unit filename="plugins\table\dlg_csvparameters.ui" />
 		<Unit filename="plugins\table\dlgcsvparameters.cpp" />
 		<Unit filename="plugins\table\dlgcsvparameters.h" />
@@ -241,6 +247,8 @@
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
 		<Unit filename="..\..\..\LIB\trunk\jkimage.h" />
+		<Unit filename="..\..\..\LIB\trunk\jkserialconnection.cpp" />
+		<Unit filename="..\..\..\LIB\trunk\jkserialconnection.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\colorcombobox.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\jkdoubleedit.cpp" />

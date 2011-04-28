@@ -158,15 +158,6 @@ bool QFExtensionCameraImplementation::getAcquisitionPreview(unsigned int camera,
     return false;
 }
 
-void QFExtensionCameraImplementation::log_indent() {
-	if (logService) logService->log_indent();
-	else if (services) services->log_indent();
-}
-
-void QFExtensionCameraImplementation::log_unindent() {
-	if (logService) logService->log_unindent();
-	else if (services) services->log_unindent();
-}
 
 void QFExtensionCameraImplementation::log_text(QString message) {
 	if (logService) logService->log_text(message);

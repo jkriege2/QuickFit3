@@ -83,6 +83,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         virtual QSettings* getSettings();
         /** \copydoc QFPluginServices::getOptions() */
         virtual ProgramOptions* getOptions();
+        /** \copydoc QFPluginServices::getConfigFileDirectory() */
+        virtual QString getConfigFileDirectory();
 
 
         /** \copydoc QFExtensionServices::getMenu() */

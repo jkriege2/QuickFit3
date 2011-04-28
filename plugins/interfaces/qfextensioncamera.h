@@ -64,9 +64,9 @@ class QFExtensionCamera {
              \return \c true on success
           */
          virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL)=0;
-         /** \brief connect to the device/sctivate it */
+         /** \brief connect to the device/activate it */
          virtual bool connectDevice(unsigned int camera)=0;
-         /** \brief connect to the device/sctivate it */
+         /** \brief connect to the device/activate it */
          virtual void disconnectDevice(unsigned int camera)=0;
          /** \brief returns the acquisition time (time the camera is open) in seconds */
          virtual double getExposureTime(unsigned int camera)=0;
