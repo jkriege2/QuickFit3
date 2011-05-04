@@ -8,7 +8,7 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 
 LIBS += -L../output/ -lquickfit3lib
 
-QT += gui xml svg
+QT += gui xml svg opengl
 DESTDIR = ../output/
 #DLLDESTDIR = $$DESTDIR
 

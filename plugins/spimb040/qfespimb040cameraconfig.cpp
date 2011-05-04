@@ -28,6 +28,7 @@ QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, 
     m_parent=parent;
     m_extManager=extManager;
     camView=NULL;
+    locked=false;
 
     // search for available camera plugins
     findCameras(extManager);
@@ -36,7 +37,7 @@ QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, 
     viewData.reset();
 
     // create widgets and actions
-    setTitle(tr("Camera %1:").arg(camViewID+1));
+    setTitle(tr(" Camera %1: ").arg(camViewID+1));
     createWidgets(extManager);
     createActions();
     rereadConfigCombos();
@@ -51,6 +52,36 @@ QFESPIMB040CameraConfig::~QFESPIMB040CameraConfig()
         camView->close();
         delete camView;
         camView=NULL;
+    }
+}
+
+bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera) {
+    if (locked || (!actDisConnect->isChecked()) || (!viewData.camera) || (!viewData.extension)) {
+        *camera=-1;
+        *extension=NULL;
+        *ecamera=NULL;
+        return false;
+    }
+    actStartStopPreview->setChecked(false);
+    displayStates(QFESPIMB040CameraConfig::Locked);
+
+    QString filename="";
+
+    if (cmbAcquisitionConfiguration->currentIndex()>=0) filename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
+    QSettings* settings=new QSettings(filename, QSettings::IniFormat);
+    viewData.camera->useCameraSettings(viewData.usedCamera, *settings);
+    delete settings;
+    *extension=viewData.extension;
+    *ecamera=viewData.camera;
+    *camera=viewData.usedCamera;
+    locked=true;
+    return true;
+}
+
+void QFESPIMB040CameraConfig::releaseCamera() {
+    if (locked) {
+        displayStates(QFESPIMB040CameraConfig::Connected);
+        locked=false;
     }
 }
 
@@ -386,6 +417,30 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         cmbPreviewConfiguration->setEnabled(false);
         cmbAcquisitionConfiguration->setEnabled(false);
         spinAcquisitionDelay->setEnabled(false);
+
+
+    } else if (state==QFESPIMB040CameraConfig::Locked) {
+        setEnabled(true);
+        actDisConnect->setIcon(QIcon(":/spimb040/acquisitiondisconnect.png"));
+        actDisConnect->setText(tr("&Disconnect"));
+        actDisConnect->setEnabled(false);
+        actDisConnect->setChecked(true);
+        actStartStopPreview->setEnabled(false);
+        actStartStopPreview->setChecked(false);
+        actStartStopPreview->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
+        actStartStopPreview->setText(tr("&Start Preview"));
+        actPreviewSingle->setEnabled(false);
+        actPreviewConfig->setEnabled(false);
+        actDeletePreviewConfig->setEnabled(false);
+        actSaveAsPreviewConfig->setEnabled(false);
+        actAcquisitionConfig->setEnabled(false);
+        actDeleteAcquisitionConfig->setEnabled(false);
+        actSaveAsAcquisitionConfig->setEnabled(false);
+
+        cmbAcquisitionDevice->setEnabled(false);
+        cmbPreviewConfiguration->setEnabled(false);
+        cmbAcquisitionConfiguration->setEnabled(false);
+        spinAcquisitionDelay->setEnabled(false);
     } else { // Disconnected
         setEnabled(true);
         actDisConnect->setIcon(QIcon(":/spimb040/acquisitionconnect.png"));
@@ -419,6 +474,8 @@ bool QFESPIMB040CameraConfig::connectDevice(int device, int camera) {
 
     viewData.reset();
 
+    locked=false;
+
     if ((device>=0)&&(device<cameras.size())) {
         extension=qobject_cast<QFExtension*>(cameras[device]);
         cam=qobject_cast<QFExtensionCamera*>(cameras[device]);
@@ -445,6 +502,7 @@ bool QFESPIMB040CameraConfig::connectDevice(int device, int camera) {
 
 
 void QFESPIMB040CameraConfig::disconnectDevice() {
+    locked=false;
     if (viewData.camera) {
         if (viewData.camera->isConnected(viewData.usedCamera)) {
             viewData.camera->disconnectDevice(viewData.usedCamera);
@@ -506,7 +564,7 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
                 m_parent->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
             } else {
                 displayStates(QFESPIMB040CameraConfig::Connected);
-                m_parent->log_text(tr("connected to device %1, camer %2!\n").arg(extension->getName()).arg(camIdx));
+                m_parent->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
                 camView->show();
                 acquireSingle();
             }

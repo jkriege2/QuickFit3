@@ -3,6 +3,8 @@
 #include <QtPlugin>
 #include <iostream>
 
+#define LOG_PREFIX "[PI863]: "
+
 QFExtensionLinearStagePI::QFExtensionLinearStagePI(QObject* parent):
     QObject(parent)
 {
@@ -43,9 +45,9 @@ void QFExtensionLinearStagePI::deinit() {
     inifile.setValue("driver/maxjoystickvelocity", maxJoystickVelocity);
 
 
-    for (int i=0; i<=axes.size(); i++) {
+    for (int i=0; i<axes.size(); i++) {
         QString axisname=axes[i].name;
-        inifile.setValue(axisname+"id", QString(QChar(axes[i].ID)));
+        inifile.setValue(axisname+"/id", QString(QChar(axes[i].ID)));
     }
 }
 
@@ -72,10 +74,12 @@ void QFExtensionLinearStagePI::initExtension() {
 
     axes.clear();
     for (int i=0; i<=15; i++) {
-        QString axisname=QString("axis%1/").arg(i);
-        if (inifile.contains(axisname+"id")) {
+        QString axisname=QString("axis%1").arg(i);
+        if (inifile.contains(axisname+"/id")) {
             AxisDescription d;
-            d.ID=inifile.value(axisname+"id", '0').toChar();
+            QString s=inifile.value(axisname+"/id", '0').toString();
+            d.ID='0';
+            if (s.size()>0) d.ID=s[0];
             d.velocity=initVelocity;
             d.joystickEnabled=false;
             d.state=QFExtensionLinearStage::Disconnected;
@@ -111,7 +115,7 @@ unsigned int QFExtensionLinearStagePI::getAxisCount() {
 	return axes.size();
 }
 
-void QFExtensionLinearStagePI::showSettingsDialog(QWidget* parent) {
+void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* parent) {
 	/* open a dialog that configures the camera.
 
 	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK
@@ -152,6 +156,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(QWidget* parent) {
     }
     delete dlg;
 	*/
+	QMessageBox::information(parent, getName(), tr("There is currently no configuration dialog!"));
 }
 
 void QFExtensionLinearStagePI::selectAxis(int i) {
@@ -193,7 +198,7 @@ void QFExtensionLinearStagePI::checkComError() {
     if (com.hasErrorOccured()) {
         for (int i=0; i<axes.size(); i++) {
             axes[i].state=QFExtensionLinearStage::Error;
-            log_error(tr(">> PI863:  serial port error: %1").arg(com.getLastError().c_str()));
+            log_error(tr(LOG_PREFIX " serial port error: %1\n").arg(com.getLastError().c_str()));
         }
     }
 }
@@ -201,8 +206,8 @@ void QFExtensionLinearStagePI::checkComError() {
 bool QFExtensionLinearStagePI::checkComConnected() {
     bool c=com.isConnectionOpen();
     if (!c) {
-        log_error(tr(">> PI863:  Could not connect to Mercury C-863 Motor Controller!!!"));
-        log_error(tr(">> PI863:  reason: %1").arg(com.getLastError().c_str()));
+        log_error(tr(LOG_PREFIX " Could not connect to Mercury C-863 Motor Controller!!!\n"));
+        log_error(tr(LOG_PREFIX " reason: %1\n").arg(com.getLastError().c_str()));
         for (int i=0; i<axes.size(); i++) {
             axes[i].state=QFExtensionLinearStage::Error;
         }
@@ -248,8 +253,8 @@ void QFExtensionLinearStagePI::connectDevice(unsigned int axis) {
             }
         }
     } else {
-        log_error(tr(">> PI863:  Could not connect to Mercury C-863 Motor Controller!!!"));
-        log_error(tr(">> PI863:  reason: %1").arg(com.getLastError().c_str()));
+        log_error(tr(LOG_PREFIX " Could not connect to Mercury C-863 Motor Controller!!!\n"));
+        log_error(tr(LOG_PREFIX " reason: %1\n").arg(com.getLastError().c_str()));
         for (int i=0; i<axes.size(); i++) {
             axes[i].state=QFExtensionLinearStage::Disconnected;
         }
@@ -295,37 +300,37 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI::getAxisState(unsigne
             if (sscanf(r.c_str(), "S:%x %x %x %x %x %x", &B1, &B2, &B3, &B4, &B5, &B6)) {
                 //std::cout<<"\n\n"<<std::string(1, (char)('x'+i-1))<<": "<<r<<"\n\n";
                 if (B6==1) {
-                    log_error(tr(">> PI863:  error on axis %1: RS-232 timeout").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: RS-232 timeout\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==2) {
-                    log_error(tr(">> PI863:  error on axis %1: RS-232 overflow").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: RS-232 overflow\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==3) {
-                    log_error(tr(">> PI863:  error on axis %1: Macro storage full").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: Macro storage full\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==4) {
-                    log_error(tr(">> PI863:  error on axis %1: Macro out of range").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: Macro out of range\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==5) {
-                    log_error(tr(">> PI863:  error on axis %1: Macro wrong com").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: Macro wrong com\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==6) {
-                    log_error(tr(">> PI863:  error on axis %1: wrong command").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: wrong command\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==7) {
-                    log_error(tr(">> PI863:  error on axis %1: hard stop").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: hard stop\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==8) {
-                    log_error(tr(">> PI863:  error on axis %1: not defined").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: not defined\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==9) {
-                    log_error(tr(">> PI863:  error on axis %1: Position following error").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: Position following error\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==10) {
-                    log_error(tr(">> PI863:  error on axis %1: Move attempt while servo off").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: Move attempt while servo off\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 } else if (B6==11) {
-                    log_error(tr(">> PI863:  error on axis %1: Move attempt while joystick on").arg(axis));
+                    log_error(tr(LOG_PREFIX " error on axis %1: Move attempt while joystick on\n").arg(axis));
                     axes[axis].state=QFExtensionLinearStage::Error;
                 }
 
@@ -335,25 +340,25 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI::getAxisState(unsigne
                     double v=0;
                     if (!com.hasErrorOccured()) {
                         if (!sscanf(rr.c_str(), "V:%lf", &v)) {
-                            log_error(tr(">> PI863:  invalid result string from TV command [expected V:<number>] in getAxisState() [axis %1]. String was '%2'.").arg(axis).arg(toprintablestr(rr).c_str()));
+                            log_error(tr(LOG_PREFIX " invalid result string from TV command [expected V:<number>] in getAxisState() [axis %1]. String was '%2'.\n").arg(axis).arg(toprintablestr(rr).c_str()));
                             axes[axis].state=QFExtensionLinearStage::Error;
                         } else {
                             axes[axis].state=QFExtensionLinearStage::Ready;
                             if (v>0) axes[axis].state=QFExtensionLinearStage::Moving;
                         }
                     } else {
-                        log_error(tr(">> PI863:  communication error"));
+                        log_error(tr(LOG_PREFIX " communication error\n"));
                         axes[axis].state=QFExtensionLinearStage::Error;
                     }
                 }
             } else {
-                log_error(tr(">> PI863:  invalid result string from TS command [expected S:<6 blocks of 2 hex numbers>] in getAxisState() [axis %1]. String was '%2'.").arg(axis).arg(toprintablestr(r).c_str()));
+                log_error(tr(LOG_PREFIX " invalid result string from TS command [expected S:<6 blocks of 2 hex numbers>] in getAxisState() [axis %1]. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
                 axes[axis].state=QFExtensionLinearStage::Error;
             }
 
 
         } else {
-            log_error(tr(">> PI863:  communication error").arg(axis));
+            log_error(tr(LOG_PREFIX " communication error\n").arg(axis));
             axes[axis].state=QFExtensionLinearStage::Error;
         }
     } else {
@@ -370,6 +375,22 @@ void QFExtensionLinearStagePI::stop(unsigned int axis) {
     }
 }
 
+double QFExtensionLinearStagePI::getSpeed(unsigned int axis) {
+    if (com.isConnectionOpen()) {
+        selectAxis(axis);
+        std::string r=queryCommand("TV")+"\n";
+        double v=0;
+        if (!com.hasErrorOccured()) {
+            if (sscanf(r.c_str(), "V:%lf", &v)) {
+                return v*velocityFactor;
+            } else {
+                log_error(tr(LOG_PREFIX " invalid result string from TV command [expected V:<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+            }
+        }
+    }
+    return 0;
+}
+
 double QFExtensionLinearStagePI::getPosition(unsigned int axis) {
     if (com.isConnectionOpen()) {
         selectAxis(axis);
@@ -377,9 +398,9 @@ double QFExtensionLinearStagePI::getPosition(unsigned int axis) {
         double v=0;
         if (!com.hasErrorOccured()) {
             if (sscanf(r.c_str(), "P:%lf", &v)) {
-                return v;
+                return v*lengthFactor;
             } else {
-                log_error(tr(">> PI863:  invalid result string from TP command [expected P:<number>] from axis %1. String was '%2'.").arg(axis).arg(toprintablestr(r).c_str()));
+                log_error(tr(LOG_PREFIX " invalid result string from TP command [expected P:<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
             }
         }
     }
@@ -387,7 +408,7 @@ double QFExtensionLinearStagePI::getPosition(unsigned int axis) {
 }
 
 void QFExtensionLinearStagePI::move(unsigned int axis, double newPosition) {
-    if (com.isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready)) {
+    if (com.isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
         long xx=(long)round(newPosition/lengthFactor);
         if (!com.hasErrorOccured()) {
             selectAxis(axis);

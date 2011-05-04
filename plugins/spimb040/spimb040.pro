@@ -14,6 +14,7 @@ HEADERS += spimb040.h \
            qfespimb040mainwindow.h \
            qfespimb040cameraview.h \
            qfespimb040cameraconfig.h \
+           qfespimb040samplestageconfig.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
            ../../../../../LIB/trunk/highrestimer.h
@@ -22,6 +23,7 @@ SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040cameraconfig.cpp \
+           qfespimb040samplestageconfig.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp
 
 FORMS =
@@ -35,7 +37,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg
+QT += gui xml svg opengl
 CONFIG += exceptions rtti stl
 
 # DEFINITION FOR CImg Library

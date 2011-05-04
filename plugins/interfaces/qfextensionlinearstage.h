@@ -51,9 +51,11 @@ class QFExtensionLinearStage {
 
             The options are stored internally and written/read using QFExtension::readSettings() and
             QFExtension::writeSettings().
+
+            \param[in] axis the axis for which to display the dialog
             \param[in] parent parent widget for the returned QWidget
          */
-         virtual void showSettingsDialog(QWidget* parent=NULL)=0;
+         virtual void showSettingsDialog(unsigned int axis, QWidget* parent=NULL)=0;
          /** \brief returns \c true if the axis is connected */
          virtual bool isConnected(unsigned int axis)=0;
          /** \brief connect to the device/activate it */
@@ -63,7 +65,14 @@ class QFExtensionLinearStage {
          /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
          virtual void setLogging(QFPluginLogService* logService)=0;
 
-         /** \brief enable/disable joystick control for the specified axis, \a maxVelocity is the maximum velocity for movements in microns/sec */
+         /*! \brief enable/disable joystick control for the specified axis, \a maxVelocity is the maximum velocity for movements in microns/sec
+
+             \param axis the axis for which to activate the joystick
+             \param enabled whether to enable or disable the joystick
+             \param maxVelocity the maximum velocity reachable with the joystick set to full in micron/second (if applicable!)
+
+             \note If this is called with \c enabled=true multiple times, only the maxVelocity will be updated.
+          */
          virtual void setJoystickActive(unsigned int axis, bool enabled, double maxVelocity=100000)=0;
          /** \brief returns \c true if the manual joystick control for the specified axis is activated */
          virtual bool isJoystickActive(unsigned int axis)=0;
@@ -76,6 +85,9 @@ class QFExtensionLinearStage {
 
          /** \brief return the absolute position of an axis in microns */
          virtual double getPosition(unsigned int axis)=0;
+
+         /** \brief return the current speed of an axis in microns/sec */
+         virtual double getSpeed(unsigned int axis)=0;
 
          /*! \brief move one axis to a given absolute position in microns
 

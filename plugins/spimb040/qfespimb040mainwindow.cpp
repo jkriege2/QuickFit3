@@ -33,21 +33,31 @@ void QFESPIMB040MainWindow::loadSettings(ProgramOptions* settings) {
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     if (camConfig1) camConfig1->loadSettings(settings, "plugin_spim_b040/cam_config1/");
     if (camConfig2) camConfig2->loadSettings(settings, "plugin_spim_b040/cam_config2/");
+    if (sampleStages) sampleStages->loadSettings(settings, "plugin_spim_b040/sample_stages/");
 }
 
 void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     if (camConfig1) camConfig1->storeSettings(settings, "plugin_spim_b040/cam_config1/");
     if (camConfig2) camConfig2->storeSettings(settings, "plugin_spim_b040/cam_config2/");
-
+    if (sampleStages) sampleStages->storeSettings(settings, "plugin_spim_b040/sample_stages/");
 }
 
 void QFESPIMB040MainWindow::closeEvent ( QCloseEvent * event ) {
-   if (camConfig1) {
+    if (camConfig1) {
         camConfig1->close();
     }
     if (camConfig2) {
         camConfig2->close();
+    }
+}
+
+void QFESPIMB040MainWindow::showEvent( QShowEvent * event )  {
+   if (camConfig1) {
+        camConfig1->show();
+    }
+    if (camConfig2) {
+        camConfig2->show();
     }
 }
 
@@ -60,12 +70,12 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
 
 
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
     logMain=new QtLogFile(this);
-    mainlayout->addWidget(logMain, 1,0,1,2);
+    mainlayout->addWidget(logMain, 2,0,1,2);
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create camera config widgets
@@ -78,6 +88,11 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     connect(camConfig1, SIGNAL(configFilesChanged()), camConfig2, SLOT(rereadConfigCombos()));
     connect(camConfig2, SIGNAL(configFilesChanged()), camConfig1, SLOT(rereadConfigCombos()));
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // create sample stage widget
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    sampleStages=new QFESPIMB040SampleStageConfig(this, extManager);
+    mainlayout->addWidget(sampleStages, 1, 0);
 
 
 

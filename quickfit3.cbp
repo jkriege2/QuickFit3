@@ -223,6 +223,8 @@
 		<Unit filename="plugins\spimb040\qfespimb040cameraview.h" />
 		<Unit filename="plugins\spimb040\qfespimb040mainwindow.cpp" />
 		<Unit filename="plugins\spimb040\qfespimb040mainwindow.h" />
+		<Unit filename="plugins\spimb040\qfespimb040samplestageconfig.cpp" />
+		<Unit filename="plugins\spimb040\qfespimb040samplestageconfig.h" />
 		<Unit filename="plugins\spimb040\spimb040.cpp" />
 		<Unit filename="plugins\spimb040\spimb040.h" />
 		<Unit filename="plugins\spimb040\spimb040.pro" />

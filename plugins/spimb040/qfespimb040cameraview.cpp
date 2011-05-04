@@ -374,6 +374,7 @@ void QFESPIMB040CameraView::setHistogramBinsAutoscale(bool autoscale) {
 }
 
 void QFESPIMB040CameraView::redrawFrame() {
+    //std::cout<<">>>> redrawFrame()\n";
     pltMain->set_doDrawing(false);
     plteMask->set_color(cmbMaskColor->currentColor());
 
@@ -408,7 +409,7 @@ void QFESPIMB040CameraView::redrawFrame() {
     //plteFrame->set_image(image, JKQTFP_double, image.width(), image.height());
     plteFrame->set_image(image.data(), JKQTFP_double, image.width(), image.height());
     pltMain->set_doDrawing(true);
-    pltMain->update_data();
+    pltMain->update_data_immediate();
 
 }
 

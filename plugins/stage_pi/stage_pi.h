@@ -66,7 +66,7 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
 
 
         /** \copydoc QFExtensionLinearStage::showSettingsDialog() */
-        virtual void showSettingsDialog(QWidget* parent=NULL);
+        virtual void showSettingsDialog(unsigned int axis, QWidget* parent=NULL);
         /** \copydoc QFExtensionLinearStage::isConnected() */
         virtual bool isConnected(unsigned int axis);
         /** \copydoc QFExtensionLinearStage::connectDevice() */
@@ -89,6 +89,8 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
 
         /** \copydoc QFExtensionLinearStage::getPosition() */
         virtual double getPosition(unsigned int axis);
+        /** \copydoc QFExtensionLinearStage::getSpeed() */
+        virtual double getSpeed(unsigned int axis);
 
         /** \copydoc QFExtensionLinearStage::move() */
         virtual void move(unsigned int axis, double newPosition);

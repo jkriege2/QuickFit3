@@ -29,9 +29,11 @@
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
 #include "../interfaces/qfextensioncamera.h"
+#include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "qfespimb040cameraconfig.h"
+#include "qfespimb040samplestageconfig.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -60,6 +62,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
 
         QFESPIMB040CameraConfig* camConfig1;
         QFESPIMB040CameraConfig* camConfig2;
+        QFESPIMB040SampleStageConfig* sampleStages;
 
 
         /** \brief handles the close event, also close all camera views in camViews
@@ -67,6 +70,8 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
          *  disconnect devices and close camera view
          */
         void closeEvent ( QCloseEvent * event );
+
+        void showEvent( QShowEvent * event );
 
 
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
