@@ -75,7 +75,7 @@ FORMS +=   dlg_newproperty.ui \
 
 RESOURCES +=
 
-TRANSLATIONS= ../output/translations/de.ts
+TRANSLATIONS= ../output/translations/de.lib.ts
 
 INCLUDEPATH +=
 

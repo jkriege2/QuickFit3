@@ -2,7 +2,7 @@
 
 #include <QtGui>
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionManager* extManager, QWidget* parent):
+QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionServices* pluginServices, QWidget* parent):
     QWidget(parent)
 {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
@@ -11,6 +11,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfil
 
     // more variable initialisation
     imageStatisticsCalculated=false;
+    m_pluginServices=pluginServices;
 
     //initialise image histogram data arrays
     histogram_n=255;

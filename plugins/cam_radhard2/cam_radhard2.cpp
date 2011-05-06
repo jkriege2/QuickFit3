@@ -18,10 +18,12 @@ QFExtensionCameraRadhard2::QFExtensionCameraRadhard2(QObject* parent):
     logService=NULL;
     edtBitfile=NULL;
     labFlashSuccess=NULL;
-    autoflashbitfile=bitfile=QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/radhard2_top_cell.bit";
+    autoflashbitfile="";
     spIterations=NULL;
     spDivider=NULL;
     autoflash=true;
+    autoflashbitfile=bitfile="";
+
 }
 
 QFExtensionCameraRadhard2::~QFExtensionCameraRadhard2() {
@@ -41,6 +43,7 @@ void QFExtensionCameraRadhard2::projectChanged(QFProject* oldProject, QFProject*
 
 void QFExtensionCameraRadhard2::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
+    autoflashbitfile=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/extensions/"+getID()+"/radhard2_top_cell.bit";
     actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
@@ -122,7 +125,7 @@ void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
     if (!settingspo) return;
     if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings());
-    //QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    //QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
     //iterations=settings.value("radhard2/iterations", iterations).toInt();
     //divider=settings.value("radhard2/divider", divider).toInt();
     //subtractOne=settings.value("radhard2/subtract_one", subtractOne).toBool();
@@ -133,7 +136,7 @@ void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
     if (!settingspo) return;
     if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings());
-    //QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    //QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
     //settings.setValue("radhard2/iterations", iterations);
     //settings.setValue("radhard2/divider", divider);
     //settings.setValue("radhard2/subtract_one", subtractOne);

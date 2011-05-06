@@ -43,13 +43,13 @@ class ProgramOptions: public QObject {
 
 
         /** \brief set languageID (which language to use for display) */
-        void setLanguageID(QString id) { languageID=id; }
+        void setLanguageID(QString id);
 
         /** \brief set the currently used stylesheet */
-        void setStylesheet(QString st) { stylesheet=st; }
+        void setStylesheet(QString st);
 
         /** \brief set the currently used style */
-        void setStyle(QString st) { style=st; }
+        void setStyle(QString st);
 
         /** \brief set the maximum number of threds */
         void setMaxThreads(int threads) { maxThreads=threads; };
@@ -58,6 +58,13 @@ class ProgramOptions: public QObject {
         int getAutosave() { return autosave; }
         /** \brief autosave project every X minutes (0 == off) */
         void setAutosave(int interval) { autosave=interval; }
+
+        /** \brief the directory in which to save configuration data, see \ref qf3whereiswhat */
+        QString getConfigFileDirectory() const;
+        /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
+        QString getPluginDirectory() const;
+        /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
+        QString getAssetsDirectory() const;
     public slots:
 
 
@@ -81,6 +88,7 @@ class ProgramOptions: public QObject {
         /** \brief this function writes the current settings to the internal QSettings object settings */
         void writeSettings();
 
+
         /** \brief QSettings object used for config options I/O */
         QSettings* settings;
         /** \brief the application this object manages the properties for */
@@ -102,6 +110,13 @@ class ProgramOptions: public QObject {
         int maxThreads;
         /** \brief autosave interval in minutes (0=off) */
         int autosave;
+        /** \brief the directory in which to save configuration data, see \ref qf3whereiswhat */
+        QString configDir;
+        /** \brief assetsDir is a directory that contains QuickFit assets, like Help-Files, additional needed files, lik
+         *         data files ... that are NOT changed by QuickFit, see \ref qf3whereiswhat */
+        QString assetsDir;
+        /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
+        QString pluginsDir;
 
 };
 

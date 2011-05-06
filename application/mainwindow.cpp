@@ -5,8 +5,9 @@
 #include "qftools.h"
 #include "../extlibs/cimg.h"
 
-MainWindow::MainWindow(QSplashScreen* splash)
+MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 {
+    settings=s;
     splashPix=splash->pixmap();
 
     rawDataFactory=new QFRawDataRecordFactory(this);
@@ -15,7 +16,7 @@ MainWindow::MainWindow(QSplashScreen* splash)
     fitAlgorithmManager=new QFFitAlgorithmManager(this);
     extensionManager=new QFExtensionManager(this);
 
-    settings=NULL;
+    //settings=NULL;
     project=NULL;
     currentProjectDir="";
 
@@ -50,8 +51,7 @@ MainWindow::MainWindow(QSplashScreen* splash)
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
-    QFile f(QCoreApplication::applicationDirPath()+"/help/plugin_list_autocreate.html");
-    //std::cout<<QString(QCoreApplication::applicationDirPath()+"/help/plugin_list_autocreate.html").toStdString()<<std::endl;
+    QFile f(settings->getAssetsDirectory()+"/help/plugin_list_autocreate.html");
     if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&f);
         out<<QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><title>%1</title></head><body><h2>%1</h2>").arg(tr("Available Plugins"));
@@ -71,6 +71,9 @@ MainWindow::MainWindow(QSplashScreen* splash)
     autoWriteSettings();
     timerAutosave->start();
 
+    readSettings();
+    rawDataFactory->distribute(project, settings, this, this);
+    evaluationFactory->distribute(project, settings, this, this);
 }
 
 
@@ -82,11 +85,11 @@ MainWindow::~MainWindow() {
 
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
-    rawDataFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
-    evaluationFactory->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins");
-    fitFunctionManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitfunctions");
-    fitAlgorithmManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/fitalgorithms");
-    extensionManager->searchPlugins(QCoreApplication::applicationDirPath()+"/plugins/extensions");
+    rawDataFactory->searchPlugins(settings->getPluginDirectory());
+    evaluationFactory->searchPlugins(settings->getPluginDirectory());
+    fitFunctionManager->searchPlugins(settings->getPluginDirectory()+"/fitfunctions");
+    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory()+"/fitalgorithms");
+    extensionManager->searchPlugins(settings->getPluginDirectory()+"/extensions");
 
 
     // distribute application hooks
@@ -346,10 +349,10 @@ void MainWindow::createWidgets() {
     logFileMainWidget->set_log_file_append(true);
     logFileProjectWidget->set_log_file_append(true);
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
-    QFileInfo fi(QCoreApplication::applicationFilePath());
-    logFileMainWidget->open_logfile(QString(fi.absolutePath()+"/"+fi.completeBaseName()+".log"), false);
+    QFileInfo fi(QApplication::applicationFilePath());
+    logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
     logFileMainWidget->log_text(tr("starting up QuickFit 3.0 ...\n"));
-    logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(fi.absolutePath()+"/"+fi.completeBaseName()+".log"));
+    logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));
     tabLogs->addTab(logFileProjectWidget, tr("Project Log"));
     tabLogs->setCurrentWidget(logFileMainWidget);
     spMain->addWidget(tabLogs);
@@ -951,5 +954,14 @@ QFExtensionManager* MainWindow::getExtensionManager() {
 }
 
 QString MainWindow::getConfigFileDirectory() {
-    return QApplication::applicationDirPath();
+    return settings->getConfigFileDirectory();
 }
+
+QString MainWindow::getAssetsDirectory() {
+    return settings->getAssetsDirectory();
+}
+
+QString MainWindow::getPluginsDirectory() {
+    return settings->getPluginDirectory();
+}
+

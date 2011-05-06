@@ -19,7 +19,7 @@ FORMS =
 
 RESOURCES += qfextensionlinearstage.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.cam_mystagename.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

@@ -1,14 +1,49 @@
 #include "programoptions.h"
 #include <iostream>
 
+#ifndef __WINDOWS__
+# if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
+#  define __WINDOWS__
+# endif
+#endif
+
+#ifndef __LINUX__
+# if defined(linux)
+#  define __LINUX__
+# endif
+#endif
+
+#ifndef __WINDOWS__
+# ifndef __LINUX__
+#  warning("these methods are ment to be used under windows or linux ... no other system were tested")
+# endif
+#endif
+
 ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app  ):
     QObject(parent)
 {
+    QFileInfo fi(QApplication::applicationFilePath());
+
+    configDir=QDir::homePath()+"/."+fi.completeBaseName()+"/";
+    assetsDir=QApplication::applicationDirPath();
+    pluginsDir=QApplication::applicationDirPath()+"/plugins/";
+
+    #ifdef __WINDOWS__
+    //configDir=QApplication::applicationDirPath();
+    #endif
+
+    #ifdef __LINUX__
+    //configDir=QApplication::applicationDirPath();
+    #endif
+
+
+    QDir d(QApplication::applicationDirPath());
+    d.mkpath(configDir);
+
     this->app=app;
     iniFilename=ini;
-    QFileInfo fi(QCoreApplication::applicationFilePath());
     if (iniFilename.isEmpty()) {
-        iniFilename= fi.absolutePath()+"/"+fi.completeBaseName()+".ini";
+        iniFilename= configDir+"/"+fi.completeBaseName()+".ini";
     }
     currentRawDataDir=fi.absolutePath();
     //std::cout<<"config file is: "<<iniFilename.toStdString()<<std::endl;
@@ -56,16 +91,26 @@ void ProgramOptions::readSettings() {
 
     languageID=settings->value("quickfit/language", languageID).toString();
     if (languageID != "en") { // english is default
-        QString fn=QString(QCoreApplication::applicationDirPath()+"/translations/%1.qm").arg(languageID);
-        //std::cout<<"loading translation '"<<fn.toStdString()<<"' ... ";
-        QTranslator* translator=new QTranslator(this);
-        if (app && translator->load(fn)) {
-            app->installTranslator(translator);
-            //std::cout<<"OK\n";
-            emit languageChanged(languageID);
-        } else {
-            //std::cout<<"ERROR\n";
+        QDir d(assetsDir+"/translations");
+        QStringList filters;
+        filters << "*.qm";
+        QStringList sl=d.entryList(filters, QDir::Files);
+        for (int i=0; i<sl.size(); i++) {
+            QString s=sl[i];
+            if (s.startsWith(languageID+".")) {
+                QString fn=d.absoluteFilePath(s);
+                //std::cout<<"loading translation '"<<fn.toStdString()<<"' ... \n";
+                QTranslator* translator=new QTranslator(this);
+                if (app && translator->load(fn)) {
+                    app->installTranslator(translator);
+                    //std::cout<<"OK\n";
+                } else {
+                    //std::cout<<"ERROR\n";
+                }
+            }
         }
+        emit languageChanged(languageID);
+
     }
     style=settings->value("quickfit/style", style).toString();
     if (app) {
@@ -88,5 +133,26 @@ void ProgramOptions::readSettings() {
 
 }
 
+QString ProgramOptions::getConfigFileDirectory() const {
+    return configDir;
+}
 
+QString ProgramOptions::getPluginDirectory() const {
+    return pluginsDir;
+}
 
+QString ProgramOptions::getAssetsDirectory() const {
+    return assetsDir;
+}
+
+void ProgramOptions::setLanguageID(QString id) {
+    languageID=id;
+}
+
+void ProgramOptions::setStylesheet(QString st) {
+    stylesheet=st;
+}
+
+void ProgramOptions::setStyle(QString st) {
+    style=st;
+}

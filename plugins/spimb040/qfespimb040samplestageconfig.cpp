@@ -3,19 +3,25 @@
 #include <QtGui>
 #include <iostream>
 
-QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFExtensionManager* extManager):
+QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices):
         QGroupBox(parent)
 {
     setTitle(tr(" Sample Translation Stages: "));
     m_parent=parent;
-    m_extManager=extManager;
+    m_pluginServices=pluginServices;
     locked=false;
     stageStateUpdateInterval=250;
     iconDisconnected=QPixmap(":/spimb040/stage_disconnected.png");
     iconReady=QPixmap(":/spimb040/stage_ready.png");
     iconError=QPixmap(":/spimb040/stage_error.png");
     iconMoving=QPixmap(":/spimb040/stage_moving.png");
-    findStages(extManager);
+    iconJoystick=QPixmap(":/spimb040/stage_joystick.png");
+    iconNoJoystick=QPixmap(":/spimb040/stage_nojoystick.png");
+    timerDisplayUpdate.setInterval(stageStateUpdateInterval);
+    connect(&timerDisplayUpdate, SIGNAL(timeout()), this, SLOT(displayAxisStates()));
+    timerDisplayUpdate.start();
+
+    findStages(m_pluginServices->getExtensionManager());
     createWidgets();
     createActions();
     updateStates();
@@ -32,6 +38,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(ProgramOptions* settings, QStrin
     cmbStageZ->setCurrentIndex((settings->getQSettings())->value(prefix+"stage_z", 2).toInt());
     spinJoystickMaxSpeed->setValue((settings->getQSettings())->value(prefix+"joystick_max_speed", 500).toDouble());
     stageStateUpdateInterval=(settings->getQSettings())->value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
+    timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
 void QFESPIMB040SampleStageConfig::storeSettings(ProgramOptions* settings, QString prefix) {
@@ -134,8 +141,35 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     hbl->addStretch();
     stagelayout->addRow(tr("<b>joystick:</b>"), hbl);
 
-
     QGridLayout* gl=new QGridLayout(this);
+    gl->addWidget(new QLabel("<b>x [&mu;m]:</b>", this), 0, 0);
+    gl->addWidget(new QLabel("<b>y [&mu;m]:</b>", this), 0, 1);
+    gl->addWidget(new QLabel("<b>z [&mu;m]:</b>", this), 0, 2);
+    gl->addWidget(new QLabel("<b>move ...</b>", this), 0, 3);
+    spinMoveX=new QDoubleSpinBox(this);
+    spinMoveX->setRange(-1e6,1e6);
+    spinMoveX->setSingleStep(1);
+    gl->addWidget(spinMoveX, 1,0);
+    spinMoveY=new QDoubleSpinBox(this);
+    spinMoveY->setRange(-1e6,1e6);
+    spinMoveY->setSingleStep(1);
+    gl->addWidget(spinMoveY, 1,1);
+    spinMoveZ=new QDoubleSpinBox(this);
+    spinMoveZ->setRange(-1e6,1e6);
+    spinMoveZ->setSingleStep(1);
+    gl->addWidget(spinMoveZ, 1,2);
+    btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/stagemove.png"), tr("... &absolute"), this);
+    gl->addWidget(btnMoveAbsolute, 1, 3);
+    btnMoveRelative=new QPushButton(QIcon(":/spimb040/stagemove.png"), tr("... &relative"), this);
+    gl->addWidget(btnMoveRelative, 1, 4);
+    gl->addWidget(new QWidget(this), 1, 5);
+    gl->setColumnStretch(5,10);
+    connect(btnMoveAbsolute, SIGNAL(clicked()), this, SLOT(moveAbsolute()));
+    connect(btnMoveRelative, SIGNAL(clicked()), this, SLOT(moveRelative()));
+    stagelayout->addRow(tr("<b>movement:</b>"), gl);
+
+
+    gl=new QGridLayout(this);
     QLabel* l;
     l=new QLabel(tr("<b><i>x</i>-axis</b>"));
     l->setStyleSheet("background-color: darkgrey;");
@@ -203,6 +237,11 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     labZState->setStyleSheet("background-color: 	lightgrey;");;
     labZState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labZState->setAutoFillBackground(true);
+
+    labJoystick=new QLabel(this);
+    labJoystick->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    gl->addWidget(labJoystick, 0,0);
+
     gl->addWidget(labXState, 1,1);
     gl->addWidget(labYState, 1,2);
     gl->addWidget(labZState, 1,3);
@@ -259,12 +298,15 @@ void QFESPIMB040SampleStageConfig::updateStates() {
     bool conn;
 
     bool anyconn=false;
+    bool anyjoy=false;
 
     stage=getXStage();
     axis=getXStageAxis();
+    conn=false;
     if (stage) {
         conn=stage->isConnected(axis);
         anyconn=anyconn||conn;
+        anyjoy=anyjoy||stage->isJoystickActive(axis);
         if (conn) {
             actConnectX->setChecked(true);
             actConnectX->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -274,16 +316,19 @@ void QFESPIMB040SampleStageConfig::updateStates() {
             actConnectX->setIcon(QIcon(":/spimb040/stageconnect.png"));
             actConnectX->setText(tr("Connect x-axis ..."));
         }
-        actConfigureX->setEnabled(conn);
-        cmbStageX->setEnabled(!conn);
     }
+    actConfigureX->setEnabled(true);
+    cmbStageX->setEnabled(!conn);
+    spinMoveX->setEnabled(conn);
 
 
     stage=getYStage();
     axis=getYStageAxis();
+    conn=false;
     if (stage) {
         conn=stage->isConnected(axis);
         anyconn=anyconn||conn;
+        anyjoy=anyjoy||stage->isJoystickActive(axis);
         if (conn) {
             actConnectY->setChecked(true);
             actConnectY->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -293,16 +338,19 @@ void QFESPIMB040SampleStageConfig::updateStates() {
             actConnectY->setIcon(QIcon(":/spimb040/stageconnect.png"));
             actConnectY->setText(tr("Connect y-axis ..."));
         }
-        actConfigureY->setEnabled(conn);
-        cmbStageY->setEnabled(!conn);
     }
+    actConfigureY->setEnabled(true);
+    cmbStageY->setEnabled(!conn);
+    spinMoveY->setEnabled(conn);
 
 
     stage=getZStage();
     axis=getZStageAxis();
+    conn=false;
     if (stage) {
         conn=stage->isConnected(axis);
         anyconn=anyconn||conn;
+        anyjoy=anyjoy||stage->isJoystickActive(axis);
         if (conn) {
             actConnectZ->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
             actConnectZ->setChecked(true);
@@ -312,12 +360,23 @@ void QFESPIMB040SampleStageConfig::updateStates() {
             actConnectZ->setIcon(QIcon(":/spimb040/stageconnect.png"));
             actConnectZ->setText(tr("Connect z-axis ..."));
         }
-        actConfigureZ->setEnabled(conn);
-        cmbStageZ->setEnabled(!conn);
     }
+    actConfigureZ->setEnabled(true);
+    cmbStageZ->setEnabled(!conn);
+    spinMoveZ->setEnabled(conn);
+
+    btnMoveAbsolute->setEnabled(anyconn);
+    btnMoveRelative->setEnabled(anyconn);
 
     chkJoystick->setEnabled(anyconn);
     spinJoystickMaxSpeed->setEnabled(anyconn);
+    if (anyconn) {
+        if (anyjoy) labJoystick->setPixmap(iconJoystick);
+        else labJoystick->setPixmap(iconNoJoystick);
+    } else {
+        labJoystick->setPixmap(QPixmap());
+    }
+
     if (!anyconn) locked=false;
 }
 
@@ -495,35 +554,34 @@ void QFESPIMB040SampleStageConfig::updateJoystick() {
     double speed=spinJoystickMaxSpeed->value();
     bool enabled=chkJoystick->isChecked();
     spinJoystickMaxSpeed->setEnabled(enabled);
-    if (enabled) {
-        QFExtensionLinearStage* stage;
-        int axis;
+    QFExtensionLinearStage* stage;
+    int axis;
 
-        stage=getXStage();
-        axis=getXStageAxis();
-        if (stage) {
-            if (stage->isConnected(axis)) {
-                stage->setJoystickActive(axis, enabled, speed);
-            }
-        }
-        stage=getYStage();
-        axis=getYStageAxis();
-        if (stage) {
-            if (stage->isConnected(axis)) {
-                stage->setJoystickActive(axis, enabled, speed);
-            }
-        }
-        stage=getZStage();
-        axis=getZStageAxis();
-        if (stage) {
-            if (stage->isConnected(axis)) {
-                stage->setJoystickActive(axis, enabled, speed);
-            }
+    stage=getXStage();
+    axis=getXStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis)) {
+            stage->setJoystickActive(axis, enabled, speed);
         }
     }
+    stage=getYStage();
+    axis=getYStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis)) {
+            stage->setJoystickActive(axis, enabled, speed);
+        }
+    }
+    stage=getZStage();
+    axis=getZStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis)) {
+            stage->setJoystickActive(axis, enabled, speed);
+        }
+    }
+
 }
 
-void QFESPIMB040SampleStageConfig::displayAxisStates(bool automatic) {
+void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
     bool anyconn=false;
 
         QFExtensionLinearStage* stage;
@@ -598,7 +656,70 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(bool automatic) {
             labPos->setText(QString::number(position, 'f', 2));
         }
 
-    if ((!locked) && anyconn && automatic) {
+    /*if ((!locked) && anyconn && automatic) {
         QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
+    }*/
+}
+
+void QFESPIMB040SampleStageConfig::moveAbsolute() {
+    double x=spinMoveX->value();
+    double y=spinMoveY->value();
+    double z=spinMoveZ->value();
+
+    QFExtensionLinearStage* stage;
+    int axis;
+
+    stage=getXStage();
+    axis=getXStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis)) {
+            stage->move(axis, x);
+        }
+    }
+    stage=getYStage();
+    axis=getYStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis)) {
+            stage->move(axis, y);
+        }
+    }
+    stage=getZStage();
+    axis=getZStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis)) {
+            stage->move(axis, z);
+        }
+    }
+
+}
+
+void QFESPIMB040SampleStageConfig::moveRelative() {
+    double x=spinMoveX->value();
+    double y=spinMoveY->value();
+    double z=spinMoveZ->value();
+
+    QFExtensionLinearStage* stage;
+    int axis;
+
+    stage=getXStage();
+    axis=getXStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis) && (x!=0)) {
+            stage->move(axis, stage->getPosition(axis)+x);
+        }
+    }
+    stage=getYStage();
+    axis=getYStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis) && (y!=0)) {
+            stage->move(axis, stage->getPosition(axis)+y);
+        }
+    }
+    stage=getZStage();
+    axis=getZStageAxis();
+    if (stage) {
+        if (stage->isConnected(axis) && (z!=0)) {
+            stage->move(axis, stage->getPosition(axis)+z);
+        }
     }
 }

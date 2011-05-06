@@ -30,6 +30,11 @@ void QFESPIMB040::projectChanged(QFProject* oldProject, QFProject* project) {
 void QFESPIMB040::initExtension() {
     services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     actStartPlugin=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control"), this);
+
+    QDir d(services->getConfigFileDirectory());
+    // make sure the directory for the config files of this extension exists
+    d.mkpath(services->getConfigFileDirectory()+"/plugins/extensions/"+getID());
+
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QToolBar* exttb=services->getToolbar("extensions");
     if (exttb) {
@@ -53,7 +58,7 @@ void QFESPIMB040::storeSettings(ProgramOptions* settings) {
 void QFESPIMB040::startPlugin() {
     //QMessageBox::information(parentWidget, getName(), getDescription());
     if (!main) {
-        main=new QFESPIMB040MainWindow(services->getExtensionManager(), NULL);
+        main=new QFESPIMB040MainWindow(services, NULL);
     }
     if (settings) main->loadSettings(settings);
     main->show();

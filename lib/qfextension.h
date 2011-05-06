@@ -78,7 +78,7 @@ class QFExtensionBase: public QFExtension {
         virtual void init(QFExtensionServices* services, QWidget* parentWidget) {
             this->services=services;
             this->parentWidget=parentWidget;
-
+            this->settings=services->getOptions();
             initExtension();
         };
 

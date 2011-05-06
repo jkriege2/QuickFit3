@@ -5,13 +5,14 @@
 
 
 
-QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFExtensionManager* extManager, QWidget* parent):
+QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFExtensionServices* pluginServices, QWidget* parent):
     QWidget(parent, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint)
 {
     camConfig1=NULL;
     camConfig2=NULL;
+    m_pluginServices=pluginServices;
     // create widgets and actions
-    createWidgets(extManager);
+    createWidgets(pluginServices->getExtensionManager());
     createActions();
 }
 
@@ -80,9 +81,9 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create camera config widgets
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    camConfig1=new QFESPIMB040CameraConfig(this, 0, extManager);
+    camConfig1=new QFESPIMB040CameraConfig(this, 0, m_pluginServices);
     mainlayout->addWidget(camConfig1, 0, 0);
-    camConfig2=new QFESPIMB040CameraConfig(this, 1, extManager);
+    camConfig2=new QFESPIMB040CameraConfig(this, 1, m_pluginServices);
     mainlayout->addWidget(camConfig2, 0, 1);
 
     connect(camConfig1, SIGNAL(configFilesChanged()), camConfig2, SLOT(rereadConfigCombos()));
@@ -91,7 +92,7 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create sample stage widget
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    sampleStages=new QFESPIMB040SampleStageConfig(this, extManager);
+    sampleStages=new QFESPIMB040SampleStageConfig(this, m_pluginServices);
     mainlayout->addWidget(sampleStages, 1, 0);
 
 

@@ -6,6 +6,24 @@
 #include <QSplashScreen>
 #include <QPainter>
 
+#ifndef __WINDOWS__
+# if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
+#  define __WINDOWS__
+# endif
+#endif
+
+#ifndef __LINUX__
+# if defined(linux)
+#  define __LINUX__
+# endif
+#endif
+
+#ifndef __WINDOWS__
+# ifndef __LINUX__
+#  warning("these methods are ment to be used under windows or linux ... no other system were tested")
+# endif
+#endif
+
 int main(int argc, char * argv[])
 {
     Q_INIT_RESOURCE(quickfit3);
@@ -29,7 +47,9 @@ int main(int argc, char * argv[])
     app.processEvents();
     app.processEvents();
 
-    app.addLibraryPath(QCoreApplication::applicationDirPath()+"/qtplugins");
+    #ifdef __WINDOWS__
+      app.addLibraryPath(QCoreApplication::applicationDirPath()+"/qtplugins");
+    #endif
     //splash.showMessage(QString("version %1 (%2 BUILD %3)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(AutoVersion::BUILDS_COUNT));
     app.processEvents();
 
@@ -39,10 +59,8 @@ int main(int argc, char * argv[])
     /** \brief this object manages program settings */
     ProgramOptions* settings=new ProgramOptions("", &app, &app);
 
-    MainWindow win(&splash);
-    win.setSettings(settings);
+    MainWindow win(settings, &splash);
     win.show();
-    //splash.finish(&win);
     QTimer::singleShot(2500, &splash, SLOT(close()));
     return app.exec();
 }

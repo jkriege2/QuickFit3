@@ -18,7 +18,6 @@ QFExtensionLinearStagePI::QFExtensionLinearStagePI(QObject* parent):
     initVelocity=1000;
     COMPort="COM1";
     COMPortSpeed=38400;
-    maxJoystickVelocity=100; // micron/sed
     currentID=-1;
     lengthFactor=6.9e-3;
     velocityFactor=6.9e-3;
@@ -42,7 +41,6 @@ void QFExtensionLinearStagePI::deinit() {
     inifile.setValue("driver/acceleration", acceleration);
     inifile.setValue("driver/initvelocity", initVelocity);
     inifile.setValue("driver/maxvelocity", maxVelocity);
-    inifile.setValue("driver/maxjoystickvelocity", maxJoystickVelocity);
 
 
     for (int i=0; i<axes.size(); i++) {
@@ -69,7 +67,6 @@ void QFExtensionLinearStagePI::initExtension() {
     acceleration=inifile.value("driver/acceleration", acceleration).toDouble();
     initVelocity=inifile.value("driver/initvelocity", initVelocity).toDouble();
     maxVelocity=inifile.value("driver/maxvelocity", maxVelocity).toDouble();
-    maxJoystickVelocity=inifile.value("driver/maxjoystickvelocity", maxJoystickVelocity).toDouble();
 
 
     axes.clear();
@@ -96,7 +93,7 @@ void QFExtensionLinearStagePI::loadSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -107,7 +104,7 @@ void QFExtensionLinearStagePI::storeSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -129,7 +126,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* pa
 	// if you want the settings dialog to be modal, you may uncomment the next lines
 	// and add implementations
 	/////////////////////////////////////////////////////////////////////////////////
-    /*
+
 	QDialog* dlg=new QDialog(parent);
 
     QVBoxLayout* lay=new QVBoxLayout(dlg);
@@ -138,9 +135,24 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* pa
     QFormLayout* formlayout=new QFormLayout(dlg);
 
 
-    //  create your widgets here, do not to initialize them with the current settings
-    // QWidget* widget=new QWidget(dlg);
-    // lay->addRow(tr("Name"), widget);
+    formlayout->addRow("", new QLabel(tr("<b>All settings marked with * will be<br>used when connecting the next time!</b>"), dlg));
+
+    QComboBox* cmbPort=new QComboBox(dlg);
+    std::vector<std::string> ports=JKSerialConnection::listPorts();
+    for (int i=0; i<ports.size(); i++) {
+        cmbPort->addItem(ports[i].c_str());
+    }
+    cmbPort->setEditable(false);
+    cmbPort->setCurrentIndex(cmbPort->findText(COMPort));
+    formlayout->addRow(tr("serial &port*:"), cmbPort);
+
+    QComboBox* cmbSpeed=new QComboBox(dlg);
+    cmbSpeed->setEditable(false);
+    cmbSpeed->addItem("9600");
+    cmbSpeed->addItem("19200");
+    cmbSpeed->addItem("38400");
+    cmbSpeed->setCurrentIndex(cmbSpeed->findText(QString::number(COMPortSpeed)));
+    formlayout->addRow(tr("serial port &baudrate*:"), cmbSpeed);
 
 
     lay->addLayout(formlayout);
@@ -153,10 +165,12 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* pa
 
     if ( dlg->exec()==QDialog::Accepted ) {
          //  read back values entered into the widgets and store in settings
+         COMPort=cmbPort->currentText();
+         COMPortSpeed=cmbSpeed->itemText(cmbSpeed->currentIndex()).toInt();
     }
     delete dlg;
-	*/
-	QMessageBox::information(parent, getName(), tr("There is currently no configuration dialog!"));
+
+	//QMessageBox::information(parent, getName(), tr("There is currently no configuration dialog!"));
 }
 
 void QFExtensionLinearStagePI::selectAxis(int i) {
@@ -276,7 +290,7 @@ void QFExtensionLinearStagePI::setLogging(QFPluginLogService* logService) {
 void QFExtensionLinearStagePI::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
     if (enabled) {
         selectAxis(axis);
-        sendCommand("JN"+inttostr((long)round(maxJoystickVelocity/velocityFactor)));
+        sendCommand("JN"+inttostr((long)round(maxVelocity/velocityFactor)));
         axes[axis].joystickEnabled=true;
     } else {
         selectAxis(axis);

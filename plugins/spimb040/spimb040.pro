@@ -30,7 +30,7 @@ FORMS =
 
 RESOURCES += spimb040.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.spimb040.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

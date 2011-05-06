@@ -45,13 +45,15 @@
 class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         Q_OBJECT
     public:
-        QFESPIMB040MainWindow(QFExtensionManager* extManager, QWidget* parent=NULL);
+        QFESPIMB040MainWindow(QFExtensionServices* pluginServices, QWidget* parent=NULL);
         virtual ~QFESPIMB040MainWindow();
 
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings);
         /** \brief save settings */
         void storeSettings(ProgramOptions* settings);
+
+
 
     protected:
 
@@ -63,6 +65,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         QFESPIMB040CameraConfig* camConfig1;
         QFESPIMB040CameraConfig* camConfig2;
         QFESPIMB040SampleStageConfig* sampleStages;
+        QFExtensionServices* m_pluginServices;
 
 
         /** \brief handles the close event, also close all camera views in camViews

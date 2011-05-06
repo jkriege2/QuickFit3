@@ -19,7 +19,7 @@ FORMS +=
 
 RESOURCES +=
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.fitalgorithm_simanneal.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../extlib/ \

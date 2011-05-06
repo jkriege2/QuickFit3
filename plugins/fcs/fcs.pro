@@ -29,7 +29,7 @@ FORMS = dlg_csvparameters.ui
 
 RESOURCES += qfrdrfcs.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.fcs.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

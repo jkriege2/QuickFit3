@@ -23,6 +23,7 @@ class OptionsDialog : public QDialog, public Ui::OptionsDlg {
         void on_cmbStyle_currentIndexChanged( const QString & text );
         void on_cmbStyle_highlighted( const QString & text );
     private:
+        ProgramOptions* m_options;
 };
 
 #endif // OPTIONSDIALOG_H

@@ -17,7 +17,7 @@ FORMS =
 
 RESOURCES +=
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.qffcsfitfuncs.ts
 
 INCLUDEPATH += ../../lib/
 

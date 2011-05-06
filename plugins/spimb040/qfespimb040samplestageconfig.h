@@ -41,7 +41,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFExtensionManager* extManager);
+        QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices);
         /** Default destructor */
         virtual ~QFESPIMB040SampleStageConfig();
 
@@ -55,7 +55,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
 
     protected:
         QFESPIMB040MainWindow* m_parent;
-        QFExtensionManager* m_extManager;
+        QFExtensionServices* m_pluginServices;
         /** \brief list of all available QFExtensionLinearStage plugins, initialized by findCameras() */
         QList<QObject*> stages;
 
@@ -91,6 +91,18 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief edit to give the maximum speed of the joystick in micron/sec */
         QDoubleSpinBox* spinJoystickMaxSpeed;
 
+        /** \brief edit to give x coordinate for movement */
+        QDoubleSpinBox* spinMoveX;
+        /** \brief edit to give y coordinate for movement */
+        QDoubleSpinBox* spinMoveY;
+        /** \brief edit to give z coordinate for movement */
+        QDoubleSpinBox* spinMoveZ;
+        /** \brief button for absolute movement */
+        QPushButton* btnMoveAbsolute;
+        /** \brief button for relative movement */
+        QPushButton* btnMoveRelative;
+
+
         /** \brief label for x-axis state */
         QLabel* labXState;
         /** \brief label for x-axis position */
@@ -111,6 +123,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QLabel* labZPosition;
         /** \brief label for z-axis position */
         QLabel* labZSpeed;
+        /** \brief label to display joystick status */
+        QLabel* labJoystick;
 
 
         /** \brief action to connect to stage for axis x */
@@ -135,6 +149,11 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QPixmap iconReady;
         QPixmap iconError;
         QPixmap iconMoving;
+        QPixmap iconJoystick;
+        QPixmap iconNoJoystick;
+
+        QTimer timerDisplayUpdate;
+
 
 
 
@@ -175,7 +194,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void configureY();
         void configureZ();
         void updateJoystick();
-        void displayAxisStates(bool automatic=true);
+        void displayAxisStates();
+        void moveAbsolute();
+        void moveRelative();
 };
 
 #endif // QFESPIMB040SAMPLESTAGECONFIG_H

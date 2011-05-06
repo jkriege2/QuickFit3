@@ -13,7 +13,7 @@ OptionsDialog::~OptionsDialog()
 }
 
 void OptionsDialog::on_cmbStylesheet_currentIndexChanged( const QString & text ) {
-    QString fn=QString(QCoreApplication::applicationDirPath()+"/stylesheets/%1.qss").arg(text);
+    QString fn=QString(m_options->getAssetsDirectory()+"/stylesheets/%1.qss").arg(text);
     QFile f(fn);
     f.open(QFile::ReadOnly);
     QTextStream s(&f);
@@ -38,9 +38,10 @@ void OptionsDialog::on_cmbStyle_highlighted( const QString & text ) {
 
 void OptionsDialog::open(ProgramOptions* options) {
     spnMaxThreads->setValue(options->getMaxThreads());
+    m_options=options;
 
     // find all available translations ... program is already in english, so add "en" by default (there is not en.qm file!)
-    QDir dir(QCoreApplication::applicationDirPath());
+    QDir dir(options->getAssetsDirectory());
     dir.cd("translations");
     QStringList filters;
     filters << "*.qm";
@@ -48,7 +49,11 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbLanguage->addItem("en");
     QStringList sl=dir.entryList(filters, QDir::Files);
     for (int i=0; i<sl.size(); i++) {
-        cmbLanguage->addItem(sl[i].remove(".qm"), Qt::CaseInsensitive);
+        QString s=sl[i];
+        int idx=s.indexOf(".");
+        if (cmbLanguage->findText(s.left(idx))<0) {
+            cmbLanguage->addItem(s.left(idx), Qt::CaseInsensitive);
+        }
     }
     cmbLanguage->setCurrentIndex( cmbLanguage->findText(options->getLanguageID()));
     cmbStyle->addItems(QStyleFactory::keys());

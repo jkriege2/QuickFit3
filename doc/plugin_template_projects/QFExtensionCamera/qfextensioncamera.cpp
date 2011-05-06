@@ -33,9 +33,8 @@ void QFExtensionCameraImplementation::loadSettings(ProgramOptions* settingspo) {
     if (!settingspo) return;
 	if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
-
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -46,7 +45,7 @@ void QFExtensionCameraImplementation::storeSettings(ProgramOptions* settingspo) 
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 	}
 

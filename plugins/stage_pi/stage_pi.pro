@@ -23,7 +23,7 @@ FORMS =
 
 RESOURCES += stage_pi.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.stage_pi863.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

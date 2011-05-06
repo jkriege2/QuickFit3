@@ -86,11 +86,11 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
-		<Unit filename="doc\plugin_template_projects\plugin_template_projects.dox" />
 		<Unit filename="doc\plugins.dox">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="doc\todo.dox" />
+		<Unit filename="doc\whereiswhat.dox" />
 		<Unit filename="extlibs\cimg.h" />
 		<Unit filename="extlibs\cimg.pri" />
 		<Unit filename="extlibs\cimg\CImg.h" />
@@ -165,6 +165,10 @@
 		<Unit filename="libqf3widgets\qffitparameterbasicinterface.h" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.cpp" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.h" />
+		<Unit filename="plugins\cam_andor\cam_andor.cpp" />
+		<Unit filename="plugins\cam_andor\cam_andor.h" />
+		<Unit filename="plugins\cam_andor\cam_andor.pro" />
+		<Unit filename="plugins\cam_andor\cam_andor.qrc" />
 		<Unit filename="plugins\cam_radhard2\cam_radhard2.cpp" />
 		<Unit filename="plugins\cam_radhard2\cam_radhard2.h" />
 		<Unit filename="plugins\cam_radhard2\cam_radhard2.pro" />

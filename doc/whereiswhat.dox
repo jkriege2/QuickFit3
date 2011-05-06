@@ -1,0 +1,55 @@
+
+/*! \page qf3whereiswhat Where to Find/Put which Data
+    \ingroup quickfit3
+
+    This page describes where you should put which type of files within the Quickfit application, especially
+    when writing \link qf3plugins plugins! \endlink
+
+    There are some important "base directories" into which to distribute/install your files. Where they exactly lie may
+    change from operating system to operating system:
+      - the application directory <b>[AppDir]</b> (accessible via <a href="http://doc.qt.nokia.com/latest/qcoreapplication.html#applicationDirPath">
+        QCoreApplication::applicationDirPath()</a> is the directory where the quickfit3 executable is situated
+      - the plugins directory <b>[PluginDir]</b> contains all plugins (excluding the Qt plugins!) available to QuickFit.
+      - the assets directory <b>[AssetsDir]</b> contains additional data files that are usually NOT changed by the running
+        program (e.g. help files, firmware files for external hardware ...)
+      - the configuration directory <b>[ConfigDir]</b> contains configuration and log-files.
+    .
+
+    On windows these pathes will be:
+      - <b>[AppDir]</b> = \c c:\\Program_Files\\QuickFit3\\
+      - <b>[PluginDir]</b> = \c c:\\Program_Files\\QuickFit3\\plugins
+      - <b>[AssetsDir]</b> = \c c:\\Program_Files\\QuickFit3
+      - <b>[ConfigDir]</b> = \c c:\\Documents_and_Settings\\<WINDOWS_USERNAME>\\.quickfit3
+    .
+
+    The last three directory are available over the ProgramOptions object or the QFPluginServices interface
+    (which one ever is easier accessible at your point of code).
+
+    So if you are planning/writing an extension or plugin for QuickFit, here is a guide of where the files
+    you create should be installed:
+      - Plugin shared libraries (SO/DLL):
+        - for raw data/evaluation plugin: \c [PluginsDir]
+        - for QFExtension plugin: \c [PluginsDir]/extensions/
+        - for QFFitAlgorithm plugin: \c [PluginDir]/fitalgorithms/
+        - for QFFitFunction plugin: \c [PluginDir]/fitfunctions/
+      .
+      - Configuration files / log files:
+        - for raw data/evaluation plugin: \c [PluginDir]/plugins/<PluginID>/
+        - for QFExtension plugin: \c [PluginDir]/plugins/extensions/<PluginID>/
+      .
+      - Help files:
+        - QuickFit directly: \c [AssetsDir]/help/
+        - for raw data/evaluation plugin: \c [AssetsDir]/plugins/help/<PluginID>/
+        - for QFExtension plugin: \c [AssetsDir]/plugins/extensions/help/<PluginID>/
+        - for QFFitAlgorithm plugin: \c [AssetsDir]/plugins/fitalgorithms/help/<PluginDLL.baseName>/<PluginID>.html
+        - for QFFitFunction plugin: \c [AssetsDir]/plugins/fitfunctions/help/<PluginDLL.baseName>/<PluginID>.html
+      .
+      - any other additional files:
+        - QuickFit directly: \c [AssetsDir]
+        - for raw data/evaluation plugin: \c [AssetsDir]/plugins/<PluginID>/
+        - for QFExtension plugin: \c [AssetsDir]/plugins/extensions/<PluginID>/
+        - translations \c [AssetDir]/<languageID>.<yourname>.ts
+        - stylesheets  \c [AssetDir]/<yourname>.qss
+      .
+    .
+*/

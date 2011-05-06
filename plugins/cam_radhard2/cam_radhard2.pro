@@ -28,7 +28,7 @@ FORMS =
 
 RESOURCES += cam_radhard2.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.cam_radhard2.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

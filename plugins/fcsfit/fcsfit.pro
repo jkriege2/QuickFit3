@@ -24,7 +24,7 @@ FORMS =
 
 RESOURCES += qfevalfcsfit.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.qfevalfcsfit.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

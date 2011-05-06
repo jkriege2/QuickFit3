@@ -21,24 +21,25 @@ void QFESPIMB040CameraConfig::viewDataStruct::reset() {
 }
 
 
-QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionManager* extManager):
+QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionServices* pluginServices):
     QGroupBox(parent)
 {
     m_camViewID=camViewID;
     m_parent=parent;
-    m_extManager=extManager;
+    m_pluginServices=pluginServices;
+    m_extManager=pluginServices->getExtensionManager();
     camView=NULL;
     locked=false;
 
     // search for available camera plugins
-    findCameras(extManager);
+    findCameras(m_pluginServices->getExtensionManager());
 
     // initialize raw image memory ...
     viewData.reset();
 
     // create widgets and actions
     setTitle(tr(" Camera %1: ").arg(camViewID+1));
-    createWidgets(extManager);
+    createWidgets(m_pluginServices->getExtensionManager());
     createActions();
     rereadConfigCombos();
     displayStates(QFESPIMB040CameraConfig::Disconnected);
@@ -103,7 +104,7 @@ void QFESPIMB040CameraConfig::rereadConfigCombos() {
         cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
     }
     if ((!cam)||(!extension)) return;
-    QString directory=QApplication::applicationDirPath()+"/plugins/extensions/"+extension->getID();
+    QString directory=m_pluginServices->getConfigFileDirectory()+"/plugins/extensions/"+extension->getID();
     mk_all_dir(directory.toStdString());
     //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
     directory+="/";
@@ -196,7 +197,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create camera view widgets ... and hide them
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    camView=new QFESPIMB040CameraView(m_camViewID, QString(QApplication::applicationDirPath()+"/spimb040_cam1.log"), extManager, NULL);
+    camView=new QFESPIMB040CameraView(m_camViewID, QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_cam1.log"), m_pluginServices, NULL);
     camView->close();
 
 
@@ -566,7 +567,7 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
                 displayStates(QFESPIMB040CameraConfig::Connected);
                 m_parent->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
                 camView->show();
-                acquireSingle();
+                previewSingle();
             }
         } else {
             //disconnect from the current device and delete the settings widget

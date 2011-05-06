@@ -65,7 +65,7 @@ void QFHTMLHelpWindow::writeSettings(QSettings& settings, QString prefix) {
 void QFHTMLHelpWindow::updateHelp(QString title, QString filename) {
     m_home=filename;
     searchPath=QFileInfo(filename).canonicalPath();
-    std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
+    //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
     disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
@@ -93,7 +93,7 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename) {
 void QFHTMLHelpWindow::updateHelp(QString filename) {
     m_home=filename;
     searchPath=QFileInfo(filename).canonicalPath();
-    std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
+    //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
     disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
     descriptionBrowser->setOpenLinks(false);
     descriptionBrowser->setOpenExternalLinks(true);

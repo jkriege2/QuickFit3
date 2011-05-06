@@ -23,7 +23,7 @@ FORMS =
 
 RESOURCES += cam_testcamera.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.cam_testcamera.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

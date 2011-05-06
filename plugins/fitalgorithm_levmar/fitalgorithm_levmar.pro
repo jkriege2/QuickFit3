@@ -20,7 +20,7 @@ FORMS +=
 
 RESOURCES +=
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.fitalgorithm_levmar.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

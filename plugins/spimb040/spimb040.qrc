@@ -20,15 +20,19 @@
      <file alias="spimb040/stageconnect.png">../../images/22x22/stage_connect.png</file>
      <file alias="spimb040/stagedisconnect.png">../../images/22x22/stage_disconnect.png</file>
      <file alias="spimb040/stagesettings.png">../../images/22x22/configure.png</file>
+     <file alias="spimb040/stagemove.png">../../images/22x22/2rightarrow.png</file>
 
      <file alias="spimb040/stage_error.png">../../images/16x16/stage_error.png</file>
      <file alias="spimb040/stage_ready.png">../../images/16x16/stage_ready.png</file>
      <file alias="spimb040/stage_moving.png">../../images/16x16/stage_moving.png</file>
      <file alias="spimb040/stage_disconnected.png">../../images/16x16/stage_disconnected.png</file>
+     <file alias="spimb040/stage_joystick.png">../../images/16x16/joystick.png</file>
+     <file alias="spimb040/stage_nojoystick.png">../../images/16x16/nojoystick.png</file>
 
      <file alias="spimb040/config_add.png">../../images/16x16/list_add.png</file>
      <file alias="spimb040/config_delete.png">../../images/16x16/list_remove.png</file>
      <file alias="spimb040/config_saveas.png">../../images/16x16/save_all.png</file>
      <file alias="spimb040/config_rename.png">../../images/16x16/edit_rename.png</file>
+
 </qresource>
 </RCC>

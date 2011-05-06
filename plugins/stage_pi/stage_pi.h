@@ -156,9 +156,6 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         /** \brief settings of max. velocity */
         double maxVelocity;
 
-        /** \brief settings of max. joystick velocity */
-        double maxJoystickVelocity;
-
         bool checkComConnected();
 
         void selectAxis(int i);

@@ -19,7 +19,7 @@ FORMS =
 
 RESOURCES += qfextensioncamera.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/translations/de.cam_mycamname.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

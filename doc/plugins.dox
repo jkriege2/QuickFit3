@@ -19,6 +19,7 @@
 
     \defgroup qf3plugintools Plugin programming Tools
     \ingroup qf3plugins
+
 */
 
 /*! \page plugins Writing Plugins
@@ -37,9 +38,12 @@
       - \subpage pluginsfitalg
       - \subpage pluginsfitfunc
       - \subpage pluginsextensions
-	    - \subpage pluginsextensionscamera
-	  .	
+        - \subpage pluginsextensionscamera
+        - \subpage pluginsextensionslinearstage
+	  .
     .
+
+    When writing/deploying your plugins also have a lokk at \ref qf3whereiswhat.
 */
 
 /*! \page pluginsrdr Writing QFRawDataRecord Plugins
@@ -136,47 +140,95 @@
 
     After QFExtension::init() has been called you my access the QFExtensionServices at every time, using
     QFExtensionBase::services. This may also be used to interface all other QFExtension s, currently loaded.
-	
+
 */
 
 /*! \page pluginsextensionscamera Writing QFExtensionCamera Plugins
 
     This is	a special QFExtension plugin which also implements the QFExtensionCamera interface. Thus it allows to access
 	a camera or any other imaging device in the system. In addition to the methods in QFExtension you will also have to
-	implement the methods from QFExtensionCamera. 
-	
-	If you want to implement such a plugin, just copy the files from the directory \c plugin_template_projects/QFExtensionCamera/ 
+	implement the methods from QFExtensionCamera.
+
+	If you want to implement such a plugin, just copy the files from the directory \c plugin_template_projects/QFExtensionCamera/
 	into a new directory and fill in the functions. In addition you should rename some of the files/classes:
-	  - rename the directory to \c \<PLUGIN_NAME\> and the project name to \c \<PLUGIN_NAME\>.pro where \c \<PLUGIN_NAME\> is 
-	    a name you selected for the plugin. 
+	  - rename the directory to \c \<PLUGIN_NAME\> and the project name to \c \<PLUGIN_NAME\>.pro where \c \<PLUGIN_NAME\> is
+	    a name you selected for the plugin.
 	  - in 	\c \<PLUGIN_NAME\>.pro, change the \c TARGET to \c \<PLUGIN_NAME\>
       - the plugin ID will be automatically set to be \c "cam_\<PLUGIN_NAME\>" using the TARGETNAME macro defined in the .pro file!
 	  - \b optionally you may rename the \c .cpp and \c .h	file and also the plugin class to a new name.
-	.  
-	
+	.
+
 	Here are the files of the template project:
-	
+
 	In \c plugin_template_projects/QFExtensionCamera/qfextensioncamera.pro you will have to set the \c TARGET to a new name
-	which will the also be the name of the plugin shared library:
+	which will the also be the name of the plugin shared library. Also change the name of the translations to something unique! 
+	Here is the tamplate:
 	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.pro
-	
-	In the Resource file you should give an icon for your plugin. To do so, rename qfextensioncamera_logo.png to a plugin-specific 
+
+	In the Resource file you should give an icon for your plugin. To do so, rename qfextensioncamera_logo.png to a plugin-specific
 	name and also return this filename in \c plugin_template_projects/QFExtensionCamera/qfextensioncamera.h in the \c getIconFilename()
 	function:
 	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.qrc
-	
+
 	Here you will have to set the plugin-description. Especially in getID() you will have to care to give a unique name which is not used
 	by any other plugin (the currently used IDs may be seen in the Plugin Info dialog of QuickFit (which is situated in the Help menu).
 	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.h
-	
+
 	Implement your plugin here:
 	\include plugin_template_projects/QFExtensionCamera/qfextensioncamera.cpp
-	
+
 	If you are a DKFZ internal developer, you may add your plugin to the \c quickitf3.pro by inserting these lines:
 	\code
 SUBDIRS += plg_<PLUGIN_NAME>
 plg_<PLUGIN_NAME>.subdir=./plugins/<PLUGIN_NAME>
-plg_<PLUGIN_NAME>.depends = lib 
+plg_<PLUGIN_NAME>.depends = lib
+	\endcode
+	now calling \code qmake && make \endcode will also build your new plugin.
+*/
+
+
+
+
+
+/*! \page pluginsextensionslinearstage Writing QFExtensionLinearStage Plugins
+
+    This is	a special QFExtension plugin which also implements the QFExtensionLinearStage interface. Thus it allows to access
+	computer controlled motion stages, as they are used in many experiments. In addition to the methods in QFExtension you will
+	also have to implement the methods from QFExtensionLinearStage.
+
+	If you want to implement such a plugin, just copy the files from the directory \c plugin_template_projects/QFExtensionLinearStage/
+	into a new directory and fill in the functions. In addition you should rename some of the files/classes:
+	  - rename the directory to \c \<PLUGIN_NAME\> and the project name to \c \<PLUGIN_NAME\>.pro where \c \<PLUGIN_NAME\> is
+	    a name you selected for the plugin.
+	  - in 	\c \<PLUGIN_NAME\>.pro, change the \c TARGET to \c \<PLUGIN_NAME\>
+      - the plugin ID will be automatically set to be \c "cam_\<PLUGIN_NAME\>" using the TARGETNAME macro defined in the .pro file!
+	  - \b optionally you may rename the \c .cpp and \c .h	file and also the plugin class to a new name.
+	.
+
+	Here are the files of the template project:
+
+	In \c plugin_template_projects/QFExtensionLinearStage/qfextensionlinearstage.pro you will have to set the \c TARGET to a new name
+	which will the also be the name of the plugin shared library. Also change the name of the translations to something unique! 
+	Here is the tamplate:
+	\include plugin_template_projects/QFExtensionLinearStage/qfextensionlinearstage.pro
+
+	In the Resource file you should give an icon for your plugin. To do so, rename qfextensionlinearstage.png to a plugin-specific
+	name and also return this filename in \c plugin_template_projects/QFExtensionLinearStage/qfextensionlinearstage.h in the \c getIconFilename()
+	function:
+	\include plugin_template_projects/QFExtensionLinearStage/qfextensionlinearstage.qrc
+
+	Here you will have to set the plugin-description. Especially in getID() you will have to care to give a unique name which is not used
+	by any other plugin (the currently used IDs may be seen in the Plugin Info dialog of QuickFit (which is situated in the Help menu).
+	\include plugin_template_projects/QFExtensionLinearStage/qfextensionlinearstage.h
+
+	Implement your plugin here:
+	\include plugin_template_projects/QFExtensionLinearStage/qfextensionlinearstage.cpp
+
+	If you are a DKFZ internal developer, you may add your plugin to the \c quickitf3.pro by inserting these lines:
+	\code
+SUBDIRS += plg_<PLUGIN_NAME>
+plg_<PLUGIN_NAME>.subdir=./plugins/<PLUGIN_NAME>
+plg_<PLUGIN_NAME>.depends = lib
 	\endcode
 	now calling \code qmake && make \endcode will also build your new plugin.
 */

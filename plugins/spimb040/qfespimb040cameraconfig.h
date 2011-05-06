@@ -48,7 +48,7 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         enum States {Disconnected, Connected, Previewing,Inactive,Locked};
     public:
         /** Default constructor */
-        QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionManager* extManager);
+        QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionServices* pluginServices);
         /** Default destructor */
         virtual ~QFESPIMB040CameraConfig();
 
@@ -94,6 +94,7 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QFESPIMB040MainWindow* m_parent;
         int m_camViewID;
         QFExtensionManager* m_extManager;
+        QFExtensionServices* m_pluginServices;
 
     protected:
         /** \brief struct that holds dta about the different camera devices, including the last raw image, ... */

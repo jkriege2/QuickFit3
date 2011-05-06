@@ -36,7 +36,7 @@
 class QFESPIMB040CameraView : public QWidget {
         Q_OBJECT
     public:
-        QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionManager* extManager, QWidget* parent=NULL);
+        QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionServices* pluginServices, QWidget* parent=NULL);
         virtual ~QFESPIMB040CameraView();
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings, QString prefix);
@@ -78,6 +78,8 @@ class QFESPIMB040CameraView : public QWidget {
         QToolBar* toolbar;
         QTabWidget* tabSettings;
         QTabWidget* tabResults;
+
+        QFExtensionServices* m_pluginServices;
 
 
 

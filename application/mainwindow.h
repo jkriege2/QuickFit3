@@ -35,15 +35,10 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         /** \brief class constructor
          *  \param splash a splash screen to use for status output during startup/construction
          */
-        MainWindow(QSplashScreen* splash);
+        MainWindow(ProgramOptions* s, QSplashScreen* splash);
         ~MainWindow();
 
-        void setSettings(ProgramOptions* s) {
-            settings=s;
-            readSettings();
-            rawDataFactory->distribute(project, settings, this, this);
-            evaluationFactory->distribute(project, settings, this, this);
-        }
+
 
         /** \copydoc QFPluginServices::log_text()  */
         virtual void log_text(QString message);
@@ -86,6 +81,10 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         /** \copydoc QFPluginServices::getConfigFileDirectory() */
         virtual QString getConfigFileDirectory();
 
+        /** \copydoc QFPluginServices::getAssetsDirectory() */
+        virtual QString getAssetsDirectory();
+        /** \copydoc QFPluginServices::getPluginsDirectory() */
+        virtual QString getPluginsDirectory();
 
         /** \copydoc QFExtensionServices::getMenu() */
         virtual QMenu* getMenu(QString menu);
