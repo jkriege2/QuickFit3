@@ -54,8 +54,16 @@ unsigned int QFExtensionCameraImplementation::getCameraCount() {
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }
 void QFExtensionCameraImplementation::useCameraSettings(unsigned int camera, const QSettings& settings) {
-    /* set the camera settings to the values specified in settings parameter */
+    /* set the camera settings to the values specified in settings parameter, called before acquire() */
 }
+
+void QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+    /* set the camera settings to the values specified in settings parameter, called before startAcquisition() */
+
+    // uncomment this if the code is the same as in useCameraSettings()
+    //useCameraSettings(camera, settings);
+}
+
 
 void QFExtensionCameraImplementation::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.

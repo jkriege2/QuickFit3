@@ -100,6 +100,11 @@ void QFECamTestCamera::useCameraSettings(unsigned int camera, const QSettings& s
 
 }
 
+void QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+    useCameraSettings(camera, settings);
+}
+
+
 void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
     QDialog* dlg=new QDialog(parent);
     dlg->setWindowTitle(tr("Configuration for Testcamera #%1").arg(camera));

@@ -19,9 +19,20 @@
       - showSettingsDialog() displays a modal dialog where the user may enter settings
       - useCameraSettings() sets the camera settings from a given QSettings object
     .
-    So usually you will use a camera in this manner:
+    So usually you will use a camera in this manner for preview:
       -# First load settings from some location (file, registry, ...) and then use them in the camera by caling useCameraSettings().
-      -# Then either take single images using acquire() or a complete image series using startAcquisition()
+      -# Then take single images using acquire()
+    .
+    And in this manner for timed acquisitions:
+      -# First load settings from some location (file, registry, ...)
+      -# call prepareAcquisition()
+      -# call startAcquisition()
+      -# loop until isAcquisitionRunning() returns \c false. During the loop the application MAY request
+         preview images using getAcquisitionPreview() (if this returns \c false no previews will be
+         shown)
+      -# After the acquisition ended a call to getAcquisitionDescription() should return information about the last
+         acquisition.
+    .
  */
 class QFExtensionCamera {
     public:
@@ -44,7 +55,7 @@ class QFExtensionCamera {
             \param[in] parent parent widget for the returned QWidget
          */
          virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL)=0;
-         /*! \brief set camera settings from the specified QSettings object
+         /*! \brief set camera settings from the specified QSettings object for subsequent acquire()
             \param[in] camera the camera the settings widget should apply to
             \param[in] settings
           */
@@ -73,6 +84,11 @@ class QFExtensionCamera {
          /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
          virtual void setLogging(QFPluginLogService* logService)=0;
 
+         /*! \brief set camera settings from the specified QSettings object for a subsequent startAcquisition()
+            \param[in] camera the camera the settings widget should apply to
+            \param[in] settings
+          */
+         virtual void prepareAcquisition(unsigned int camera, const QSettings& settings)=0;
 
          /*! \brief start an acquisition
 

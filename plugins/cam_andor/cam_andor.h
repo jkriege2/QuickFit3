@@ -93,6 +93,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
 
+        /** \copydoc QFExtensionCamera::prepareAcquisition() */
+        virtual void prepareAcquisition(unsigned int camera, const QSettings& settings);
         /** \copydoc QFExtensionCamera::startAcquisition() */
         virtual bool startAcquisition(unsigned int camera, QString filenamePrefix=QString(""));
         /** \copydoc QFExtensionCamera::cancelAcquisition() */

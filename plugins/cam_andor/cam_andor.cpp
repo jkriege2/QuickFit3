@@ -59,6 +59,11 @@ unsigned int QFExtensionCameraAndor::getCameraCount() {
 void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSettings& settings) {
 }
 
+void QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+    useCameraSettings(camera, settings);
+}
+
+
 void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.
 

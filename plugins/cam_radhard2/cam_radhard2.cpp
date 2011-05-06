@@ -159,6 +159,10 @@ void QFExtensionCameraRadhard2::useCameraSettings(unsigned int camera, const QSe
      }
 }
 
+void QFExtensionCameraRadhard2::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+    useCameraSettings(camera, settings);
+}
+
 void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.
 
