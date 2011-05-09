@@ -6,6 +6,9 @@
 #include "qfextension.h"
 #include "../interfaces/qfextensioncamera.h"
 #include "highrestimer.h"
+// include libTIFF header
+#include <tiffio.h>
+
 
 /*!
     \defgroup qf3ext_testcamera QFExtensionCamera implementation which outputs configurable test images
@@ -101,17 +104,19 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
-        virtual void prepareAcquisition(unsigned int camera, const QSettings& settings);
+        virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
         /** \copydoc QFExtensionCamera::startAcquisition() */
-        virtual bool startAcquisition(unsigned int camera, QString filenamePrefix=QString(""));
+        virtual bool startAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::cancelAcquisition() */
-        virtual bool cancelAcquisition(unsigned int camera);
+        virtual void cancelAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
         virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
         virtual void getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
+        /** \copydoc QFExtensionCamera::getAcquisitionProgress() */
+        virtual int getAcquisitionProgress(unsigned int camera);
 
         /** \brief log project text message
          *  \param message the message to log
@@ -162,6 +167,18 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         void initParticles(int camera, int n);
         void stepParticles(int camera);
 
+        /** \brief how many images to acquire after startAcquisition() */
+        int seriesAcquisitions;
+        int seriesDelay;
+        QString seriesFilenamePrefix[2];
+
+        int seriesCount[2];
+        bool seriesRunning[2];
+        TIFF* tif[2];
+
+    protected slots:
+        void seriesStep1();
+        void seriesStep2();
 
 };
 

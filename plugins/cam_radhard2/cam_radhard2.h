@@ -109,17 +109,19 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
-        virtual void prepareAcquisition(unsigned int camera, const QSettings& settings);
+        virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
         /** \copydoc QFExtensionCamera::startAcquisition() */
-        virtual bool startAcquisition(unsigned int camera, QString filenamePrefix=QString(""));
+        virtual bool startAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::cancelAcquisition() */
-        virtual bool cancelAcquisition(unsigned int camera);
+        virtual void cancelAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
         virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
         virtual void getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
+        /** \copydoc QFExtensionCamera::getAcquisitionProgress() */
+        virtual int getAcquisitionProgress(unsigned int camera);
 
         /** \brief log project text message
          *  \param message the message to log

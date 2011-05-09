@@ -56,7 +56,7 @@ QFESPIMB040CameraConfig::~QFESPIMB040CameraConfig()
     }
 }
 
-bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera) {
+bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {
     if (locked || (!actDisConnect->isChecked()) || (!viewData.camera) || (!viewData.extension)) {
         *camera=-1;
         *extension=NULL;
@@ -67,11 +67,10 @@ bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCam
     displayStates(QFESPIMB040CameraConfig::Locked);
 
     QString filename="";
-
-    if (cmbAcquisitionConfiguration->currentIndex()>=0) filename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
-    QSettings* settings=new QSettings(filename, QSettings::IniFormat);
-    viewData.camera->useCameraSettings(viewData.usedCamera, *settings);
-    delete settings;
+    *previewSettingsFilename="";
+    *acquisitionSettingsFilename="";
+    if (cmbAcquisitionConfiguration->currentIndex()>=0) *acquisitionSettingsFilename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
+    if (cmbPreviewConfiguration->currentIndex()>=0) *previewSettingsFilename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
     *extension=viewData.extension;
     *ecamera=viewData.camera;
     *camera=viewData.usedCamera;

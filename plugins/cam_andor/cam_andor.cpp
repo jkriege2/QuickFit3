@@ -59,8 +59,9 @@ unsigned int QFExtensionCameraAndor::getCameraCount() {
 void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSettings& settings) {
 }
 
-void QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
+    return true;
 }
 
 
@@ -139,12 +140,11 @@ double QFExtensionCameraAndor::getExposureTime(unsigned int camera) {
 
 
 
-bool QFExtensionCameraAndor::startAcquisition(unsigned int camera, QString filenamePrefix) {
+bool QFExtensionCameraAndor::startAcquisition(unsigned int camera) {
     return false;
 }
 
-bool QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
-    return true;
+void QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
 }
 
 bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
@@ -156,6 +156,10 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QStr
 
 bool QFExtensionCameraAndor::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
+}
+
+int QFExtensionCameraAndor::getAcquisitionProgress(unsigned int camera) {
+    return 0;
 }
 
 void QFExtensionCameraAndor::log_text(QString message) {

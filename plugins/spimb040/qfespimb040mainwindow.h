@@ -67,6 +67,13 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         QFESPIMB040SampleStageConfig* sampleStages;
         QFExtensionServices* m_pluginServices;
 
+        QTabWidget* tabAcquisition;
+        QCheckBox* chkAcquisitionUseCam1;
+        QCheckBox* chkAcquisitionUseCam2;
+        QLineEdit* edtAcquisitionPrefix1;
+        QLineEdit* edtAcquisitionPrefix2;
+        QPushButton* btnAcquire;
+
 
         /** \brief handles the close event, also close all camera views in camViews
          *
@@ -85,7 +92,8 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
 
 
 
-
+    protected slots:
+        void doAcquisition();
 
 
     public:

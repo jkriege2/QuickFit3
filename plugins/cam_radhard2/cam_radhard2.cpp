@@ -159,8 +159,9 @@ void QFExtensionCameraRadhard2::useCameraSettings(unsigned int camera, const QSe
      }
 }
 
-void QFExtensionCameraRadhard2::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+bool QFExtensionCameraRadhard2::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
+    return true;
 }
 
 void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
@@ -363,12 +364,11 @@ void QFExtensionCameraRadhard2::sendIterations() {
 }
 
 
-bool QFExtensionCameraRadhard2::startAcquisition(unsigned int camera, QString filenamePrefix) {
+bool QFExtensionCameraRadhard2::startAcquisition(unsigned int camera) {
     return false;
 }
 
-bool QFExtensionCameraRadhard2::cancelAcquisition(unsigned int camera) {
-    return true;
+void QFExtensionCameraRadhard2::cancelAcquisition(unsigned int camera) {
 }
 
 bool QFExtensionCameraRadhard2::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
@@ -381,6 +381,11 @@ void QFExtensionCameraRadhard2::getAcquisitionDescription(unsigned int camera, Q
 bool QFExtensionCameraRadhard2::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
+
+int QFExtensionCameraRadhard2::getAcquisitionProgress(unsigned int camera) {
+    return 0;
+}
+
 
 void QFExtensionCameraRadhard2::log_text(QString message) {
 	if (logService) logService->log_text(LOG_PREFIX+message);

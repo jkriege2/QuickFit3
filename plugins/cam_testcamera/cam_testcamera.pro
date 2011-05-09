@@ -9,7 +9,7 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/extensions/
 
-LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets -ltiff
 
 # Input
 HEADERS += cam_testcamera.h \

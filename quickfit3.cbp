@@ -169,6 +169,8 @@
 		<Unit filename="plugins\cam_andor\cam_andor.h" />
 		<Unit filename="plugins\cam_andor\cam_andor.pro" />
 		<Unit filename="plugins\cam_andor\cam_andor.qrc" />
+		<Unit filename="plugins\cam_andor\camandoracquisitionthread.cpp" />
+		<Unit filename="plugins\cam_andor\camandoracquisitionthread.h" />
 		<Unit filename="plugins\cam_radhard2\cam_radhard2.cpp" />
 		<Unit filename="plugins\cam_radhard2\cam_radhard2.h" />
 		<Unit filename="plugins\cam_radhard2\cam_radhard2.pro" />

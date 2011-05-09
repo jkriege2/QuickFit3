@@ -23,6 +23,11 @@ QFECamTestCamera::QFECamTestCamera(QObject* parent):
     particleBackground[0]=particleBackground[1]=0.2;
     srand(time(0));
     hotpixels[0]=hotpixels[1]=0;
+    seriesAcquisitions=20;
+    seriesDelay=250;
+    seriesCount[0]=seriesCount[1]=0;
+    seriesRunning[0]=seriesRunning[1]=false;
+    seriesFilenamePrefix[0]=seriesFilenamePrefix[1]="";
 
 }
 
@@ -100,8 +105,10 @@ void QFECamTestCamera::useCameraSettings(unsigned int camera, const QSettings& s
 
 }
 
-void QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+bool QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
+    seriesFilenamePrefix[camera]=QString("%3%1_cam%2.tif").arg(getID()).arg(camera).arg(filenamePrefix);
+    return true;
 }
 
 
@@ -353,26 +360,206 @@ void QFECamTestCamera::stepParticles(int camera) {
 }
 
 
-bool QFECamTestCamera::startAcquisition(unsigned int camera, QString filenamePrefix) {
-    return false;
-}
+bool QFECamTestCamera::startAcquisition(unsigned int camera) {
+    seriesRunning[camera]=false;
+    tif[camera]=TIFFOpen(seriesFilenamePrefix[camera].toAscii().data(), "w");
+    if (tif[camera]==NULL) return false;
 
-bool QFECamTestCamera::cancelAcquisition(unsigned int camera) {
+    seriesRunning[camera]=true;
+    seriesCount[camera]=0;
+
+    if (camera==0) QTimer::singleShot(0, this, SLOT(seriesStep1()));
+    if (camera==1) QTimer::singleShot(1, this, SLOT(seriesStep2()));
+
     return true;
 }
 
+void QFECamTestCamera::cancelAcquisition(unsigned int camera) {
+    seriesRunning[camera]=false;
+}
+
 bool QFECamTestCamera::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
-    return false;
+    return seriesRunning[camera];
 }
 
 void QFECamTestCamera::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+    if (files) files->append(seriesFilenamePrefix[camera]);
+    if (parameters) {
+        (*parameters)["images"]=seriesCount[camera];
+        (*parameters)["fileformat"]="TIFF, 8-bit";
+    }
 }
 
 bool QFECamTestCamera::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
 
+int QFECamTestCamera::getAcquisitionProgress(unsigned int camera) {
+    if (seriesRunning[camera]) {
+        return seriesCount[camera]*100/seriesAcquisitions;
+    } else {
+        return 0;
+    }
+}
 
+void QFECamTestCamera::seriesStep1() {
+    int camera=0;
+
+    uint16 frame_samplesperpixel=1;
+    uint16 frame_bitspersample=8;
+    uint16 frame_sampleformat = SAMPLEFORMAT_UINT;
+    uint32 frame_width=getImageWidth(camera);
+    uint32 frame_height=getImageHeight(camera);
+    uint32 rowsperstrip = (uint32)-1;
+
+    uint32* frame32 = (uint32*)calloc(frame_width*frame_height, sizeof(uint32));
+    uint32 frame_min=0xFFFFFFFF;
+    uint32 frame_max=0;
+    acquire(camera, frame32);
+    for (register int i=0; i<frame_width*frame_height; i++) {
+        register uint32 v=frame32[i];
+        if (v<frame_min) frame_min=v;
+        if (v>frame_max) frame_max=v;
+    }
+    uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
+    for (register int i=0; i<frame_width*frame_height; i++) {
+        register uint64_t v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
+        if (v>255) v=255;
+        frame[i]=v;
+    }
+
+
+    TIFFSetField(tif[camera], TIFFTAG_IMAGEWIDTH, frame_width);
+    TIFFSetField(tif[camera], TIFFTAG_IMAGELENGTH, frame_height);
+    TIFFSetField(tif[camera], TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    TIFFSetField(tif[camera], TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tif[camera], TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+    TIFFSetField(tif[camera], TIFFTAG_BITSPERSAMPLE, frame_bitspersample);
+    TIFFSetField(tif[camera], TIFFTAG_SAMPLESPERPIXEL, frame_samplesperpixel);
+    rowsperstrip = TIFFDefaultStripSize(tif[camera], rowsperstrip);
+    TIFFSetField(tif[camera], TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+    TIFFSetField(tif[camera], TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
+    TIFFSetField(tif[camera],TIFFTAG_SAMPLEFORMAT,frame_sampleformat);
+    TIFFSetField(tif[camera],TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
+
+    // write frame data
+    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
+    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
+    // smaller, so it is NOT padded with dummy data.
+    uint8* const buf = (uint8*)_TIFFmalloc(TIFFStripSize(tif[camera])); // data buffer for a strip of the image
+    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
+        // compute rows in this strip:
+        uint32 nrow = rowsperstrip;
+        if ((row + rowsperstrip)>frame_height) {
+            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
+        }
+        tstrip_t strip = TIFFComputeStrip(tif[camera],row,0);
+        tsize_t bi = 0;
+        // go through the fraem row-wise
+        for (unsigned int rr = 0; rr<nrow; ++rr) {
+            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
+                buf[bi++] = (uint8)frame[cc+(row + rr)*frame_width];
+            }
+        }
+        TIFFWriteEncodedStrip(tif[camera],strip,buf,bi*sizeof(uint8));
+    }
+    _TIFFfree(buf);
+    // write current directory, i.e. start new image
+    TIFFWriteDirectory(tif[camera]);
+
+
+    free(frame);
+    free(frame32);
+
+    seriesCount[camera]++;
+    seriesRunning[camera] = seriesRunning[camera] && (seriesCount[camera]<seriesAcquisitions);
+
+    if (seriesRunning[camera]) {
+        QTimer::singleShot(seriesDelay, this,SLOT(seriesStep1()));
+    } else {
+        TIFFClose(tif[camera]);
+    }
+}
+
+void QFECamTestCamera::seriesStep2() {
+    int camera=1;
+
+    uint16 frame_samplesperpixel=1;
+    uint16 frame_bitspersample=8;
+    uint16 frame_sampleformat = SAMPLEFORMAT_UINT;
+    uint32 frame_width=getImageWidth(camera);
+    uint32 frame_height=getImageHeight(camera);
+    uint32 rowsperstrip = (uint32)-1;
+
+    uint32* frame32 = (uint32*)calloc(frame_width*frame_height, sizeof(uint32));
+    uint32 frame_min=0xFFFFFFFF;
+    uint32 frame_max=0;
+    acquire(camera, frame32);
+    for (register int i=0; i<frame_width*frame_height; i++) {
+        register uint32 v=frame32[i];
+        if (v<frame_min) frame_min=v;
+        if (v>frame_max) frame_max=v;
+    }
+    //std::cout<<"frame_min="<<frame_min<<"   frame_max="<<frame_max<<std::endl;
+    uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
+    for (register int i=0; i<frame_width*frame_height; i++) {
+        register uint64_t v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
+        if (v>255) v=255;
+        frame[i]=v;
+    }
+
+
+    TIFFSetField(tif[camera], TIFFTAG_IMAGEWIDTH, frame_width);
+    TIFFSetField(tif[camera], TIFFTAG_IMAGELENGTH, frame_height);
+    TIFFSetField(tif[camera], TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    TIFFSetField(tif[camera], TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tif[camera], TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+    TIFFSetField(tif[camera], TIFFTAG_BITSPERSAMPLE, frame_bitspersample);
+    TIFFSetField(tif[camera], TIFFTAG_SAMPLESPERPIXEL, frame_samplesperpixel);
+    rowsperstrip = TIFFDefaultStripSize(tif[camera], rowsperstrip);
+    TIFFSetField(tif[camera], TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+    TIFFSetField(tif[camera], TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
+    TIFFSetField(tif[camera],TIFFTAG_SAMPLEFORMAT,frame_sampleformat);
+    TIFFSetField(tif[camera],TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
+
+    // write frame data
+    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
+    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
+    // smaller, so it is NOT padded with dummy data.
+    uint8* const buf = (uint8*)_TIFFmalloc(TIFFStripSize(tif[camera])); // data buffer for a strip of the image
+    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
+        // compute rows in this strip:
+        uint32 nrow = rowsperstrip;
+        if ((row + rowsperstrip)>frame_height) {
+            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
+        }
+        tstrip_t strip = TIFFComputeStrip(tif[camera],row,0);
+        tsize_t bi = 0;
+        // go through the fraem row-wise
+        for (unsigned int rr = 0; rr<nrow; ++rr) {
+            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
+                buf[bi++] = (uint8)frame[cc+(row + rr)*frame_width];
+            }
+        }
+        TIFFWriteEncodedStrip(tif[camera],strip,buf,bi*sizeof(uint8));
+    }
+    _TIFFfree(buf);
+    // write current directory, i.e. start new image
+    TIFFWriteDirectory(tif[camera]);
+
+
+    free(frame);
+    free(frame32);
+
+    seriesCount[camera]++;
+    seriesRunning[camera] = seriesRunning[camera] && (seriesCount[camera]<seriesAcquisitions);
+
+    if (seriesRunning[camera]) {
+        QTimer::singleShot(seriesDelay, this,SLOT(seriesStep2()));
+    } else {
+        TIFFClose(tif[camera]);
+    }
+}
 
 
 

@@ -13,10 +13,12 @@ win32:LIBS += -lgdi32
 
 # Input
 HEADERS += cam_andor.h \
+           camandoracquisitionthread.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/highrestimer.h
 
 SOURCES += cam_andor.cpp \
+           camandoracquisitionthread.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp
 
 FORMS =

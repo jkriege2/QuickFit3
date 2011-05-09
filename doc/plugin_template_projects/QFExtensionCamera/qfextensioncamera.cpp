@@ -57,11 +57,13 @@ void QFExtensionCameraImplementation::useCameraSettings(unsigned int camera, con
     /* set the camera settings to the values specified in settings parameter, called before acquire() */
 }
 
-void QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings) {
+bool QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     /* set the camera settings to the values specified in settings parameter, called before startAcquisition() */
 
     // uncomment this if the code is the same as in useCameraSettings()
     //useCameraSettings(camera, settings);
+
+    return true;
 }
 
 
@@ -146,12 +148,12 @@ double QFExtensionCameraImplementation::getExposureTime(unsigned int camera) {
     return /* exposure time of the last image */;
 }
 
-bool QFExtensionCameraImplementation::startAcquisition(unsigned int camera, QString filenamePrefix) {
+bool QFExtensionCameraImplementation::startAcquisition(unsigned int camera) {
     return false;
 }
 
-bool QFExtensionCameraImplementation::cancelAcquisition(unsigned int camera) {
-    return true;
+void QFExtensionCameraImplementation::cancelAcquisition(unsigned int camera) {
+
 }
 
 bool QFExtensionCameraImplementation::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
@@ -163,6 +165,10 @@ void QFExtensionCameraImplementation::getAcquisitionDescription(unsigned int cam
 
 bool QFExtensionCameraImplementation::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
+}
+
+int QFExtensionCameraImplementation::getAcquisitionProgress(unsigned int camera) {
+    return 0; // return a number between 0 and 100 which indicates the progress of a currently running acquisition
 }
 
 

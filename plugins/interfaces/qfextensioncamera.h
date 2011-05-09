@@ -85,22 +85,23 @@ class QFExtensionCamera {
          virtual void setLogging(QFPluginLogService* logService)=0;
 
          /*! \brief set camera settings from the specified QSettings object for a subsequent startAcquisition()
-            \param[in] camera the camera the settings widget should apply to
-            \param[in] settings
+             \param[in] camera the camera the settings widget should apply to
+             \param[in] settings the acquisition settings to use (may be created using showCameraSettingsDialog() )
+             \param[in] filenamePrefix the acquisition result is stored in file(s) based on this baseFilename
           */
-         virtual void prepareAcquisition(unsigned int camera, const QSettings& settings)=0;
+         virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""))=0;
 
          /*! \brief start an acquisition
 
              \param camera start an acquisition for this camera
-             \param filenamePrefix the acquisition result is stored in file(s) based on this baseFilename
+             \retunr \c true on success
           */
-         virtual bool startAcquisition(unsigned int camera, QString filenamePrefix=QString(""))=0;
+         virtual bool startAcquisition(unsigned int camera)=0;
          /*! \brief cancel an acquisition started with startAcquisition()
 
              \param camera start an acquisition for this camera
           */
-         virtual bool cancelAcquisition(unsigned int camera)=0;
+         virtual void cancelAcquisition(unsigned int camera)=0;
          /*! \brief check whether an acquisition started with startAcquisition() is running
 
              \param camera acquisition for this camera
@@ -124,6 +125,12 @@ class QFExtensionCamera {
              \return \c true on success, or \c false on error or if the camera driver does not provide previews
          */
          virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data)=0;
+         /*! \brief return the progress (0..100) of the current acquisition
+
+             \param camera which camera to use for the acquisition
+             \return the progress as an integer between 0 and 100
+         */
+         virtual int getAcquisitionProgress(unsigned int camera)=0;
 
 
 };
