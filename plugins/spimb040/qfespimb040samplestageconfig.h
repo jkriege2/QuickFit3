@@ -149,6 +149,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QPixmap iconReady;
         QPixmap iconError;
         QPixmap iconMoving;
+        QPixmap iconMovingOpposite;
         QPixmap iconJoystick;
         QPixmap iconNoJoystick;
 

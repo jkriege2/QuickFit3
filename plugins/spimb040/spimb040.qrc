@@ -25,6 +25,7 @@
      <file alias="spimb040/stage_error.png">../../images/16x16/stage_error.png</file>
      <file alias="spimb040/stage_ready.png">../../images/16x16/stage_ready.png</file>
      <file alias="spimb040/stage_moving.png">../../images/16x16/stage_moving.png</file>
+     <file alias="spimb040/stage_moving2.png">../../images/16x16/stage_moving2.png</file>
      <file alias="spimb040/stage_disconnected.png">../../images/16x16/stage_disconnected.png</file>
      <file alias="spimb040/stage_joystick.png">../../images/16x16/joystick.png</file>
      <file alias="spimb040/stage_nojoystick.png">../../images/16x16/nojoystick.png</file>

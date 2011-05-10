@@ -350,20 +350,11 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI::getAxisState(unsigne
 
                 if (axes[axis].state!=QFExtensionLinearStage::Error) {
                     // read current velocity
-                    std::string rr=queryCommand("TV")+"\n";
-                    double v=0;
-                    if (!com.hasErrorOccured()) {
-                        if (!sscanf(rr.c_str(), "V:%lf", &v)) {
-                            log_error(tr(LOG_PREFIX " invalid result string from TV command [expected V:<number>] in getAxisState() [axis %1]. String was '%2'.\n").arg(axis).arg(toprintablestr(rr).c_str()));
-                            axes[axis].state=QFExtensionLinearStage::Error;
-                        } else {
-                            axes[axis].state=QFExtensionLinearStage::Ready;
-                            if (v>0) axes[axis].state=QFExtensionLinearStage::Moving;
-                        }
-                    } else {
-                        log_error(tr(LOG_PREFIX " communication error\n"));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    }
+		    axes[axis].state=QFExtensionLinearStage::Ready;
+		    double v=getSpeed(axis);
+		    if (axes[axis].state!=QFExtensionLinearStage::Error) {
+                        if (fabs(v)>0) axes[axis].state=QFExtensionLinearStage::Moving;
+		    }
                 }
             } else {
                 log_error(tr(LOG_PREFIX " invalid result string from TS command [expected S:<6 blocks of 2 hex numbers>] in getAxisState() [axis %1]. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));

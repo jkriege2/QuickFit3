@@ -15,6 +15,7 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow
     iconReady=QPixmap(":/spimb040/stage_ready.png");
     iconError=QPixmap(":/spimb040/stage_error.png");
     iconMoving=QPixmap(":/spimb040/stage_moving.png");
+    iconMovingOpposite=QPixmap(":/spimb040/stage_moving2.png");
     iconJoystick=QPixmap(":/spimb040/stage_joystick.png");
     iconNoJoystick=QPixmap(":/spimb040/stage_nojoystick.png");
     timerDisplayUpdate.setInterval(stageStateUpdateInterval);
@@ -599,12 +600,15 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
             anyconn=anyconn||stage->isConnected(axis);
             QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
             double position=stage->getPosition(axis);
-            double speed=0;
+            double speed=stage->getSpeed(axis);
             labState->setText("");
             switch(state) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
-                case QFExtensionLinearStage::Moving : labState->setPixmap(iconMoving); break;
+                case QFExtensionLinearStage::Moving : {
+		  if (speed>0) labState->setPixmap(iconMoving); 
+		  else labState->setPixmap(iconMovingOpposite); 
+		} break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
@@ -621,12 +625,15 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
             anyconn=anyconn||stage->isConnected(axis);
             QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
             double position=stage->getPosition(axis);
-            double speed=0;
+            double speed=stage->getSpeed(axis);
             labState->setText("");
             switch(state) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
-                case QFExtensionLinearStage::Moving : labState->setPixmap(iconMoving); break;
+                case QFExtensionLinearStage::Moving : {
+		  if (speed>0) labState->setPixmap(iconMoving); 
+		  else labState->setPixmap(iconMovingOpposite); 
+		} break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
@@ -643,12 +650,14 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
             anyconn=anyconn||stage->isConnected(axis);
             QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
             double position=stage->getPosition(axis);
-            double speed=0;
-            labState->setText("");
+            double speed=stage->getSpeed(axis);
             switch(state) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
-                case QFExtensionLinearStage::Moving : labState->setPixmap(iconMoving); break;
+                case QFExtensionLinearStage::Moving : {
+		  if (speed>0) labState->setPixmap(iconMoving); 
+		  else labState->setPixmap(iconMovingOpposite); 
+		} break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
