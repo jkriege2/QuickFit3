@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="cam_rh2v2.logo.png">cam_rh2v2.logo.png</file>
+    <file alias="cam_rh2v2.pc.ini">cam_rh2v2.pc.ini</file>
+</qresource>
+</RCC>
