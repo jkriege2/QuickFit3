@@ -228,12 +228,14 @@ void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString 
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumber(getEvaluationResultID(run), getFitParamID(id), value, unit);
+        emit resultsChanged();
     }
 }
 void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString id, double value, QString unit) {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
         r->resultsSetNumber(getEvaluationResultID(run), getFitParamID(id), value, unit);
+        emit resultsChanged();
     }
 }
 
@@ -246,6 +248,7 @@ void QFFCSFitEvaluation::setFitResultValueString(QFRawDataRecord* r, int run, QS
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetString(getEvaluationResultID(run), getFitParamID(id), value);
+        emit resultsChanged();
     }
 }
 
@@ -258,6 +261,7 @@ void QFFCSFitEvaluation::setFitResultValueBool(QFRawDataRecord* r, int run, QStr
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetBoolean(getEvaluationResultID(run), getFitParamID(id), value);
+        emit resultsChanged();
     }
 }
 
@@ -270,6 +274,7 @@ void QFFCSFitEvaluation::setFitResultValueInt(QFRawDataRecord* r, int run, QStri
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetInteger(getEvaluationResultID(run), getFitParamID(id), value, unit);
+        emit resultsChanged();
     }
 }
 
@@ -277,6 +282,7 @@ void QFFCSFitEvaluation::setFitResultValueInt(QFRawDataRecord* r, int run, QStri
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
         r->resultsSetInteger(getEvaluationResultID(run), getFitParamID(id), value, unit);
+        emit resultsChanged();
     }
 }
 
@@ -329,6 +335,7 @@ void QFFCSFitEvaluation::setFitResultValue(QFRawDataRecord* r, int run, QString 
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(id), value, error, unit);
+        emit resultsChanged();
     }
 }
 
@@ -341,6 +348,7 @@ void QFFCSFitEvaluation::setFitResultError(QFRawDataRecord* r, int run, QString 
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(id), getFitValue(id), error, unit);
+        emit resultsChanged();
     }
 }
 
@@ -355,6 +363,7 @@ void QFFCSFitEvaluation::setFitResultValues(QFRawDataRecord* r, int run, double*
                 r->resultsSetNumberError(getEvaluationResultID(run), getFitParamID(pid), values[i], errors[i], unit);
             }
             emit propertiesChanged();
+            emit resultsChanged();
         }
 
     }
@@ -373,6 +382,7 @@ void QFFCSFitEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int run, 
                 }
             }
             emit propertiesChanged();
+            emit resultsChanged();
         }
 
     }
@@ -445,6 +455,7 @@ void QFFCSFitEvaluation::setFitResultFix(QFRawDataRecord* r, int run, QString id
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetBoolean(getEvaluationResultID(run), getFitParamFixID(id), fix);
+        emit resultsChanged();
     }
 }
 
@@ -1084,6 +1095,7 @@ void QFFCSFitEvaluation::setAllFitValues(QString id, double value, double error)
             if (hasFit(recs[i], r)) recs[i]->resultsSetNumberError(en, getFitParamID(id), value, error, unit);
         }
     }
+    emit resultsChanged();
 }
 
 /*! \brief set the given parameter \a id to the given fix value */
@@ -1104,6 +1116,7 @@ void QFFCSFitEvaluation::setAllFitFixes(QString id, bool fix) {
             if (hasFit(recs[i], r)) recs[i]->resultsSetBoolean(en, getFitParamFixID(id), fix);
         }
     }
+    emit resultsChanged();
 }
 
 void QFFCSFitEvaluation::setInitFitValue(QString id, double value, double error) {

@@ -10,6 +10,9 @@
 #include <iostream>
 #include <QProgressBar>
 #include <QStringList>
+#include <QPair>
+#include <QList>
+#include <QPointer>
 #include "qfproperties.h"
 
 // forward declaration
@@ -253,6 +256,49 @@ class QFProject : public QObject, public QFProperties {
          * This model is used to display the project tree */
         QFProjectTreeModel* getTreeModel();
 
+        /*! \brief return a list of all result names for a given evaluation name for all raw data records in this project
+
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+        */
+        QStringList rdrCalcMatchingResultsNames(const QString& evalFilter) const;
+
+        /*! \brief return a list of all QFRawDataRecord object that contain at least one evaluation which matched the given \a evalFilter
+                   together with a list of all the matching evaluation results therein.
+
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+        */
+        QList<QPair<QPointer<QFRawDataRecord>, QString> > rdrCalcMatchingResults(const QString& evalFilter) const;
+
+        /*! \brief save the raw data record results stored in this project for a given evaluation to a CSV file
+
+
+
+            Saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+            \param filename the file to create
+            \param separator column separator in the file
+            \param decinmalPoint which character to sue as decimal point
+            \param stringDelimiter strings are surrounded by this character (one in front,one behind)
+            \return \c true on success
+        */
+        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QString separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"');
+
+        /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
+
+            saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+            \param filename the file to create
+            \return \c true on success
+        */
+        bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename);
     signals:
         /** \brief emitted when the data changed state of the project is modified */
         void wasChanged(bool changed);

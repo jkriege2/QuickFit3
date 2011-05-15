@@ -2,8 +2,8 @@
 #include "qfrawdatarecord.h"
 
 
-QFRDRResultsModel::QFRDRResultsModel():
-    QAbstractTableModel(NULL)
+QFRDRResultsModel::QFRDRResultsModel(QObject* parent):
+    QAbstractTableModel(parent)
 {
     record=NULL;
 }
@@ -14,7 +14,8 @@ QFRDRResultsModel::~QFRDRResultsModel()
 }
 
 void QFRDRResultsModel::resultsChanged() {
-    lastResultNames=calcResultNames();
+    if (record) lastResultNames=record->resultsCalcNames();
+    else lastResultNames.clear();
     reset();
 }
 
@@ -22,27 +23,28 @@ void QFRDRResultsModel::init(QFRawDataRecord* record) {
     disconnect();
     setParent(record);
     this->record=record;
-    lastResultNames=calcResultNames();
+    if (record) lastResultNames=record->resultsCalcNames();
+    else lastResultNames.clear();
     connect(record, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
     reset();
 }
 
 int QFRDRResultsModel::rowCount(const QModelIndex &parent ) const {
     if (!record) {
-        std::cout<<"result row count=0\n";
+        //std::cout<<"result row count=0\n";
         return 0;
     }
     //QList<QString>& l=lastResultNames;
-    std::cout<<"result row count="<<lastResultNames.size()<<std::endl;
+    //std::cout<<"result row count="<<lastResultNames.size()<<std::endl;
     return lastResultNames.size();
 }
 
 int QFRDRResultsModel::columnCount(const QModelIndex &parent) const {
     if (!record) {
-        std::cout<<"result column count=0\n" ;
+        //std::cout<<"result column count=0\n" ;
         return 0;
     }
-    std::cout<<"result column count="<<record->resultsGetEvaluationCount()<<std::endl;
+    //std::cout<<"result column count="<<record->resultsGetEvaluationCount()<<std::endl;
     return record->resultsGetEvaluationCount()+1;
 }
 
@@ -53,7 +55,6 @@ Qt::ItemFlags QFRDRResultsModel::flags(const QModelIndex &index) const {
 QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
     if (!record || !index.isValid()) return QVariant();
     if (role==Qt::DisplayRole) {
-        //QList<QString>& l=lastResultNames;//calcResultNames();
         if (index.row()<lastResultNames.size()) {
             if (index.column()<record->resultsGetEvaluationCount()) {
                 QString en=record->resultsGetEvaluationName(index.column());
@@ -94,30 +95,10 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
             if (section<record->resultsGetEvaluationCount()) return QVariant(record->resultsGetEvaluationName(section));
             else return tr("Average +/- StdDev");
         } else {
-            //QList<QString>& l=lastResultNames;//calcResultNames();
             if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
         }
     }
     return QVariant();
-}
-
-QList<QString> QFRDRResultsModel::calcResultNames() const {
-    QStringList l;
-    //if (record) {
-        int evalCount=record->resultsGetEvaluationCount();
-        for (int i=0; i<evalCount; i++) {
-            QString en=record->resultsGetEvaluationName(i);
-            int jmax=record->resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=record->resultsGetResultName(en, j);
-                if (!l.contains(rn)) {
-                    l.append(rn);
-                }
-            }
-        }
-    //}
-    if (l.size()>0) l.sort();
-    return l;
 }
 
 void QFRDRResultsModel::calcStatistics(QString resultName, double& average, double& stddev) const {

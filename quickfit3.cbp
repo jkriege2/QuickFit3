@@ -113,6 +113,8 @@
 		<Unit filename="lib\qfevaluationitemfactory.h" />
 		<Unit filename="lib\qfevaluationpropertyeditor.cpp" />
 		<Unit filename="lib\qfevaluationpropertyeditor.h" />
+		<Unit filename="lib\qfevaluationresultsmodel.cpp" />
+		<Unit filename="lib\qfevaluationresultsmodel.h" />
 		<Unit filename="lib\qfextension.h" />
 		<Unit filename="lib\qfextensionmanager.cpp" />
 		<Unit filename="lib\qfextensionmanager.h" />

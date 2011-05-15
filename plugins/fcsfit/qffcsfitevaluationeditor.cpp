@@ -1388,6 +1388,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                         default: break;
                     }
                 }
+                emit resultsChanged();
             } else {
                 services->log_warning(tr("   - fit canceled by user!!!\n"));
             }

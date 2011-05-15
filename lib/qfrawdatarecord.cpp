@@ -1,4 +1,5 @@
 #include "qfrawdatarecord.h"
+#include "qftools.h"
 
 QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     QObject(parent), QFProperties()
@@ -390,6 +391,21 @@ int64_t QFRawDataRecord::resultsGetAsInteger(QString evalName, QString resultNam
     return 0.0;
 }
 
+bool QFRawDataRecord::resultsGetAsBoolean(QString evalName, QString resultName, bool* ok) {
+    evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
+     switch(r.type) {
+        case qfrdreBoolean: return r.bvalue;
+        case qfrdreInteger: return r.ivalue!=0;
+        case qfrdreNumber: case qfrdreNumberError: return r.dvalue!=0.0;
+        case qfrdreString: return QStringToBool(r.svalue);
+        default: if (ok) *ok=false;
+                 return false;
+    }
+    if (ok) *ok=false;
+    return false;
+}
+
 QVector<double> QFRawDataRecord::resultsGetAsDoubleList(QString evalName, QString resultName, bool* ok) {
     evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
@@ -433,4 +449,141 @@ void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
         }
         emit resultsChanged();
     }
+}
+
+bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QChar decimalPoint, QChar stringDelimiter) {
+    QString sdel=stringDelimiter;
+    QString dp=decimalPoint;
+    QStringList rownames=resultsCalcNames();
+    QStringList header, data;
+    header.append(sdel+tr("datafield")+sdel);
+    header.append("");
+    QLocale loc=QLocale::c();
+    for (int i=0; i<rownames.size(); i++) data.append(sdel+rownames[i]+sdel);
+    for (int c=0; c<resultsGetEvaluationCount(); c++) {
+        QString evalname=resultsGetEvaluationName(c);
+        header[0] += separator+sdel+evalname+sdel;
+        header[1] += separator+sdel+tr("value")+sdel;
+        bool hasError=false;
+        for (int r=0; r<rownames.size(); r++) {
+            QString dat="";
+            if (resultsExists(evalname, rownames[r])) {
+                switch(resultsGet(evalname, rownames[r]).type) {
+                    case qfrdreNumber: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint); break;
+                    case qfrdreNumberError: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint); hasError=true; break;
+                    case qfrdreInteger: dat=loc.toString(resultsGetAsInteger(evalname, rownames[r])); break;
+                    case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
+                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                }
+            }
+            data[r]+=separator+dat;
+        }
+        if (hasError) {
+            header[0] += separator;
+            header[1] += separator+sdel+tr("error")+sdel;
+            for (int r=0; r<rownames.size(); r++) {
+                QString dat="";
+                if (resultsExists(evalname, rownames[r])) {
+                    if (resultsGet(evalname, rownames[r]).type==qfrdreNumberError) {
+                        dat=doubleToQString(resultsGetErrorAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint);
+                    }
+                }
+                data[r]+=separator+dat;
+            }
+        }
+    }
+
+     QFile of(filename);
+     if (of.open(QFile::WriteOnly | QFile::Truncate)) {
+         QTextStream out(&of);
+         QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+         if (c==NULL) c=QTextCodec::codecForCStrings();
+         if (c==NULL) c=QTextCodec::codecForLocale();
+         out.setCodec(c);
+         for (int i=0; i<header.size(); i++) out<<header[i]<<"\n";
+         for (int i=0; i<data.size(); i++) out<<data[i]<<"\n";
+     } else { return false; }
+     return true;
+}
+
+
+bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
+    // try output SYLK file
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
+    QTextStream out(&file);
+    out.setCodec(QTextCodec::codecForName("ISO-8859-1"));
+    out.setLocale(QLocale::c());
+
+
+    // write SYLK header
+    out<<"ID;P\n";
+
+    QChar stringDelimiter='"';
+    QStringList rownames=resultsCalcNames();
+    // write column headers
+    out<<QString("C;Y1;X1;K\"%1\"\n").arg(tr("datafield"));
+    for (int r=0; r<rownames.size(); r++) {
+        out<<QString("C;Y%2;X1;K\"%1\"\n").arg(rownames[r]).arg(r+3);
+        //out<<QString("F;Y%2;X1;SDB\n").arg(r+2);
+    }
+
+    QLocale loc=QLocale::c();
+    int col=2;
+    for (int c=0; c<resultsGetEvaluationCount(); c++) {
+        QString evalname=resultsGetEvaluationName(c);
+        out<<QString("C;Y1;X%2;K\"%1\"\n").arg(evalname).arg(col);
+        //out<<QString("F;Y1;X%2;SDB\n").arg(col);
+        out<<QString("C;Y2;X%2;K\"%1\"\n").arg(tr("value")).arg(col);
+        //out<<QString("F;Y2;X%2;SDB\n").arg(col);
+        bool hasError=false;
+        for (int r=0; r<rownames.size(); r++) {
+            QString dat="";
+            if (resultsExists(evalname, rownames[r])) {
+                switch(resultsGet(evalname, rownames[r]).type) {
+                    case qfrdreNumber: dat=loc.toString(resultsGetAsDouble(evalname, rownames[r]), 'g', 15); break;
+                    case qfrdreNumberError: dat=loc.toString(resultsGetAsDouble(evalname, rownames[r]), 'g', 15); hasError=true; break;
+                    case qfrdreInteger: dat=loc.toString(resultsGetAsInteger(evalname, rownames[r])); break;
+                    case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
+                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                }
+            }
+            if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+        }
+        if (hasError) {
+            col++;
+            out<<QString("C;Y2;X%2;K\"%1\"\n").arg(tr("error")).arg(col);
+            //out<<QString("F;Y2;X%2;SDB\n").arg(col);
+            for (int r=0; r<rownames.size(); r++) {
+                QString dat="";
+                if (resultsExists(evalname, rownames[r])) {
+                    if (resultsGet(evalname, rownames[r]).type==qfrdreNumberError) {
+                        dat=loc.toString(resultsGetErrorAsDouble(evalname, rownames[r]), 'g', 15);;
+                    }
+                }
+                if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+            }
+        }
+        col++;
+    }
+    return true;
+}
+
+QList<QString> QFRawDataRecord::resultsCalcNames() const {
+    QStringList l;
+    //if (record) {
+        int evalCount=resultsGetEvaluationCount();
+        for (int i=0; i<evalCount; i++) {
+            QString en=resultsGetEvaluationName(i);
+            int jmax=resultsGetCount(en);
+            for (int j=0; j<jmax; j++) {
+                QString rn=resultsGetResultName(en, j);
+                if (!l.contains(rn)) {
+                    l.append(rn);
+                }
+            }
+        }
+    //}
+    if (l.size()>0) l.sort();
+    return l;
 }

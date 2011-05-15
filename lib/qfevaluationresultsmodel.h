@@ -1,25 +1,28 @@
-#ifndef QFRDRRESULTSMODEL_H
-#define QFRDRRESULTSMODEL_H
+#ifndef QFEVALUATIONRESULTSMODEL_H
+#define QFEVALUATIONRESULTSMODEL_H
 
 #include <QAbstractTableModel>
 #include <QStringList>
+#include <QPointer>
 
 // forward declaration
 class QFRawDataRecord;
+class QFEvaluationItem;
+class QFProject;
 
-/*! \brief class to display the results stored in QFRawDataRecord
+/*! \brief class to display the results stored in all QFRawDataRecord for a given QFEvaluationItem
     \ingroup qf3lib_project
 
 */
-class QFRDRResultsModel : public QAbstractTableModel {
+class QFEvaluationResultsModel : public QAbstractTableModel {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRDRResultsModel(QObject* parent=NULL);
+        QFEvaluationResultsModel(QObject* parent=NULL);
         /** Default destructor */
-        virtual ~QFRDRResultsModel();
+        virtual ~QFEvaluationResultsModel();
 
-        void init(QFRawDataRecord* record);
+        void init(QFEvaluationItem* evaluation, QString evalFilter);
 
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
         int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -33,17 +36,21 @@ class QFRDRResultsModel : public QAbstractTableModel {
             ValueRole=Qt::UserRole,
             NameRole=Qt::UserRole+1
         };
-    private slots:
+    public slots:
         void resultsChanged();
     protected:
-        QFRawDataRecord* record;
+        QFEvaluationItem* evaluation;
+        QString evalFilter;
+
+        void calcStatistics(QString resultName, double& average, double& stddev) const;
     private:
 
         /** \brief calculate average and standard deviation over all result for a given result name */
-        void calcStatistics(QString resultName, double& average, double& stddev) const;
+        //void calcStatistics(QString resultName, double& average, double& stddev) const;
 
         /** \brief current list of all shown result names (updated on model reset, using calcResultNames() */
         QStringList lastResultNames;
+        QList<QPair<QPointer<QFRawDataRecord>, QString> > lastResults;
 };
 
-#endif // QFRDRRESULTSMODEL_H
+#endif // QFEVALUATIONRESULTSMODEL_H

@@ -10,8 +10,6 @@
     \section qf3todo_widgetlib QuickFit Widgets Library
 
     \section qf3todo_rdrplugins Raw Data Plugins
-    \todo delete fit results in QFRawDataPropertyEditor
-    \todo save fit results in QFRawDataPropertyEditor to CSV (DIF, SYLK, ..) file
     \todo implement RDR plugin for images and image series
     \todo store vectors and matrices (of doubles)
 
@@ -21,9 +19,8 @@
     \subsection qf3todo_fcsfit Plugin: FCS Fit
     \todo implement print/export report with all fit parameters and fit statistics data
     \todo implement more estimators for fit data weighting
-    \todo possibly implement additional possibilities to estmate parameter confidence intervals (additional to jacobian), like monte-carlo methods
+    \todo possibly implement additional possibilities to estimate parameter confidence intervals (additional to jacobian), like monte-carlo methods
     \todo implement load/save of Fit Parameters+Function in config file
-    \todo save fit results for all fitted files to CSV (DIF, SYLK, ..) file
     \todo fit current file when <ENTER> is pressed in current widget
     \todo store jacobian matrix in fit results
 

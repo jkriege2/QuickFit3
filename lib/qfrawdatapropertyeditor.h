@@ -64,6 +64,9 @@ class QFRawDataPropertyEditor : public QWidget {
 
         /** \brief delete selected results */
         void deleteSelectedResults();
+
+        /** \brief save results to a file */
+        void saveResults();
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -118,6 +121,8 @@ class QFRawDataPropertyEditor : public QWidget {
         int id;
         /** \brief pointer that allows for access to central QuickFit services */
         QFPluginServices* services;
+
+        QString currentSaveDir;
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_H

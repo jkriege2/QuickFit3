@@ -22,22 +22,11 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     description="";
     creator="";
     highestID=-1;
-    //rawData.clear();
     errorOcc=false;
     errorDesc="";
-    //rdModel=new QFProjectRawDataModel(this);
-    //rdModel->setParent(this);
     rdModel=NULL;
     treeModel=NULL;
-    //treeModel=new QFProjectTreeModel(this);
-    //treeModel->init(this);
-    //std::cout<<QModelIndex().internalId()<<std::endl;
-    //addRawData("unknown", "testRawData0");
-    //addRawData("fcs", "testRawData1");
-    //addRawData("table", "testRawData2");
-    //addRawData("table", "testRawData3");
-    //addEvaluation("unknown", "eval1");
-    //addEvaluation("unknown", "eval2");
+
 }
 
 
@@ -477,4 +466,183 @@ QStringList QFProject::getAllPropertyNames() {
     sl.removeDuplicates();
     sl.sort();
     return sl;
+}
+
+QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter) const {
+    QStringList l;
+    QRegExp rx(evalFilter);
+    rx.setPatternSyntax(QRegExp::Wildcard);
+    QMapIterator<int, QFRawDataRecord*> i(rawData);
+    // iterate over all raw data records
+    while (i.hasNext()) {
+        i.next();
+        // iterate over all evaluations that have save a result in the current rdr
+        for (int e=0; e<i.value()->resultsGetEvaluationCount(); e++) {
+            QString evalname=i.value()->resultsGetEvaluationName(e);
+            // futher look into an evaluation only if it matches evalFilter
+            if (rx.exactMatch(evalname)) {
+                for (int r=0; r<i.value()->resultsGetCount(evalname); r++) {
+                    QString rname=i.value()->resultsGetResultName(evalname, r);
+                    if (!l.contains(rname)) l.append(rname);
+                }
+            }
+        }
+    }
+
+    if (l.size()>0) l.sort();
+    return l;
+}
+
+bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QString separator, QChar decimalPoint, QChar stringDelimiter) {
+    QString sdel=stringDelimiter;
+    QString dp=decimalPoint;
+    QStringList colnames=rdrCalcMatchingResultsNames(evalFilter);
+    QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
+    QStringList header, data;
+    header.append(sdel+tr("file")+sdel);
+    header.append("");
+    QLocale loc=QLocale::c();
+    for (int i=0; i<records.size(); i++) data.append(sdel+records[i].first->getName()+": "+records[i].second+sdel);
+
+    for (int c=0; c<colnames.size(); c++) {
+        header[0] += separator+sdel+colnames[c]+sdel;
+        header[1] += separator+sdel+tr("value")+sdel;
+        bool hasError=false;
+        for (int r=0; r<records.size(); r++) {
+            QFRawDataRecord* record=records[r].first;
+            QString evalname=records[r].second;
+            QString dat="";
+            if (record) {
+                if (record->resultsExists(evalname, colnames[c])) {
+                    switch(record->resultsGet(evalname, colnames[c]).type) {
+                        case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); break;
+                        case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
+                        case QFRawDataRecord::qfrdreInteger: dat=loc.toString(record->resultsGetAsInteger(evalname, colnames[c])); break;
+                        case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
+                        case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                        default: dat=""; break;
+                    }
+                }
+            }
+            data[r]+=separator+dat;
+        }
+        if (hasError) {
+            header[0] += separator;
+            header[1] += separator+sdel+tr("error")+sdel;
+            for (int r=0; r<records.size(); r++) {
+                QFRawDataRecord* record=records[r].first;
+                QString evalname=records[r].second;
+                QString dat="";
+                if (record) {
+                    if (record->resultsExists(evalname, colnames[c])) {
+                        if (record->resultsGet(evalname, colnames[c]).type==QFRawDataRecord::qfrdreNumberError) {
+                            dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint);
+                        }
+                    }
+                }
+                data[r]+=separator+dat;
+            }
+        }
+    }
+
+    QFile of(filename);
+    if (of.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&of);
+        QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+        if (c==NULL) c=QTextCodec::codecForCStrings();
+        if (c==NULL) c=QTextCodec::codecForLocale();
+        out.setCodec(c);
+        for (int i=0; i<header.size(); i++) out<<header[i]<<"\n";
+        for (int i=0; i<data.size(); i++) out<<data[i]<<"\n";
+    } else { return false; }
+    return true;
+}
+
+bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename) {
+    QFile of(filename);
+    if (of.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&of);
+        QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+        if (c==NULL) c=QTextCodec::codecForCStrings();
+        if (c==NULL) c=QTextCodec::codecForLocale();
+        out.setCodec(c);
+        out<<"ID;P\n";
+
+        QChar stringDelimiter='"';
+        QChar decimalPoint='.';
+        QStringList colnames=rdrCalcMatchingResultsNames(evalFilter);
+        QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
+        QLocale loc=QLocale::c();
+        for (int i=0; i<records.size(); i++) {
+            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(i+3).arg(1).arg(records[i].first->getName()+": "+records[i].second);
+        }
+        int col=2;
+        for (int c=0; c<colnames.size(); c++) {
+            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(1).arg(col).arg(colnames[c]);
+            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
+            bool hasError=false;
+            for (int r=0; r<records.size(); r++) {
+                QFRawDataRecord* record=records[r].first;
+                QString evalname=records[r].second;
+                QString dat="";
+                if (record) {
+                    if (record->resultsExists(evalname, colnames[c])) {
+                        switch(record->resultsGet(evalname, colnames[c]).type) {
+                            case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); break;
+                            case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
+                            case QFRawDataRecord::qfrdreInteger: dat=loc.toString(record->resultsGetAsInteger(evalname, colnames[c])); break;
+                            case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
+                            case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                            default: dat=""; break;
+                        }
+                    }
+                }
+                if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+            }
+            if (hasError) {
+                col++;
+                out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
+                for (int r=0; r<records.size(); r++) {
+                    QFRawDataRecord* record=records[r].first;
+                    QString evalname=records[r].second;
+                    QString dat="";
+                    if (record) {
+                        if (record->resultsExists(evalname, colnames[c])) {
+                            if (record->resultsGet(evalname, colnames[c]).type==QFRawDataRecord::qfrdreNumberError) {
+                                dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint);
+                            }
+                        }
+                    }
+                    if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+                }
+            }
+            col++;
+        }
+
+    } else { return false; }
+    return true;
+}
+
+QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResults(const QString& evalFilter) const {
+    QList<QPair<QPointer<QFRawDataRecord>, QString> > l;
+
+    QRegExp rx(evalFilter);
+    rx.setPatternSyntax(QRegExp::Wildcard);
+    QMapIterator<int, QFRawDataRecord*> i(rawData);
+    // iterate over all raw data records
+    while (i.hasNext()) {
+        i.next();
+        // iterate over all evaluations that have save a result in the current rdr
+        for (int e=0; e<i.value()->resultsGetEvaluationCount(); e++) {
+            QString evalname=i.value()->resultsGetEvaluationName(e);
+            // futher look into an evaluation only if it matches evalFilter
+            if (rx.exactMatch(evalname)) {
+                QPointer<QFRawDataRecord> po(i.value());
+                QPair<QPointer<QFRawDataRecord>, QString> pa=qMakePair(po, evalname);
+                l.append(pa);
+            }
+        }
+    }
+
+    return l;
 }

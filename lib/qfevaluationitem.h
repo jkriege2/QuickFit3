@@ -187,6 +187,16 @@ class QFEvaluationItem : public QObject, public QFProperties {
         /** \brief list of the raw data records this evaluation is applicable to */
         QList<QFRawDataRecord*> getApplicableRecords();
 
+        /*! \brief the filter returned by this function is used to filter the evaluation reeults to display in the
+                   "results" pane of the QFEvaluationPropertyEditor dialog.
+
+            The default implementation returns: \code getType()+"_"+QString::number(getID())+"*"; \endcode
+
+            If you want to refilter the results pane, you should make sure that this function returns the new filter
+            and then \code emit resultsChanged() \endcode which will result in a redisplay of the evaluation results.
+         */
+        virtual QString getResultsDisplayFilter() const;
+
     public slots:
         /** \brief set the name */
         inline void setName(const QString n) {
@@ -265,6 +275,7 @@ class QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief points to the currently highlighted record */
         QFRawDataRecord* highlightedRecord;
+
 };
 
 #endif // QEVALUATIONITEM_H

@@ -113,4 +113,15 @@ QString getQVariantData(const QVariant& variant);
 */
 QVariant getQVariantFromString(const QString& type, const QString& data);
 
+/*! \brief convert a number to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QString doubleToQString(double value, int prec = 6, char f = 'g', QChar decimalSeparator=',' );
+
+/*! \brief convert a string \a data to a boolean
+    \ingroup qf3lib_tools
+
+*/
+bool QStringToBool(QString& data);
 #endif // QFTOOLS_H

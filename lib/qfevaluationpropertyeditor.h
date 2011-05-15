@@ -9,6 +9,8 @@
 #include "qfpluginservices.h"
 #include "qftools.h"
 #include "qfhtmlhelpwindow.h"
+#include "qfevaluationresultsmodel.h"
+#include "qenhancedtableview.h"
 
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
@@ -97,6 +99,12 @@ class QFEvaluationPropertyEditor : public QWidget {
             is still available or another record, if not (it has been deleted).
         */
         void rdrModelReset();
+
+        void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+
+
+        /** \brief save results to a file */
+        void saveResults();
     protected:
         /** \brief points to the record currently displayed */
         QFEvaluationItem* current;
@@ -104,6 +112,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         QFProjectRawDataModel* rdrModel;
         /** \brief proxy model to filter rdrModel */
         QFEvaluationRawDataModelProxy* rdrProxy;
+        /** \brief datamodel used for display of evaluation results */
+        QFEvaluationResultsModel* resultsModel;
         /** \brief read the settings from ProgramOptions set by setSettings() */
         virtual void readSettings();
         void closeEvent( QCloseEvent * event );
@@ -132,6 +142,22 @@ class QFEvaluationPropertyEditor : public QWidget {
         QSplitter* splitMain;
         /** \brief Layout widget for the evaluation editor widget */
         QHBoxLayout* layWidgets;
+
+        /** \brief tabel display the evaluation results associated with this file  */
+        QEnhancedTableView* tvResults;
+        /** \brief label for averaging over selected values in tvResults */
+        QLabel* labAveragedresults;
+        /** \brief toolbar to access functions of tvResults */
+        QToolBar* tbResults;
+        /** \brief action used to copy selection in tvResults to clipbord */
+        QAction* actCopyResults;
+        /** \brief action used to save selection in tvResults to file */
+        QAction* actSaveResults;
+        QAction* actRefreshResults;
+        /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
+        QWidget* widResults;
+
+
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief of all currently instaciated editors */
@@ -142,6 +168,9 @@ class QFEvaluationPropertyEditor : public QWidget {
         QFPluginServices* services;
         /** \brief help widget for evaluation */
         QFHTMLHelpWindow* helpWidget;
+
+        QString currentSaveDir;
+
 };
 
 #endif // QFEVALUATIONPROPERTYEDITOR_H

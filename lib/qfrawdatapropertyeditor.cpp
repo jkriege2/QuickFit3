@@ -9,6 +9,8 @@ QFRawDataPropertyEditor::QFRawDataPropertyEditor(QFPluginServices* services, Pro
     QWidget(parent, f)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
+
+    currentSaveDir="";
     //std::cout<<"creating QFRawDataPropertyEditor ...\n";
     this->current=NULL;
     this->id=id;
@@ -95,16 +97,18 @@ void QFRawDataPropertyEditor::createWidgets() {
     rwvlayout->addWidget(tbResults);
     actCopyResults=new QAction(QIcon(":/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
+    actSaveResults=new QAction(QIcon(":/save16.png"), tr("Save all results to file"), this);
+    tbResults->addAction(actSaveResults);
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/delete16.png"), tr("Delete Selection"), this);
     tbResults->addAction(actDeleteResults);
 
+
     tvResults=new QEnhancedTableView(widResults);
     tvResults->setAlternatingRowColors(true);
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     rwvlayout->addWidget(tvResults);
-    tabMain->addTab(widResults, tr("Evaluation &Results"));
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
     labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
@@ -112,7 +116,11 @@ void QFRawDataPropertyEditor::createWidgets() {
     rwvlayout->addWidget(labAveragedresults);
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
+
+    tabMain->addTab(widResults, tr("Evaluation &Results"));
+
 
     helpWidget=new QFHTMLHelpWindow(this);
     tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
@@ -136,7 +144,7 @@ void QFRawDataPropertyEditor::resizePropertiesTable() {
 
 void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
     QString oldType="";
-    std::cout<<"deleting old editors ... \n";
+    //std::cout<<"deleting old editors ... \n";
     int oldEditorCount=0;
     if (current) {
         oldType=current->getType();
@@ -169,9 +177,9 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
             }
         }
     }
-    std::cout<<"deleting old editors ... DONE!\n";
+    //std::cout<<"deleting old editors ... DONE!\n";
     current=c;
-    std::cout<<"creating new editors ... \n";
+    //std::cout<<"creating new editors ... \n";
     if (current) {
         setWindowTitle(tr("Raw Data Editor/Viewer (%1)").arg(current->getTypeDescription()));
         if (current->getType()!=oldType) {
@@ -248,7 +256,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         tvProperties->setModel(NULL);
         tvProperties->setEnabled(false);
     }
-    std::cout<<"creating new editors ... DONE!\n";
+    //std::cout<<"creating new editors ... DONE!\n";
 }
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
@@ -402,6 +410,7 @@ void QFRawDataPropertyEditor::readSettings() {
             editorList[i]->readSettings();
         }
     }
+    currentSaveDir=settings->getQSettings()->value("rawdatapropeditor/lastSaveDir", currentSaveDir).toString();
 }
 
 void QFRawDataPropertyEditor::writeSettings() {
@@ -416,6 +425,7 @@ void QFRawDataPropertyEditor::writeSettings() {
             editorList[i]->writeSettings();
         }
     }
+    settings->getQSettings()->setValue("rawdatapropeditor/lastSaveDir", currentSaveDir);
 }
 
 void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
@@ -499,12 +509,12 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
         if (ret == QMessageBox::Yes) {
             // first we store a list of all items to be deleted (one list for the evaluation name (col)
             // and one list for the result name (row).
-            std::cout<<"\n\n-- deleteing "<<sel.size()<<" items:\n";
+            //std::cout<<"\n\n-- deleteing "<<sel.size()<<" items:\n";
             QStringList row, col;
             for (int i=0; i<sel.size(); i++) {
                 QString hh=tvResults->model()->headerData(sel[i].column(), Qt::Horizontal).toString();
                 QString vh=tvResults->model()->headerData(sel[i].row(), Qt::Vertical).toString();
-                std::cout<<"hh="<<hh.toStdString()<<"   vh="<<vh.toStdString()<<"\n";
+                //std::cout<<"hh="<<hh.toStdString()<<"   vh="<<vh.toStdString()<<"\n";
                 row.append(vh);
                 col.append(hh);
             }
@@ -521,5 +531,22 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
     }
 }
 
-
+void QFRawDataPropertyEditor::saveResults() {
+    if (current) {
+        QString selectedFilter="";
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk)");
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
+        if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+            int f=filter.split(";;").indexOf(selectedFilter);
+            if (f==1) {
+                current->resultsSaveToCSV(fileName, ";", ',', '"');
+            } else if (f==2) {
+                current->resultsSaveToSYLK(fileName);
+            } else {
+                current->resultsSaveToCSV(fileName, ", ", '.', '"');
+            }
+            currentSaveDir=QFileInfo(fileName).absolutePath();
+        }
+    }
+}
 

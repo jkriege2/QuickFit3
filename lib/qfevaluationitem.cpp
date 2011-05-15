@@ -198,3 +198,6 @@ QList<QFRawDataRecord*> QFEvaluationItem::getApplicableRecords() {
     return recs;
 }
 
+QString QFEvaluationItem::getResultsDisplayFilter() const {
+    return getType()+"_"+QString::number(getID())+"*";
+}

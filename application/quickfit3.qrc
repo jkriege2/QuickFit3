@@ -14,9 +14,11 @@
     <file alias="aboutqt.png">../images/22x22/help_about_qt.png</file>
     <file alias="copy.png">../images/22x22/edit_copy.png</file>
     <file alias="copy16.png">../images/16x16/editcopy.png</file>
+    <file alias="save16.png">../images/16x16/filesave.png</file>
     <file alias="cut.png">../images/22x22/edit_cut.png</file>
     <file alias="paste.png">../images/22x22/edit_paste.png</file>
     <file alias="delete16.png">../images/16x16/deletetable.png</file>
+    <file alias="refresh16.png">../images/16x16/reload.png</file>
     <file alias="print.png">../images/22x22/document_print.png</file>
     <file alias="project_new.png">../images/22x22/project_new.png</file>
     <file alias="project_open.png">../images/22x22/project_open.png</file>

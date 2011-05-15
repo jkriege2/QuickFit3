@@ -83,6 +83,8 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* service
     this->current=NULL;
     this->services=services;
     layWidgets=NULL;
+    resultsModel=new QFEvaluationResultsModel(this);
+    resultsModel->init(NULL, "*");
 
     rdrModel=new QFProjectRawDataModel(NULL);
     rdrProxy=new QFEvaluationRawDataModelProxy(rdrModel);
@@ -126,6 +128,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         lstRawData->setModel(NULL);
         rdrProxy->setEvaluation(NULL);
         rdrModel->setProject(NULL);
+        resultsModel->init(NULL, "*");
         oldType=current->getType();
         //oldEditorCount=current->getEditorCount();
         disconnect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
@@ -134,6 +137,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
+        disconnect(current, SIGNAL(resultsChanged()), resultsModel, SLOT(resultsChanged()));
+        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         if (c) {
             if (c->getType()!=oldType) {
                 /*for (int i=oldEditorCount; i>=0; i--) {
@@ -158,6 +163,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         //std::cout<<"connecting new ...\n";
         rdrModel->setProject(current->getProject());
         rdrProxy->setEvaluation(current);
+        resultsModel->init(current, current->getResultsDisplayFilter());
         if (current->getType()!=oldType) {
             //editorList.clear();
             //for (int i=0; i<current->getEditorCount(); i++) {
@@ -196,6 +202,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
+        connect(current, SIGNAL(resultsChanged()), resultsModel, SLOT(resultsChanged()));
+        connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
         selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
 
@@ -316,6 +324,40 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     tabMain->addTab(splitMain, tr("&Evaluation"));
 
+    widResults=new QWidget(this);
+    QVBoxLayout* rwvlayout=new QVBoxLayout(this);
+    widResults->setLayout(rwvlayout);
+    tbResults=new QToolBar("toolbar_eval_results", this);
+    rwvlayout->addWidget(tbResults);
+    actRefreshResults=new QAction(QIcon(":/refresh16.png"), tr("Refresh results ..."), this);
+    tbResults->addAction(actRefreshResults);
+    tbResults->addSeparator();
+
+    actCopyResults=new QAction(QIcon(":/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    tbResults->addAction(actCopyResults);
+    actSaveResults=new QAction(QIcon(":/save16.png"), tr("Save all results to file"), this);
+    tbResults->addAction(actSaveResults);
+
+
+
+    tvResults=new QEnhancedTableView(widResults);
+    tvResults->setAlternatingRowColors(true);
+    QFontMetrics fm(font());
+    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
+    tvResults->setModel(resultsModel);
+    rwvlayout->addWidget(tvResults);
+    labAveragedresults=new QLabel(widResults);
+    labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    labAveragedresults->setMaximumHeight(200);
+    rwvlayout->addWidget(labAveragedresults);
+
+    connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
+    connect(actRefreshResults, SIGNAL(triggered()), resultsModel, SLOT(resultsChanged()));
+
+    tabMain->addTab(widResults, tr("Evaluation &Results"));
+
     helpWidget=new QFHTMLHelpWindow(this);
     tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
 }
@@ -334,16 +376,14 @@ void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
 
 void QFEvaluationPropertyEditor::readSettings() {
     if (!settings) return;
-    //std::cout<<"QFEvaluationPropertyEditor::readSettings()\n";
     settings->getQSettings()->sync();
     if (tabMain) {
         int idx=settings->getQSettings()->value("evalpropeditor/currentTab", 0).toInt();
-        //helpWidget->readSettings(*settings->getQSettings(), "evalpropeditor/help_");
-        //if ((idx>=0) && (idx<tabMain->count())) tabMain->setCurrentIndex(idx);
     }
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(10, 10), QSize(800, 600), "evalpropeditor/");
     if (splitMain) loadSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
     if (editor) editor->readSettings();
+    currentSaveDir=settings->getQSettings()->value("evalpropeditor/lastSaveDir", currentSaveDir).toString();
 }
 
 void QFEvaluationPropertyEditor::writeSettings() {
@@ -352,12 +392,10 @@ void QFEvaluationPropertyEditor::writeSettings() {
     saveSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
     if (tabMain) {
         settings->getQSettings()->setValue("evalpropeditor/currentTab", tabMain->currentIndex());
-        //helpWidget->writeSettings(*settings->getQSettings(), "evalpropeditor/help_");
     }
-    /*for (int i=0; i<editorList.size(); i++) {
-        if (editorList[i]) editorList[i]->writeSettings();
-    }*/
+
     if (editor) editor->writeSettings();
+    settings->getQSettings()->setValue("evalpropeditor/lastSaveDir", currentSaveDir);
 }
 
 
@@ -380,6 +418,101 @@ void QFEvaluationPropertyEditor::rdrModelReset() {
     QModelIndex idx=rdrModel->index(current->getProject()->getRawDataIndex(current->getHighlightedRecord()));
     QModelIndex pidx=rdrProxy->mapFromSource(idx);
     lstRawData->selectionModel()->select(pidx, QItemSelectionModel::SelectCurrent);
+}
+
+
+
+void QFEvaluationPropertyEditor::tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+    QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
+    QMap<int, QString> names;
+    QMap<int, double> sum, sum2, count;
+    for (int i=0; i<sel.size(); i++) {
+        int c=sel[i].row();
+        int r=sel[i].column();
+        QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
+        QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
+        double d=0;
+        bool ok=false;
+        if (data.canConvert(QVariant::Double)) {
+            d=data.toDouble();
+            ok=true;
+        }
+        if (data.canConvert(QVariant::PointF)) {
+            d=data.toPointF().x();
+            ok=true;
+        }
+        if (data.type()==QVariant::String) { ok=false; }
+        if (ok) {
+            if (names.contains(r)) {
+                sum[r] = sum[r]+d;
+                sum2[r] = sum2[r]+d*d;
+                count[r] = count[r]+1;
+            } else {
+                sum[r] = d;
+                sum2[r] = d*d;
+                count[r] = 1;
+                names[r] = name;
+            }
+        }
+    }
+
+    int lineHeight=labAveragedresults->fontMetrics().lineSpacing();
+    int maxheight=labAveragedresults->maximumHeight();
+    int linespercol=maxheight/(2*lineHeight)-1;
+    QStringList datalist;
+    QMapIterator<int, QString> it(names);
+    while (it.hasNext()) {
+        it.next();
+        QString name=it.value();
+        int i=it.key();
+        if (count[i]>0) {
+            double avg=sum[i]/count[i];
+            double error=sqrt(sum2[i]/count[i]-sum[i]*sum[i]/count[i]/count[i]);
+            datalist.append(QString("<td align=\"right\"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1:&nbsp;</b></td><td>&nbsp;&nbsp;%2 &plusmn; %3&nbsp;</td>").arg(name).arg(roundWithError(avg, error)).arg(roundError(error)));
+        }
+    }
+    QString results=tr("<table border=\"1\" cellspacing=\"0\"><tr>");
+    int cols=(int)ceil((double)datalist.size()/(double)linespercol);
+    for (int i=0; i<cols; i++) {
+        results+=tr("<th align=\"right\"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Field:&nbsp;</b></th><th><b>&nbsp;&nbsp;Average &plusmn; StdDev&nbsp;</b></th>");
+    }
+    results+=tr("</th>");
+    for (int r=0; r<linespercol; r++) {
+        results+=tr("<tr>");
+        for (int c=0; c<cols; c++) {
+            int idx=c*linespercol+r;
+            if ((idx>=0)&&(idx<datalist.size())) {
+                results+=datalist[idx];
+            } else {
+                results+=tr("<td></td><td></td>");
+            }
+        }
+        results+=tr("</tr>");
+    }
+    results+=tr("</table>");
+    labAveragedresults->setText(results);
+}
+
+
+
+void QFEvaluationPropertyEditor::saveResults() {
+    if (current) {
+        QString evalfilter=current->getResultsDisplayFilter();
+        QString selectedFilter="";
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk)");
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
+        if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+            int f=filter.split(";;").indexOf(selectedFilter);
+            if (f==1) {
+                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ";", ',', '"');
+            } else if (f==2) {
+                current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName);
+            } else {
+                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ", ", '.', '"');
+            }
+            currentSaveDir=QFileInfo(fileName).absolutePath();
+        }
+    }
 }
 
 

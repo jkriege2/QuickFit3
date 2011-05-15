@@ -237,6 +237,8 @@ class QFRawDataRecord : public QObject, public QFProperties {
         QVariant resultsGetAsQVariant(QString evalName, QString resultName);
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
         double resultsGetAsDouble(QString evalName, QString resultName, bool* ok=NULL);
+        /** \brief return a specified result as boolean (or \c false if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
+        bool resultsGetAsBoolean(QString evalName, QString resultName, bool* ok=NULL);
         /** \brief return a specified result as integer (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         int64_t resultsGetAsInteger(QString evalName, QString resultName, bool* ok=NULL);
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
@@ -244,7 +246,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         double resultsGetErrorAsDouble(QString evalName, QString resultName, bool* ok=NULL);
         /** \brief get number of results for a specified evaluation */
-        inline int resultsGetCount(QString evalName) {
+        inline int resultsGetCount(QString evalName) const {
             if (results.contains(evalName)) return results[evalName].size();
             return 0;
         };
@@ -267,8 +269,39 @@ class QFRawDataRecord : public QObject, public QFProperties {
          */
         void resultsCopy(QString oldEvalName, QString newEvalName);
 
+        /*! \brief save the results to a CSV file
+
+            saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param filename the file to create
+            \param separator column separator in the file
+            \param decinmalPoint which character to sue as decimal point
+            \param stringDelimiter strings are surrounded by this character (one in front,one behind)
+            \return \c true on success
+        */
+        bool resultsSaveToCSV(QString filename, QString separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"');
+
+        /*! \brief save the results to a SYLK file
+
+            saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param filename the file to create
+            \return \c true on success
+        */
+        bool resultsSaveToSYLK(QString filename);
+
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel();
+
+        /** \brief return a list of all result names for this raw data record */
+        QList<QString> resultsCalcNames() const;
+
 
     public:
         /** \brief return type (short type string) */

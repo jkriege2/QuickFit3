@@ -13,6 +13,8 @@ class QEnhancedTableView : public QTableView {
     public:
         QEnhancedTableView(QWidget* parent=NULL);
         virtual ~QEnhancedTableView();
+    signals:
+        void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:
         void copySelectionToExcel();
     protected:

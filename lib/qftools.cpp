@@ -4,6 +4,7 @@
 #include <QList>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QLocale>
 
 void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
     settings.setValue(prefix+"pos", widget->pos());
@@ -135,5 +136,26 @@ QVariant getQVariantFromString(const QString& type, const QString& data) {
     return d;
 }
 
+QString doubleToQString(double value, int prec, char f, QChar decimalSeparator) {
+    QLocale loc=QLocale::c();
+    QString res=loc.toString(value, f, prec);
+    if (loc.decimalPoint()!=decimalSeparator) {
+        res=res.replace(loc.decimalPoint(), decimalSeparator);
+    }
+    return res;
+}
 
-
+bool QStringToBool(QString& data){
+    QString d=data.toLower();
+    if (d=="true") return true;
+    if (d=="t") return true;
+    if (d=="1") return true;
+    if (d=="j") return true;
+    if (d=="y") return true;
+    if (d=="yes") return true;
+    if (d=="ja") return true;
+    bool ok=false;
+    int i=d.toInt(&ok);
+    if (ok) return i!=0;
+    return false;
+}
