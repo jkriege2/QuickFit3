@@ -20,9 +20,9 @@
     \todo implement print/export report with all fit parameters and fit statistics data
     \todo implement more estimators for fit data weighting
     \todo possibly implement additional possibilities to estimate parameter confidence intervals (additional to jacobian), like monte-carlo methods
-    \todo implement load/save of Fit Parameters+Function in config file
     \todo fit current file when <ENTER> is pressed in current widget
     \todo store jacobian matrix in fit results
+    \todo add tool that allows to determine focal volume from a fit with given fluorophore parameters
 
     \section qf3todo_fitfunctions Fit Functions
     \todo FCS-Fit-Function with diffusion and rotation

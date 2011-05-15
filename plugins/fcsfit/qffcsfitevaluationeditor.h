@@ -149,6 +149,11 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief copy current parameter set to all files & initial parameters */
         QPushButton* btnCopyToAllCurrentRun;
 
+        /** \brief button to save current parameter set */
+        QPushButton* btnSaveParameters;
+        /** \brief button to load current parameter set */
+        QPushButton* btnLoadParameters;
+
         /** \brief scroll area for the fit parameters */
         JKVerticalScrollArea* scrollParameters;
         /** \brief layout that is used to display fit parameters */
@@ -174,6 +179,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QString currentSaveDirectory;
         /** \brief stores the last fit statistics report, created in updateFitFunction() */
         QString fitStatisticsReport;
+
+        QString currentFPSSaveDir;
 
         /*! \brief execute a fit for the given record and run
 
@@ -278,6 +285,11 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
         double* allocWeights(bool* weightsOK=NULL);
+
+        /** \brief save current fit function and fit results to an INI file */
+        void saveCurrentFitResults();
+        /** \brief set current fit function and fit results according to an INI file */
+        void loadCurrentFitResults();
 
     private:
         /** \brief create all widgets on the form */

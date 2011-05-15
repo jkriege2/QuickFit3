@@ -22,5 +22,7 @@
 
     <file alias="fcs_fit_fit.png">../../images/16x16/wizard.png</file>
 
+    <file alias="fcs_param_load.png">../../images/16x16/fileopen.png</file>
+    <file alias="fcs_param_save.png">../../images/16x16/filesave.png</file>
 </qresource>
 </RCC>

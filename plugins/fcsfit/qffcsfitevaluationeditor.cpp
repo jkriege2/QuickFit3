@@ -368,6 +368,13 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters and also to all files, but only to the current run therein."));
     layBtn->addWidget(btnCopyToAllCurrentRun, 4, 0);
 
+    QPushButton* btnLoadParameters=new QPushButton(QIcon(":/fcs_param_load.png"), tr("&Load Parameters"), this);
+    btnLoadParameters->setToolTip(tr("load a FCS fit parameter set"));
+    layBtn->addWidget(btnLoadParameters, 5, 0);
+    QPushButton* btnSaveParameters=new QPushButton(QIcon(":/fcs_param_save.png"), tr("&Save Parameters"), this);
+    btnSaveParameters->setToolTip(tr("save the current FCS fit parameter as a set"));
+    layBtn->addWidget(btnSaveParameters, 5, 1);
+
     layModel->addLayout(layBtn);
 
 
@@ -438,6 +445,8 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(btnCopyToAll, SIGNAL(clicked()), this, SLOT(copyToAll()));
     connect(btnCopyToInitial, SIGNAL(clicked()), this, SLOT(copyToInitial()));
     connect(btnCopyToAllCurrentRun, SIGNAL(clicked()), this, SLOT(copyToAllCurrentRun()));
+    connect(btnLoadParameters, SIGNAL(clicked()), this, SLOT(loadCurrentFitResults()));
+    connect(btnSaveParameters, SIGNAL(clicked()), this, SLOT(saveCurrentFitResults()));
 
     connect(datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
     connect(datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
@@ -547,6 +556,7 @@ void QFFCSFitEvaluationEditor::readSettings() {
         btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", m_parameterWidgetWidth).toBool());
         spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
         tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
+        currentFPSSaveDir=settings->getQSettings()->value("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir).toString();
     }
 }
 
@@ -568,7 +578,7 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", btnEditRanges->isChecked());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_toolbox_current", tabResidulas->currentIndex());
-
+        settings->getQSettings()->setValue("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir);
     }
 }
 
@@ -2104,6 +2114,109 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK) {
     }
     if (weightsOKK) *weightsOKK=weightsOK;
     return weights;
+}
+
+void QFFCSFitEvaluationEditor::saveCurrentFitResults() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFFitFunction* ffunc=eval->getFitFunction();
+    if (!ffunc || !eval) return;
+
+
+    QString filter= tr("FCS Fit Parameter Set (*.fps)");
+    QString selectedFilter=filter;
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save FCS Fit Parameter Set as ..."), currentFPSSaveDir, filter, &selectedFilter);
+    if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+        currentFPSSaveDir=QFileInfo(fileName).absolutePath();
+        bool ok=true;
+        if (QFile::exists(fileName)) {
+            int ret = QMessageBox::question(this, tr("Save FCS Fit Parameter Set as  ..."),
+                            tr("A Configuration with the name '%1' already exists.\n"
+                               "Do you want to overwrite?").arg(fileName),
+                            QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
+            if (ret==QMessageBox::No) ok=false;
+        }
+        if (ok) {
+            QSettings settings(fileName, QSettings::IniFormat);
+            settings.setValue("fit_function/id", eval->getFitFunction()->id());
+
+            QStringList pids=ffunc->getParameterIDs();
+            double* fullParams=eval->allocFillParameters();
+            double* errors=eval->allocFillParameterErrors();
+            bool* paramsFix=eval->allocFillFix();
+            double* paramsMin=eval->allocFillParametersMin();
+            double* paramsMax=eval->allocFillParametersMax();
+            //ffunc->calcParameter(fullParams, errors);
+            for (int i=0; i<pids.size(); i++) {
+                QString id=pids[i];
+                int num=ffunc->getParameterNum(id);
+                if (!id.isEmpty()) {
+                    bool visible=ffunc->isParameterVisible(num, fullParams);
+                    QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
+                    if (!d.userEditable) visible=false;
+
+                    if (visible) {
+                        settings.setValue("fit_params/"+id+"/value", eval->getFitValue(id));
+                        if (d.displayError==QFFitFunction::EditError) settings.setValue("fit_params/"+id+"/error", eval->getFitError(id));
+                        if (d.fit) settings.setValue("fit_params/"+id+"/fix", eval->getFitFix(id));
+                        if (d.userRangeEditable) {
+                           settings.setValue("fit_params/"+id+"/min", eval->getFitMin(id));
+                           settings.setValue("fit_params/"+id+"/max", eval->getFitMax(id));
+                        }
+                    }
+                }
+            }
+            free(fullParams);
+            free(errors);
+            free(paramsFix);
+            free(paramsMin);
+            free(paramsMax);
+        }
+    }
+}
+
+void QFFCSFitEvaluationEditor::loadCurrentFitResults() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFFitFunction* ffunc=eval->getFitFunction();
+    if (!ffunc || !eval) return;
+
+    QString filter= tr("FCS Fit Parameter Set (*.fps)");
+    QString selectedFilter=filter;
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load FCS Fit Parameter Set ..."), currentFPSSaveDir, filter, &selectedFilter);
+    if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        currentFPSSaveDir=QFileInfo(fileName).absolutePath();
+        QSettings settings(fileName, QSettings::IniFormat);
+        QString ffuncname=settings.value("fit_function/id", eval->getFitFunction()->id()).toString();
+        eval->setFitFunction(ffuncname);
+        settings.beginGroup("fit_params");
+        QStringList keys = settings.allKeys();
+        for (int i=0; i<keys.size(); i++) {
+            if (keys[i].endsWith("/error")) {
+                QString paramname=keys[i].left(keys[i].length()-6);
+                eval->setFitError(paramname, settings.value(keys[i]).toDouble());
+            } else if (keys[i].endsWith("/value")) {
+                QString paramname=keys[i].left(keys[i].length()-6);
+                eval->setFitValue(paramname, settings.value(keys[i]).toDouble());
+            } else if (keys[i].endsWith("/fix")) {
+                QString paramname=keys[i].left(keys[i].length()-4);
+                eval->setFitFix(paramname, settings.value(keys[i]).toBool());
+            } else if (keys[i].endsWith("/min")) {
+                QString paramname=keys[i].left(keys[i].length()-4);
+                eval->setFitMin(paramname, settings.value(keys[i]).toDouble());
+            } else if (keys[i].endsWith("/max")) {
+                QString paramname=keys[i].left(keys[i].length()-4);
+                eval->setFitMax(paramname, settings.value(keys[i]).toDouble());
+            }
+        }
+        displayModel(true);
+        replotData();
+        QApplication::restoreOverrideCursor();
+
+    }
 }
 
 
