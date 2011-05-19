@@ -350,6 +350,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
     labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labAveragedresults->setMaximumHeight(200);
+    labAveragedresults->setMaximumHeight(200);
+    labAveragedresults->setSizePolicy(QSizePolicy::Ignored, labAveragedresults->sizePolicy().verticalPolicy());
     rwvlayout->addWidget(labAveragedresults);
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
@@ -515,4 +517,6 @@ void QFEvaluationPropertyEditor::saveResults() {
     }
 }
 
-
+void QFEvaluationPropertyEditor::resizeEvent(QResizeEvent* event) {
+    labAveragedresults->setMaximumWidth(event->size().width());
+}

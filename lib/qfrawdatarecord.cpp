@@ -131,7 +131,13 @@ void QFRawDataRecord::readXML(QDomElement& e) {
     if (!te.isNull()) {
         QDomElement fe=te.firstChildElement("file");
         while (!fe.isNull()) {
-            files.push_back(fe.text());
+            QString filexml=fe.text();
+            QFileInfo fi(project->getFile());
+            //std::cout<<"file = "<<filexml.toStdString()<<"\n";
+            //std::cout<<"  project-absolute path = "<<fi.absoluteDir().absolutePath().toStdString()<<"\n";
+            //std::cout<<"  file-absolute path = "<<fi.absoluteDir().absoluteFilePath(filexml).toStdString()<<"\n";
+
+            files.push_back(fi.absoluteDir().absoluteFilePath(filexml));
             fe=fe.nextSiblingElement("file");
         }
     }

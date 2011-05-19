@@ -116,7 +116,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         QFEvaluationResultsModel* resultsModel;
         /** \brief read the settings from ProgramOptions set by setSettings() */
         virtual void readSettings();
-        void closeEvent( QCloseEvent * event );
+        void closeEvent( QCloseEvent* event);
+        void resizeEvent(QResizeEvent* event);
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();

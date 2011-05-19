@@ -113,6 +113,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
     labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labAveragedresults->setMaximumHeight(200);
+    labAveragedresults->setSizePolicy(QSizePolicy::Ignored, labAveragedresults->sizePolicy().verticalPolicy());
     rwvlayout->addWidget(labAveragedresults);
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
@@ -260,13 +261,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
 }
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
-    if (current) {
-        /*current->getProject()->setIntProperty(QString("rawdatapropeditor%1/posx").arg(id), pos().x());
-        current->getProject()->setIntProperty(QString("rawdatapropeditor%1/posy").arg(id), pos().y());
-        current->getProject()->setIntProperty(QString("rawdatapropeditor%1/width").arg(id), size().width());
-        current->getProject()->setIntProperty(QString("rawdatapropeditor%1/height").arg(id), size().height());
-        */
-    }
+    labAveragedresults->setMaximumWidth(event->size().width());
     QWidget::resizeEvent(event);
 }
 

@@ -3,33 +3,33 @@
     <description><![CDATA[]]></description>
     <properties/>
     <rawdata>
-        <rawdataelement type="fcs" name="DNA_2nM_Al488_0ul_1.ASC - CH0" id="0">
+        <rawdataelement type="fcs" name="20nM_488_Day2_04s.asc - CH0" id="3">
             <description><![CDATA[]]></description>
             <properties>
-                <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
-                <property name="BINNED_RATE_N" type="longlong" data="128" usereditable="false" visible="false"/>
+                <property name="ANGLE [°]" type="double" data="0" usereditable="false" visible="true"/>
+                <property name="BINNED_RATE_N" type="longlong" data="126" usereditable="false" visible="false"/>
                 <property name="CHANNEL" type="uint" data="0" usereditable="false" visible="true"/>
                 <property name="CROSS_CORRELATION" type="bool" data="false" usereditable="false" visible="true"/>
-                <property name="DATE" type="date" data="" usereditable="false" visible="true"/>
+                <property name="DATE" type="date" data="2009-01-20" usereditable="false" visible="true"/>
                 <property name="DUAL_CHANNEL" type="bool" data="false" usereditable="false" visible="true"/>
-                <property name="DURATION [s]" type="double" data="30" usereditable="false" visible="true"/>
+                <property name="DURATION [s]" type="double" data="10" usereditable="false" visible="true"/>
                 <property name="FILETYPE" type="string" data="ALV5000" usereditable="false" visible="true"/>
                 <property name="MODE" type="string" data="SINGLE AUTO CH0" usereditable="false" visible="true"/>
                 <property name="REFRACTIVE_INDEX" type="double" data="1.332" usereditable="false" visible="true"/>
                 <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
                 <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
                 <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
-                <property name="TIME" type="time" data="13:49:03" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="11:02:15" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
-                <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
+                <property name="WAVELENGTH [nm]" type="double" data="0" usereditable="false" visible="true"/>
             </properties>
             <results/>
             <files>
-                <file>testdata/DNA_2nM_Al488_0ul_1.ASC</file>
+                <file>testdata/20nM_488_Day2_04s.asc</file>
             </files>
             <data/>
         </rawdataelement>
-        <rawdataelement type="fcs" name="DNA_2nM_Al488_10ul.ASC - CH0" id="1">
+        <rawdataelement type="fcs" name="qd525_20nM_15ul_al488_20nM_15ul.ASC - CH0" id="4">
             <description><![CDATA[]]></description>
             <properties>
                 <property name="ANGLE [°]" type="double" data="90" usereditable="false" visible="true"/>
@@ -45,13 +45,13 @@
                 <property name="SAMPLE_MEMO" type="string" data="" usereditable="false" visible="true"/>
                 <property name="Samplename" type="string" data="" usereditable="false" visible="true"/>
                 <property name="TEMPERATURE [K]" type="double" data="298.16" usereditable="false" visible="true"/>
-                <property name="TIME" type="time" data="12:06:05" usereditable="false" visible="true"/>
+                <property name="TIME" type="time" data="14:52:17" usereditable="false" visible="true"/>
                 <property name="VISCOSITY [cp]" type="double" data="0.89" usereditable="false" visible="true"/>
                 <property name="WAVELENGTH [nm]" type="double" data="632.8" usereditable="false" visible="true"/>
             </properties>
             <results/>
             <files>
-                <file>testdata/DNA_2nM_Al488_10ul.ASC</file>
+                <file>testdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>

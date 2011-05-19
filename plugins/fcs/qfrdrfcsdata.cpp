@@ -406,9 +406,9 @@ bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QString filename) {
 }
 
 bool QFRDRFCSData::loadFromALV5000(QString filename) {
-    std::cout<<"loadFromALV5000('"<<filename.toStdString()<<"')\n";
+    //std::cout<<"loadFromALV5000('"<<filename.toStdString()<<"')\n";
     FILE* alv_file=fopen(filename.toAscii().data(), "r");
-    std::cout<<"    alv_file = "<<alv_file<<"\n";
+    //std::cout<<"    alv_file = "<<alv_file<<"\n";
     if (!alv_file) {
         setError(tr("could not open file '%1'").arg(filename));
         return false;
