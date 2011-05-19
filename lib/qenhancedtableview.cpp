@@ -87,7 +87,7 @@ void QEnhancedTableView::copySelectionToExcel() {
                 txt=QLocale().toString(vdata.toPointF().x());
                 break;
             default:
-                txt=QString("\"%1\"").arg(vdata.toString());
+                txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r "));
                 break;
         }
         if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt))data[r+1][c+1]=txt;
