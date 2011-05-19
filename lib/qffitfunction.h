@@ -135,7 +135,7 @@ class QFFitFunction {
         virtual QString name() const=0;
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
-        /** \brief return a HTML file to be displayed as model help. This file has to be positioned in \verbatim plugins/fitfunctions/help/<plugin_id> \endverbatim */
+        /** \brief return a HTML file to be displayed as model help. This file has to be positioned in \verbatim plugins/help/<plugin_id> \endverbatim */
         virtual QString helpFile() const { return id()+".html"; };
 
         /*! \brief evaluate the fitting function \f$ f(x, \vec{p}) \f$ at the position \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$

@@ -4,7 +4,7 @@ CONFIG += plugin
 
 TARGET = cam_andor
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 
 DEFINES += TARGETNAME=$$TARGET
 
@@ -25,7 +25,7 @@ FORMS =
 
 RESOURCES += cam_andor.qrc
 
-TRANSLATIONS= ../../output/translations/de.cam_andor.ts
+TRANSLATIONS= ../../output/assets/translations/de.cam_andor.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

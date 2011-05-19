@@ -29,7 +29,7 @@ FORMS =    optionsdialog.ui \
 RESOURCES += quickfit3.qrc
 
 
-TRANSLATIONS= ../output/translations/de.ts
+TRANSLATIONS= ../output/assets/translations/de.ts
 
 INCLUDEPATH += ../../../../LIB/trunk/
 

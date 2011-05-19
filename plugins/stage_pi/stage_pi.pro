@@ -5,7 +5,7 @@ CONFIG += plugin
 TARGET = stage_pi863
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 
 LIBS += -L../../output/ -lquickfit3lib
 
@@ -23,7 +23,7 @@ FORMS =
 
 RESOURCES += stage_pi.qrc
 
-TRANSLATIONS= ../../output/translations/de.stage_pi863.ts
+TRANSLATIONS= ../../output/assets/translations/de.stage_pi863.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

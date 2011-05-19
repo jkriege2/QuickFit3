@@ -5,7 +5,7 @@ CONFIG += plugin
 TARGET = cam_mycamname
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 
 LIBS += -L../../output/ -lquickfit3lib
 
@@ -19,7 +19,7 @@ FORMS =
 
 RESOURCES += qfextensioncamera.qrc
 
-TRANSLATIONS= ../../output/translations/de.cam_mycamname.ts
+TRANSLATIONS= ../../output/assets/translations/de.cam_mycamname.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

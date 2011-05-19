@@ -25,7 +25,7 @@ FORMS = dlg_csvparameters.ui
 
 RESOURCES += qfrdrtable.qrc
 
-TRANSLATIONS= ../../output/translations/de.qfrdrtable.ts
+TRANSLATIONS= ../../output/assets/translations/de.qfrdrtable.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/

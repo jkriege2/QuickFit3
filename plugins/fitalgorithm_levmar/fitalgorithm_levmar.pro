@@ -4,7 +4,7 @@ CONFIG += plugin
 
 TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/fitalgorithms/
+DESTDIR = ../../output/plugins/
 #DLLDESTDIR = $$DESTDIR
 win32:LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
 unix:LIBS += -llapack -lblas -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
@@ -20,7 +20,7 @@ FORMS +=
 
 RESOURCES +=
 
-TRANSLATIONS= ../../output/translations/de.fitalgorithm_levmar.ts
+TRANSLATIONS= ../../output/assets/translations/de.fitalgorithm_levmar.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

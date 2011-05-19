@@ -4,7 +4,7 @@ CONFIG += plugin
 
 TARGET = fitalgorithm_simanneal
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/fitalgorithms/
+DESTDIR = ../../output/plugins/
 #DLLDESTDIR = $$DESTDIR
 LIBS += -llevmar -L../../output/ -lquickfit3lib -lquickfit3widgets
 
@@ -19,7 +19,7 @@ FORMS +=
 
 RESOURCES +=
 
-TRANSLATIONS= ../../output/translations/de.fitalgorithm_simanneal.ts
+TRANSLATIONS= ../../output/assets/translations/de.fitalgorithm_simanneal.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../extlib/ \

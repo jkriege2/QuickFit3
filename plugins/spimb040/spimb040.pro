@@ -4,7 +4,7 @@ CONFIG += plugin
 
 TARGET = spimb040
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 #DLLDESTDIR = $$DESTDIR
 # ./
 LIBS += -ltiff -L../../output/ -lquickfit3lib -lquickfit3widgets
@@ -30,7 +30,7 @@ FORMS =
 
 RESOURCES += spimb040.qrc
 
-TRANSLATIONS= ../../output/translations/de.spimb040.ts
+TRANSLATIONS= ../../output/assets/translations/de.spimb040.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

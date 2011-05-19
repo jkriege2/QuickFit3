@@ -73,7 +73,7 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
              ../../../../LIB/trunk/qt/jkstyledbutton.qrc
 
-TRANSLATIONS= ../output/translations/de.quickfit3widgets.ts
+TRANSLATIONS= ../output/assets/translations/de.quickfit3widgets.ts
 
 INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/

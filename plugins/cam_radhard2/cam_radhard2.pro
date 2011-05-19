@@ -4,7 +4,7 @@ CONFIG += plugin
 
 TARGET = cam_radhard2
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 
 DEFINES += TARGETNAME=$$TARGET
 
@@ -28,7 +28,7 @@ FORMS =
 
 RESOURCES += cam_radhard2.qrc
 
-TRANSLATIONS= ../../output/translations/de.cam_radhard2.ts
+TRANSLATIONS= ../../output/assets/translations/de.cam_radhard2.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

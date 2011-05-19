@@ -87,9 +87,9 @@ void MainWindow::searchAndRegisterPlugins() {
     // find plugins
     rawDataFactory->searchPlugins(settings->getPluginDirectory());
     evaluationFactory->searchPlugins(settings->getPluginDirectory());
-    fitFunctionManager->searchPlugins(settings->getPluginDirectory()+"/fitfunctions");
-    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory()+"/fitalgorithms");
-    extensionManager->searchPlugins(settings->getPluginDirectory()+"/extensions");
+    fitFunctionManager->searchPlugins(settings->getPluginDirectory());
+    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory());
+    extensionManager->searchPlugins(settings->getPluginDirectory());
 
 
     // distribute application hooks
@@ -258,7 +258,7 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
-        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/fitalgorithms/help/%2/%2.html\"><b>%1</b></a></td></tr>").arg(fitAlgorithmManager->getName(id)).arg(QFileInfo(fitAlgorithmManager->getFilename(id)).completeBaseName());
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/help/%2/%2.html\"><b>%1</b></a></td></tr>").arg(fitAlgorithmManager->getName(id)).arg(QFileInfo(fitAlgorithmManager->getFilename(id)).completeBaseName());
         else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><b>%1</b></td></tr>").arg(fitAlgorithmManager->getName(id));
         text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(fitAlgorithmManager->getDescription(id));
         text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(fitAlgorithmManager->getAuthor(id));
@@ -272,7 +272,7 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
-        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/fitfunctions/help/%2/%2.html\"><b>%1</b></a></td></tr>").arg(fitFunctionManager->getName(id)).arg(QFileInfo(fitFunctionManager->getFilename(id)).completeBaseName());
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/help/%2/%2.html\"><b>%1</b></a></td></tr>").arg(fitFunctionManager->getName(id)).arg(QFileInfo(fitFunctionManager->getFilename(id)).completeBaseName());
         else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><b>%1</b></td></tr>").arg(fitFunctionManager->getName(id));
         text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(fitFunctionManager->getDescription(id));
         text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(fitFunctionManager->getAuthor(id));
@@ -287,7 +287,7 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
-        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/extensions/help/%3/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(getExtensionManager()->getName(id)).arg(getExtensionManager()->getIconFilename(id)).arg(id);
+        if (docLinks) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/help/%3/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(getExtensionManager()->getName(id)).arg(getExtensionManager()->getIconFilename(id)).arg(id);
         else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(getExtensionManager()->getName(id)).arg(getExtensionManager()->getIconFilename(id));
         text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(getExtensionManager()->getDescription(id));
         text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(getExtensionManager()->getAuthor(id));

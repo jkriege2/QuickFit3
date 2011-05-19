@@ -8,7 +8,7 @@ CONFIG += plugin
 
 TARGET = cam_rh2v2
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 
 DEFINES += TARGETNAME=$$TARGET
 
@@ -27,7 +27,7 @@ FORMS =
 
 RESOURCES += cam_rh2v2.qrc
 
-TRANSLATIONS= ../../output/translations/de.ts
+TRANSLATIONS= ../../output/assets/translations/de.cam_rh2v2.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

@@ -25,7 +25,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     QFileInfo fi(QApplication::applicationFilePath());
 
     configDir=QDir::homePath()+"/."+fi.completeBaseName()+"/";
-    assetsDir=QApplication::applicationDirPath();
+    assetsDir=QApplication::applicationDirPath()+"/assets/";
     pluginsDir=QApplication::applicationDirPath()+"/plugins/";
 
     #ifdef __WINDOWS__

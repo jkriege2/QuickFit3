@@ -253,16 +253,37 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
     autoCalcRateN=getProperty("AUTO_BINNED_RATE_N", autoCalcRateN).toInt();
 
     QString filetype=getProperty("FILETYPE", "unknown").toString();
-    //std::cout<<"reading data "<<filetype.toStdString()<<"\n";
+    //std::cout<<"reading data "<<filetype.toStdString()<<" from 1/"<<files.size()<<" '"<<files.join(", ").toStdString()<<"'\n";
+
     if (filetype.toUpper()=="ALV5000") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return;
+        }
         loadFromALV5000(files[0]);
     } else if (filetype.toUpper()=="ISS_ALBA") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return;
+        }
         loadCorrelationCurvesFromALBA(files[0]);
     } else if (filetype.toUpper()=="CSV_CORR") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return;
+        }
         loadCorrelationCurvesFromCSV(files[0]);
     } else if (filetype.toUpper()=="CSV_RATE") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return;
+        }
         loadCountRatesFromCSV(files[0]);
     } else if (filetype.toUpper()=="CSV_CORR_RATE") {
+        if (files.size()<=1) {
+            setError(tr("there are too few files in the FCS record!"));
+            return;
+        }
         loadCorrelationCurvesFromCSV(files[0]);
         loadCountRatesFromCSV(files[1]);
     }
@@ -385,7 +406,13 @@ bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QString filename) {
 }
 
 bool QFRDRFCSData::loadFromALV5000(QString filename) {
+    std::cout<<"loadFromALV5000('"<<filename.toStdString()<<"')\n";
     FILE* alv_file=fopen(filename.toAscii().data(), "r");
+    std::cout<<"    alv_file = "<<alv_file<<"\n";
+    if (!alv_file) {
+        setError(tr("could not open file '%1'").arg(filename));
+        return false;
+    }
     if (ferror(alv_file)) {
         setError(tr("%2").arg(filename).arg(strerror(errno)));
         return false;

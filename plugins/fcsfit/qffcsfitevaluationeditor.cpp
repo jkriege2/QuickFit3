@@ -1899,8 +1899,8 @@ void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
     QString ppid=cmbModel->itemData(cmbModel->currentIndex()).toString();
     int pid=services->getFitFunctionManager()->getPluginForID(ppid);
     QString dll=services->getFitFunctionManager()->getFilename(pid);
-    if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/fitfunctions/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
-    else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/fitfunctions/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
+    if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
+    else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
     hlpFunction->show();
 }
 
@@ -1916,8 +1916,8 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     QString dll=services->getFitAlgorithmManager()->getFilename(ppid);
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
     if (algorithm) {
-        if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/fitalgorithms/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->id()+".html");
-        else hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/fitalgorithms/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->helpFile());
+        if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->id()+".html");
+        else hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->helpFile());
         hlpAlgorithm->show();
     }
 }

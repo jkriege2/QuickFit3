@@ -4,7 +4,7 @@ CONFIG += plugin
 
 TARGET = qffcsfitfuncs
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/fitfunctions
+DESTDIR = ../../output/plugins
 #DLLDESTDIR = $$DESTDIR
 LIBS +=
 
@@ -17,7 +17,7 @@ FORMS =
 
 RESOURCES +=
 
-TRANSLATIONS= ../../output/translations/de.qffcsfitfuncs.ts
+TRANSLATIONS= ../../output/assets/translations/de.qffcsfitfuncs.ts
 
 INCLUDEPATH += ../../lib/
 

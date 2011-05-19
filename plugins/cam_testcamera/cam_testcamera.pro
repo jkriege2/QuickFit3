@@ -7,7 +7,7 @@ TARGET = cam_testcamera
 DEFINES += TARGETNAME=$$TARGET
 
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/extensions/
+DESTDIR = ../../output/plugins/
 
 LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets -ltiff
 
@@ -23,7 +23,7 @@ FORMS =
 
 RESOURCES += cam_testcamera.qrc
 
-TRANSLATIONS= ../../output/translations/de.cam_testcamera.ts
+TRANSLATIONS= ../../output/assets/translations/de.cam_testcamera.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

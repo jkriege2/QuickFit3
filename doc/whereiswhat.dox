@@ -18,7 +18,7 @@
     On windows these pathes will be:
       - <b>[AppDir]</b> = \c c:\\Program_Files\\QuickFit3\\
       - <b>[PluginDir]</b> = \c c:\\Program_Files\\QuickFit3\\plugins
-      - <b>[AssetsDir]</b> = \c c:\\Program_Files\\QuickFit3
+      - <b>[AssetsDir]</b> = \c c:\\Program_Files\\QuickFit3\\assets
       - <b>[ConfigDir]</b> = \c c:\\Documents_and_Settings\\<WINDOWS_USERNAME>\\.quickfit3
     .
 
@@ -29,27 +29,27 @@
     you create should be installed:
       - Plugin shared libraries (SO/DLL):
         - for raw data/evaluation plugin: \c [PluginsDir]
-        - for QFExtension plugin: \c [PluginsDir]/extensions/
-        - for QFFitAlgorithm plugin: \c [PluginDir]/fitalgorithms/
-        - for QFFitFunction plugin: \c [PluginDir]/fitfunctions/
+        - for QFExtension plugin: \c [PluginsDir]
+        - for QFFitAlgorithm plugin: \c [PluginDir]
+        - for QFFitFunction plugin: \c [PluginDir]
       .
       - Configuration files / log files:
         - for raw data/evaluation plugin: \c [PluginDir]/plugins/<PluginID>/
-        - for QFExtension plugin: \c [PluginDir]/plugins/extensions/<PluginID>/
+        - for QFExtension plugin: \c [PluginDir]/plugins/<PluginID>/
       .
       - Help files:
         - QuickFit directly: \c [AssetsDir]/help/
         - for raw data/evaluation plugin: \c [AssetsDir]/plugins/help/<PluginID>/
-        - for QFExtension plugin: \c [AssetsDir]/plugins/extensions/help/<PluginID>/
-        - for QFFitAlgorithm plugin: \c [AssetsDir]/plugins/fitalgorithms/help/<PluginDLL.baseName>/<PluginID>.html
-        - for QFFitFunction plugin: \c [AssetsDir]/plugins/fitfunctions/help/<PluginDLL.baseName>/<PluginID>.html
+        - for QFExtension plugin: \c [AssetsDir]/plugins/help/<PluginID>/
+        - for QFFitAlgorithm plugin: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
+        - for QFFitFunction plugin: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
       .
       - any other additional files:
         - QuickFit directly: \c [AssetsDir]
         - for raw data/evaluation plugin: \c [AssetsDir]/plugins/<PluginID>/
-        - for QFExtension plugin: \c [AssetsDir]/plugins/extensions/<PluginID>/
-        - translations \c [AssetDir]/<languageID>.<yourname>.ts
-        - stylesheets  \c [AssetDir]/<yourname>.qss
+        - for QFExtension plugin: \c [AssetsDir]/plugins/<PluginID>/
+        - translations \c [AssetDir]/translations/<languageID>.<yourname>.ts
+        - stylesheets  \c [AssetDir]/stylesheets/<yourname>.qss
       .
     .
 */

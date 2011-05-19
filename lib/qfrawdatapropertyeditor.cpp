@@ -239,7 +239,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         */
 
         helpWidget->clear();
-        helpWidget->updateHelp(QString(services->getPluginsDirectory()+QString("/help/")+current->getType()+QString("/"))+current->getType()+".html");
+        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+current->getType()+QString("/"))+current->getType()+".html");
 
     } else {
         edtName->setText("");
