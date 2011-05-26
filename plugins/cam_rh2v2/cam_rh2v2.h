@@ -88,18 +88,20 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
-
+        /** \copydoc QFExtensionCamera::prepareAcquisition() */
+        virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
         /** \copydoc QFExtensionCamera::startAcquisition() */
-        virtual bool startAcquisition(unsigned int camera, QString filenamePrefix=QString(""));
-        /** \copydoc QFExtensionCamera::cancelAcquisition() */
-        virtual bool cancelAcquisition(unsigned int camera);
+        virtual bool startAcquisition(unsigned int camera);
+				/** \copydoc QFExtensionCamera::cancelAcquisition() */
+        virtual void cancelAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
         virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
         virtual void getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
-
+        /** \copydoc QFExtensionCamera::getAcquisitionProgress() */
+        virtual int getAcquisitionProgress(unsigned int camera);
 
 
         /** \brief log project text message
@@ -120,6 +122,9 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
 				QSettings *settings_pc;
 				QString& findGroupByType(const QString&);
 				processing_chain *pc;
+				
+	public:
+		void reconfigure(unsigned int camera, const QSettings& settings, unsigned int set);
 				
 	protected slots:
 		void logger_txt(QString message){log_text(LOG_PREFIX+message);}

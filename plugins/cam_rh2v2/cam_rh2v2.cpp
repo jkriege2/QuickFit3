@@ -12,7 +12,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
 	logService=NULL;
 	settings_pc = new QSettings(QString(":/cam_rh2v2.pc.ini"), QSettings::IniFormat );/** read ini file */
 	
-	pc=new processing_chain(settings_pc,1);
+	pc=new processing_chain(settings_pc,0);
 	
 	QObject::connect(pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
 	QObject::connect(pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
@@ -84,20 +84,19 @@ unsigned int QFExtensionCameraRh2v2::getCameraCount() {
     return 1;
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }
-void QFExtensionCameraRh2v2::useCameraSettings(unsigned int camera, const QSettings& settings) {
-	//load settings from global settings object
-	
-	settings_pc->setValue(findGroupByType("we_writer")+"/config/filename",settings.value(QString("rh2v2/filename")));
+
+void QFExtensionCameraRh2v2::reconfigure(unsigned int camera, const QSettings& settings, unsigned int set){
 	settings_pc->setValue(findGroupByType("we_accumulator")+"/config/count",settings.value(QString("rh2v2/acccnt")));
-	
-	log_text(settings_pc->value("writer/config/filename").toString());
-	log_text(settings_pc->value("accumulator/config/count").toString());
-	
-	//TODO:for future use, must be called befor acquire, otherwise fifo empty->lock 
-	//pc->run();
+	settings_pc->setValue(findGroupByType("we_writer")+"/config/duration",settings.value(QString("rh2v2/duration")));
+	pc->reconfigure(settings_pc,set);
+}	
 
-
-	//configure chain - maybe by recreating it...
+void QFExtensionCameraRh2v2::useCameraSettings(unsigned int camera, const QSettings& settings) {
+	std::cerr << __FUNCTION__ << __FILE__ << __LINE__ << std::endl;
+	const unsigned int set=0;
+	pc->stop();
+	reconfigure(camera,settings,set);
+	pc->run();
 }
 
 void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
@@ -138,13 +137,6 @@ void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSett
 	sbDuration->setValue(settings.value("rh2v2/duration", 128*1024).toUInt());
 	formlayout->addRow(tr("Number of frames to read-out ()"), sbDuration);
 	
-	QEnhancedLineEdit* edtFilename=new QEnhancedLineEdit(dlg);
-	formlayout->addRow(tr("output filename:"), edtFilename);
-	JKStyledButton* btnSelect=new JKStyledButton(JKStyledButton::SelectFile, edtFilename, dlg);
-	edtFilename->addButton(btnSelect);
-	edtFilename->setText(settings.value("rh2v2/filename","/tmp/test.dat").toString());
-
-	
 	lay->addLayout(formlayout);
 
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel, Qt::Horizontal, dlg);
@@ -157,7 +149,6 @@ void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSett
 			//  read back values entered into the widgets and store in settings
 			settings.setValue(QString("rh2v2/acccnt"),sbAccCnt->value());
 			settings.setValue(QString("rh2v2/duration"),sbDuration->value());
-			settings.setValue(QString("rh2v2/filename"),edtFilename->text());
 	}
 	delete dlg;
 }
@@ -189,7 +180,6 @@ bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64
 }
 
 bool QFExtensionCameraRh2v2::connectDevice(unsigned int camera) {
-	pc->run();
 	return true;
 }
 
@@ -202,16 +192,25 @@ double QFExtensionCameraRh2v2::getExposureTime(unsigned int camera) {
     return 0.000010;
 }
 
-bool QFExtensionCameraRh2v2::startAcquisition(unsigned int camera, QString filenamePrefix) {
-    return false;
+bool QFExtensionCameraRh2v2::startAcquisition(unsigned int camera) {
+    pc->run();
 }
 
-bool QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
-    return true;
+void QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
+	
+}
+
+bool QFExtensionCameraRh2v2::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+	const unsigned int set=1;
+	pc->stop();
+	reconfigure(camera,settings,set);
+	settings_pc->setValue(findGroupByType("we_writer")+"/config/filename",filenamePrefix+".dat");
+	pc->reconfigure(settings_pc,set);
+	return true;
 }
 
 bool QFExtensionCameraRh2v2::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
-    return false;
+    return pc->isRunning();
 }
 
 void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
@@ -221,6 +220,9 @@ bool QFExtensionCameraRh2v2::getAcquisitionPreview(unsigned int camera, uint32_t
     return false;
 }
 
+int QFExtensionCameraRh2v2::getAcquisitionProgress(unsigned int camera) {
+    return 0;
+}
 
 void QFExtensionCameraRh2v2::log_text(QString message) {
 	if (logService) logService->log_text(message);
