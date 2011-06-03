@@ -8,7 +8,12 @@ DESTDIR = ../../output/plugins/
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS +=  -landor -L../../output/ -lquickfit3lib -lquickfit3widgets
+win32 {
+  LIBS+= -L../../extlibs/andor_win32
+  INCLUDEPATH += ../../extlibs/andor_win32
+}
+
+LIBS += -landor -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += cam_andor.h \
@@ -30,6 +35,7 @@ INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
+
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl
