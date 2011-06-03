@@ -477,7 +477,7 @@ bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QCha
                 switch(resultsGet(evalname, rownames[r]).type) {
                     case qfrdreNumber: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint); break;
                     case qfrdreNumberError: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint); hasError=true; break;
-                    case qfrdreInteger: dat=loc.toString(resultsGetAsInteger(evalname, rownames[r])); break;
+                    case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
                     case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                 }
@@ -549,7 +549,7 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
                 switch(resultsGet(evalname, rownames[r]).type) {
                     case qfrdreNumber: dat=loc.toString(resultsGetAsDouble(evalname, rownames[r]), 'g', 15); break;
                     case qfrdreNumberError: dat=loc.toString(resultsGetAsDouble(evalname, rownames[r]), 'g', 15); hasError=true; break;
-                    case qfrdreInteger: dat=loc.toString(resultsGetAsInteger(evalname, rownames[r])); break;
+                    case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
                     case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                 }

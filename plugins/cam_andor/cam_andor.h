@@ -8,7 +8,7 @@
 #include "highrestimer.h"
 #include "qenhancedlineedit.h"
 #include "jkstyledbutton.h"
-
+#include "atmcdLXd.h"
 
 
 /*!

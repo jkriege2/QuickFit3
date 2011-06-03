@@ -517,7 +517,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
                     switch(record->resultsGet(evalname, colnames[c]).type) {
                         case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); break;
                         case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
-                        case QFRawDataRecord::qfrdreInteger: dat=loc.toString(record->resultsGetAsInteger(evalname, colnames[c])); break;
+                        case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c])); break;
                         case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
                         case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                         default: dat=""; break;
@@ -590,7 +590,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                         switch(record->resultsGet(evalname, colnames[c]).type) {
                             case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); break;
                             case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
-                            case QFRawDataRecord::qfrdreInteger: dat=loc.toString(record->resultsGetAsInteger(evalname, colnames[c])); break;
+                            case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c])); break;
                             case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
                             case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                             default: dat=""; break;

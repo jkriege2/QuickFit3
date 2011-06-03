@@ -53,7 +53,9 @@ void QFExtensionCameraAndor::storeSettings(ProgramOptions* settingspo) {
 }
 
 unsigned int QFExtensionCameraAndor::getCameraCount() {
-    return 1;
+    at_32 lNumCameras;
+    GetAvailableCameras(&lNumCameras);
+    return lNumCameras;
 }
 
 void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSettings& settings) {

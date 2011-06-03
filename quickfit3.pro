@@ -38,11 +38,12 @@ SUBDIRS += plg_cam_radhard2
 plg_cam_radhard2.subdir=./plugins/cam_radhard2
 plg_cam_radhard2.depends = lib libqf3widgets
 
-SUBDIRS += plg_cam_andor
-plg_cam_andor.subdir=./plugins/cam_andor
-plg_cam_andor.depends = lib libqf3widgets
-
 unix {
+
+	SUBDIRS += plg_cam_andor
+	plg_cam_andor.subdir=./plugins/cam_andor
+	plg_cam_andor.depends = lib libqf3widgets
+
 	SUBDIRS += plg_cam_rh2v2
 	plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
 	plg_cam_rh2v2.depends = lib libqf3widgets

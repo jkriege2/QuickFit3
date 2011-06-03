@@ -8,8 +8,7 @@ DESTDIR = ../../output/plugins/
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS += -lusb -L../../output/ -lquickfit3lib -lquickfit3widgets
-win32:LIBS += -lgdi32
+LIBS +=  -landor -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += cam_andor.h \
