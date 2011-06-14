@@ -1772,7 +1772,153 @@ void QFFCSFitEvaluationEditor::copyToInitial() {
 }
 
 
+void QFFCSFitEvaluationEditor::createReport(QPrinter* printer) {
+    {   int trci=tabResidulas->currentIndex();
+        for (int i=0;i<tabResidulas->count(); i++) {
+            tabResidulas->setCurrentIndex(i);
+        }
+        tabResidulas->setCurrentIndex(trci);
+    }
 
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    if (!fcs) return;
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* algorithm=eval->getFitAlgorithm();
+    int run=eval->getCurrentRun();
+    double* params=eval->allocFillParameters();
+
+    QPainter painter;
+    QString html;
+    html+="<font size=\"8\"><table border=\"0\">";
+    html+=tr("<tr><td colspan=\"5\"><b>&nbsp;&nbsp;%1 Parameter</b></td>%2</tr>").arg((eval->hasFit())?tr("Local"):tr("Global")).arg((algorithm->get_supportsBoxConstraints())?tr("<td>&nbsp;&nbsp;&nbsp;<b>Range</b></td>"):QString(""));
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double error=roundError(eval->getFitError(id),2);
+        double value=roundWithError(eval->getFitValue(id), error, 2);
+        bool fix=eval->getFitFix(id);
+        QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            QString err="";
+            QString errpre="&nbsp;&nbsp;";
+            if (d.displayError!=QFFitFunction::NoError) {
+                errpre="( ";
+                err=QString("&plusmn;&nbsp;%1 )").arg(QString(floattohtmlstr(error, 5, true).c_str()));
+            }
+            QString flags="";
+            if (fix) flags+="<b>F</b>";
+            QString range=QString("%1...%2").arg(QString(floattohtmlstr(d.minValue, 5, true).c_str())).arg(QString(floattohtmlstr(d.maxValue, 5, true).c_str()));
+            QString rangeval=(algorithm->get_supportsBoxConstraints())?(QString("<td>&nbsp;&nbsp;&nbsp;<font size=\"6\">%1</font></td>").arg(range)):QString("");
+            html+=QString("<tr><td>&nbsp;&nbsp;%1=&nbsp;&nbsp;</td><td>%5</td><td>%6 %2</td><td>%3</td><td>%4</td> %7 </tr>").arg(d.label)
+                                                                                                                           .arg(QString(floattohtmlstr(value, 5, true).c_str()))
+                                                                                                                           .arg(err)
+                                                                                                                           .arg(d.unitLabel)
+                                                                                                                           .arg(flags)
+                                                                                                                           .arg(errpre)
+                                                                                                                           .arg(rangeval);
+        };
+    }
+    html+="</table><br><center><font size=\"6\"><i><u>legend</u>:&nbsp;&nbsp;&nbsp;<b>F:</b> fixed parameter</i></font></center></font>";
+    //qDebug()<<html;
+
+    QString htmlTop;
+    htmlTop+=tr("<h2>%1 Report:</h2>").arg(eval->getTypeName());
+    htmlTop+=tr("<table border=\"0\">");
+    htmlTop+=tr("<tr><td><b>file:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>'%1'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>").arg(record->getName());
+    htmlTop+=tr("<td><b>run:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>").arg((eval->getCurrentRun()<0)?tr("average"):QString::number(eval->getCurrentRun()));
+    htmlTop+=tr("<td><b>data range:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td><td></td><td>%1...%2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(datacut->get_userMin()).arg(datacut->get_userMax()).arg((algorithm->get_supportsBoxConstraints())?4:3);
+    htmlTop+=tr("<tr><td><b>fit algorithm:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(algorithm->name());
+    QString dataw=cmbWeights->currentText();
+    htmlTop+=tr("<tr><td><b>fit function:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><b>data weighting:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(ffunc->name()).arg(dataw);
+    htmlTop+=tr("</table><br>&nbsp;");
+
+    QString htmlBot=fitStatisticsReport;
+    htmlBot.replace("width=\"95%\"", "");
+
+    free(params);
+
+    painter.begin(printer);
+    QTextDocument doc(this);
+    doc.setHtml(html);
+    QTextDocument docTop(this);
+    docTop.setHtml(htmlTop);
+    QTextDocument docBot(this);
+    docBot.setHtml(htmlBot);
+    QRectF page=printer->pageRect();
+    double width=page.width();
+    if (printer->orientation()==QPrinter::Landscape) width=page.height();
+
+    painter.save();
+        docTop.setTextWidth(3000);
+        double docTopScale=width/(double)docTop.idealWidth();//docTop.idealWidth();
+        painter.scale(docTopScale, docTopScale);
+        docTop.drawContents(&painter);
+    painter.restore();
+
+    painter.translate(0, docTop.size().height()*docTopScale);
+
+    painter.save();
+        double plotwidth=width*2.0/3.0;
+        double plotscale=plotwidth/1000.0;
+        double plotHeight=plotwidth*pltData->height()/pltData->width();
+        painter.scale(plotscale, plotscale);
+        pltData->get_plotter()->draw(painter, QRect(0,0,1000,1000));
+    painter.restore();
+
+    painter.save();
+        double paramwidth=width/3.0;
+        doc.setTextWidth(1200);
+        double docScale=paramwidth/(double)doc.idealWidth();
+        //doc.setTextWidth(doc.idealWidth());
+        painter.translate(plotwidth, 0);
+        painter.scale(docScale, docScale);
+        doc.drawContents(&painter);
+        doc.setTextWidth(doc.idealWidth());
+        if (doc.size().height()*plotscale>plotHeight) plotHeight=doc.size().height()*plotscale;
+    painter.restore();
+
+    painter.save();
+
+        painter.translate(0, plotHeight*1.05);
+
+        painter.save();
+            double histplotwidth=width/3.0;
+            double histplotscale=histplotwidth/1000.0;
+            double histplotheight=histplotwidth*tabResidulas->height()/tabResidulas->width();
+            painter.scale(histplotscale, histplotscale);
+            pltResidualHistogram->get_plotter()->draw(painter, QRect(0,0,1000,1000*tabResidulas->height()/tabResidulas->width()));
+        painter.restore();
+        painter.save();
+            painter.translate(0, histplotheight*1.05);
+            painter.save();
+                double corrplotwidth=width/3.0;
+                double corrplotscale=corrplotwidth/1000.0;
+                double corrplotheight=corrplotwidth*tabResidulas->height()/tabResidulas->width();
+                painter.scale(corrplotscale, corrplotscale);
+                pltResidualCorrelation->get_plotter()->draw(painter, QRect(0,0,1000,1000*tabResidulas->height()/tabResidulas->width()));
+            painter.restore();
+        painter.restore();
+        painter.save();
+            painter.translate(qMax(corrplotwidth, histplotwidth), 0);
+            painter.save();
+                double botwidth=width*2.0/3.0;
+                docBot.setTextWidth(botwidth*1.15);
+                double botscale=botwidth/(double)docBot.textWidth();
+                painter.scale(botscale, botscale);
+                docBot.drawContents(&painter);
+            painter.restore();
+
+        painter.restore();
+    painter.restore();
+
+    painter.end();
+}
 
 
 void QFFCSFitEvaluationEditor::saveReport() {
@@ -1787,24 +1933,21 @@ void QFFCSFitEvaluationEditor::saveReport() {
     if (!fn.isEmpty()) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter;
+        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
         printer->setPaperSize(QPrinter::A4);
         printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
         if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
         printer->setOutputFileName(fn);
-        QPainter painter;
-        painter.begin(printer);
-        pltData->get_plotter()->draw(painter, printer->pageRect());
-        painter.end();
+        createReport(printer);
         delete printer;
         QApplication::restoreOverrideCursor();
     }
 }
 
 void QFFCSFitEvaluationEditor::printReport() {
-    QPrinter* p=new QPrinter;
+    QPrinter* p=new QPrinter();//QPrinter::HighResolution);
 
     p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
     p->setOrientation(QPrinter::Portrait);
@@ -1816,11 +1959,7 @@ void QFFCSFitEvaluationEditor::printReport() {
     }
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QPainter painter;
-    painter.begin(p);
-    pltData->get_plotter()->draw(painter, p->pageRect());
-    painter.end();
-
+    createReport(p);
     delete p;
     QApplication::restoreOverrideCursor();
 }

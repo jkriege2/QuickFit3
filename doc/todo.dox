@@ -15,6 +15,7 @@
 
     \section qf3todo_evalplugins Evaluation Plugins
     \todo implement FCS correlation curve transform to RMS(tau) curve
+    \todo implement Maximum Entropy (ME) evaluation for FCS data
 
     \subsection qf3todo_fcsfit Plugin: FCS Fit
     \todo implement print/export report with all fit parameters and fit statistics data

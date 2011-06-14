@@ -4,6 +4,7 @@
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qt/jkqtplotter.h"
+#include "tools.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
@@ -243,6 +244,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void saveReport();
         /** \brief emitted when we should print a report */
         void printReport();
+        /** \brief create a report on a given QPrinter object */
+        void createReport(QPrinter* printer);
         /** \brief emitted when the x logscale checkbox changes its state */
         void chkXLogScaleToggled(bool checked);
         /** \brief emitted when the grid checkbox changes its state */

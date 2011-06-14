@@ -74,6 +74,16 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     readSettings();
     rawDataFactory->distribute(project, settings, this, this);
     evaluationFactory->distribute(project, settings, this, this);
+
+    // scan program arguments for a project file (has to be the last argument)
+    QStringList args=QApplication::arguments();
+    if (args.size()>0) {
+        QString lastarg=args[args.size()-1];
+        if (QFile::exists(lastarg) && (QFileInfo(lastarg).suffix()=="qfp")) {
+            currentProjectDir=QFileInfo(lastarg).dir().absolutePath();
+            loadProject(lastarg);
+        }
+    }
 }
 
 
@@ -219,7 +229,7 @@ void MainWindow::about() {
     QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li><li>Qt %4 (<a href=\"http://cimg.sourceforge.net/\">http://cimg.sourceforge.net/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(cimg_version));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li><li>CImg %4 (<a href=\"http://cimg.sourceforge.net/\">http://cimg.sourceforge.net/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(cimg_version));
     widget->exec();
     delete widget;
 }

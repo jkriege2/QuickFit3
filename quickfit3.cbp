@@ -6,7 +6,7 @@
 		<Option makefile_is_custom="1" />
 		<Option execution_dir="." />
 		<Option pch_mode="2" />
-		<Option compiler="gnu_gcc_compiler_450" />
+		<Option compiler="gcc" />
 		<MakeCommands>
 			<Build command="$make -f $makefile $target" />
 			<CompileFile command="$make -f $makefile $target $file" />
@@ -21,7 +21,8 @@
 				<Option working_dir="output" />
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_compiler_450" />
+				<Option compiler="gcc" />
+				<Option parameters="./assets/test.qfp" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -42,7 +43,7 @@
 				<Option working_dir="output" />
 				<Option object_output="obj\Release\" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_compiler_450" />
+				<Option compiler="gcc" />
 				<ExtraCommands>
 					<Add before="$(#qt4)/bin/qmake.exe $(PROJECT_NAME).pro" />
 				</ExtraCommands>

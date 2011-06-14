@@ -15,6 +15,7 @@
 #include "qffitparameterbasicinterface.h"
 #include "jkdoubleedit.h"
 #include "qffitfunction.h"
+#include "tools.h"
 
 /*! \brief a class that displays a fit parameter, together with a label, possibly a checkbox to fix the value, possibly a label for the error and the fit range widgets.
     \ingroup qf3lib_widgets
