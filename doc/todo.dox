@@ -12,10 +12,13 @@
     \section qf3todo_rdrplugins Raw Data Plugins
     \todo implement RDR plugin for images and image series
     \todo store vectors and matrices (of doubles)
+    \todo make evaluation result table sortable via header
 
     \section qf3todo_evalplugins Evaluation Plugins
     \todo implement FCS correlation curve transform to RMS(tau) curve
     \todo implement Maximum Entropy (ME) evaluation for FCS data
+    \todo allow to delete eval results in the results table associated with the evaluation window!
+    \todo make evaluation result table sortable via header
 
     \subsection qf3todo_fcsfit Plugin: FCS Fit
     \todo implement print/export report with all fit parameters and fit statistics data

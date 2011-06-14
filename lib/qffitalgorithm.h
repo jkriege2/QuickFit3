@@ -93,6 +93,9 @@ class QFFitAlgorithm {
         class Functor {
             public:
                 Functor(int Mevalout) { m_evalout=Mevalout; }
+
+                virtual ~Functor() {};
+
                 /*! \brief function that evaluates the arbitrary function
 
                     \param[out] evalout with size get_evalout()
@@ -153,7 +156,7 @@ class QFFitAlgorithm {
                 */
                 FitQFFitFunctionFunctor(QFFitFunction* model, double* currentParams, bool* fixParams, double* dataX, double* dataY, double* dataWeight, uint64_t M) ;
 
-                ~FitQFFitFunctionFunctor();
+                virtual ~FitQFFitFunctionFunctor();
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()

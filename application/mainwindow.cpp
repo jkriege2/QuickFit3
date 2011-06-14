@@ -10,6 +10,10 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     settings=s;
     splashPix=splash->pixmap();
 
+    newProjectTimer.setInterval(500);
+    newProjectTimer.stop();
+    connect(&newProjectTimer, SIGNAL(timeout()), this, SLOT(saveProjectFirstTime()));
+
     rawDataFactory=new QFRawDataRecordFactory(this);
     evaluationFactory=new QFEvaluationItemFactory(this);
     fitFunctionManager=new QFFitFunctionManager(this);
@@ -191,6 +195,8 @@ void MainWindow::newProject() {
         rawDataFactory->distribute(project, settings, this, this);
         evaluationFactory->distribute(project, settings, this, this);
         extensionManager->distribute(project);
+
+        newProjectTimer.start();
     }
 }
 
@@ -479,7 +485,10 @@ void MainWindow::createMenus() {
 void MainWindow::insertRawData() {
     QVariant id=sender()->property("call_id");
     if (id.isValid() && project) {
-         getRawDataRecordFactory()->createRecord(id.toString(), project);
+        int pc=project->getRawDataCount()+project->getEvaluationCount();
+        std::cout<<"pc="<<pc<<std::endl;
+        getRawDataRecordFactory()->createRecord(id.toString(), project);
+        if ((pc<=0)&&(project->getRawDataCount()+project->getEvaluationCount()>0)) saveProject();
     }
     tvMain->expandToDepth(2);
     prgMainProgress->setRange(0,1);
@@ -491,8 +500,10 @@ void MainWindow::insertEvaluation() {
     QVariant id=sender()->property("call_id");
     //std::cout<<"insertEvaluation("<<id.toString().toStdString()<<")\n";
     if (id.isValid() && project) {
+        int pc=project->getRawDataCount()+project->getEvaluationCount();
         getEvaluationItemFactory()->createRecord(id.toString(), this, project);
-     }
+        if ((pc<=0)&&(project->getRawDataCount()+project->getEvaluationCount()>0)) saveProject();
+    }
     tvMain->expandToDepth(2);
     prgMainProgress->setRange(0,1);
     prgMainProgress->setValue(0);
@@ -630,6 +641,7 @@ bool MainWindow::maybeSave() {
 }
 
 void MainWindow::loadProject(const QString &fileName) {
+    newProjectTimer.stop();
     tabLogs->setCurrentWidget(logFileProjectWidget);
     logFileProjectWidget->close_logfile();
     logFileProjectWidget->clearLog();
@@ -685,6 +697,7 @@ void MainWindow::loadProject(const QString &fileName) {
 }
 
 bool MainWindow::saveProject(const QString &fileName) {
+    newProjectTimer.stop();
     logFileMainWidget->log_text(tr("saving project to file '%1' ...\n").arg(fileName));
     tabLogs->setCurrentWidget(logFileProjectWidget);
     statusBar()->showMessage(tr("saving project file '%1' ...").arg(fileName), 2000);
@@ -926,6 +939,7 @@ void MainWindow::autosaveProject() {
     QString autosaveFilename=curFile;
     if (autosaveFilename.isEmpty()) autosaveFilename="untitled.qfp";
     autosaveFilename=autosaveFilename+".autosave";
+    autosaveFilename=autosaveFilename+".autosave";
 
     statusBar()->showMessage(tr("autosaving project file '%1' ...").arg(autosaveFilename), 500);
     logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
@@ -935,7 +949,7 @@ void MainWindow::autosaveProject() {
 
 void MainWindow::displayHelp() {
     helpWindow->clear();
-    helpWindow->updateHelp(QApplication::applicationDirPath()+QString("/help/quickfit.html"));
+    helpWindow->updateHelp(settings->getAssetsDirectory()+QString("/help/quickfit.html"));
     helpWindow->show();
 }
 
@@ -975,3 +989,14 @@ QString MainWindow::getPluginsDirectory() {
     return settings->getPluginDirectory();
 }
 
+void MainWindow::saveProjectFirstTime() {
+    if (project->getRawDataCount()+project->getEvaluationCount()>0) {
+        newProjectTimer.stop();
+        int ret = QMessageBox::question(this, tr("QuickFit 3.0"),
+                                tr("You added the first data or evaluation item to an empty project.\n"
+                                   "Do you want to save your project now (no further reminders will be shown)?"),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::Yes);
+        if (ret==QMessageBox::Yes) saveProject();
+    }
+}

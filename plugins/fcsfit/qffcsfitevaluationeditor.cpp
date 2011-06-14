@@ -316,6 +316,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     layModel->addWidget(labFitParameters);
     btnEditRanges=new QPushButton(tr("Edit &Ranges"), this);
     btnEditRanges->setCheckable(true);
+    btnEditRanges->setChecked(false);
     QHBoxLayout* hblfp=new QHBoxLayout(this);
     hblfp->addWidget(labFitParameters);
     hblfp->addStretch();
@@ -539,9 +540,9 @@ void QFFCSFitEvaluationEditor::resultsChanged() {
 
 void QFFCSFitEvaluationEditor::readSettings() {
     if (cmbModel) {
-        //cmbAlgorithm->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/algorithm", cmbAlgorithm->currentIndex()).toInt());
-        //cmbModel->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/model", cmbModel->currentIndex()).toInt());
-        //cmbWeights->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/weights", cmbWeights->currentIndex()).toInt());
+        cmbAlgorithm->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/algorithm", cmbAlgorithm->currentIndex()).toInt());
+        cmbModel->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/model", cmbModel->currentIndex()).toInt());
+        cmbWeights->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/weights", cmbWeights->currentIndex()).toInt());
         pltData->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
         pltResiduals->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
         pltResidualHistogram->loadSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresidualhistogram/");
@@ -553,7 +554,7 @@ void QFFCSFitEvaluationEditor::readSettings() {
         loadSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsfitevaleditor/splitter_fitstatistics");
         m_parameterWidgetWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth).toInt();
         m_parameterCheckboxWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth).toInt();
-        btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", m_parameterWidgetWidth).toBool());
+        btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", false).toBool());
         spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
         tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
         currentFPSSaveDir=settings->getQSettings()->value("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir).toString();
@@ -564,8 +565,8 @@ void QFFCSFitEvaluationEditor::writeSettings() {
     if (cmbModel) {
         //settings->getQSettings()->setValue("fcsfitevaleditor/splitter_plot", splitPlot->saveState());
         settings->getQSettings()->setValue("fcsfitevaleditor/algorithm", cmbAlgorithm->currentIndex());
-        //settings->getQSettings()->setValue("fcsfitevaleditor/model", cmbModel->currentIndex());
-        //settings->getQSettings()->setValue("fcsfitevaleditor/weights", cmbWeights->currentIndex());
+        settings->getQSettings()->setValue("fcsfitevaleditor/model", cmbModel->currentIndex());
+        settings->getQSettings()->setValue("fcsfitevaleditor/weights", cmbWeights->currentIndex());
         //pltData->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltdata/");
         //pltResiduals->saveSettings(*settings->getQSettings(), "fcsfitevaleditor/pltresiduals/");
         hlpAlgorithm->writeSettings(*settings->getQSettings(), "fcsfitevaleditor/algorithm_");
@@ -1482,6 +1483,7 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
     dlgFitProgress->setProgress(0);
     dlgFitProgress->setSuperProgress(0);
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->setAllowCancel(true);
     dlgFitProgress->display();
     int runmax=data->getCorrelationRuns();
     if (runmax==1) runmax=0;
@@ -1527,6 +1529,7 @@ void QFFCSFitEvaluationEditor::fitAll() {
     dlgFitProgress->setProgress(0);
     dlgFitProgress->setSuperProgress(0);
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgFitProgress->setAllowCancel(true);
     dlgFitProgress->display();
 
 
@@ -1578,6 +1581,7 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
     dlgFitProgress->setSuperProgressMax(10);
     dlgFitProgress->setProgress(0);
     dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     dlgFitProgress->display();
 

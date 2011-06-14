@@ -24,6 +24,7 @@ void dlgQFFitAlgorithmProgressDialog::setAllowCancel(bool enable) {
 void dlgQFFitAlgorithmProgressDialog::done() {
     m_display=false;
     close();
+    btnCancel->setEnabled(true);
 }
 
 void dlgQFFitAlgorithmProgressDialog::doDisplay() {

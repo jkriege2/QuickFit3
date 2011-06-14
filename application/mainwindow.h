@@ -160,6 +160,9 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
 
         /** \brief display help */
         void displayHelp();
+
+        /** \brief whenever a new project is created this is called every 500ms, until the project has been save at least once. This function asks the suer to save the project when he adds the first items */
+        void saveProjectFirstTime();
     private:
         void createWidgets();
         void createActions();
@@ -178,6 +181,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
 
         QString curFile;
         QPointer<QFProject> project;
+
+        QTimer newProjectTimer;
 
         QMenu *fileMenu;
         QMenu *dataMenu;
