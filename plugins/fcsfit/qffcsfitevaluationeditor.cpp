@@ -1832,7 +1832,7 @@ void QFFCSFitEvaluationEditor::createReport(QPrinter* printer) {
     htmlTop+=tr("<table border=\"0\">");
     htmlTop+=tr("<tr><td><b>file:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>'%1'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>").arg(record->getName());
     htmlTop+=tr("<td><b>run:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>").arg((eval->getCurrentRun()<0)?tr("average"):QString::number(eval->getCurrentRun()));
-    htmlTop+=tr("<td><b>data range:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td><td></td><td>%1...%2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(datacut->get_userMin()).arg(datacut->get_userMax()).arg((algorithm->get_supportsBoxConstraints())?4:3);
+    htmlTop+=tr("<td><b>data range:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td><td></td><td>%1...%2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(datacut->get_userMin()).arg(datacut->get_userMax());
     htmlTop+=tr("<tr><td><b>fit algorithm:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(algorithm->name());
     QString dataw=cmbWeights->currentText();
     htmlTop+=tr("<tr><td><b>fit function:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><b>data weighting:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>").arg(ffunc->name()).arg(dataw);
