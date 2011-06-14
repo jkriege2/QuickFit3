@@ -202,7 +202,7 @@ void MainWindow::newProject() {
 
 void MainWindow::openProject() {
     if (maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project ..."), currentProjectDir, tr("QuickFit Project (*.qfp)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project ..."), currentProjectDir, tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave)"));
         if (!fileName.isEmpty()) {
             currentProjectDir=QFileInfo(fileName).dir().absolutePath();
             loadProject(fileName);

@@ -12,7 +12,7 @@
 <center><b><a href="plugin_list_autocreate.html">List of all available Plugins</a></b></center>
 </p>
 
-<h3>Data Model</h3>
+<h3>QuickFit Projects (Data Model)</h3>
 <p>Quickfit is based on a very simple and versatile data model:</p>
 <center><img src="./pic/qf3_datamodel.png"></center>
 <p>All data is organized in projects and at every time one project is loaded in QuickFit. A project is saved in an .qfp file (an XML file) which contains all data (like e.g. links to all data files used in the project, fit results, ...). Usually it does not contain the raw data. These are stored in separate files and should usually not be altered, when saving or changing the project (exception may be data files, created by QuickFit itself). Also the data files whould be located in the same directory as the project (or in sub directories of the project direcory), so you may copy the whole set of project+data files to another machine.</p>
@@ -22,8 +22,7 @@
    <li>data <b>evaluations</b> which work on one or more data objects from the list of raw data records. The results of such an evaluation step are usually saved in the project file.</li>
  </ul>
 </p>
-It is important to note that a single evaluation may act upon any of the raw data records. As the evaluation results are usually stored together with the raw data record they belong to, this may be used to e.g. compare different evaluations of the same type, but with different parameters (e.g. fit with different models to the same data). Every fit result gets a unique identifier which relates it to the evaluation object that created it. So together with each raw data record QuickFit may save multiple fit results which were created by different evaluations and does not mix them up!
-
+<p>It is important to note that a single evaluation may act upon any of the raw data records. As the evaluation results are usually stored together with the raw data record they belong to, this may be used to e.g. compare different evaluations of the same type, but with different parameters (e.g. fit with different models to the same data). Every fit result gets a unique identifier which relates it to the evaluation object that created it. So together with each raw data record QuickFit may save multiple fit results which were created by different evaluations and does not mix them up!</p>
 
 <h3>User Interface</h3>
 <ul>
@@ -33,7 +32,15 @@ It is important to note that a single evaluation may act upon any of the raw dat
 </ul>
 
 
+
 <h3>Plugins</h3>
+<p>As mentioned in the introduction, QuickFit may be extended by plugins. All available plugins may be found in the directory <tt>&lt;PluginsDir&gt;/</tt> (usually the subdirectory <tt>plugins</tt> of the QuickFit installation directory). The plugins are loaded when QuickFit is started. To check whether a plugin is available, have a look at <i>Help | About Plugins</i> in the main window. The plugin interface of QuickFit is very versatile. Basically there are three parts:
+<ol>
+<li><b>project items</b>: These plugins implement raw data records and evaluations that may appear as part of the project. Each plugin implements a logical object that represents the raw data/evaluation settings and a graphical user interface (GUI) to display the raw data/evaluation. The GUI for an evaluation will also provide means to start the evaluation for a selection of raw data records. Some basic tools are already implemented in QuickFit and therefore are equal in all raw data records or evaluations. These basic features are a managment for results created from raw data records, which allows to store the result associated to the record and a special evaluation in the project. Also a GUI element to access these results from an evaluation or a raw data record window is implemented. Raw data records may have a set of properties (numbers, text, ...) that may be used to represent some metadata. THe evaluations have access to these properties. Also bothe raw data records and evaluations have some common descriptions stored in the project, that allow to take notes of what one is doing, or to comment on the data.</li>
+<li><b>fit algorithms and functions</b>: As QuickFit is designed as a data evaluation program, one of the common tasks is least-squares fitting:<center><img src="./pic/qf3_least_squares_problem.png"></center> The plugins in this group implement fit algorthms and fit functions <i>f(x, <b>p</b>)</i> that may be reused by different evaluations to fit a parameter vector <b>p</b> to a set of data points <i>(x<sub>i</sub>, y<sub>i</sub>)</i>. This also allows to easily add new algorithms/functions without having to change the whole evaluation procedure. </li>
+<li><b>extensions</b>: These plugins may extend QuickFit in a very free way. They may add items to the menu and toolbar of the mainwindow to execute some function. Also they mey access the current project, but they do NOT implement a part of the project. You may e.g. use them to implement experiment control that may store the recorded data directly into a QuickFit project, or some function that does not fit in any of the above categories.</li>
+</ol>
+</p>
 
 </body>
 </html>
