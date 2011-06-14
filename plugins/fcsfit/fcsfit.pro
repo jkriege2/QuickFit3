@@ -13,14 +13,16 @@ HEADERS += qfpevalfcsfit.h \
            qffcsfitevaluation.h \
            qffcsfitevaluationeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
-           ../../../../../LIB/trunk/statistics_tools.h
+           ../../../../../LIB/trunk/statistics_tools.h \
+           dlgestimatefocalvolume.h
 
 SOURCES += qfpevalfcsfit.cpp \
            qffcsfitevaluation.cpp \
            qffcsfitevaluationeditor.cpp \
-           ../../../../../LIB/trunk/statistics_tools.cpp
+           ../../../../../LIB/trunk/statistics_tools.cpp \
+           dlgestimatefocalvolume.cpp
 
-FORMS =
+FORMS =    estimatefocalvolumedlg.ui
 
 RESOURCES += qfevalfcsfit.qrc
 

@@ -6,6 +6,7 @@
     <file alias="fcs_fit_help.png">../../images/16x16/fcsfit_help.png</file>
     <file alias="fcs_fit_savereport.png">../../images/22x22/fcs_savereport.png</file>
     <file alias="fcs_fit_printreport.png">../../images/22x22/fcs_printreport.png</file>
+    <file alias="fcs_focalvolume.png">../../images/22x22/fcs_focalvolume.png</file>
 
     <file alias="fcsplot_saveplot.png">../../images/22x22/fcsplot_saveplot.png</file>
     <file alias="fcsplot_savedata.png">../../images/22x22/fcsplot_savedata.png</file>

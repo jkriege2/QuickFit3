@@ -149,6 +149,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnCopyToAll;
         /** \brief copy current parameter set to all files & initial parameters */
         QPushButton* btnCopyToAllCurrentRun;
+        /** \brief button used to calculate the focal volume */
+        QPushButton* btnCalibrateFocalVolume;
 
         /** \brief button to save current parameter set */
         QPushButton* btnSaveParameters;
@@ -197,8 +199,9 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         */
         void doFit(QFRawDataRecord* record, int run);
 
-
     protected slots:
+        /** \brief calibrate the focal volume */
+        void calibrateFocalVolume();
         /** \brief executed when the mouse position over the plot changes */
         void plotMouseMove(double x, double y);
         /** \brief activated when the highlighted record changed */

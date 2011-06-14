@@ -12,6 +12,7 @@
 #include "tools.h"
 #include "statistics_tools.h"
 #include <QThread>
+#include "dlgestimatefocalvolume.h"
 
 
 
@@ -341,16 +342,16 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     QGridLayout* layBtn=new QGridLayout(this);
     layBtn->setContentsMargins(0,0,0,0);
-    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current and Run"), this);
+    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current"), this);
     btnFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));
     layBtn->addWidget(btnFitCurrent, 0, 0);
-    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Runs (Current File)"), this);
-    btnFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently displayed file "));
+    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Runs "), this);
+    btnFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently selected file "));
     layBtn->addWidget(btnFitRunsCurrent, 0, 1);
     btnFitAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Files (Current Run)"), this);
     btnFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
     layBtn->addWidget(btnFitAll, 1, 0);
-    btnFitRunsAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit &All Files and All Runs"), this);
+    btnFitRunsAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit &Everything"), this);
     btnFitRunsAll->setToolTip(tr("perform a fit for all runs in all files"));
     layBtn->addWidget(btnFitRunsAll, 1, 1);
     btnResetCurrent=new QPushButton(tr("&Reset Current"), this);
@@ -369,12 +370,16 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters and also to all files, but only to the current run therein."));
     layBtn->addWidget(btnCopyToAllCurrentRun, 4, 0);
 
-    QPushButton* btnLoadParameters=new QPushButton(QIcon(":/fcs_param_load.png"), tr("&Load Parameters"), this);
+    btnCalibrateFocalVolume=new QPushButton(QIcon(":/fcs_focalvolume.png"), tr("Focal &Volume"), this);
+    btnCalibrateFocalVolume->setToolTip(tr("estimate the focal volume"));
+    layBtn->addWidget(btnCalibrateFocalVolume, 5, 0);
+
+    btnLoadParameters=new QPushButton(QIcon(":/fcs_param_load.png"), tr("&Load Parameters"), this);
     btnLoadParameters->setToolTip(tr("load a FCS fit parameter set"));
-    layBtn->addWidget(btnLoadParameters, 5, 0);
-    QPushButton* btnSaveParameters=new QPushButton(QIcon(":/fcs_param_save.png"), tr("&Save Parameters"), this);
+    layBtn->addWidget(btnLoadParameters, 6, 0);
+    btnSaveParameters=new QPushButton(QIcon(":/fcs_param_save.png"), tr("&Save Parameters"), this);
     btnSaveParameters->setToolTip(tr("save the current FCS fit parameter as a set"));
-    layBtn->addWidget(btnSaveParameters, 5, 1);
+    layBtn->addWidget(btnSaveParameters, 6, 1);
 
     layModel->addLayout(layBtn);
 
@@ -448,6 +453,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(btnCopyToAllCurrentRun, SIGNAL(clicked()), this, SLOT(copyToAllCurrentRun()));
     connect(btnLoadParameters, SIGNAL(clicked()), this, SLOT(loadCurrentFitResults()));
     connect(btnSaveParameters, SIGNAL(clicked()), this, SLOT(saveCurrentFitResults()));
+    connect(btnCalibrateFocalVolume, SIGNAL(clicked()), this, SLOT(calibrateFocalVolume()));
 
     connect(datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
     connect(datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
@@ -680,9 +686,18 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create new parameter widgets
         /////////////////////////////////////////////////////////////////////////////////////////////
+        btnCalibrateFocalVolume->setEnabled(false);
+        bool has_particles=false;
+        bool has_wxy=false;
+        bool has_tauD=false;
+        bool has_gamma=false;
         for (int i=0; i<ffunc->paramCount(); i++) {
             QString id=ffunc->getParameterID(i);
-            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            if ((id.toLower()=="n_particle") || (id.toLower()=="1n_particle")) has_particles=true;
+            if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) has_tauD=true;
+            if ((id.toLower()=="focus_width")) has_wxy=true;
+            if ((id.toLower()=="focus_struct_fac")) has_gamma=true;
+           QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
             QFFitParameterWidgetWrapper::WidgetType wtype=QFFitParameterWidgetWrapper::FloatEdit;
             if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidgetWrapper::IntSpinBox;
             if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidgetWrapper::IntDropDown;
@@ -718,6 +733,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             fpw->setEditRange(btnEditRanges->isChecked());
             fpw->unsetEditValues(btnEditRanges->isChecked());
         }
+        btnCalibrateFocalVolume->setEnabled((has_tauD||(has_particles&&has_gamma))&&has_wxy);
         // add stretcher item in bottom row
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
     }
@@ -2362,4 +2378,88 @@ void QFFCSFitEvaluationEditor::loadCurrentFitResults() {
     }
 }
 
+void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
+    double particles=1;
+    double tauD=10;
+    double particles_error=0;
+    double tauD_error=0;
+    double wxy=0, wxy_error=0;
+    double gamma=6, gamma_error=1;
+    bool has_tauD=false;
+    bool has_nparticles=false;
+    bool has_gamma=false;
 
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFFitFunction* ffunc=eval->getFitFunction();
+    if (!ffunc || !eval) return;
+
+    //read input parameters
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+        if (id.toLower()=="n_particle") {
+            particles=eval->getFitValue(id);
+            particles_error=eval->getFitError(id);
+            has_nparticles=true;
+        }
+        if ((id.toLower()=="1n_particle") && (!has_nparticles)) {
+            particles=1.0/eval->getFitValue(id);
+            particles_error=fabs(eval->getFitError(id)/(eval->getFitValue(id)*eval->getFitValue(id)));
+            has_nparticles=true;
+        }
+        if ((id.toLower()=="focus_struct_fac") && (!has_nparticles)) {
+            gamma=eval->getFitValue(id);
+            gamma_error=eval->getFitError(id);
+            has_gamma=true;
+        }
+        if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) {
+            double factor=1;
+            if (d.unit=="msec") { factor=1000; }
+            if (d.unit=="ms") { factor=1000; }
+            if (d.unit=="msecs") { factor=1000; }
+            if (d.unit=="milliseconds") { factor=1000; }
+            if (d.unit=="sec") { factor=1000000; }
+            if (d.unit=="s") { factor=1000000; }
+            if (d.unit=="secs") { factor=1000000; }
+            if (d.unit=="seconds") { factor=1000000; }
+            tauD=factor*eval->getFitValue(id);
+            tauD_error=factor*eval->getFitError(id);
+            has_tauD=true;
+        }
+    }
+
+    dlgEstimateFocalVolume* dlg=new dlgEstimateFocalVolume(settings, this);
+    dlg->init(particles,  particles_error, has_nparticles, tauD, tauD_error, has_tauD, gamma, gamma_error, has_gamma);
+
+    bool ok= ( dlg->exec() == QDialog::Accepted);
+    wxy=dlg->get_wxy();
+    wxy_error=dlg->get_wxyerror();
+
+    delete dlg;
+    //write back output parameters
+    if (ok) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            if (id.toLower()=="focus_width") {
+
+                double factor=1;
+                if (d.unit=="micron") { factor=1000; }
+                if (d.unit=="µm") { factor=1000; }
+                if (d.unit=="um") { factor=1000; }
+                if (d.unit=="microns") { factor=1000; }
+                if (d.unit=="m") { factor=1000000; }
+                if (d.unit=="meter") { factor=1000000; }
+                if (d.unit=="meters") { factor=1000000; }
+                eval->setFitValue(id, wxy/factor);
+                eval->setFitError(id, wxy_error/factor);
+            }
+        }
+        displayModel(true);
+        replotData();
+        QApplication::restoreOverrideCursor();
+    }
+}
