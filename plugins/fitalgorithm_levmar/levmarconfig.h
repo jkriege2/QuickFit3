@@ -7,6 +7,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QSpinBox>
+#include <QCheckBox>
 #include "jkdoubleedit.h"
 
 /*! \brief This class represents a configuration dialog for the Levmar Levenberg-Marquardt Library
@@ -49,6 +50,11 @@ class LevmarConfigDialog : public QDialog {
         inline int getMaxIterations() { return spinMaxIterations->value(); };
 
 
+        /** \brief set the MaxIterations value before displaying the dialog and also (optionally) its increment */
+        void setNumGrad(bool value=false);
+        /** \brief returns the current MaxIterations value */
+        inline int getNumGrad() { return chkNumGrad->isChecked(); };
+
     protected:
         QSpinBox* spinMaxIterations;
         JKDoubleEdit* neditGradDelta;
@@ -56,6 +62,7 @@ class LevmarConfigDialog : public QDialog {
         JKDoubleEdit* neditEpsilon1;
         JKDoubleEdit* neditEpsilon2;
         JKDoubleEdit* neditEpsilon3;
+        QCheckBox* chkNumGrad;
         QDialogButtonBox* buttons;
 };
 

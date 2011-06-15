@@ -60,7 +60,7 @@ class QFProjectTreeModel : public QAbstractItemModel {
     protected slots:
         /** \brief connected to the propertiesChanged() slot of the owning QFEvaluationItem. Used to
          *         tell the model that something has changed */
-        void projectChanged(bool data);
+        void projectChanged(bool data=true);
 };
 
 #endif // QFPROJECTTREEMODEL_H

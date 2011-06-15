@@ -168,11 +168,13 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     dataChange=true;
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
+    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
-    emit wasChanged(dataChange);
+    emitStructureChanged();
+
     return true;
 }
 
@@ -186,10 +188,10 @@ bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
     IDs.insert(newID);
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
+    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setDataChanged()));
-    dataChange=true;
-    emit wasChanged(dataChange);
+    emitStructureChanged();
     return true;
 }
 
@@ -201,8 +203,7 @@ void QFProject::deleteRawData(int ID) {
         rawData.remove(ID);
         IDs.remove(ID);
         delete rec;
-        dataChange=true;
-        emit wasChanged(dataChange);
+        emitStructureChanged();
     }
 }
 
@@ -214,8 +215,7 @@ void QFProject::deleteEvaluation(int ID) {
         evaluations.remove(ID);
         IDs.remove(ID);
         delete rec;
-        dataChange=true;
-        emit wasChanged(dataChange);
+        emitStructureChanged();
     }
 }
 
@@ -270,8 +270,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     w.writeEndDocument();
     if (resetDataChanged) {
         if (!errorOcc) {
-            dataChange=false;
-            emit wasChanged(dataChange);
+            emitStructureChanged();
             if (namechanged) emit propertiesChanged();
         }
     }
@@ -383,6 +382,7 @@ void QFProject::readXML(const QString& file) {
     if (!errorOcc) {
         dataChange=false;
         emit wasChanged(dataChange);
+        emit structureChanged();
         if (namechanged) emit propertiesChanged();
     }
 
@@ -423,8 +423,7 @@ QFRawDataRecord* QFProject::addRawData(QString type, QString name, QStringList i
     }
 
 
-    dataChange=true;
-    emit wasChanged(dataChange);
+    setDataChanged();
     return rde;
 }
 
@@ -451,8 +450,7 @@ QFEvaluationItem* QFProject::addEvaluation(QString type, QString name) {
         setError(tr("error while trying to initialize an object for datatype '%1' in the QuickFit Project '%2'").arg(type).arg(getName()));
         return NULL;
     }
-    dataChange=true;
-    emit wasChanged(dataChange);
+    setDataChanged();
     return rde;
 }
 

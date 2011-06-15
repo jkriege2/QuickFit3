@@ -116,12 +116,13 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
     mapArrayFromFunctorToModel(m_modelParams, params);
     register int pcount=get_paramcount();
     register int ecount=get_evalout();
-    double* p=(double*)calloc(pcount, sizeof(double));
+    double* p=(double*)calloc(m_N, sizeof(double));
     for (register int i=0; i<ecount; i++) {
         register int offset=i*pcount;
+        for (register int j=0; j<m_N; j++) { p[j]=0; }
         m_model->evaluateDerivatives(p, m_dataX[i], m_modelParams);
         for (register int j=0; j<pcount; j++) {
-            evalout[offset+j]=-1.0*p[j]/m_dataWeight[i];
+            evalout[offset+j]=-1.0*p[modelFromFunctor[j]]/m_dataWeight[i];
         }
     }
     free(p);

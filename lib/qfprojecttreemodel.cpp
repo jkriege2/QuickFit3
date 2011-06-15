@@ -13,9 +13,9 @@ QFProjectTreeModel::~QFProjectTreeModel()
 }
 
 void QFProjectTreeModel::init(QFProject* p) {
-    if (current) disconnect(current, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
+    if (current) disconnect(current, SIGNAL(structureChanged(bool)), this , SLOT(projectChanged()));
     current=p;
-    connect(current, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
+    connect(current, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
     reset();
 }
 
@@ -156,11 +156,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
                 break;
         };
     }
-    /*if (result) {
-        dataChange=true;
-        emit wasChanged(dataChange);
-        emit dataChanged(index, index);
-    }*/
+
     return result;
 }
 

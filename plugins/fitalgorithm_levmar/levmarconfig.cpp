@@ -79,6 +79,14 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
     grid->addWidget(new QLabel(tr("difference length (||<b>&delta;p</b>||<sub>2</sub>) when estimating gradients &part;m(<b>p</b>)/&part;<b>p</b> numerically"), this), 5, 2);
 
 
+    l=new QLabel(tr("Always use Numerical Jaobian:"), this);
+    l->setAlignment(Qt::AlignRight);
+    chkNumGrad=new QCheckBox("", this);
+    l->setBuddy(chkNumGrad);
+    grid->addWidget(l, 6, 0);
+    grid->addWidget(chkNumGrad, 6, 1);
+    grid->addWidget(new QLabel(tr("always use a numerical estimate of the jacobian, even if analytical derivatives are provided by the model function"), this), 6, 2);
+
     main->addLayout(grid, 10);
 
     buttons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel, Qt::Horizontal, this);
@@ -95,6 +103,7 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
     setEpsilon2();
     setEpsilon3();
     setMaxIterations();
+    setNumGrad();
 }
 
 
@@ -126,4 +135,8 @@ void LevmarConfigDialog::setEpsilon3(double value, double inc){
 void LevmarConfigDialog::setMaxIterations(int value, int inc){
     spinMaxIterations->setValue(value);
     spinMaxIterations->setSingleStep(inc);
+}
+
+void LevmarConfigDialog::setNumGrad(bool value) {
+    chkNumGrad->setChecked(value);
 }

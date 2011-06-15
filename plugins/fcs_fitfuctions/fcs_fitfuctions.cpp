@@ -633,17 +633,49 @@ double QFFitFunctionFCSSimpleDiff::evaluate(double t, const double* data) const 
     return offset+pre/N*d1;
 }
 
+void QFFitFunctionFCSSimpleDiff::evaluateDerivatives(double* derivatives, double x, const double* data) const {
+    for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
+    const double t=x*1.0e6;
+    const double N=data[FCSSDiff_n_particle];
+    double nf_tau=data[FCSSDiff_nonfl_tau1];
+    if (nf_tau==0) nf_tau=1e-20;
+    double nf_theta=data[FCSSDiff_nonfl_theta1];
+    if (nf_theta==1) nf_theta=0.999999999;
+    double tauD=data[FCSSDiff_diff_tau1];
+    if (tauD==0) tauD=1e-20;
+    double gamma=data[FCSSDiff_focus_struct_fac];
+    if (gamma==0) gamma=1;
+    const double gamma2=sqr(gamma);
+    const double offset=data[FCSSDiff_offset];
+
+    double reltau=t/tauD;
+
+    const double exptT=exp(-t/nf_tau);
+    const double fT=(1.0+nf_theta/(1.0-nf_theta)*exptT);
+    const double fD=1.0+t/tauD;
+    const double fD12=sqrt(fD);
+    const double fDG=1.0+t/tauD/gamma2;
+    const double fDG12=sqrt(fDG);
+
+    derivatives[FCSSDiff_n_particle]=-1.0/N/N*fT/fD/fDG12;
+    derivatives[FCSSDiff_nonfl_theta1]=1.0/N/fD/fDG12*exptT/sqr(1.0-nf_theta);
+    derivatives[FCSSDiff_nonfl_tau1]=-1.0/N/fD/fDG12*(nf_theta/(1.0-nf_theta)/sqr(nf_tau)*t*exptT);
+    derivatives[FCSSDiff_diff_tau1]=fT/N*(t/sqr(tauD)/fDG12/sqr(fD) + t/2.0/fD/cube(fDG12)/gamma2/sqr(tauD));
+    derivatives[FCSSDiff_focus_struct_fac]=1.0/N*fT/fD/cube(fDG12)*t/tauD/cube(gamma);
+    derivatives[FCSSDiff_offset]=1.0;
+}
+
 
 
 
 void QFFitFunctionFCSSimpleDiff::calcParameter(double* data, double* error) const {
     double N=data[FCSSDiff_n_particle];
     double eN=0;
-    double nf_tau1=data[FCSSDiff_nonfl_tau1];
+    double nf_tau1=data[FCSSDiff_nonfl_tau1]/1.0e6;
     double enf_tau1=0;
     double nf_theta1=data[FCSSDiff_nonfl_theta1];
     double enf_theta1=0;
-    double tauD1=data[FCSSDiff_diff_tau1];
+    double tauD1=data[FCSSDiff_diff_tau1]/1.0e6;
     double etauD1=0;
     double gamma=data[FCSSDiff_focus_struct_fac];
     double egamma=0;
@@ -655,8 +687,8 @@ void QFFitFunctionFCSSimpleDiff::calcParameter(double* data, double* error) cons
 
     if (error) {
         eN=error[FCSSDiff_n_particle];
-        enf_tau1=error[FCSSDiff_nonfl_tau1];
-        etauD1=error[FCSSDiff_diff_tau1];
+        enf_tau1=error[FCSSDiff_nonfl_tau1]/1.0e6;
+        etauD1=error[FCSSDiff_diff_tau1]/1.0e6;
         egamma=error[FCSSDiff_focus_struct_fac];
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
         eoffset=error[FCSSDiff_offset];
@@ -665,14 +697,6 @@ void QFFitFunctionFCSSimpleDiff::calcParameter(double* data, double* error) cons
     data[FCSSDiff_nonfl_theta1]=nf_theta1;
 
 
-    data[FCSSDiff_diff_tau1]=tauD1;
-    if (error) {
-        error[FCSSDiff_diff_tau1]=etauD1;
-    }
-    tauD1=data[FCSSDiff_diff_tau1]/1.0e6;
-    if (error) {
-        etauD1=error[FCSSDiff_diff_tau1]/1.0e6;
-    }
 
     // calculate 1/N
     data[FCSSDiff_1n_particle]=1.0/N;
@@ -681,7 +705,7 @@ void QFFitFunctionFCSSimpleDiff::calcParameter(double* data, double* error) cons
     // calculate Veff = pi^(3/2) * gamma * wxy^3
     const double pi32=sqrt(cube(M_PI));
     data[FCSSDiff_focus_volume]=pi32*gamma*cube(wxy);
-    if (error) error[FCSDiff_focus_volume]=sqrt(sqr(egamma*pi32*cube(wxy))+sqr(ewxy*3.0*pi32*gamma*sqr(wxy)));
+    if (error) error[FCSSDiff_focus_volume]=sqrt(sqr(egamma*pi32*cube(wxy))+sqr(ewxy*3.0*pi32*gamma*sqr(wxy)));
 
     // calculate C = N / Veff
     const double pim32=1.0/sqrt(cube(M_PI));

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 #include "levmarconfig.h"
 
 QFFitAlgorithmLevmar::QFFitAlgorithmLevmar() {
@@ -11,13 +12,18 @@ QFFitAlgorithmLevmar::QFFitAlgorithmLevmar() {
     setParameter("epsilon2", 1e-17);
     setParameter("epsilon3", 1e-17);
     setParameter("gradient_delta", 1e-6);
+    setParameter("always_num_gradient", false);
 
 }
 
-void levmarfitfunc(double* p, double* x, int m, int n, void* data)
-{
+void levmarfitfunc(double* p, double* x, int m, int n, void* data) {
     QFFitAlgorithm::Functor* adata=(QFFitAlgorithm::Functor*)data;
     adata->evaluate(x, p);
+}
+
+void levmarfitjac(double *p, double *j, int m, int n, void *data) {
+    QFFitAlgorithm::Functor* adata=(QFFitAlgorithm::Functor*)data;
+    adata->evaluateJacobian(j, p);
 }
 
 QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, QFFitAlgorithm::Functor* model, double* paramsMin, double* paramsMax) {
@@ -35,6 +41,8 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     opts[3]=getParameter("epsilon3").toDouble();
     opts[4]=getParameter("gradient_delta").toDouble(); // relevant only if the finite difference Jacobian version is used
 
+    bool always_num_grad=getParameter("always_num_gradient").toBool();
+
     // allocate memory for covariance matrix
     // the matrix will be returned by levmar calls, if memory is provided!
     double* covar=(double*)calloc(paramCount*paramCount, sizeof(double));
@@ -51,7 +59,15 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     */
 
     int ret=0;
-    ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+    bool numGrad=false;
+    if ((!model->get_implementsJacobian())||(always_num_grad)) {
+            std::cout<<"levmar: numerical gradients\n";
+        ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+        numGrad=true;
+    } else {
+            std::cout<<"levmar: analytical gradients\n";
+        ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+    }
 
 
     result.params["initial_error_sum"]=info[0];
@@ -61,6 +77,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     result.params["jacobian_evals"]=info[8];
     result.params["linsys_solved"]=info[9];
     result.params["fit_paramcount"]=paramCount;
+    result.params["numerical_gradient"]=numGrad;
 
     QString reason="", reason_simple="";
     switch((int)info[6]) {
@@ -112,6 +129,7 @@ bool QFFitAlgorithmLevmar::displayConfig() {
     dlg->setEpsilon2(getParameter("epsilon2").toDouble());
     dlg->setEpsilon3(getParameter("epsilon3").toDouble());
     dlg->setGradDelta(getParameter("gradient_delta").toDouble());
+    dlg->setNumGrad(getParameter("always_num_gradient").toBool());
 
     if (dlg->exec()==QDialog::Accepted) {
         setParameter("max_iterations", dlg->getMaxIterations());
@@ -120,6 +138,7 @@ bool QFFitAlgorithmLevmar::displayConfig() {
         setParameter("epsilon2", dlg->getEpsilon2());
         setParameter("epsilon3", dlg->getEpsilon3());
         setParameter("gradient_delta", dlg->getGradDelta());
+        setParameter("always_num_gradient", dlg->getNumGrad());
         delete dlg;
         return true;
     } else {

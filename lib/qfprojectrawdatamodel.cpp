@@ -7,19 +7,21 @@ QFProjectRawDataModel::QFProjectRawDataModel(QFProject* parent):
 {
     item = parent;
     defaultMimeType="application/qf2.ids.int.list";
-    connect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
+    connect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
+    //connect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
 }
 
 QFProjectRawDataModel::~QFProjectRawDataModel()
 {
-    disconnect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
+    disconnect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
+    //disconnect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
 }
 
 void QFProjectRawDataModel::setProject(QFProject* parent) {
-    if (item) disconnect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
+    if (item) disconnect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
 
     item = parent;
-    if (item) connect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
+    if (item) connect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
     reset();
 }
 

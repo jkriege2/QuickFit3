@@ -310,6 +310,8 @@ class QFProject : public QObject, public QFProperties {
         void propertiesChanged();
         /** \brief emitted when an error occured (may be used to display the error) */
         void errorOccured(QString errorDescription);
+        /** \bief emitted when the project structure changes (i.e. a record is added, or renamed) */
+        void structureChanged();
 
         /** \brief emitted when the data in a record changes */
         //void rdDataChanged(QFRawDataRecord* record);
@@ -320,6 +322,10 @@ class QFProject : public QObject, public QFProperties {
             emit wasChanged(dataChange);
         }
 
+        virtual void setStructureChanged() {
+            emitStructureChanged();
+        };
+
     protected:
         /** \brief set the internal error flag and description */
         inline void setError(QString description) {
@@ -329,6 +335,11 @@ class QFProject : public QObject, public QFProperties {
         }
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged() { emit propertiesChanged(); };
+
+        virtual void emitStructureChanged() {
+            setDataChanged();
+            emit structureChanged();
+        };
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message) { setError(message); };
 

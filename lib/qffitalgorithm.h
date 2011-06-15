@@ -174,7 +174,7 @@ class QFFitAlgorithm {
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
                 virtual void evaluate(double* evalout, double* params);
 
-                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q}=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q})}{\partial m(q_n)} \f$ */
+                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
                 virtual void evaluateJacobian(double* evalout, double* params);
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
@@ -184,15 +184,26 @@ class QFFitAlgorithm {
                 virtual int get_paramcount() const { return m_paramCount; };
             protected:
 
+
+                /** \brief  QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$ */
                 QFFitFunction* m_model;
+                /** \brief the x-values data vector \f$ x_m \f$ */
                 double* m_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$ */
                 double* m_dataY;
+                /** \brief the weight vector \f$ \sigma_m \f$ */
                 double* m_dataWeight;
+                /** \brief number of datapoints      */
                 uint64_t m_M;
+                /** \brief number of parameters in m_model */
                 int m_N;
+                /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
                 int m_paramCount;
+                /** \brief maps from function parameter index to model parameter index (size m_N) */
                 int* functorFromModel;
+                /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
                 int* modelFromFunctor;
+                /** \brief copy of the current model parameter vector (size m_N) */
                 double* m_modelParams;
         };
 

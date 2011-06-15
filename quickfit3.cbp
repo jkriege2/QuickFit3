@@ -22,7 +22,7 @@
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gnu_gcc_compiler_450" />
-				<Option parameters="./assets/test.qfp" />
+				<Option parameters="./assets/test_linux.qfp" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

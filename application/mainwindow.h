@@ -22,8 +22,8 @@
 #include "../lib/qfextension.h"
 
 
-#define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm, Tabea Elbel"
-#define QF_COPYRIGHT "&copy; 2010 by Jan Krieger"
+#define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm, Tabea Elbel, Jan Buchholz"
+#define QF_COPYRIGHT "&copy; 2010-2011 by Jan Krieger"
 
 /*! \brief main widget for QuickFit
     \ingroup qf3app

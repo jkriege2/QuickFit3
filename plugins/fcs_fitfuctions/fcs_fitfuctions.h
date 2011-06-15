@@ -66,6 +66,8 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
+
+
 };
 
 /*! \brief plugin class for FCS Anomalous Diffusion Fit Functions
@@ -154,6 +156,11 @@ class QFFitFunctionFCSSimpleDiff: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
+        /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
+        virtual bool get_implementsDerivatives() { return true; };
+
+        /*! \copydoc QFFitFunction::evaluateDerivatives()   */
+        virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const ;
 };
 
 
