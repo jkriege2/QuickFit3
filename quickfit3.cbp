@@ -32,7 +32,7 @@
 				<MakeCommands>
 					<Build command="$make -f $makefile $target" />
 					<CompileFile command="$make -f $makefile $target $file" />
-					<Clean command="$make -f $makefile clean" />
+					<Clean command="$make -f $makefile distclean" />
 					<DistClean command="$make -f $makefile.$target distclean" />
 					<AskRebuildNeeded command="$make -q -f $makefile $target" />
 					<SilentBuild command="$make -s -f $makefile $target" />

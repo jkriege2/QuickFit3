@@ -29,6 +29,8 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
     m_parameterCheckboxWidth=32;
     fitStatisticsReport="";
 
+    doFitThread=new QFFitAlgorithmThreadedFit(this);
+
     createWidgets();
 }
 
@@ -1240,6 +1242,9 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
 
 void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
+    QApplication::processEvents();
+    QApplication::processEvents();
+
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
@@ -1286,7 +1291,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
         double* paramsMin=eval->allocFillParametersMin();
         double* paramsMax=eval->allocFillParametersMax();
         bool* paramsFix=eval->allocFillFix(record, run);
-        QFFitAlgorithmThreadedFit* thread=new QFFitAlgorithmThreadedFit(this);
+
 
 
         try {
@@ -1324,9 +1329,9 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 dlgFitProgress->reportStatus(tr("fitting ..."));
                 dlgFitProgress->setProgressMax(100);
                 dlgFitProgress->setProgress(0);
-                thread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-                thread->start(QThread::HighestPriority);
-                while (!thread->isFinished()) {
+                doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                doFitThread->start(QThread::HighestPriority);
+                while (!doFitThread->isFinished()) {
                     QApplication::processEvents();
                 }
                 dlgFitProgress->setProgressFull();
@@ -1336,7 +1341,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
 
 
             if (!dlgFitProgress->isCanceled()) {
-                QFFitAlgorithm::FitResult result=thread->getResult();
+                QFFitAlgorithm::FitResult result=doFitThread->getResult();
                 ffunc->calcParameter(params, errors);
                 ffunc->sortParameter(params, errors);
                 ffunc->calcParameter(params, errors);
@@ -1364,7 +1369,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                     //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                 }
 
-                services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(thread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
+                services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
                 services->log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
                 services->log_text(tr("   - initial params         (%1)\n").arg(iparams));
                 services->log_text(tr("   - output params          (%1)\n").arg(oparams));
@@ -1374,7 +1379,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 eval->setFitResultValueInt(record, run, "fit_used_run", run);
                 eval->setFitResultValueString(record, run, "fit_model_name", ffunc->id());
                 eval->setFitResultValueString(record, run, "fitalg_name", falg->id());
-                eval->setFitResultValue(record, run, "fitalg_runtime", thread->getDeltaTime(), "msecs");
+                eval->setFitResultValue(record, run, "fitalg_runtime", doFitThread->getDeltaTime(), "msecs");
                 eval->setFitResultValueBool(record, run, "fitalg_success", result.fitOK);
                 eval->setFitResultValueString(record, run, "fitalg_message", result.messageSimple);
                 eval->setFitResultValueString(record, run, "fitalg_messageHTML", result.message);
@@ -1386,7 +1391,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_used_run", run);
                 record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fit_model_name", ffunc->id());
                 record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_name", falg->id());
-                record->resultsSetNumber(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_runtime", thread->getDeltaTime(), "msecs");
+                record->resultsSetNumber(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_runtime", doFitThread->getDeltaTime(), "msecs");
                 record->resultsSetBoolean(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_success", result.fitOK);
                 record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_message", result.messageSimple);
                 record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_messageHTML", result.message);
@@ -1424,7 +1429,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
         }
 
         // clean temporary parameters
-        delete thread;
+        //delete doFitThread;
         free(weights);
         free(params);
         free(initialparams);

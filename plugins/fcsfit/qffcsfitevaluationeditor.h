@@ -185,6 +185,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
 
         QString currentFPSSaveDir;
 
+        QFFitAlgorithmThreadedFit* doFitThread;
+
         /*! \brief execute a fit for the given record and run
 
             \param record the record to to the fit for

@@ -131,6 +131,33 @@ class QFFitFunctionFCSADiff: public QFFitFunction {
 
 
 
+class QFFitFunctionFCSSimpleDiff: public QFFitFunction {
+    public:
+        QFFitFunctionFCSSimpleDiff();
+        virtual ~QFFitFunctionFCSSimpleDiff() {}
+        /*! \copydoc QFFitFunction::name()   */
+        virtual QString name() const { return QString("FCS: 1-component Normal Diffusion 3D"); };
+        /*! \copydoc QFFitFunction::id()   */
+        virtual QString id() const { return QString("fcs_diff1"); };
+
+        /*! \copydoc QFFitFunction::evaluate()   */
+        virtual double evaluate(double x, const double* parameters) const;
+
+        /*! \copydoc QFFitFunction::calcParameter()   */
+        virtual void calcParameter(double* parameterValues, double* error=NULL) const;
+
+        /*! \copydoc QFFitFunction::isParameterVisible()   */
+        virtual bool isParameterVisible(int parameter, double* parameterValues) const;
+        /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
+        virtual unsigned int getAdditionalPlotCount(const double* params);
+
+        /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params);
+
+};
+
+
+
 /*! \brief plugin class for FCS Fitting Functions
     \ingroup qf3fitfunp_fcs
 */
