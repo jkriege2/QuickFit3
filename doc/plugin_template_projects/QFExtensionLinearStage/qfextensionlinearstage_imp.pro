@@ -2,7 +2,7 @@ TEMPLATE = lib
 CONFIG += plugin
 
 
-TARGET = cam_mystagename
+TARGET = target_id
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/
@@ -10,16 +10,16 @@ DESTDIR = ../../output/plugins/
 LIBS += -L../../output/ -lquickfit3lib
 
 # Input
-HEADERS += qfextensionlinearstage.h \
+HEADERS += qfextensionlinearstage_imp.h \
            ../interfaces/qfextensionlinearstage.h
 
-SOURCES += qfextensionlinearstage.cpp
+SOURCES += qfextensionlinearstage_imp.cpp
 
 FORMS =
 
-RESOURCES += qfextensionlinearstage.qrc
+RESOURCES += qfextensionlinearstage_imp.qrc
 
-TRANSLATIONS= ../../output/assets/translations/de.cam_mystagename.ts
+TRANSLATIONS= ../../output/assets/translations/de.target_id.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

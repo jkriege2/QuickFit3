@@ -2,7 +2,7 @@ TEMPLATE = lib
 CONFIG += plugin
 
 
-TARGET = cam_mycamname
+TARGET = target_id
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 DESTDIR = ../../output/plugins/
@@ -19,7 +19,7 @@ FORMS =
 
 RESOURCES += qfextensioncamera_imp.qrc
 
-TRANSLATIONS= ../../output/assets/translations/de.cam_mycamname.ts
+TRANSLATIONS= ../../output/assets/translations/de.target_id.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

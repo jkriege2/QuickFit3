@@ -188,4 +188,4 @@ void QFExtensionCameraImplementation::log_error(QString message) {
 }
 
 
-Q_EXPORT_PLUGIN2(cam_mycamname, QFExtensionCameraImplementation)
+Q_EXPORT_PLUGIN2(target_id, QFExtensionCameraImplementation)

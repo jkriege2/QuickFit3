@@ -1,5 +1,5 @@
-#ifndef QFEXTENSIONCAMERA_H
-#define QFEXTENSIONCAMERA_H
+#ifndef HEADER_H
+#define HEADER_H
 
 #include <time.h>
 #include <QObject>
@@ -28,7 +28,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("cam_mycamname"); };
+        virtual QString getID() const  { return QString("target_id"); };
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr(/* human readable name for plugin */); };
         /** \copydoc QFExtension::getDescription() */
@@ -40,7 +40,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(/* your homepage */); };
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { /* plug in name from .qrc file */ return QString(":/cam_mycamname/qfextensioncamera_imp.png"); };
+        virtual QString getIconFilename() const  { return QString(":/target_id/qfextensioncamera_imp.png"); };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
@@ -118,4 +118,4 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
 
 };
 
-#endif // QFEXTENSIONCAMERA_H
+#endif // HEADER_H

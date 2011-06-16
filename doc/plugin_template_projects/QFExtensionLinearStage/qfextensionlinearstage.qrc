@@ -1,6 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <!-- RENAME THE ALIAS !!! -->
-    <file alias="qfextensionlinearstage_logo.png">qfextensionlinearstage.png</file>
-</qresource>
-</RCC>

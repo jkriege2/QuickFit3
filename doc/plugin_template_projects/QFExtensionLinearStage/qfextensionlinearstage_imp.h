@@ -1,5 +1,5 @@
-#ifndef QFEXTENSIONLINEARSTAGEIMPLEMENTATION_H
-#define QFEXTENSIONLINEARSTAGEIMPLEMENTATION_H
+#ifndef HEADER_H
+#define HEADER_H
 
 #include <time.h>
 #include <QObject>
@@ -28,7 +28,7 @@ class QFExtensionLinearStageImplementation : public QObject, public QFExtensionB
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString(/* internal ID for this stage */); };
+        virtual QString getID() const  { return QString("target_id"); };
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr(/* human readable name for plugin */); };
         /** \copydoc QFExtension::getDescription() */
@@ -40,7 +40,7 @@ class QFExtensionLinearStageImplementation : public QObject, public QFExtensionB
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(/* your homepage */); };
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { /* plug in name from .qrc file */ return QString(":/qfextensioncamera_logo.png"); };
+        virtual QString getIconFilename() const  { /* plug in name from .qrc file */ return QString(":/target_id/qfextensionlinearstage_imp.png"); };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
@@ -113,4 +113,4 @@ class QFExtensionLinearStageImplementation : public QObject, public QFExtensionB
 
 };
 
-#endif // QFEXTENSIONCAMERA_H
+#endif // HEADER_H

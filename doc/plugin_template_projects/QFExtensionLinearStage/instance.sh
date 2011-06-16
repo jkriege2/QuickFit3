@@ -10,7 +10,7 @@ function replace_in_all {
 
 CLASSNAME=$1
 TARGETNAME=$2
-BASENAME=qfextensioncamera_imp
+BASENAME=qfextensionlinearstage_imp
 
 echo "This script will create a set of usable files from this template. 
 In this course you will be asked for some information (e.g. class names ...)!
@@ -18,10 +18,10 @@ In this course you will be asked for some information (e.g. class names ...)!
 "
 
 if [ "$CLASSNAME" == "" ]; then
-	echo -n "class name for QFExtensionCamera implementation: "
+	echo -n "class name for QFExtensionLinearStage implementation: "
 	read -e CLASSNAME
 else
-	echo -n "class name for QFExtensionCamera implementation: " $CLASSNAME "
+	echo -n "class name for QFExtensionLinearStage implementation: " $CLASSNAME "
 "
 fi
 
@@ -36,7 +36,7 @@ fi
 CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
 
 FNAME=`echo $CLASSNAME | tr A-Z a-z`
-echo -n "file name for QFExtensionCamera implementation: " $FNAME ".*
+echo -n "file name for QFExtensionLinearStage implementation: " $FNAME ".*
 "
 mkdir -p $FNAME
 
@@ -45,7 +45,7 @@ for i in ${BASENAME}.*; do
 done
 
 
-replace_in_all 's/QFExtensionCameraImplementation/'$CLASSNAME'/g'
+replace_in_all 's/QFExtensionLinearStageImplementation/'$CLASSNAME'/g'
 replace_in_all 's/target_id/'$TARGETNAME'/g'
 replace_in_all 's/'$BASENAME'.png/'$FNAME'.png/g'
 replace_in_all 's/'$BASENAME'.h/'$FNAME'.h/g'

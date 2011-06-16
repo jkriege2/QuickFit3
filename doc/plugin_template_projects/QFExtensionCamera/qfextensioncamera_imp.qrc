@@ -1,6 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <!-- RENAME THE ALIAS !!! -->
-    <file alias="cam_mycamname/qfextensioncamera_imp.png">qfextensioncamera_imp.png</file>
+    <file alias="target_id/qfextensioncamera_imp.png">qfextensioncamera_imp.png</file>
 </qresource>
 </RCC>

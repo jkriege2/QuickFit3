@@ -1,4 +1,4 @@
-#include "qfextensionlinearstage.h"
+#include "qfextensionlinearstage_imp.h"
 #include <QtGui>
 #include <QtPlugin>
 #include <iostream>
@@ -149,4 +149,4 @@ void QFExtensionLinearStageImplementation::log_error(QString message) {
 }
 
 
-Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionLinearStageImplementation)
+Q_EXPORT_PLUGIN2(target_id, QFExtensionLinearStageImplementation)
