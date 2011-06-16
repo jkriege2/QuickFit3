@@ -1,6 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <!-- RENAME THE ALIAS !!! -->
-    <file alias="cam_test/qfecamtest.png">qfecamtest.png</file>
-</qresource>
-</RCC>
