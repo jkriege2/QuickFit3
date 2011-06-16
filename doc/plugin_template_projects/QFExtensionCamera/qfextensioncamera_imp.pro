@@ -10,14 +10,14 @@ DESTDIR = ../../output/plugins/
 LIBS += -L../../output/ -lquickfit3lib
 
 # Input
-HEADERS += qfextensioncamera.h \
+HEADERS += qfextensioncamera_imp.h \
            ../interfaces/qfextensioncamera.h
 
-SOURCES += qfextensioncamera.cpp
+SOURCES += qfextensioncamera_imp.cpp
 
 FORMS =
 
-RESOURCES += qfextensioncamera.qrc
+RESOURCES += qfextensioncamera_imp.qrc
 
 TRANSLATIONS= ../../output/assets/translations/de.cam_mycamname.ts
 

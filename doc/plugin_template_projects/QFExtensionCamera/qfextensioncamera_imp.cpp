@@ -1,4 +1,4 @@
-#include "qfextensioncamera.h"
+#include "qfextensioncamera_imp.h"
 #include <QtGui>
 #include <QtPlugin>
 #include <iostream>
@@ -188,4 +188,4 @@ void QFExtensionCameraImplementation::log_error(QString message) {
 }
 
 
-Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraImplementation)
+Q_EXPORT_PLUGIN2(cam_mycamname, QFExtensionCameraImplementation)

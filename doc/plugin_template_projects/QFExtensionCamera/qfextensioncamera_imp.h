@@ -28,7 +28,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString(/* internal ID for this camera */); };
+        virtual QString getID() const  { return QString("cam_mycamname"); };
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr(/* human readable name for plugin */); };
         /** \copydoc QFExtension::getDescription() */
@@ -40,7 +40,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(/* your homepage */); };
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { /* plug in name from .qrc file */ return QString(":/qfextensioncamera_logo.png"); };
+        virtual QString getIconFilename() const  { /* plug in name from .qrc file */ return QString(":/cam_mycamname/qfextensioncamera_imp.png"); };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
