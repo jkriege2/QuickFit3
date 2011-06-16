@@ -35,11 +35,11 @@ void QFRawDataPropertyEditor::createWidgets() {
     ml->setContentsMargins(2,2,2,2);
     QHBoxLayout* vl=new QHBoxLayout(this);
     ml->addLayout(vl);
-    btnPrevious=new QPushButton(QIcon(":/prop_previous.png"), tr("&previous"), this);
+    btnPrevious=new QPushButton(QIcon(":/lib/prop_previous.png"), tr("&previous"), this);
     btnPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     vl->addWidget(btnPrevious);
     connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previousPressed()));
-    btnNext=new QPushButton(QIcon(":/prop_next.png"), tr("&next"), this);
+    btnNext=new QPushButton(QIcon(":/lib/prop_next.png"), tr("&next"), this);
     btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     vl->addWidget(btnNext);
     labTopIcon=new QLabel(this);
@@ -81,10 +81,10 @@ void QFRawDataPropertyEditor::createWidgets() {
     pl1->addWidget(tvProperties);
     QVBoxLayout* pl2=new QVBoxLayout(this);
     pl1->addLayout(pl2);
-    btnNewProperty=new QPushButton(QIcon(":/prop_add.png"), tr("In&sert Property"), this);
+    btnNewProperty=new QPushButton(QIcon(":/lib/prop_add.png"), tr("In&sert Property"), this);
     connect(btnNewProperty, SIGNAL(clicked()), this, SLOT(newPropClicked()));
     pl2->addWidget(btnNewProperty);
-    btnDeleteProperty=new QPushButton(QIcon(":/prop_delete.png"), tr("&Delete Property"), this);
+    btnDeleteProperty=new QPushButton(QIcon(":/lib/prop_delete.png"), tr("&Delete Property"), this);
     connect(btnDeleteProperty, SIGNAL(clicked()), this, SLOT(deletePropClicked()));
     pl2->addWidget(btnDeleteProperty);
     pl2->addStretch();
@@ -95,13 +95,13 @@ void QFRawDataPropertyEditor::createWidgets() {
     widResults->setLayout(rwvlayout);
     tbResults=new QToolBar("toolbar_rdr_results", this);
     rwvlayout->addWidget(tbResults);
-    actCopyResults=new QAction(QIcon(":/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
-    actSaveResults=new QAction(QIcon(":/save16.png"), tr("Save all results to file"), this);
+    actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
     tbResults->addSeparator();
-    actDeleteResults=new QAction(QIcon(":/delete16.png"), tr("Delete Selection"), this);
+    actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete Selection"), this);
     tbResults->addAction(actDeleteResults);
 
 
@@ -124,7 +124,7 @@ void QFRawDataPropertyEditor::createWidgets() {
 
 
     helpWidget=new QFHTMLHelpWindow(this);
-    tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
+    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));
 
 }
 
@@ -197,7 +197,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
                 }
             }
             tabMain->addTab(widResults, tr("Evaluation &Results"));
-            tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("Online-&Help"));
+            tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("Online-&Help"));
         } else {
             for (int i=0; i<editorList.size(); i++) {
                 editorList[i]->setCurrent(current, id);

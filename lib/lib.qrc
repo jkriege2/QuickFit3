@@ -1,0 +1,26 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+
+    <file alias="lib/help.png">../images/16x16/help.png</file>
+    <file alias="lib/help_next.png">../images/16x16/help_next.png</file>
+    <file alias="lib/help_previous.png">../images/16x16/help_previous.png</file>
+    <file alias="lib/help_home.png">../images/16x16/help_home.png</file>
+    <file alias="lib/print.png">../images/16x16/document_print.png</file>
+
+    <file alias="lib/copy16.png">../images/16x16/editcopy.png</file>
+    <file alias="lib/save16.png">../images/16x16/filesave.png</file>
+    <file alias="lib/delete16.png">../images/16x16/deletetable.png</file>
+    <file alias="lib/refresh16.png">../images/16x16/reload.png</file>
+    <file alias="lib/prop_add.png">../images/16x16/list_add.png</file>
+    <file alias="lib/prop_delete.png">../images/16x16/list_remove.png</file>
+    <file alias="lib/prop_next.png">../images/16x16/arrow_right.png</file>
+    <file alias="lib/prop_previous.png">../images/16x16/arrow_left.png</file>
+    <file alias="lib/projecttree_folder.png">../images/16x16/project_folder.png</file>
+    <file alias="lib/projecttree_folderopen.png">../images/16x16/project_folderopen.png</file>
+    <file alias="lib/projecttree_emptyrdr.png">../images/16x16/empty.png</file>
+    <file alias="lib/projecttree_tablefile.png">../images/16x16/table.png</file>
+    <file alias="lib/projecttree_emptyevaluatione.png">../images/16x16/datashowchart.png</file>
+
+</qresource>
+</RCC>
+

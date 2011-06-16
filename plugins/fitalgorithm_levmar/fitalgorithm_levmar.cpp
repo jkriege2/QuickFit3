@@ -12,7 +12,7 @@ QFFitAlgorithmLevmar::QFFitAlgorithmLevmar() {
     setParameter("epsilon2", 1e-17);
     setParameter("epsilon3", 1e-17);
     setParameter("gradient_delta", 1e-6);
-    setParameter("always_num_gradient", false);
+    setParameter("always_num_gradient", true);
 
 }
 

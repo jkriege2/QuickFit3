@@ -110,10 +110,10 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
             case qfpntRoot:
                 return QVariant();
             case qfpntProject:
-                return QVariant(QIcon(":/projecttree_folder.png"));
+                return QVariant(QIcon(":/lib/projecttree_folder.png"));
             case qfpntRawDataDir:
             case qfpntEvaluationDir:
-                return QVariant(QIcon(":/projecttree_folderopen.png"));
+                return QVariant(QIcon(":/lib/projecttree_folderopen.png"));
             case qfpntRawDataRecord:
                 if (current->getRawDataByNum(index.row())) return current->getRawDataByNum(index.row())->getSmallIcon();
             case qfpntEvaluationRecord:

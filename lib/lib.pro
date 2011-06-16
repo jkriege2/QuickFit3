@@ -2,9 +2,8 @@ TEMPLATE = lib
 TARGET = quickfit3lib
 DEPENDPATH += .
 
-INCLUDEPATH +=
-#../../../../LIB/trunk/ \
-               #../../../../LIB/trunk/qt
+INCLUDEPATH += ../../../../LIB/trunk/ \
+               ../../../../LIB/trunk/qt
 
 QT += gui xml
 DESTDIR = ../output/
@@ -70,12 +69,13 @@ SOURCES += dlgnewproperty.cpp \
            qfhtmlhelpwindow.cpp \
            qffitalgorithmthreaddedfit.cpp \
            qfextensionmanager.cpp \
-           qfevaluationresultsmodel.cpp
+           qfevaluationresultsmodel.cpp \
+           ../../../../LIB/trunk/tools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui
 
-RESOURCES +=
+RESOURCES += lib.qrc
 
 TRANSLATIONS= ../output/assets/translations/de.lib.ts
 

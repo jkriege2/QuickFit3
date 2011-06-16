@@ -50,6 +50,7 @@ class QFHTMLHelpWindow : public QWidget {
         QPushButton* btnPrevious;
         QPushButton* btnNext;
         QPushButton* btnHome;
+        QPushButton* btnPrint;
 
 
         /** \brief a text edit for the model information/description */
@@ -76,6 +77,7 @@ class QFHTMLHelpWindow : public QWidget {
         void next();
         void home();
         void showFile(QString filename);
+        void print();
 };
 
 #endif // QFHTMLHelpWindow_H

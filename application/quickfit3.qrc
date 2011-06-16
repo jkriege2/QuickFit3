@@ -13,18 +13,15 @@
     <file alias="about.png">../images/22x22/help_about.png</file>
     <file alias="aboutqt.png">../images/22x22/help_about_qt.png</file>
     <file alias="copy.png">../images/22x22/edit_copy.png</file>
-    <file alias="copy16.png">../images/16x16/editcopy.png</file>
-    <file alias="save16.png">../images/16x16/filesave.png</file>
     <file alias="cut.png">../images/22x22/edit_cut.png</file>
     <file alias="paste.png">../images/22x22/edit_paste.png</file>
-    <file alias="delete16.png">../images/16x16/deletetable.png</file>
-    <file alias="refresh16.png">../images/16x16/reload.png</file>
     <file alias="print.png">../images/22x22/document_print.png</file>
     <file alias="project_new.png">../images/22x22/project_new.png</file>
     <file alias="project_open.png">../images/22x22/project_open.png</file>
     <file alias="project_save.png">../images/22x22/project_save.png</file>
     <file alias="project_saveas.png">../images/22x22/project_saveas.png</file>
-    <file alias="prop_add.png">../images/16x16/list_add.png</file>
+
+<!--    <file alias="prop_add.png">../images/16x16/list_add.png</file>
     <file alias="prop_delete.png">../images/16x16/list_remove.png</file>
     <file alias="prop_next.png">../images/16x16/arrow_right.png</file>
     <file alias="prop_previous.png">../images/16x16/arrow_left.png</file>
@@ -33,6 +30,13 @@
     <file alias="projecttree_emptyfile.png">../images/16x16/empty.png</file>
     <file alias="projecttree_tablefile.png">../images/16x16/table.png</file>
     <file alias="projecttree_emptyevaluatione.png">../images/16x16/datashowchart.png</file>
+    <file alias="copy16.png">../images/16x16/editcopy.png</file>
+    <file alias="save16.png">../images/16x16/filesave.png</file>
+    <file alias="delete16.png">../images/16x16/deletetable.png</file>
+    <file alias="refresh16.png">../images/16x16/reload.png</file>
+
+
+
     <file alias="table_clear.png">../images/16x16/table_clear.png</file>
     <file alias="table_open.png">../images/16x16/table_open.png</file>
     <file alias="fcs_open.png">../images/16x16/fcs_open.png</file>
@@ -45,9 +49,9 @@
     <file alias="column_delete.png">../images/16x16/column_delete.png</file>
     <file alias="column_title.png">../images/16x16/column_title.png</file>
     <file alias="cell_type.png">../images/16x16/cell_type.png</file>
-
-    <file alias="rawdata_insert.png">../images/22x22/document_new.png</file>
-    <file alias="evaluation_insert.png">../images/22x22/document_new.png</file>
+-->
+    <file alias="rawdata_insert.png">../images/22x22/rdr_add.png</file>
+    <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>
     <file alias="item_delete.png">../images/16x16/item_delete.png</file>
     <file alias="table_insert.png">../images/22x22/table_insert.png</file>
 </qresource>

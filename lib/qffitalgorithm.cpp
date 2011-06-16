@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <cstdio>
 #include <iostream>
+#include "tools.h"
 
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) {
@@ -125,6 +126,9 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
             evalout[offset+j]=-1.0*p[modelFromFunctor[j]]/m_dataWeight[i];
         }
     }
+    //std::cout<<"jac"<<doublevectortostr(params, pcount)<<"=    [ecount="<<ecount<<", pcount="<<pcount<<"";
+    //std::cout<<"modelFromFunctor"<<intvectortostr(modelFromFunctor, pcount)<<" ]\n";
+    //std::cout<<doublearraytostr(evalout, pcount, ecount)<<std::endl;
     free(p);
 }
 

@@ -329,13 +329,13 @@ void QFEvaluationPropertyEditor::createWidgets() {
     widResults->setLayout(rwvlayout);
     tbResults=new QToolBar("toolbar_eval_results", this);
     rwvlayout->addWidget(tbResults);
-    actRefreshResults=new QAction(QIcon(":/refresh16.png"), tr("Refresh results ..."), this);
+    actRefreshResults=new QAction(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), this);
     tbResults->addAction(actRefreshResults);
     tbResults->addSeparator();
 
-    actCopyResults=new QAction(QIcon(":/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
-    actSaveResults=new QAction(QIcon(":/save16.png"), tr("Save all results to file"), this);
+    actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
 
@@ -361,7 +361,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
     helpWidget=new QFHTMLHelpWindow(this);
-    tabMain->addTab(helpWidget, QIcon(":/help.png"), tr("&Online-Help"));
+    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));
 }
 
 void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {

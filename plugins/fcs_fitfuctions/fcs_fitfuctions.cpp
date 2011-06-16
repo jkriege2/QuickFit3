@@ -1,5 +1,7 @@
 #include "fcs_fitfuctions.h"
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 #define sqr(x) ((x)*(x))
 #define cube(x) ((x)*(x)*(x))
@@ -591,7 +593,7 @@ QString QFFitFunctionFCSADiff::transformParametersForAdditionalPlot(int plot, do
 
 QFFitFunctionFCSSimpleDiff::QFFitFunctionFCSSimpleDiff() {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 3.0,          0,        10,       0.1, 0  );
+    addParameter(FloatNumber,  "nonfl_tau1",              "triplet decay time",                                    "&tau;<sub>trip</sub>",     "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 3.0,          0,        10,       0.1, 0.1  );
     #define FCSSDiff_nonfl_tau1 0
     addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSSDiff_nonfl_theta1 1
@@ -599,7 +601,7 @@ QFFitFunctionFCSSimpleDiff::QFFitFunctionFCSSimpleDiff() {
     #define FCSSDiff_n_particle 2
     addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSSDiff_1n_particle 3
-    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 30,           1,        1e5,      1,   0        );
+    addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, 30,           1,        1e5,      1,   0.1        );
     #define FCSSDiff_diff_tau1 4
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 0,            -10,      10,       0.1  );
     #define FCSSDiff_offset 5
@@ -663,6 +665,8 @@ void QFFitFunctionFCSSimpleDiff::evaluateDerivatives(double* derivatives, double
     derivatives[FCSSDiff_diff_tau1]=fT/N*(t/sqr(tauD)/fDG12/sqr(fD) + t/2.0/fD/cube(fDG12)/gamma2/sqr(tauD));
     derivatives[FCSSDiff_focus_struct_fac]=1.0/N*fT/fD/cube(fDG12)*t/tauD/cube(gamma);
     derivatives[FCSSDiff_offset]=1.0;
+
+    //printf("der(t=%lg   N=%lg nf_theta=%lg nf_tau=%lg tauD=%lg gamma=%lg offset=%lg   expT=%lg) = [ %lg %lg %lg %lg %lg %lg]\n", t, N, nf_theta, nf_tau, tauD, gamma, offset, exptT, derivatives[FCSSDiff_n_particle], derivatives[FCSSDiff_nonfl_theta1], derivatives[FCSSDiff_nonfl_tau1], derivatives[FCSSDiff_diff_tau1], derivatives[FCSSDiff_focus_struct_fac], derivatives[FCSSDiff_offset]);
 }
 
 

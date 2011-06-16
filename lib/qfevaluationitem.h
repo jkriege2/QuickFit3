@@ -172,11 +172,11 @@ class QFEvaluationItem : public QObject, public QFProperties {
         /** \brief return type (longer type string, user readable) */
         virtual QString getTypeName() const { return tr("unknown"); };
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/projecttree_emptyevaluation.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/lib/projecttree_emptyeval.png"); };
         /** \brief return type description */
         virtual QString getTypeDescription() const { return tr("unknown"); };
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/projecttree_emptyevaluatione.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/lib/projecttree_emptyeval.png"); };
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName() { return QString(""); };
         /** \brief create an object for the i-th editor pane */

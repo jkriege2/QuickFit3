@@ -3,6 +3,7 @@
 #include <QtGui>
 #include <iostream>
 #include <QDir>
+#include <QDesktopServices>
 
 
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
@@ -25,20 +26,26 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
 
     QHBoxLayout* layButtons=new QHBoxLayout;//(this);
 
-    btnPrevious=new QPushButton(QIcon(":/help_previous.png"), tr("&Previous"), this);
+    btnPrevious=new QPushButton(QIcon(":/lib/help_previous.png"), tr("&Previous"), this);
     //connect(descriptionBrowser, SIGNAL(backwardAvailable(bool)), btnPrevious, SLOT(setEnabled(bool)));
     //connect(btnPrevious, SIGNAL(clicked()), descriptionBrowser, SLOT(backward()));
     connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previous()));
     layButtons->addWidget(btnPrevious);
-    btnHome=new QPushButton(QIcon(":/help_home.png"), tr("&Home"), this);
+    btnHome=new QPushButton(QIcon(":/lib/help_home.png"), tr("&Home"), this);
     layButtons->addWidget(btnHome);
     //connect(btnHome, SIGNAL(clicked()), descriptionBrowser, SLOT(home()));
     connect(btnHome, SIGNAL(clicked()), this, SLOT(home()));
-    btnNext=new QPushButton(QIcon(":/help_next.png"), tr("&Next"), this);
+    btnNext=new QPushButton(QIcon(":/lib/help_next.png"), tr("&Next"), this);
     //connect(descriptionBrowser, SIGNAL(forwardAvailable(bool)), btnNext, SLOT(setEnabled(bool)));
     //connect(btnNext, SIGNAL(clicked()), descriptionBrowser, SLOT(forward()));
     connect(btnNext, SIGNAL(clicked()), this, SLOT(next()));
     layButtons->addWidget(btnNext);
+
+    btnPrint=new QPushButton(QIcon(":/lib/print.png"), tr("&Print this help page"), this);
+    layButtons->addWidget(btnPrint);
+    connect(btnPrint, SIGNAL(clicked()), this, SLOT(print()));
+
+
     layButtons->addStretch();
 
     layout->addLayout(layButtons);
@@ -132,19 +139,24 @@ void QFHTMLHelpWindow::displayTitle() {
 }
 
 void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
-    QDir spd(searchPath);
-    QString cl=spd.cleanPath(spd.absoluteFilePath(link.toString()));
-    QString s=spd.absoluteFilePath(cl); //absoluteFilePath
-    searchPath=QFileInfo(s).absolutePath();
-    //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
-    descriptionBrowser->setSearchPaths(QStringList(searchPath));
-    descriptionBrowser->setSource(QFileInfo(s).fileName());
-    descriptionBrowser->reload();
+    //std::cout<<"scheme = "<<link.scheme().toStdString()<<std::endl;
+    if (link.scheme().isEmpty()) {
+        QDir spd(searchPath);
+        QString cl=spd.cleanPath(spd.absoluteFilePath(link.toString()));
+        QString s=spd.absoluteFilePath(cl); //absoluteFilePath
+        searchPath=QFileInfo(s).absolutePath();
+        //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
+        descriptionBrowser->setSearchPaths(QStringList(searchPath));
+        descriptionBrowser->setSource(QFileInfo(s).fileName());
+        descriptionBrowser->reload();
 
-    history.push(s);
-    history_idx=history.size()-1;
-    btnNext->setEnabled(history.size()>1);
-    btnPrevious->setEnabled(history_idx>0);
+        history.push(s);
+        history_idx=history.size()-1;
+        btnNext->setEnabled(history.size()>1);
+        btnPrevious->setEnabled(history_idx>0);
+    } else {
+        QDesktopServices::openUrl(link);
+    }
 }
 
 void QFHTMLHelpWindow::showFile(QString filename) {
@@ -183,4 +195,19 @@ void QFHTMLHelpWindow::home() {
     history_idx=history.size()-1;
     btnNext->setEnabled(history.size()>1);
     btnPrevious->setEnabled(history_idx>0);
+}
+
+void QFHTMLHelpWindow::print() {
+    QPrinter* p=new QPrinter;
+
+    // select a printer
+
+    QPrintDialog *dialog = new QPrintDialog(p, NULL);
+    dialog->setWindowTitle(tr("Print Help Page"));
+    if (dialog->exec() != QDialog::Accepted) {
+        delete p;
+        return;
+    }
+    descriptionBrowser->print(p);
+    delete p;
 }

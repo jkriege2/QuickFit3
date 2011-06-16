@@ -309,11 +309,11 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return type (longer type string, user readable) */
         virtual QString getTypeName() const { return tr("unknown"); };
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/projecttree_emptyfile.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/lib/projecttree_emptyrdr.png"); };
         /** \brief return type description */
         virtual QString getTypeDescription() const { return tr("unknown"); };
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/projecttree_emptyfile.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/lib/projecttree_emptyrdr.png"); };
         /** \brief returns the number of additional editor panes for this record */
         virtual int getEditorCount() { return 0; };
         /** \brief returns the name for the i-th editor pane */

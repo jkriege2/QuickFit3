@@ -1201,6 +1201,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
                 if (!fitResult.isEmpty()) {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>%1</center></div><br>").arg(fitResult);
+                } else {
+                    txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>not fit yet</center></div><br>");
                 }
                 txtFit+=QString("<b>%1</b><cebter>").arg(tr("Fit Statistics:"));
                 txtFit+=QString("<table border=\"0\" width=\"95%\">");
@@ -1849,7 +1851,7 @@ void QFFCSFitEvaluationEditor::createReport(QPrinter* printer) {
                                                                                                                            .arg(rangeval);
         };
     }
-    html+="</table><br><center><font size=\"6\"><i><u>legend</u>:&nbsp;&nbsp;&nbsp;<b>F:</b> fixed parameter</i></font></center></font>";
+    html+="</table><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size=\"6\"><i><u>legend</u>:&nbsp;&nbsp;&nbsp;<b>F:</b> fixed parameter</i></font></font>";
     //qDebug()<<html;
 
     QString htmlTop;
@@ -1891,16 +1893,16 @@ void QFFCSFitEvaluationEditor::createReport(QPrinter* printer) {
     painter.save();
         double plotwidth=width*2.0/3.0;
         double plotscale=plotwidth/1000.0;
-        double plotHeight=plotwidth*pltData->height()/pltData->width();
+        double plotHeight=plotwidth*(pltData->height()+pltResiduals->height())/pltData->width();
         painter.scale(plotscale, plotscale);
         pltData->get_plotter()->draw(painter, QRect(0,0,1000,1000));
     painter.restore();
 
     painter.save();
         double paramwidth=width/3.0;
-        doc.setTextWidth(1200);
+        //doc.setTextWidth(1200);
         double docScale=paramwidth/(double)doc.idealWidth();
-        //doc.setTextWidth(doc.idealWidth());
+        doc.setTextWidth(doc.idealWidth());
         painter.translate(plotwidth, 0);
         painter.scale(docScale, docScale);
         doc.drawContents(&painter);
@@ -1917,7 +1919,12 @@ void QFFCSFitEvaluationEditor::createReport(QPrinter* printer) {
             double histplotscale=histplotwidth/1000.0;
             double histplotheight=histplotwidth*tabResidulas->height()/tabResidulas->width();
             painter.scale(histplotscale, histplotscale);
-            pltResidualHistogram->get_plotter()->draw(painter, QRect(0,0,1000,1000*tabResidulas->height()/tabResidulas->width()));
+            QRect rect(0,0,1000,1000*tabResidulas->height()/tabResidulas->width());
+            pltResidualHistogram->get_plotter()->draw(painter, rect);
+            /*QPen pen;
+            pen.setWidth(10);
+            painter.setPen(pen);
+            painter.drawRect(rect);*/
         painter.restore();
         painter.save();
             painter.translate(0, histplotheight*1.05);
@@ -1926,17 +1933,28 @@ void QFFCSFitEvaluationEditor::createReport(QPrinter* printer) {
                 double corrplotscale=corrplotwidth/1000.0;
                 double corrplotheight=corrplotwidth*tabResidulas->height()/tabResidulas->width();
                 painter.scale(corrplotscale, corrplotscale);
-                pltResidualCorrelation->get_plotter()->draw(painter, QRect(0,0,1000,1000*tabResidulas->height()/tabResidulas->width()));
+                rect=QRect(0,0,1000,1000*tabResidulas->height()/tabResidulas->width());
+                pltResidualCorrelation->get_plotter()->draw(painter, rect);
+                //QPen pen();
+                /*pen.setWidth(10);
+                painter.setPen(pen);
+                painter.drawRect(rect);*/
             painter.restore();
         painter.restore();
         painter.save();
-            painter.translate(qMax(corrplotwidth, histplotwidth), 0);
+            double botwidth=width*2.0/3.0*0.95;
+            painter.translate(width-botwidth, 0);
             painter.save();
-                double botwidth=width*2.0/3.0;
-                docBot.setTextWidth(botwidth*1.15);
+
+                docBot.setTextWidth(botwidth);
                 double botscale=botwidth/(double)docBot.textWidth();
                 painter.scale(botscale, botscale);
                 docBot.drawContents(&painter);
+                rect=QRect(0,0,docBot.textWidth(), docBot.size().height());
+                //QPen pen();
+                /*pen.setWidth(10);
+                painter.setPen(pen);
+                painter.drawRect(rect);*/
             painter.restore();
 
         painter.restore();
