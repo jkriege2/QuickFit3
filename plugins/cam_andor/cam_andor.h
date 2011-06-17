@@ -159,6 +159,17 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         bool conn;
         /** \brief timer */
         HighResTimer timer;
+        
+        
+        
+        /** \brief select the given camera */
+        bool selectCamera (int iSelectedCamera);
+        
+        /** \brief get temperature from camera i */
+        int getTemperature(int cam);
+        
+        /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
+        QString detectorsIniPath;
 
 
 };
