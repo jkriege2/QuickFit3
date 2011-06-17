@@ -281,6 +281,8 @@
 		<Unit filename="..\..\..\LIB\trunk\qt\numberedit.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qenhancedlineedit.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qenhancedlineedit.h" />
+		<Unit filename="..\..\..\LIB\trunk\qt\qmodernprogresswidget.cpp" />
+		<Unit filename="..\..\..\LIB\trunk\qt\qmodernprogresswidget.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qspecialtoolbutton.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qspecialtoolbutton.h" />
 		<Unit filename="..\..\..\LIB\trunk\qt\qspecialtoolbutton.qrc" />
