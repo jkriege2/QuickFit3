@@ -16,7 +16,8 @@ HEADERS += dlgcsvparameters.h \
            qfrdrfcsdata.h \
            qfrdrfcsrateeditor.h \
 		   qfprdrfcs.h \
-		   ../interfaces/qfrdrfcsdatainterface.h
+		   ../interfaces/qfrdrfcsdatainterface.h \
+		   ../interfaces/qfrdrcountratesinterface.h
 
 SOURCES += dlgcsvparameters.cpp \
            alv5000tools.cpp \

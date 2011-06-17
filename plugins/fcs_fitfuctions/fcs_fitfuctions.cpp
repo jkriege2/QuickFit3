@@ -56,6 +56,10 @@ QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
     #define FCSDiff_diff_coeff2 20
     addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, 500,          0,        1e50,     1    );
     #define FCSDiff_diff_coeff3 21
+    addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    0,            0,        1e50,     1    );
+    #define FCSDiff_count_rate 22
+    addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, 0,            0,        1e50,     1    );
+    #define FCSDiff_cpm 23
 }
 
 double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
@@ -139,6 +143,10 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     double ewxy=0;
     double offset=data[FCSDiff_offset];
     double eoffset=0;
+    double cps=data[FCSDiff_count_rate];
+    double ecps=0;
+    double cpm=data[FCSDiff_cpm];
+    double ecpm=0;
 
     if (error) {
         eN=error[FCSDiff_n_particle];
@@ -155,6 +163,8 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         egamma=error[FCSDiff_focus_struct_fac];
         ewxy=error[FCSDiff_focus_width]/1.0e3;
         eoffset=error[FCSDiff_offset];
+        ecps=error[FCSDiff_count_rate];
+        ecpm=error[FCSDiff_cpm];
     }
 
     // correct for invalid fractions
@@ -270,6 +280,10 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         if (tauD3!=0) error[FCSDiff_diff_coeff3]=sqrt( sqr(etauD3*sqr(wxy)/sqr(tauD3)/4.0) + sqr(ewxy*2.0*wxy/tauD3/4.0) );
         else error[FCSDiff_diff_coeff3]=0;
     }
+
+    // calculate CPM = CPS/N
+    data[FCSDiff_cpm]=cps/N;
+    error[FCSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
 }
 
 bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, double* data) const {
@@ -346,6 +360,10 @@ QFFitFunctionFCSADiff::QFFitFunctionFCSADiff() {
     #define FCSADiff_focus_volume 20
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, 0.5,          0,        1e50,     1    );
     #define FCSADiff_concentration 21
+    addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    0,            0,        1e50,     1    );
+    #define FCSADiff_count_rate 22
+    addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, 0,            0,        1e50,     1    );
+    #define FCSADiff_cpm 23
 }
 
 double QFFitFunctionFCSADiff::evaluate(double t, const double* data) const {
@@ -436,6 +454,10 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
     double ealpha2=0;
     double alpha3=data[FCSADiff_diff_alpha3];
     double ealpha3=0;
+    double cps=data[FCSDiff_count_rate];
+    double ecps=0;
+    double cpm=data[FCSDiff_cpm];
+    double ecpm=0;
 
     if (error) {
         eN=error[FCSADiff_n_particle];
@@ -455,6 +477,8 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         ealpha1=error[FCSADiff_diff_alpha1];
         ealpha2=error[FCSADiff_diff_alpha2];
         ealpha3=error[FCSADiff_diff_alpha3];
+        ecps=error[FCSDiff_count_rate];
+        ecpm=error[FCSDiff_cpm];
     }
 
     // correct for invalid fractions
@@ -542,6 +566,10 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
         if ((wxy!=0)&&(gamma!=0)) error[FCSADiff_concentration]=sqrt( sqr(egamma*pim32*N/cube(wxy)/sqr(gamma)) + sqr(ewxy*3.0*pim32*N/gamma/pow4(wxy)) + sqr(eN*pim32/gamma/cube(wxy)) )/(NAVOGADRO * 1.0e-24);
         else error[FCSADiff_concentration]=0;
     }
+
+    // calculate CPM = CPS/N
+    data[FCSDiff_cpm]=cps/N;
+    error[FCSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
 
 }
 

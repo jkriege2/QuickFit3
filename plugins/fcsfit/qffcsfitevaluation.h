@@ -6,6 +6,7 @@
 
 #include "qfevaluationitem.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
+#include "../interfaces/qfrdrcountratesinterface.h"
 #include "qfevaluationitemfactory.h"
 #include "qffitfunction.h"
 #include "qffitalgorithm.h"
@@ -14,8 +15,12 @@
 /*! \brief evaluation item class for FCS least square fits
     \ingroup qf3evalp_fcsfit
 
+
     \note This evaluation is applicable to all QFRawDataRecords that implement the QFRDRFCSDataInterface interface! Also it makes use of all
           fit functions (see QFFitFunction and QFFitFunctionManager) registered to QuickFit where the id starts with \c "fcs_" !
+
+    \note If a fit function has a parameter with name count_rate this is filled with the count rate stored in the FCS dataset (if
+          implemented, i.e. if the QFRawDataset also implements QFRDRCountRatesInterface)
 */
 class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
         Q_OBJECT

@@ -11,6 +11,7 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     description="";
     resultsmodel=NULL;
     propModel=NULL;
+    doEmitResultsChanged=true;
 }
 
 
@@ -251,7 +252,7 @@ void QFRawDataRecord::resultsSetNumber(QString evaluationName, QString resultNam
     r.dvalue=value;
     r.unit=unit;
     results[evaluationName].insert(resultName, r);
-    emit resultsChanged();
+    if (doEmitResultsChanged) emit resultsChanged();
 };
 
 void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool emitChangedSignal) {
@@ -262,7 +263,7 @@ void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool e
             results.remove(evalName);
             changed=true;
         }
-        if (changed && emitChangedSignal) emit resultsChanged();
+        if (changed && emitChangedSignal && doEmitResultsChanged) emit resultsChanged();
     }
 }
 
@@ -274,7 +275,7 @@ void QFRawDataRecord::resultsClear(QString name, QString postfix) {
             //cout << i.key() << ": " << i.value() << endl;
             if (i.key().endsWith(postfix)) results[name].remove(i.key());
         }
-        emit resultsChanged();
+        if (doEmitResultsChanged) emit resultsChanged();
     }
 };
 
@@ -284,7 +285,7 @@ void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resul
     r.dvec=value;
     r.unit=unit;
     results[evaluationName].insert(resultName, r);
-    emit resultsChanged();
+    if (doEmitResultsChanged) emit resultsChanged();
 };
 
 
@@ -295,7 +296,7 @@ void QFRawDataRecord::resultsSetNumberError(QString evaluationName, QString resu
     r.derror=error;
     r.unit=unit;
     results[evaluationName].insert(resultName, r);
-    emit resultsChanged();
+    if (doEmitResultsChanged) emit resultsChanged();
 };
 
 void QFRawDataRecord::resultsSetInteger(QString evaluationName, QString resultName, int64_t value, QString unit) {
@@ -304,7 +305,7 @@ void QFRawDataRecord::resultsSetInteger(QString evaluationName, QString resultNa
     r.ivalue=value;
     r.unit=unit;
     results[evaluationName].insert(resultName, r);
-    emit resultsChanged();
+    if (doEmitResultsChanged) emit resultsChanged();
 };
 
 void QFRawDataRecord::resultsSetString(QString evaluationName, QString resultName, QString value) {
@@ -312,7 +313,7 @@ void QFRawDataRecord::resultsSetString(QString evaluationName, QString resultNam
     r.type=qfrdreString;
     r.svalue=value;
     results[evaluationName].insert(resultName, r);
-    emit resultsChanged();
+    if (doEmitResultsChanged) emit resultsChanged();
 };
 
 void QFRawDataRecord::resultsSetBoolean(QString evaluationName, QString resultName, bool value) {
@@ -320,7 +321,7 @@ void QFRawDataRecord::resultsSetBoolean(QString evaluationName, QString resultNa
     r.type=qfrdreBoolean;
     r.bvalue=value;
     results[evaluationName].insert(resultName, r);
-    emit resultsChanged();
+    if (doEmitResultsChanged) emit resultsChanged();
 };
 
 QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultName) {
@@ -453,7 +454,7 @@ void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
             i.next();
             results[newEvalName].insert(i.key(), i.value());
         }
-        emit resultsChanged();
+        if (doEmitResultsChanged) emit resultsChanged();
     }
 }
 

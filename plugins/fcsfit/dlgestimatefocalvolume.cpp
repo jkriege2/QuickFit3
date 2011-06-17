@@ -90,7 +90,7 @@ void dlgEstimateFocalVolume::calc_from_D() {
         calc_from_C();
     } else {
         wxy=sqrt(4.0*tauD*spinD->value());
-        wxy_error=sqrt(sqr(2.0*spinDError->value()*tauD/sqrt(4.0*spinD->value()*tauD)) + sqr(2.0*tauD_error*spinD->value()/sqrt(4.0*spinD->value()*tauD)));
+        wxy_error=sqrt(sqr(spinDError->value()*tauD/sqrt(spinD->value()*tauD)) + sqr(tauD_error*spinD->value()/sqrt(spinD->value()*tauD)));
         labFocusparamDiffusion->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
     }
 }

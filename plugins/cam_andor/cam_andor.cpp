@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <time.h>
+#include "qmodernprogresswidget.h"
 
 #define LOG_PREFIX "[Andor]:  "
 
@@ -12,7 +13,7 @@ QFExtensionCameraAndor::QFExtensionCameraAndor(QObject* parent):
 {
     logService=NULL;
     conn=false;
-    detectorsIniPath="/usr/local/etc/andor";
+    detectorsIniPath=detectorsIniPath_init="/usr/local/etc/andor";
 }
 
 QFExtensionCameraAndor::~QFExtensionCameraAndor() {
@@ -45,16 +46,16 @@ void QFExtensionCameraAndor::loadSettings(ProgramOptions* settingspo) {
     if (!settingspo) return;
     if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings());
-    
-    detectorsIniPath=settings->value(getID()+"/detectorsIniPath", detectorsIniPath).toString();
+
+    detectorsIniPath=settings.value(getID()+"/detectorsIniPath", detectorsIniPath).toString();
 }
 
 void QFExtensionCameraAndor::storeSettings(ProgramOptions* settingspo) {
     if (!settingspo) return;
     if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings());
-    
-    settings->setValue(getID()+"/detectorsIniPath", detectorsIniPath);
+
+    if (detectorsIniPath!=detectorsIniPath_init) settings.setValue(getID()+"/detectorsIniPath", detectorsIniPath);
 }
 
 unsigned int QFExtensionCameraAndor::getCameraCount() {
@@ -133,15 +134,17 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     conn=false;
     timer.start();
 
-    
+
    at_32 *data = NULL;
 
    //Initialise and setup defaults
    unsigned int error;
-   error=Initialize(detectorsIniPath.toStdString().c_str());
+   char path[2048];
+   strcpy(path, detectorsIniPath.toStdString().c_str());
+   error=Initialize(path);
 
    // TODO: Go on here ...
-   cout << "Initialising..." << endl;
+   /*cout << "Initialising..." << endl;
    sleep(2);
    if(error==DRV_SUCCESS) error=GetDetector(&width, &height);
    if(error==DRV_SUCCESS) error=SetShutter(1,0,50,50);
@@ -167,9 +170,9 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
    if(error!=DRV_SUCCESS){
     cout << "!!Error initialising system!!:: " << error << endl;
       return 1;
-   }
-    
-    
+   }*/
+
+
     return conn;
 }
 
@@ -185,28 +188,31 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
         std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
         bool tempOK=false;
 
-        QProgressDialog progress(tr("Cooling Andor Camera #%1").arg(camera+1), "", 0, 100, NULL);
+        QModernProgressDialog progress(tr("Cooling Andor Camera #%1").arg(camera+1), "", NULL);
         progress.setWindowModality(Qt::WindowModal);
+        progress.setHasCancel(false);
+        progress.openDelayed(500);
         while (!tempOK) {
             tempOK=true;
             int temp1=getTemperature(i);
-            progress.setValue(33);
+            //progress.setValue(33);
             progress.setLabelText(tr("cameras #%2: temperature = %1 °C ...\n").arg(temp1).arg(i+1));
             std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp1).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
             if ((temp1<5)&&(temp1!=-999)) tempOK=false;
             QApplication::processEvents();
         }
-        progress.setValue(66);
+        //progress.setValue(66);
         progress.setLabelText(tr("cameras #%2: shutdown ...\n").arg(i+1));
         QApplication::processEvents();
         ShutDown();
-        progress.setValue(100);
+        //progress.setValue(100);
+        progress.accept();
 
-        services->log_global_text(tr("%1 heating cameras to 5°C ... DONE\n").arg(LOG_PREFIX));    
-        std::cout<<tr("%1 heating cameras to 5°C ... DONE\n").arg(LOG_PREFIX).toStdString()<<std::endl;;    
+        services->log_global_text(tr("%1 heating cameras to 5°C ... DONE\n").arg(LOG_PREFIX));
+        std::cout<<tr("%1 heating cameras to 5°C ... DONE\n").arg(LOG_PREFIX).toStdString()<<std::endl;;
     }
-    
-    
+
+
     conn = false;
 }
 
@@ -256,7 +262,11 @@ void QFExtensionCameraAndor::log_error(QString message) {
 
 bool QFExtensionCameraAndor::selectCamera (int iSelectedCamera) {
     std::cout<<"select ANDOR camera "<<iSelectedCamera<<std::endl;
+    #ifdef __WINDOWS__
+    long int SelectedCamera=0;
+    #else
     int SelectedCamera=0;
+    #endif
     GetCurrentCamera(&SelectedCamera);
     if (iSelectedCamera==SelectedCamera) return true;
     if ((iSelectedCamera < getCameraCount()) && (iSelectedCamera >= 0) ) {

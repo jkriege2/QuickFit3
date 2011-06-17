@@ -1390,6 +1390,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 eval->setFitResultValueInt(record, run, "fit_cut_up", cut_up);
 
 */
+                record->disableEmitResultsChanged();
                 record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_used_run", run);
                 record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fit_model_name", ffunc->id());
                 record->resultsSetString(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_name", falg->id());
@@ -1422,6 +1423,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                         default: break;
                     }
                 }
+                record->enableEmitResultsChanged();
                 emit resultsChanged();
             } else {
                 services->log_warning(tr("   - fit canceled by user!!!\n"));

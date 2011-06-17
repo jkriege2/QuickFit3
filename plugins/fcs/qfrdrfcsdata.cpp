@@ -90,6 +90,8 @@ void QFRDRFCSData::resizeRates(long long N, int runs) {
     if (!rateT || !rate)
         setError(tr("Error while allocating memory for count rate data!"));
     emit rawDataChanged();
+    rateMean.clear();
+    rateStdDev.clear();
 }
 
 void QFRDRFCSData::resizeBinnedRates(long long N) {
@@ -175,7 +177,55 @@ double QFRDRFCSData::calcRateMean(int run) {
             m=m+rate[run*rateN+i];
         }
     }
-    return m/(double)rateN;
+    double me= m/(double)rateN;
+    rateMean[run]=me;
+    return me;
+}
+
+
+
+double QFRDRFCSData::getRateMean(int run) {
+    if (rateN<=0 || !rate) {
+        return 0.0;
+    }
+    if (run<0) {
+        double cnt=0;
+        double sum=0;
+        for (int i=0; i<rateN; i++) {
+            double r=getRateMean(i);
+            if (r>0) {
+                sum=sum+r;
+                cnt++;
+            }
+        }
+        return sum/cnt;
+    }
+    if (!rateMean.contains(run)) {
+        rateMean[run]=calcRateMean(run);
+    }
+    return rateMean[run];
+}
+
+double QFRDRFCSData::getRateStdDev(int run) {
+   if (rateN<0 || !rate) {
+        return 0.0;
+    }
+    if (run<0) {
+        double cnt=0;
+        double sum=0;
+        for (int i=0; i<rateN; i++) {
+            double r=getRateStdDev(i);
+            if (r>0) {
+                sum=sum+r;
+                cnt++;
+            }
+        }
+        return sum/cnt;
+    }
+    if (!rateStdDev.contains(run)) {
+        rateStdDev[run]=calcRateStdDev(run);
+    }
+    return rateStdDev[run];
 }
 
 double QFRDRFCSData::calcRateStdDev(int run) {
@@ -192,7 +242,9 @@ double QFRDRFCSData::calcRateStdDev(int run) {
             s=s+v*v         ;
         }
     }
-    return sqrt(s/(double)rateN-m*m/(double)rateN/(double)rateN);
+    double sd=sqrt(s/(double)rateN-m*m/(double)rateN/(double)rateN);
+    rateStdDev[run]=sd;
+    return sd;
 }
 
 void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max) {
@@ -254,6 +306,9 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
 
     QString filetype=getProperty("FILETYPE", "unknown").toString();
     //std::cout<<"reading data "<<filetype.toStdString()<<" from 1/"<<files.size()<<" '"<<files.join(", ").toStdString()<<"'\n";
+
+    rateMean.clear();
+    rateStdDev.clear();
 
     if (filetype.toUpper()=="ALV5000") {
         if (files.size()<=0) {

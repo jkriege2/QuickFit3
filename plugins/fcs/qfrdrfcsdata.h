@@ -19,13 +19,15 @@
 #include "alv5000tools.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
+#include "../interfaces/qfrdrcountratesinterface.h"
 
-/*! \brief manages a FCS dataset
+
+/*! \brief manages a FCS dataset (set of correlation curves with multiple runs)
     \ingroup qf3rdrdp_fcs
 
   Every FCS dataset contains these elements:
-    - a set of correlation curves ("runs") and their average and standard deviation (calculated after loading
-      and by calling recalculateCorrelations().
+    - a set of correlation curves ("runs")
+    - their average and standard deviation (calculated after loading and by calling recalculateCorrelations().
     - a set of count rate curves plus a second set with the count rates in reduced resolution.
       This second set may be used for quick plotting of the count rates, as for long measurements
       with high timeresolution plotting may otherwise be quite tedious. The property autoCalcRateN
@@ -38,9 +40,9 @@
   account for the correlation average. This may be usefull, if only some few of the runs in a file are damaged
   (e.g. by agregates moving through the focus ...).
 */
-class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
+class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface)
     public:
         /** Default constructor */
         QFRDRFCSData(QFProject* parent);
@@ -160,6 +162,11 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
         virtual double calcRateMean(int run=0);
         /** \brief calculate the standard deviation of the count rate */
         virtual double calcRateStdDev(int run=0);
+        /** \brief return the mean value of the count rate, as last calculated by a call to calcRateMean() */
+        virtual double getRateMean(int run=0);
+        /** \brief return the standard deviation of the count rate, as last calculated by a call to calcRateStdDev()  */
+        virtual double getRateStdDev(int run=0);
+
         /** \brief calculate minimum and maximum count rates */
         virtual void calcRateMinMax(int run, double& min, double& max);
         /** \brief recalculate correlation curve mean and standard deviation */
@@ -261,6 +268,9 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
          * access this as \code rate[run*rateN + n] \endcode
          */
         double* rate;
+
+        QMap<int, double> rateMean;
+        QMap<int, double> rateStdDev;
 
         /** \brief if positive this is the number of datapoints to which the countrate
          *         shall be binned in the binnedRate field. */

@@ -102,9 +102,13 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged() { emit propertiesChanged(); };
         /** \brief this function emits a resultsChanged() signal. */
-        virtual void emitResultsChanged() { emit resultsChanged(); };
+        virtual void emitResultsChanged() { if (doEmitResultsChanged) emit resultsChanged(); };
         /** \brief this function emits a rawDataChanged() signal. */
         virtual void emitRawDataChanged() { emit rawDataChanged(); };
+        /** \brief disable emitting of rawDataChanged() signal*/
+        void disableEmitResultsChanged() { doEmitResultsChanged=false; }
+        /** \brief enable emitting of rawDataChanged() signal and emit one signal */
+        void enableEmitResultsChanged() { doEmitResultsChanged=true; emit resultsChanged(); }
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message) { setError(message); };
@@ -170,18 +174,21 @@ class QFRawDataRecord : public QObject, public QFProperties {
         QMap<QString, QMap<QString, evaluationResult> > results;
         /** \brief table used to display the results */
         QFRDRResultsModel* resultsmodel;
+
+        /** \brief is this is \c false, the signal resultsChanged() is NOT emited */
+        bool doEmitResultsChanged;
     public:
         /** \brief clear all evaluation results */
         inline void resultsClearAll() {
             results.clear();
-            emit resultsChanged();
+            if (doEmitResultsChanged) emit resultsChanged();
         };
         /** \brief clear all evaluation results of a specific evaluation name */
         inline void resultsClear(QString name) {
             if (results.contains(name)) {
                 results[name].clear();
                 results.remove(name);
-                emit resultsChanged();
+                if (doEmitResultsChanged) emit resultsChanged();
             }
         };
         /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */

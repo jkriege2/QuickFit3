@@ -35,6 +35,16 @@
 
 /*! \brief editor class for FCS least-square fits
     \ingroup qf3evalp_fcsfit
+
+    This class also provides a tool to estimate the focal volume: It reads the parameters from the fit function
+    and tries to deduce its meaning by their IDs:
+      - the particle number \f$ N \f$ is extracted from \c n_particle or \c 1n_particle (as \f$ 1/N \f$ )
+      - the diffusion time \f$ \tau_D \f$ is read from \c diff_tau or \c diff_tau1 (this class recognizes these units for \f$ \tau_D \f$: \c msec, \c ms, \c msecs, \c milliseconds, \c sec, \c s, \c secs, \c seconds
+      - the focal size \f$ w_{xy} \f$ is written back into \c focus_struct_fac
+    .
+    Then the focal size \f$ w_{xy} \f$ is calculated as:
+      \f[ w_{xy}=\sqrt{4\cdot D\cdot\tau_D} \f]
+      \f[ \Delta w_{xy}=\sqrt{ \left(\frac{\Delta D\cdot \tau_D}{\sqrt{D\cdot\tau_D}}\right)^2 + \left(\frac{\Delta\tau_D\cdot D}{\sqrt{D\cdot\tau_D}}\right)^2 } \f]
 */
 class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT

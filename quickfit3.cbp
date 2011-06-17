@@ -228,6 +228,7 @@
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.h" />
 		<Unit filename="plugins\interfaces\qfextensioncamera.h" />
 		<Unit filename="plugins\interfaces\qfextensionlinearstage.h" />
+		<Unit filename="plugins\interfaces\qfrdrcountratesinterface.h" />
 		<Unit filename="plugins\interfaces\qfrdrfcsdatainterface.h" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraconfig.cpp" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraconfig.h" />
