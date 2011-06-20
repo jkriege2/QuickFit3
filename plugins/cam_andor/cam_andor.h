@@ -75,6 +75,11 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual QString getWeblink() const  { return tr(""); };
         /** \copydoc QFExtension::getIconFilename() */
         virtual QString getIconFilename() const  { return QString(":/cam_andor_logo.png"); };
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 

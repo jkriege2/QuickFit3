@@ -52,7 +52,7 @@
 -->
     <file alias="rawdata_insert.png">../images/22x22/rdr_add.png</file>
     <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>
-    <file alias="item_delete.png">../images/16x16/item_delete.png</file>
+    <file alias="item_delete.png">../images/22x22/item_delete.png</file>
     <file alias="table_insert.png">../images/22x22/table_insert.png</file>
 </qresource>
 </RCC>

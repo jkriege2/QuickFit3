@@ -42,7 +42,9 @@ HEADERS += dlgnewproperty.h \
            qffitalgorithmthreaddedfit.h \
            qfextension.h \
            qfextensionmanager.h \
-           qfevaluationresultsmodel.h
+           qfevaluationresultsmodel.h \
+           qfplugin.h \
+           qflib_version.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

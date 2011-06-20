@@ -95,6 +95,8 @@ class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
         Q_OBJECT
         Q_INTERFACES(QFPluginFitAlgorithm)
     public:
+        QF_PLUGIN
+
         /** Default constructor */
         QFPFitAlgorithmLevmar(QObject* parent=NULL) {}
         /** Default destructor */
@@ -129,6 +131,17 @@ class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const {
             return tr("");
+        };
+
+
+        /** \brief plugin icon  */
+        virtual QString getIconFilename() const {
+            return ":/plugin_fitfunc_incon.png";
+        };
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
         };
 
         /** \brief return list of plugin IDs */

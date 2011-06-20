@@ -171,7 +171,10 @@ class QFFitFunctionFCSSimpleDiff: public QFFitFunction {
 class QFPFitFunctionFCS : public QObject, public QFPluginFitFunction {
         Q_OBJECT
         Q_INTERFACES(QFPluginFitFunction)
+        Q_INTERFACES(QFPlugin)
     public:
+        QF_PLUGIN
+
         /** Default constructor */
         QFPFitFunctionFCS(QObject* parent=NULL) {}
         /** Default destructor */
@@ -200,6 +203,22 @@ class QFPFitFunctionFCS : public QObject, public QFPluginFitFunction {
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const {
             return tr("");
+        };
+
+        /** \copydoc QFPlugin::getID()  */
+        virtual QString getID() const {
+            return "qffcsfitfuncs";
+        };
+
+        /** \copydoc QFPlugin::getIconFilename()  */
+        virtual QString getIconFilename() const {
+            return ":/plugin_fitfunc_incon.png";
+        };
+
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
         };
 
         /** \brief return list of plugin IDs */

@@ -14,7 +14,7 @@
         returned by getCorrelationN()
       - all runs (and also the average/stddev) have the same lag time axis. The lags are returned by getCorrelationT().
       - The data of the runs is returned by getCorrelationRun(), getCorrelationMean() and getCorrelationStdDev()
-      - It is possible to select only a subset of runs. In that case runVisible() returns \c true if a run is really visible
+      - It is possible to select only a subset of runs. In that case isCorrelationRunVisible() returns \c true if a run is really visible
         and to be used.
     .
 
@@ -48,7 +48,7 @@ class QFRDRFCSDataInterface {
         virtual double* getCorrelationStdDev()=0;
 
         /** \brief returns true when a given run is visible. the average run is indicated by -1 */
-        virtual bool runVisible(int run)=0;
+        virtual bool isCorrelationRunVisible(int run)=0;
 
 };
 

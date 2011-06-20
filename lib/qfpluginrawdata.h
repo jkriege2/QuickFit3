@@ -6,13 +6,13 @@
 #include "qfproject.h"
 #include <QWidget>
 #include "qfrawdatarecord.h"
-
+#include "qfplugin.h"
 
 /** \brief virtual interface class for all QuickFit 3 raw data record plugins
     \ingroup qf3rawdataplugins
 
 */
-class QFPluginRawDataRecord {
+class QFPluginRawDataRecord: public QFPlugin {
     public:
         /** \brief class destructor */
         virtual ~QFPluginRawDataRecord() {};
@@ -26,26 +26,6 @@ class QFPluginRawDataRecord {
         */
         virtual void registerToMenu(QMenu* menu)=0;
 
-        /** \brief short ID for the plugin */
-        virtual QString getID() const =0;
-
-        /** \brief name for the plugin */
-        virtual QString getName() const =0;
-
-        /** \brief short description for the plugin */
-        virtual QString getDescription() const =0;
-
-        /** \brief author the plugin */
-        virtual QString getAuthor() const =0;
-
-        /** \brief copyright information the plugin */
-        virtual QString getCopyright() const =0;
-
-        /** \brief weblink for the plugin */
-        virtual QString getWeblink() const =0;
-
-        /** \brief icon for the plugin */
-        virtual QString getIconFilename() const =0;
 
         /** \brief set current project */
         virtual void setProject(QFProject* project)=0;
@@ -67,6 +47,8 @@ class QFPluginRawDataRecord {
 */
 class QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
     public:
+        QF_PLUGIN
+
         /** \brief class destructor */
         virtual ~QFPluginRawDataRecordBase() {};
 
@@ -78,6 +60,7 @@ class QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
         virtual void setSettings(ProgramOptions* settings) { this->settings=settings; };
         /** \brief set parent widget (e.g. for message dialogs) */
         virtual void setParentWidget(QWidget* parentWidget) { this->parentWidget=parentWidget; };
+
     protected:
         QFPluginServices* services;
         QFProject* project;

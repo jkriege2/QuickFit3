@@ -45,6 +45,11 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         virtual QString getIconFilename() const  { return QString(":/stage_pi_logo.png"); };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */

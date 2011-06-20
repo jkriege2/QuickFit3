@@ -96,6 +96,7 @@
 		<Unit filename="lib\dlgqffitalgorithmprogressdialog.cpp" />
 		<Unit filename="lib\dlgqffitalgorithmprogressdialog.h" />
 		<Unit filename="lib\lib.pro" />
+		<Unit filename="lib\lib.qrc" />
 		<Unit filename="lib\programoptions.cpp" />
 		<Unit filename="lib\programoptions.h" />
 		<Unit filename="lib\qenhancedtableview.cpp" />

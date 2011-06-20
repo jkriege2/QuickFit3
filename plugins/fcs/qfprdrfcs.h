@@ -46,6 +46,11 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr(""); };
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); };

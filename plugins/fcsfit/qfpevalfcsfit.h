@@ -48,6 +48,11 @@ class QFPEvalFCSFit : public QObject, public QFPluginEvaluationItemBase {
         /** \brief icon file for the plugin (from resource system or a separate file) */
         virtual QString getIconFilename() const  { return QString(":/fcs_fit_logo.png"); };
 
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
     protected slots:
         /** \brief insert FCS data from file*/

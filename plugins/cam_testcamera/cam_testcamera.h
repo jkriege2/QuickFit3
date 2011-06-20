@@ -52,7 +52,11 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
 
         /** \copydoc QFExtension::getIconFilename() */
         virtual QString getIconFilename() const  { return QString(":/cam_testcamera_logo.png"); };
-
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();

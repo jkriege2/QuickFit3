@@ -43,6 +43,11 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
 
         /** \copydoc QFExtension::getIconFilename() */
         virtual QString getIconFilename() const  { return QString(":/spimb040_logo.png"); };
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
 
         /** \copydoc QFExtension::deinit() */

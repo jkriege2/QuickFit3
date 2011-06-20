@@ -168,6 +168,8 @@ class QFPFitAlgorithmSimAnneal : public QObject, public QFPluginFitAlgorithm {
         Q_OBJECT
         Q_INTERFACES(QFPluginFitAlgorithm)
     public:
+        QF_PLUGIN
+
         /** Default constructor */
         QFPFitAlgorithmSimAnneal(QObject* parent=NULL) {}
         /** Default destructor */
@@ -204,12 +206,24 @@ class QFPFitAlgorithmSimAnneal : public QObject, public QFPluginFitAlgorithm {
             return tr("");
         };
 
+
+        /** \brief plugin icon  */
+        virtual QString getIconFilename() const {
+            return ":/plugin_fitfunc_incon.png";
+        };
+
         /** \brief return list of plugin IDs */
         virtual QStringList getIDs() const {
             QStringList sl;
             sl<<"fit_simanneal";
             return sl;
         }
+
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFFitAlgorithm* get(QString id, QObject* parent) const {

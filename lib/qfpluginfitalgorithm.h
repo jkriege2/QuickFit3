@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QObject>
 #include "qffitalgorithm.h"
+#include "qfplugin.h"
 
 /** \brief virtual interface class for all QuickFit 3 fit algorithm plugins
     \ingroup qf3fitalgplugins
@@ -13,29 +14,10 @@
     These plugins may contain several fitting functions. The function getIDs() returns a QStringList
     with all implemented plugin IDs.
 */
-class QFPluginFitAlgorithm
-{
+class QFPluginFitAlgorithm: public QFPlugin {
     public:
         /** Default destructor */
         virtual ~QFPluginFitAlgorithm() {}
-
-        /** \brief unique id for the plugin */
-        virtual QString getID() const=0;
-
-        /** \brief name for the plugin */
-        virtual QString getName() const=0;
-
-        /** \brief short description for the plugin */
-        virtual QString getDescription() const=0;
-
-        /** \brief author the plugin */
-        virtual QString getAuthor() const=0;
-
-        /** \brief copyright information the plugin */
-        virtual QString getCopyright() const=0;
-
-        /** \brief weblink for the plugin */
-        virtual QString getWeblink() const=0;
 
         /** \brief return list of plugin IDs */
         virtual QStringList getIDs() const =0;

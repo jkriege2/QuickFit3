@@ -41,6 +41,11 @@ class QFExtensionLinearStageImplementation : public QObject, public QFExtensionB
         virtual QString getWeblink() const  { return tr(/* your homepage */); };
         /** \copydoc QFExtension::getIconFilename() */
         virtual QString getIconFilename() const  { /* plug in name from .qrc file */ return QString(":/target_id/qfextensionlinearstage_imp.png"); };
+		/** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 

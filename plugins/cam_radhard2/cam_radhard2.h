@@ -65,6 +65,11 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         virtual QString getIconFilename() const  { return QString(":/cam_radhard2_logo.png"); };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
     protected:
         QFPluginLogService* logService;

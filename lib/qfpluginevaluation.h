@@ -6,13 +6,14 @@
 #include "qfproject.h"
 #include "qfevaluationitem.h"
 #include <QWidget>
+#include "qfplugin.h"
 
 
 /** \brief base class for all QuickFit 3 raw data record plugins
     \ingroup qf3evaluationplugins
 
 */
-class QFPluginEvaluationItem {
+class QFPluginEvaluationItem: public QFPlugin {
     public:
         /** \brief class destructor */
         virtual ~QFPluginEvaluationItem() {};
@@ -29,23 +30,6 @@ class QFPluginEvaluationItem {
         /** \brief short ID for the plugin */
         virtual QString getID() const =0;
 
-        /** \brief name for the plugin */
-        virtual QString getName() const =0;
-
-        /** \brief short description for the plugin */
-        virtual QString getDescription() const =0;
-
-        /** \brief author the plugin */
-        virtual QString getAuthor() const =0;
-
-        /** \brief copyright information the plugin */
-        virtual QString getCopyright() const =0;
-
-        /** \brief weblink for the plugin */
-        virtual QString getWeblink() const =0;
-
-        /** \brief icon for the plugin */
-        virtual QString getIconFilename() const =0;
 
         /** \brief set current project */
         virtual void setProject(QFProject* project)=0;
@@ -60,6 +44,8 @@ class QFPluginEvaluationItem {
 
 class QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
     public:
+        QF_PLUGIN
+
         /** \brief class destructor */
         virtual ~QFPluginEvaluationItemBase() {};
 
@@ -71,6 +57,7 @@ class QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
         virtual void setSettings(ProgramOptions* settings) {this->settings=settings; };
         /** \brief set parent widget (e.g. for message dialogs) */
         virtual void setParentWidget(QWidget* parentWidget) {this->parentWidget=parentWidget; };
+
     protected:
         QFPluginServices* services;
         QFProject* project;

@@ -7,6 +7,7 @@
 #include <QString>
 #include "qfproject.h"
 #include <QtPlugin>
+#include "qfplugin.h"
 
 /** \brief virtual interface class for all QuickFit 3 extension plugins
     \ingroup qf3extensionplugins
@@ -15,7 +16,7 @@
           as it already implements some functionality (storage of commonly used pointers, ...)
 */
 
-class QFExtension {
+class QFExtension: public QFPlugin {
     public:
         /** \brief class destructor */
         virtual ~QFExtension() {};
@@ -26,26 +27,6 @@ class QFExtension {
         /*! \brief deinitialize the plugin */
         virtual void deinit()=0;
 
-        /** \brief short ID for the plugin */
-        virtual QString getID() const =0;
-
-        /** \brief name for the plugin */
-        virtual QString getName() const =0;
-
-        /** \brief short description for the plugin */
-        virtual QString getDescription() const =0;
-
-        /** \brief author the plugin */
-        virtual QString getAuthor() const =0;
-
-        /** \brief copyright information the plugin */
-        virtual QString getCopyright() const =0;
-
-        /** \brief weblink for the plugin */
-        virtual QString getWeblink() const =0;
-
-        /** \brief icon for the plugin */
-        virtual QString getIconFilename() const =0;
 
         /** \brief set current project, when implementing plugins, do not overload this, but overload QFExtensionBase::projectChanged() */
         virtual void setProject(QFProject* project)=0;
@@ -71,6 +52,8 @@ class QFExtension {
 */
 class QFExtensionBase: public QFExtension {
     public:
+        QF_PLUGIN
+
         /** \brief class destructor */
         virtual ~QFExtensionBase() {};
 
@@ -100,6 +83,8 @@ class QFExtensionBase: public QFExtension {
             this->settings=settings;
             storeSettings(settings);
         }
+
+
     protected:
         QFExtensionServices* services;
         QFProject* project;

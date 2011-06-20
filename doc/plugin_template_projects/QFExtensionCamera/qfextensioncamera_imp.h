@@ -41,6 +41,11 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         virtual QString getWeblink() const  { return tr(/* your homepage */); };
         /** \copydoc QFExtension::getIconFilename() */
         virtual QString getIconFilename() const  { return QString(":/target_id/qfextensioncamera_imp.png"); };
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 

@@ -193,7 +193,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         inline virtual void leaveoutClear() { leaveout.clear(); }
 
         /** \brief returns true when a given run is visible. the average run is indicated by -1 */
-        inline virtual bool runVisible(int run) {
+        inline virtual bool isCorrelationRunVisible(int run) {
             if (run+1<runsVisibleList.size() && run>=-1)
                 return runsVisibleList[run+1];
             else return true;

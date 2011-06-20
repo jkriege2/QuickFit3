@@ -49,6 +49,11 @@ class QFPRDRTable : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
         virtual QString getIconFilename() const  { return QString(":/table_insert.png"); };
+        /** \brief plugin version  */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
     protected slots:
         /** \brief insert an editable table */
