@@ -52,6 +52,10 @@ SUBDIRS += plg_stage_pi
 plg_stage_pi.subdir=./plugins/stage_pi
 plg_stage_pi.depends = lib libqf3widgets
 
+
+
+
+
 dir_plugins.commands = ${MKDIR} ./output/plugins
 dir_assets.commands = ${MKDIR} ./output/assets
 dir_assetshelp.commands = ${MKDIR} ./output/assets/help

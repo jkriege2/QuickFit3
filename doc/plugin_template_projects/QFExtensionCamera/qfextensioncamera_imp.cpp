@@ -3,6 +3,10 @@
 #include <QtPlugin>
 #include <iostream>
 
+
+#define LOG_PREFIX QString("target_id >>> ").toUpper()
+
+
 QFExtensionCameraImplementation::QFExtensionCameraImplementation(QObject* parent):
     QObject(parent)
 {
@@ -173,18 +177,18 @@ int QFExtensionCameraImplementation::getAcquisitionProgress(unsigned int camera)
 
 
 void QFExtensionCameraImplementation::log_text(QString message) {
-	if (logService) logService->log_text(message);
-	else if (services) services->log_text(message);
+	if (logService) logService->log_text(LOG_PREFIX+message);
+	else if (services) services->log_text(LOG_PREFIX+message);
 }
 
 void QFExtensionCameraImplementation::log_warning(QString message) {
-	if (logService) logService->log_warning(message);
-	else if (services) services->log_warning(message);
+	if (logService) logService->log_warning(LOG_PREFIX+message);
+	else if (services) services->log_warning(LOG_PREFIX+message);
 }
 
 void QFExtensionCameraImplementation::log_error(QString message) {
-	if (logService) logService->log_error(message);
-	else if (services) services->log_error(message);
+	if (logService) logService->log_error(LOG_PREFIX+message);
+	else if (services) services->log_error(LOG_PREFIX+message);
 }
 
 
