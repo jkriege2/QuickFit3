@@ -91,7 +91,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/20nM_488_Day2_04s.asc</file>
+                <file>fcs_testdata/20nM_488_Day2_04s.asc</file>
             </files>
             <data/>
         </rawdataelement>
@@ -125,7 +125,7 @@
             </properties>
             <results/>
             <files>
-                <file>fcstestdata/al488_20nM_3.ASC</file>
+                <file>fcs_testdata/al488_20nM_3.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -268,7 +268,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/beads_1t1000_80pGlycerin_1.ASC</file>
+                <file>fcs_testdata/beads_1t1000_80pGlycerin_1.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -410,7 +410,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/DNA_2nM_Al488_0ul_1.ASC</file>
+                <file>fcs_testdata/DNA_2nM_Al488_0ul_1.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -552,7 +552,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/DNA_2nM_Al488_5ul.ASC</file>
+                <file>fcs_testdata/DNA_2nM_Al488_5ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -695,7 +695,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/DNA_2nM_Al488_10ul.ASC</file>
+                <file>fcs_testdata/DNA_2nM_Al488_10ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -837,7 +837,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/DNA_2nM_Al488_15ul.ASC</file>
+                <file>fcs_testdata/DNA_2nM_Al488_15ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -979,7 +979,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/DNA_4nM_3.ASC</file>
+                <file>fcs_testdata/DNA_4nM_3.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -1121,7 +1121,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/egfp1_1.ASC</file>
+                <file>fcs_testdata/egfp1_1.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -1488,7 +1488,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/egfp1_2.ASC</file>
+                <file>fcs_testdata/egfp1_2.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -1702,7 +1702,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/Hela_16_39d.asc</file>
+                <file>fcs_testdata/Hela_16_39d.asc</file>
             </files>
             <data/>
         </rawdataelement>
@@ -1917,7 +1917,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/Hela_16_39d.asc</file>
+                <file>fcs_testdata/Hela_16_39d.asc</file>
             </files>
             <data/>
         </rawdataelement>
@@ -2059,7 +2059,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/qd525_20nM.ASC</file>
+                <file>fcs_testdata/qd525_20nM.ASC</file>
             </files>
             <data/>
         </rawdataelement>
@@ -2201,7 +2201,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
+                <file>fcs_testdata/qd525_20nM_15ul_al488_20nM_15ul.ASC</file>
             </files>
             <data/>
         </rawdataelement>

@@ -57,8 +57,8 @@ HELPPIC_FILES.path = $${QFOUTPUT}/assets/help/pic/
 ASSETS_FILES.files = ./assets/*.*
 ASSETS_FILES.path = $${QFOUTPUT}/assets/
 
-ASSETSTESTDATA_FILES.files = ./assets/testdata/*.*
-ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/testdata/
+ASSETSTESTDATA_FILES.files = ./assets/fcs_testdata/*.*
+ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/fcs_testdata/
 
 ASSETSSTYLESHEET_FILES.files = ./assets/stylesheets/*.*
 ASSETSSTYLESHEET_FILES.path = $${QFOUTPUT}/assets/stylesheets/

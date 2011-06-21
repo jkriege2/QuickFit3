@@ -110,7 +110,7 @@
                 </evaluation>
             </results>
             <files>
-                <file>fcstestdata/20nM_488_Day2_04s.asc</file>
+                <file>fcs_testdata/20nM_488_Day2_04s.asc</file>
             </files>
             <data/>
         </rawdataelement>
