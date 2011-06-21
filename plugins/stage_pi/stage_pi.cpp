@@ -57,6 +57,8 @@ void QFExtensionLinearStagePI::projectChanged(QFProject* oldProject, QFProject* 
 
 void QFExtensionLinearStagePI::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
+    QString ini=services->getConfigFileDirectory()+QString("/stage_pi863.ini");
+    if (!QFile::exists(ini)) QFile::copy(services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/stage_pi863.ini"), ini);
     QSettings inifile(services->getConfigFileDirectory()+"/stage_pi863.ini", QSettings::IniFormat);
     COMPort=inifile.value("driver/port", COMPort).toString();
     COMPortSpeed=inifile.value("driver/port_speed", COMPortSpeed).toUInt();

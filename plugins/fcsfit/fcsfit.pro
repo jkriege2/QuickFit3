@@ -37,7 +37,7 @@ INCLUDEPATH += ../../lib/ \
 QT += gui xml svg core
 CONFIG += exceptions rtti stl
 
-QMAKE_MKDIR = mkdir -p
+
 
 
 HELP_FILES.files = ./help/*.*

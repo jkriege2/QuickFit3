@@ -37,7 +37,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QMAKE_MKDIR = mkdir -p
+
 
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/

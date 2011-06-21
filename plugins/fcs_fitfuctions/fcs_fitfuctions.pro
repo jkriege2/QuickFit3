@@ -31,7 +31,7 @@ UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
 
-QMAKE_MKDIR = mkdir -p
+
 
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/

@@ -51,3 +51,12 @@ unix {
 SUBDIRS += plg_stage_pi
 plg_stage_pi.subdir=./plugins/stage_pi
 plg_stage_pi.depends = lib libqf3widgets
+
+dir_plugins.commands = ${MKDIR} ./output/plugins
+dir_assets.commands = ${MKDIR} ./output/assets
+dir_assetshelp.commands = ${MKDIR} ./output/assets/help
+dir_assetsplugins.commands = ${MKDIR} ./output/assets/plugins
+dir_assetspluginshelp.commands = ${MKDIR} ./output/assets/plugins/help
+QMAKE_EXTRA_TARGETS += dir_plugins dir_assets dir_assetshelp dir_assetsplugins dir_assetspluginshelp
+
+PRE_TARGETDEPS += dir_assets dir_assetshelp dir_assetsplugins dir_assetspluginshelp

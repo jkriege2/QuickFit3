@@ -46,7 +46,7 @@ CONFIG += exceptions rtti stl
 include( ../../extlibs/cimg.pri )
 PRECOMPILED_HEADER += ../../extlibs/cimg.h
 
-QMAKE_MKDIR = mkdir -p
+
 
 
 HELP_FILES.files = ./help/*.*

@@ -34,7 +34,7 @@ INCLUDEPATH += ../../lib/ \
 QT += gui xml svg
 CONFIG += exceptions rtti stl
 
-QMAKE_MKDIR = mkdir -p
+
 
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/

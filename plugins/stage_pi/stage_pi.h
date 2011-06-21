@@ -30,7 +30,7 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("stage_pimercury"); };
+        virtual QString getID() const  { return QString("stage_pi863"); };
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return tr("Motion Stage: PI Mercury 863"); };
         /** \copydoc QFExtension::getDescription() */

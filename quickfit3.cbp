@@ -178,6 +178,12 @@
 		<Unit filename="plugins\cam_radhard2\radhard2lib\radhard2flash.cpp" />
 		<Unit filename="plugins\cam_radhard2\radhard2lib\radhard2flash.h" />
 		<Unit filename="plugins\cam_radhard2\radhard2lib\radhard2lib.h" />
+		<Unit filename="plugins\cam_rh2v2\cam_rh2v2.cpp" />
+		<Unit filename="plugins\cam_rh2v2\cam_rh2v2.h" />
+		<Unit filename="plugins\cam_rh2v2\cam_rh2v2.logo.png" />
+		<Unit filename="plugins\cam_rh2v2\cam_rh2v2.pc.ini" />
+		<Unit filename="plugins\cam_rh2v2\cam_rh2v2.pro" />
+		<Unit filename="plugins\cam_rh2v2\cam_rh2v2.qrc" />
 		<Unit filename="plugins\cam_testcamera\cam_testcamera.cpp" />
 		<Unit filename="plugins\cam_testcamera\cam_testcamera.h" />
 		<Unit filename="plugins\cam_testcamera\cam_testcamera.pro" />
