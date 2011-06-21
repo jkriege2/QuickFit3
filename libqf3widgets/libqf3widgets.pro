@@ -10,7 +10,8 @@ LIBS += -L../output/ -lquickfit3lib
 
 QT += gui xml svg opengl
 DESTDIR = ../output/
-#DLLDESTDIR = $$DESTDIR
+
+QFOUTPUT=$$DESTDIR
 
 # Input
 HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
@@ -81,6 +82,7 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
 CONFIG += exceptions rtti stl
+
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

@@ -9,10 +9,11 @@ INCLUDEPATH += . \
                ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt
 DESTDIR = ../output
-#QMAKE_LFLAGS_RPATH += .
-QMAKE_RPATHDIR += ../output/
+QFOUTPUT = $$DESTDIR
 
-LIBS += -L../output/ -lquickfit3lib -lquickfit3widgets
+QMAKE_RPATHDIR += $$DESTDIR
+
+LIBS += -L$$DESTDIR -lquickfit3lib -lquickfit3widgets
 # Input
 HEADERS += mainwindow.h \
            version.h \
@@ -29,7 +30,7 @@ FORMS =    optionsdialog.ui \
 RESOURCES += quickfit3.qrc
 
 
-TRANSLATIONS= ../output/assets/translations/de.ts
+TRANSLATIONS= ./translations/de.ts
 
 INCLUDEPATH += ../../../../LIB/trunk/
 
@@ -44,7 +45,27 @@ PRECOMPILED_HEADER += ../extlibs/cimg.h
 
 
 
+
+QMAKE_MKDIR = mkdir -p
+
+HELP_FILES.files = ./help/*.*
+HELP_FILES.path = $${QFOUTPUT}/assets/help/
+
+HELPPIC_FILES.files = ./help/pic/*.*
+HELPPIC_FILES.path = $${QFOUTPUT}/assets/help/pic/
+
+ASSETS_FILES.files = ./assets/*.*
+ASSETS_FILES.path = $${QFOUTPUT}/assets/
+
+ASSETS_TRANSLATIONS.files = ./translations/*.qm
+ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
+
+INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
+
+POST_TARGETDEPS += install
+
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
+

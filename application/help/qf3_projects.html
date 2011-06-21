@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit 3 Projects (Data Model)</title>
+</head>
+<body>
+back: <a href="quickfit.html">QuickFit Basics</a><hr>
+
+<h2>QuickFit 3 Projects (Data Model)</h2>
+<p>Quickfit is based on a very simple and versatile data model:</p>
+<center><img src="./pic/qf3_datamodel.png"></center>
+<p>All data is organized in projects and at every time one project is loaded in QuickFit. A project is saved in an .qfp file (an XML file) which contains all data (like e.g. links to all data files used in the project, fit results, ...). Usually it does not contain the raw data. These are stored in separate files and should usually not be altered, when saving or changing the project (exception may be data files, created by QuickFit itself). Also the data files whould be located in the same directory as the project (or in sub directories of the project direcory), so you may copy the whole set of project+data files to another machine.</p>
+<p>There are only two basic types of objects in a project:
+ <ul>
+   <li><b>raw data records</b> which represents any type of data. </li>
+   <li>data <b>evaluations</b> which work on one or more data objects from the list of raw data records. The results of such an evaluation step are usually saved in the project file.</li>
+ </ul>
+</p>
+<p>It is important to note that a single evaluation may act upon any of the raw data records. As the evaluation results are usually stored together with the raw data record they belong to, this may be used to e.g. compare different evaluations of the same type, but with different parameters (e.g. fit with different models to the same data). Every fit result gets a unique identifier which relates it to the evaluation object that created it. So together with each raw data record QuickFit may save multiple fit results which were created by different evaluations and does not mix them up!</p>
+
+</body>
+</html>

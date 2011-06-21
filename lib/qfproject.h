@@ -83,9 +83,6 @@ class QFProject : public QObject, public QFProperties {
         QFRawDataRecordFactory* rdrFactory;
         QFPluginServices* services;
 
-        QFRawDataRecordFactory* getRawDataRecordFactory() { return rdrFactory; };
-        QFEvaluationItemFactory* getEvaluationItemFactory() { return evalFactory; };
-
     public:
         /** Default constructor */
         QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
@@ -299,6 +296,10 @@ class QFProject : public QObject, public QFProperties {
             \return \c true on success
         */
         bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename);
+
+
+        QFRawDataRecordFactory* getRawDataRecordFactory() { return rdrFactory; };
+        QFEvaluationItemFactory* getEvaluationItemFactory() { return evalFactory; };
     signals:
         /** \brief emitted when the data changed state of the project is modified */
         void wasChanged(bool changed);

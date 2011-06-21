@@ -20,6 +20,7 @@
 
 
 
+
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
     QFEvaluationEditor(services, parent)
 {

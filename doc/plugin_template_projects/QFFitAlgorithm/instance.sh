@@ -44,6 +44,11 @@ for i in ${BASENAME}*.*; do
   cp -v "$i" "./$FNAME/${FNAME}${i/$BASENAME}"; 
 done
 
+mkdir -p $FNAME/translations
+mkdir -p $FNAME/assets
+mkdir -p $FNAME/help
+mkdir -p $FNAME/help/pic
+touch $FNAME/help/${TARGETNAME}.html
 
 replace_in_all 's/QFFitAlgorithmInst/'$CLASSNAME'/g'
 replace_in_all 's/target_id/'$TARGETNAME'/g'

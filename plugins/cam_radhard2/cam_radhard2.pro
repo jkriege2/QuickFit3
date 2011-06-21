@@ -1,14 +1,16 @@
 TEMPLATE = lib
 CONFIG += plugin
 
+QFOUTPUT = ../../output/
+DESTDIR = $$QFOUTPUT/plugins
 
 TARGET = cam_radhard2
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/
+
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS += -lusb -L../../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -lusb -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 win32:LIBS += -lgdi32
 
 # Input
@@ -28,12 +30,31 @@ FORMS =
 
 RESOURCES += cam_radhard2.qrc
 
-TRANSLATIONS= ../../output/assets/translations/de.cam_radhard2.ts
+TRANSLATIONS= ./translations/de.cam_radhard2.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
+
+QMAKE_MKDIR = mkdir -p
+
+HELP_FILES.files = ./help/*.*
+HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/
+
+HELPPIC_FILES.files = ./help/pic/*.*
+HELPPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/pic/
+
+ASSETS_FILES.files = ./assets/*.*
+ASSETS_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/
+
+ASSETS_TRANSLATIONS.files = ./translations/*.qm
+ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
+
+INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
+
+POST_TARGETDEPS += install
+
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl

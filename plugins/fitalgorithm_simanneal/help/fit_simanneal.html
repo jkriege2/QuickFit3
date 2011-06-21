@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>QuickFit: quickfitFitSA Class Reference</title>
+</head><body>
+
+This (SimAnneal) is an implementation of the <b>Simulated Annealing Method.</b> The algorithm implemented in this class is described in:
+</p>
+<blockquote><b>[COR87]</b> Corana, A., Marchesi, M., Martini, C., Ridella, S.: <b>Minimizing Multimodal Functions of Continuous Variables with the "Simulated Annealing" Algorithm.</b> in: <em>ACM Transactions on Mathematical Software</em> <b>(13)</b> 3: p.262-280, 1987</blockquote>
+
+<p>
+This is a relatively simple implementation of the common simmulated annealing method which is a
+stochastic global search technique that tries to find the minimum of a given function by a Metropolis
+Monte-Carlo sampling of the parameter space. It allows for a (small) propability to leave a local minimum
+which prevents the method from beeing stuck in local minima which is generally not possible in
+standard fitting and minimization methods like the <a href="levmar.html">Levenberg-Marquardt-Algorithm</a> as they are
+strictly local search techniques.</p>
+<p> During the search in the parameter space the propability to leave a local minimum is reduced. This is
+expressed in terms of a "temperature" which defines a measure for the above propability. The name comes from an
+analogy to metallurgy where the speed of cooldown influences the size of the crystals that form in a material
+and therefore its properties. If the cooling is slow, large crystal (high magnitude of order) forms in the cold
+metal, as the long phases of high temperature allow the atoms to diffuse through the metal (brownian motion) and
+find a place which minimizes their energy. This process is modelled by the simulated annealing method.
+</p>
+
+<p>A good overview is given in <a href="http://en.wikipedia.org/wiki/Simulated_annealing">this Wikipedia article</a>.
+</p>
+
+<p>This pseudocode gives a basic implementaation of the simulated annealing method: </p>
+<div class="fragment"><pre class="fragment">      
+      p = init_parameter_guess;
+      N = 0; <span class="comment">// step counter</span>
+      NT = init_steps_per_temperature;
+      rT = init_temperature_reduction_coefficient;
+      T = init_temperature;
+      <span style="color: #e08000;">do</span> {
+          p1=neighbor(p); <span style="color: #800000;">// generate new guess for parameters</span>
+          <span style="color: #e08000;">if</span> ( chi2(p) ) {
+              <span style="color: #800000;">// accept guess p1</span>
+              p = p1;
+          } <span style="color: #e08000;">else</span> {
+              <span style="color: #e08000;">if</span> ( rand() &lt; exp( (chi2(p)-chi2(p1)) / T ) ) {
+                  <span style="color: #800000;">// accept guess p1, although it does not improve chi2</span>
+                  p = p1;
+              } <span style="color: #e08000;">else</span> {
+                  <span style="color: #800000;">// reject guess p1</span>
+              }
+          }
+          N = N + 1;
+          <span style="color: #e08000;">if</span> ( N &gt; NT ) {
+              <span style="color: #800000;">// reduce temperature</span>
+              NT = 0;
+              T = T * rT;
+          }
+      } <span style="color: #e08000;">while</span> (not converged);
+      <span style="color: #e08000;">return</span> p, chi2(p);
+</pre></div><p>
+In this code we do not explain how to check convergence and how to
+generate a new guess. Here the latter is done by a function neighbor(p)
+which chooses a new vector p1 which is in the vicinity of p. The first
+if ensures that guesses that reduce the <img style="vertical-align: middle;"  alt="$ \chi^2 $" src="form_41.png"> value are always accepted. This implies an ensured downhill movement Guesses that increase <img style="vertical-align: middle;"  alt="$ \chi^2 $" src="form_41.png"> may be accepted with a propability <img style="vertical-align: middle;"  alt="$ \exp\left(\frac{\chi^2(p)-\chi^2(p')}{T}\right). $" src="form_208.png"> Here <img style="vertical-align: middle;"  alt="$ T $" src="form_209.png"> is a temperature constant in the sense of a metropolis choice.</p><p>
+The algorithm from [COR87] may be denoted like this:</p><ol type="1">
+<li><b>Preconditions:</b><ul>
+<li>The model function <img style="vertical-align: middle;"  alt="$ m(\tau, \vec{p}) $" src="form_148.png"> is described by M parameters <img style="vertical-align: middle;"  alt="$ \vec{p}=(p_1,...,p_M)^t $" src="form_210.png">. All parameters are provided with bounds for their value, i.e. <img style="vertical-align: middle;"  alt="$ a_i\leq p_i\leq b_i. $" src="form_211.png"></li><li>the user provides an initial guess <img style="vertical-align: middle;"  alt="$ \vec{p}_0 $" src="form_212.png"> for the parameters.</li><li>the algorithm minimizes the objective function <p >
+<img style="vertical-align: middle;"  alt="\[ \chi^2(\vec{p})=\sum\limits_{i=1}^N\frac{\bigl(y_i-m(\tau_i, \vec{p})\bigr)^2}{\sigma_i^2} \]" src="form_213.png">
+</p><p>
+ i.e. it finds the solution to the minimization problem </p><p >
+<img style="vertical-align: middle;"  alt="\[ \min\limits_{\vec{p}}\chi^2(\vec{p}) \]" src="form_214.png">
+</p><p>
+ for a given set of N measurements <img style="vertical-align: middle;"  alt="$ (\tau_i, y_i)_{i=1..N} $" src="form_215.png"></p></li><li>the user provides the parameters <img style="vertical-align: middle;"  alt="$ N_{max}, N_S, N_T, f_{max}, T_0 $" src="form_246.png"> and <img style="vertical-align: middle;"  alt="$ c $" src="form_247.png"></li></ul>
+</li><li><b>Initialization:</b><ul>
+<li>initial temperature: <img style="vertical-align: middle;"  alt="$ T=T_0 \cdot 10^{ \left\lfloor \log_{10}(\chi^2(\vec{p}_0)) \right\rfloor } $" src="form_216.png"></li><li>initial max. step sizes: <img style="vertical-align: middle;"  alt="$ v_i=\frac{|b_i-a_i|}{1000},\ \ \ \ \ \ \ \ \ \ (i=1..M) $" src="form_217.png"></li><li>initial best guess: <img style="vertical-align: middle;"  alt="$ \vec{p}_{opt}=\vec{p}_0,\ \ \ \chi^2_{opt}=\chi^2(\vec{p}_0) $" src="form_218.png"></li><li><img style="vertical-align: middle;"  alt="$ \vec{p}_{cur}=\vec{p}_0,\ \ \ \chi^2_{cur}=\chi^2(\vec{p}_0) $" src="form_219.png"></li><li><img style="vertical-align: middle;"  alt="$ N=0 $" src="form_248.png"> (iteration counter)</li></ul>
+</li><li><b>Repeat the next steps until convergence or <img style="vertical-align: middle;"  alt="$ N&gt;N_{max} $" src="form_249.png"> :</b><ul>
+<li><b>Repeat <img style="vertical-align: middle;"  alt="$ N_T $" src="form_220.png"> times:</b><ul>
+<li><img style="vertical-align: middle;"  alt="$ N\leftarrow N+1 $" src="form_250.png"></li><li>reset all <img style="vertical-align: middle;"  alt="$ V_n=0,\ \ \ (n=1,...,M) $" src="form_221.png">. The <img style="vertical-align: middle;"  alt="$ V_n $" src="form_222.png"> count the accepted variation steps of the n-th parameter.</li><li><b>Repeat <img style="vertical-align: middle;"  alt="$ N_S $" src="form_223.png"> times:</b><ul>
+<li>for every parameter <img style="vertical-align: middle;"  alt="$ n=1..M $" src="form_224.png"> generate a new guess <p >
+<img style="vertical-align: middle;"  alt="\[ \vec{p}'=\vec{p} + r\cdot v_n\cdot\vec{e}_n \]" src="form_225.png">
+</p><p>
+ here <img style="vertical-align: middle;"  alt="$ r\in[0..1] $" src="form_226.png"> is a uniformly distributed random number and <img style="vertical-align: middle;"  alt="$ \vec{e}_n $" src="form_227.png"> is a vector where all elements are zero, except element n which is one (unit vector in direction n)</p></li><li><b>if</b> <img style="vertical-align: middle;"  alt="$ \mathbf{\chi^2(\vec{p}')&lt;\chi^2_{cur}} $" src="form_228.png"> then accept the new vector, i.e. <img style="vertical-align: middle;"  alt="$ \vec{p}_{cur}=\vec{p}' $" src="form_229.png"> and <img style="vertical-align: middle;"  alt="$ \chi^2_{cur}=\chi^2(\vec{p}') $" src="form_230.png">, if even <img style="vertical-align: middle;"  alt="$ \chi^2(\vec{p}')&lt;\chi^2_{opt} $" src="form_231.png"> then also accept the new guess as optimal point, i.e. <img style="vertical-align: middle;"  alt="$ \vec{p}_{opt}=\vec{p}' $" src="form_232.png"> and <img style="vertical-align: middle;"  alt="$ \chi^2_{opt}=\chi^2(\vec{p}') $" src="form_233.png"></li><li><b>otherwise</b> accept the reduction of <img style="vertical-align: middle;"  alt="$ \chi^2 $" src="form_41.png"> with a metropolis probability <img style="vertical-align: middle;"  alt="$ p=\exp\left(\frac{\chi^2_{cur}-\chi^2(\vec{p}')}{T}\right) $" src="form_234.png"> for <img style="vertical-align: middle;"  alt="$ \vec{p}_{cur}, \chi^2_{cur} $" src="form_235.png"></li><li>if a variation in parameter n has been accepted increase <img style="vertical-align: middle;"  alt="$ V_n $" src="form_222.png"> by 1</li></ul>
+</li><li><b>End Repeat</b></li><li>update the step size vector <img style="vertical-align: middle;"  alt="$ \vec{v}=(v_1,...,v_M)^t $" src="form_236.png">:{p} <p >
+<img style="vertical-align: middle;"  alt="\[ v_n'=\begin{cases}v_n\cdot\left(1+c\cdot\frac{V_n/N_S-0.6}{0.4}\right) &amp; V_n&gt;0.6\cdot N_S\\ v_n\cdot\frac{1}{1+c\cdot\frac{0.4-V_n/N_S}{0.4}} &amp; V_n&lt;0.4\cdot N_S\\ v_n&amp; \text{otherwise}\end{cases} \]" src="form_251.png">
+</p><p>
+</p></li></ul>
+</li><li><b>End Repeat</b></li><li>update temperature: <img style="vertical-align: middle;"  alt="$ T'=T\cdot r_T $" src="form_252.png"></li><li>check convergence: test whether <img style="vertical-align: middle;"  alt="$ |\chi^2_{cur, i}-\chi^2{cur, i-j}|\leq f_{max} $" src="form_253.png"> folds for all <img style="vertical-align: middle;"  alt="$ j=1..N_\epsilon $" src="form_254.png"> where <img style="vertical-align: middle;"  alt="$ \chi^2_{cur, i} $" src="form_255.png"> is the <img style="vertical-align: middle;"  alt="$ \chi^2_{cur} $" src="form_256.png"> value of the i-th convergence check. This means that the change between two subsequent iterations may not exceed <img style="vertical-align: middle;"  alt="$ f_{max} $" src="form_245.png"></li></ul>
+</li></ol>
+<p><p> Thsi algorithm uses random numbers generated by the Mersenn Twister Method, implemented here: <a href=http://www-personal.umich.edu/~wagnerr/MersenneTwister.html>http://www-personal.umich.edu/~wagnerr/MersenneTwister.html</a>.
+
+</body></html>

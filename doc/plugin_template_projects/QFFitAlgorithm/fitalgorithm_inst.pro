@@ -1,13 +1,13 @@
 TEMPLATE = lib
 CONFIG += plugin
 
-
+QFOUTPUT=../../output
 TARGET = target_id
+DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/
-#DLLDESTDIR = $$DESTDIR
-win32:LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
-unix:LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
+DESTDIR = $${QFOUTPUT}/plugins/
+
+LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += fitalgorithm_inst.h \
@@ -26,6 +26,26 @@ INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
+
+
+
+QMAKE_MKDIR = mkdir -p
+
+HELP_FILES.files = ./help/*.*
+HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/
+
+HELPPIC_FILES.files = ./help/pic/*.*
+HELPPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/pic/
+
+ASSETS_FILES.files = ./assets/*.*
+ASSETS_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/
+
+ASSETS_TRANSLATIONS.files = ./translations/*.qm
+ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
+
+INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
+
+POST_TARGETDEPS += install
 
 
 QT += core

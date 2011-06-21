@@ -1,6 +1,6 @@
 #include "qfevaluationpropertyeditor.h"
 #include "qfprojectrawdatamodel.h"
-
+#include "qfevaluationitemfactory.h"
 
 bool QFEvaluationRawDataModelProxy::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
@@ -209,7 +209,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
 
 
         helpWidget->clear();
-        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+current->getType()+QString("/"))+current->getType()+".html");
+        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginFilename(current->getType());
+        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/"))+current->getType()+".html");
 
     } else {
         edtName->setText("");

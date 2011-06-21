@@ -1,12 +1,12 @@
 TEMPLATE = lib
 CONFIG += plugin
 
-
+QFOUTPUT = ../../output/
+DESTDIR = $$QFOUTPUT/plugins
 TARGET = qfevalfcsfit
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins
-#DLLDESTDIR = $$DESTDIR
-LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
+
+LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += qfpevalfcsfit.h \
@@ -27,7 +27,7 @@ FORMS =    estimatefocalvolumedlg.ui
 
 RESOURCES += qfevalfcsfit.qrc
 
-TRANSLATIONS= ../../output/assets/translations/de.qfevalfcsfit.ts
+TRANSLATIONS= ./translations/de.qfevalfcsfit.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
@@ -36,6 +36,26 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg core
 CONFIG += exceptions rtti stl
+
+QMAKE_MKDIR = mkdir -p
+
+
+HELP_FILES.files = ./help/*.*
+HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/
+
+HELPPIC_FILES.files = ./help/pic/*.*
+HELPPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/pic/
+
+ASSETS_FILES.files = ./assets/*.*
+ASSETS_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/
+
+ASSETS_TRANSLATIONS.files = ./translations/*.qm
+ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
+
+INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
+
+POST_TARGETDEPS += install
+
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/

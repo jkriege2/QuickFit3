@@ -1,7 +1,8 @@
 #include "qfrawdatapropertyeditor.h"
 #include "dlgnewproperty.h"
+#include "qfrawdatarecordfactory.h"
 
-// TODO: add some more options to the fit results display: average over several selected data items
+
 // TODO: add some more options to the fit results display: store column under different name
 
 
@@ -240,7 +241,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         */
 
         helpWidget->clear();
-        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+current->getType()+QString("/"))+current->getType()+".html");
+        QString dll=current->getProject()->getRawDataRecordFactory()->getPluginFilename(current->getType());
+        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/"))+current->getType()+".html");
 
     } else {
         edtName->setText("");
