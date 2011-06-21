@@ -2,8 +2,9 @@ TEMPLATE = lib
 TARGET = quickfit3lib
 DEPENDPATH += .
 
-INCLUDEPATH += ../../../../LIB/trunk/ \
-               ../../../../LIB/trunk/qt
+INCLUDEPATH += .
+#../../../../LIB/trunk/ \
+#               ../../../../LIB/trunk/qt
 
 
 QT += gui xml
@@ -73,20 +74,25 @@ SOURCES += dlgnewproperty.cpp \
            qfhtmlhelpwindow.cpp \
            qffitalgorithmthreaddedfit.cpp \
            qfextensionmanager.cpp \
-           qfevaluationresultsmodel.cpp \
-           ../../../../LIB/trunk/tools.cpp
+           qfevaluationresultsmodel.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui
 
 RESOURCES += lib.qrc
 
-TRANSLATIONS= ../output/assets/translations/de.lib.ts
+TRANSLATIONS= ./translations/de.lib.ts
 
 INCLUDEPATH +=
 
 CONFIG += exceptions rtti stl
 
+ASSETS_TRANSLATIONS.files = ./translations/*.qm
+ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
+
+INSTALLS += ASSETS_TRANSLATIONS
+
+!isEmpty(ASSETS_TRANSLATIONS)_POST_TARGETDEPS += install_ASSETS_TRANSLATIONS
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

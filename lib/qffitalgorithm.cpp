@@ -5,7 +5,6 @@
 #include <cfloat>
 #include <cstdio>
 #include <iostream>
-#include "tools.h"
 
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) {

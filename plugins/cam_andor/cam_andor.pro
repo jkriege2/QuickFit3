@@ -58,7 +58,6 @@ POST_TARGETDEPS += install
 
 
 
-
 QT += gui xml svg
 CONFIG += exceptions rtti stl
 MOC_DIR = ./.mocs/

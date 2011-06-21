@@ -83,6 +83,12 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 
 CONFIG += exceptions rtti stl
 
+ASSETS_TRANSLATIONS.files = ./translations/*.qm
+ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
+
+INSTALLS += ASSETS_TRANSLATIONS
+
+POST_TARGETDEPS += install
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
