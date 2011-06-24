@@ -28,7 +28,8 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /** \brief which data weighting should be applied */
         enum DataWeight {
             EqualWeighting=0,
-            StdDevWeighting=1
+            StdDevWeighting=1,
+            RunErrorWeighting=2
         };
 
         /** Default constructor */

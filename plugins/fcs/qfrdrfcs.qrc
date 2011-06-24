@@ -1,8 +1,16 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file alias="fcs_open.png">../../images/16x16/fcs_open.png</file>
-    <file alias="fcs_logo.png">../../images/22x22/fcs_open.png</file>
-    <file alias="fcs_rawdata.png">../../images/16x16/fcs_rawdata.png</file>
-    <file alias="fcs_rawdata_large.png">../../images/32x32/fcs_rawdata.png</file>
+    <file alias="fcs_open.png">./icons/fcs_open.png</file>
+    <file alias="fcs_logo.png">./icons/22x22_fcs_open.png</file>
+    <file alias="fcs_rawdata.png">./icons/fcs_rawdata.png</file>
+    <file alias="fcs_rawdata_large.png">./icons/32x32_fcs_rawdata.png</file>
+
+    <file alias="fcs/fcsplot_points.png">./icons/fcsplot_points.png</file>
+    <file alias="fcs/fcsplot_pointslines.png">./icons/fcsplot_pointslines.png</file>
+    <file alias="fcs/fcsplot_lines.png">./icons/fcsplot_lines.png</file>
+    <file alias="fcs/fcsplot_elines.png">./icons/fcsplot_elines.png</file>
+    <file alias="fcs/fcsplot_elinesbars.png">./icons/fcsplot_elinesbars.png</file>
+    <file alias="fcs/fcsplot_ebars.png">./icons/fcsplot_ebars.png</file>
+    <file alias="fcs/fcsplot_enone.png">./icons/fcsplot_enone.png</file>
 </qresource>
 </RCC>

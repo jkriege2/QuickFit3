@@ -97,6 +97,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnModelHelp;
         /** \brief QSpinBox that allows to select a special run */
         QSpinBox* spinRun;
+        /** \brief label for the run name */
+        QLabel* labRun;
         /** \brief help window for help on the current fit algorithm */
         QFHTMLHelpWindow* hlpAlgorithm;
         /** \brief help window for help on the current fit model function */
@@ -302,7 +304,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        double* allocWeights(bool* weightsOK=NULL);
+        double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100);
 
         /** \brief save current fit function and fit results to an INI file */
         void saveCurrentFitResults();

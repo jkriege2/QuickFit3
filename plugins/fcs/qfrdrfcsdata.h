@@ -104,6 +104,12 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          * access this as \code correlation[run*correlationN + n] \endcode
          */
         inline virtual double* getCorrelation() { return correlation; };
+        /** \brief values of the correlation function.
+         *         This is a 2D array of size runs * correlationN
+         *
+         * access this as \code correlation[run*correlationN + n] \endcode
+         */
+        inline virtual double* getCorrelationRunErrors() { return correlationErrors; };
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
@@ -114,7 +120,13 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief values of the standard deviation of the correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
         inline virtual double* getCorrelationStdDev() { return correlationStdDev; };
+        /** \brief errors, associated with the correlation function for a specified run.
+         *         This is a 1D array of size correlationN
+         */
+        virtual double* getCorrelationRunError(int run) { return &(correlationErrors[run*correlationN]); };
 
+        /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
+        virtual QString getCorrelationRunName(int run);
 
         /** \brief number of countrate runs in this object */
         inline virtual int getRateRuns() { return rateRuns; };
@@ -247,6 +259,12 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          * access this as \code correlation[run*correlationN + n] \endcode
          */
         double* correlation;
+        /** \brief values of the correlation function errors (for each run).
+         *         This is a 2D array of size correlationRuns * correlationN
+         *
+         * access this as \code correlation[run*correlationN + n] \endcode
+         */
+        double* correlationErrors;
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
         double* correlationMean;

@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="imaging_fcs/qfrdrimagingfcs.png">./icons/qfrdrimagingfcs.png</file>
+    <file alias="imaging_fcs/qfrdrimagingfcs_small.png">./icons/qfrdrimagingfcs_small.png</file>
+</qresource>
+</RCC>

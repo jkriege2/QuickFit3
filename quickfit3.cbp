@@ -229,6 +229,14 @@
 		<Unit filename="plugins\fitalgorithm_simanneal\fitalgorithm_simanneal.pro" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.cpp" />
 		<Unit filename="plugins\fitalgorithm_simanneal\simannealconfig.h" />
+		<Unit filename="plugins\imagingfcs\imagingfcs.pro" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs.cpp" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs.h" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs.qrc" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs_data.cpp" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs_data.h" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs_dataeditor.cpp" />
+		<Unit filename="plugins\imagingfcs\qfrdrimagingfcs_dataeditor.h" />
 		<Unit filename="plugins\interfaces\qfextensioncamera.h" />
 		<Unit filename="plugins\interfaces\qfextensionlinearstage.h" />
 		<Unit filename="plugins\interfaces\qfrdrcountratesinterface.h" />

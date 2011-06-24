@@ -77,6 +77,8 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         QListView* lstRunsSelect;
         /** \brief a combobox to select how the error of the average run are displayed */
         QComboBox* cmbAverageErrors;
+        /** \brief a combobox to select how the error of the average run are displayed */
+        QComboBox* cmbRunErrors;
         /** \brief a button which excludes the selected runs from the evaluation */
         QPushButton* btnDontUse;
         /** \brief a button which includes the selected runs to the evaluation */

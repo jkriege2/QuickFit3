@@ -1,0 +1,38 @@
+date/time                   : 05/25/11 16:10:53
+input file                  : D:\kriegerj\daten\spim\2011_05_25\hela4xp_em300_0.0005s_1886.6Hz_1.tif
+autocorrelation file        : D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.autocorrelation.dat
+                                => organization: correlation curves of pixels row-wise, separated by two empty lines
+                                => columns: "lag time", "normalized correlation"
+crosscorrelation file       : D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.crosscorrelation.dat
+                                => organization: crosscorrelation curves of pixels to neighbors row-wise, separated by two empty lines
+                                => columns: "lag time", "normalized correlation, left", "normalized correlation, right", "normalized correlation, up", "normalized correlation, down"
+  -> GnuPlot file           : D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.plt
+  -> GnuPlot preview file   : D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.preview.plt
+statistics file             : D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.statistics.dat
+                                => columns: "frame", "mean", "stddev", "min", "max"
+  -> GnuPlot statistics file: D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.statistics.plt
+width                       : 16
+height                      : 16
+samples per pixel           : 1
+bits per sample             : 16
+tiled frames                : false
+sample format               : 1 = uint
+frame count (in TIFF)       : 200000
+reading frame count         : 200000
+first frame                 : 0
+last frame                  : 199999
+summing over # frames       : 1
+correlator S                : 18
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+smallest tau [s]            : 0.000530
+correct baseline            : true
+baseline                    : 77.000000
+correlation_displayfactor   : 10.000000
+video output file           : D:\kriegerj\daten\spim\2011_05_25\results_bc_c2\hela4xp_em300_0.0005s_1886.6Hz_1.video.tif
+video sum up                : 20
+video range                 : 19.350000 .. 644.500000
+video frames                : 10000
+autocorrelation axis range  : 0.996849 .. 1.031720
+crosscorrelation axis range  : 0.996401 .. 1.031459

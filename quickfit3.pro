@@ -12,6 +12,10 @@ SUBDIRS += plg_fcs
 plg_fcs.subdir = ./plugins/fcs
 plg_fcs.depends = lib libqf3widgets
 
+SUBDIRS += plg_imagingfcs
+plg_imagingfcs.subdir = ./plugins/imagingfcs
+plg_imagingfcs.depends = lib libqf3widgets
+
 SUBDIRS += plg_fcsfit
 plg_fcsfit.subdir = ./plugins/fcsfit
 plg_fcsfit.depends = lib libqf3widgets

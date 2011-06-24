@@ -57,6 +57,7 @@ void QFFCSFitEvaluation::intWriteData(QXmlStreamWriter& w) {
     w.writeAttribute("current", m_fitAlgorithm);
     if (m_weighting==EqualWeighting) w.writeAttribute("weighting", "equal");
     if (m_weighting==StdDevWeighting) w.writeAttribute("weighting", "stddev");
+    if (m_weighting==RunErrorWeighting) w.writeAttribute("weighting", "runerror");
 
     QMapIterator<QString, QMap<QString, QVariant> > fapit(algorithm_parameterstore);
     while (fapit.hasNext()) {
@@ -121,6 +122,7 @@ void QFFCSFitEvaluation::intReadData(QDomElement* e) {
         QString a=e1.attribute("weighting").toLower();
         m_weighting=EqualWeighting;
         if (a=="stddev") m_weighting=StdDevWeighting;
+        if (a=="runerror") m_weighting=RunErrorWeighting;
     }
     QDomElement elt=e1.firstChildElement("algorithm");
     algorithm_parameterstore.clear();

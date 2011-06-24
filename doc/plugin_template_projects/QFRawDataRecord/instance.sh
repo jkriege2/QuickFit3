@@ -49,6 +49,7 @@ mkdir -p $FNAME/assets
 mkdir -p $FNAME/help
 mkdir -p $FNAME/help/pic
 cp -v help.html $FNAME/help/${TARGETNAME}.html
+cp -v tutorial.html $FNAME/help/tutorial.html
 
 replace_in_all 's/target_id/'$TARGETNAME'/g'
 replace_in_all 's/qf3rdrdp_GROUPNAME/qf3rdrdp_'$TARGETNAME'/g'
@@ -56,6 +57,7 @@ replace_in_all 's/qf3rdrdp_GROUPNAME/qf3rdrdp_'$TARGETNAME'/g'
 replace_in_all 's/'$BASENAME'.png/'$FNAME'.png/g'
 replace_in_all 's/'$BASENAME'_small.png/'$FNAME'_small.png/g'
 replace_in_all 's/QFRDR/'$CLASSNAME'/g'
+replace_in_all 's/QFPRDR/'$CLASSNAME'Plugin/g'
 replace_in_all 's/'$BASENAME'.h/'$FNAME'.h/g'
 replace_in_all 's/'$BASENAME'.cpp/'$FNAME'.cpp/g'
 replace_in_all 's/'$BASENAME'.qrc/'$FNAME'.qrc/g'

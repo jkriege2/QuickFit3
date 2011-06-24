@@ -8,6 +8,7 @@ QFRDRFCSData::QFRDRFCSData(QFProject* parent):
     correlationN=0;
     correlationT=NULL;
     correlation=NULL;
+    correlationErrors=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
 
@@ -28,6 +29,7 @@ QFRDRFCSData::~QFRDRFCSData()
 {
     if (correlationT) free(correlationT);
     if (correlation) free(correlation);
+    if (correlationErrors) free(correlationErrors);
     if (correlationMean) free(correlationMean);
     if (correlationStdDev) free(correlationStdDev);
     if (rateT) free(rateT);
@@ -40,6 +42,7 @@ QFRDRFCSData::~QFRDRFCSData()
     correlation=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
+    correlationErrors=NULL;
 
     autoCalcRateN=-1;
     binnedRateN=0;
@@ -63,6 +66,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     correlation=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
+    correlationErrors=NULL;
     runsVisibleList.clear();
     for (int i=0; i<=N; i++) runsVisibleList.append(true);
     correlationN=N;
@@ -71,7 +75,8 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     correlationMean=(double*)calloc(correlationN, sizeof(double));
     correlationStdDev=(double*)calloc(correlationN, sizeof(double));
     correlation=(double*)calloc(correlationN*correlationRuns, sizeof(double));
-    if (!correlationT || !correlation || !correlationMean || !correlationStdDev)
+    correlationErrors=(double*)calloc(correlationN*correlationRuns, sizeof(double));
+    if (!correlationT || !correlation || !correlationMean || !correlationStdDev || !correlationErrors)
         setError(tr("Error while allocating memory for correlation function data!"));
     emit rawDataChanged();
 }
@@ -645,7 +650,11 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
     return true;
 }
 
-
+QString QFRDRFCSData::getCorrelationRunName(int run) {
+    //if (run<0) return tr("average");
+    if (run<correlationRuns) return tr("run %1").arg(run);
+    return QString("");
+}
 
 
 

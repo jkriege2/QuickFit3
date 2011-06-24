@@ -84,7 +84,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()));
 
     htmlReplaceList.append(qMakePair(QString("version.major"), QString::number(AutoVersion::MAJOR)));
-    htmlReplaceList.append(qMakePair(QString("version.minor"), QString::number(AutoVersion::MAJOR)));
+    htmlReplaceList.append(qMakePair(QString("version.minor"), QString::number(AutoVersion::MINOR)));
     htmlReplaceList.append(qMakePair(QString("version.build"), QString::number(AutoVersion::BUILD)));
     htmlReplaceList.append(qMakePair(QString("version.revision"), QString::number(AutoVersion::REVISION)));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(AutoVersion::STATUS)));

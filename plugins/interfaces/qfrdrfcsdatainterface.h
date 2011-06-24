@@ -40,6 +40,18 @@ class QFRDRFCSDataInterface {
          *         This is a 1D array of size correlationN
          */
         virtual double* getCorrelationRun(int run)=0;
+        /** \brief errors, associated with the correlation function for a specified run.
+         *         This is a 1D array of size correlationN
+         */
+        virtual double* getCorrelationRunError(int run)=0;
+        /** \brief values of the correlation function errors.
+         *         This is a 2D array of size runs * correlationN
+         *
+         * access this as \code correlationRunErros[run*correlationN + n] \endcode
+         */
+        virtual double* getCorrelationRunErrors()=0;
+        /** \brief return a string naming/describing a run (should be short) */
+        virtual QString getCorrelationRunName(int run)=0;
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
         virtual double* getCorrelationMean()=0;

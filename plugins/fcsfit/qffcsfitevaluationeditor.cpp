@@ -78,6 +78,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     cmbWeights->setEditable(false);
     cmbWeights->addItem(tr("equal weights"));
     cmbWeights->addItem(tr("standard deviation"));
+    cmbWeights->addItem(tr("per run errors"));
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
     l=new QLabel(tr("&Weight Model: "), this);
@@ -313,7 +314,12 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     spinRun->setMaximum(-1);
     spinRun->setSpecialValueText(tr("average"));
     spinRun->setMinimumWidth(100);
-    fl->addRow(tr("run: "), spinRun);
+    labRun=new QLabel(this);
+    QHBoxLayout* hblRun=new QHBoxLayout();
+    hblRun->setContentsMargins(0,0,0,0);
+    hblRun->addWidget(spinRun, 1);
+    hblRun->addWidget(labRun, 2);
+    fl->addRow(tr("run: "), hblRun);
     layModel->addLayout(fl, 0);
 
     labFitParameters=new QLabel(this);
@@ -598,7 +604,7 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
     bool modelChanged=false;
-    std::cout<<"QFFCSFitEvaluationEditor::highlightingChanged("<<formerRecord<<", "<<currentRecord<<")  eval="<<eval<<"   data="<<data<<"\n";
+    //std::cout<<"QFFCSFitEvaluationEditor::highlightingChanged("<<formerRecord<<", "<<currentRecord<<")  eval="<<eval<<"   data="<<data<<"\n";
     if (data) {
         //labRecord->setText(tr("<b>current:</b> <i>%1</i>").arg(currentRecord->getName()) );
         connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
@@ -633,6 +639,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
+
     if (!ffunc) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         // delete all fit parameter widgets
@@ -868,19 +875,31 @@ void QFFCSFitEvaluationEditor::replotData() {
         //////////////////////////////////////////////////////////////////////////////////
         size_t c_mean=0;
         QString graphName="";
+        size_t c_std=0;
+        QString errorName="";
         if (eval->getCurrentRun()<0) {
             c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
             graphName=tr("\\verb{%1} average").arg(record->getName());
+            c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+            errorName=tr("stddev");
         } else {
             if (eval->getCurrentRun()<(int)data->getCorrelationRuns()) {
                 c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentRun()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentRun())).toStdString());
-                graphName=tr("\\verb{%2} run %1").arg(eval->getCurrentRun()).arg(record->getName());
+                graphName=tr("\\verb{%2} %3").arg(eval->getCurrentRun()).arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentRun()));
+                if (eval->getFitDataWeighting()==QFFCSFitEvaluation::RunErrorWeighting) {
+                    c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentRun()), data->getCorrelationN(), "cperrunerror");
+                    errorName=tr("per run");
+                } else {
+                    c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+                    errorName=tr("stddev");
+                }
             } else {
                 c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
                 graphName=tr("\\verb{%1} average").arg(record->getName());
+                c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+                errorName=tr("stddev");
             }
         }
-        size_t c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
         JKQTPerrorPlotstyle styl=JKQTPnoError;
         switch (errorStyle) {
             case 1: styl=JKQTPerrorLines; break;
@@ -971,11 +990,19 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 // retrieve data and tau-values from rawdata record
                 /////////////////////////////////////////////////////////////////////////////////
                 long N=data->getCorrelationN();
+                int runAvgWidth=10;
+                int runAvgStart=-runAvgWidth/2;
                 double* fitfunc=(double*)calloc(N,sizeof(double));
                 double* residuals=(double*)calloc(N,sizeof(double));
                 double* residuals_weighted=(double*)calloc(N,sizeof(double));
                 double* tauvals=data->getCorrelationT();
                 double* corrdata=NULL;
+                int runAvgMaxN=N;
+                int runAvgN=0;
+                double* tau_runavg=(double*)calloc(runAvgMaxN, sizeof(double));
+                double* residuals_runavg=(double*)calloc(runAvgMaxN, sizeof(double));
+                double* residuals_runavg_weighted=(double*)calloc(runAvgMaxN, sizeof(double));
+
                 if (eval->getCurrentRun()<0) {
                     corrdata=data->getCorrelationMean();
                 } else {
@@ -985,6 +1012,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                         corrdata=data->getCorrelationMean();
                     }
                 }
+
                 double* weights=allocWeights();
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -1046,6 +1074,17 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                             if (resw<rminw) rminw=resw;
                         }
                         //std::cout<<"res="<<res<<" resw="<<resw<<"    :    rmin="<<rmin<<"  rmax="<<rmax<<"    rminw="<<rminw<<"  rmaxw="<<rmaxw<<std::endl;
+                        if ((i+runAvgStart>=datacut_min) && (i+runAvgStart+runAvgWidth<=datacut_max) && ((i-datacut_min)%runAvgWidth==0)) {
+                            double s=0, sw=0;
+                            for (int j=0; j<runAvgWidth; j++) {
+                                s=s+residuals[i+j+runAvgStart];
+                                sw=sw+residuals_weighted[i+j+runAvgStart];
+                            }
+                            tau_runavg[runAvgN]=tauvals[i];
+                            residuals_runavg[runAvgN]=s/(double)runAvgWidth;
+                            residuals_runavg_weighted[runAvgN]=sw/(double)runAvgWidth;
+                            runAvgN++;
+                        }
                     }
                 }
 
@@ -1159,6 +1198,38 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
                 pltResiduals->addGraph(g_residuals);
 
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // plot residuals running average
+                /////////////////////////////////////////////////////////////////////////////////
+                size_t c_tauresra=dsres->addCopiedColumn(tau_runavg, runAvgN, "tau_resid_runavg");
+                size_t c_residualsra=0;
+                JKQTPxyLineGraph* g_residualsra=new JKQTPxyLineGraph(pltResiduals->get_plotter());
+
+
+                if (chkWeightedResiduals->isChecked()) {
+                    c_residualsra=dsres->addCopiedColumn(residuals_runavg_weighted, runAvgN, "residuals_runavg_weighted");
+                    g_residualsra->set_title("weighted residuals, movAvg");
+                } else {
+                    c_residualsra=dsres->addCopiedColumn(residuals_runavg, runAvgN, "residuals_runavg");
+                    g_residualsra->set_title("residuals, movAvg");
+                }
+                g_residualsra->set_xColumn(c_tauresra);
+                g_residualsra->set_yColumn(c_residualsra);
+                g_residualsra->set_symbolSize(6);
+                g_residualsra->set_symbolWidth(1);
+                g_residualsra->set_color(g_residuals->get_color().darker());
+                //g_residuals->set_datarange_start(datacut->get_userMin());
+                //g_residuals->set_datarange_end(datacut->get_userMax());
+                g_residualsra->set_drawLine(true);
+                if (residualStyle==0) { // draw points
+                    // always draw as lines
+                    g_residualsra->set_symbol(JKQTPplus);
+                } else if (residualStyle==2) {
+                    g_residualsra->set_symbol(JKQTPplus);
+                }
+                pltResiduals->addGraph(g_residualsra);
+
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals histogram
                 /////////////////////////////////////////////////////////////////////////////////
@@ -1227,6 +1298,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 free(errors);
                 free(fitfunc);
                 free(residuals);
+                free(tau_runavg);
+                free(residuals_runavg);
                 free(residuals_weighted);
                 free(weights);
                 free(resHistogram);
@@ -1234,6 +1307,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 free(paramsFix);
                 free(resWCorrelation);
                 free(resCorrelation);
+                free(residuals_runavg_weighted);
             }
         }
     } catch(std::exception& E) {
@@ -1283,7 +1357,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
             }
         }
         bool weightsOK=false;
-        weights=allocWeights(&weightsOK);
+        weights=allocWeights(&weightsOK, record, run);
         if (!weightsOK) services->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -2190,9 +2264,12 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
 
+
     QFRawDataRecord* currentRecord=current->getHighlightedRecord();
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
+
+    labRun->setText(QString("  (%1)").arg(fcs->getCorrelationRunName(run)));
 
     data->setCurrentRun(run);
 
@@ -2236,6 +2313,7 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     if (data) {
         if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
         else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
+        else if (cmbWeights->currentIndex()==2) data->setFitDataWeighting(QFFCSFitEvaluation::RunErrorWeighting);
         else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
     }
     QApplication::restoreOverrideCursor();
@@ -2267,16 +2345,19 @@ void QFFCSFitEvaluationEditor::plotMouseMove(double x, double y) {
     labMousePosition->setText(tr("cursor: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
 }
 
-double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK) {
+double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in) {
     if (weightsOKK) *weightsOKK=false;
     if (!current) return NULL;
     if (!cmbModel) return NULL;
-    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRawDataRecord* record=record_in;
+    if (!record_in) record=current->getHighlightedRecord();
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     QFFitFunction* ffunc=eval->getFitFunction();
+    int run=run_in;
+    if (run<=-100) run=eval->getCurrentRun();
 
     int N=data->getCorrelationN();
 
@@ -2294,7 +2375,17 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK) {
             };
         }
     }
-    if (!weightsOK) {
+    if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
+        double* std=data->getCorrelationRunError(run);
+        weightsOK=true;
+        for (int i=0; i<N; i++) {
+            weights[i]=std[i];
+            if ((fabs(weights[i])<1000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                weightsOK=false;
+                break;
+            };
+        }
+    }    if (!weightsOK) {
         for (int i=0; i<N; i++) weights[i]=1;
     }
     if (weightsOKK) *weightsOKK=weightsOK;
