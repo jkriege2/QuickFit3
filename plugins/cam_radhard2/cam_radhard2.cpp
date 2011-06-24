@@ -47,8 +47,8 @@ void QFExtensionCameraRadhard2::initExtension() {
     actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
-    QMenu* subMenu=extm->addMenu(tr("Radhard 2 Tools"));
     if (extm) {
+        QMenu* subMenu=extm->addMenu(tr("Radhard 2 Tools"));
         subMenu->addAction(actProgramFPGA);
     }
 

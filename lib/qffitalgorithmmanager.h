@@ -37,8 +37,14 @@ class QFFitAlgorithmManager : public QObject {
         /** \brief plugin filename */
         virtual QString getFilename(int i) const;
 
+        /** \brief plugin filename */
+        virtual QString getIconFilename(int i) const;
+
         /** \brief short description for the plugin */
         virtual QString getDescription(int i) const;
+
+        /** \brief ID of the plugin */
+        virtual QString getID(int i) const;
 
         /** \brief author the plugin */
         virtual QString getAuthor(int i) const;
@@ -54,6 +60,12 @@ class QFFitAlgorithmManager : public QObject {
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
+
+        /** \brief get plugins major version number */
+        int getMajorVersion(int i);
+
+        /** \brief get plugins minor version number */
+        int getMinorVersion(int i);
 
         /** \brief create a new fit algorithm object instance */
         QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;

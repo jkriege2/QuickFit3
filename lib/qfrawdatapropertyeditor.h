@@ -32,6 +32,10 @@ class QFRawDataPropertyEditor : public QWidget {
         void setSettings(ProgramOptions* settings);
         /** \brief write the settings */
         void writeSettings();
+        /** \brief set a pointer to an external (global) replacement list */
+        void setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
+            helpWidget->setHtmlReplacementList(list);
+        }
     protected:
         /** \brief points to the record currently displayed */
         QFRawDataRecord* current;

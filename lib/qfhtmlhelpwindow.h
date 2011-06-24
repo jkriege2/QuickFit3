@@ -14,6 +14,13 @@
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
+
+    There is a mechanism to reformat the HTML before display. This is doen in the loadHTML() method and uses
+    two lists \f$( \mathtt{<key>}, \mathtt{<replaceBy>} )_i\f$ of replacements:
+      - an internal list may be managed by clearInternalReplaces() and addInternalReplace()
+      - an external (e.g. global) list is provided as pointer, using setHtmlReplacementList()
+    .
+    The mechanism replace every occurence of \c $$key by the according \c replaceBy string.
  */
 
 class QFHTMLHelpWindow : public QWidget {
@@ -36,6 +43,16 @@ class QFHTMLHelpWindow : public QWidget {
         /** \brief return a reference to the base font of the main text */
         QFont& baseFont() { return m_baseFont; }
 
+        /** \brief set a pointer to an external (global) replacement list */
+        void setHtmlReplacementList(QList<QPair<QString, QString> >* list);
+
+        /** \brief clear the INTERNAL list of replacements */
+        void clearInternalReplaces() { internal_replaces.clear(); }
+
+        /** \brief add internal replacement */
+        void addInternalReplace(QString key, QString replaceBy) {
+            internal_replaces.append(qMakePair(key, replaceBy));
+        }
     public slots:
         /** \brief updates the information in the window */
         void updateHelp(QString title, QString filename);
@@ -44,6 +61,12 @@ class QFHTMLHelpWindow : public QWidget {
         /** \brief clear contents of window */
         void clear();
     private:
+        QList<QPair<QString, QString> >* replaces;
+
+        QList<QPair<QString, QString> > internal_replaces;
+
+        QString loadHTML(QString filename);
+
         /** \brief a label for the model name */
         QLabel* labelTitle;
 
@@ -66,7 +89,22 @@ class QFHTMLHelpWindow : public QWidget {
 
         QString m_home;
 
-        QStack<QString> history;
+        struct HistoryEntry {
+            QString url;
+            QString name;
+
+            HistoryEntry(QString url, QString name) {
+                this->url=url;
+                this->name=name;
+            }
+
+            HistoryEntry() {
+                url="";
+                name="";
+            }
+        };
+
+        QStack<HistoryEntry> history;
 
         int history_idx;
 
@@ -78,6 +116,7 @@ class QFHTMLHelpWindow : public QWidget {
         void home();
         void showFile(QString filename);
         void print();
+        void updateButtons();
 };
 
 #endif // QFHTMLHelpWindow_H

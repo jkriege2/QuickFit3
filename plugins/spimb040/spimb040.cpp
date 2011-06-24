@@ -37,10 +37,12 @@ void QFESPIMB040::initExtension() {
 
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QToolBar* exttb=services->getToolbar("extensions");
+    //std::cout<<"extensions toolbars: "<<exttb<<std::endl;
     if (exttb) {
         exttb->addAction(actStartPlugin);
     }
     QMenu* extm=services->getMenu("extensions");
+    //std::cout<<"extensions menu: "<<extm<<std::endl;
     if (extm) {
         extm->addAction(actStartPlugin);
     }

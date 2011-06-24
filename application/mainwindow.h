@@ -20,6 +20,7 @@
 #include "../lib/qfhtmlhelpwindow.h"
 #include "../lib/qfextensionmanager.h"
 #include "../lib/qfextension.h"
+#include "version.h"
 
 
 #define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm, Tabea Elbel, Jan Buchholz"
@@ -81,6 +82,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         /** \copydoc QFPluginServices::getConfigFileDirectory() */
         virtual QString getConfigFileDirectory();
 
+        /** \copydoc QFPluginServices::getHTMLReplacementList() */
+        virtual QList<QPair<QString, QString> >* getHTMLReplacementList();
         /** \copydoc QFPluginServices::getAssetsDirectory() */
         virtual QString getAssetsDirectory();
         /** \copydoc QFPluginServices::getPluginsDirectory() */
@@ -174,6 +177,10 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         void writeSettings();
         bool maybeSave();
         QString createPluginDoc(bool docLinks=false);
+        QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
+        QString createPluginDocHelp(QString mainitem_before=QObject::tr("<h2>%1 Help:</h2><ul>"), QString mainitem_after=QString("</ul>"));
+        /** \brief create one item in the plugin listing, created in createPluginDoc(). Provide all the basic data. If you want additional row, supply them in additional where line i contains the i-th addition name and line i+1 contains the i-th addition value */
+        QString createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional);
         void loadProject(const QString &fileName);
         bool saveProject(const QString &fileName);
         void setCurrentProject(const QString &fileName);
@@ -181,6 +188,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
 
         QString curFile;
         QPointer<QFProject> project;
+
+        QList<QPair<QString, QString> > htmlReplaceList;
 
         QTimer newProjectTimer;
 

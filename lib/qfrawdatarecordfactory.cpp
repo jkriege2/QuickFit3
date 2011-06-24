@@ -39,3 +39,20 @@ void QFRawDataRecordFactory::distribute(QFProject* project, ProgramOptions* sett
 }
 
 
+int QFRawDataRecordFactory::getMajorVersion(QString id) {
+    int ma, mi;
+    if (items.contains(id)) {
+        items[id]->getVersion(ma, mi);
+        return ma;
+    }
+    return 0;
+}
+
+int QFRawDataRecordFactory::getMinorVersion(QString id) {
+    int ma, mi;
+    if (items.contains(id)) {
+        items[id]->getVersion(ma, mi);
+        return mi;
+    }
+    return 0;
+}

@@ -78,6 +78,10 @@ class QFEvaluationPropertyEditor : public QWidget {
         int getID() { return id; };
         /** \brief set the current record */
         void setCurrent(QFEvaluationItem* c);
+        /** \brief set a pointer to an external (global) replacement list */
+        void setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
+            helpWidget->setHtmlReplacementList(list);
+        }
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);

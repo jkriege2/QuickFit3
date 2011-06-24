@@ -71,6 +71,10 @@ QString QFFitFunctionManager::getWeblink(int i) const {
     return fitPlugins[i]->getWeblink();
 }
 
+QString QFFitFunctionManager::getID(int i) const {
+    return fitPlugins[i]->getID();
+}
+
 QStringList QFFitFunctionManager::getIDList(int i) const {
     return fitPlugins[i]->getIDs();
 }
@@ -81,4 +85,26 @@ int QFFitFunctionManager::getPluginForID(QString id) const {
          if (ids.contains(id)) return i;
    }
    return -1;
+}
+
+int QFFitFunctionManager::getMajorVersion(int id) {
+    int ma, mi;
+    if (id<fitPlugins.size()) {
+        fitPlugins[id]->getVersion(ma, mi);
+        return ma;
+    }
+    return 0;
+}
+
+int QFFitFunctionManager::getMinorVersion(int id) {
+    int ma, mi;
+    if (id<fitPlugins.size()) {
+        fitPlugins[id]->getVersion(ma, mi);
+        return mi;
+    }
+    return 0;
+}
+
+QString QFFitFunctionManager::getIconFilename(int i) const {
+    return fitPlugins[i]->getIconFilename();
 }

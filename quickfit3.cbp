@@ -125,6 +125,8 @@
 		<Unit filename="lib\qffitfunctionmanager.h" />
 		<Unit filename="lib\qfhtmlhelpwindow.cpp" />
 		<Unit filename="lib\qfhtmlhelpwindow.h" />
+		<Unit filename="lib\qflib_version.h" />
+		<Unit filename="lib\qfplugin.h" />
 		<Unit filename="lib\qfpluginevaluation.h" />
 		<Unit filename="lib\qfpluginfitalgorithm.h" />
 		<Unit filename="lib\qfpluginfitfunction.h" />

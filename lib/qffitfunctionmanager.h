@@ -39,8 +39,14 @@ class QFFitFunctionManager : public QObject {
         /** \brief short description for the plugin */
         virtual QString getDescription(int i) const;
 
+        /** \brief plugin filename */
+        virtual QString getIconFilename(int i) const;
+
         /** \brief author the plugin */
         virtual QString getAuthor(int i) const;
+
+        /** \brief ID of the plugin */
+        virtual QString getID(int i) const;
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright(int i) const;
@@ -57,6 +63,10 @@ class QFFitFunctionManager : public QObject {
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
+        /** \brief get plugins major version number */
+        int getMajorVersion(int i);
+        /** \brief get plugins minor version number */
+        int getMinorVersion(int i);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

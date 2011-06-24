@@ -63,6 +63,10 @@ class QFExtensionManager : public QObject {
         QString getIconFilename(QString ID);
         /** \brief returns the plugins filename for a specified QFRawDataRecord ID. */
         QString getPluginFilename(QString ID);
+        /** \brief get plugins major version number */
+        int getMajorVersion(QString id);
+        /** \brief get plugins minor version number */
+        int getMinorVersion(QString id);
 
         /** \brief return a pointer to the given QFExtension instance */
         QFExtension* getInstance(QString id);

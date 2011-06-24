@@ -128,3 +128,21 @@ QObject* QFExtensionManager::getQObjectInstance(QString ID) {
     if (itemobjects.contains(ID)) return itemobjects[ID];
     return NULL;
 }
+
+int QFExtensionManager::getMajorVersion(QString id) {
+    int ma, mi;
+    if (items.contains(id)) {
+        items[id]->getVersion(ma, mi);
+        return ma;
+    }
+    return 0;
+}
+
+int QFExtensionManager::getMinorVersion(QString id) {
+    int ma, mi;
+    if (items.contains(id)) {
+        items[id]->getVersion(ma, mi);
+        return mi;
+    }
+    return 0;
+}

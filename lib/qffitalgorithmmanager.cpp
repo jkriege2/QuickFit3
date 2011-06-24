@@ -87,3 +87,31 @@ QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(QString id, QObject* pare
     }
     return NULL;
 }
+
+int QFFitAlgorithmManager::getMajorVersion(int id) {
+    int ma, mi;
+    if (id<fitPlugins.size()) {
+        fitPlugins[id]->getVersion(ma, mi);
+        return ma;
+    }
+    return 0;
+}
+
+int QFFitAlgorithmManager::getMinorVersion(int id) {
+    int ma, mi;
+    if (id<fitPlugins.size()) {
+        fitPlugins[id]->getVersion(ma, mi);
+        return mi;
+    }
+    return 0;
+}
+
+
+QString QFFitAlgorithmManager::getID(int i) const {
+    return fitPlugins[i]->getID();
+}
+
+
+QString QFFitAlgorithmManager::getIconFilename(int i) const {
+    return fitPlugins[i]->getIconFilename();
+}

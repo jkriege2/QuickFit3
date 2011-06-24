@@ -104,6 +104,12 @@ class QFEvaluationItemFactory : public QObject {
                 return items[ID]->registerToMenu(menu);
             }
         };
+
+        /** \brief get plugins major version number */
+        int getMajorVersion(QString id);
+        /** \brief get plugins minor version number */
+        int getMinorVersion(QString id);
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

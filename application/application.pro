@@ -46,8 +46,6 @@ PRECOMPILED_HEADER += ../extlibs/cimg.h
 
 
 
-
-
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/help/
 

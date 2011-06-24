@@ -40,5 +40,23 @@ void QFEvaluationItemFactory::distribute(QFProject* project, ProgramOptions* set
 }
 
 
+int QFEvaluationItemFactory::getMajorVersion(QString id) {
+    int ma, mi;
+    if (items.contains(id)) {
+        items[id]->getVersion(ma, mi);
+        return ma;
+    }
+    return 0;
+}
+
+int QFEvaluationItemFactory::getMinorVersion(QString id) {
+    int ma, mi;
+    if (items.contains(id)) {
+        items[id]->getVersion(ma, mi);
+        return mi;
+    }
+    return 0;
+}
+
 
 

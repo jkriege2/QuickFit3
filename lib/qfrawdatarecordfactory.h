@@ -93,7 +93,10 @@ class QFRawDataRecordFactory : public QObject {
         };
 
 
-
+        /** \brief get plugins major version number */
+        int getMajorVersion(QString id);
+        /** \brief get plugins minor version number */
+        int getMinorVersion(QString id);
 
 
 

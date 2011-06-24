@@ -87,6 +87,12 @@ class QFPluginServices {
         virtual QString getAssetsDirectory()=0;
         /** \brief return a base path where to find plugins */
         virtual QString getPluginsDirectory()=0;
+        /** \brief a list of replacements for the online help system.
+         *
+         *  Each entry in this list has a \c key, and some text. The QFHTMLHelpWindow will search through the html code for an
+         *  occurence of \c $$key and replace any such occurence by the given value.
+         */
+        virtual QList<QPair<QString, QString> >* getHTMLReplacementList()=0;
 };
 
 
