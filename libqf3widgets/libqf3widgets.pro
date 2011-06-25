@@ -88,7 +88,7 @@ ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 
 INSTALLS += ASSETS_TRANSLATIONS
 
-POST_TARGETDEPS += install
+#POST_TARGETDEPS += install
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

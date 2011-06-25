@@ -19,14 +19,20 @@ HEADERS += spimb040.h \
            qfespimb040samplestageconfig.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
-           ../../../../../LIB/trunk/highrestimer.h
+           ../../../../../LIB/trunk/highrestimer.h \
+           qfcameracombobox.h \
+           qfstagecombobox.h \
+           qfcameraconfigcombobox.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040cameraconfig.cpp \
            qfespimb040samplestageconfig.cpp \
-           ../../../../../LIB/trunk/highrestimer.cpp
+           ../../../../../LIB/trunk/highrestimer.cpp \
+           qfcameracombobox.cpp \
+           qfstagecombobox.cpp \
+           qfcameraconfigcombobox.cpp
 
 FORMS =
 
@@ -63,7 +69,7 @@ ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 
 INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
 
-POST_TARGETDEPS += install
+#POST_TARGETDEPS += install
 
 
 MOC_DIR = ./.mocs/

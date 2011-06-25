@@ -9,6 +9,12 @@ rm ${ZIPFILE}
 
 mkdir -p deploy
 
+cd ..
+qmake
+make
+make install
+cd output
+
 for f in *
 do
     if [ $f != "deploy" ]; then

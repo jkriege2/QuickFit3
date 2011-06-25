@@ -47,7 +47,8 @@ HEADERS += dlgnewproperty.h \
            qfextensionmanager.h \
            qfevaluationresultsmodel.h \
            qfplugin.h \
-           qflib_version.h
+           qflib_version.h \
+           csvtools.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -74,7 +75,8 @@ SOURCES += dlgnewproperty.cpp \
            qfhtmlhelpwindow.cpp \
            qffitalgorithmthreaddedfit.cpp \
            qfextensionmanager.cpp \
-           qfevaluationresultsmodel.cpp
+           qfevaluationresultsmodel.cpp \
+           csvtools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui
@@ -92,7 +94,7 @@ ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 
 INSTALLS += ASSETS_TRANSLATIONS
 
-!isEmpty(ASSETS_TRANSLATIONS)_POST_TARGETDEPS += install_ASSETS_TRANSLATIONS
+
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

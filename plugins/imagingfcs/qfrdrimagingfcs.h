@@ -57,6 +57,14 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
     protected slots:
         /** \brief insertdata from file*/
         void insertRecord();
+    protected:
+        /*! \brief add a video_correlator file to the current project
+
+            \param filename filename of the input file
+            \param paramValues values for parameters in paramNames
+            \param paramReadonly names of initial parameters that should be declared readonly
+        */
+        void insertVideoCorrelatorFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
 };
 
 #endif // QFRDRIMAGINGFCS_H

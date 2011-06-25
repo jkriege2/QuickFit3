@@ -400,7 +400,7 @@ double QFFCSFitEvaluation::getFitValue(QFRawDataRecord* r, int run, const QStrin
     if (pid>-1) res=f->getDescription(pid).initialValue;
     res=fitParamSettings->value(QString(m_fitFunction+"/"+id), res).toDouble();
     QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
-    if (r && (id=="count_rate")) {
+    if (crintf && (id=="count_rate")) {
         res=crintf->getRateMean(run)*1000;
     }
     QString psID=getParameterStoreID(id);
@@ -430,7 +430,7 @@ double QFFCSFitEvaluation::getFitError(QFRawDataRecord* r, int run, const QStrin
             return parameterStore[psID].error;
         }
     }
-    if (r && (id=="count_rate")) {
+    if (crintf && (id=="count_rate")) {
         return crintf->getRateStdDev(run)*1000;
     }
     return 0.0;

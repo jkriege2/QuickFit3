@@ -35,5 +35,7 @@
      <file alias="spimb040/config_saveas.png">../../images/16x16/save_all.png</file>
      <file alias="spimb040/config_rename.png">../../images/16x16/edit_rename.png</file>
 
+     <file alias="spimb040/camera_config.png">./icons/camera_config.png</file>
+
 </qresource>
 </RCC>

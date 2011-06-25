@@ -31,8 +31,6 @@ QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, 
     camView=NULL;
     locked=false;
 
-    // search for available camera plugins
-    findCameras(m_pluginServices->getExtensionManager());
 
     // initialize raw image memory ...
     viewData.reset();
@@ -41,9 +39,8 @@ QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, 
     setTitle(tr(" Camera %1: ").arg(camViewID+1));
     createWidgets(m_pluginServices->getExtensionManager());
     createActions();
-    rereadConfigCombos();
     displayStates(QFESPIMB040CameraConfig::Disconnected);
-    if (cameras.size()<=0) displayStates(QFESPIMB040CameraConfig::Inactive);
+    if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040CameraConfig::Inactive);
 
 }
 
@@ -69,8 +66,9 @@ bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCam
     QString filename="";
     *previewSettingsFilename="";
     *acquisitionSettingsFilename="";
-    if (cmbAcquisitionConfiguration->currentIndex()>=0) *acquisitionSettingsFilename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
-    if (cmbPreviewConfiguration->currentIndex()>=0) *previewSettingsFilename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
+    *acquisitionSettingsFilename=cmbAcquisitionConfiguration->currentConfigFilename();
+    //if (cmbPreviewConfiguration->currentIndex()>=0) *previewSettingsFilename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
+    *previewSettingsFilename=cmbPreviewConfiguration->currentConfigFilename();
     *extension=viewData.extension;
     *ecamera=viewData.camera;
     *camera=viewData.usedCamera;
@@ -85,75 +83,14 @@ void QFESPIMB040CameraConfig::releaseCamera() {
     }
 }
 
-void QFESPIMB040CameraConfig::rereadConfigCombos() {
-    // store current setting of comboboxes
-    QString ac=cmbAcquisitionConfiguration->currentText();
-    QString pc=cmbPreviewConfiguration->currentText();
-    cmbAcquisitionConfiguration->clear();
-    cmbPreviewConfiguration->clear();
-    if (cameras.size()<=0) return;
-
-    // find applicable .ccf files
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
-    if ((!cam)||(!extension)) return;
-    QString directory=m_pluginServices->getConfigFileDirectory()+"/plugins/extensions/"+extension->getID();
-    mk_all_dir(directory.toStdString());
-    //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
-    directory+="/";
-    QStringList filenames;
-    QDir dir = QDir(directory, "*.ccf");
-    foreach (QString fileName, dir.entryList(QDir::Files)) {
-        QString absfn=dir.absoluteFilePath(fileName);
-        filenames.append(absfn);
-    }
-    // if there are no configurations, make sure there is at least default.ccf
-    if (filenames.isEmpty()) {
-        QFile file(directory+"default.ccf");
-        file.open(QIODevice::WriteOnly | QIODevice::Text);
-        file.close();
-        filenames.append(directory+"default.ccf");
-    }
-    // fill comboboxes
-    for (int i=0; i<filenames.size(); i++) {
-        QString fn=QFileInfo(filenames[i]).baseName();
-        cmbAcquisitionConfiguration->addItem(fn, filenames[i]);
-        cmbPreviewConfiguration->addItem(fn, filenames[i]);
-    }
-
-
-    // FINALLY: make sure the combo boxes have their values set.
-    int configidx=cmbAcquisitionConfiguration->findText(ac);
-    if (configidx<0) configidx=0;
-    cmbAcquisitionConfiguration->setCurrentIndex(configidx);
-
-    configidx=cmbPreviewConfiguration->findText(pc);
-    if (configidx<0) configidx=0;
-    cmbPreviewConfiguration->setCurrentIndex(configidx);
-
-}
 
 void QFESPIMB040CameraConfig::loadSettings(ProgramOptions* settings, QString prefix) {
     if (camView) camView->loadSettings(settings, prefix+"cam_view/");
 
     cmbAcquisitionDevice->setCurrentIndex(settings->getQSettings()->value(prefix+"last_device", 0).toInt());
     spinAcquisitionDelay->setValue(settings->getQSettings()->value(prefix+"acquisition_delay", 0).toDouble());
-
-    QString configfile=settings->getQSettings()->value(prefix+"preview_config", "default").toString();
-    int configidx=cmbPreviewConfiguration->findText(configfile);
-    if (configidx<0) configidx=0;
-    cmbPreviewConfiguration->setCurrentIndex(configidx);
-
-    configfile=settings->getQSettings()->value(prefix+"acquisition_config", "default").toString();
-    configidx=cmbAcquisitionConfiguration->findText(configfile);
-    if (configidx<0) configidx=0;
-    cmbAcquisitionConfiguration->setCurrentIndex(configidx);
+    cmbPreviewConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"preview_config", "default").toString());
+    cmbAcquisitionConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"acquisition_config", "default").toString());
 }
 
 void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString prefix) {
@@ -161,9 +98,8 @@ void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString pr
 
     settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentText());
-    settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentText());
-
+    settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigFilename());
+    settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigFilename());
 }
 
 void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
@@ -174,16 +110,6 @@ void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
     }
 }
 
-void QFESPIMB040CameraConfig::findCameras(QFExtensionManager* extManager) {
-    // load available acquisition devices from extManager
-    QStringList ids=extManager->getIDList();
-    for (int i=0; i<ids.size(); i++) {
-        QObject* extobj=extManager->getQObjectInstance(ids[i]);
-        QFExtension* extension=extManager->getInstance(ids[i]);
-        QFExtensionCamera* cam = qobject_cast<QFExtensionCamera*>(extobj);
-        if (cam) cameras.append(extobj);
-    }
-}
 
 void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,17 +130,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    cmbAcquisitionDevice=new QComboBox(this);
-    for (int i=0; i<cameras.size(); i++) {
-        QFExtension* extension=qobject_cast<QFExtension*>(cameras[i]);
-        QFExtensionCamera* cam = qobject_cast<QFExtensionCamera*>(cameras[i]);
-        for (unsigned int j=0; j<cam->getCameraCount(); j++) {
-            QPoint sl(i, j);
-            QString name=extension->getName();
-            if (cam->getCameraCount()>0) name=name+QString(" #%1").arg(j);
-            cmbAcquisitionDevice->addItem(QIcon(extension->getIconFilename()), name, sl);
-        }
-    }
+    cmbAcquisitionDevice=new QFCameraComboBox(extManager, this);
     QHBoxLayout* hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
     hbl->addWidget(cmbAcquisitionDevice);
@@ -222,27 +138,12 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     hbl->addWidget(btnConnect);
     camlayout->addRow(tr("<b>Device:</b>"), hbl);
     cmbAcquisitionDevice->setEnabled(false);
-    connect(cmbAcquisitionDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(rereadConfigCombos()));
 
 
 
-    hbl=new QHBoxLayout(this);
-    hbl->setContentsMargins(0,0,0,0);
-    hbl->addWidget(new QLabel(tr("configuration: "), this));
-    cmbPreviewConfiguration=new QComboBox(this);
-    hbl->addWidget(cmbPreviewConfiguration);
-    btnPreviewConfig=new QToolButton(this);
-    hbl->addWidget(btnPreviewConfig);
-    hbl->addSpacing(5);
-    btnDeletePreviewConfig=new QToolButton(this);
-    btnDeletePreviewConfig->setIcon(QIcon(":/spimb040/config_delete.png"));
-    btnDeletePreviewConfig->setToolTip(tr("delete current configuration"));
-    hbl->addWidget(btnDeletePreviewConfig);
-    btnSaveAsPreviewConfig=new QToolButton(this);
-    btnSaveAsPreviewConfig->setIcon(QIcon(":/spimb040/config_saveas.png"));
-    btnSaveAsPreviewConfig->setToolTip(tr("save current configuration with a new name"));
-    hbl->addWidget(btnSaveAsPreviewConfig);
-    camlayout->addRow(tr("<b>Preview:</b>"), hbl);
+    cmbPreviewConfiguration=new QFCameraConfigEditorWidget(m_pluginServices->getConfigFileDirectory(), this);
+    cmbPreviewConfiguration->connectTo(cmbAcquisitionDevice);
+    camlayout->addRow(tr("<b>Preview:</b>"), cmbPreviewConfiguration);
 
     hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
@@ -273,23 +174,10 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
 
 
 
-    hbl=new QHBoxLayout(this);
-    hbl->setContentsMargins(0,0,0,0);
-    hbl->addWidget(new QLabel(tr("configuration: "), this));
-    cmbAcquisitionConfiguration=new QComboBox(this);
-    hbl->addWidget(cmbAcquisitionConfiguration);
-    btnAcquisitionConfig=new QToolButton(this);
-    hbl->addWidget(btnAcquisitionConfig);
-    hbl->addSpacing(5);
-    btnDeleteAcquisitionConfig=new QToolButton(this);
-    btnDeleteAcquisitionConfig->setIcon(QIcon(":/spimb040/config_delete.png"));
-    btnDeleteAcquisitionConfig->setToolTip(tr("delete current configuration"));
-    hbl->addWidget(btnDeleteAcquisitionConfig);
-    btnSaveAsAcquisitionConfig=new QToolButton(this);
-    btnSaveAsAcquisitionConfig->setIcon(QIcon(":/spimb040/config_saveas.png"));
-    btnSaveAsAcquisitionConfig->setToolTip(tr("save current configuration with a new name"));
-    hbl->addWidget(btnSaveAsAcquisitionConfig);
-    camlayout->addRow(tr("<b>Acquisition:</b>"), hbl);
+
+    cmbAcquisitionConfiguration=new QFCameraConfigEditorWidget(m_pluginServices->getConfigFileDirectory(), this);
+    cmbAcquisitionConfiguration->connectTo(cmbAcquisitionDevice);
+    camlayout->addRow(tr("<b>Acquisition:</b>"), cmbAcquisitionConfiguration);
 }
 
 
@@ -308,39 +196,13 @@ void QFESPIMB040CameraConfig::createActions() {
     actPreviewSingle = new QAction(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acquire single image"), this);
     connect(actPreviewSingle, SIGNAL(triggered()), this, SLOT(previewSingle()));
 
-    actPreviewConfig = new QAction(QIcon(":/spimb040/acquisitionsettings.png"), tr("&Configure Camera"), this);
-    connect(actPreviewConfig, SIGNAL(triggered()), this, SLOT(configPreviewCamera()));
 
-    actDeletePreviewConfig = new QAction(QIcon(":/spimb040/config_delete.png"), tr("&Delete Configuration"), this);
-    connect(actDeletePreviewConfig, SIGNAL(triggered()), this, SLOT(deletePreviewConfig()));
-
-    actSaveAsPreviewConfig = new QAction(QIcon(":/spimb040/config_saveas.png"), tr("&Save Configuration As ..."), this);
-    connect(actSaveAsPreviewConfig, SIGNAL(triggered()), this, SLOT(saveasPreviewConfig()));
-
-
-    actAcquisitionConfig = new QAction(QIcon(":/spimb040/acquisitionsettings.png"), tr("&Configure Camera"), this);
-    connect(actAcquisitionConfig, SIGNAL(triggered()), this, SLOT(configAcquisitionCamera()));
-
-    actDeleteAcquisitionConfig = new QAction(QIcon(":/spimb040/config_delete.png"), tr("&Delete Configuration"), this);
-    connect(actDeleteAcquisitionConfig, SIGNAL(triggered()), this, SLOT(deleteAcquisitionConfig()));
-
-    actSaveAsAcquisitionConfig = new QAction(QIcon(":/spimb040/config_saveas.png"), tr("&Save Configuration As ..."), this);
-    connect(actSaveAsAcquisitionConfig, SIGNAL(triggered()), this, SLOT(saveasAcquisitionConfig()));
-
-
-
-    camView->addUserAction(actPreviewConfig);
+    camView->addUserAction(cmbPreviewConfiguration->configAction());
     camView->addUserAction(actStartStopPreview);
     camView->addUserAction(actPreviewSingle);
     btnConnect->setDefaultAction(actDisConnect);
-    btnPreviewConfig->setDefaultAction(actPreviewConfig);
     btnPreviewSingle->setDefaultAction(actPreviewSingle);
     btnPreviewContinuous->setDefaultAction(actStartStopPreview);
-    btnDeletePreviewConfig->setDefaultAction(actDeletePreviewConfig);
-    btnSaveAsPreviewConfig->setDefaultAction(actSaveAsPreviewConfig);
-    btnAcquisitionConfig->setDefaultAction(actAcquisitionConfig);
-    btnDeleteAcquisitionConfig->setDefaultAction(actDeleteAcquisitionConfig);
-    btnSaveAsAcquisitionConfig->setDefaultAction(actSaveAsAcquisitionConfig);
 
 
 
@@ -358,12 +220,6 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         actStartStopPreview->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
         actStartStopPreview->setText(tr("&Start Preview"));
         actPreviewSingle->setEnabled(true);
-        actPreviewConfig->setEnabled(true);
-        actDeletePreviewConfig->setEnabled(true);
-        actSaveAsPreviewConfig->setEnabled(true);
-        actAcquisitionConfig->setEnabled(true);
-        actDeleteAcquisitionConfig->setEnabled(true);
-        actSaveAsAcquisitionConfig->setEnabled(true);
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(true);
@@ -382,12 +238,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         actStartStopPreview->setIcon(QIcon(":/spimb040/acquisitionstop.png"));
         actStartStopPreview->setText(tr("&Stop Preview"));
         actPreviewSingle->setEnabled(false);
-        actPreviewConfig->setEnabled(false);
-        actDeletePreviewConfig->setEnabled(false);
-        actSaveAsPreviewConfig->setEnabled(false);
-        actAcquisitionConfig->setEnabled(false);
-        actDeleteAcquisitionConfig->setEnabled(true);
-        actSaveAsAcquisitionConfig->setEnabled(true);
+
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(false);
@@ -406,12 +257,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         actStartStopPreview->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
         actStartStopPreview->setText(tr("&Start Preview"));
         actPreviewSingle->setEnabled(false);
-        actPreviewConfig->setEnabled(false);
-        actDeletePreviewConfig->setEnabled(false);
-        actSaveAsPreviewConfig->setEnabled(false);
-        actAcquisitionConfig->setEnabled(false);
-        actDeleteAcquisitionConfig->setEnabled(false);
-        actSaveAsAcquisitionConfig->setEnabled(false);
+
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(false);
@@ -430,12 +276,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         actStartStopPreview->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
         actStartStopPreview->setText(tr("&Start Preview"));
         actPreviewSingle->setEnabled(false);
-        actPreviewConfig->setEnabled(false);
-        actDeletePreviewConfig->setEnabled(false);
-        actSaveAsPreviewConfig->setEnabled(false);
-        actAcquisitionConfig->setEnabled(false);
-        actDeleteAcquisitionConfig->setEnabled(false);
-        actSaveAsAcquisitionConfig->setEnabled(false);
+
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(false);
@@ -452,12 +293,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         actStartStopPreview->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
         actStartStopPreview->setText(tr("&Start Preview"));
         actPreviewSingle->setEnabled(false);
-        actPreviewConfig->setEnabled(false);
-        actDeletePreviewConfig->setEnabled(false);
-        actSaveAsPreviewConfig->setEnabled(false);
-        actAcquisitionConfig->setEnabled(false);
-        actDeleteAcquisitionConfig->setEnabled(false);
-        actSaveAsAcquisitionConfig->setEnabled(false);
+
 
         cmbAcquisitionDevice->setEnabled(true);
         cmbPreviewConfiguration->setEnabled(false);
@@ -467,19 +303,12 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
 }
 
 
-bool QFESPIMB040CameraConfig::connectDevice(int device, int camera) {
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-
+bool QFESPIMB040CameraConfig::connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera) {
 
     viewData.reset();
 
     locked=false;
 
-    if ((device>=0)&&(device<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[device]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[device]);
-    }
 
     if (cam && extension) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -544,21 +373,17 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
         return;
     }
 
-    QPoint p = cmbAcquisitionDevice->itemData(cmbAcquisitionDevice->currentIndex()).toPoint();
-    QFExtension* extension=NULL;
-    QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
-    if ((p.x()>=0)&&(p.x()<cameras.size())) {
-        extension=qobject_cast<QFExtension*>(cameras[p.x()]);
-        cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
-    }
+    QFExtension* extension=cmbAcquisitionDevice->currentExtension();
+    QFExtensionCamera* cam=cmbAcquisitionDevice->currentExtensionCamera();
+    int camIdx=cmbAcquisitionDevice->currentCameraID();
+
     //std::cout<<"disConnectAcquisitionDevice()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
 
     if (cam && extension) {
         if (actDisConnect->isChecked()) {
             // connect to a device
 
-            connectDevice(p.x(), p.y());
+            connectDevice(cmbAcquisitionDevice->currentExtension(), cmbAcquisitionDevice->currentExtensionCamera(), cmbAcquisitionDevice->currentCameraID());
             if (!cam->isConnected(camIdx)) {
                 displayStates(QFESPIMB040CameraConfig::Disconnected);
                 m_parent->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
@@ -582,125 +407,6 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
 
 
 
-void QFESPIMB040CameraConfig::configPreviewCamera() {
-    int camIdx=viewData.usedCamera;
-    /*if (viewData.camera) {
-        if (viewData.camera->isConnected(camIdx)) {*/
-            QString filename="";
-            if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
-            if (filename.size()>0) {
-                QSettings* settings=new QSettings(filename, QSettings::IniFormat);
-                viewData.camera->showCameraSettingsDialog(camIdx, *settings, this);
-                settings->sync();
-                delete settings;
-            }
-        /*}
-    }*/
-}
-
-
-void QFESPIMB040CameraConfig::configAcquisitionCamera() {
-    int camIdx=viewData.usedCamera;
-    /*if (viewData.camera) {
-        if (viewData.camera->isConnected(camIdx)) {*/
-            QString filename="";
-            if (cmbAcquisitionConfiguration->currentIndex()>=0) filename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
-            if (filename.size()>0) {
-                QSettings* settings=new QSettings(filename, QSettings::IniFormat);
-                viewData.camera->showCameraSettingsDialog(camIdx, *settings, this);
-                settings->sync();
-                delete settings;
-            }
-        /*}
-    }*/
-}
-
-
-void QFESPIMB040CameraConfig::deletePreviewConfig() {
-    QString filename="";
-    if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
-    if (filename.size()>0) {
-        int ret = QMessageBox::question(this, tr("Delete Configurtion ..."),
-                        tr("Do you really want to delete the configuration '%1'?").arg(QFileInfo(filename).baseName()),
-                        QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
-        if (ret==QMessageBox::Yes) {
-            QFile::remove(filename);
-            rereadConfigCombos();
-            emit configFilesChanged();
-        }
-    }
-}
-
-
-void QFESPIMB040CameraConfig::saveasPreviewConfig() {
-    QString filename="";
-    if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
-    if (filename.size()>0) {
-        bool ok;
-        QString newname = QInputDialog::getText(this, tr("Save Configurtion As ..."),
-                                          tr("New Name:"), QLineEdit::Normal,
-                                          QFileInfo(filename).baseName(), &ok);
-        if (ok && !newname.isEmpty()) {
-            QString newfilename=QFileInfo(filename).absolutePath()+"/"+newname+".ccf";
-            if (QFile::exists(newfilename)) {
-                int ret = QMessageBox::question(this, tr("Save Configurtion As ..."),
-                                tr("A Configuration with the name '%1' already exists.\n"
-                                   "Do you want to overwrite?").arg(newname),
-                                QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
-                if (ret==QMessageBox::No) ok=false;
-            }
-            if (ok) {
-                copy_file(filename.toStdString(), newfilename.toStdString());
-                rereadConfigCombos();
-                emit configFilesChanged();
-            }
-        }
-    }
-}
-
-
-void QFESPIMB040CameraConfig::deleteAcquisitionConfig() {
-    QString filename="";
-    if (cmbAcquisitionConfiguration->currentIndex()>=0) filename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
-    if (filename.size()>0) {
-        int ret = QMessageBox::question(this, tr("Delete Configurtion ..."),
-                        tr("Do you really want to delete the configuration '%1'?").arg(QFileInfo(filename).baseName()),
-                        QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
-        if (ret==QMessageBox::Yes) {
-            QFile::remove(filename);
-            rereadConfigCombos();
-            emit configFilesChanged();
-        }
-    }}
-
-
-void QFESPIMB040CameraConfig::saveasAcquisitionConfig() {
-    QString filename="";
-    if (cmbAcquisitionConfiguration->currentIndex()>=0) filename=cmbAcquisitionConfiguration->itemData(cmbAcquisitionConfiguration->currentIndex()).toString();
-    if (filename.size()>0) {
-        bool ok;
-        QString newname = QInputDialog::getText(this, tr("Save Configurtion As ..."),
-                                          tr("New Name:"), QLineEdit::Normal,
-                                          QFileInfo(filename).baseName(), &ok);
-        if (ok && !newname.isEmpty()) {
-            QString newfilename=QFileInfo(filename).absolutePath()+"/"+newname+".ccf";
-            if (QFile::exists(newfilename)) {
-                int ret = QMessageBox::question(this, tr("Save Configurtion As ..."),
-                                tr("A Configuration with the name '%1' already exists.\n"
-                                   "Do you want to overwrite?").arg(newname),
-                                QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
-                if (ret==QMessageBox::No) ok=false;
-            }
-            if (ok) {
-                copy_file(filename.toStdString(), newfilename.toStdString());
-                rereadConfigCombos();
-                emit configFilesChanged();
-            }
-        }
-    }
-}
-
-
 
 void QFESPIMB040CameraConfig::previewSingle() {
     if (viewData.camera) {
@@ -710,7 +416,8 @@ void QFESPIMB040CameraConfig::previewSingle() {
         if (viewData.camera->isConnected(camIdx)) {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QString filename="";
-            if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
+            //if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
+            filename=cmbPreviewConfiguration->currentConfigFilename();
             QSettings* settings=new QSettings(filename, QSettings::IniFormat);
             viewData.camera->useCameraSettings(camIdx, *settings);
             if (acquireSingle()) {
@@ -742,7 +449,8 @@ void QFESPIMB040CameraConfig::startStopPreview() {
                 viewData.abort_continuous_acquisition=false;
                 viewData.continuous_is_first=true;
                 QString filename="";
-                if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
+                //if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
+                filename=cmbPreviewConfiguration->currentConfigFilename();
                 QSettings* settings=new QSettings(filename, QSettings::IniFormat);
                 viewData.camera->useCameraSettings(camIdx, *settings);
                 camView->show();

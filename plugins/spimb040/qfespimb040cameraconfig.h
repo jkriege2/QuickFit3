@@ -35,6 +35,8 @@ class QFESPIMB040MainWindow; // forward
 #include "../interfaces/qfextensioncamera.h"
 #include "qfextension.h"
 #include "tools.h"
+#include "qfcameracombobox.h"
+#include "qfcameraconfigcombobox.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
     \ingroup qf3ext_spimb040
@@ -82,15 +84,6 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         /** \brief emitted when the set of configuration files changes */
         void configFilesChanged();
 
-    public slots:
-        /*! \brief reread the configuration files combo boxes
-
-            After a call to this function the QComboBoxes that allow to select a configuration contain
-            the list of available configurations for the current device (selected in cmbAcquisitionDevice).
-            The data property of the items is used to store the full filename of the configuration file as
-            a string.
-        */
-        void rereadConfigCombos();
 
     protected:
         QFESPIMB040MainWindow* m_parent;
@@ -137,9 +130,6 @@ class QFESPIMB040CameraConfig : public QGroupBox {
 
         };
 
-        /** \brief list of all available QFExtensionCamera plugins, initialized by findCameras() */
-        QList<QObject*> cameras;
-
         /** \brief list containing data about the acquisition devices connected to the views (last read image, when did acquisition start ...) */
         viewDataStruct viewData;
 
@@ -152,15 +142,15 @@ class QFESPIMB040CameraConfig : public QGroupBox {
             It contains a QPoint, where x specifies the device in cameras and y the camera inside the selected
             device.
         */
-        QComboBox* cmbAcquisitionDevice;
+        QFCameraComboBox* cmbAcquisitionDevice;
         /** \brief spinbox to select delay between two subsequent frames */
         QDoubleSpinBox* spinAcquisitionDelay;
         /** \brief view for images from camera */
         QFESPIMB040CameraView* camView;
         /** \brief combobox for the selected camera preview configuration */
-        QComboBox* cmbPreviewConfiguration;
+        QFCameraConfigEditorWidget* cmbPreviewConfiguration;
         /** \brief combobox for the selected camera acquisition configuration */
-        QComboBox* cmbAcquisitionConfiguration;
+        QFCameraConfigEditorWidget* cmbAcquisitionConfiguration;
 
 
         /** \brief button to connect/disconnect to a device */
@@ -169,18 +159,6 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QToolButton* btnPreviewContinuous;
         /** \brief button to acquire a single frame */
         QToolButton* btnPreviewSingle;
-        /** \brief button to configure preview camera */
-        QToolButton* btnPreviewConfig;
-        /** \brief button to delete the current preview configuration */
-        QToolButton* btnDeletePreviewConfig;
-        /** \brief button to save the current preview configuration as a different name */
-        QToolButton* btnSaveAsPreviewConfig;
-        /** \brief button to acquisition configure camera */
-        QToolButton* btnAcquisitionConfig;
-        /** \brief button to delete the current acquisition configuration */
-        QToolButton* btnDeleteAcquisitionConfig;
-        /** \brief button to save the current acquisition configuration as a different name */
-        QToolButton* btnSaveAsAcquisitionConfig;
 
 
         /** \brief action to connect/disconnect to acquisition device */
@@ -189,22 +167,7 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QAction* actStartStopPreview;
         /** \brief action to acquire a single frame */
         QAction* actPreviewSingle;
-        /** \brief action to display a camera configuration dialog for preview */
-        QAction* actPreviewConfig;
-        /** \brief action to delete a configuration for preview */
-        QAction* actDeletePreviewConfig;
-        /** \brief action to save a configuration for preview with a new name */
-        QAction* actSaveAsPreviewConfig;
-        /** \brief action to display a camera configuration dialog for acquisition */
-        QAction* actAcquisitionConfig;
-        /** \brief action to delete a configuration for acquisition */
-        QAction* actDeleteAcquisitionConfig;
-        /** \brief action to save a configuration for acquisition with a new name */
-        QAction* actSaveAsAcquisitionConfig;
 
-
-        /** \brief void find all available cameras (QFExtensionCamera), fills \a cameras QList */
-        void findCameras(QFExtensionManager* extManager);
 
         /** \brief handles the close event, also close all camera views in camViews
          *
@@ -227,12 +190,12 @@ class QFESPIMB040CameraConfig : public QGroupBox {
 
         /*! \brief connect camera view \a camView + camera  \a camView widgets to a given acquisition device and camera therein
 
-            \param camView work with the given camera view
-            \param device the device to connect to
+            \param extension the extension objectof thecamera to connect to
+            \param cam same as extension, but mapped to QFExtensionCamera
             \param camera the camera inside \a device to connect to
             \return \c true on success
         */
-        bool connectDevice(int device, int camera);
+        bool connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera);
         /*! \brief acquire a single image from the device connected to the fiven \a camView and store it in rawImages
 
             \param camView work with the given camera view
@@ -265,18 +228,12 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         void previewContinuous();
         /** \brief acquire single preview frame */
         void previewSingle();
-        /** \brief display a configuration dialog for preview  */
-        void configPreviewCamera();
-        /** \brief display a configuration dialog for acquisition  */
-        void configAcquisitionCamera();
+
         /** \brief set enabled/disabled states of the actions and widgets according to the given parameter */
         void displayStates(States state);
 
 
-        void deletePreviewConfig();
-        void saveasPreviewConfig();
-        void deleteAcquisitionConfig();
-        void saveasAcquisitionConfig();
+
 
     private:
 };

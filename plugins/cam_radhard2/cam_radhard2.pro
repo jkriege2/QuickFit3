@@ -53,7 +53,7 @@ ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 
 INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
 
-POST_TARGETDEPS += install
+#POST_TARGETDEPS += install
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl

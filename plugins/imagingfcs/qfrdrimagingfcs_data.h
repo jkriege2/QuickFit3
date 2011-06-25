@@ -15,6 +15,7 @@
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
+#include "csvtools.h"
 
 
 
@@ -91,11 +92,26 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double* getCorrelationRunErrors();
 
 
-		/** \brief return width of the image */
+        /** \brief return width of the image */
 		virtual int getDataImageWidth() const { return width; }
 		/** \brief return height of the image */
 		virtual int getDataImageHeight() const { return height; }
 
+
+
+
+
+        /** \brief returns whether to leave out a run */
+        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); };
+        /** \brief add a run to the leaveouts */
+        inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
+        /** \brief remove a run from the leaveouts */
+        inline virtual void leaveoutRemoveRun(int run) { leaveout.removeAll(run); }
+        /** \brief clear all leaveouts */
+        inline virtual void leaveoutClear() { leaveout.clear(); }
+
+        /** \brief recalculate the averages/std. deviations */
+        void recalcCorrelations();
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);
@@ -106,7 +122,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void intReadData(QDomElement* e=NULL);
 
 		/** \brief load data file */
-        bool loadDataFile(QString filename);
+        bool loadVideoCorrelatorFile(QString filename);
 
     private:
 		/** \brief width of the image */
@@ -124,7 +140,10 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 		/** \brief points to the correlation curve erorrs */
 		double* sigmas;
 		/** \brief time axis [seconds] */
-		double * tau;
+		double* tau;
+
+		/** \brief the leaveout list */
+        QList<int> leaveout;
 
 
         /** \brief convert a pixel coordinate to a rund index */
@@ -145,6 +164,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 		}
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
         void allocateContents(int x, int y, int N);
+
 };
 
 

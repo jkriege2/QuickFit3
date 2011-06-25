@@ -89,6 +89,8 @@
 		<Unit filename="extlibs\cimg.h" />
 		<Unit filename="extlibs\cimg.pri" />
 		<Unit filename="extlibs\cimg\CImg.h" />
+		<Unit filename="lib\csvtools.cpp" />
+		<Unit filename="lib\csvtools.h" />
 		<Unit filename="lib\dlg_fitalgorithmprogress.ui" />
 		<Unit filename="lib\dlg_newproperty.ui" />
 		<Unit filename="lib\dlgnewproperty.cpp" />
@@ -241,6 +243,10 @@
 		<Unit filename="plugins\interfaces\qfextensionlinearstage.h" />
 		<Unit filename="plugins\interfaces\qfrdrcountratesinterface.h" />
 		<Unit filename="plugins\interfaces\qfrdrfcsdatainterface.h" />
+		<Unit filename="plugins\spimb040\qfcameracombobox.cpp" />
+		<Unit filename="plugins\spimb040\qfcameracombobox.h" />
+		<Unit filename="plugins\spimb040\qfcameraconfigcombobox.cpp" />
+		<Unit filename="plugins\spimb040\qfcameraconfigcombobox.h" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraconfig.cpp" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraconfig.h" />
 		<Unit filename="plugins\spimb040\qfespimb040cameraview.cpp" />
@@ -249,6 +255,8 @@
 		<Unit filename="plugins\spimb040\qfespimb040mainwindow.h" />
 		<Unit filename="plugins\spimb040\qfespimb040samplestageconfig.cpp" />
 		<Unit filename="plugins\spimb040\qfespimb040samplestageconfig.h" />
+		<Unit filename="plugins\spimb040\qfstagecombobox.cpp" />
+		<Unit filename="plugins\spimb040\qfstagecombobox.h" />
 		<Unit filename="plugins\spimb040\spimb040.cpp" />
 		<Unit filename="plugins\spimb040\spimb040.h" />
 		<Unit filename="plugins\spimb040\spimb040.pro" />
@@ -272,6 +280,7 @@
 		<Unit filename="plugins\table\qftablemodel.h" />
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pro" />
+		<Unit filename="version.h" />
 		<Unit filename="..\..\..\LIB\trunk\jkimage.h" />
 		<Unit filename="..\..\..\LIB\trunk\jkserialconnection.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\jkserialconnection.h" />
@@ -347,21 +356,21 @@
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />
-			<AutoVersioning>
-				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application\version.h" />
-				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
-				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
-			</AutoVersioning>
 			<DoxyBlocks>
 				<comment_style block="3" line="0" />
-				<doxyfile_project output_directory="doc" use_auto_version="1" />
+				<doxyfile_project output_directory="doc" />
 				<doxyfile_build extract_all="1" />
 				<doxyfile_warnings />
 				<doxyfile_output />
 				<doxyfile_dot class_diagrams="1" have_dot="1" />
 				<general />
 			</DoxyBlocks>
+			<AutoVersioning>
+				<Scheme minor_max="100" build_max="0" rev_max="100" rev_rand_max="1" build_times_to_increment_minor="1000" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application/version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
