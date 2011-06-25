@@ -1,18 +1,20 @@
 include(../../../../../SPIM/trunk/software/processing_chain/processing_chain.pri)
 
-QMAKE_CXXFLAGS += -ggdb 
+QMAKE_CXXFLAGS += -ggdb
 
 TEMPLATE = lib
 CONFIG += plugin
 
+debug:QFOUTPUT = ../../output
+!debug:QFOUTPUT = ../../output_release
 
 TARGET = cam_rh2v2
 DEPENDPATH += ./
-DESTDIR = ../../output/plugins/
+DESTDIR = $$QFOUTPUT/plugins/
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS += -lusb -L../../output/ -lquickfit3lib -lquickfit3widgets
+LIBS += -lusb -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 win32:LIBS += -lgdi32
 
 # Input
@@ -27,7 +29,7 @@ FORMS =
 
 RESOURCES += cam_rh2v2.qrc
 
-TRANSLATIONS= ../../output/assets/translations/de.cam_rh2v2.ts
+TRANSLATIONS= $$QFOUTPUT/assets/translations/de.cam_rh2v2.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \

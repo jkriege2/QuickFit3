@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZIPFILE=quickfit3.zip
+ZIPFILE=quickfit3_debug.zip
 REMOVEPLUGINS="cam_radhard2 cam_testcamera stage_pi863 cam_andor spimb040"
 
 rm -rf deploy
@@ -10,7 +10,7 @@ rm ${ZIPFILE}
 mkdir -p deploy
 
 cd ..
-qmake
+qmake "CONFIG-=release" "CONFIG+=debug" quickfit3.pro
 make
 make install
 cd output

@@ -36,7 +36,7 @@
 
 
 */
-class dlgQFFitAlgorithmProgressDialog : public QDialog, public Ui::QFFitAlgorithmProgressDlg//, public QFFitAlgorithmReporter
+class dlgQFFitAlgorithmProgressDialog : public QDialog, public Ui::QFFitAlgorithmProgressDlg
 {
         Q_OBJECT
     public:

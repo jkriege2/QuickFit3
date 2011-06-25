@@ -8,8 +8,10 @@ INCLUDEPATH += . \
                ../libqf3widgets/ \
                ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt
-DESTDIR = ../output
-QFOUTPUT = $$DESTDIR
+
+include(../quickfit3.pri)
+
+DESTDIR = $$QFOUTPUT
 
 QMAKE_RPATHDIR += $$DESTDIR
 
@@ -46,30 +48,8 @@ PRECOMPILED_HEADER += ../extlibs/cimg.h
 
 
 
-HELP_FILES.files = ./help/*.*
-HELP_FILES.path = $${QFOUTPUT}/assets/help/
-
-HELPPIC_FILES.files = ./help/pic/*.*
-HELPPIC_FILES.path = $${QFOUTPUT}/assets/help/pic/
-
-ASSETS_FILES.files = ./assets/*.*
-ASSETS_FILES.path = $${QFOUTPUT}/assets/
-
-ASSETSTESTDATA_FILES.files = ./assets/fcs_testdata/*.*
-ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/fcs_testdata/
 
 ASSETSSTYLESHEET_FILES.files = ./assets/stylesheets/*.*
 ASSETSSTYLESHEET_FILES.path = $${QFOUTPUT}/assets/stylesheets/
 
-ASSETS_TRANSLATIONS.files = ./translations/*.qm
-ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
-
-INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS ASSETSSTYLESHEET_FILES ASSETSTESTDATA_FILES
-
-#POST_TARGETDEPS += install
-
-MOC_DIR = ./.mocs/
-UI_DIR = ./.uis/
-RCC_DIR = ./.rccs/
-OBJECTS_DIR = ./.objs/
-
+INSTALLS += ASSETSSTYLESHEET_FILES

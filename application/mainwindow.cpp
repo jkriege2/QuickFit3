@@ -316,8 +316,9 @@ QString MainWindow::createPluginDoc(bool docLinks) {
 
 QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
     QString text="";
-    if (docLink) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"../plugins/help/%3/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(name).arg(iconfilename).arg(id);
-    else text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(name).arg(iconfilename);
+    //if (docLink) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"%4/plugins/help/%5/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(name).arg(iconfilename).arg(id).arg(settings->getAssetsDirectory());
+    //else
+    text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(name).arg(iconfilename);
     text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2.%3</td></tr>").arg(tr("version:")).arg(verMajor).arg(verMinor);
     text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(description);
     text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("author:")).arg(author);
@@ -391,6 +392,7 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
     for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
         QString id=getRawDataRecordFactory()->getIDList().at(i);
         QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(QFileInfo(getRawDataRecordFactory()->getPluginFilename(id)).baseName()).arg(id);
+        //std::cout<<"searching '"<<dir.toStdString()<<"'\n";
         if (QFile::exists(dir)) text+=item_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir);
     }
     text+=mainitem_after;

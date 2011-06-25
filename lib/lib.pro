@@ -2,15 +2,14 @@ TEMPLATE = lib
 TARGET = quickfit3lib
 DEPENDPATH += .
 
+include(../quickfit3.pri)
+
 INCLUDEPATH += .
-#../../../../LIB/trunk/ \
-#               ../../../../LIB/trunk/qt
 
 
 QT += gui xml
-DESTDIR = ../output/
 
-QFOUTPUT = $$DESTDIR
+DESTDIR = $$QFOUTPUT
 
 # Input
 HEADERS += dlgnewproperty.h \
@@ -89,14 +88,3 @@ INCLUDEPATH +=
 
 CONFIG += exceptions rtti stl
 
-ASSETS_TRANSLATIONS.files = ./translations/*.qm
-ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
-
-INSTALLS += ASSETS_TRANSLATIONS
-
-
-
-MOC_DIR = ./.mocs/
-UI_DIR = ./.uis/
-RCC_DIR = ./.rccs/
-OBJECTS_DIR = ./.objs/

@@ -1,17 +1,22 @@
 TEMPLATE = lib
 TARGET = quickfit3widgets
+
+include(../quickfit3.pri)
+
 DEPENDPATH += .
 
 INCLUDEPATH += ../../../../LIB/trunk/ \
                . \
                ../lib/
 
-LIBS += -L../output/ -lquickfit3lib
+LIBS += -L$$QFOUTPUT -lquickfit3lib
 
 QT += gui xml svg opengl
-DESTDIR = ../output/
 
-QFOUTPUT=$$DESTDIR
+
+
+DESTDIR = $$QFOUTPUT
+
 
 # Input
 HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
@@ -76,21 +81,11 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
              ../../../../LIB/trunk/qt/jkstyledbutton.qrc
 
-TRANSLATIONS= ../output/assets/translations/de.quickfit3widgets.ts
+TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 
 INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
 CONFIG += exceptions rtti stl
 
-ASSETS_TRANSLATIONS.files = ./translations/*.qm
-ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 
-INSTALLS += ASSETS_TRANSLATIONS
-
-#POST_TARGETDEPS += install
-
-MOC_DIR = ./.mocs/
-UI_DIR = ./.uis/
-RCC_DIR = ./.rccs/
-OBJECTS_DIR = ./.objs/
