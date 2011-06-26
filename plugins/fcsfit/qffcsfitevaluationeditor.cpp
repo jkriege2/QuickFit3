@@ -1014,7 +1014,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     }
                 }
 
-                double* weights=allocWeights();
+                double* weights=allocWeights(NULL, record, eval->getCurrentRun(), datacut_min, datacut_max);
 
                 /////////////////////////////////////////////////////////////////////////////////
                 // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -1055,6 +1055,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     residuals[i]=corrdata[i]-value;
                     double res=residuals[i];
                     residuals_weighted[i]=res/weights[i];
+                    if (fabs(weights[i])<1000*DBL_MIN) residuals_weighted[i]=0;
+                    //std::cout<<"weights["<<i<<"]="<<weights[i]<<"\n";
                     double resw=residuals_weighted[i];
                     if ((i>=datacut_min)&&(i<=datacut_max)) {
                         residSqrSum+=res*res;
@@ -1357,8 +1359,18 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 corrdata=data->getCorrelationMean();
             }
         }
+        // we also have to care for the data cutting
+        int cut_low=datacut->get_userMin();
+        int cut_up=datacut->get_userMax();
+        int cut_N=N-cut_low-(N-cut_up);
+        if (cut_N<0) {
+            cut_low=0;
+            cut_up=ffunc->paramCount()-1;
+            if (cut_up>=N) cut_up=N;
+            cut_N=cut_up;
+        }
         bool weightsOK=false;
-        weights=allocWeights(&weightsOK, record, run);
+        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
         if (!weightsOK) services->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -1389,16 +1401,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 //printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
             }
 
-            // we also have to care for the data cutting
-            int cut_low=datacut->get_userMin();
-            int cut_up=datacut->get_userMax();
-            int cut_N=N-cut_low-(N-cut_up);
-            if (cut_N<0) {
-                cut_low=0;
-                cut_up=ffunc->paramCount()-1;
-                if (cut_up>=N) cut_up=N;
-                cut_N=cut_up;
-            }
+
 
 
 
@@ -2375,6 +2378,8 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
         else if (cmbWeights->currentIndex()==2) data->setFitDataWeighting(QFFCSFitEvaluation::RunErrorWeighting);
         else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
     }
+    displayModel(true);
+    replotData();
     QApplication::restoreOverrideCursor();
 }
 
@@ -2404,7 +2409,7 @@ void QFFCSFitEvaluationEditor::plotMouseMove(double x, double y) {
     labMousePosition->setText(tr("cursor: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
 }
 
-double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in) {
+double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) {
     if (weightsOKK) *weightsOKK=false;
     if (!current) return NULL;
     if (!cmbModel) return NULL;
@@ -2428,10 +2433,19 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord
         weightsOK=true;
         for (int i=0; i<N; i++) {
             weights[i]=std[i];
-            if ((fabs(weights[i])<1000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                weightsOK=false;
-                break;
-            };
+            if ((data_start>=0) && (data_end>=0)) {
+                if ((i>=data_start)&&(i<=data_end)) {
+                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                        weightsOK=false;
+                        break;
+                    }
+                };
+            } else {
+                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                    weightsOK=false;
+                    break;
+                };
+            }
         }
     }
     if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
@@ -2439,13 +2453,24 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord
         weightsOK=true;
         for (int i=0; i<N; i++) {
             weights[i]=std[i];
-            if ((fabs(weights[i])<1000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                weightsOK=false;
-                break;
-            };
+            if ((data_start>=0) && (data_end>=0)) {
+                if ((i>=data_start)&&(i<=data_end)) {
+                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                        weightsOK=false;
+                        break;
+                    }
+                };
+            } else {
+                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                    weightsOK=false;
+                    break;
+                };
+            }
         }
-    }    if (!weightsOK) {
+    }
+    if (!weightsOK) {
         for (int i=0; i<N; i++) weights[i]=1;
+        if (weighting==QFFCSFitEvaluation::EqualWeighting) weightsOK=true;
     }
     if (weightsOKK) *weightsOKK=weightsOK;
     return weights;

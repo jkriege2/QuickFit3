@@ -308,7 +308,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100);
+        double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
 
         /** \brief save current fit function and fit results to an INI file */
         void saveCurrentFitResults();

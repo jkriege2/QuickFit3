@@ -81,30 +81,42 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		ok=false;
 	} else {
+        int taucolumn=getProperty("TAU_COLUMN", 0).toInt();
+        if (taucolumn<0) taucolumn=0;
+        int corrcolumn=getProperty("CORRELATION_COLUMN", 1).toInt();
+        if (corrcolumn<0) corrcolumn=1;
+        int maxCol=qMax(corrcolumn, taucolumn);
+
 		QTextStream stream(&file);
 		bool last_empty, empty;
 		QVector<QVector<QPair<double, double> > > data_matrix;
 		QVector<QPair<double, double> > current_set;
 		int NN=0;
-		while ((!file.atEnd()) && (NN<width*height)) {
+		int runs=0;
+		while ((!stream.atEnd()) && (runs<=width*height)) {
             QVector<double> data=csvReadline(stream, ',', '#');
             last_empty=empty;
             empty=data.isEmpty();
-            if (!empty && data.size()>1) {
-                current_set.append(qMakePair(data[0], data[1]));
-                //std::cout<<"  tau="<<data[0]<<"   c="<<data[1]<<std::endl;
+            if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size())) {
+                current_set.append(qMakePair(data[taucolumn], data[corrcolumn]));
+                //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
             }
-            if (((last_empty&&empty)||(file.atEnd()))&&(!current_set.isEmpty())) {
+            if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {
                 data_matrix.append(current_set);
                 if (NN<current_set.size()) NN=current_set.size();
+                //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size();
                 current_set.clear();
+                runs++;
+                QApplication::processEvents();
             }
+            //if (stream.atEnd()) qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
+
 		}
         width=getProperty("WIDTH").toInt();
         height=getProperty("HEIGHT").toInt();
         //std::cout<<"width="<<width<<"   height="<<height<<"   NN="<<NN<<std::endl;
         if (NN>0) {
-            if (NN+1>=width*height) {
+            if (runs+1>=width*height) {
                 allocateContents(width, height, NN);
                 for (int i=0; i<width*height; i++) {
                     if (i>=data_matrix.size()) {
@@ -126,7 +138,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
                         }
                     }
                 }
+                QApplication::processEvents();
                 recalcCorrelations();
+                QApplication::processEvents();
             } else {
                 ok=false;
                 errorDescription=tr("too few records in file: %1 records found, but %2 * %3 = %4 required").arg(NN).arg(width).arg(height).arg(width*height);
@@ -222,11 +236,10 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
 
 void QFRDRImagingFCSData::recalcCorrelations() {
     if (correlations && correlationMean && correlationStdDev) {
-        double sum=0;
-        double sum2=0;
-        double norm=width*height;
         for (int i=0; i<N; i++) {
-            norm=0;
+            double norm=0;
+            double sum=0;
+            double sum2=0;
             for (int j=0; j<width*height; j++) {
                 const double& v=correlations[j*N+i];
                 sum+=v;

@@ -100,9 +100,6 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 
     newProject();
 
-    autoWriteSettings();
-    timerAutosave->start();
-
     readSettings();
     rawDataFactory->distribute(project, settings, this, this);
     evaluationFactory->distribute(project, settings, this, this);
@@ -116,6 +113,9 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
             loadProject(lastarg);
         }
     }
+
+    autoWriteSettings();
+    timerAutosave->start();
 }
 
 
