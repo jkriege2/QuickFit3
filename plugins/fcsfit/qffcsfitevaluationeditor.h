@@ -25,6 +25,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <QTextDocument>
 #include "datacutslider.h"
 #include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
@@ -261,8 +262,11 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void saveReport();
         /** \brief emitted when we should print a report */
         void printReport();
-        /** \brief create a report on a given QPrinter object */
-        void createReport(QPrinter* printer);
+        /** \brief create a report in a given QTextDocument object
+         *
+         *  For correct sizing of the plots: set the textWidth of the document before calling this function!
+         */
+        void createReportDoc(QTextDocument* document);
         /** \brief emitted when the x logscale checkbox changes its state */
         void chkXLogScaleToggled(bool checked);
         /** \brief emitted when the grid checkbox changes its state */
