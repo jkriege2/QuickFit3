@@ -46,7 +46,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
         iniFilename= configDir+"/"+fi.completeBaseName()+".ini";
     }
     currentRawDataDir=fi.absolutePath();
-    //std::cout<<"config file is: "<<iniFilename.toStdString()<<std::endl;
+    std::cout<<"config file is: "<<iniFilename.toStdString()<<std::endl;
     settings=NULL;
 
     // default values
@@ -77,6 +77,7 @@ void ProgramOptions::writeSettings() {
 
 void ProgramOptions::readSettings() {
     if (!settings) {
+        qDebug()<<"iniFilename="<<iniFilename;
         if (iniFilename=="native") { // on windows: registry, on Linux/MacOS: default
             settings= new QSettings(this);
         } else if (iniFilename=="native_inifile") { // ensures a INI file at the default location, even on windows

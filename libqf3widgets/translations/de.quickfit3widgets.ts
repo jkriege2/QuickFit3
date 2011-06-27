@@ -87,33 +87,33 @@
 <context>
     <name>DataCutSliders</name>
     <message>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="23"/>
+        <location filename="../datacutslider.cpp" line="23"/>
         <source>&lt;b&gt;lower cut-off&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="24"/>
+        <location filename="../datacutslider.cpp" line="24"/>
         <source>&lt;b&gt;upper cut-off&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="47"/>
+        <location filename="../datacutslider.cpp" line="47"/>
         <source>copy m&amp;in to all files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="49"/>
+        <location filename="../datacutslider.cpp" line="49"/>
         <source>copy m&amp;ax to all files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="51"/>
+        <location filename="../datacutslider.cpp" line="51"/>
         <source>copy min&amp;+max to all files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="92"/>
-        <location filename="../../libqf3widgets/datacutslider.cpp" line="94"/>
+        <location filename="../datacutslider.cpp" line="92"/>
+        <location filename="../datacutslider.cpp" line="94"/>
         <source>/%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -158,74 +158,74 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="864"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="907"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="921"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="935"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="949"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="963"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="977"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="865"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="908"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="922"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="936"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="950"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="964"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="978"/>
         <source>Save Plot Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="866"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="867"/>
         <source>Comma Separated Values (*.csv *.dat);;Tab Separated Values (*.txt);;Semicolon Separated Values [German Excel] (*.csv *.dat *.txt);;Semicolon Separated Values (*.csv *.dat *.txt);;SYLK spreadsheet (*.slk);;DIF: Data Interchange Format (*.dif)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="909"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="951"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="910"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="952"/>
         <source>Comma Separated Values (*.csv *.dat)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="923"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="924"/>
         <source>SYLK spreadsheet (*.slk)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="937"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="938"/>
         <source>DIF: Data Interchange Format (*.dif)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="965"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="979"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="966"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="980"/>
         <source>Tabulator Separated Values (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="991"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1018"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1045"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1069"/>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1111"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="992"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1019"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1046"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1070"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1112"/>
         <source>Save Plot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="993"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="994"/>
         <source>PDF File (*.pdf)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1020"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1021"/>
         <source>PostScript File (*.ps)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1047"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1048"/>
         <source>Portable Document Format PDF (*.pdf);;PostScript (*.ps);;Scalable Vector Graphics (*.svg);;PNG Image (*.png);;BMP Image (*.bmp);;TIFF Image (*.tif *.tiff);;JPEG Image (*.jpg *.jpeg);;X11 Bitmap (*.xbm);;X11 Pixmap (*.xpm)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1071"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1072"/>
         <source>PNG Image (*.png);;BMP Image (*.bmp);;TIFF Image (*.tif *.tiff);;JPEG Image (*.jpg *.jpeg);;X11 Bitmap (*.xbm);;X11 Pixmap (*.xpm)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1113"/>
+        <location filename="../../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp" line="1114"/>
         <source>SVG Image (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -233,13 +233,12 @@
 <context>
     <name>JKStyledButton</name>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkstyledbutton.cpp" line="17"/>
-        <location filename="../../../../../LIB/trunk/qt/jkstyledbutton.cpp" line="31"/>
+        <location filename="../../../../../LIB/trunk/qt/jkstyledbutton.cpp" line="55"/>
         <source>All Files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../LIB/trunk/qt/jkstyledbutton.cpp" line="53"/>
+        <location filename="../../../../../LIB/trunk/qt/jkstyledbutton.cpp" line="55"/>
         <source>Select File ...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -247,68 +246,68 @@
 <context>
     <name>QFDlgCSVParameters</name>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="26"/>
-        <location filename="../../libqf3widgets/qfdlgcsvparameters.cpp" line="45"/>
+        <location filename="../qfdlg_csvparameters.ui" line="26"/>
+        <location filename="../qfdlgcsvparameters.cpp" line="45"/>
         <source>CSV Import Properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="57"/>
+        <location filename="../qfdlg_csvparameters.ui" line="57"/>
         <source>Please specify the parameters used to import a comma separated values (CSV) file into QuickFit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="79"/>
+        <location filename="../qfdlg_csvparameters.ui" line="79"/>
         <source>,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="89"/>
+        <location filename="../qfdlg_csvparameters.ui" line="89"/>
         <source>&amp;Decimal Separator:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="99"/>
+        <location filename="../qfdlg_csvparameters.ui" line="99"/>
         <source>.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="109"/>
+        <location filename="../qfdlg_csvparameters.ui" line="109"/>
         <source>C&amp;oment Separator:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="119"/>
+        <location filename="../qfdlg_csvparameters.ui" line="119"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="129"/>
+        <location filename="../qfdlg_csvparameters.ui" line="129"/>
         <source>&amp;Header Start:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="139"/>
+        <location filename="../qfdlg_csvparameters.ui" line="139"/>
         <source>#!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="149"/>
+        <location filename="../qfdlg_csvparameters.ui" line="149"/>
         <source>&amp;Column Separator:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="195"/>
+        <location filename="../qfdlg_csvparameters.ui" line="195"/>
         <source>Parameters:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlg_csvparameters.ui" line="214"/>
+        <location filename="../qfdlg_csvparameters.ui" line="214"/>
         <source>File contents:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qfdlgcsvparameters.cpp" line="45"/>
+        <location filename="../qfdlgcsvparameters.cpp" line="45"/>
         <source>The first three properties (column, decimal and comment separator) may not be set to the same character! Please correct the indicated fields.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,101 +315,101 @@
 <context>
     <name>QFFitParameterWidgetWrapper</name>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="70"/>
+        <location filename="../qffitparameterwidget.cpp" line="70"/>
         <source>copy &amp;value to all files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="72"/>
+        <location filename="../qffitparameterwidget.cpp" line="72"/>
         <source>copy &amp;fix to all files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="74"/>
+        <location filename="../qffitparameterwidget.cpp" line="74"/>
         <source>copy value &amp;&amp; fix to all files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="76"/>
+        <location filename="../qffitparameterwidget.cpp" line="76"/>
         <source>copy &amp;value to initial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="78"/>
+        <location filename="../qffitparameterwidget.cpp" line="78"/>
         <source>copy &amp;fix to initial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="80"/>
+        <location filename="../qffitparameterwidget.cpp" line="80"/>
         <source>copy value &amp;&amp; fix to initial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="84"/>
+        <location filename="../qffitparameterwidget.cpp" line="84"/>
         <source>reset this value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="86"/>
+        <location filename="../qffitparameterwidget.cpp" line="86"/>
         <source>reset this fix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="88"/>
+        <location filename="../qffitparameterwidget.cpp" line="88"/>
         <source>reset this value &amp;&amp; fix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="106"/>
+        <location filename="../qffitparameterwidget.cpp" line="106"/>
         <source>&lt;b&gt;fix&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="184"/>
+        <location filename="../qffitparameterwidget.cpp" line="184"/>
         <source>&lt;b&gt;value&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="194"/>
+        <location filename="../qffitparameterwidget.cpp" line="194"/>
         <source>&lt;b&gt;&amp;nbsp;&amp;plusmn; error&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="251"/>
+        <location filename="../qffitparameterwidget.cpp" line="251"/>
         <source>&lt;b&gt;minimum&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="253"/>
+        <location filename="../qffitparameterwidget.cpp" line="253"/>
         <source>&lt;b&gt;maximum&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="350"/>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="384"/>
+        <location filename="../qffitparameterwidget.cpp" line="350"/>
+        <location filename="../qffitparameterwidget.cpp" line="384"/>
         <source>&amp;plusmn; %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="636"/>
+        <location filename="../qffitparameterwidget.cpp" line="636"/>
         <source>click to fix/unfix this parameter
  (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="637"/>
+        <location filename="../qffitparameterwidget.cpp" line="637"/>
         <source>estimated uncertainty of this parameter
  (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="638"/>
+        <location filename="../qffitparameterwidget.cpp" line="638"/>
         <source>choose the lower bound for this parameter
  (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../libqf3widgets/qffitparameterwidget.cpp" line="639"/>
+        <location filename="../qffitparameterwidget.cpp" line="639"/>
         <source>choose the upper bound for this parameter
  (%1)</source>
         <translation type="unfinished"></translation>
@@ -439,6 +438,19 @@
     <message>
         <location filename="../../../../../LIB/trunk/qt/qspecialtoolbutton.cpp" line="38"/>
         <source>All Files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QModernProgressDialog</name>
+    <message>
+        <location filename="../../../../../LIB/trunk/qt/qmodernprogresswidget.cpp" line="319"/>
+        <source>Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../../../LIB/trunk/qt/qmodernprogresswidget.cpp" line="325"/>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -8,6 +8,12 @@
 #include "highrestimer.h"
 #include "qenhancedlineedit.h"
 #include "jkstyledbutton.h"
+#include "camandoracquisitionthread.h"
+#include <QMap>
+#include <QSet>
+
+#include <unistd.h>
+
 
 
 
@@ -152,6 +158,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
          */
         virtual void log_error(QString message);
 
+        static QString andorErrorToString(unsigned int error);
+
     signals:
         /** \brief signal that may be used to display the current exposure time as a string */
         void displayAcquisitionTime(const QString& time);
@@ -176,6 +184,45 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
         QString detectorsIniPath;
         QString detectorsIniPath_init;
+
+        /** \brief stores information about a camera */
+        struct CameraInfo {
+            /** \brief width of image in pixel */
+            int width;
+            /** \brief height of image in pixel */
+            int height;
+
+            /** \brief acquisition mode */
+            int AcqMode;
+            /** \brief read mode */
+            int ReadMode;
+            /** \brief shutter mode 0: auto, 1: open, 2: close */
+            int shutterMode;
+            float expoTime;
+            int trigMode;
+            int numKins;
+            int numAccs;
+            float kinTime;
+            float accTime;
+            QRect subImage;
+            int hbin;
+            int vbin;
+            int spool;
+
+            CameraInfo();
+        };
+
+        /** \brief a set of all connected cameras */
+        QSet<int> camConnected;
+
+        /** \brief configure the given camera with the settings from the provided CameraInfo object */
+        bool setCameraSettings(int camera, CameraInfo& info);
+
+        /** \brief this map stores infos about all connected cameras. If a camer is not in the map, it is not connected */
+        QMap<int, CameraInfo> camInfos;
+
+        /** \brief this map contains all threads that control the available cameras. Each camera has it's own thread! */
+        QMap<int, CamAndorAcquisitionThread*> camThreads;
 
 
 };

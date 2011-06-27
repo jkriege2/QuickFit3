@@ -4,12 +4,12 @@
 <context>
     <name>About</name>
     <message>
-        <location filename="../../application/about.ui" line="23"/>
+        <location filename="../about.ui" line="23"/>
         <source>About QuickFit</source>
         <translation type="unfinished">Über QuickFit</translation>
     </message>
     <message>
-        <location filename="../../application/about.ui" line="76"/>
+        <location filename="../about.ui" line="76"/>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Schließen</translation>
     </message>
@@ -17,17 +17,17 @@
 <context>
     <name>AboutPlugins</name>
     <message>
-        <location filename="../../application/aboutplugins.ui" line="17"/>
+        <location filename="../aboutplugins.ui" line="17"/>
         <source>About registered plugins</source>
         <translation type="unfinished">Informationen über registrierte Plugins</translation>
     </message>
     <message>
-        <location filename="../../application/aboutplugins.ui" line="33"/>
+        <location filename="../aboutplugins.ui" line="33"/>
         <source>Plugins:</source>
         <translation type="unfinished">Plugins:</translation>
     </message>
     <message>
-        <location filename="../../application/aboutplugins.ui" line="68"/>
+        <location filename="../aboutplugins.ui" line="68"/>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Schließen</translation>
     </message>
@@ -145,18 +145,17 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="189"/>
+        <location filename="../mainwindow.cpp" line="233"/>
         <source>Open Project ...</source>
         <translation type="unfinished">Projekt öffnen ...</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="189"/>
-        <location filename="../../application/mainwindow.cpp" line="206"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>QuickFit Project (*.qfp)</source>
         <translation type="unfinished">QuickFit Projekt (*.qfp)</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="206"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Save Project As ...</source>
         <translation type="unfinished">Projekt speichern unter ...</translation>
     </message>
@@ -165,359 +164,413 @@
         <translation type="obsolete">Über QuickFit</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="51"/>
+        <location filename="../mainwindow.cpp" line="55"/>
         <source>searching for plugins ...</source>
         <translation type="unfinished">suche nach Plugins ...</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="57"/>
+        <location filename="../mainwindow.cpp" line="61"/>
         <source>Available Plugins</source>
         <translation type="unfinished">Verfügbare Plugins</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="64"/>
+        <location filename="../mainwindow.cpp" line="84"/>
         <source>%1 Plugins loaded successfully</source>
         <translation type="unfinished">%1 Plugins erfolgreich geladen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="66"/>
+        <location filename="../mainwindow.cpp" line="98"/>
         <source>QuickFit started succesfully!
 </source>
         <translation type="unfinished">QuickFit erfolgreich gestartet!</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="171"/>
+        <location filename="../mainwindow.cpp" line="213"/>
         <source>created new project!
 </source>
         <translation type="unfinished">neues Projekt erzeugt!</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="222"/>
         <source>&lt;b&gt;Copyright:&lt;/b&gt;&lt;blockquote&gt;%3&lt;/blockquote&gt;&lt;b&gt;libraries, used by QuickFit:&lt;/b&gt;&lt;ul&gt;&lt;li&gt;Qt %1 (&lt;a href=&quot;http://qt.nokia.com/&quot;&gt;http://qt.nokia.com/&lt;/a&gt;)&lt;/li&gt;&lt;li&gt;Qt %4 (&lt;a href=&quot;http://cimg.sourceforge.net/&quot;&gt;http://cimg.sourceforge.net/&lt;/a&gt;)&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;many thanks to:&lt;/b&gt;&lt;blockquote&gt;%2&lt;/blockquote&gt;</source>
-        <translation type="unfinished">&lt;b&gt;Copyright:&lt;/b&gt;&lt;blockquote&gt;%3&lt;/blockquote&gt;&lt;b&gt;von QuickFit benutze Bibliotheken:&lt;/b&gt;&lt;ul&gt;&lt;li&gt;Qt %1 (&lt;a href=&quot;http://qt.nokia.com/&quot;&gt;http://qt.nokia.com/&lt;/a&gt;)&lt;/li&gt;&lt;li&gt;Qt %4 (&lt;a href=&quot;http://cimg.sourceforge.net/&quot;&gt;http://cimg.sourceforge.net/&lt;/a&gt;)&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;Vielen Dank an:&lt;/b&gt;&lt;blockquote&gt;%2&lt;/blockquote&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;Copyright:&lt;/b&gt;&lt;blockquote&gt;%3&lt;/blockquote&gt;&lt;b&gt;von QuickFit benutze Bibliotheken:&lt;/b&gt;&lt;ul&gt;&lt;li&gt;Qt %1 (&lt;a href=&quot;http://qt.nokia.com/&quot;&gt;http://qt.nokia.com/&lt;/a&gt;)&lt;/li&gt;&lt;li&gt;Qt %4 (&lt;a href=&quot;http://cimg.sourceforge.net/&quot;&gt;http://cimg.sourceforge.net/&lt;/a&gt;)&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;Vielen Dank an:&lt;/b&gt;&lt;blockquote&gt;%2&lt;/blockquote&gt;</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="228"/>
+        <location filename="../mainwindow.cpp" line="285"/>
         <source>&lt;h2&gt;Raw Data Record Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</source>
         <translation type="unfinished">&lt;h2&gt;Rohdaten Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="234"/>
-        <location filename="../../application/mainwindow.cpp" line="248"/>
-        <location filename="../../application/mainwindow.cpp" line="263"/>
-        <location filename="../../application/mainwindow.cpp" line="277"/>
-        <location filename="../../application/mainwindow.cpp" line="292"/>
+        <location filename="../mainwindow.cpp" line="336"/>
         <source>description:</source>
         <translation type="unfinished">Beschreibung:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="235"/>
-        <location filename="../../application/mainwindow.cpp" line="249"/>
-        <location filename="../../application/mainwindow.cpp" line="264"/>
-        <location filename="../../application/mainwindow.cpp" line="278"/>
-        <location filename="../../application/mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="337"/>
         <source>author:</source>
         <translation type="unfinished">Autor:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="236"/>
-        <location filename="../../application/mainwindow.cpp" line="250"/>
-        <location filename="../../application/mainwindow.cpp" line="265"/>
-        <location filename="../../application/mainwindow.cpp" line="279"/>
-        <location filename="../../application/mainwindow.cpp" line="294"/>
+        <location filename="../mainwindow.cpp" line="338"/>
         <source>copyright:</source>
         <translation type="unfinished">Copyright:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="237"/>
-        <location filename="../../application/mainwindow.cpp" line="251"/>
-        <location filename="../../application/mainwindow.cpp" line="266"/>
-        <location filename="../../application/mainwindow.cpp" line="280"/>
-        <location filename="../../application/mainwindow.cpp" line="295"/>
+        <location filename="../mainwindow.cpp" line="339"/>
         <source>weblink:</source>
         <translation type="unfinished">Weblink:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="238"/>
-        <location filename="../../application/mainwindow.cpp" line="252"/>
-        <location filename="../../application/mainwindow.cpp" line="267"/>
-        <location filename="../../application/mainwindow.cpp" line="281"/>
-        <location filename="../../application/mainwindow.cpp" line="296"/>
+        <location filename="../mainwindow.cpp" line="340"/>
         <source>file:</source>
         <translation type="unfinished">Datei:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="239"/>
-        <location filename="../../application/mainwindow.cpp" line="253"/>
-        <location filename="../../application/mainwindow.cpp" line="297"/>
+        <location filename="../mainwindow.cpp" line="341"/>
         <source>id:</source>
         <translation type="unfinished">ID:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="242"/>
+        <location filename="../mainwindow.cpp" line="292"/>
         <source>&lt;br&gt;&lt;br&gt;&lt;h2&gt;Data Evaluation Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</source>
         <translation type="unfinished">&lt;br&gt;&lt;br&gt;&lt;h2&gt;Auswerte-Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="257"/>
+        <location filename="../mainwindow.cpp" line="69"/>
+        <location filename="../mainwindow.cpp" line="77"/>
+        <source>Plugin Tutorials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="233"/>
+        <source>QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="279"/>
+        <source>&lt;b&gt;Copyright:&lt;/b&gt;&lt;blockquote&gt;%3&lt;/blockquote&gt;&lt;b&gt;libraries, used by QuickFit:&lt;/b&gt;&lt;ul&gt;&lt;li&gt;Qt %1 (&lt;a href=&quot;http://qt.nokia.com/&quot;&gt;http://qt.nokia.com/&lt;/a&gt;)&lt;/li&gt;&lt;li&gt;CImg %4 (&lt;a href=&quot;http://cimg.sourceforge.net/&quot;&gt;http://cimg.sourceforge.net/&lt;/a&gt;)&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;many thanks to:&lt;/b&gt;&lt;blockquote&gt;%2&lt;/blockquote&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="300"/>
         <source>&lt;br&gt;&lt;br&gt;&lt;h2&gt;Fit Algorithm Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</source>
         <translation type="unfinished">&lt;br&gt;&lt;br&gt;&lt;h2&gt;Fit Algorithm Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="268"/>
-        <location filename="../../application/mainwindow.cpp" line="282"/>
+        <location filename="../mainwindow.cpp" line="305"/>
+        <location filename="../mainwindow.cpp" line="314"/>
         <source>implemented ids:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="271"/>
+        <location filename="../mainwindow.cpp" line="309"/>
         <source>&lt;br&gt;&lt;br&gt;&lt;h2&gt;Fit Function Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="286"/>
+        <location filename="../mainwindow.cpp" line="319"/>
         <source>&lt;br&gt;&lt;br&gt;&lt;h2&gt;Extension Plugins:&lt;/h2&gt;&lt;center&gt;&lt;table border=&quot;0&quot; bgcolor=&quot;darkgray&quot; width=&quot;90%&quot;&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="335"/>
+        <location filename="../mainwindow.cpp" line="335"/>
+        <source>version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="353"/>
+        <location filename="../mainwindow.cpp" line="403"/>
+        <source>Raw Data Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="362"/>
+        <location filename="../mainwindow.cpp" line="413"/>
+        <source>Data Evaluation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="371"/>
+        <location filename="../mainwindow.cpp" line="422"/>
+        <source>Fit Algorithm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="379"/>
+        <location filename="../mainwindow.cpp" line="430"/>
+        <source>Fit Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="388"/>
+        <location filename="../mainwindow.cpp" line="439"/>
+        <source>Extension</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="483"/>
         <source>Project &amp;Name:</source>
         <translation type="unfinished">Projekt&amp;name:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="338"/>
+        <location filename="../mainwindow.cpp" line="486"/>
         <source>Project File:</source>
         <translation type="unfinished">Projektdatei:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="340"/>
+        <location filename="../mainwindow.cpp" line="488"/>
         <source>Project &amp;Creator:</source>
         <translation type="unfinished">Projekt&amp;erzeuger</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="343"/>
+        <location filename="../mainwindow.cpp" line="491"/>
         <source>Project &amp;Description:</source>
         <translation type="unfinished">Projekt-&amp;Beschreibung:</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="351"/>
+        <location filename="../mainwindow.cpp" line="499"/>
         <source>QuickFit Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="354"/>
-        <source>starting up QuickFit 3.0 ...
+        <location filename="../mainwindow.cpp" line="502"/>
+        <source>starting up QuickFit %1 ...
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="355"/>
+        <location filename="../mainwindow.cpp" line="503"/>
         <source>logging to &apos;%1&apos; ...
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="356"/>
+        <location filename="../mainwindow.cpp" line="504"/>
         <source>Project Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="370"/>
+        <location filename="../mainwindow.cpp" line="519"/>
         <source>&amp;New Project</source>
         <translation type="unfinished">&amp;Neue Projekt</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="372"/>
+        <location filename="../mainwindow.cpp" line="521"/>
         <source>Create a new project</source>
         <translation type="unfinished">Neues Projekt erzeugen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="376"/>
+        <location filename="../mainwindow.cpp" line="525"/>
         <source>&amp;Open Project...</source>
         <translation type="unfinished">Projekt ö&amp;ffnen...</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="378"/>
+        <location filename="../mainwindow.cpp" line="527"/>
         <source>Open an existing project</source>
         <translation type="unfinished">Ein existierendes Projekt öffnen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="382"/>
+        <location filename="../mainwindow.cpp" line="537"/>
         <source>&amp;Save Project</source>
         <translation type="unfinished">Projekt &amp;speichern</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="384"/>
+        <location filename="../mainwindow.cpp" line="539"/>
         <source>Save the project to disk</source>
         <translation type="unfinished">Das aktuelle Projekt auf die Festplatte speichern</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="387"/>
+        <location filename="../mainwindow.cpp" line="542"/>
         <source>Save Project &amp;As...</source>
         <translation type="unfinished">Projekt speichern &amp;unter ...</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="389"/>
+        <location filename="../mainwindow.cpp" line="544"/>
         <source>Save the project under a new name</source>
         <translation type="unfinished">Das aktuelle Projekt unter einem neuen Dateinamen speichern</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="392"/>
+        <location filename="../mainwindow.cpp" line="547"/>
         <source>&amp;Settings</source>
         <translation type="unfinished">&amp;Optionen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="393"/>
+        <location filename="../mainwindow.cpp" line="548"/>
         <source>Application settings dialog</source>
         <translation type="unfinished">Programm-Einstellungs-Dialog</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="396"/>
+        <location filename="../mainwindow.cpp" line="551"/>
         <source>E&amp;xit</source>
         <translation type="unfinished">&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="397"/>
+        <location filename="../mainwindow.cpp" line="552"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished">Strg+Q</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="398"/>
+        <location filename="../mainwindow.cpp" line="553"/>
         <source>Exit the application</source>
         <translation type="unfinished">QuickFit beenden</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="406"/>
+        <location filename="../mainwindow.cpp" line="561"/>
         <source>&amp;About</source>
         <translation type="unfinished">&amp;Über</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="407"/>
+        <location filename="../mainwindow.cpp" line="562"/>
         <source>Show the application&apos;s About box</source>
         <translation type="unfinished">Informationen über QuickFit anzeigen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="410"/>
+        <location filename="../mainwindow.cpp" line="565"/>
         <source>About &amp;Plugins</source>
         <translation type="unfinished">Über &amp;Plugins</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="411"/>
+        <location filename="../mainwindow.cpp" line="566"/>
         <source>Show a list with all registered plugins</source>
         <translation type="unfinished">Eine Liste mit allen regsiterierten Plugins anzeigen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="415"/>
+        <location filename="../mainwindow.cpp" line="570"/>
         <source>About &amp;Qt</source>
         <translation type="unfinished">Über &amp;Qt</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="416"/>
+        <location filename="../mainwindow.cpp" line="571"/>
         <source>Show the Qt library&apos;s About box</source>
         <translation type="unfinished">Informationen über die Qt Bibliothek anzeigen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="422"/>
+        <location filename="../mainwindow.cpp" line="577"/>
         <source>&amp;Delete Current Item</source>
         <translation type="unfinished">aktuelles Element &amp;löschen</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="423"/>
+        <location filename="../mainwindow.cpp" line="578"/>
         <source>delete the currently selected item (if deletable) ...</source>
         <translation type="unfinished">Das gerade selektierte Element löschen (wenn löschbar) ...</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="503"/>
+        <location filename="../mainwindow.cpp" line="590"/>
+        <source>&amp;Recent Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="669"/>
         <source>insert a new raw data item ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="509"/>
+        <location filename="../mainwindow.cpp" line="675"/>
         <source>insert a new evaluation ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="514"/>
+        <location filename="../mainwindow.cpp" line="680"/>
         <source>Extensions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="633"/>
+        <location filename="../mainwindow.cpp" line="776"/>
+        <location filename="../mainwindow.cpp" line="799"/>
+        <location filename="../mainwindow.cpp" line="827"/>
+        <location filename="../mainwindow.cpp" line="867"/>
+        <location filename="../mainwindow.cpp" line="893"/>
+        <location filename="../mainwindow.cpp" line="1185"/>
+        <source>QuickFit %1.%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="800"/>
         <source>Cannot access project file %1:
 %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="637"/>
+        <location filename="../mainwindow.cpp" line="804"/>
         <source>Cannot access project file %1:
     %2.
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="647"/>
-        <location filename="../../application/mainwindow.cpp" line="694"/>
+        <location filename="../mainwindow.cpp" line="814"/>
+        <location filename="../mainwindow.cpp" line="862"/>
         <source>%1.log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="672"/>
+        <location filename="../mainwindow.cpp" line="839"/>
         <source>Project file &apos;%1&apos; loaded!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="673"/>
+        <location filename="../mainwindow.cpp" line="840"/>
         <source>loading project file &apos;%1&apos; ... DONE!
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="678"/>
+        <location filename="../mainwindow.cpp" line="846"/>
         <source>saving project to file &apos;%1&apos; ...
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="680"/>
+        <location filename="../mainwindow.cpp" line="848"/>
         <source>saving project file &apos;%1&apos; ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="681"/>
+        <location filename="../mainwindow.cpp" line="849"/>
         <source>saving project file &apos;%1&apos; ...
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="709"/>
+        <location filename="../mainwindow.cpp" line="877"/>
         <source>Project file &apos;%1&apos; saved!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="710"/>
+        <location filename="../mainwindow.cpp" line="878"/>
         <source>Project file &apos;%1&apos; saved!
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="721"/>
+        <location filename="../mainwindow.cpp" line="889"/>
         <source>untitled.qfp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="725"/>
+        <location filename="../mainwindow.cpp" line="893"/>
         <source>%1[*] - %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="920"/>
+        <location filename="../mainwindow.cpp" line="927"/>
+        <source>&amp;%1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1130"/>
         <source>autosaving project file &apos;%1&apos; ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="921"/>
+        <location filename="../mainwindow.cpp" line="1131"/>
         <source>autosaving project file &apos;%1&apos; ...
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1186"/>
+        <source>You added the first data or evaluation item to an empty project.
+Do you want to save your project now (no further reminders will be shown)?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -537,17 +590,17 @@
         <translation type="obsolete">Fügt eine neue Tabelle ein, die in QuickFit bearbeitet werde kann und mit keiner Datei verbunden ist.</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="430"/>
+        <location filename="../mainwindow.cpp" line="585"/>
         <source>&amp;File</source>
         <translation type="unfinished">&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="441"/>
+        <location filename="../mainwindow.cpp" line="602"/>
         <source>&amp;Data Items</source>
         <translation type="unfinished">Daten&amp;elemente</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="442"/>
+        <location filename="../mainwindow.cpp" line="603"/>
         <source>Insert &amp;Raw Data</source>
         <translation type="unfinished">&amp;Rohdaten einfügen</translation>
     </message>
@@ -556,28 +609,28 @@
         <translation type="obsolete">&amp;Tabelle</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="402"/>
-        <location filename="../../application/mainwindow.cpp" line="456"/>
+        <location filename="../mainwindow.cpp" line="557"/>
+        <location filename="../mainwindow.cpp" line="617"/>
         <source>&amp;Help</source>
         <translation type="unfinished">&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="444"/>
+        <location filename="../mainwindow.cpp" line="605"/>
         <source>Insert &amp;Evaluation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="452"/>
+        <location filename="../mainwindow.cpp" line="613"/>
         <source>&amp;Extensions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="494"/>
+        <location filename="../mainwindow.cpp" line="660"/>
         <source>File</source>
         <translation type="unfinished">Datei</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="499"/>
+        <location filename="../mainwindow.cpp" line="665"/>
         <source>Data</source>
         <translation type="unfinished">Daten</translation>
     </message>
@@ -586,34 +639,29 @@
         <translation type="obsolete">Fügt ein neues Rohdatenelement ein.</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="524"/>
+        <location filename="../mainwindow.cpp" line="690"/>
         <source>Ready</source>
         <translation type="unfinished">Bereit ...</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="610"/>
-        <location filename="../../application/mainwindow.cpp" line="632"/>
-        <location filename="../../application/mainwindow.cpp" line="660"/>
-        <location filename="../../application/mainwindow.cpp" line="699"/>
-        <location filename="../../application/mainwindow.cpp" line="725"/>
         <source>QuickFit 3.0</source>
-        <translation type="unfinished">QuickFit 3.0</translation>
+        <translation type="obsolete">QuickFit 3.0</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="611"/>
+        <location filename="../mainwindow.cpp" line="777"/>
         <source>The project or the data in it has been modified.
 Do you want to save your changes?</source>
         <translation type="unfinished">Das Projekt oder die darin enthaltenen Daten wurden verändert.
 ;öchten Sie die Änderungen speichern?</translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="628"/>
+        <location filename="../mainwindow.cpp" line="795"/>
         <source>loading project file &apos;%1&apos; ...
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/mainwindow.cpp" line="629"/>
+        <location filename="../mainwindow.cpp" line="796"/>
         <source>loading project file &apos;%1&apos; ...</source>
         <translation type="unfinished">lade Projektdatei &apos;%1&apos; ...</translation>
     </message>
@@ -621,32 +669,32 @@ Do you want to save your changes?</source>
 <context>
     <name>OptionsDlg</name>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="23"/>
+        <location filename="../optionsdialog.ui" line="23"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="54"/>
+        <location filename="../optionsdialog.ui" line="54"/>
         <source>&amp;View &amp;&amp; Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="63"/>
+        <location filename="../optionsdialog.ui" line="63"/>
         <source>&amp;Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="74"/>
+        <location filename="../optionsdialog.ui" line="74"/>
         <source>en</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="79"/>
+        <location filename="../optionsdialog.ui" line="79"/>
         <source>de</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="87"/>
+        <location filename="../optionsdialog.ui" line="87"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -655,32 +703,32 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="98"/>
+        <location filename="../optionsdialog.ui" line="98"/>
         <source>St&amp;yle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="108"/>
+        <location filename="../optionsdialog.ui" line="108"/>
         <source>&amp;Stylesheet:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="125"/>
+        <location filename="../optionsdialog.ui" line="125"/>
         <source>&amp;Parallelization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="134"/>
+        <location filename="../optionsdialog.ui" line="134"/>
         <source>&amp;Maximum Number of Threads:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="161"/>
+        <location filename="../optionsdialog.ui" line="161"/>
         <source>&amp;Autosave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="167"/>
+        <location filename="../optionsdialog.ui" line="167"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -689,7 +737,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../application/optionsdialog.ui" line="187"/>
+        <location filename="../optionsdialog.ui" line="187"/>
         <source>off</source>
         <translation type="unfinished"></translation>
     </message>
@@ -750,6 +798,19 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>QuickFit 3.0</source>
         <translation type="obsolete">QuickFit 3.0</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../mainwindow.h" line="183"/>
+        <source>&lt;h2&gt;%1 Tutorials:&lt;/h2&gt;&lt;ul&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.h" line="184"/>
+        <source>&lt;h2&gt;%1 Help:&lt;/h2&gt;&lt;ul&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
