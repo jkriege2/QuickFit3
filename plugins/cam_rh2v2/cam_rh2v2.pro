@@ -5,12 +5,14 @@ QMAKE_CXXFLAGS += -ggdb
 TEMPLATE = lib
 CONFIG += plugin
 
-debug:QFOUTPUT = ../../output
-!debug:QFOUTPUT = ../../output_release
-
 TARGET = cam_rh2v2
 DEPENDPATH += ./
-DESTDIR = $$QFOUTPUT/plugins/
+
+
+include(../plugins.pri)
+
+DESTDIR = $$QFOUTPUT/plugins
+
 
 DEFINES += TARGETNAME=$$TARGET
 
@@ -29,7 +31,7 @@ FORMS =
 
 RESOURCES += cam_rh2v2.qrc
 
-TRANSLATIONS= $$QFOUTPUT/assets/translations/de.cam_rh2v2.ts
+TRANSLATIONS= ./translations/de.cam_rh2v2.ts
 
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
@@ -38,8 +40,5 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl
-MOC_DIR = ./.mocs/
-UI_DIR = ./.uis/
-RCC_DIR = ./.rccs/
-OBJECTS_DIR = ./.objs/
+
 

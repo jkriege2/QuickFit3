@@ -49,6 +49,11 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         virtual QString getIconFilename() const  { return QString(":/cam_rh2v2.logo.png");};
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
+        /** \copydoc QFPlugin::getVersion() */
+        virtual void getVersion(int& major, int& minor) const {
+            major=1;
+            minor=0;
+        };
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */

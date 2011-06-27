@@ -1,3 +1,12 @@
+debug {
+    message("building in DEBUG mode, output is in ./output/")
+}
+
+!debug {
+    message("building in RELEASE mode, output is in ./output_release/")
+}
+
+
 TEMPLATE = subdirs
 
 SUBDIRS += lib libqf3widgets application
