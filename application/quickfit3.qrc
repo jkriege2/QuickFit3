@@ -18,6 +18,7 @@
     <file alias="print.png">../images/22x22/document_print.png</file>
     <file alias="project_new.png">../images/22x22/project_new.png</file>
     <file alias="project_open.png">../images/22x22/project_open.png</file>
+    <file alias="project_open_recent.png">../images/22x22/project_open_recent.png</file>
     <file alias="project_save.png">../images/22x22/project_save.png</file>
     <file alias="project_saveas.png">../images/22x22/project_saveas.png</file>
 

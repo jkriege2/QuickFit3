@@ -14,7 +14,7 @@
 #include <QThread>
 #include "dlgestimatefocalvolume.h"
 #include "qmoretextobject.h"
-
+#include "qmodernprogresswidget.h"
 
 
 
@@ -1968,7 +1968,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         tabCursor.insertText(tr("correlation data, model and residuals:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
-
+    QApplication::processEvents();
 
     {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
@@ -1981,6 +1981,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         tabCursor.insertText(tr("residual histogram:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
+    QApplication::processEvents();
     {
         QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
         QPicture pic;
@@ -1993,11 +1994,13 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
 
     int fitParamCount=0;
     for (int i=0; i<ffunc->paramCount(); i++) {
         if (ffunc->isParameterVisible(i, params)) fitParamCount++;
     }
+    QApplication::processEvents();
 
     cursor.insertBlock(); cursor.insertBlock();
     if (eval->hasFit()) cursor.insertText(tr("Model Parameters (fit results):"), fTextBold);
@@ -2007,6 +2010,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableFormat2.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     table = cursor.insertTable(ceil((double)fitParamCount/2.0)+1, 10, tableFormat2);
     QTextCursor tableCursor;
+    QApplication::processEvents();
 
     tableCursor=table->cellAt(0, 0).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
@@ -2015,6 +2019,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableCursor.setBlockFormat(bfRight);
     tableCursor.insertText(tr("Value"), fTextBoldSmall);
     if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 3).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
+    QApplication::processEvents();
 
     tableCursor=table->cellAt(0, 5).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
@@ -2023,11 +2028,13 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableCursor.setBlockFormat(bfRight);
     tableCursor.insertText(tr("Value"), fTextBoldSmall);
     if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 7).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
+    QApplication::processEvents();
 
 
     int rowStart=1;
     int colStart=0;
     for (int i=0; i<ffunc->paramCount(); i++) {
+        QApplication::processEvents();
         QString id=ffunc->getParameterID(i);
         double error=roundError(eval->getFitError(id),2);
         double value=roundWithError(eval->getFitValue(id), error, 2);
@@ -2085,6 +2092,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     cursor.setBlockFormat(bfCenter);
     cursor.setBlockCharFormat(fTextSmall);
     cursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<i><u>legend:</u> <b>F</b>: fit parameter, <b>X</b>: fixed parameter, <b>C</b>: calculated parameter</i>")));
+    QApplication::processEvents();
 
     cursor.setBlockFormat(bfLeft);
     cursor.movePosition(QTextCursor::End);
@@ -2106,6 +2114,12 @@ void QFFCSFitEvaluationEditor::saveReport() {
 
     if (!fn.isEmpty()) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QModernProgressDialog progress(tr("Exporting ..."), "", NULL);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setHasCancel(false);
+        progress.setLabelText(tr("saving FCS Fit report <br> to '%1' ...").arg(fn));
+        progress.open();
+
         QFileInfo fi(fn);
         QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
         printer->setPaperSize(QPrinter::A4);
@@ -2121,6 +2135,7 @@ void QFFCSFitEvaluationEditor::saveReport() {
         //qDebug()<<doc->toHtml();
         delete doc;
         delete printer;
+        progress.accept();
         QApplication::restoreOverrideCursor();
     }
 }
@@ -2138,11 +2153,17 @@ void QFFCSFitEvaluationEditor::printReport() {
     }
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QModernProgressDialog progress(tr("Printing ..."), "", NULL);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setHasCancel(false);
+    progress.setLabelText(tr("printing FCS Fit report ..."));
+    progress.open();
     QTextDocument* doc=new QTextDocument();
     doc->setTextWidth(p->pageRect().size().width());
     createReportDoc(doc);
     doc->print(p);
     delete p;
+    progress.accept();
     QApplication::restoreOverrideCursor();
 }
 

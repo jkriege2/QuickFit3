@@ -113,6 +113,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         void closeProject();
         /** \brief display an open project dialog and open the selected project */
         void openProject();
+        /** \brief load project from recent projects menu */
+        void openRecentProject();
         /** \brief save current project */
         bool saveProject();
         /** \brief save current project with a new filename */
@@ -176,6 +178,7 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         void readSettings();
         void writeSettings();
         bool maybeSave();
+        void updateRecentFileActions();
         QString createPluginDoc(bool docLinks=false);
         QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocHelp(QString mainitem_before=QObject::tr("<h2>%1 Help:</h2><ul>"), QString mainitem_after=QString("</ul>"));
@@ -213,6 +216,12 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         QAction* helpAct;
         QAction* optionsAct;
         QProgressBar* prgMainProgress;
+
+        /** \brief length of the list of recently opened files */
+        enum { MaxRecentFiles = 5 };
+        QAction *recentFileActs[MaxRecentFiles];
+        QMenu* recentMenu;
+
 
         QAction* delItemAct;
         /*QAction* insertRDTableAct;

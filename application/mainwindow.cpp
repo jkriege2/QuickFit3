@@ -238,6 +238,19 @@ void MainWindow::openProject() {
     }
 }
 
+void MainWindow::openRecentProject() {
+    if (maybeSave()) {
+        QAction *action = qobject_cast<QAction *>(sender());
+        if (action) {
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            currentProjectDir=QFileInfo(action->data().toString()).dir().absolutePath();
+            loadProject(action->data().toString());
+            QApplication::restoreOverrideCursor();
+        }
+    }
+}
+
+
 bool MainWindow::saveProject() {
     if (curFile.isEmpty()) {
         return saveProjectAs();
@@ -514,6 +527,12 @@ void MainWindow::createActions() {
     openProjectAct->setStatusTip(tr("Open an existing project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
+    for (int i = 0; i < MaxRecentFiles; ++i) {
+        recentFileActs[i] = new QAction(this);
+        recentFileActs[i]->setVisible(false);
+        connect(recentFileActs[i], SIGNAL(triggered()), this, SLOT(openRecentProject()));
+    }
+
 
     saveProjectAct = new QAction(QIcon(":/project_save.png"), tr("&Save Project"), this);
     saveProjectAct->setShortcuts(QKeySequence::Save);
@@ -567,6 +586,12 @@ void MainWindow::createMenus() {
     fileMenu->addAction(newProjectAct);
 
     fileMenu->addAction(openProjectAct);
+
+    recentMenu=fileMenu->addMenu(QIcon(":/project_open_recent.png"), tr("&Recent Files"));
+    for (int i = 0; i < MaxRecentFiles; ++i)
+        recentMenu->addAction(recentFileActs[i]);
+    updateRecentFileActions();
+
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
     fileMenu->addSeparator();
@@ -866,6 +891,45 @@ void MainWindow::setCurrentProject(const QString &fileName) {
         shownName = strippedName(curFile);
 
     setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("QuickFit %1.%2").arg(AutoVersion::MAJOR).arg(AutoVersion::MINOR)));
+
+    // update recent files list in ini file
+    QSettings* s=settings->getQSettings();
+    QStringList files = s->value("mainwindow/recentfilelist").toStringList();
+    files.removeAll(fileName);
+    files.prepend(fileName);
+    while (files.size() > MaxRecentFiles)
+        files.removeLast();
+    files.removeDuplicates();
+    if (files.size()>0) for (int j = files.size()-1; j >=0 ; j--) {
+        if (files[j].trimmed().isEmpty()) {
+            files.removeAt(j);
+        } else {
+            recentFileActs[j]->setVisible(false);
+        }
+    }
+    s->setValue("mainwindow/recentfilelist", files);
+    updateRecentFileActions();
+}
+
+void MainWindow::updateRecentFileActions(){
+    QSettings* s=settings->getQSettings();
+    QStringList files = s->value("mainwindow/recentfilelist").toStringList();
+    files.removeDuplicates();
+    if (files.size()>0) for (int j = files.size()-1; j >=0 ; j--) {
+        if (files[j].trimmed().isEmpty()) {
+            files.removeAt(j);
+        } else {
+            recentFileActs[j]->setVisible(false);
+        }
+    }
+    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
+    for (int i = 0; i < numRecentFiles; ++i) {
+        QString text = tr("&%1 %2").arg(i + 1).arg(strippedName(files[i]));
+        recentFileActs[i]->setText(text);
+        recentFileActs[i]->setData(files[i]);
+        recentFileActs[i]->setVisible(true);
+    }
+    if (recentMenu) recentMenu->setEnabled(numRecentFiles > 0);
 }
 
 QString MainWindow::strippedName(const QString &fullFileName) {
