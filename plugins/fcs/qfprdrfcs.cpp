@@ -46,9 +46,9 @@ void QFPRDRFCS::insertALV5000File(const QString& filename, const QMap<QString, Q
         p["CHANNEL"]=i;
         QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename).fileName()).arg(i), QStringList(filename), p, paramReadonly);
         if (e->error()) {
-            project->deleteRawData(e->getID());
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1' (channel %3/%4):\n%2").arg(filename).arg(e->errorDescription()).arg(i+1).arg(cc));
             services->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
         }
     }
 }
@@ -56,9 +56,9 @@ void QFPRDRFCS::insertALV5000File(const QString& filename, const QMap<QString, Q
 void QFPRDRFCS::insertCSVFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
     QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName(), QStringList(filename), paramValues, paramReadonly);
     if (e->error()) {
-        project->deleteRawData(e->getID());
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
     }
 }
 
@@ -66,9 +66,9 @@ void QFPRDRFCS::insertCSVFile(const QString& filename, const QMap<QString, QVari
 void QFPRDRFCS::insertALBAFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
     QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName(), QStringList(filename), paramValues, paramReadonly);
     if (e->error()) {
-        project->deleteRawData(e->getID());
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
     }
 }
 

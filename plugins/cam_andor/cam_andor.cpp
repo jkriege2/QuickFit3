@@ -442,7 +442,6 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
         case DRV_KINETIC_TIME_NOT_MET : return tr("kinetic time not met"); break;
         case DRV_ACCUM_TIME_NOT_MET : return tr("accumulation time not met"); break;
         case DRV_NO_NEW_DATA : return tr("no new data"); break;
-        case KERN_MEM_ERROR : return tr(""); break;
         case DRV_SPOOLERROR : return tr(""); break;
         case DRV_SPOOLSETUPERROR : return tr(""); break;
         case DRV_FILESIZELIMITERROR : return tr(""); break;
@@ -490,7 +489,7 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
         case DRV_P8INVALID : return tr(""); break;
         case DRV_P9INVALID : return tr(""); break;
         case DRV_P10INVALID : return tr(""); break;
-        case DRV_P11INVALID : return tr(""); break;
+
 
         case DRV_USBERROR : return tr(""); break;
         case DRV_IOCERROR : return tr(""); break;
@@ -503,7 +502,6 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
         case DRV_INVALID_RINGEXPOSURES : return tr(""); break;
         case DRV_BINNING_ERROR : return tr(""); break;
         case DRV_INVALID_AMPLIFIER : return tr(""); break;
-        case DRV_INVALID_COUNTCONVERT_MODE: return tr(""); break;
 
         case DRV_ERROR_NOCAMERA: return tr("no camera"); break;
         case DRV_NOT_SUPPORTED: return tr(""); break;
@@ -542,16 +540,21 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
         case DRV_OA_INVALID_STRING_LENGTH: return tr(""); break;
         case DRV_OA_INVALID_CHARS_IN_NAME: return tr(""); break;
         case DRV_OA_INVALID_NAMING: return tr(""); break;
-        case DRV_OA_GET_CAMERA_ERROR: return tr(""); break;
         case DRV_OA_MODE_ALREADY_EXISTS: return tr(""); break;
         case DRV_OA_STRINGS_NOT_EQUAL: return tr(""); break;
         case DRV_OA_NO_USER_DATA: return tr(""); break;
         case DRV_OA_VALUE_NOT_SUPPORTED: return tr(""); break;
         case DRV_OA_MODE_DOES_NOT_EXIST: return tr(""); break;
-        case DRV_OA_CAMERA_NOT_SUPPORTED: return tr(""); break;
-        case DRV_OA_FAILED_TO_GET_MODE: return tr(""); break;
 
+    #ifdef __LINUX__
         case DRV_PROCESSING_FAILED: return tr("processing failed"); break;
+        case DRV_OA_FAILED_TO_GET_MODE: return tr(""); break;
+        case DRV_OA_CAMERA_NOT_SUPPORTED: return tr(""); break;
+        case DRV_OA_GET_CAMERA_ERROR: return tr(""); break;
+        case KERN_MEM_ERROR : return tr(""); break;
+        case DRV_P11INVALID : return tr(""); break;
+        case DRV_INVALID_COUNTCONVERT_MODE: return tr(""); break;
+    #endif
 
         default: return tr(""); break;
     }

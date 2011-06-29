@@ -493,6 +493,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
         if (findIdentifier) {
             if (token.type==ALV_NAME) {
                 if (token.value.contains("ALV-5000", Qt::CaseInsensitive)) {
+                    setQFProperty("ALV_TYPE", token.value, false, true);
                     findIdentifier=false;
                 } else if (token.type!=ALV_LINEBREAK && token.type!=ALV_EOF) {
                     setError(tr("did not find file header").arg(filename));
@@ -506,55 +507,63 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
                 // get next token which has to be a colon':'
                 token=ALV_getToken(alv_file, readingHeader);
                 if (token.type!=ALV_COLON) {
-                    setError(tr("colon ':' expected, but found '%2'").arg(filename).arg(token.value));
-                    return false;
-                }
-                // get next token which has to be a value or a quoted string or a linebreak
-                token=ALV_getToken(alv_file, readingHeader);
-                if (token.type==ALV_QUOTED) {
-                    value=token.value;
-                } else if (token.type==ALV_VALUE) {
-                    value=token.value;
-                } else if (token.type!=ALV_LINEBREAK) {
-                    setError(tr("linebreak, number or quoted string expected").arg(filename));
-                    return false;
-                }
-                // here we check whether this is an interpreted data field (i.e. it is stored in a separate field of item1
-                if (name.compare("Date",  Qt::CaseInsensitive)==0) {
-                    QDate date=ALV_toDate(value);
-                    if (date.year()<1950) date.setDate(date.year()+100, date.month(), date.day());
-                    setQFProperty("DATE", date, false, true);
-                } else if (name.compare("Time",  Qt::CaseInsensitive)==0) {
-                    QTime date=ALV_toTime(value);
-                    setQFProperty("TIME", date, false, true);
-                } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
-                    setQFProperty("DURATION [s]", token.doubleValue, false, true);
-                } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
-                    runs=(int)round(token.doubleValue);
-                } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
-                    setQFProperty("TEMPERATURE [K]", token.doubleValue, false, true);
-                } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
-                    setQFProperty("VISCOSITY [cp]", token.doubleValue, false, true);
-                } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
-                    setQFProperty("REFRACTIVE_INDEX", token.doubleValue, false, true);
-                } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
-                    setQFProperty("WAVELENGTH [nm]", token.doubleValue, false, true);
-                } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                    setQFProperty("ANGLE [°]", token.doubleValue, false, true);
-                } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
-                    // ignore this property, as it is calculated by this class
-                } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
-                    QString text=getProperty("SAMPLE_MEMO", "").toString();
-                    if (!value.isEmpty()) text=text+"\n"+value;
-                    setQFProperty("SAMPLE_MEMO", text, false, true);
-                } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
-                    setQFProperty("MODE", value, false, true);
-                    setQFProperty("CROSS_CORRELATION", (bool)value.contains("CROSS", Qt::CaseInsensitive), false, true);
-                    isDual=value.contains("DUAL", Qt::CaseInsensitive);
-                    setQFProperty("DUAL_CHANNEL", isDual, false, true);
+                    if (name.toLower().startsWith("alv") && name.toLower().endsWith("data")) {
+                        int pnum=1;
+                        while (propertyExists(QString("ALV_TYPE%1").arg(pnum))) pnum++;
+                        setQFProperty(QString("ALV_TYPE%1").arg(pnum), token.value, false, true);
+                    } else {
+                        setError(tr("colon ':' expected, but found '%2'").arg(filename).arg(token.value));
+                        return false;
+                    }
                 } else {
-                    setQFProperty(name, value, false, true);
+                    // get next token which has to be a value or a quoted string or a linebreak
+                    token=ALV_getToken(alv_file, readingHeader);
+                    if (token.type==ALV_QUOTED) {
+                        value=token.value;
+                    } else if (token.type==ALV_VALUE) {
+                        value=token.value;
+                    } else if (token.type!=ALV_LINEBREAK) {
+                        setError(tr("linebreak, number or quoted string expected").arg(filename));
+                        return false;
+                    }
+                    // here we check whether this is an interpreted data field (i.e. it is stored in a separate field of item1
+                    if (name.compare("Date",  Qt::CaseInsensitive)==0) {
+                        QDate date=ALV_toDate(value);
+                        if (date.year()<1950) date.setDate(date.year()+100, date.month(), date.day());
+                        setQFProperty("DATE", date, false, true);
+                    } else if (name.compare("Time",  Qt::CaseInsensitive)==0) {
+                        QTime date=ALV_toTime(value);
+                        setQFProperty("TIME", date, false, true);
+                    } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
+                        setQFProperty("DURATION [s]", token.doubleValue, false, true);
+                    } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
+                        runs=(int)round(token.doubleValue);
+                    } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
+                        setQFProperty("TEMPERATURE [K]", token.doubleValue, false, true);
+                    } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
+                        setQFProperty("VISCOSITY [cp]", token.doubleValue, false, true);
+                    } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
+                        setQFProperty("REFRACTIVE_INDEX", token.doubleValue, false, true);
+                    } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
+                        setQFProperty("WAVELENGTH [nm]", token.doubleValue, false, true);
+                    } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
+                        setQFProperty("ANGLE [°]", token.doubleValue, false, true);
+                    } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
+                        // ignore this property, as it is calculated by this class
+                    } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
+                        QString text=getProperty("SAMPLE_MEMO", "").toString();
+                        if (!value.isEmpty()) text=text+"\n"+value;
+                        setQFProperty("SAMPLE_MEMO", text, false, true);
+                    } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
+                        setQFProperty("MODE", value, false, true);
+                        setQFProperty("CROSS_CORRELATION", (bool)value.contains("CROSS", Qt::CaseInsensitive), false, true);
+                        isDual=value.contains("DUAL", Qt::CaseInsensitive);
+                        setQFProperty("DUAL_CHANNEL", isDual, false, true);
+                    } else {
+                        setQFProperty(name, value, false, true);
+                    }
                 }
+
             } else if (token.type==ALV_QUOTED) {
                 // we stop reading the header when we meet the first quoted string token
                 // this is possible as every line of the header begins with an unquoted name
