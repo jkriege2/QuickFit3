@@ -105,6 +105,8 @@ class QFFitFunction {
             double absMinValue;
             /** \brief absolute maximum value of the parameter range (if supported by algorithm), or \c DBL_MAX if disabled */
             double absMaxValue;
+            /** \brief names for the items in the combobox (if type==IntCombo) */
+            QStringList comboItems;
 
             ParameterDescription() {
                 type=Invalid;
@@ -122,6 +124,7 @@ class QFFitFunction {
                 inc=1;
                 absMinValue=-DBL_MAX;
                 absMaxValue=DBL_MAX;
+                comboItems=QStringList();
             }
         };
 
@@ -248,7 +251,7 @@ class QFFitFunction {
             used in the constructor to define the model parameters
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX) {
+        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, QStringList comboItems=QStringList()) {
             ParameterDescription d;
             d.type=type;
             d.id=id;
@@ -266,6 +269,7 @@ class QFFitFunction {
             d.userRangeEditable=userRangeEditable;
             d.absMaxValue=absMaxValue;
             d.absMinValue=absMinValue;
+            d.comboItems=comboItems;
 
             return addParameter(d);
         }

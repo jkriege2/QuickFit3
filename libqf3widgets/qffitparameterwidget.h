@@ -53,7 +53,7 @@ class QFFitParameterWidgetWrapper : public QObject {
             \param parent parent widget
             \param label label for the parameter
         */
-        QFFitParameterWidgetWrapper(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""));
+        QFFitParameterWidgetWrapper(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent=NULL, QString label=QString(""), QStringList comboValues=QStringList());
         virtual ~QFFitParameterWidgetWrapper();
 
         /** \brief return whether the user may edit the values */
@@ -166,6 +166,8 @@ class QFFitParameterWidgetWrapper : public QObject {
         bool m_visible;
         /** \brief parent widget */
         QPointer<QWidget> m_parent;
+
+        QStringList m_comboValues;
 
         QPointer<JKDoubleEdit> neditValue;
         QPointer<JKDoubleEdit> neditError;

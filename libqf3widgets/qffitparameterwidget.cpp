@@ -27,7 +27,7 @@ double roundError(double error, int addSignifcant) {
 
 #define QFFitParameterWidgetWrapper_setMaxHeight(widget, height) { if (widget) { widget->setMaximumHeight(height); } }
 
-QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent, QString label):
+QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInterface* datastore,  QGridLayout* layout, int row, QString parameterID, WidgetType widget, bool editable, bool displayFix, QFFitFunction::ErrorDisplayMode displayError, bool editRangeAllowed, QWidget* parent, QString label, QStringList comboValues):
     QObject(parent)
 {
     m_datastore=datastore;
@@ -47,6 +47,7 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     m_paramDescription="";
     m_parent=parent;
     m_visible=true;
+    m_comboValues=comboValues;
 
     neditValue=NULL;
     spinIntValue=NULL;
@@ -596,8 +597,11 @@ void QFFitParameterWidgetWrapper::setRangeEnabled(bool enabled) {
 
 void QFFitParameterWidgetWrapper::fillCombo(QComboBox* cmb, int min, int max) {
     cmb->clear();
+    int j=0;
     for(int i=min; i<=max; i++) {
-        cmb->addItem(QString::number(i), i);
+        if (j<m_comboValues.size()) cmb->addItem(m_comboValues[j], i);
+        else cmb->addItem(QString::number(i), i);
+        j++;
     }
 }
 

@@ -211,6 +211,8 @@
 		<Unit filename="plugins\fcs_fitfuctions\fcs_fitfuctions.cpp" />
 		<Unit filename="plugins\fcs_fitfuctions\fcs_fitfuctions.h" />
 		<Unit filename="plugins\fcs_fitfuctions\fcs_fitfuctions.pro" />
+		<Unit filename="plugins\fcs_fitfuctions\qffitfunctionfcsmultidiffusion.cpp" />
+		<Unit filename="plugins\fcs_fitfuctions\qffitfunctionfcsmultidiffusion.h" />
 		<Unit filename="plugins\fcsfit\dlgestimatefocalvolume.cpp" />
 		<Unit filename="plugins\fcsfit\dlgestimatefocalvolume.h" />
 		<Unit filename="plugins\fcsfit\estimatefocalvolumedlg.ui" />

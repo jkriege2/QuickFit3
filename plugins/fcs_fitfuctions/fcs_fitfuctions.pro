@@ -10,9 +10,17 @@ DESTDIR = $$QFOUTPUT/plugins
 LIBS +=
 
 # Input
-HEADERS += fcs_fitfuctions.h
+HEADERS += fcs_fitfuctions.h \
+           qffitfunctionfcsmultidiffusion.h \
+           qffitfunctionfcsadiff.h \
+           qffitfunctionfcsdiff.h \
+           qffitfunctionfcssimplediff.h
 
-SOURCES += fcs_fitfuctions.cpp
+SOURCES += fcs_fitfuctions.cpp\
+           qffitfunctionfcsmultidiffusion.cpp \
+           qffitfunctionfcsadiff.cpp \
+           qffitfunctionfcsdiff.cpp \
+           qffitfunctionfcssimplediff.cpp
 
 FORMS =
 

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<title>Multi-Component Anomalous 2D/3D Diffusion (with non-fluorescing components)</title>
+</head>
+<body>
+<h2>Multi-Component Anomalous 2D/3D Diffusion (with non-fluorescing components)</h2>
+<p>This plugin implements a 2D/3D diffusion model including anomalous diffusion and up to two non-fluorescent components (e.g. triplet state dynamics) for the fitting routines in QuickFit 3. The model may be denoted as: </p>
+
+<p>
+<img alt="\[ G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right] \]" src="form_2.png">
+</p>
+<p> with different choices for <img alt="$ g_i(\tau) $" src="form_24.png"> (depending in the user settings): </p>
+<ul>
+<li>anomalous normal diffusion 3D: <p>
+<img alt="\[ g_i(\tau)=\left(1+\left(\frac{\tau}{\tau_{diff,i}}\right)^{\alpha_i}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2}\cdot\left(\frac{\tau}{\tau_{diff,i}}\right)^{\alpha_i}\right)^{-1/2} \]" src="form_25.png">
+</p>
+</li>
+<li>anomalous normal diffusion 2D (xy): <p>
+<img alt="\[ g_i(\tau)=\left(1+\left(\frac{\tau}{\tau_{diff,i}}\right)^{\alpha_i}\right)^{-1} \]" src="form_26.png">
+</p>
+</li>
+<li>anomalous normal diffusion 2D (xz): <p>
+<img alt="\[ g_i(\tau)=\left(1+\left(\frac{\tau}{\tau_{diff,i}}\right)^{\alpha_i}\right)^{-1/2}\cdot\left(1+\frac{\tau}{\gamma^2}\cdot\left(\frac{\tau}{\tau_{diff,i}}\right)^{\alpha_i}\right)^{-1/2} \]" src="form_27.png">
+</p>
+</li>
+</ul>
+<p>For the normal diffusion variants: simply fix <img alt="$ \alpha_i=1 $" src="form_28.png">.</p>
+<p>The parameters are:</p>
+<ul>
+<li><img alt="$ G_\infty $" src="form_4.png">: offset of the correlation function</li>
+<li><img alt="$ N $" src="form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><img alt="$ \Theta_{trip}, \Theta_{non} $" src="form_6.png">: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
+<li><img alt="$ \tau_{trip}, \tau_{non} $" src="form_7.png">: decay time of the first two non-fluorescent states (triplet, ...)</li>
+<li><img alt="$ \rho_1=1-\rho2-\rho3, \rho_2, \rho_3 $" src="form_8.png">: fractions of the three diffusing components</li>
+<li><img alt="$ \tau_{diff,i} $" src="form_9.png">: diffusion decay time of the i-th diffusing component</li>
+<li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
+<li><img alt="$ w_{xy} $" src="form_12.png">: lateral half axis of the focus gaussian</li>
+<li><img alt="$ z_0 $" src="form_13.png">: longitudinal half axis of the focus gaussian</li>
+</ul>
+<p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="form_12.png"> of the laser focus (xy plane) is known, as: </p>
+<p>
+<img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="form_20.png">
+</p>
+<p> where <img alt="$ \tau_D $" src="form_21.png"> is the diffusion time. Also the effective focal volume <img alt="$ V_{eff} $" src="form_22.png"> is calculated: </p>
+<p>
+<img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="form_14.png">
+</p>
+<p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
+<p>
+<img alt="\[ C=\frac{N}{V_{eff}} \]" src="form_15.png">
+</p>
+<p>The plugin also calculates some parameter errors: </p>
+<p>
+<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="form_16.png">
+</p>
+ <p>
+<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="form_23.png">
+</p>
+ <p>
+<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="form_17.png">
+</p>
+ <p>
+<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="form_18.png">
+</p>
+
+</body></html>

@@ -708,7 +708,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) has_tauD=true;
             if ((id.toLower()=="focus_width")) has_wxy=true;
             if ((id.toLower()=="focus_struct_fac")) has_gamma=true;
-           QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
             QFFitParameterWidgetWrapper::WidgetType wtype=QFFitParameterWidgetWrapper::FloatEdit;
             if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidgetWrapper::IntSpinBox;
             if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidgetWrapper::IntDropDown;
@@ -725,7 +725,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             l.replace("<sup>", "<sup><font size=\"+2\">", Qt::CaseInsensitive);
             l.replace("</sup>", "</font></sup>", Qt::CaseInsensitive);
             l.replace("</sub>", "</font></sub>", Qt::CaseInsensitive);
-            QFFitParameterWidgetWrapper* fpw=new QFFitParameterWidgetWrapper(eval, layParameters, i+1, id, wtype, editable, displayFix, displayError, editRange, this, l);
+            QFFitParameterWidgetWrapper* fpw=new QFFitParameterWidgetWrapper(eval, layParameters, i+1, id, wtype, editable, displayFix, displayError, editRange, this, l, d.comboItems);
             fpw->setUnit(d.unit);
             fpw->setIncrement(d.inc);
             fpw->setWidgetWidth(m_parameterWidgetWidth);
