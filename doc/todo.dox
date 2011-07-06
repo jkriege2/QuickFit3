@@ -21,18 +21,15 @@
     \todo make evaluation result table sortable via header
 
     \subsection qf3todo_fcsfit Plugin: FCS Fit
-    \todo implement print/export report with all fit parameters and fit statistics data
     \todo implement more estimators for fit data weighting
     \todo possibly implement additional possibilities to estimate parameter confidence intervals (additional to jacobian), like monte-carlo methods
     \todo fit current file when <ENTER> is pressed in current widget
     \todo store jacobian matrix in fit results
-    \todo add tool that allows to determine focal volume from a fit with given fluorophore parameters
 
     \section qf3todo_fitfunctions Fit Functions
     \todo FCS-Fit-Function with diffusion and rotation
     \todo FCS-Fit-Function with diffusion and flow
     \todo FCS-Fit-Function with 1D and 2D diffusion
-    \todo FCS-Fit-Function with multiple 2D/3D components which may be anomalous
     \todo FCS-Fit-Function for diffusion with non-gaussian focus profile
     \todo implement for some of the models analytical derivatives
     \todo implement fit function: multiple gaussians
@@ -40,7 +37,6 @@
     \todo implement fit function which is editable by user (math parser)
 
     \section qf3todo_fitalgorthms Fit Algorithms
-    \todo Levmar: use analytical derivatives
 
 */
 

@@ -290,7 +290,6 @@
 		<Unit filename="plugins\table\table.pro" />
 		<Unit filename="quickfit3.pri" />
 		<Unit filename="quickfit3.pro" />
-		<Unit filename="version.h" />
 		<Unit filename="..\..\..\LIB\trunk\jkimage.h" />
 		<Unit filename="..\..\..\LIB\trunk\jkserialconnection.cpp" />
 		<Unit filename="..\..\..\LIB\trunk\jkserialconnection.h" />
@@ -379,7 +378,7 @@
 			</DoxyBlocks>
 			<AutoVersioning>
 				<Scheme minor_max="100" build_max="0" rev_max="100" rev_rand_max="1" build_times_to_increment_minor="1000" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application/version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="application/version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

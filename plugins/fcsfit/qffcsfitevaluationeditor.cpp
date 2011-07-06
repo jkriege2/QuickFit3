@@ -30,6 +30,7 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
     m_parameterWidgetWidth=75;
     m_parameterCheckboxWidth=32;
     fitStatisticsReport="";
+    currentSaveDirectory="";
 
     doFitThread=new QFFitAlgorithmThreadedFit(this);
 
@@ -574,6 +575,7 @@ void QFFCSFitEvaluationEditor::readSettings() {
         spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
         tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
         currentFPSSaveDir=settings->getQSettings()->value("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir).toString();
+        currentSaveDirectory=settings->getQSettings()->value("fcsfitevaleditor/lastSaveDirectory", currentSaveDirectory).toString();
     }
 }
 
@@ -596,6 +598,7 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_toolbox_current", tabResidulas->currentIndex());
         settings->getQSettings()->setValue("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir);
+        settings->getQSettings()->setValue("fcsfitevaleditor/lastSaveDirectory", currentSaveDirectory);
     }
 }
 
@@ -1939,7 +1942,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(1, 0).firstCursorPosition().insertText(tr("fit algorithm:"), fTextBold);
     table->cellAt(1, 1).firstCursorPosition().insertText(algorithm->name(), fText);
     table->cellAt(1, 2).firstCursorPosition().insertText(tr("data range:"), fTextBold);
-    table->cellAt(1, 3).firstCursorPosition().insertText(tr("%1 ... %2").arg(datacut->get_userMin()).arg(datacut->get_userMax()), fText);
+    table->cellAt(1, 3).firstCursorPosition().insertText(tr("%1 ... %2 / %3 ... %4").arg(datacut->get_userMin()).arg(datacut->get_userMax()).arg(datacut->get_min()).arg(datacut->get_max()), fText);
     table->cellAt(2, 0).firstCursorPosition().insertText(tr("fit function:"), fTextBold);
     table->cellAt(2, 1).firstCursorPosition().insertText(ffunc->name(), fText);
     table->cellAt(2, 2).firstCursorPosition().insertText(tr("data weighting:"), fTextBold);
@@ -2008,7 +2011,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     QTextTableFormat tableFormat2;
     tableFormat2.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat2.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    table = cursor.insertTable(ceil((double)fitParamCount/2.0)+1, 10, tableFormat2);
+    table = cursor.insertTable(ceil((double)fitParamCount/2.0)+1, 12, tableFormat2);
     QTextCursor tableCursor;
     QApplication::processEvents();
 
@@ -2018,16 +2021,16 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableCursor=table->cellAt(0, 2).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
     tableCursor.insertText(tr("Value"), fTextBoldSmall);
-    if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 3).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
+    if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 5).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
     QApplication::processEvents();
 
-    tableCursor=table->cellAt(0, 5).firstCursorPosition();
-    tableCursor.setBlockFormat(bfRight);
-    tableCursor.insertText(tr("Parameter"), fTextBoldSmall);
     tableCursor=table->cellAt(0, 6).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
+    tableCursor.insertText(tr("Parameter"), fTextBoldSmall);
+    tableCursor=table->cellAt(0, 7).firstCursorPosition();
+    tableCursor.setBlockFormat(bfRight);
     tableCursor.insertText(tr("Value"), fTextBoldSmall);
-    if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 7).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
+    if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 11).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
     QApplication::processEvents();
 
 
@@ -2038,14 +2041,18 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         QString id=ffunc->getParameterID(i);
         double error=roundError(eval->getFitError(id),2);
         double value=roundWithError(eval->getFitValue(id), error, 2);
+        QString value_string=floattohtmlstr(value, 5, true).c_str();
         bool fix=eval->getFitFix(id);
         QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
+        QString range=QString("%1...%2").arg(QString(floattohtmlstr(d.minValue, 5, true).c_str())).arg(QString(floattohtmlstr(d.maxValue, 5, true).c_str()));
+        if ((d.type==QFFitFunction::IntCombo)&&((int)value>=0)&&((int)value<d.comboItems.size())) {
+            value_string="<i>"+d.comboItems[(int)value]+"</i>";
+        }
         if (ffunc->isParameterVisible(i, params)) {
             QString err="";
             if (d.displayError!=QFFitFunction::NoError) {
                 err=QString("&plusmn;&nbsp;%1").arg(QString(floattohtmlstr(error, 5, true).c_str()));
             }
-            QString range=QString("%1...%2").arg(QString(floattohtmlstr(d.minValue, 5, true).c_str())).arg(QString(floattohtmlstr(d.maxValue, 5, true).c_str()));
 
             tableCursor=table->cellAt(rowStart, colStart).firstCursorPosition();
             tableCursor.setBlockFormat(bfRight);
@@ -2069,14 +2076,18 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
             tableCursor=table->cellAt(rowStart, colStart+2).firstCursorPosition();
             tableCursor.setBlockFormat(bfRight);
             tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString(floattohtmlstr(value, 5, true).c_str())));
+            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(value_string));
 
             tableCursor=table->cellAt(rowStart, colStart+3).firstCursorPosition();
             tableCursor.setBlockCharFormat(fTextSmall);
             tableCursor.insertFragment(QTextDocumentFragment::fromHtml(err));
 
+            tableCursor=table->cellAt(rowStart, colStart+4).firstCursorPosition();
+            tableCursor.setBlockCharFormat(fTextSmall);
+            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(d.unitLabel));
+
             if (algorithm->get_supportsBoxConstraints()) {
-                tableCursor=table->cellAt(rowStart, colStart+4).firstCursorPosition();
+                tableCursor=table->cellAt(rowStart, colStart+5).firstCursorPosition();
                 tableCursor.setBlockCharFormat(fTextSmall);
                 tableCursor.insertFragment(QTextDocumentFragment::fromHtml(range));
             }
@@ -2084,7 +2095,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         };
         if (rowStart>=table->rows()) {
             rowStart=1;
-            colStart+=5;
+            colStart+=6;
         }
     }
     cursor.movePosition(QTextCursor::End);
@@ -2104,15 +2115,12 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 }
 
 void QFFCSFitEvaluationEditor::saveReport() {
-    QString fn="";
-    if (fn.isEmpty()) {
-        fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                    currentSaveDirectory,
-                                    tr("PDF File (*.pdf);;PostScript File (*.ps)"));
-        if (!fn.isEmpty()) currentSaveDirectory=extract_file_path(fn.toStdString()).c_str();
-    }
+    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+                                currentSaveDirectory,
+                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
 
     if (!fn.isEmpty()) {
+        currentSaveDirectory=QFileInfo(fn).absolutePath();
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QModernProgressDialog progress(tr("Exporting ..."), "", NULL);
         progress.setWindowModality(Qt::WindowModal);
