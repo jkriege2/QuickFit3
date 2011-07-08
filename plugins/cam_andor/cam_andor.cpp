@@ -46,6 +46,27 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     hbin=1;
     vbin=1;
     spool=0;
+    emgain_on=false;
+    emgain=1;
+    frameTransfer=true;
+    shutterOpeningTime=50;
+    shutterClosingTime=50;
+
+    coolerOn=true;
+    setTemperature=0;
+
+    preamp_gain=0;
+    vsAmplitude=0;
+    vsSpeed=0;
+    hsSpeed=0;
+    outputAmplifier=0;
+    advancedEMGain=false;
+
+    cropMode=false;
+
+    baselineOffset=0;
+    baselineClamp=true;
+
 
 }
 
@@ -80,6 +101,33 @@ void QFExtensionCameraAndor::projectChanged(QFProject* oldProject, QFProject* pr
 void QFExtensionCameraAndor::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
 
+/*
+    #ifdef __LINUX__
+    { services->log_global_text(tr("%2  loading Andor driver module into Linux kernel (running andordrvlx_load) ...").arg(getName()).arg(LOG_PREFIX));
+
+      QProcess *myProcess = new QProcess(this);
+      myProcess->start(QString("andordrvlx_load"));
+      bool ok=myProcess->waitForFinished(10000);
+      if (!ok) {
+          services->log_global_error(tr("\n%2  ERROR loading Andor driver module into Linux kernel ... process timed out after 10 seconds\n").arg(getName()).arg(LOG_PREFIX));
+          myProcess->kill();
+      } else {
+          QProcess::ExitStatus status=myProcess->exitStatus();
+          int code=myProcess->exitCode();
+          if (status!=QProcess::NormalExit) {
+              services->log_global_error(tr("\n%2  ERROR loading Andor driver module into Linux kernel ... process crashed\n").arg(getName()).arg(LOG_PREFIX));
+          } else if (code!=0)  {
+              services->log_global_error(tr("\n%2  ERROR loading Andor driver module into Linux kernel ... errorcode non-zero, was %1\n").arg(code).arg(LOG_PREFIX));
+          } else {
+              services->log_global_text(tr("OK\n"));
+          }
+      }
+
+      delete myProcess;
+    }
+
+    #endif
+*/
     loadSettings(NULL);
 
     services->log_global_text(tr("%2initializing extension '%1' ... DONE\n").arg(getName()).arg(LOG_PREFIX));
@@ -192,7 +240,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 	}
 
 
-	log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
+	//log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
 	at_32* imageData = (at_32*)malloc(info.width*info.height*sizeof(at_32));
 	CHECK_ON_ERROR(GetAcquiredData(imageData, info.width*info.height), tr("error while acquiring frame"), free(imageData));
 
@@ -278,18 +326,21 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
         //std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
         bool tempOK=false;
 
-        QModernProgressDialog progress(tr("Cooling Andor Camera #%1").arg(camera+1), "", NULL);
-        progress.setWindowModality(Qt::WindowModal);
+        QModernProgressDialog progress(tr("\"Heating\" Andor Camera #%1").arg(camera+1), "", NULL);
+        progress.setWindowModality(Qt::ApplicationModal);
         progress.setHasCancel(false);
-        progress.openDelayed(500);
+        progress.open();
         while (!tempOK) {
             tempOK=true;
             int temp1=getTemperature(i);
             //progress.setValue(33);
             progress.setLabelText(tr("cameras #%2: temperature = %1 °C ...\n").arg(temp1).arg(i+1));
-            std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp1).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
+            //std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp1).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
             if ((temp1<5)&&(temp1!=-999)) tempOK=false;
             QApplication::processEvents();
+            //progress.repaint();
+            //usleep(100000);
+
         }
         //progress.setValue(66);
         progress.setLabelText(tr("cameras #%2: shutdown ...\n").arg(i+1));
@@ -376,29 +427,63 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
 
     if (selectCamera(camera)) {
         CHECK(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
+
+        if (!setTemperature(camera, info.coolerOn, info.setTemperature, info.fanMode)) {
+            log_error(tr("error setting temperature")); \
+            return false;
+        }
+
         /* SetShutter(
             typ = 0 (TTL low opens shutter)
             mode = 0 (Auto)
             closingtime = 50
             openingtime = 50
         */
-        CHECK(SetShutter(1,info.shutterMode,50,50), tr("error while setting shutter"));
-        CHECK(SetTriggerMode(info.trigMode), tr(""));
-        CHECK(SetAcquisitionMode(info.AcqMode), tr(""));
-        CHECK(SetReadMode(info.ReadMode), tr(""));
-        CHECK(SetExposureTime(info.expoTime), tr(""));
-        CHECK(SetAccumulationCycleTime(info.accTime), tr(""));
-        CHECK(SetNumberAccumulations(info.numAccs), tr(""));
-        CHECK(SetKineticCycleTime(info.kinTime), tr(""));
-        CHECK(SetNumberKinetics(info.numKins), tr(""));
-        CHECK(SetReadMode(info.ReadMode), tr(""));
-        CHECK(SetImage(info.hbin,info.vbin,info.subImage.left(), info.subImage.right(), info.subImage.top(), info.subImage.bottom()), tr(""));
-        CHECK(SetHSSpeed(0, 0), tr(""));
+        CHECK(SetShutter(1,info.shutterMode,info.shutterClosingTime, info.shutterOpeningTime), tr("error while setting shutter"));
+        CHECK(SetTemperature(info.setTemperature), tr("error while setting temperature"));
+        CHECK(SetTriggerMode(info.trigMode), tr("error while setting trigger mode"));
+        CHECK(SetAcquisitionMode(info.AcqMode), tr("error while setting acquisition mode"));
+        CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
+        CHECK(SetHSSpeed(0, 0), tr("error while setting HSSpeed"));
+        CHECK(SetImageRotate(0), tr("error while switching image rotation off"));
+        CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
+        CHECK(SetFrameTransferMode((info.frameTransfer)?1:0), tr("error while setting frame transfer mode"));
+
+        CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
+        CHECK(SetBaselineClamp((info.baselineClamp)?1:0), tr("error while setting baseline clamp mode"));
+
+        CHECK(SetImage(info.hbin,info.vbin,info.subImage.left(), info.subImage.right(), info.subImage.top(), info.subImage.bottom()), tr("error while settings image size"));
+        CHECK(SetIsolatedCropMode((info.cropMode)?1:0, info.subImage.height(), info.subImage.width(), info.vbin, info.hbin), tr("error while settings isolated crop mode"));
+
+        CHECK(SetExposureTime(info.expoTime), tr("error while setting exposure time"));
+        CHECK(SetAccumulationCycleTime(info.accTime), tr("error while settings accumulation cycle time"));
+        CHECK(SetNumberAccumulations(info.numAccs), tr("error while setting number of accumulations"));
+        CHECK(SetKineticCycleTime(info.kinTime), tr("error while setting kinetic cycle time"));
+        CHECK(SetNumberKinetics(info.numKins), tr("error while setting number of kinetic cycles"));
+
+        CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
+        CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
+        CHECK(SetOutputAmplifier(info.outputAmplifier), tr("error while setting output amplifier"));
 
         return true;
     }
 
     return false;
+}
+
+bool QFExtensionCameraAndor::setTemperature(int camera, bool coolerOn, int temperature, int fanMode) {
+    if (selectCamera(camera)) {
+        CHECK(SetFanMode(fanMode), tr("error setting fan mode"));
+        CHECK(SetTemperature(temperature), tr("error setting temperature"));
+        if (coolerOn) {
+            CHECK(CoolerON(), tr("error while switching cooler on"));
+        } else {
+            CHECK(CoolerOFF(), tr("error while switching cooler off"));
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 int QFExtensionCameraAndor::getTemperature(int cam) {

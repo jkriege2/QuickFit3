@@ -181,6 +181,12 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief get temperature from camera i */
         int getTemperature(int cam);
 
+        /** \brief set the temperature and cooler of the given camera,
+         *
+         * fan mode of the inertanl fan 0: full, 1: low, 0: off
+         */
+        bool setTemperature(int camera, bool coolerOn, int temperature, int fanMode=0);
+
         /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
         QString detectorsIniPath;
         QString detectorsIniPath_init;
@@ -194,20 +200,77 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
             /** \brief acquisition mode */
             int AcqMode;
-            /** \brief read mode */
+            /** \brief read mode   0: FVB, 1: Multi-Track, 2: Random-Track, 3: Sngle-Track, 4: Image*/
             int ReadMode;
             /** \brief shutter mode 0: auto, 1: open, 2: close */
             int shutterMode;
+            /** \brief shutter closing time in milliseconds */
+            int shutterClosingTime;
+            /** \brief shutter opening time in milliseconds */
+            int shutterOpeningTime;
+
+            /** \brief exposure time in seconds */
             float expoTime;
+            /** \brief trigger mode */
             int trigMode;
+            /** \brief number of frames in kinetic series */
             int numKins;
+            /** \brief number of accumulations */
             int numAccs;
+            /** \brief kinetic cycle time in seconds */
             float kinTime;
+            /** \brief accumulation cycle time in seconds */
             float accTime;
+            /** \brief defines the subregion to read out */
             QRect subImage;
+            /** \brief horicontal binning */
             int hbin;
+            /** \brief vertical binning */
             int vbin;
+            /** \brief spooling mode? */
             int spool;
+
+            /** \brief cooler on/off  */
+            bool coolerOn;
+
+            /** \brief set temperature °C */
+            int setTemperature;
+
+            /** \brief EM-GAIN on/off */
+            bool emgain_on;
+            /** \brief advanced EM-GAIN mode */
+            bool advancedEMGain;
+            /** \brief EM-GAIN factor */
+            int emgain;
+
+            /** \brief output amplifier mode */
+            int outputAmplifier;
+
+            /** \brief preamplifier gain */
+            float preamp_gain;
+
+            /** \brief vertical shift amplitude (0, +1..+4)*/
+            int vsAmplitude;
+
+            /** \brief vertical shift speed */
+            int vsSpeed;
+
+            /** \brief horicontal shift speed */
+            int hsSpeed;
+
+            /** \brief crop mode on/off */
+            bool cropMode;
+
+            /** \brief frame transfer on/off */
+            bool frameTransfer;
+
+            /** \brief mode of the inertanl fan 0: full, 1: low, 2: off */
+            int fanMode;
+
+            /** \brief baseline offset value */
+            int baselineOffset;
+            /** \brief enable/disable baseline clamp */
+            bool baselineClamp;
 
             CameraInfo();
         };
