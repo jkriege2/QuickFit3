@@ -67,6 +67,10 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     baselineOffset=0;
     baselineClamp=true;
 
+    frameTransfer=true;
+
+    fanMode=0;
+
 
 }
 
