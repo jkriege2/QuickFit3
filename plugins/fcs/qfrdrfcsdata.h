@@ -87,6 +87,10 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;SYLK File (*.sylk, *.slk);;DIF File (*.dif)"); };
 
 
+        /** \brief number of correlation measurements */
+        virtual int getCorrelationMeasurements() { return 1; };
+        /** \brief name of the given correlation measurements */
+        virtual QString getCorrelationMeasurementsName(int measurement) { return tr("measurement 1"); };
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,
          *         but only one channel is represented by one object. This is saved in the property
          *         CHANNEL. */
@@ -113,20 +117,20 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        inline virtual double* getCorrelationRun(int run) { return &(correlation[run*correlationN]); };
+        inline virtual double* getCorrelationRun(int run, int measurement=0) { return &(correlation[run*correlationN]); };
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        inline virtual double* getCorrelationMean() { return correlationMean; };
+        inline virtual double* getCorrelationMean(int measurement=0) { return correlationMean; };
         /** \brief values of the standard deviation of the correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        inline virtual double* getCorrelationStdDev() { return correlationStdDev; };
+        inline virtual double* getCorrelationStdDev(int measurement=0) { return correlationStdDev; };
         /** \brief errors, associated with the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        virtual double* getCorrelationRunError(int run) { return &(correlationErrors[run*correlationN]); };
+        virtual double* getCorrelationRunError(int run, int measurement=0) { return &(correlationErrors[run*correlationN]); };
 
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
-        virtual QString getCorrelationRunName(int run);
+        virtual QString getCorrelationRunName(int run, int measurement=0);
 
         /** \brief number of countrate runs in this object */
         inline virtual int getRateRuns() { return rateRuns; };
@@ -196,16 +200,16 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual void calcBinnedRate();
 
         /** \brief returns whether to leave out a run */
-        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); };
+        inline virtual bool leaveoutRun(int run, int measurement=0) { return leaveout.contains(run); };
         /** \brief add a run to the leaveouts */
-        inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
+        inline virtual void leaveoutAddRun(int run, int measurement=0) { leaveout.append(run); }
         /** \brief remove a run from the leaveouts */
-        inline virtual void leaveoutRemoveRun(int run) { leaveout.removeAll(run); }
+        inline virtual void leaveoutRemoveRun(int run, int measurement=0) { leaveout.removeAll(run); }
         /** \brief clear all leaveouts */
         inline virtual void leaveoutClear() { leaveout.clear(); }
 
         /** \brief returns true when a given run is visible. the average run is indicated by -1 */
-        inline virtual bool isCorrelationRunVisible(int run) {
+        inline virtual bool isCorrelationRunVisible(int run, int measurement=0) {
             if (run+1<runsVisibleList.size() && run>=-1)
                 return runsVisibleList[run+1];
             else return true;
