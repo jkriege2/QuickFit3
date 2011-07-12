@@ -12,11 +12,10 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     N=0;
     width=0;
     height=0;
-    runs=0;
 }
 
 QFRDRImagingFCSData::~QFRDRImagingFCSData() {
-     allocateContents(0,0,0,0);
+     allocateContents(0,0,0);
 }
 
 void QFRDRImagingFCSData::exportData(const QString& format, const QString& filename)const  {
@@ -29,11 +28,9 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
 	// write data to the project XML file using the QXmlStreamWriter
     if (leaveout.size()>0) {
         QString l="";
-        for (int i=0; i<leaveout.size(); i+=2) {
-            if (i+1<leaveout.size()) {
-                if (!l.isEmpty()) l=l+",";
-                l=l+QString::number(leaveout[i].first)+","+QString::number(leaveout[i+1].second);
-            }
+        for (int i=0; i<leaveout.size(); i++) {
+            if (!l.isEmpty()) l=l+",";
+            l=l+QString::number(leaveout[i]);
         }
         w.writeStartElement("leaveout");
         w.writeAttribute("list", l);
@@ -49,19 +46,15 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         QDomElement te=e->firstChildElement("leaveout");
         QString l=te.attribute("list");
         QStringList li=l.split(",");
-        for (int i=0; i<li.size(); i+=2) {
-            if (i+1<li.size()) {
-                bool ok=false, ok2=false;
-                int lo=li[i].toUInt(&ok);
-                int lo2=li[i+1].toUInt(&ok2);
-                if (ok && ok2) leaveout.append(qMakePair(lo, lo2));
-            }
+        for (int i=0; i<li.size(); i++) {
+            bool ok=false;
+            int lo=li[i].toUInt(&ok);
+            if (ok) leaveout.append(lo);
         }
     }
 
 	width=getProperty("WIDTH").toInt();
 	height=getProperty("HEIGHT").toInt();
-	runs=getProperty("RUNS").toInt();
 	QString filetype=getProperty("FILETYPE", "unknown").toString();
 
 	// now also load the data file(s) this record is linked to
@@ -99,8 +92,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
 		QVector<QVector<QPair<double, double> > > data_matrix;
 		QVector<QPair<double, double> > current_set;
 		int NN=0;
-		int measurements=0;
-		while ((!stream.atEnd()) && (measurements<=width*height)) {
+		int runs=0;
+		while ((!stream.atEnd()) && (runs<=width*height)) {
             QVector<double> data=csvReadline(stream, ',', '#');
             last_empty=empty;
             empty=data.isEmpty();
@@ -111,21 +104,20 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
             if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {
                 data_matrix.append(current_set);
                 if (NN<current_set.size()) NN=current_set.size();
-                //qDebug()<<"measurements="<<measurements<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size();
+                //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size();
                 current_set.clear();
-                measurements++;
+                runs++;
                 QApplication::processEvents();
             }
-            //if (stream.atEnd()) qDebug()<<"measurements="<<measurements<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
+            //if (stream.atEnd()) qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
 		}
         width=getProperty("WIDTH").toInt();
         height=getProperty("HEIGHT").toInt();
-        runs=getProperty("RUNS").toInt();
         //std::cout<<"width="<<width<<"   height="<<height<<"   NN="<<NN<<std::endl;
         if (NN>0) {
-            if (measurements+1>=width*height) {
-                allocateContents(width, height, runs, NN);
+            if (runs+1>=width*height) {
+                allocateContents(width, height, NN);
                 for (int i=0; i<width*height; i++) {
                     if (i>=data_matrix.size()) {
                         for (int j=0; j<NN; j++) {
@@ -172,7 +164,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
 
 
 int QFRDRImagingFCSData::getCorrelationRuns() {
-    return runs;
+    return width*height;
 }
 
 long long QFRDRImagingFCSData::getCorrelationN() {
@@ -191,41 +183,33 @@ double* QFRDRImagingFCSData::getCorrelationRunErrors() {
     return sigmas;
 }
 
-double* QFRDRImagingFCSData::getCorrelationRun(int run, int measurement) {
-    return &(correlations[measurement*runs*N + run*N]);
+double* QFRDRImagingFCSData::getCorrelationRun(int run) {
+    return &(correlations[run*N]);
 }
 
-double* QFRDRImagingFCSData::getCorrelationRunError(int run, int measurement) {
-    return &(sigmas[measurement*runs*N + run*N]);
+double* QFRDRImagingFCSData::getCorrelationRunError(int run) {
+    return &(sigmas[run*N]);
 }
 
-QString QFRDRImagingFCSData::getCorrelationRunName(int run, int measurement) {
-    return tr("run %1").arg(run);
-}
-
-int QFRDRImagingFCSData::getCorrelationMeasurements() {
-    return width*height;
-}
-
-QString QFRDRImagingFCSData::getCorrelationMeasurementsName(int measurement) {
-    int x=measurementToX(measurement);
-    int y=measurementToY(measurement);
+QString QFRDRImagingFCSData::getCorrelationRunName(int run) {
+    int x=runToX(run);
+    int y=runToY(run);
     return QString("[%1, %2]").arg(x).arg(y);
 }
 
-double* QFRDRImagingFCSData::getCorrelationMean(int measurement) {
-    return &correlationMean[measurement*N];
+double* QFRDRImagingFCSData::getCorrelationMean() {
+    return correlationMean;
 }
 
-double* QFRDRImagingFCSData::getCorrelationStdDev(int measurement) {
-    return &correlationStdDev[measurement*N];
+double* QFRDRImagingFCSData::getCorrelationStdDev() {
+    return correlationStdDev;
 }
 
-bool QFRDRImagingFCSData::isCorrelationRunVisible(int run, int measurement) {
-    return !leaveoutRun(run, measurement);
+bool QFRDRImagingFCSData::isCorrelationRunVisible(int run) {
+    return !leaveoutRun(run);
 }
 
-void QFRDRImagingFCSData::allocateContents(int x, int y, int runs, int N) {
+void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (correlations) free(correlations);
     if (correlationMean) free(correlationMean);
     if (correlationStdDev) free(correlationStdDev);
@@ -236,42 +220,38 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int runs, int N) {
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
-    if ((x>0) && (y>0) && (N>0) && (runs>0)) {
-        correlations=(double*)calloc(x*y*runs*N,sizeof(double));
-        sigmas=(double*)calloc(x*y*runs*N,sizeof(double));
-        correlationMean=(double*)calloc(runs*N,sizeof(double));
-        correlationStdDev=(double*)calloc(runs*N,sizeof(double));
+    if ((x>0) && (y>0) && (N>0)) {
+        correlations=(double*)calloc(x*y*N,sizeof(double));
+        sigmas=(double*)calloc(x*y*N,sizeof(double));
+        correlationMean=(double*)calloc(N,sizeof(double));
+        correlationStdDev=(double*)calloc(N,sizeof(double));
         tau=(double*)calloc(N,sizeof(double));
         width=x;
         height=y;
         this->N=N;
-        this->runs=runs;
         setProperty("WIDTH", x);
         setProperty("HEIGHT", y);
-        setProperty("RUNS", runs);
     }
 }
 
 void QFRDRImagingFCSData::recalcCorrelations() {
     if (correlations && correlationMean && correlationStdDev) {
-        for (int n=0; n<N; n++) {
-            for (int m=0; m<width*height; m++) {
-                double norm=0;
-                double sum=0;
-                double sum2=0;
-                for (int r=0; r<runs; r++) {
-                    const double& v=correlations[m*N*runs + r*N + n];
-                    sum+=v;
-                    sum2+=v*v;
-                    norm++;
-                }
-                if (norm>0) {
-                    correlationMean[m*N+n]=sum/norm;
-                    correlationStdDev[m*N+n]=sqrt(sum2/norm-sum*sum/norm/norm);
-                } else {
-                    correlationMean[m*N+n]=0;
-                    correlationStdDev[m*N+n]=0;
-                }
+        for (int i=0; i<N; i++) {
+            double norm=0;
+            double sum=0;
+            double sum2=0;
+            for (int j=0; j<width*height; j++) {
+                const double& v=correlations[j*N+i];
+                sum+=v;
+                sum2+=v*v;
+                norm++;
+            }
+            if (norm>0) {
+                correlationMean[i]=sum/norm;
+                correlationStdDev[i]=sqrt(sum2/norm-sum*sum/norm/norm);
+            } else {
+                correlationMean[i]=0;
+                correlationStdDev[i]=0;
             }
         }
     }

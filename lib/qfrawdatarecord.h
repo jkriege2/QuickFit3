@@ -148,25 +148,40 @@ class QFRawDataRecord : public QObject, public QFProperties {
         enum evaluationResultType {
             qfrdreNumber,
             qfrdreNumberError,
-            qfrdreNumberList,
+            qfrdreNumberVector,
+            qfrdreNumberMatrix,
             qfrdreInteger,
             qfrdreString,
             qfrdreBoolean,
             qfrdreInvalid
         };
-        /** \brief this struct is used to store evaluation results associated with this data record */
+        /*! \brief this struct is used to store evaluation results associated with this data record
+
+            Data is stored in different fields, according to the data type:
+              - evaluationResultType::qfrdreNumber: data stored in dvalue [double]
+              - evaluationResultType::qfrdreNumberError: data stored in dvalue, error on derror [double]
+              - evaluationResultType::qfrdreNumberVector: data stored in dvec [double]
+              - evaluationResultType::qfrdreInteger: data stored in ivalue [int64_t]
+              - evaluationResultType::qfrdreString: data stored in dvec [double]
+              - evaluationResultType::qfrdreBoolean: data stored in bvalue [boolean]
+              - evaluationResultType::qfrdreInvalid: no data stored (invalid result)
+              - evaluationResultType::qfrdreNumberMatrix: data stored in dvec [double], in row-major order, number of columns is stored in columns
+            .
+         */
         struct evaluationResult {
             evaluationResult() {
                 type=qfrdreInvalid;
+                columns=0;
             }
-            evaluationResultType type;
-            double dvalue;
-            double derror;
-            int64_t ivalue;
-            bool bvalue;
-            QString svalue;
-            QString unit;
-            QVector<double> dvec;
+            evaluationResultType type;  /**< type of data */
+            double dvalue;  /**< doubl data value */
+            double derror;  /**< error of double data */
+            int64_t ivalue;  /**< value as 64-bit signed integer */
+            bool bvalue;  /**< value as boolean */
+            QString svalue;  /**< value as string */
+            QString unit; /**< unit name of the stored values */
+            QVector<double> dvec;  /**< data as double vector */
+            int columns;  /**< number of columns if matrix is stored in dvec (\c type \c == evaluationResultType::qfrdreNumberMatrix) */
         };
     protected:
         /** \brief evaluation results are stored in this QMap which maps an evaluation name to
@@ -206,8 +221,16 @@ class QFRawDataRecord : public QObject, public QFProperties {
         };
         /** \brief set a result of type number */
         void resultsSetNumber(QString evaluationName, QString resultName, double value, QString unit=QString(""));
-        /** \brief set a result of type number */
+        /** \brief set a result of type number vector */
         void resultsSetNumberList(QString evaluationName, QString resultName, QVector<double>& value, QString unit=QString(""));
+        /** \brief set a result of type number matrix */
+        void resultsSetNumberMatrix(QString evaluationName, QString resultName, QVector<double>& value, int columns, QString unit=QString(""));
+        /** \brief set a result of type number vector */
+        void resultsSetNumberList(QString evaluationName, QString resultName, double* value, int items, QString unit=QString(""));
+        /** \brief set a result of type number matrix */
+        void resultsSetNumberMatrix(QString evaluationName, QString resultName, double* value, int columns, int rows, QString unit=QString(""));
+
+
         /** \brief set a result of type number+error */
         void resultsSetNumberError(QString evaluationName, QString resultName, double value, double error, QString unit=QString(""));
         /** \brief set a result of type integer */
@@ -239,7 +262,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /*! \brief return a specified result as a QVariant
 
             The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
-            a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberList).
+            a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberVector).
         */
         QVariant resultsGetAsQVariant(QString evalName, QString resultName);
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */

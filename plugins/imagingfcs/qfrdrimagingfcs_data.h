@@ -67,10 +67,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         QString getExportDialogFiletypes() { return tr(""); };
 
 
-        /** \brief number of correlation measurements */
-        virtual int getCorrelationMeasurements();
-        /** \brief name of the given correlation measurements */
-        virtual QString getCorrelationMeasurementsName(int measurement=0);
+
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRuns() */
         virtual int getCorrelationRuns();
         /** \copydoc QFRDRFCSDataInterface::getCorrelationN() */
@@ -80,17 +77,17 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \copydoc QFRDRFCSDataInterface::getCorrelation() */
         virtual double* getCorrelation();
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRun() */
-        virtual double* getCorrelationRun(int run, int measurement=0);
+        virtual double* getCorrelationRun(int run);
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunError() */
-        virtual double* getCorrelationRunError(int run, int measurement=0);
+        virtual double* getCorrelationRunError(int run);
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
-        virtual QString getCorrelationRunName(int run, int measurement=0);
+        virtual QString getCorrelationRunName(int run);
         /** \copydoc QFRDRFCSDataInterface::getCorrelationMean() */
-        virtual double* getCorrelationMean(int measurement=0);
+        virtual double* getCorrelationMean();
         /** \copydoc QFRDRFCSDataInterface::getCorrelationStdDev() */
-        virtual double* getCorrelationStdDev(int measurement=0);
+        virtual double* getCorrelationStdDev();
         /** \copydoc QFRDRFCSDataInterface::isCorrelationRunVisible() */
-        virtual bool isCorrelationRunVisible(int run, int measurement=0);
+        virtual bool isCorrelationRunVisible(int run);
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunErrors() */
         virtual double* getCorrelationRunErrors();
 
@@ -105,11 +102,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \brief returns whether to leave out a run */
-        inline virtual bool leaveoutRun(int run, int measurement=0) { return leaveout.contains(qMakePair(run, measurement)); };
+        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); };
         /** \brief add a run to the leaveouts */
-        inline virtual void leaveoutAddRun(int run, int measurement=0) { leaveout.append(qMakePair(run, measurement)); }
+        inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
         /** \brief remove a run from the leaveouts */
-        inline virtual void leaveoutRemoveRun(int run, int measurement=0) { leaveout.removeAll(qMakePair(run, measurement)); }
+        inline virtual void leaveoutRemoveRun(int run) { leaveout.removeAll(run); }
         /** \brief clear all leaveouts */
         inline virtual void leaveoutClear() { leaveout.clear(); }
 
@@ -134,8 +131,6 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 		int height;
 		/** \brief number of points in correlation curve */
 		int N;
-		/** \brief number of runs in each measurement */
-		int runs;
 		/** \brief points to the correlation curves */
 		double* correlations;
 		/** \brief average over all correlation curves */
@@ -147,28 +142,28 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 		/** \brief time axis [seconds] */
 		double* tau;
 
-		/** \brief the leaveout list where the first entry in each item is the run and the second the measurement id. */
-        QList<QPair<int, int> > leaveout;
+		/** \brief the leaveout list */
+        QList<int> leaveout;
 
 
         /** \brief convert a pixel coordinate to a rund index */
-		inline int xyToMeasurement(int x, int y) {
+		inline int xyToRun(int x, int y) {
 		    return y*width+x;
 		}
-		/** \brief convert a measurement to a pixel x-coordinate */
-        inline int measurementToX(int measurement) {
-            return measurement%width;
+		/** \brief convert a run to a pixel x-coordinate */
+        inline int runToX(int run) {
+            return run%width;
         }
-		/** \brief convert a measurement to a pixel y-coordinate */
-        inline int measurementToY(int measurement) {
-            return measurement/width;
+		/** \brief convert a run to a pixel y-coordinate */
+        inline int runToY(int run) {
+            return run/width;
         }
         /** \brief convert a pixel coordinate to an array index (in correlations and sigmas) */
 		inline int xyToIndex(int x, int y) {
 		    return (y*width+x)*N;
 		}
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
-        void allocateContents(int x, int y, int runs, int N);
+        void allocateContents(int x, int y, int N);
 
 };
 

@@ -2478,7 +2478,9 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord
         }
     }
     if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
-        double* std=data->getCorrelationRunError(run);
+        double* std=NULL;
+        if (run>=0) std=data->getCorrelationRunError(run);
+        else std=data->getCorrelationStdDev();
         weightsOK=true;
         for (int i=0; i<N; i++) {
             weights[i]=std[i];

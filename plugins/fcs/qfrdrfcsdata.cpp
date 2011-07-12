@@ -659,7 +659,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
     return true;
 }
 
-QString QFRDRFCSData::getCorrelationRunName(int run, int measurement) {
+QString QFRDRFCSData::getCorrelationRunName(int run) {
     //if (run<0) return tr("average");
     if (run<correlationRuns) return tr("run %1").arg(run);
     return QString("");

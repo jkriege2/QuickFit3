@@ -103,7 +103,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     r.dvalue=re.attribute("value", "0.0").toDouble();
                     r.unit=re.attribute("unit", "");
                 } else if (t=="numberlist") {
-                    r.type=qfrdreNumberList;
+                    r.type=qfrdreNumberVector;
                     r.dvec.clear();
                     QStringList s=re.attribute("value", "0.0").split(";");
                     for (int i=0; i<s.size(); i++) {
@@ -113,6 +113,18 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                         else { r.dvec.append(0); }
                     }
                     r.unit=re.attribute("unit", "");
+                } else if (t=="numbermatrix") {
+                    r.type=qfrdreNumberVector;
+                    r.dvec.clear();
+                    QStringList s=re.attribute("value", "0.0").split(";");
+                    for (int i=0; i<s.size(); i++) {
+                        bool ok=false;
+                        double d=s[i].toDouble(&ok);
+                        if (ok) { r.dvec.append(d); }
+                        else { r.dvec.append(0); }
+                    }
+                    r.unit=re.attribute("unit", "");
+                    r.columns=re.attribute("columns", "").toInt();
                 } else if (t=="numbererror") {
                     r.type=qfrdreNumberError;
                     r.dvalue=re.attribute("value", "0.0").toDouble();
@@ -191,7 +203,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     break;
                 case qfrdreInteger:
                     w.writeAttribute("type", "integer");
-                    w.writeAttribute("value", QString::number(r.ivalue));
+                    w.writeAttribute("value", QLocale::c().toString(r.ivalue));
                     w.writeAttribute("unit", r.unit);
                     break;
                 case qfrdreString:
@@ -200,23 +212,34 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     break;
                 case qfrdreNumber:
                     w.writeAttribute("type", "number");
-                    w.writeAttribute("value", QString::number(r.dvalue));
+                    w.writeAttribute("value", QLocale::c().toString(r.dvalue));
                     w.writeAttribute("unit", r.unit);
                     break;
-                case qfrdreNumberList: {
+                case qfrdreNumberVector: {
                     w.writeAttribute("type", "numberlist");
                     QString s="";
                     for (int i=0; i<r.dvec.size(); i++) {
                         if (i>0) s=s+";";
-                        s=s+QString::number(r.dvec[i]);
+                        s=s+QLocale::c().toString(r.dvec[i]);
                     }
                     w.writeAttribute("value", s);
                     w.writeAttribute("unit", r.unit);
                     } break;
+                case qfrdreNumberMatrix: {
+                    w.writeAttribute("type", "numbermatrix");
+                    QString s="";
+                    for (int i=0; i<r.dvec.size(); i++) {
+                        if (i>0) s=s+";";
+                        s=s+QLocale::c().toString(r.dvec[i]);
+                    }
+                    w.writeAttribute("value", s);
+                    w.writeAttribute("unit", r.unit);
+                    w.writeAttribute("columns", QLocale::c().toString(r.columns));
+                    } break;
                 case qfrdreNumberError:
                     w.writeAttribute("type", "numbererror");
-                    w.writeAttribute("value", QString::number(r.dvalue));
-                    w.writeAttribute("error", QString::number(r.derror));
+                    w.writeAttribute("value", QLocale::c().toString(r.dvalue));
+                    w.writeAttribute("error", QLocale::c().toString(r.derror));
                     w.writeAttribute("unit", r.unit);
                     break;
 
@@ -281,12 +304,39 @@ void QFRawDataRecord::resultsClear(QString name, QString postfix) {
 
 void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resultName, QVector<double>& value, QString unit) {
     evaluationResult r;
-    r.type=qfrdreNumberList;
+    r.type=qfrdreNumberVector;
     r.dvec=value;
     r.unit=unit;
     results[evaluationName].insert(resultName, r);
     if (doEmitResultsChanged) emit resultsChanged();
 };
+
+void QFRawDataRecord::resultsSetNumberMatrix(QString evaluationName, QString resultName, QVector<double>& value, int columns, QString unit) {
+    evaluationResult r;
+    r.type=qfrdreNumberMatrix;
+    r.dvec=value;
+    r.unit=unit;
+    r.columns=columns;
+    results[evaluationName].insert(resultName, r);
+    if (doEmitResultsChanged) emit resultsChanged();
+};
+
+void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resultName, double* value, int items, QString unit) {
+    QVector<double> data;
+    for (int i=0; i<items; i++) {
+        data.append(value[i]);
+    }
+    resultsSetNumberList(evaluationName, resultName, data, unit);
+}
+
+void QFRawDataRecord::resultsSetNumberMatrix(QString evaluationName, QString resultName, double* value, int columns, int rows, QString unit) {
+    QVector<double> data;
+    for (int i=0; i<columns*rows; i++) {
+        data.append(value[i]);
+    }
+    resultsSetNumberMatrix(evaluationName, resultName, data, columns, unit);
+}
+
 
 
 void QFRawDataRecord::resultsSetNumberError(QString evaluationName, QString resultName, double value, double error, QString unit)  {
@@ -332,7 +382,8 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultN
         case qfrdreInteger: result=(qlonglong)r.ivalue; break;
         case qfrdreNumberError: result=QPointF(r.dvalue, r.derror); break;
         case qfrdreNumber: result=r.dvalue; break;
-        case qfrdreNumberList: {
+        case qfrdreNumberMatrix:
+        case qfrdreNumberVector: {
             QList<QVariant> data;
             for (int i=0; i<r.dvec.size(); i++) {
                 data.append(r.dvec[i]);
@@ -352,10 +403,21 @@ QString QFRawDataRecord::resultsGetAsString(QString evalName, QString resultName
         case qfrdreBoolean: if (r.bvalue) return tr("true"); else return tr("false");
         case qfrdreInteger: return tr("%1 %2").arg(r.ivalue).arg(r.unit);
         case qfrdreNumber: return tr("%1 %2").arg(r.dvalue).arg(r.unit);
-        case qfrdreNumberList: {
+        case qfrdreNumberVector: {
             QString s="(";
             for (int i=0; i<r.dvec.size(); i++) {
-                if (i>0) s=s+";";
+                if (i>0) s=s+"; ";
+                s=s+QString::number(r.dvec[i]);
+            }
+            return s+") "+r.unit;
+        }
+        case qfrdreNumberMatrix: {
+            QString s="(";
+            for (int i=0; i<r.dvec.size(); i++) {
+                if (i>0) {
+                    if (i%r.columns==0) s=s+";; ";
+                    else s=s+"; ";
+                }
                 s=s+QString::number(r.dvec[i]);
             }
             return s+") "+r.unit;
@@ -417,7 +479,8 @@ QVector<double> QFRawDataRecord::resultsGetAsDoubleList(QString evalName, QStrin
     evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
-        case qfrdreNumberList: return r.dvec;
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix: return r.dvec;
         default: if (ok) *ok=false;
                  return QVector<double>();
     }
@@ -481,6 +544,8 @@ bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QCha
                     case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
                     case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreNumberVector:
+                    case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                 }
             }
             data[r]+=separator+dat;
@@ -553,6 +618,8 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
                     case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
                     case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreNumberVector:
+                    case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                 }
             }
             if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
