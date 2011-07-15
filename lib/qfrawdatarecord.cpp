@@ -1,5 +1,6 @@
 #include "qfrawdatarecord.h"
 #include "qftools.h"
+#include <QtXml>
 
 QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     QObject(parent), QFProperties()
@@ -373,6 +374,11 @@ void QFRawDataRecord::resultsSetBoolean(QString evaluationName, QString resultNa
     results[evaluationName].insert(resultName, r);
     if (doEmitResultsChanged) emit resultsChanged();
 };
+
+void QFRawDataRecord::resultsSet(QString evaluationName, QString resultName, const evaluationResult& result) {
+    results[evaluationName].insert(resultName, result);
+    if (doEmitResultsChanged) emit resultsChanged();
+}
 
 QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultName) {
     QVariant result;

@@ -231,18 +231,18 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
         reason+=QObject::tr(" stopped by error: %1").arg(errorDescription);
         reason_simple+=QObject::tr(" stopped by error: %1").arg(errorDescription);
     }
-    result.params["stop_reason"]=reason_simple;
+    result.addString("stop_reason", reason_simple);
 
 
 
 
 
 
-    result.params["initial_error_sum"]=initialChi2;
-    result.params["error_sum"]=currentChi2;
-    result.params["iterations"]=iterations;
-    result.params["function_evals"]=chi2EvalCount;
-    result.params["fit_paramcount"]=fitParamCount;
+    result.addNumber("initial_error_sum", initialChi2);
+    result.addNumber("error_sum", currentChi2);
+    result.addNumber("iterations", iterations);
+    result.addNumber("function_evals", chi2EvalCount);
+    result.addNumber("fit_paramcount", fitParamCount);
 
 
 

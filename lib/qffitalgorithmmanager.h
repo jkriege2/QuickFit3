@@ -6,8 +6,9 @@
 #include <QString>
 #include <QStringList>
 #include <QMap>
-#include "qffitalgorithm.h"
-#include "qfpluginfitalgorithm.h"
+
+class QFPluginFitAlgorithm; // forward
+class QFFitAlgorithm;
 
 /*! \brief this class manages the available fitting algorithms
     \ingroup qf3lib_fitting

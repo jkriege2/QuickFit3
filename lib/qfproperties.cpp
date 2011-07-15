@@ -1,6 +1,6 @@
 #include "qfproperties.h"
 #include <iostream>
-
+#include <QtXml>
 #include "qftools.h"
 
 

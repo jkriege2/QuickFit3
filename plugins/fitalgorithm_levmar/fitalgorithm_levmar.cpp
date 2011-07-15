@@ -70,14 +70,15 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     }
 
 
-    result.params["initial_error_sum"]=info[0];
-    result.params["error_sum"]=info[1];
-    result.params["iterations"]=info[5];
-    result.params["function_evals"]=info[7];
-    result.params["jacobian_evals"]=info[8];
-    result.params["linsys_solved"]=info[9];
-    result.params["fit_paramcount"]=paramCount;
-    result.params["numerical_gradient"]=numGrad;
+    result.addNumber("initial_error_sum", info[0]);
+    result.addNumber("error_sum", info[1]);
+    result.addNumber("iterations", info[5]);
+    result.addNumber("function_evals", info[7]);
+    result.addNumber("jacobian_evals", info[8]);
+    result.addNumber("linsys_solved", info[9]);
+    result.addInteger("fit_paramcount", paramCount);
+    result.addBoolean("numerical_gradient", numGrad);
+    result.addNumberMatrix("covariance_matrix", covar, paramCount, paramCount);
 
     QString reason="", reason_simple="";
     switch((int)info[6]) {
@@ -103,7 +104,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
                 reason_simple=QObject::tr("stopped by invalid (i.e. Not a Number (NaN) or Infinity) model function values. This is a user error, contact the model implementer!");
                 break;
     };
-    result.params["stop_reason"]=reason_simple;
+    result.addString("stop_reason", reason_simple);
 
     printf("Levenberg-Marquardt returned in %g iter, reason %s, sumsq %g [%g]\n", info[5], reason.toStdString().c_str(), info[1], info[0]);
 

@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QString>
 #include <QVariant>
-#include <QtXml>
 #include <QStringList>
 #include <QMap>
 #include <QIcon>
@@ -15,6 +14,8 @@
 #include "qfrdrpropertymodel.h"
 #include "qfproperties.h"
 
+
+class QDomElement; // forward
 
 /*! \brief this class manages one raw data record in the project
     \ingroup qf3lib_project
@@ -239,6 +240,8 @@ class QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetString(QString evaluationName, QString resultName, QString value);
         /** \brief set a result of type boolean */
         void resultsSetBoolean(QString evaluationName, QString resultName, bool value);
+        /** \brief set result from evaluationResult */
+        void resultsSet(QString evaluationName, QString resultName, const evaluationResult& result);
         /** \brief return a specified result as variant */
         inline evaluationResult resultsGet(QString evalName, QString resultName) {
             evaluationResult r;

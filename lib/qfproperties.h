@@ -2,12 +2,13 @@
 #define QFPROPERTIES_H
 
 #include <QObject>
-#include <QDomElement>
-#include <QXmlStreamWriter>
 #include <QString>
 #include <QMap>
 #include <QVariant>
 #include <QStringList>
+
+class QDomElement; // forward
+class QXmlStreamWriter;
 
 /*! \brief implements a property system, together with storage to/read from XML files
     \ingroup qf3lib_project

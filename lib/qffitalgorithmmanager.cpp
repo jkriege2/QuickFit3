@@ -2,6 +2,8 @@
 #include <QtPlugin>
 #include <QPluginLoader>
 #include <QDir>
+#include "qfpluginfitalgorithm.h"
+#include "qffitalgorithm.h"
 
 
 QFFitAlgorithmManager::QFFitAlgorithmManager(QObject* parent):

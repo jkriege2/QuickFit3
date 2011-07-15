@@ -5,11 +5,144 @@
 #include <cfloat>
 #include <cstdio>
 #include <iostream>
-
+#include "qfrawdatarecord.h"
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) {
 }
 
+
+
+void QFFitAlgorithm::FitResult::addNumber(QString resultName, double value, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreNumber;
+    r.dvalue=value;
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+void QFFitAlgorithm::FitResult::addNumberList(QString resultName, QVector<double>& value, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreNumberVector;
+    r.dvec=value;
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addNumberMatrix(QString resultName, QVector<double>& value, int columns, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreNumberMatrix;
+    r.dvec=value;
+    r.columns=columns;
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addNumberList(QString resultName, double* value, int items, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreNumberVector;
+    r.dvec.clear();
+    for (int i=0; i<items; i++) r.dvec.append(value[i]);
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addNumberMatrix(QString resultName, double* value, int columns, int rows, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreNumberVector;
+    r.dvec.clear();
+    for (int i=0; i<rows*columns; i++) r.dvec.append(value[i]);
+    r.columns=columns;
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addNumberError(QString resultName, double value, double error, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreNumberError;
+    r.dvalue=value;
+    r.derror=error;
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addInteger(QString resultName, int64_t value, QString unit) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreInteger;
+    r.ivalue=value;
+    r.unit=unit;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addString(QString resultName, QString value) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreString;
+    r.svalue=value;
+
+    params[resultName]=r;
+}
+
+
+void QFFitAlgorithm::FitResult::addBoolean(QString resultName, bool value) {
+    QFRawDataRecord::evaluationResult r;
+
+    r.type=QFRawDataRecord::qfrdreBoolean;
+    r.bvalue=value;
+
+    params[resultName]=r;
+}
+
+QString  QFFitAlgorithm::FitResult::getAsString(QString resultName) {
+    QFRawDataRecord::evaluationResult r=params[resultName];
+    switch(r.type) {
+        case QFRawDataRecord::qfrdreBoolean: if (r.bvalue) return QObject::tr("true"); else return QObject::tr("false");
+        case QFRawDataRecord::qfrdreInteger: return QObject::tr("%1 %2").arg(r.ivalue).arg(r.unit);
+        case QFRawDataRecord::qfrdreNumber: return QObject::tr("%1 %2").arg(r.dvalue).arg(r.unit);
+        case QFRawDataRecord::qfrdreNumberVector: {
+            QString s="(";
+            for (int i=0; i<r.dvec.size(); i++) {
+                if (i>0) s=s+"; ";
+                s=s+QString::number(r.dvec[i]);
+            }
+            return s+") "+r.unit;
+        }
+        case QFRawDataRecord::qfrdreNumberMatrix: {
+            QString s="(";
+            for (int i=0; i<r.dvec.size(); i++) {
+                if (i>0) {
+                    if (i%r.columns==0) s=s+";; ";
+                    else s=s+"; ";
+                }
+                s=s+QString::number(r.dvec[i]);
+            }
+            return s+") "+r.unit;
+        }
+        case QFRawDataRecord::qfrdreNumberError: return QObject::tr("(%1 +/- %2) %3").arg(r.dvalue).arg(r.derror).arg(r.unit);
+        case QFRawDataRecord::qfrdreString: return r.svalue;
+        default: return ("");
+    }
+    return QString("");
+}
 
 
 

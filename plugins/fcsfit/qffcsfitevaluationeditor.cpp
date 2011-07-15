@@ -1484,7 +1484,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_cut_low", cut_low);
                 record->resultsSetInteger(eval->getEvaluationResultID(ffunc->id(), run), "fit_cut_up", cut_up);
 
-                QMapIterator<QString, QVariant> it(result.params);
+                /*QMapIterator<QString, QVariant> it(result.params);
                 while (it.hasNext()) {
                     it.next();
                     switch(it.value().type()) {
@@ -1504,6 +1504,11 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                             record->resultsSetBoolean(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_"+it.key(), it.value().toBool()); break;
                         default: break;
                     }
+                }*/
+                QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
+                while (it.hasNext()) {
+                    it.next();
+                    record->resultsSet(eval->getEvaluationResultID(ffunc->id(), run), "fitalg_"+it.key(), it.value());
                 }
                 record->enableEmitResultsChanged();
                 emit resultsChanged();

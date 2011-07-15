@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QVariant>
 #include <stdint.h>
+#include "qfrawdatarecord.h"
 
 /*! \brief reporter interface for fitting algorithms
     \ingroup qf3lib_fitting
@@ -218,11 +219,33 @@ class QFFitAlgorithm {
             bool fitOK;
             /** \brief additional result parameters of the fit (maxIterations, ...).
              *         These parameters are ment superseed parameters with the same name retrieved with QFFitAlgorithm::getParameter() */
-            QMap<QString, QVariant> params;
+            QMap<QString, QFRawDataRecord::evaluationResult> params;
             /** \brief a report of the fit result in human-readable form, you may use HTML markup to enrich your results */
             QString message;
             /** \brief a report of the fit result in human-readable form, you may NOT use HTML markup to enrich your results */
             QString messageSimple;
+
+
+            /** \brief set a result of type number */
+            void addNumber(QString resultName, double value, QString unit=QString(""));
+            /** \brief set a result of type number vector */
+            void addNumberList(QString resultName, QVector<double>& value, QString unit=QString(""));
+            /** \brief set a result of type number matrix */
+            void addNumberMatrix(QString resultName, QVector<double>& value, int columns, QString unit=QString(""));
+            /** \brief set a result of type number vector */
+            void addNumberList(QString resultName, double* value, int items, QString unit=QString(""));
+            /** \brief set a result of type number matrix */
+            void addNumberMatrix(QString resultName, double* value, int columns, int rows, QString unit=QString(""));
+            /** \brief set a result of type number+error */
+            void addNumberError(QString resultName, double value, double error, QString unit=QString(""));
+            /** \brief set a result of type integer */
+            void addInteger(QString resultName, int64_t value, QString unit=QString(""));
+            /** \brief set a result of type string */
+            void addString(QString resultName, QString value);
+            /** \brief set a result of type boolean */
+            void addBoolean(QString resultName, bool value);
+            /** \brief return result as string */
+            QString  getAsString(QString resultName);
         };
 
         /** \brief class construtor */
