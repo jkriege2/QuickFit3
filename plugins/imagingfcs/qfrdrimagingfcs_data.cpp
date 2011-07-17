@@ -1,4 +1,5 @@
 #include "qfrdrimagingfcs_data.h"
+#include <QtXml>
 
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):

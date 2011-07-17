@@ -1,11 +1,11 @@
 #include "dlgqffitalgorithmprogressdialog.h"
-
+#include "ui_dlg_fitalgorithmprogress.h"
 #include <QTimer>
 
 dlgQFFitAlgorithmProgressDialog::dlgQFFitAlgorithmProgressDialog(QWidget* parent):
-    QDialog(parent)//, QFFitAlgorithmReporter()
+    QDialog(parent), ui(new Ui::QFFitAlgorithmProgressDlg)
 {
-    setupUi(this);
+    ui->setupUi(this);
     m_canceled=false;
     m_display=false;
     m_displayDelay=500;
@@ -17,14 +17,14 @@ dlgQFFitAlgorithmProgressDialog::~dlgQFFitAlgorithmProgressDialog()
 }
 
 void dlgQFFitAlgorithmProgressDialog::setAllowCancel(bool enable) {
-    btnCancel->setEnabled(enable);
+    ui->btnCancel->setEnabled(enable);
 }
 
 
 void dlgQFFitAlgorithmProgressDialog::done() {
     m_display=false;
     close();
-    btnCancel->setEnabled(true);
+    ui->btnCancel->setEnabled(true);
 }
 
 void dlgQFFitAlgorithmProgressDialog::doDisplay() {
@@ -34,55 +34,55 @@ void dlgQFFitAlgorithmProgressDialog::doDisplay() {
 void dlgQFFitAlgorithmProgressDialog::display() {
     m_canceled=false;
     m_display=true;
-    labCancel->setText("");
+    ui->labCancel->setText("");
     if (m_displayDelay>0) QTimer::singleShot(m_displayDelay, this, SLOT(doDisplay()));
     else doDisplay();
 }
 
 void dlgQFFitAlgorithmProgressDialog::on_btnCancel_clicked() {
     m_canceled=true;
-    labCancel->setText(tr("canceled ... please wait ..."));
-    btnCancel->setEnabled(false);
+    ui->labCancel->setText(tr("canceled ... please wait ..."));
+    ui->btnCancel->setEnabled(false);
 }
 
 
 void dlgQFFitAlgorithmProgressDialog::reportStatus(const QString& message) {
-    labStatus->setText(message);
+    ui->labStatus->setText(message);
 }
 
 void dlgQFFitAlgorithmProgressDialog::setProgressMax(int max) {
-    prgFit->setRange(0,max);
+    ui->prgFit->setRange(0,max);
 }
 
 void dlgQFFitAlgorithmProgressDialog::setProgress(int value) {
-    prgFit->setValue(value);
+    ui->prgFit->setValue(value);
 }
 
 void dlgQFFitAlgorithmProgressDialog::setProgressFull() {
-    prgFit->setValue(prgFit->maximum());
+    ui->prgFit->setValue(ui->prgFit->maximum());
 }
 
 void dlgQFFitAlgorithmProgressDialog::incProgress(int increment) {
-    prgFit->setValue(prgFit->value()+increment);
+    ui->prgFit->setValue(ui->prgFit->value()+increment);
 }
 
 
 
 
 void dlgQFFitAlgorithmProgressDialog::reportSuperStatus(const QString& message) {
-    labSuperStatus->setText(message);
+    ui->labSuperStatus->setText(message);
 }
 
 void dlgQFFitAlgorithmProgressDialog::setSuperProgressMax(int max) {
-    prgOverall->setRange(0,max);
+    ui->prgOverall->setRange(0,max);
 }
 
 void dlgQFFitAlgorithmProgressDialog::setSuperProgress(int value) {
-    prgOverall->setValue(value);
+    ui->prgOverall->setValue(value);
 }
 
 void dlgQFFitAlgorithmProgressDialog::incSuperProgress(int increment) {
-    prgOverall->setValue(prgOverall->value()+increment);
+    ui->prgOverall->setValue(ui->prgOverall->value()+increment);
 }
 
 

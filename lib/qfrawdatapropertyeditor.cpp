@@ -345,19 +345,19 @@ void QFRawDataPropertyEditor::newPropClicked() {
             }
         }*/
         dlgNewProperty* d=new dlgNewProperty(this);
-        d->cmbName->setEditText(tr("new_property"));
-        d->cmbName->addItems(current->getProject()->getAllPropertyNames());
+        d->setPropertyName(tr("new_property"));
+        d->addPropertyNames(current->getProject()->getAllPropertyNames());
 
         if (d->exec()==QDialog::Accepted) {
-            QVariant v=d->edtValue->text();
-            switch (d->cmbType->currentIndex()) {
+            QVariant v=d->propertyValue();
+            switch (d->propertyTypeInt()) {
                 case 1: v.convert(QVariant::Double); break;
                 case 2: v.convert(QVariant::LongLong); break;
                 case 3: v.convert(QVariant::Bool); break;
                 case 4: v.convert(QVariant::DateTime); break;
                 default: break;
             }
-            current->setQFProperty(d->cmbName->currentText(), v);
+            current->setQFProperty(d->propertyName(), v);
         }
 
         delete d;
@@ -368,16 +368,21 @@ void QFRawDataPropertyEditor::newPropClicked() {
 void QFRawDataPropertyEditor::deletePropClicked() {
     if (current) {
         QModelIndexList l=tvProperties->selectionModel()->selectedIndexes();
-        for (int i=current->getPropertyModel()->rowCount()-1; i>=0; i--) {
-            if (tvProperties->selectionModel()->rowIntersectsSelection(i, QModelIndex()) ) {
-                //std::cout<<"deleting "<<current->getPropertyName(i).toStdString()<<std::endl;
-                QString n=current->getPropertyName(i);
-                if (n!="" && current->propertyExists(n)) {
-                    current->deleteProperty(n);
-                    return;
-                }
+        QStringList props;
+        for (int i=0; i<l.size(); i++) {
+            int row=l[i].row();
+            QString prop=current->getVisibleProperty(row);
+            if ((!prop.isEmpty()) && current->propertyExists(prop)) {
+                props.append(prop);
             }
         }
+        if (props.size()>0) {
+            for (int i=0; i<props.size(); i++) {
+                //std::cout<<"deleting "<<props[i].toStdString()<<std::endl;
+                current->deleteProperty(props[i]);
+            }
+        }
+
     }
 }
 

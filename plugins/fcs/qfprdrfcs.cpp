@@ -3,6 +3,7 @@
 #include "qfrdrfcsdata.h"
 #include "dlgcsvparameters.h"
 #include "dlgcsvparameters.h"
+#include <QtXml>
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)

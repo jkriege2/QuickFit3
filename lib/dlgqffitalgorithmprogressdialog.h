@@ -3,9 +3,11 @@
 
 #include <QDialog>
 #include "qffitalgorithm.h"
-#include ".uis/ui_dlg_fitalgorithmprogress.h"
 
 
+namespace Ui {
+    class QFFitAlgorithmProgressDlg; // forward
+};
 
 
 /*! \brief a progress dialog for QFFitAlgorithm objects
@@ -36,7 +38,7 @@
 
 
 */
-class dlgQFFitAlgorithmProgressDialog : public QDialog, public Ui::QFFitAlgorithmProgressDlg
+class dlgQFFitAlgorithmProgressDialog : public QDialog
 {
         Q_OBJECT
     public:
@@ -84,6 +86,7 @@ class dlgQFFitAlgorithmProgressDialog : public QDialog, public Ui::QFFitAlgorith
         bool m_canceled;
         bool m_display;
         double m_displayDelay;
+        Ui::QFFitAlgorithmProgressDlg* ui;
     private slots:
         void on_btnCancel_clicked();
         void doDisplay();

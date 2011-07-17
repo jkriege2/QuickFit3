@@ -1,5 +1,5 @@
 #include "qfrdr_data.h"
-
+#include <QtXml>
 
 QFRDRData::QFRDRData(QFProject* parent):
     QFRawDataRecord(parent)

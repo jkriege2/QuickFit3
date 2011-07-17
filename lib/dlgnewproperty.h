@@ -2,11 +2,13 @@
 #define DLGNEWPROPERTY_H
 
 #include <QDialog>
-#include "ui_dlg_newproperty.h"
 
 
+namespace Ui {
+    class dlgNewProperty; // forward
+}
 
-class dlgNewProperty : public QDialog, public Ui::dlgNewProperty
+class dlgNewProperty : public QDialog
 {
         Q_OBJECT
     public:
@@ -14,8 +16,19 @@ class dlgNewProperty : public QDialog, public Ui::dlgNewProperty
         dlgNewProperty(QWidget* parent);
         /** Default destructor */
         virtual ~dlgNewProperty();
+
+        QString propertyName();
+        QString propertyType();
+        int propertyTypeInt();
+        QString propertyValue();
+
+        void setPropertyName(QString name);
+        void setPropertyValue(QString value);
+        void setPropertyType(int i);
+        void addPropertyNames(const QStringList& names);
     protected:
     private:
+        Ui::dlgNewProperty* ui;
 };
 
 #endif // DLGNEWPROPERTY_H
