@@ -9,7 +9,7 @@ dlgNewProperty::dlgNewProperty(QWidget* parent):
 
 dlgNewProperty::~dlgNewProperty()
 {
-    //dtor
+    delete ui;
 }
 
 

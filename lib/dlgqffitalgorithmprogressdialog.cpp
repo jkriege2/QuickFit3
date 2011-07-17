@@ -13,7 +13,7 @@ dlgQFFitAlgorithmProgressDialog::dlgQFFitAlgorithmProgressDialog(QWidget* parent
 
 dlgQFFitAlgorithmProgressDialog::~dlgQFFitAlgorithmProgressDialog()
 {
-    //dtor
+    delete ui;
 }
 
 void dlgQFFitAlgorithmProgressDialog::setAllowCancel(bool enable) {
