@@ -18,7 +18,6 @@
 #include <QTabWidget>
 #include <QGroupBox>
 
-#include "../../extlibs/cimg.h"
 
 #include "programoptions.h"
 #include "jkimage.h"

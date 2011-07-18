@@ -4,10 +4,11 @@
 #include <iostream>
 #include <unistd.h>
 #include <time.h>
+#include <QMapIterator>
 #include "qmodernprogresswidget.h"
 
 #define LOG_PREFIX "[Andor]:  "
-
+#define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
 
 #define CHECK(s, msg) \
 { \
@@ -28,6 +29,27 @@
     } \
 }
 
+QFExtensionCameraAndor::CameraGlobalSettings::CameraGlobalSettings() {
+    coolerOn=true;
+    setTemperature=20;
+    fanMode=0;
+}
+
+
+void QFExtensionCameraAndor::CameraGlobalSettings::readSettings(QSettings& settings, int camera) {
+    settings.sync();
+    coolerOn=settings.value(QString("camera%1/cooler_on").arg(camera), coolerOn).toBool();
+    setTemperature=settings.value(QString("camera%1/set_temperature").arg(camera), setTemperature).toInt();
+    fanMode=settings.value(QString("camera%1/fan_mode").arg(camera), fanMode).toInt();
+}
+
+void QFExtensionCameraAndor::CameraGlobalSettings::writeSettings(QSettings& settings, int camera) const {
+    settings.setValue(QString("camera%1/cooler_on").arg(camera), coolerOn);
+    settings.setValue(QString("camera%1/set_temperature").arg(camera), setTemperature);
+    settings.setValue(QString("camera%1/fan_mode").arg(camera), fanMode);
+    settings.sync();
+}
+
 QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     width=10;
     height=10;
@@ -46,20 +68,17 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     hbin=1;
     vbin=1;
     spool=0;
-    emgain_on=false;
     emgain=1;
+    outputAmplifier=1;
     frameTransfer=true;
     shutterOpeningTime=50;
     shutterClosingTime=50;
 
-    coolerOn=true;
-    setTemperature=0;
 
     preamp_gain=0;
     vsAmplitude=0;
     vsSpeed=0;
     hsSpeed=0;
-    outputAmplifier=0;
     advancedEMGain=false;
 
     cropMode=false;
@@ -69,8 +88,8 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
 
     frameTransfer=true;
 
-    fanMode=0;
-
+    headModel="";
+    serialNumber=0;
 
 }
 
@@ -93,7 +112,7 @@ QFExtensionCameraAndor::~QFExtensionCameraAndor() {
 
 
 void QFExtensionCameraAndor::deinit() {
-
+    storeGlobalSettings();
 }
 
 void QFExtensionCameraAndor::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -104,6 +123,25 @@ void QFExtensionCameraAndor::projectChanged(QFProject* oldProject, QFProject* pr
 
 void QFExtensionCameraAndor::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
+
+    // read and output version infos:
+    char version[1024];
+    GetVersionInfo(AT_SDKVersion, version, 1023);
+    services->log_global_text(tr("%2    SDK version: %1\n").arg(QString(version)).arg(LOG_PREFIX));
+    GetVersionInfo(AT_DeviceDriverVersion, version, 1023);
+    services->log_global_text(tr("%2    device driver version: %1\n").arg(QString(version)).arg(LOG_PREFIX));
+
+
+    // try to load global settings for all available cameras (more may be added by connectDevice() function
+    // writeback of these occurs in deinit()
+    // these settings will be modified by a special dialog available through a menu entry!
+    QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
+    camGlobalSettings.clear();
+    for (int i=0; i<getCameraCount(); i++) {
+        CameraGlobalSettings global;
+        global.readSettings(inifile, i);
+        camGlobalSettings[i]=global;
+    }
 
 /*
     #ifdef __LINUX__
@@ -264,7 +302,7 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     progress.setWindowModality(Qt::WindowModal);
     progress.setHasCancel(false);
     progress.open();
-
+    QApplication::processEvents();
 
     at_32 *data = NULL;
 
@@ -272,11 +310,29 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     char path[2048];
 
     if (selectCamera(camera)) {
+        // ensure that global camera settings are loaded (usually done in initExtension), if they are not present,
+        // try to load them from global INI file.
+        if (!camGlobalSettings.contains(camera)) {
+            QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
+            CameraGlobalSettings global;
+            global.readSettings(inifile, camera);
+            camGlobalSettings[camera]=global;
+        }
 
-
+        // initialize camera, if init fails, call ShutDown and the Initialize again ... if this also fails -> exit with an error!
         strcpy(path, detectorsIniPath.toStdString().c_str());
         progress.setLabelText(tr("initializing camera %1 ...<br>&nbsp;&nbsp;&nbsp;&nbsp;detectorsIniPath='%2'").arg(camera).arg(detectorsIniPath));
-        CHECK(Initialize(path), tr("Error during Initialize"));
+        QApplication::processEvents();
+        { unsigned int error1=Initialize(path);
+            if (error1!=DRV_SUCCESS) {
+                log_warning(tr("Error during Initialize\n%3    error code was: %1 [%2]\n%3    instruction was: %4\n").arg(error1).arg(andorErrorToString(error1)).arg(LOG_PREFIX).arg("Initialize(path)"));
+                log_warning(tr(" trying shutdown() + initialize cycle").arg(LOG_PREFIX));
+                CHECK(ShutDown(), tr("Error during Shutdown"));
+                CHECK(Initialize(path), tr("Error during Initialize"));
+            }
+        }
+
+
 
         // wait for >2 seconds and call QApplication::processEvents(); here and there,
         // so the widgets are updated
@@ -301,6 +357,19 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
             camInfos[camera]=info;
             camConnected.insert(camera);
             log_text(tr("connected to Andor Camera #%1, width=%2, height=%3\n").arg(camera).arg(info.width).arg(info.height));
+            log_text(tr("    width=%1, height=%2\n").arg(info.width).arg(info.height));
+            char text[MAX_PATH];
+            GetHeadModel(text);
+            info.headModel=text;
+            log_text(tr("    head model = %1\n").arg(info.headModel));
+            GetCameraSerialNumber(&(info.serialNumber));
+            log_text(tr("    serial number = %1\n").arg(info.serialNumber));
+            GetControllerCardModel(text);
+            log_text(tr("    controller card = %1\n").arg(text));
+            if (!setGlobalSettings(camera)) {
+                log_error(tr("error setting global settings")); \
+                return false;
+            }
             return true;
         } else {
             log_error("error while setting camera settings!");
@@ -432,10 +501,6 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
     if (selectCamera(camera)) {
         CHECK(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
 
-        if (!setTemperature(camera, info.coolerOn, info.setTemperature, info.fanMode)) {
-            log_error(tr("error setting temperature")); \
-            return false;
-        }
 
         /* SetShutter(
             typ = 0 (TTL low opens shutter)
@@ -444,7 +509,6 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
             openingtime = 50
         */
         CHECK(SetShutter(1,info.shutterMode,info.shutterClosingTime, info.shutterOpeningTime), tr("error while setting shutter"));
-        CHECK(SetTemperature(info.setTemperature), tr("error while setting temperature"));
         CHECK(SetTriggerMode(info.trigMode), tr("error while setting trigger mode"));
         CHECK(SetAcquisitionMode(info.AcqMode), tr("error while setting acquisition mode"));
         CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
@@ -504,145 +568,174 @@ int QFExtensionCameraAndor::getTemperature(int cam) {
     }
 }
 
+void QFExtensionCameraAndor::storeGlobalSettings() {
+    QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
+    QMapIterator<int, CameraGlobalSettings> it(camGlobalSettings);
+    while (it.hasNext()) {
+        it.next();
+        it.value().writeSettings(inifile, it.key());
+    }
+}
+
+
+bool QFExtensionCameraAndor::setGlobalSettings(int cam) {
+    int camera=cam;
+    bool ok=true;
+    if (cam<0) {
+        QMapIterator<int, CameraGlobalSettings> it(camGlobalSettings);
+        while (it.hasNext()) {
+            it.next();
+            camera=it.key();
+            if (isConnected(camera)) {
+                ok=ok&&setTemperature(camera, it.value().coolerOn, it.value().setTemperature, it.value().fanMode);
+            }
+        }
+    } else {
+        if (camGlobalSettings.contains(camera) && isConnected(camera)) {
+            ok=setTemperature(camera, camGlobalSettings[camera].coolerOn, camGlobalSettings[camera].setTemperature, camGlobalSettings[camera].fanMode);
+        }
+    }
+    return ok;
+}
 
 QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
     switch (error) {
         case DRV_SUCCESS: return tr("success"); break;
         case DRV_ERROR_CODES : return tr("DRV_ERROR_CODES"); break;
         case DRV_VXDNOTINSTALLED : return tr("VxD not installed"); break;
-        case DRV_ERROR_SCAN : return tr(""); break;
-        case DRV_ERROR_CHECK_SUM : return tr(""); break;
-        case DRV_ERROR_FILELOAD : return tr(""); break;
+        case DRV_ERROR_SCAN : return tr("DRV_ERROR_SCAN"); break;
+        case DRV_ERROR_CHECK_SUM : return tr("DRV_ERROR_CHECK_SUM"); break;
+        case DRV_ERROR_FILELOAD : return tr("DRV_ERROR_FILELOAD"); break;
         case DRV_UNKNOWN_FUNCTION : return tr("unknown function"); break;
-        case DRV_ERROR_VXD_INIT : return tr(""); break;
-        case DRV_ERROR_ADDRESS : return tr(""); break;
-        case DRV_ERROR_PAGELOCK : return tr(""); break;
-        case DRV_ERROR_PAGEUNLOCK : return tr(""); break;
-        case DRV_ERROR_BOARDTEST : return tr(""); break;
-        case DRV_ERROR_ACK : return tr(""); break;
-        case DRV_ERROR_UP_FIFO : return tr(""); break;
-        case DRV_ERROR_PATTERN : return tr(""); break;
+        case DRV_ERROR_VXD_INIT : return tr("DRV_ERROR_VXD_INIT"); break;
+        case DRV_ERROR_ADDRESS : return tr("DRV_ERROR_ADDRESS"); break;
+        case DRV_ERROR_PAGELOCK : return tr("DRV_ERROR_PAGELOCK"); break;
+        case DRV_ERROR_PAGEUNLOCK : return tr("DRV_ERROR_PAGEUNLOCK"); break;
+        case DRV_ERROR_BOARDTEST : return tr("DRV_ERROR_BOARDTEST"); break;
+        case DRV_ERROR_ACK : return tr("DRV_ERROR_ACK"); break;
+        case DRV_ERROR_UP_FIFO : return tr("DRV_ERROR_UP_FIFO"); break;
+        case DRV_ERROR_PATTERN : return tr("DRV_ERROR_PATTERN"); break;
 
-        case DRV_ACQUISITION_ERRORS : return tr(""); break;
-        case DRV_ACQ_BUFFER : return tr(""); break;
-        case DRV_ACQ_DOWNFIFO_FULL : return tr(""); break;
-        case DRV_PROC_UNKONWN_INSTRUCTION : return tr(""); break;
+        case DRV_ACQUISITION_ERRORS : return tr("RV_ACQUISITION_ERRORS"); break;
+        case DRV_ACQ_BUFFER : return tr("DRV_ACQ_BUFFER"); break;
+        case DRV_ACQ_DOWNFIFO_FULL : return tr("DRV_ACQ_DOWNFIFO_FULL"); break;
+        case DRV_PROC_UNKONWN_INSTRUCTION : return tr("DRV_PROC_UNKONWN_INSTRUCTION"); break;
         case DRV_ILLEGAL_OP_CODE : return tr("illegal opcode"); break;
         case DRV_KINETIC_TIME_NOT_MET : return tr("kinetic time not met"); break;
         case DRV_ACCUM_TIME_NOT_MET : return tr("accumulation time not met"); break;
         case DRV_NO_NEW_DATA : return tr("no new data"); break;
-        case DRV_SPOOLERROR : return tr(""); break;
-        case DRV_SPOOLSETUPERROR : return tr(""); break;
-        case DRV_FILESIZELIMITERROR : return tr(""); break;
-        case DRV_ERROR_FILESAVE : return tr(""); break;
+        case DRV_SPOOLERROR : return tr("DRV_SPOOLERROR"); break;
+        case DRV_SPOOLSETUPERROR : return tr("DRV_SPOOLSETUPERROR"); break;
+        case DRV_FILESIZELIMITERROR : return tr("DRV_FILESIZELIMITERROR"); break;
+        case DRV_ERROR_FILESAVE : return tr("DRV_ERROR_FILESAVE"); break;
 
-        case DRV_TEMPERATURE_CODES : return tr(""); break;
-        case DRV_TEMPERATURE_OFF : return tr(""); break;
+        case DRV_TEMPERATURE_CODES : return tr("DRV_TEMPERATURE_CODES"); break;
+        case DRV_TEMPERATURE_OFF : return tr("DRV_TEMPERATURE_OFF"); break;
         case DRV_TEMPERATURE_NOT_STABILIZED : return tr("temperature not stabilized"); break;
         case DRV_TEMPERATURE_STABILIZED : return tr("temperature stabilized"); break;
         case DRV_TEMPERATURE_NOT_REACHED : return tr("temperature not reached"); break;
-        case DRV_TEMPERATURE_OUT_RANGE : return tr(""); break;
-        case DRV_TEMPERATURE_NOT_SUPPORTED : return tr(""); break;
-        case DRV_TEMPERATURE_DRIFT : return tr(""); break;
+        case DRV_TEMPERATURE_OUT_RANGE : return tr("temperature out of range"); break;
+        case DRV_TEMPERATURE_NOT_SUPPORTED : return tr("temperature not supported"); break;
+        case DRV_TEMPERATURE_DRIFT : return tr("DRV_TEMPERATURE_DRIFT"); break;
 
 
-        case DRV_GENERAL_ERRORS : return tr(""); break;
-        case DRV_INVALID_AUX : return tr(""); break;
-        case DRV_COF_NOTLOADED : return tr(""); break;
-        case DRV_FPGAPROG : return tr(""); break;
-        case DRV_FLEXERROR : return tr(""); break;
+        case DRV_GENERAL_ERRORS : return tr("general error"); break;
+        case DRV_INVALID_AUX : return tr("DRV_INVALID_AUX"); break;
+        case DRV_COF_NOTLOADED : return tr("DRV_COF_NOTLOADED"); break;
+        case DRV_FPGAPROG : return tr("DRV_FPGAPROG"); break;
+        case DRV_FLEXERROR : return tr("DRV_FLEXERROR"); break;
         case DRV_GPIBERROR : return tr("GPIB error"); break;
-        case DRV_EEPROMVERSIONERROR : return tr(""); break;
+        case DRV_EEPROMVERSIONERROR : return tr("DRV_EEPROMVERSIONERROR"); break;
 
-        case DRV_DATATYPE : return tr(""); break;
-        case DRV_DRIVER_ERRORS : return tr(""); break;
+        case DRV_DATATYPE : return tr("DRV_DATATYPE"); break;
+        case DRV_DRIVER_ERRORS : return tr("DRV_DRIVER_ERRORS"); break;
         case DRV_P1INVALID : return tr("parameter 1 invalid"); break;
         case DRV_P2INVALID : return tr("parameter 2 invalid"); break;
         case DRV_P3INVALID : return tr("parameter 3 invalid"); break;
         case DRV_P4INVALID : return tr("parameter 4 invalid"); break;
-        case DRV_INIERROR : return tr(""); break;
-        case DRV_COFERROR : return tr(""); break;
-        case DRV_ACQUIRING : return tr(""); break;
-        case DRV_IDLE : return tr(""); break;
-        case DRV_TEMPCYCLE : return tr(""); break;
+        case DRV_INIERROR : return tr("DRV_INIERROR"); break;
+        case DRV_COFERROR : return tr("DRV_COFERROR"); break;
+        case DRV_ACQUIRING : return tr("DRV_ACQUIRING"); break;
+        case DRV_IDLE : return tr("DRV_IDLE"); break;
+        case DRV_TEMPCYCLE : return tr("DRV_TEMPCYCLE"); break;
         case DRV_NOT_INITIALIZED : return tr("system not initialized"); break;
         case DRV_P5INVALID : return tr("parameter 5 invalid"); break;
         case DRV_P6INVALID : return tr("parameter 6 invalid"); break;
         case DRV_INVALID_MODE : return tr("invalid mode"); break;
         case DRV_INVALID_FILTER : return tr("invalid filter"); break;
 
-        case DRV_I2CERRORS : return tr(""); break;
-        case DRV_I2CDEVNOTFOUND : return tr(""); break;
-        case DRV_I2CTIMEOUT : return tr(""); break;
-        case DRV_P7INVALID : return tr(""); break;
-        case DRV_P8INVALID : return tr(""); break;
-        case DRV_P9INVALID : return tr(""); break;
-        case DRV_P10INVALID : return tr(""); break;
+        case DRV_I2CERRORS : return tr("DRV_I2CERRORS"); break;
+        case DRV_I2CDEVNOTFOUND : return tr("DRV_I2CDEVNOTFOUND"); break;
+        case DRV_I2CTIMEOUT : return tr("DRV_I2CTIMEOUT"); break;
+        case DRV_P7INVALID : return tr("DRV_P7INVALID"); break;
+        case DRV_P8INVALID : return tr("DRV_P8INVALID"); break;
+        case DRV_P9INVALID : return tr("DRV_P9INVALID"); break;
+        case DRV_P10INVALID : return tr("DRV_P10INVALID"); break;
 
 
-        case DRV_USBERROR : return tr(""); break;
-        case DRV_IOCERROR : return tr(""); break;
-        case DRV_VRMVERSIONERROR : return tr(""); break;
-        case DRV_USB_INTERRUPT_ENDPOINT_ERROR : return tr(""); break;
-        case DRV_RANDOM_TRACK_ERROR : return tr(""); break;
-        case DRV_INVALID_TRIGGER_MODE : return tr(""); break;
-        case DRV_LOAD_FIRMWARE_ERROR : return tr(""); break;
-        case DRV_DIVIDE_BY_ZERO_ERROR : return tr(""); break;
-        case DRV_INVALID_RINGEXPOSURES : return tr(""); break;
-        case DRV_BINNING_ERROR : return tr(""); break;
-        case DRV_INVALID_AMPLIFIER : return tr(""); break;
+        case DRV_USBERROR : return tr("DRV_USBERROR"); break;
+        case DRV_IOCERROR : return tr("DRV_IOCERROR"); break;
+        case DRV_VRMVERSIONERROR : return tr("DRV_VRMVERSIONERROR"); break;
+        case DRV_USB_INTERRUPT_ENDPOINT_ERROR : return tr("DRV_USB_INTERRUPT_ENDPOINT_ERROR"); break;
+        case DRV_RANDOM_TRACK_ERROR : return tr("DRV_RANDOM_TRACK_ERROR"); break;
+        case DRV_INVALID_TRIGGER_MODE : return tr("DRV_INVALID_TRIGGER_MODE"); break;
+        case DRV_LOAD_FIRMWARE_ERROR : return tr("DRV_LOAD_FIRMWARE_ERROR"); break;
+        case DRV_DIVIDE_BY_ZERO_ERROR : return tr("DRV_DIVIDE_BY_ZERO_ERROR"); break;
+        case DRV_INVALID_RINGEXPOSURES : return tr("DRV_INVALID_RINGEXPOSURES"); break;
+        case DRV_BINNING_ERROR : return tr("DRV_BINNING_ERROR"); break;
+        case DRV_INVALID_AMPLIFIER : return tr("DRV_INVALID_AMPLIFIER"); break;
 
         case DRV_ERROR_NOCAMERA: return tr("no camera"); break;
-        case DRV_NOT_SUPPORTED: return tr(""); break;
+        case DRV_NOT_SUPPORTED: return tr("not supported"); break;
         case DRV_NOT_AVAILABLE: return tr("feature not available"); break;
 
-        case DRV_ERROR_MAP: return tr(""); break;
-        case DRV_ERROR_UNMAP: return tr(""); break;
-        case DRV_ERROR_MDL: return tr(""); break;
-        case DRV_ERROR_UNMDL: return tr(""); break;
-        case DRV_ERROR_BUFFSIZE: return tr(""); break;
-        case DRV_ERROR_NOHANDLE: return tr(""); break;
+        case DRV_ERROR_MAP: return tr("DRV_ERROR_MAP"); break;
+        case DRV_ERROR_UNMAP: return tr("DRV_ERROR_UNMAP"); break;
+        case DRV_ERROR_MDL: return tr("DRV_ERROR_MDL"); break;
+        case DRV_ERROR_UNMDL: return tr("DRV_ERROR_UNMDL"); break;
+        case DRV_ERROR_BUFFSIZE: return tr("DRV_ERROR_BUFFSIZE"); break;
+        case DRV_ERROR_NOHANDLE: return tr("DRV_ERROR_NOHANDLE"); break;
 
         case DRV_GATING_NOT_AVAILABLE: return tr("gating not available"); break;
         case DRV_FPGA_VOLTAGE_ERROR: return tr("FPGA voltage error"); break;
 
-        case DRV_OW_CMD_FAIL: return tr(""); break;
-        case DRV_OWMEMORY_BAD_ADDR: return tr(""); break;
-        case DRV_OWCMD_NOT_AVAILABLE: return tr(""); break;
-        case DRV_OW_NO_SLAVES: return tr(""); break;
-        case DRV_OW_NOT_INITIALIZED: return tr(""); break;
-        case DRV_OW_ERROR_SLAVE_NUM: return tr(""); break;
-        case DRV_MSTIMINGS_ERROR: return tr(""); break;
+        case DRV_OW_CMD_FAIL: return tr("DRV_OW_CMD_FAIL"); break;
+        case DRV_OWMEMORY_BAD_ADDR: return tr("DRV_OWMEMORY_BAD_ADDR"); break;
+        case DRV_OWCMD_NOT_AVAILABLE: return tr("DRV_OWCMD_NOT_AVAILABLE"); break;
+        case DRV_OW_NO_SLAVES: return tr("DRV_OW_NO_SLAVES"); break;
+        case DRV_OW_NOT_INITIALIZED: return tr("DRV_OW_NOT_INITIALIZED"); break;
+        case DRV_OW_ERROR_SLAVE_NUM: return tr("DRV_OW_ERROR_SLAVE_NUM"); break;
+        case DRV_MSTIMINGS_ERROR: return tr("DRV_MSTIMINGS_ERROR"); break;
 
-        case DRV_OA_NULL_ERROR: return tr(""); break;
-        case DRV_OA_PARSE_DTD_ERROR: return tr(""); break;
-        case DRV_OA_DTD_VALIDATE_ERROR: return tr(""); break;
-        case DRV_OA_FILE_ACCESS_ERROR: return tr(""); break;
-        case DRV_OA_FILE_DOES_NOT_EXIST: return tr(""); break;
-        case DRV_OA_XML_INVALID_OR_NOT_FOUND_ERROR: return tr(""); break;
-        case DRV_OA_PRESET_FILE_NOT_LOADED: return tr(""); break;
-        case DRV_OA_USER_FILE_NOT_LOADED: return tr(""); break;
-        case DRV_OA_PRESET_AND_USER_FILE_NOT_LOADED: return tr(""); break;
-        case DRV_OA_INVALID_FILE: return tr(""); break;
-        case DRV_OA_FILE_HAS_BEEN_MODIFIED: return tr(""); break;
-        case DRV_OA_BUFFER_FULL: return tr(""); break;
-        case DRV_OA_INVALID_STRING_LENGTH: return tr(""); break;
-        case DRV_OA_INVALID_CHARS_IN_NAME: return tr(""); break;
-        case DRV_OA_INVALID_NAMING: return tr(""); break;
-        case DRV_OA_MODE_ALREADY_EXISTS: return tr(""); break;
-        case DRV_OA_STRINGS_NOT_EQUAL: return tr(""); break;
-        case DRV_OA_NO_USER_DATA: return tr(""); break;
-        case DRV_OA_VALUE_NOT_SUPPORTED: return tr(""); break;
-        case DRV_OA_MODE_DOES_NOT_EXIST: return tr(""); break;
+        case DRV_OA_NULL_ERROR: return tr("DRV_OA_NULL_ERROR"); break;
+        case DRV_OA_PARSE_DTD_ERROR: return tr("DRV_OA_PARSE_DTD_ERROR"); break;
+        case DRV_OA_DTD_VALIDATE_ERROR: return tr("DRV_OA_DTD_VALIDATE_ERROR"); break;
+        case DRV_OA_FILE_ACCESS_ERROR: return tr("DRV_OA_FILE_ACCESS_ERROR"); break;
+        case DRV_OA_FILE_DOES_NOT_EXIST: return tr("DRV_OA_FILE_DOES_NOT_EXIST"); break;
+        case DRV_OA_XML_INVALID_OR_NOT_FOUND_ERROR: return tr("DRV_OA_XML_INVALID_OR_NOT_FOUND_ERROR"); break;
+        case DRV_OA_PRESET_FILE_NOT_LOADED: return tr("DRV_OA_PRESET_FILE_NOT_LOADED"); break;
+        case DRV_OA_USER_FILE_NOT_LOADED: return tr("DRV_OA_USER_FILE_NOT_LOADED"); break;
+        case DRV_OA_PRESET_AND_USER_FILE_NOT_LOADED: return tr("DRV_OA_PRESET_AND_USER_FILE_NOT_LOADED"); break;
+        case DRV_OA_INVALID_FILE: return tr("DRV_OA_INVALID_FILE"); break;
+        case DRV_OA_FILE_HAS_BEEN_MODIFIED: return tr("DRV_OA_FILE_HAS_BEEN_MODIFIED"); break;
+        case DRV_OA_BUFFER_FULL: return tr("DRV_OA_BUFFER_FULL"); break;
+        case DRV_OA_INVALID_STRING_LENGTH: return tr("DRV_OA_INVALID_STRING_LENGTH"); break;
+        case DRV_OA_INVALID_CHARS_IN_NAME: return tr("DRV_OA_INVALID_CHARS_IN_NAME"); break;
+        case DRV_OA_INVALID_NAMING: return tr("DRV_OA_INVALID_NAMING"); break;
+        case DRV_OA_MODE_ALREADY_EXISTS: return tr("DRV_OA_MODE_ALREADY_EXISTS"); break;
+        case DRV_OA_STRINGS_NOT_EQUAL: return tr("DRV_OA_STRINGS_NOT_EQUAL"); break;
+        case DRV_OA_NO_USER_DATA: return tr("DRV_OA_NO_USER_DATA"); break;
+        case DRV_OA_VALUE_NOT_SUPPORTED: return tr("DRV_OA_VALUE_NOT_SUPPORTED"); break;
+        case DRV_OA_MODE_DOES_NOT_EXIST: return tr("DRV_OA_MODE_DOES_NOT_EXIST"); break;
 
     #ifdef __LINUX__
         case DRV_PROCESSING_FAILED: return tr("processing failed"); break;
-        case DRV_OA_FAILED_TO_GET_MODE: return tr(""); break;
-        case DRV_OA_CAMERA_NOT_SUPPORTED: return tr(""); break;
-        case DRV_OA_GET_CAMERA_ERROR: return tr(""); break;
-        case KERN_MEM_ERROR : return tr(""); break;
-        case DRV_P11INVALID : return tr(""); break;
-        case DRV_INVALID_COUNTCONVERT_MODE: return tr(""); break;
+        case DRV_OA_FAILED_TO_GET_MODE: return tr("DRV_OA_FAILED_TO_GET_MODE"); break;
+        case DRV_OA_CAMERA_NOT_SUPPORTED: return tr("DRV_OA_CAMERA_NOT_SUPPORTED"); break;
+        case DRV_OA_GET_CAMERA_ERROR: return tr("DRV_OA_GET_CAMERA_ERROR"); break;
+        case KERN_MEM_ERROR : return tr("KERN_MEM_ERROR"); break;
+        case DRV_P11INVALID : return tr("DRV_P11INVALID"); break;
+        case DRV_INVALID_COUNTCONVERT_MODE: return tr("DRV_INVALID_COUNTCONVERT_MODE"); break;
     #endif
 
         default: return tr(""); break;

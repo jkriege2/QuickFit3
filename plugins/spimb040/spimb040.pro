@@ -10,7 +10,7 @@ include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
-LIBS += -ltiff -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+LIBS += -L../../extlibs/libtiff/ -ltiff -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += spimb040.h \
@@ -44,15 +44,13 @@ TRANSLATIONS= ./translations/de.spimb040.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../../../../LIB/trunk/qt/ \
+               ../../extlibs/libtiff/
 
 QT += gui xml svg opengl
 
 CONFIG += exceptions rtti stl
 
-# DEFINITION FOR CImg Library
-include( ../../extlibs/cimg.pri )
-PRECOMPILED_HEADER += ../../extlibs/cimg.h
 
 
 

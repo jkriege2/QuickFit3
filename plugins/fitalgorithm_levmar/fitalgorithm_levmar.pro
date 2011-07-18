@@ -7,7 +7,7 @@ include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
-win32:LIBS += -llevmar -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+win32:LIBS += -L../../extlibs/levmar/ -llevmar -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 unix:LIBS += -llapack -lblas -llevmar -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
@@ -26,8 +26,9 @@ TRANSLATIONS= ./translations/de.fitalgorithm_levmar.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
-
+               ../../../../../LIB/trunk/qt/ \
+               ../../extlibs/ \
+               .
 
 QT += core
 CONFIG += exceptions rtti stl

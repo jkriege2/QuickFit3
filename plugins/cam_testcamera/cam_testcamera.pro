@@ -12,7 +12,7 @@ DESTDIR = $$QFOUTPUT/plugins
 
 DEPENDPATH += ./
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets -ltiff
+LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets -L../../extlibs/libtiff/ -ltiff
 
 # Input
 HEADERS += cam_testcamera.h \
@@ -31,7 +31,8 @@ TRANSLATIONS= ./translations/de.cam_testcamera.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../../../../LIB/trunk/qt/ \
+               ../../extlibs/libtiff/
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl

@@ -22,8 +22,6 @@ class QFESPIMB040MainWindow; // forward
 #include <QGroupBox>
 #include <QTimer>
 
-#include "../../extlibs/cimg.h"
-
 #include "programoptions.h"
 #include "jkqttools.h"
 #include "qtlogfile.h"

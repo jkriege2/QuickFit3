@@ -191,6 +191,42 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         QString detectorsIniPath;
         QString detectorsIniPath_init;
 
+        /*! \brief stores global settings for a camera
+
+             stores global settings for a camera, which are not included in CameraInfo and therefore should not be set on a
+             settings basis, as used by useCameraSettings() or prepareAcquisition(). These settings can be set using menu
+             commands provided by the extension plugin.
+
+             Currently these global settings mostly include fan and temperature control!
+
+             When connectDevice() is called, the global settings for the specified camera are applied. They will then only
+             be applied again, if the user changes them.
+
+             The functions initExtension() and connectDevice() will load the global settings from a global ini file as needed.
+             The function deinit() will write the current settings back. A writeback may also occur in intermediate steps, but
+             is not guaranteed to!
+        */
+        struct CameraGlobalSettings {
+            /** \brief cooler on/off  */
+            bool coolerOn;
+
+            /** \brief set temperature °C */
+            int setTemperature;
+
+            /** \brief mode of the inertanl fan 0: full, 1: low, 2: off */
+            int fanMode;
+
+
+            /** \brief set default values */
+            CameraGlobalSettings();
+
+            /** \brief read these settings from QSettings object for given camera ID */
+            void readSettings(QSettings& settings, int camera);
+            /** \brief write these settings to QSettings object for given camera ID */
+            void writeSettings(QSettings& settings, int camera) const;
+
+        };
+
         /** \brief stores information about a camera */
         struct CameraInfo {
             /** \brief width of image in pixel */
@@ -230,20 +266,12 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief spooling mode? */
             int spool;
 
-            /** \brief cooler on/off  */
-            bool coolerOn;
 
-            /** \brief set temperature °C */
-            int setTemperature;
-
-            /** \brief EM-GAIN on/off */
-            bool emgain_on;
             /** \brief advanced EM-GAIN mode */
             bool advancedEMGain;
             /** \brief EM-GAIN factor */
             int emgain;
-
-            /** \brief output amplifier mode */
+            /** \brief output amplifier mode: 0: EMCCD (default) 1: CCD (switch EM gain off) */
             int outputAmplifier;
 
             /** \brief preamplifier gain */
@@ -264,13 +292,15 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief frame transfer on/off */
             bool frameTransfer;
 
-            /** \brief mode of the inertanl fan 0: full, 1: low, 2: off */
-            int fanMode;
-
             /** \brief baseline offset value */
             int baselineOffset;
             /** \brief enable/disable baseline clamp */
             bool baselineClamp;
+
+            /** \brief camera head model (read by connectDevice() ) */
+            QString headModel;
+            /** \brief camera serial number (read by connectDevice() ) */
+            int serialNumber;
 
             CameraInfo();
         };
@@ -283,6 +313,20 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief this map stores infos about all connected cameras. If a camer is not in the map, it is not connected */
         QMap<int, CameraInfo> camInfos;
+
+        /** \brief this map stores global settings (temperature, fan mode ...) about all connected cameras. If a camer is not in the map, it is not connected */
+        QMap<int, CameraGlobalSettings> camGlobalSettings;
+
+        /** \brief write contents of camGlobalSettings to global ini file */
+        void storeGlobalSettings();
+
+        /*! \brief set the global settings of the given camera, or all cameras (if \a cam \c < \c 0, default)
+
+            \return \ true on success and \c false if an error occured (also if an error occured only on some of the cameras, for \c cam==-1 )
+
+            This function internally calls setTemperature()!
+        */
+        bool setGlobalSettings(int cam=-1);
 
         /** \brief this map contains all threads that control the available cameras. Each camera has it's own thread! */
         QMap<int, CamAndorAcquisitionThread*> camThreads;

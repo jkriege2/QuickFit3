@@ -3,7 +3,6 @@
 #include "ui_about.h"
 #include "ui_aboutplugins.h"
 #include "qftools.h"
-#include "../extlibs/cimg.h"
 
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 {
@@ -276,7 +275,7 @@ void MainWindow::about() {
     QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li><li>CImg %4 (<a href=\"http://cimg.sourceforge.net/\">http://cimg.sourceforge.net/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(cimg_version));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT));
     widget->exec();
     delete widget;
 }

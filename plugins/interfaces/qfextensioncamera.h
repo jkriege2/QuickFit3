@@ -21,7 +21,9 @@
     .
     So usually you will use a camera in this manner for preview:
       -# First load settings from some location (file, registry, ...) and then use them in the camera by caling useCameraSettings().
-      -# Then take single images using acquire()
+      -# Then take single images using acquire(), This function will always use those settings given in the last call of useCameraSettings().
+         Do not call functions for timed acquisitions in between useCameraSettings() and acquire(), as then the object is not guaranteed
+         do use the correct settings!
     .
     And in this manner for timed acquisitions:
       -# First load settings from some location (file, registry, ...)
