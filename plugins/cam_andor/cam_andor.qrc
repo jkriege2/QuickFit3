@@ -1,5 +1,17 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="cam_andor_logo.png">cam_andor.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="cam_andor_logo.png">images/cam_andor.png</file>
+    </qresource>
+    <qresource prefix="/cam_andor">
+        <file alias="fan_off.png">images/fan_off.png</file>
+        <file alias="fan_full.png">images/fan_full.png</file>
+        <file alias="fan_half.png">images/fan_half.png</file>
+        <file alias="thermometer_rising.png">images/thermometer_rising.png</file>
+        <file alias="thermometer.png">images/thermometer.png</file>
+        <file alias="thermometer_falling.png">images/thermometer_falling.png</file>
+        <file alias="thermometer_error.png">images/thermometer_error.png</file>
+        <file alias="thermometer_off.png">images/thermometer_off.png</file>
+        <file alias="thermometer_stabilized.png">images/thermometer_stabilized.png</file>
+        <file alias="show_global.png">images/show_global.png</file>
+    </qresource>
 </RCC>

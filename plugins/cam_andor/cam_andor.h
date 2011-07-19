@@ -11,7 +11,8 @@
 #include "camandoracquisitionthread.h"
 #include <QMap>
 #include <QSet>
-
+#include "andorglobalcamerasettingswidget.h"
+#include "flowlayout.h"
 #include <unistd.h>
 
 
@@ -165,7 +166,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         void displayAcquisitionTime(const QString& time);
 
     protected slots:
-
+        /** \brief update the current temperature of the sensors ... calls itself again using a QTimer::singleShot() */
+        void updateTemperatures();
 
     protected:
         /** \brief are we connected? */
@@ -316,6 +318,15 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief this map stores global settings (temperature, fan mode ...) about all connected cameras. If a camer is not in the map, it is not connected */
         QMap<int, CameraGlobalSettings> camGlobalSettings;
+
+        /** \brief this map conatins all widgets used to display/edit the global settings */
+        QMap<int, AndorGlobalCameraSettingsWidget*> camGlobalSettingsWidgets;
+
+        /** \brief window, used to display the current global settings */
+        QWidget* dlgGlobalSettings;
+
+        /** \brief flow layout on dlgGlobalSettings */
+        FlowLayout* dlgGlobalSettings_layout;
 
         /** \brief write contents of camGlobalSettings to global ini file */
         void storeGlobalSettings();

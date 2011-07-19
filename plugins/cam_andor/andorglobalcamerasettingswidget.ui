@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AndorGlobalCameraSettingsWidget</class>
+ <widget class="QWidget" name="AndorGlobalCameraSettingsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>217</width>
+    <height>138</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="labCamera">
+     <property name="text">
+      <string>camera</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>  &amp;Fan mode:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbFanMode</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="cmbFanMode">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>24</height>
+      </size>
+     </property>
+     <item>
+      <property name="text">
+       <string>full</string>
+      </property>
+      <property name="icon">
+       <iconset resource="cam_andor.qrc">
+        <normaloff>:/cam_andor/fan_full.png</normaloff>:/cam_andor/fan_full.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>slow</string>
+      </property>
+      <property name="icon">
+       <iconset resource="cam_andor.qrc">
+        <normaloff>:/cam_andor/fan_half.png</normaloff>:/cam_andor/fan_half.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>off</string>
+      </property>
+      <property name="icon">
+       <iconset resource="cam_andor.qrc">
+        <normaloff>:/cam_andor/fan_off.png</normaloff>:/cam_andor/fan_off.png</iconset>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>  &amp;Cooling:</string>
+     </property>
+     <property name="buddy">
+      <cstring>chkCooling</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="chkCooling">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>  Set &amp;temperature:</string>
+     </property>
+     <property name="buddy">
+      <cstring>spinTemperature</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QSpinBox" name="spinTemperature">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="suffix">
+      <string> °C</string>
+     </property>
+     <property name="minimum">
+      <number>-100</number>
+     </property>
+     <property name="maximum">
+      <number>40</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>  Status:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <item>
+      <widget class="QLabel" name="labTemperaturePic">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="cam_andor.qrc">:/cam_andor/thermometer.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labTemperature">
+       <property name="text">
+        <string>0 °C</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="cam_andor.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>chkCooling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinTemperature</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>111</x>
+     <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCooling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_3</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>47</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbFanMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>AndorGlobalCameraSettingsWidget</receiver>
+   <slot>valuesChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinTemperature</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>AndorGlobalCameraSettingsWidget</receiver>
+   <slot>valuesChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>58</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCooling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>AndorGlobalCameraSettingsWidget</receiver>
+   <slot>valuesChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>117</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>67</x>
+     <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>valuesChanged()</slot>
+ </slots>
+</ui>

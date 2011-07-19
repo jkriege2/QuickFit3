@@ -22,13 +22,16 @@ LIBS += -landor -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 HEADERS += cam_andor.h \
            camandoracquisitionthread.h \
            ../interfaces/qfextensioncamera.h \
-           ../../../../../LIB/trunk/highrestimer.h
+           ../../../../../LIB/trunk/highrestimer.h \
+    andorglobalcamerasettingswidget.h
 
 SOURCES += cam_andor.cpp \
            camandoracquisitionthread.cpp \
-           ../../../../../LIB/trunk/highrestimer.cpp
+           ../../../../../LIB/trunk/highrestimer.cpp \
+    andorglobalcamerasettingswidget.cpp
 
-FORMS =
+FORMS = \
+    andorglobalcamerasettingswidget.ui
 
 RESOURCES += cam_andor.qrc
 

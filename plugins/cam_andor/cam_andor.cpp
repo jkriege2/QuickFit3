@@ -6,6 +6,8 @@
 #include <time.h>
 #include <QMapIterator>
 #include "qmodernprogresswidget.h"
+#include "flowlayout.h"
+#include <cmath>
 
 #define LOG_PREFIX "[Andor]:  "
 #define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
@@ -143,6 +145,23 @@ void QFExtensionCameraAndor::initExtension() {
         camGlobalSettings[i]=global;
     }
 
+
+    // create a (still invisible) window that shows the current global camera settings
+    // + a menu item to display it.
+    dlgGlobalSettings=new QWidget(NULL, Qt::Tool|Qt::WindowTitleHint|Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint);
+    dlgGlobalSettings->hide();
+    FlowLayout* dlgGlobalSettings_layout=new FlowLayout(dlgGlobalSettings);
+    dlgGlobalSettings->setLayout(dlgGlobalSettings_layout);
+    dlgGlobalSettings->setWindowTitle(tr("Andor: Global Settings"));
+
+    QAction* actShowGlobal=new QAction(tr("show global settings ..."), this);
+    connect(actShowGlobal, SIGNAL(triggered()), dlgGlobalSettings, SLOT(show()));
+    QMenu* extm=services->getMenu("extensions");
+    if (extm) {
+        QMenu* andorMenu=extm->addMenu(QIcon(getIconFilename()), tr("Andor Cameras"));
+        andorMenu->addAction(actShowGlobal);
+    }
+
 /*
     #ifdef __LINUX__
     { services->log_global_text(tr("%2  loading Andor driver module into Linux kernel (running andordrvlx_load) ...").arg(getName()).arg(LOG_PREFIX));
@@ -170,7 +189,12 @@ void QFExtensionCameraAndor::initExtension() {
 
     #endif
 */
+
+    // load settings
     loadSettings(NULL);
+
+    // start continuous display of global settings
+    updateTemperatures();
 
     services->log_global_text(tr("%2initializing extension '%1' ... DONE\n").arg(getName()).arg(LOG_PREFIX));
 }
@@ -743,6 +767,52 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
     return "";
 }
 
+void QFExtensionCameraAndor::updateTemperatures() {
+    for (int i=0; i<getCameraCount(); i++) {
+        AndorGlobalCameraSettingsWidget* widget=camGlobalSettingsWidgets.value(i, NULL);
+        if (!widget) {
+            widget=new AndorGlobalCameraSettingsWidget(i, dlgGlobalSettings);
+            camGlobalSettingsWidgets[i]=widget;
+            dlgGlobalSettings_layout->addWidget(widget);
+        }
+
+        if (isConnected(i)) {
+            if (widget) {
+                widget->setVisible(true);
+                if (selectCamera(i)) {
+                    int min, max;
+                    if (GetTemperatureRange(&min, &max)==DRV_SUCCESS) {
+                        widget->setRange(min, max);
+                    }
+
+                    float temp;
+                    unsigned int status=GetTemperatureF(&temp);
+                    int progress=0;
+                    bool updateTemp=false;
+                    switch(status) {
+                        case DRV_NOT_INITIALIZED: progress=-1; updateTemp=true; break;
+                        case DRV_ERROR_ACK: progress=-1; updateTemp=true; break;
+                        case DRV_TEMP_OFF: progress=-2; updateTemp=true; break;
+                        case DRV_TEMP_STABILIZED: progress=0; updateTemp=true; break;
+                        case DRV_TEMP_NOT_REACHED: progress=1; updateTemp=true; break;
+                        case DRV_TEMP_DRIFT: progress=3; updateTemp=true; break;
+                        case DRV_TEMP_NOT_STABILIZED: progress=2; updateTemp=true; break;
+
+                        default: break;
+                    }
+
+                    if (updateTemp) widget->showCurrentTemperature(progress, temp);
+                } else {
+                    widget->showCurrentTemperature(-1, 0);
+                }
+            }
+        } else {
+            if (widget) widget->setVisible(false);
+        }
+    }
+
+    QTimer::singleShot(500, this, SLOT(updateTemperatures()));
+}
 
 
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraAndor)

@@ -28,6 +28,7 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/jkqtplotter.h \
            ../../../../LIB/trunk/qt/jkqtptools.h \
            ../../../../LIB/trunk/qt/jkqttools.h \
+           ../../../../LIB/trunk/qt/flowlayout.h \
            ../../../../LIB/trunk/qt/jkqtfastplotter.h \
            ../../../../LIB/trunk/qt/qtlogfile.h \
            ../../../../LIB/trunk/qt/qtshortcutwidgets.h \
@@ -58,6 +59,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            ../../../../LIB/trunk/qt/jkqtplotter.cpp \
            ../../../../LIB/trunk/qt/jkqtptools.cpp \
            ../../../../LIB/trunk/qt/jkqttools.cpp \
+            ../../../../LIB/trunk/qt/flowlayout.cpp \
            ../../../../LIB/trunk/qt/qtlogfile.cpp \
            ../../../../LIB/trunk/qt/jkqtfastplotter.cpp \
            ../../../../LIB/trunk/qt/qtshortcutwidgets.cpp \
