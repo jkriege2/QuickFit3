@@ -4,6 +4,7 @@
 #include "ui_aboutplugins.h"
 #include "qftools.h"
 #include "../svnversion.h"
+#include "../compiledate.h"
 
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 {
@@ -87,10 +88,10 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     htmlReplaceList.append(qMakePair(QString("version.minor"), QString::number(AutoVersion::MINOR)));
     htmlReplaceList.append(qMakePair(QString("version.build"), QString::number(AutoVersion::BUILD)));
     htmlReplaceList.append(qMakePair(QString("version.revision"), QString::number(AutoVersion::REVISION)));
-    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(SVNVERSION)));
+    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(SVNVERSION).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(AutoVersion::STATUS)));
-    htmlReplaceList.append(qMakePair(QString("version.date"), QString("%1-%2-%3").arg(AutoVersion::YEAR).arg(AutoVersion::MONTH).arg(AutoVersion::DATE)));
-    htmlReplaceList.append(qMakePair(QString("version"), QString(AutoVersion::FULLVERSION_STRING)));
+    htmlReplaceList.append(qMakePair(QString("version.date"), QString(COMPILEDATE).trimmed()));// QString("%1-%2-%3").arg(AutoVersion::YEAR).arg(AutoVersion::MONTH).arg(AutoVersion::DATE)));
+    htmlReplaceList.append(qMakePair(QString("version"), QApplication::applicationVersion()));//QString(AutoVersion::FULLVERSION_STRING)));
     htmlReplaceList.append(qMakePair(QString("thanksto"), QString(QF_THANKS_TO)));
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
