@@ -3,6 +3,7 @@
 #include "ui_about.h"
 #include "ui_aboutplugins.h"
 #include "qftools.h"
+#include "../svnversion.h"
 
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 {
@@ -86,6 +87,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     htmlReplaceList.append(qMakePair(QString("version.minor"), QString::number(AutoVersion::MINOR)));
     htmlReplaceList.append(qMakePair(QString("version.build"), QString::number(AutoVersion::BUILD)));
     htmlReplaceList.append(qMakePair(QString("version.revision"), QString::number(AutoVersion::REVISION)));
+    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(SVNVERSION)));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(AutoVersion::STATUS)));
     htmlReplaceList.append(qMakePair(QString("version.date"), QString("%1-%2-%3").arg(AutoVersion::YEAR).arg(AutoVersion::MONTH).arg(AutoVersion::DATE)));
     htmlReplaceList.append(qMakePair(QString("version"), QString(AutoVersion::FULLVERSION_STRING)));

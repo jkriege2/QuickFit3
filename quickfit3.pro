@@ -9,6 +9,9 @@ debug {
 
 TEMPLATE = subdirs
 
+
+include(autoversioning.pri)
+
 SUBDIRS += lib libqf3widgets application
 application.depends = lib libqf3widgets
 

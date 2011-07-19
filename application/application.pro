@@ -11,6 +11,7 @@ INCLUDEPATH += . \
 
 include(../quickfit3.pri)
 
+
 DESTDIR = $$QFOUTPUT
 
 QMAKE_RPATHDIR += $$DESTDIR

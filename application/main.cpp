@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "version.h"
 #include "../lib/programoptions.h"
+#include "../svnversion.h"
 
 #include <QtGui>
 #include <QSplashScreen>
@@ -30,14 +31,14 @@ int main(int argc, char * argv[])
     QApplication app(argc, argv);
 
     app.setOrganizationName("");
-    app.setApplicationName(QString("QuickFit %1").arg(AutoVersion::FULLVERSION_STRING));
+    app.setApplicationName(QString("QuickFit %1 (SVN %2)").arg(AutoVersion::FULLVERSION_STRING).arg(SVNVERSION));
     app.setOrganizationDomain("http://www.jkrieger.de/");
-    app.setApplicationVersion(QString("%1 (%2 BUILD %3)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(AutoVersion::BUILDS_COUNT));
+    app.setApplicationVersion(QString("%1 (%2 SVN %3)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(SVNVERSION));
 
     QPixmap pixmap(":/splash.png");
     QPainter* painter=new QPainter(&pixmap);
     painter->setFont(QFont("Arial", 9));
-    painter->drawText(QPoint(5,290), QString("version %1 (%2 BUILD %3)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(AutoVersion::BUILDS_COUNT));
+    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(SVNVERSION));
     delete painter;
     painter=NULL;
     QSplashScreen splash(pixmap,Qt::WindowStaysOnTopHint);
@@ -50,13 +51,8 @@ int main(int argc, char * argv[])
     #ifdef __WINDOWS__
       app.addLibraryPath(QCoreApplication::applicationDirPath()+"/qtplugins");
     #endif
-    //splash.showMessage(QString("version %1 (%2 BUILD %3)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(AutoVersion::BUILDS_COUNT));
     app.processEvents();
 
-    /*for (int i=0; i<10000; i++) {
-        std::cout<<"Test "<<i<<std::endl;
-    }*/
-    /** \brief this object manages program settings */
     ProgramOptions* settings=new ProgramOptions("", &app, &app);
 
     MainWindow win(settings, &splash);
