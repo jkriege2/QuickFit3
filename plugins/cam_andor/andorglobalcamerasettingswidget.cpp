@@ -10,7 +10,7 @@ AndorGlobalCameraSettingsWidget::AndorGlobalCameraSettingsWidget(int camera, QWi
     m_camera=camera;
     ui->setupUi(this);
     ui->labCamera->setText(tr("<u><b>camer #1:</b></u>").arg(camera));
-
+    setInfo("");
     m_emit=true;
 }
 
@@ -19,16 +19,17 @@ AndorGlobalCameraSettingsWidget::~AndorGlobalCameraSettingsWidget()
     delete ui;
 }
 
-void AndorGlobalCameraSettingsWidget::setSettings(int fan_mode, bool cooling_on, int temperature) {
+void AndorGlobalCameraSettingsWidget::setSettings(int fan_mode, bool cooling_on, int temperature, int shutterMode) {
     m_emit=false;
     ui->cmbFanMode->setCurrentIndex(fan_mode);
     ui->chkCooling->setChecked(cooling_on);
     ui->spinTemperature->setValue(temperature);
+    ui->cmbShutter->setCurrentIndex(shutterMode);
     m_emit=true;
 }
 
 void AndorGlobalCameraSettingsWidget::forceSettingsChanged() {
-    emit settingsChanged(m_camera, ui->cmbFanMode->currentIndex(), ui->chkCooling->isChecked(), ui->spinTemperature->value());
+    emit settingsChanged(m_camera, ui->cmbFanMode->currentIndex(), ui->chkCooling->isChecked(), ui->spinTemperature->value(), ui->cmbShutter->currentIndex());
 }
 
 void AndorGlobalCameraSettingsWidget::showCurrentTemperature(int progress, float temperature) {
@@ -58,4 +59,15 @@ void AndorGlobalCameraSettingsWidget::valuesChanged() {
 
 void AndorGlobalCameraSettingsWidget::setRange(int min, int max) {
     ui->spinTemperature->setRange(min, max);
+}
+
+void AndorGlobalCameraSettingsWidget::setInfo(const QString& info) {
+    if (info.isEmpty()) {
+        ui->labInfo->setVisible(true);
+        ui->labInfoLabel->setVisible(true);
+        ui->labInfo->setText(info);
+    } else {
+        ui->labInfo->setVisible(false);
+        ui->labInfoLabel->setVisible(false);
+    }
 }

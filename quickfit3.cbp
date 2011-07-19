@@ -170,6 +170,12 @@
 		<Unit filename="libqf3widgets\qffitparameterbasicinterface.h" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.cpp" />
 		<Unit filename="libqf3widgets\qffitparameterwidget.h" />
+		<Unit filename="plugins\cam_andor\andorglobalcamerasettingswidget.cpp" />
+		<Unit filename="plugins\cam_andor\andorglobalcamerasettingswidget.h" />
+		<Unit filename="plugins\cam_andor\andorglobalcamerasettingswidget.ui" />
+		<Unit filename="plugins\cam_andor\andorsettingsdialog.cpp" />
+		<Unit filename="plugins\cam_andor\andorsettingsdialog.h" />
+		<Unit filename="plugins\cam_andor\andorsettingsdialog.ui" />
 		<Unit filename="plugins\cam_andor\cam_andor.cpp" />
 		<Unit filename="plugins\cam_andor\cam_andor.h" />
 		<Unit filename="plugins\cam_andor\cam_andor.pro" />

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>217</width>
-    <height>138</height>
+    <width>211</width>
+    <height>214</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>  &amp;Fan mode:</string>
@@ -34,7 +34,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="3" column="1">
     <widget class="QComboBox" name="cmbFanMode">
      <property name="minimumSize">
       <size>
@@ -71,7 +71,7 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>  &amp;Cooling:</string>
@@ -81,14 +81,14 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="4" column="1">
     <widget class="QCheckBox" name="chkCooling">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="label_3">
      <property name="enabled">
       <bool>false</bool>
@@ -101,7 +101,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="5" column="1">
     <widget class="QSpinBox" name="spinTemperature">
      <property name="enabled">
       <bool>false</bool>
@@ -123,14 +123,14 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>  Status:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="6" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
       <widget class="QLabel" name="labTemperaturePic">
@@ -151,6 +151,67 @@
      </item>
     </layout>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labInfoLabel">
+     <property name="text">
+      <string>  Info:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="labInfo">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>  &amp;Shutter:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbShutter</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="cmbShutter">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>24</height>
+      </size>
+     </property>
+     <item>
+      <property name="text">
+       <string>automatic</string>
+      </property>
+      <property name="icon">
+       <iconset resource="cam_andor.qrc">
+        <normaloff>:/cam_andor/shutter_auto.png</normaloff>:/cam_andor/shutter_auto.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>open</string>
+      </property>
+      <property name="icon">
+       <iconset resource="cam_andor.qrc">
+        <normaloff>:/cam_andor/shutter_open.png</normaloff>:/cam_andor/shutter_open.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>closed</string>
+      </property>
+      <property name="icon">
+       <iconset resource="cam_andor.qrc">
+        <normaloff>:/cam_andor/shutter_closed.png</normaloff>:/cam_andor/shutter_closed.png</iconset>
+      </property>
+     </item>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources>
@@ -164,12 +225,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>48</y>
+     <x>201</x>
+     <y>119</y>
     </hint>
     <hint type="destinationlabel">
-     <x>111</x>
-     <y>67</y>
+     <x>165</x>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
@@ -180,12 +241,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>42</y>
+     <x>201</x>
+     <y>119</y>
     </hint>
     <hint type="destinationlabel">
-     <x>47</x>
-     <y>70</y>
+     <x>56</x>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
@@ -196,8 +257,8 @@
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>22</y>
+     <x>201</x>
+     <y>99</y>
     </hint>
     <hint type="destinationlabel">
      <x>59</x>
@@ -212,8 +273,8 @@
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>145</x>
-     <y>73</y>
+     <x>165</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
      <x>58</x>
@@ -228,12 +289,28 @@
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>117</x>
-     <y>47</y>
+     <x>201</x>
+     <y>119</y>
     </hint>
     <hint type="destinationlabel">
      <x>67</x>
      <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbShutter</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>AndorGlobalCameraSettingsWidget</receiver>
+   <slot>valuesChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>32</x>
+     <y>73</y>
     </hint>
    </hints>
   </connection>

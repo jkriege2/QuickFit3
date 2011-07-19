@@ -169,6 +169,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief update the current temperature of the sensors ... calls itself again using a QTimer::singleShot() */
         void updateTemperatures();
 
+
+        /** \brief called when global settings have changed */
+        void globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode);
     protected:
         /** \brief are we connected? */
         bool conn;
@@ -188,6 +191,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
          * fan mode of the inertanl fan 0: full, 1: low, 0: off
          */
         bool setTemperature(int camera, bool coolerOn, int temperature, int fanMode=0);
+
+        /** \brief set the shutter mode */
+        bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50)
 
         /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
         QString detectorsIniPath;
@@ -218,6 +224,13 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief mode of the inertanl fan 0: full, 1: low, 2: off */
             int fanMode;
 
+            /** \brief shutter mode 0: auto, 1: open, 2: close */
+            int shutterMode;
+            /** \brief shutter closing time in milliseconds */
+            int shutterClosingTime;
+            /** \brief shutter opening time in milliseconds */
+            int shutterOpeningTime;
+
 
             /** \brief set default values */
             CameraGlobalSettings();
@@ -236,16 +249,10 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief height of image in pixel */
             int height;
 
-            /** \brief acquisition mode */
+            /** \brief acquisition mode: 1: single scan, 2: accumulate, 3: kinetics, 4: fast kinetics, 5: run till abort */
             int AcqMode;
             /** \brief read mode   0: FVB, 1: Multi-Track, 2: Random-Track, 3: Sngle-Track, 4: Image*/
             int ReadMode;
-            /** \brief shutter mode 0: auto, 1: open, 2: close */
-            int shutterMode;
-            /** \brief shutter closing time in milliseconds */
-            int shutterClosingTime;
-            /** \brief shutter opening time in milliseconds */
-            int shutterOpeningTime;
 
             /** \brief exposure time in seconds */
             float expoTime;

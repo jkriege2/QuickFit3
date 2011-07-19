@@ -8,6 +8,7 @@
 #include "qmodernprogresswidget.h"
 #include "flowlayout.h"
 #include <cmath>
+#include "andorsettingsdialog.h"
 
 #define LOG_PREFIX "[Andor]:  "
 #define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
@@ -35,6 +36,9 @@ QFExtensionCameraAndor::CameraGlobalSettings::CameraGlobalSettings() {
     coolerOn=true;
     setTemperature=20;
     fanMode=0;
+    shutterMode=1;
+    shutterOpeningTime=50;
+    shutterClosingTime=50;
 }
 
 
@@ -56,7 +60,6 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     width=10;
     height=10;
 
-    shutterMode=1;
 
     AcqMode=1;
     ReadMode=4;
@@ -73,8 +76,6 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     emgain=1;
     outputAmplifier=1;
     frameTransfer=true;
-    shutterOpeningTime=50;
-    shutterClosingTime=50;
 
 
     preamp_gain=0;
@@ -241,34 +242,15 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-    QDialog* dlg=new QDialog(parent);
-
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
-    dlg->setLayout(lay);
-
-    QFormLayout* formlayout=new QFormLayout(dlg);
-
-
-
-    /*spIterations=new QSpinBox(dlg);
-    spIterations->setMinimum(0);
-    spIterations->setMaximum(100000);
-    spIterations->setValue(settings.value("radhard2/iterations", 1000).toUInt());
-    formlayout->addRow(tr("iterations:"), spIterations);
-    connect(spIterations, SIGNAL(valueChanged(int)), this, SLOT(updateAcquisitionTime()));*/
-
-
-    lay->addLayout(formlayout);
-
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
-    lay->addWidget(buttonBox);
-
-    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
-
+    AndorSettingsDialog* dlg=new AndorSettingsDialog(parent);
+    QString headModel="";
+    if (camInfos.contains(camera)) {
+        headModel=" ["+camInfos[camera].headModel+"]";
+    }
+    dlg->setWindowTitle(tr("Andor Camera #%1%2 Settings").arg(camera).arg(headModel));
+    dlg->readSettings(settings, "cam_andor");
     if ( dlg->exec()==QDialog::Accepted ) {
-         //  read back values entered into the widgets
-         //settings.setValue("radhard2/iterations", spIterations->value());
+         dlg->writeSettings(settings, "cam_andor");
     }
     delete dlg;
 }
@@ -526,13 +508,6 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
 
 
-        /* SetShutter(
-            typ = 0 (TTL low opens shutter)
-            mode = 0 (Auto)
-            closingtime = 50
-            openingtime = 50
-        */
-        CHECK(SetShutter(1,info.shutterMode,info.shutterClosingTime, info.shutterOpeningTime), tr("error while setting shutter"));
         CHECK(SetTriggerMode(info.trigMode), tr("error while setting trigger mode"));
         CHECK(SetAcquisitionMode(info.AcqMode), tr("error while setting acquisition mode"));
         CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
@@ -561,6 +536,21 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
     }
 
     return false;
+}
+
+bool QFExtensionCameraAndor::setShutter(int camera, int mode, int closingtime, int openingtime) {
+    if (selectCamera(camera)) {
+        /* SetShutter(
+            typ = 0 (TTL low opens shutter)
+            mode = 0 (Auto)
+            closingtime = 50
+            openingtime = 50
+        */
+        CHECK(SetShutter(1,mode,closingtime, openingtime), tr("error while setting shutter"));
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool QFExtensionCameraAndor::setTemperature(int camera, bool coolerOn, int temperature, int fanMode) {
@@ -612,11 +602,13 @@ bool QFExtensionCameraAndor::setGlobalSettings(int cam) {
             camera=it.key();
             if (isConnected(camera)) {
                 ok=ok&&setTemperature(camera, it.value().coolerOn, it.value().setTemperature, it.value().fanMode);
+                ok=ok&&setShutter(camera, it.value().shutterMode, it.value().shutterClosingTime, it.value().shutterOpeningTime);
             }
         }
     } else {
         if (camGlobalSettings.contains(camera) && isConnected(camera)) {
             ok=setTemperature(camera, camGlobalSettings[camera].coolerOn, camGlobalSettings[camera].setTemperature, camGlobalSettings[camera].fanMode);
+            ok=ok&&setShutter(camera, camGlobalSettings[camera].shutterMode, camGlobalSettings[camera].shutterClosingTime, camGlobalSettings[camera].shutterOpeningTime);
         }
     }
     return ok;
@@ -774,11 +766,17 @@ void QFExtensionCameraAndor::updateTemperatures() {
             widget=new AndorGlobalCameraSettingsWidget(i, dlgGlobalSettings);
             camGlobalSettingsWidgets[i]=widget;
             dlgGlobalSettings_layout->addWidget(widget);
+            connect(widget, SIGNAL(settingsChanged(int,int,bool,int)), this, SLOT(globalSettingsChanged(int,int,bool,int)));
         }
 
         if (isConnected(i)) {
             if (widget) {
                 widget->setVisible(true);
+                if (camInfos.contains(i)) {
+                    widget->setInfo(tr("<i>head:</i> %3<br><i>serial no:</i> %4<br><i>size:</i> %1&times;%2").arg(camInfos[i].width).arg(camInfos[i].height).arg(camInfos[i].headModel).arg(camInfos[i].serialNumber));
+                } else {
+                    widget->setInfo("");
+                }
                 if (selectCamera(i)) {
                     int min, max;
                     if (GetTemperatureRange(&min, &max)==DRV_SUCCESS) {
@@ -812,6 +810,21 @@ void QFExtensionCameraAndor::updateTemperatures() {
     }
 
     QTimer::singleShot(500, this, SLOT(updateTemperatures()));
+}
+
+void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature) {
+    if (!camGlobalSettings.contains(camera)) {
+        QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
+        CameraGlobalSettings global;
+        global.readSettings(inifile, camera);
+        camGlobalSettings[camera]=global;
+    }
+
+    camGlobalSettings[camera].coolerOn=cooler_on;
+    camGlobalSettings[camera].fanMode=fan_mode;
+    camGlobalSettings[camera].setTemperature=temperature;
+    setGlobalSettings(camera);
+    storeGlobalSettings();
 }
 
 

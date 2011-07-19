@@ -17,15 +17,17 @@ class AndorGlobalCameraSettingsWidget : public QWidget {
         explicit AndorGlobalCameraSettingsWidget(int camera, QWidget *parent = 0);
         ~AndorGlobalCameraSettingsWidget();
 
-    public slots:
         /** \brief set the widgets to the given values. This does NOT emit settingsChanged() */
-        void setSettings(int fan_mode, bool cooling_on, int temperature);
+        void setSettings(int fan_mode, bool cooling_on, int temperature, int shutterMode);
 
         /** \brief set the temperature range */
         void setRange(int min, int max);
 
         /** \brief force emitting settingsChanged() with the currently set settings */
         void forceSettingsChanged();
+
+        /** \brief set the camera information */
+        void setInfo(const QString& info);
 
         /** \brief display current temperature and whether it has reached the set point
          *
@@ -39,7 +41,7 @@ class AndorGlobalCameraSettingsWidget : public QWidget {
         void showCurrentTemperature(int progress, float temperature);
     signals:
         /** \brief emitted whenever the user changes settings */
-        void settingsChanged(int camera, int fan_mode, bool cooling_on, int temperature);
+        void settingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode);
 
     private:
         Ui::AndorGlobalCameraSettingsWidget *ui;

@@ -13,5 +13,8 @@
         <file alias="thermometer_off.png">images/thermometer_off.png</file>
         <file alias="thermometer_stabilized.png">images/thermometer_stabilized.png</file>
         <file alias="show_global.png">images/show_global.png</file>
+        <file alias="shutter_open.png">images/shutter_open.png</file>
+        <file alias="shutter_auto.png">images/shutter_auto.png</file>
+        <file alias="shutter_closed.png">images/shutter_closed.png</file>
     </qresource>
 </RCC>
