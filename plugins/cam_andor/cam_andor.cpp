@@ -812,7 +812,7 @@ void QFExtensionCameraAndor::updateTemperatures() {
     QTimer::singleShot(500, this, SLOT(updateTemperatures()));
 }
 
-void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature) {
+void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode) {
     if (!camGlobalSettings.contains(camera)) {
         QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
         CameraGlobalSettings global;
@@ -820,9 +820,10 @@ void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, boo
         camGlobalSettings[camera]=global;
     }
 
-    camGlobalSettings[camera].coolerOn=cooler_on;
+    camGlobalSettings[camera].coolerOn=cooling_on;
     camGlobalSettings[camera].fanMode=fan_mode;
     camGlobalSettings[camera].setTemperature=temperature;
+    camGlobalSettings[camera].shutterMode=shutterMode;
     setGlobalSettings(camera);
     storeGlobalSettings();
 }

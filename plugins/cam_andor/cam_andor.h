@@ -193,7 +193,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         bool setTemperature(int camera, bool coolerOn, int temperature, int fanMode=0);
 
         /** \brief set the shutter mode */
-        bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50)
+        bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50);
 
         /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
         QString detectorsIniPath;
