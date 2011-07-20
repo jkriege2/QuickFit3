@@ -404,7 +404,7 @@ void QFRawDataPropertyEditor::readSettings() {
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(20, 20), QSize(800, 600), "rawdatapropeditor/");
     if (tabMain) {
         //helpWidget->readSettings(*settings->getQSettings(), "rawdatapropeditor/help_");
-        int idx=settings->getQSettings()->value("rawdatapropeditor/currentTab", 0).toInt();
+        //int idx=settings->getQSettings()->value("rawdatapropeditor/currentTab", 0).toInt();
         //if ((idx>=0) && (idx<tabMain->count())) tabMain->setCurrentIndex(idx);
     }
     for (int i=0; i<editorList.size(); i++) {
@@ -436,7 +436,7 @@ void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& se
     QMap<int, double> sum, sum2, count;
     for (int i=0; i<sel.size(); i++) {
         int r=sel[i].row();
-        int c=sel[i].column();
+        //int c=sel[i].column();
         QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
         QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
         double d=0;

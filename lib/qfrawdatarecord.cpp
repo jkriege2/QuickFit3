@@ -552,6 +552,7 @@ bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QCha
                     case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                     case qfrdreNumberVector:
                     case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    default: break;
                 }
             }
             data[r]+=separator+dat;
@@ -626,6 +627,7 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
                     case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                     case qfrdreNumberVector:
                     case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    default: break;
                 }
             }
             if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);

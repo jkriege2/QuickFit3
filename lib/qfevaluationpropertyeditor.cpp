@@ -381,7 +381,7 @@ void QFEvaluationPropertyEditor::readSettings() {
     if (!settings) return;
     settings->getQSettings()->sync();
     if (tabMain) {
-        int idx=settings->getQSettings()->value("evalpropeditor/currentTab", 0).toInt();
+        //int idx=settings->getQSettings()->value("evalpropeditor/currentTab", 0).toInt();
     }
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(10, 10), QSize(800, 600), "evalpropeditor/");
     if (splitMain) loadSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
@@ -430,7 +430,7 @@ void QFEvaluationPropertyEditor::tvResultsSelectionChanged(const QItemSelection&
     QMap<int, QString> names;
     QMap<int, double> sum, sum2, count;
     for (int i=0; i<sel.size(); i++) {
-        int c=sel[i].row();
+        //int c=sel[i].row();
         int r=sel[i].column();
         QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
         QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
