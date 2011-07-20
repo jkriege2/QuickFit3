@@ -62,7 +62,7 @@ void AndorGlobalCameraSettingsWidget::setRange(int min, int max) {
 }
 
 void AndorGlobalCameraSettingsWidget::setInfo(const QString& info) {
-    if (info.isEmpty()) {
+    if (!info.isEmpty()) {
         ui->labInfo->setVisible(true);
         ui->labInfoLabel->setVisible(true);
         ui->labInfo->setText(info);

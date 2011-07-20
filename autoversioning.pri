@@ -11,23 +11,32 @@
         }
     }
     !isEmpty(SVNVERSION) {
-        system(echo ' $$LITERAL_HASH define SVNVERSION \" $$SVNVERSION \" ' > svnversion.h )
+        system(echo ' $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" ' > svnversion.h )
     } else {
         system(echo ' $$LITERAL_HASH define SVNVERSION \"---\" ' > svnversion.h )
     }
 
     win32 {
-        !isEmpty(QMAKE_SH) {
-            DATESTR = $$system(date)
+	    # first we have to check whether a MS Windows style date command is called. If you call this without the /T option, it will
+		# expect a new date on input, whereas the unix date command with the /T option will return an error message containing the
+		# word "invalid". So we call date /T and check the output for "invalid". if it is present, we have a Unix-style date command,
+		# otherwise the MS Windows date. Finally we can set DATESTR using the right command.
+		HAS_WINDOWS_DATE=TRUE
+		DATE_OUTPUT=$$system(date /T)
+		contains(DATE_OUTPUT, "invalid"):HAS_WINDOWS_DATE=FALSE
+		
+        contains(HAS_WINDOWS_DATE, FALSE) {
+            DATESTR = $$system(date +%Y/%M/%d)
         } else {
             DATESTR = $$system(date /T)
         }
     } else {
-        DATESTR = $$system(date)
+	    # on UNIX we just call the date command!
+        DATESTR = $$system(date +%Y/%M/%d)
     }
 
     !isEmpty(DATESTR) {
-        system(echo ' $$LITERAL_HASH define COMPILEDATE \" $$DATESTR \" ' > compiledate.h )
+        system(echo ' $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" ' > compiledate.h )
     } else {
         system(echo ' $$LITERAL_HASH define COMPILEDATE \"---\" ' > compiledate.h )
     }

@@ -10,6 +10,36 @@
 #include <cmath>
 #include "andorsettingsdialog.h"
 
+
+
+#ifndef __WINDOWS__
+# if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
+#  define __WINDOWS__
+# endif
+#endif
+
+#ifndef __LINUX__
+# if defined(linux)
+#  define __LINUX__
+# endif
+#endif
+
+#ifndef __WINDOWS__
+# ifndef __LINUX__
+#  warning("these methods are ment to be used under windows or linux ... no other system were tested")
+# endif
+#endif
+
+
+#ifdef __WINDOWS__
+#  include "ATMCD32D.H"
+#else
+#  include "atmcdLXd.h"
+#endif
+
+
+
+
 #define LOG_PREFIX "[Andor]:  "
 #define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
 
@@ -242,15 +272,15 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-    AndorSettingsDialog* dlg=new AndorSettingsDialog(parent);
+    AndorSettingsDialog* dlg=new AndorSettingsDialog(camera, parent);
     QString headModel="";
     if (camInfos.contains(camera)) {
         headModel=" ["+camInfos[camera].headModel+"]";
     }
     dlg->setWindowTitle(tr("Andor Camera #%1%2 Settings").arg(camera).arg(headModel));
-    dlg->readSettings(settings, "cam_andor");
+    dlg->readSettings(settings, "cam_andor/");
     if ( dlg->exec()==QDialog::Accepted ) {
-         dlg->writeSettings(settings, "cam_andor");
+         dlg->writeSettings(settings, "cam_andor/");
     }
     delete dlg;
 }

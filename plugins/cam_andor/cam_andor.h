@@ -18,32 +18,6 @@
 
 
 
-
-#ifndef __WINDOWS__
-# if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
-#  define __WINDOWS__
-# endif
-#endif
-
-#ifndef __LINUX__
-# if defined(linux)
-#  define __LINUX__
-# endif
-#endif
-
-#ifndef __WINDOWS__
-# ifndef __LINUX__
-#  warning("these methods are ment to be used under windows or linux ... no other system were tested")
-# endif
-#endif
-
-
-#ifdef __WINDOWS__
-#  include "ATMCD32D.H"
-#else
-#  include "atmcdLXd.h"
-#endif
-
 /*!
     \defgroup qf3ext_andor QFExtensionCamera implementation for Andor Cameras
     \ingroup qf3extensionplugins
@@ -256,7 +230,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
             /** \brief exposure time in seconds */
             float expoTime;
-            /** \brief trigger mode */
+            /** \brief trigger mode 0:internal, 1: external, 6: external start, 7: external exposure (bulb) 9: external FVB EM, 10: software trigger  */
             int trigMode;
             /** \brief number of frames in kinetic series */
             int numKins;

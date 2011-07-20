@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>211</width>
-    <height>214</height>
+    <height>187</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -214,6 +214,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cmbShutter</tabstop>
+  <tabstop>cmbFanMode</tabstop>
+  <tabstop>chkCooling</tabstop>
+  <tabstop>spinTemperature</tabstop>
+ </tabstops>
  <resources>
   <include location="cam_andor.qrc"/>
  </resources>

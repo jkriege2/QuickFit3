@@ -43,11 +43,12 @@ TRANSLATIONS= ./translations/de.cam_andor.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/
+               ../../../../../LIB/trunk/qt/ \
+               ../../../../../../LIB/trunk/qt/
 
 
 
 
 
-QT += gui xml svg
+QT += gui xml svg opengl
 CONFIG += exceptions rtti stl
