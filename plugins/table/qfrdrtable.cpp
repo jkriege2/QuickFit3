@@ -1,6 +1,6 @@
 #include "qfrdrtable.h"
 #include "dlgcsvparameters.h"
-
+#include <QtXml>
 
 
 

@@ -411,8 +411,8 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
 void QFESPIMB040CameraConfig::previewSingle() {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        QFExtension* extension=viewData.extension;
-        QFExtensionCamera* cam=viewData.camera;
+        //QFExtension* extension=viewData.extension;
+        //QFExtensionCamera* cam=viewData.camera;
         if (viewData.camera->isConnected(camIdx)) {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QString filename="";
@@ -437,8 +437,8 @@ void QFESPIMB040CameraConfig::previewSingle() {
 void QFESPIMB040CameraConfig::startStopPreview() {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        QFExtension* extension=viewData.extension;
-        QFExtensionCamera* cam=viewData.camera;
+        //QFExtension* extension=viewData.extension;
+        //QFExtensionCamera* cam=viewData.camera;
         if (viewData.camera->isConnected(camIdx)) {
             if (actStartStopPreview->isChecked()) {
                 displayStates(QFESPIMB040CameraConfig::Previewing);

@@ -4,7 +4,7 @@ QFTableModel::QFTableModel(QObject * parent):
     QAbstractTableModel(parent)
 {
     readonly=true;
-    quint32 a=xyAdressToUInt32(5, 5);
+    //quint32 a=xyAdressToUInt32(5, 5);
     //std::cout<<"adress test: "<<a<<" => row="<<UInt32ToRow(a)<<", column="<<UInt32ToColumn(a)<<"\n";
 }
 
@@ -64,7 +64,7 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
 void QFTableModel::resize(quint16 rows, quint16 columns) {
     if (readonly) return;
     //std::cout<<"  resize("<<rows<<", "<<columns<<"): 1\n";
-    quint16 oldrows=this->rows;
+    //quint16 oldrows=this->rows;
     quint16 oldcolumns=this->columns;
 
     if (columns>oldcolumns) {

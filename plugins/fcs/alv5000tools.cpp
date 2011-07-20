@@ -11,8 +11,8 @@ void ALV_analyze(QString filename, QString& mode, unsigned int& channelCount, un
     FILE* alv_file=fopen(filename.toAscii().data(), "r");
     if (ferror(alv_file)) throw alv_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
     bool readingHeader=true;
-    bool isCorrelation=false;
-    bool isCounRate=false;
+    //bool isCorrelation=false;
+    //bool isCounRate=false;
     bool findIdentifier=true;
     ALV_TOKEN token=ALV_getToken(alv_file, readingHeader);
     // first we parse the header (until we find the first quoted string)
@@ -82,7 +82,7 @@ ALV_TOKEN ALV_readNumberMatrix(FILE* alv_file, QVector<QVector<double> >* datm) 
     // (name or quoted, whitespace/linebreaks will be swallowed)
     ALV_TOKEN token=ALV_getToken(alv_file, false);
     bool first=true; // if true: all linebreaks and other tokens will be ignored (= search for first ALV_VALUE)
-    unsigned int count=0;
+    //unsigned int count=0;
     bool end=false;
     while (!end && token.type!=ALV_EOF && (first || (!first && token.type!=ALV_QUOTED))) {
         if (token.type==ALV_VALUE) {

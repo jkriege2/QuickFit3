@@ -21,7 +21,7 @@ void QFCameraComboBox::findExtensions() {
     QStringList ids=m_extManager->getIDList();
     for (int i=0; i<ids.size(); i++) {
         QObject* extobj=m_extManager->getQObjectInstance(ids[i]);
-        QFExtension* extension=m_extManager->getInstance(ids[i]);
+        //QFExtension* extension=m_extManager->getInstance(ids[i]);
         QFExtensionCamera* cam = qobject_cast<QFExtensionCamera*>(extobj);
         if (cam) cameras.append(extobj);
     }
@@ -47,7 +47,7 @@ QFExtension* QFCameraComboBox::currentExtension() const {
     QPoint p = itemData(currentIndex()).toPoint();
     QFExtension* extension=NULL;
     QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
+    //int camIdx=p.y();
     if ((p.x()>=0)&&(p.x()<cameras.size())) {
         extension=qobject_cast<QFExtension*>(cameras[p.x()]);
         cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
@@ -63,7 +63,7 @@ QFExtensionCamera* QFCameraComboBox::currentExtensionCamera() const {
     QPoint p = itemData(currentIndex()).toPoint();
     QFExtension* extension=NULL;
     QFExtensionCamera* cam=NULL;
-    int camIdx=p.y();
+    //int camIdx=p.y();
     if ((p.x()>=0)&&(p.x()<cameras.size())) {
         extension=qobject_cast<QFExtension*>(cameras[p.x()]);
         cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);

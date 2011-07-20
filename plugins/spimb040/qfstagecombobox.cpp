@@ -20,7 +20,7 @@ void QFStageComboBox::findExtensions() {
     QStringList ids=m_extManager->getIDList();
     for (int i=0; i<ids.size(); i++) {
         QObject* extobj=m_extManager->getQObjectInstance(ids[i]);
-        QFExtension* extension=m_extManager->getInstance(ids[i]);
+        //QFExtension* extension=m_extManager->getInstance(ids[i]);
         QFExtensionLinearStage* stage = qobject_cast<QFExtensionLinearStage*>(extobj);
         if (stage) stages.append(extobj);
     }
@@ -46,7 +46,7 @@ QFExtension* QFStageComboBox::currentExtension() const {
     QPoint p = itemData(currentIndex()).toPoint();
     QFExtension* extension=NULL;
     QFExtensionLinearStage* stage=NULL;
-    int stageIdx=p.y();
+    //int stageIdx=p.y();
     if ((p.x()>=0)&&(p.x()<stages.size())) {
         extension=qobject_cast<QFExtension*>(stages[p.x()]);
         stage=qobject_cast<QFExtensionLinearStage*>(stages[p.x()]);
@@ -62,7 +62,7 @@ QFExtensionLinearStage* QFStageComboBox::currentExtensionLinearStage() const {
     QPoint p = itemData(currentIndex()).toPoint();
     QFExtension* extension=NULL;
     QFExtensionLinearStage* stage=NULL;
-    int stageIdx=p.y();
+    //int stageIdx=p.y();
     if ((p.x()>=0)&&(p.x()<stages.size())) {
         extension=qobject_cast<QFExtension*>(stages[p.x()]);
         stage=qobject_cast<QFExtensionLinearStage*>(stages[p.x()]);

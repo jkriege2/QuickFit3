@@ -91,7 +91,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
     memcpy(paramsOut, initialParams, fitParamCount*sizeof(double));
 
     // next parameters */
-    double* x1;
+    //double* x1;
 
     // current \f$ \chi^2 \f$ */
     double currentChi2;
@@ -210,12 +210,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
         if ((iterations%iterations_progress_step)==0) {
             incProgress();
         }
-    } while ((!finished) && (error==0) && (iterations<iterationsMax));
+    } while ((!finished) && (error==0) && ((long)iterations<iterationsMax));
 
 
 
     QString reason="", reason_simple="";
-    if (iterations>=iterationsMax) {
+    if ((long)iterations>=iterationsMax) {
         reason+=QObject::tr(" stopped by maximum iterations.");
         reason_simple+=QObject::tr(" stopped by maximum iterations.");
     }

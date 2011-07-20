@@ -51,12 +51,12 @@ void QFECamTestCamera::initExtension() {
 }
 
 void QFECamTestCamera::loadSettings(ProgramOptions* settingspo) {
-    QSettings& settings=*(settingspo->getQSettings());
+    //QSettings& settings=*(settingspo->getQSettings());
 
 }
 
 void QFECamTestCamera::storeSettings(ProgramOptions* settingspo) {
-    QSettings& settings=*(settingspo->getQSettings());
+    //QSettings& settings=*(settingspo->getQSettings());
 
     /*settings.setValue("testdevice/width0", width[0]);
     settings.setValue("testdevice/height0", height[0]);
@@ -416,13 +416,13 @@ void QFECamTestCamera::seriesStep1() {
     uint32 frame_min=0xFFFFFFFF;
     uint32 frame_max=0;
     acquire(camera, frame32);
-    for (register int i=0; i<frame_width*frame_height; i++) {
+    for (register unsigned int i=0; i<frame_width*frame_height; i++) {
         register uint32 v=frame32[i];
         if (v<frame_min) frame_min=v;
         if (v>frame_max) frame_max=v;
     }
     uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
-    for (register int i=0; i<frame_width*frame_height; i++) {
+    for (register unsigned int i=0; i<frame_width*frame_height; i++) {
         register uint64_t v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
         if (v>255) v=255;
         frame[i]=v;
@@ -495,14 +495,14 @@ void QFECamTestCamera::seriesStep2() {
     uint32 frame_min=0xFFFFFFFF;
     uint32 frame_max=0;
     acquire(camera, frame32);
-    for (register int i=0; i<frame_width*frame_height; i++) {
+    for (register unsigned int i=0; i<frame_width*frame_height; i++) {
         register uint32 v=frame32[i];
         if (v<frame_min) frame_min=v;
         if (v>frame_max) frame_max=v;
     }
     //std::cout<<"frame_min="<<frame_min<<"   frame_max="<<frame_max<<std::endl;
     uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
-    for (register int i=0; i<frame_width*frame_height; i++) {
+    for (register unsigned int i=0; i<frame_width*frame_height; i++) {
         register uint64_t v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
         if (v>255) v=255;
         frame[i]=v;

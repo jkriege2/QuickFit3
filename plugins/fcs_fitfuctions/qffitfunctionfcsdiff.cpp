@@ -111,14 +111,14 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
 
 void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     int comp=data[FCSDiff_n_components];
-    int nonfl_comp=data[FCSDiff_n_nonfluorescent];
+    //int nonfl_comp=data[FCSDiff_n_nonfluorescent];
     double N=data[FCSDiff_n_particle];
     double eN=0;
-    double nf_tau1=data[FCSDiff_nonfl_tau1];
+    //double nf_tau1=data[FCSDiff_nonfl_tau1];
     double enf_tau1=0;
     double nf_theta1=data[FCSDiff_nonfl_theta1];
     double enf_theta1=0;
-    double nf_tau2=data[FCSDiff_nonfl_tau2];
+    //double nf_tau2=data[FCSDiff_nonfl_tau2];
     double enf_tau2=0;
     double nf_theta2=data[FCSDiff_nonfl_theta2];
     double enf_theta2=0;
@@ -136,14 +136,14 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     double etauD3=0;
     double gamma=data[FCSDiff_focus_struct_fac];
     double egamma=0;
-    double gamma2=sqr(gamma);
+    //double gamma2=sqr(gamma);
     double wxy=data[FCSDiff_focus_width]/1.0e3;
     double ewxy=0;
-    double offset=data[FCSDiff_offset];
+    //double offset=data[FCSDiff_offset];
     double eoffset=0;
     double cps=data[FCSDiff_count_rate];
     double ecps=0;
-    double cpm=data[FCSDiff_cpm];
+    //double cpm=data[FCSDiff_cpm];
     double ecpm=0;
 
     if (error) {

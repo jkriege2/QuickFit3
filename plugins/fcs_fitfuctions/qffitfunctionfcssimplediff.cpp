@@ -85,14 +85,14 @@ void QFFitFunctionFCSSimpleDiff::evaluateDerivatives(double* derivatives, double
     double gamma=data[FCSSDiff_focus_struct_fac];
     if (gamma==0) gamma=1;
     const double gamma2=sqr(gamma);
-    const double offset=data[FCSSDiff_offset];
+    //const double offset=data[FCSSDiff_offset];
 
-    double reltau=t/tauD;
+    //double reltau=t/tauD;
 
     const double exptT=exp(-t/nf_tau);
     const double fT=(1.0+nf_theta/(1.0-nf_theta)*exptT);
     const double fD=1.0+t/tauD;
-    const double fD12=sqrt(fD);
+    //const double fD12=sqrt(fD);
     const double fDG=1.0+t/tauD/gamma2;
     const double fDG12=sqrt(fDG);
 
@@ -112,18 +112,18 @@ void QFFitFunctionFCSSimpleDiff::evaluateDerivatives(double* derivatives, double
 void QFFitFunctionFCSSimpleDiff::calcParameter(double* data, double* error) const {
     double N=data[FCSSDiff_n_particle];
     double eN=0;
-    double nf_tau1=data[FCSSDiff_nonfl_tau1]/1.0e6;
+    //double nf_tau1=data[FCSSDiff_nonfl_tau1]/1.0e6;
     double enf_tau1=0;
     double nf_theta1=data[FCSSDiff_nonfl_theta1];
-    double enf_theta1=0;
+    //double enf_theta1=0;
     double tauD1=data[FCSSDiff_diff_tau1]/1.0e6;
     double etauD1=0;
     double gamma=data[FCSSDiff_focus_struct_fac];
     double egamma=0;
-    double gamma2=sqr(gamma);
+    //double gamma2=sqr(gamma);
     double wxy=data[FCSSDiff_focus_width]/1.0e3;
     double ewxy=0;
-    double offset=data[FCSSDiff_offset];
+    //double offset=data[FCSSDiff_offset];
     double eoffset=0;
 
     if (error) {

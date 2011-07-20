@@ -640,7 +640,7 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
 void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     if (!current) return;
     if (!cmbModel) return;
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
+    //QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
 
@@ -782,7 +782,7 @@ void QFFCSFitEvaluationEditor::parameterRangeChanged() {
 void QFFCSFitEvaluationEditor::updateParameterValues() {
     if (!current) return;
     if (!cmbModel) return;
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
+    //QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
 
@@ -868,7 +868,7 @@ void QFFCSFitEvaluationEditor::replotData() {
 
     int errorStyle=cmbErrorStyle->currentIndex();
     int plotStyle=cmbPlotStyle->currentIndex();
-    int residualStyle=cmbResidualStyle->currentIndex();
+    //int residualStyle=cmbResidualStyle->currentIndex();
 
     if (data->getCorrelationN()>0) {
         size_t c_tau=ds->addColumn(data->getCorrelationT(), data->getCorrelationN(), "tau");
@@ -972,7 +972,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
     JKQTPdatastore* dsresc=pltResidualCorrelation->getDatastore();
     QFFitFunction* ffunc=eval->getFitFunction();
-    QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
+    //QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
 
     if (!ffunc) return;
 
@@ -1337,7 +1337,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
 
     eval->restoreQFFitAlgorithmParameters(falg);
 
-    QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
+    //QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
 
     if (data->getCorrelationN()>0) {
         falg->setReporter(dlgFitProgressReporter);
@@ -1749,7 +1749,7 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
 void QFFCSFitEvaluationEditor::resetCurrent() {
     if (!current) return;
     if (!cmbModel) return;
-    QFRawDataRecord* record=current->getHighlightedRecord();
+    //QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1762,7 +1762,7 @@ void QFFCSFitEvaluationEditor::resetCurrent() {
 void QFFCSFitEvaluationEditor::resetAll() {
     if (!current) return;
     if (!cmbModel) return;
-    QFRawDataRecord* record=current->getHighlightedRecord();
+    //QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1911,7 +1911,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* algorithm=eval->getFitAlgorithm();
-    int run=eval->getCurrentRun();
+    //int run=eval->getCurrentRun();
     double* params=eval->allocFillParameters();
 
     QTextCursor cursor(document);
@@ -2183,7 +2183,7 @@ void QFFCSFitEvaluationEditor::printReport() {
 void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2192,7 +2192,7 @@ void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
 void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_grid", chkGrid->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2201,7 +2201,7 @@ void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
 void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_style", cmbPlotStyle->currentIndex(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2210,7 +2210,7 @@ void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
 void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_errorstyle", cmbErrorStyle->currentIndex(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2219,7 +2219,7 @@ void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
 void QFFCSFitEvaluationEditor::residualStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_residualsstyle", cmbResidualStyle->currentIndex(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2228,7 +2228,7 @@ void QFFCSFitEvaluationEditor::residualStyleChanged(int style) {
 void QFFCSFitEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("weighted_residuals", chkWeightedResiduals->isChecked(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2237,7 +2237,7 @@ void QFFCSFitEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
 void QFFCSFitEvaluationEditor::residualHistogramBinsChanged(int bins) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     current->setQFProperty("plot_residualshistogrambins", spinResidualHistogramBins->value(), false, false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2451,9 +2451,9 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord
     if (!record_in) record=current->getHighlightedRecord();
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    JKQTPdatastore* ds=pltData->getDatastore();
-    JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    QFFitFunction* ffunc=eval->getFitFunction();
+    //JKQTPdatastore* ds=pltData->getDatastore();
+    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
+    //QFFitFunction* ffunc=eval->getFitFunction();
     int run=run_in;
     if (run<=-100) run=eval->getCurrentRun();
 

@@ -56,7 +56,7 @@ void QFESPIMB040SampleStageConfig::findStages(QFExtensionManager* extManager) {
     stages.clear();
     for (int i=0; i<ids.size(); i++) {
         QObject* extobj=extManager->getQObjectInstance(ids[i]);
-        QFExtension* extension=extManager->getInstance(ids[i]);
+        //QFExtension* extension=extManager->getInstance(ids[i]);
         QFExtensionLinearStage* stage = qobject_cast<QFExtensionLinearStage*>(extobj);
         if (stage) stages.append(extobj);
     }

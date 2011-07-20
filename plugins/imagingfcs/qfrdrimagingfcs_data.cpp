@@ -86,7 +86,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
         if (taucolumn<0) taucolumn=0;
         int corrcolumn=getProperty("CORRELATION_COLUMN", 1).toInt();
         if (corrcolumn<0) corrcolumn=1;
-        int maxCol=qMax(corrcolumn, taucolumn);
+        //int maxCol=qMax(corrcolumn, taucolumn);
 
 		QTextStream stream(&file);
 		bool last_empty, empty;

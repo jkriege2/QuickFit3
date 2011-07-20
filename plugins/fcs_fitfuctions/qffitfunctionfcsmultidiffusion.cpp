@@ -153,14 +153,14 @@ double QFFitFunctionFCSMultiDiffusion::evaluate(double t, const double* data) co
 
 void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) const {
     int comp=data[FCSMULTI_n_components];
-    int nonfl_comp=data[FCSMULTI_n_nonfluorescent];
+    //int nonfl_comp=data[FCSMULTI_n_nonfluorescent];
     double N=data[FCSMULTI_n_particle];
     double eN=0;
-    double nf_tau1=data[FCSMULTI_nonfl_tau1];
+    //double nf_tau1=data[FCSMULTI_nonfl_tau1];
     double enf_tau1=0;
     double nf_theta1=data[FCSMULTI_nonfl_theta1];
     double enf_theta1=0;
-    double nf_tau2=data[FCSMULTI_nonfl_tau2];
+    //double nf_tau2=data[FCSMULTI_nonfl_tau2];
     double enf_tau2=0;
     double nf_theta2=data[FCSMULTI_nonfl_theta2];
     double enf_theta2=0;
@@ -178,10 +178,10 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
     double etauD3=0;
     double gamma=data[FCSMULTI_focus_struct_fac];
     double egamma=0;
-    double gamma2=sqr(gamma);
+    //double gamma2=sqr(gamma);
     double wxy=data[FCSMULTI_focus_width]/1.0e3;
     double ewxy=0;
-    double offset=data[FCSMULTI_offset];
+    //double offset=data[FCSMULTI_offset];
     double eoffset=0;
     double alpha1=data[FCSMULTI_diff_alpha1];
     double ealpha1=0;
@@ -191,7 +191,7 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
     double ealpha3=0;
     double cps=data[FCSMULTI_count_rate];
     double ecps=0;
-    double cpm=data[FCSMULTI_cpm];
+    //double cpm=data[FCSMULTI_cpm];
     double ecpm=0;
 
     if (error) {

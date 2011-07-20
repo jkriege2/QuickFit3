@@ -53,6 +53,10 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     GetEMGainRange(&i1, &i2);
     ui->spinEMGain->setRange(i1, i2);
 
+    ui->labSensorSize->setTextFormat(Qt::RichText);
+    ui->labCameraHead->setText(m_headModel);
+    ui->labSensorSize->setText(QString("%1 &times; %2").arg(m_sensorWidth).arg(m_sensorHeight));
+
 
 }
 
