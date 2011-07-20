@@ -9,7 +9,7 @@ AndorGlobalCameraSettingsWidget::AndorGlobalCameraSettingsWidget(int camera, QWi
     m_emit=false;
     m_camera=camera;
     ui->setupUi(this);
-    ui->labCamera->setText(tr("<u><b>camer #1:</b></u>").arg(camera));
+    ui->labCamera->setText(tr("<u><b>camera #%1:</b></u>").arg(camera));
     setInfo("");
     m_emit=true;
 }
@@ -51,6 +51,7 @@ void AndorGlobalCameraSettingsWidget::showCurrentTemperature(int progress, float
         else if (direction<0) ui->labTemperaturePic->setPixmap(QPixmap(QString(":/cam_andor/thermometer_falling.png")));
         else ui->labTemperaturePic->setPixmap(QPixmap(QString(":/cam_andor/thermometer.png")));
     }
+    if (!ui->chkCooling->isChecked()) ui->labTemperaturePic->setPixmap(QPixmap(QString(":/cam_andor/thermometer.png")));
 }
 
 void AndorGlobalCameraSettingsWidget::valuesChanged() {

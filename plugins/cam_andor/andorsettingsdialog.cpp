@@ -42,6 +42,8 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     m_sensorHeight=0;
     m_camera=camera;
     ui->setupUi(this);
+
+
     setInfo("");
     selectCamera(camera);
     GetDetector(&m_sensorWidth, &m_sensorHeight);
@@ -56,6 +58,21 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     ui->labSensorSize->setTextFormat(Qt::RichText);
     ui->labCameraHead->setText(m_headModel);
     ui->labSensorSize->setText(QString("%1 &times; %2").arg(m_sensorWidth).arg(m_sensorHeight));
+
+    ui->spinWidth->setRange(1, m_sensorWidth);
+    ui->spinWidth->setValue(m_sensorWidth);
+    ui->spinHeight->setRange(1, m_sensorHeight);
+    ui->spinHeight->setValue(m_sensorWidth);
+    ui->spinLeft->setRange(0, m_sensorWidth-1);
+    ui->spinTop->setRange(0, m_sensorHeight-1);
+    ui->spinLeft->setValue(0);
+    ui->spinTop->setValue(0);
+    ui->plotter->set_aspectRatio(1);
+    ui->plotter->set_maintainAspectRatio(true);
+    ui->plotter->setXRange(0, m_sensorWidth-1);
+    ui->plotter->setYRange(0, m_sensorHeight-1);
+    ui->plotter->set_xTickDistance(10);
+    ui->plotter->set_yTickDistance(10);
 
 
 }
@@ -89,7 +106,6 @@ void AndorSettingsDialog::readSettings(const QSettings& settings, const QString&
     ui->spinHeight->setValue(settings.value(prefix+"subimage_height", m_sensorHeight).toInt());
     ui->spinHorizontalBinning->setValue(settings.value(prefix+"horizontal_binning", 1).toInt());
     ui->spinVerticalBinning->setValue(settings.value(prefix+"vertical_binning", 1).toInt());
-    ui->chkCroppedMode->setChecked(settings.value(prefix+"cropped_mode", false).toBool());
 }
 
 void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& prefix) const {
@@ -117,12 +133,10 @@ void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& pref
     settings.setValue(prefix+"subimage_height", ui->spinHeight->value());
     settings.setValue(prefix+"horizontal_binning", ui->spinHorizontalBinning->value());
     settings.setValue(prefix+"vertical_binning", ui->spinVerticalBinning->value());
-    settings.setValue(prefix+"cropped_mode", ui->chkCroppedMode->isChecked());
 }
 
 
 void AndorSettingsDialog::setInfo(const QString& info) {
-    ui->grpCameraInfo->setVisible(!info.isEmpty());
     ui->labCameraInfo->setText(info);
 }
 
@@ -140,3 +154,106 @@ void AndorSettingsDialog::selectCamera(int iSelectedCamera) {
     GetCameraHandle(iSelectedCamera, &lCameraHandle);
     SetCurrentCamera(lCameraHandle);
 }
+
+QRect AndorSettingsDialog::calcImageRect() {
+    int l=ui->spinLeft->value();
+    int t=ui->spinTop->value();
+    int w=ui->spinWidth->value();
+    int h=ui->spinHeight->value();
+    int mode=ui->cmbReadMode->currentIndex();
+    if (mode==1) { // FVB mode
+        w=m_sensorWidth;
+        t=0; l=0;
+    } else if (mode==2) {
+        t=0; l=0;
+    }
+
+    if (l+w>m_sensorWidth) l=m_sensorWidth-w;
+    if (t+h>m_sensorHeight) t=m_sensorHeight-h;
+    if (l<0) l=0;
+    if (t<0) t=0;
+
+    return QRect(l,t,w,h);
+}
+
+void AndorSettingsDialog::updateSubregion() {
+    int mode=ui->cmbReadMode->currentIndex();
+
+    ui->spinWidth->setEnabled(mode!=1);
+    ui->spinHeight->setEnabled(true);
+    ui->spinLeft->setEnabled(mode==0);
+    ui->spinTop->setEnabled(mode==0);
+    ui->spinHorizontalBinning->setEnabled(true);
+    ui->spinVerticalBinning->setEnabled(mode!=1);
+    if (mode==1) ui->spinVerticalBinning->setValue(1);
+
+    QRect r=calcImageRect();
+
+    if (ui->spinWidth->value()!=r.width()) ui->spinWidth->setValue(r.width());
+    if (ui->spinHeight->value()!=r.height()) ui->spinHeight->setValue(r.height());
+    if (ui->spinLeft->value()!=r.left()) ui->spinLeft->setValue(r.left());
+    if (ui->spinTop->value()!=r.top()) ui->spinTop->setValue(r.top());
+
+    ui->btnCenter->setEnabled(mode==0);
+}
+/** \brief resize subregion to given size and keep the center */
+void AndorSettingsDialog::resizeSubregion(int width, int height) {
+    QRect r=calcImageRect();
+    QPoint c=r.center();
+
+    ui->spinLeft->setValue(r.left()+r.width()/2-width/2);
+    ui->spinTop->setValue(r.top()+r.height()/2-height/2);
+    ui->spinWidth->setValue(width);
+    ui->spinHeight->setValue(height);
+    updateSubregion();
+}
+
+
+
+
+
+
+
+
+
+
+
+void AndorSettingsDialog::on_cmbReadMode_currentIndexChanged(int currentIndex) {
+
+    ui->chkFrameTransfer->setEnabled(currentIndex==0);
+    if (currentIndex!=0) ui->chkFrameTransfer->setChecked(true);
+
+    updateSubregion();
+}
+
+
+void AndorSettingsDialog::on_btnCenter_clicked() {
+    int w=ui->spinWidth->value();
+    int h=ui->spinHeight->value();
+    ui->spinLeft->setValue((m_sensorWidth-w)/2);
+    ui->spinTop->setValue((m_sensorHeight-h)/2);
+    updateSubregion();
+}
+
+void AndorSettingsDialog::on_btnFull_clicked() {
+    ui->spinLeft->setValue(0);
+    ui->spinTop->setValue(0);
+    ui->spinWidth->setValue(m_sensorWidth);
+    ui->spinHeight->setValue(m_sensorHeight);
+    updateSubregion();
+}
+
+void AndorSettingsDialog::on_btn32_clicked() {
+    resizeSubregion(32,32);
+}
+
+void AndorSettingsDialog::on_btn16_clicked() {
+    resizeSubregion(16,16);
+}
+
+void AndorSettingsDialog::on_btn8_clicked() {
+    resizeSubregion(8,8);
+}
+
+
+

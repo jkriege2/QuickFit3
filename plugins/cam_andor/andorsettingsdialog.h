@@ -43,6 +43,27 @@ private:
 
     /** select an Andor camera */
     void selectCamera(int iSelectedCamera);
+
+    /** \brief calculate the current image rect, based on the current widget settings */
+    QRect calcImageRect();
+
+    /** \brief resize subregion to given size and keep the center */
+    void resizeSubregion(int width, int height);
+
+private slots:
+    /** \brief update widgets that allow to set subregion */
+    void updateSubregion();
+
+
+
+
+
+    void on_cmbReadMode_currentIndexChanged(int currentIndex);
+    void on_btnCenter_clicked();
+    void on_btnFull_clicked();
+    void on_btn32_clicked();
+    void on_btn16_clicked();
+    void on_btn8_clicked();
 };
 
 #endif // ANDORSETTINGSDIALOG_H

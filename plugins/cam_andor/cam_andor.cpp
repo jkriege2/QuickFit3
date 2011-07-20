@@ -104,7 +104,7 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     vbin=1;
     spool=0;
     emgain=1;
-    outputAmplifier=1;
+    outputAmplifier=0;
     frameTransfer=true;
 
 
@@ -181,7 +181,7 @@ void QFExtensionCameraAndor::initExtension() {
     // + a menu item to display it.
     dlgGlobalSettings=new QWidget(NULL, Qt::Tool|Qt::WindowTitleHint|Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint);
     dlgGlobalSettings->hide();
-    FlowLayout* dlgGlobalSettings_layout=new FlowLayout(dlgGlobalSettings);
+    dlgGlobalSettings_layout=new FlowLayout(dlgGlobalSettings);
     dlgGlobalSettings->setLayout(dlgGlobalSettings_layout);
     dlgGlobalSettings->setWindowTitle(tr("Andor: Global Settings"));
 
@@ -390,7 +390,6 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
         info.subImage=QRect(1,1,info.width, info.height);
 
         if (setCameraSettings(camera, info)) {
-            camInfos[camera]=info;
             camConnected.insert(camera);
             log_text(tr("connected to Andor Camera #%1, width=%2, height=%3\n").arg(camera).arg(info.width).arg(info.height));
             log_text(tr("    width=%1, height=%2\n").arg(info.width).arg(info.height));
@@ -402,6 +401,8 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
             log_text(tr("    serial number = %1\n").arg(info.serialNumber));
             GetControllerCardModel(text);
             log_text(tr("    controller card = %1\n").arg(text));
+
+            camInfos[camera]=info;
             if (!setGlobalSettings(camera)) {
                 log_error(tr("error setting global settings")); \
                 return false;
@@ -789,6 +790,12 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
     return "";
 }
 
+QString QFExtensionCameraAndor::getCameraInfo(int camera) {
+    int i=camera;
+    if (camInfos.contains(i)) return tr("<i>head:</i> %3<br><i>serial no:</i> %4<br><i>size:</i> %1&times;%2").arg(camInfos[i].width).arg(camInfos[i].height).arg(camInfos[i].headModel).arg(camInfos[i].serialNumber);
+    else return "";
+}
+
 void QFExtensionCameraAndor::updateTemperatures() {
     for (int i=0; i<getCameraCount(); i++) {
         AndorGlobalCameraSettingsWidget* widget=camGlobalSettingsWidgets.value(i, NULL);
@@ -796,17 +803,13 @@ void QFExtensionCameraAndor::updateTemperatures() {
             widget=new AndorGlobalCameraSettingsWidget(i, dlgGlobalSettings);
             camGlobalSettingsWidgets[i]=widget;
             dlgGlobalSettings_layout->addWidget(widget);
-            connect(widget, SIGNAL(settingsChanged(int,int,bool,int)), this, SLOT(globalSettingsChanged(int,int,bool,int)));
+            connect(widget, SIGNAL(settingsChanged(int,int,bool,int,int)), this, SLOT(globalSettingsChanged(int,int,bool,int,int)));
         }
 
         if (isConnected(i)) {
             if (widget) {
                 widget->setVisible(true);
-                if (camInfos.contains(i)) {
-                    widget->setInfo(tr("<i>head:</i> %3<br><i>serial no:</i> %4<br><i>size:</i> %1&times;%2").arg(camInfos[i].width).arg(camInfos[i].height).arg(camInfos[i].headModel).arg(camInfos[i].serialNumber));
-                } else {
-                    widget->setInfo("");
-                }
+                widget->setInfo(getCameraInfo(i));
                 if (selectCamera(i)) {
                     int min, max;
                     if (GetTemperatureRange(&min, &max)==DRV_SUCCESS) {
@@ -839,7 +842,7 @@ void QFExtensionCameraAndor::updateTemperatures() {
         }
     }
 
-    QTimer::singleShot(500, this, SLOT(updateTemperatures()));
+    QTimer::singleShot(250, this, SLOT(updateTemperatures()));
 }
 
 void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode) {

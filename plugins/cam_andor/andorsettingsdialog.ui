@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>948</width>
-    <height>732</height>
+    <width>818</width>
+    <height>696</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,8 +23,8 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,1,2" columnstretch="1,0,0">
-      <item row="0" column="0" colspan="3">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,1" columnstretch="1,0">
+      <item row="0" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="label">
@@ -45,12 +45,12 @@
           </item>
           <item>
            <property name="text">
-            <string>cropped mode</string>
+            <string>full vertical binning</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>full vertical binning</string>
+            <string>cropped mode</string>
            </property>
           </item>
          </widget>
@@ -85,15 +85,15 @@ p, li { white-space: pre-wrap; }
       <item row="1" column="0" rowspan="3">
        <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
-         <string> Subregion &amp; Cropping </string>
+         <string> Subimage Setup </string>
         </property>
         <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0">
+        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0" columnstretch="1,0,1,0">
          <item row="1" column="0">
-          <layout class="QFormLayout" name="formLayout_4">
-           <item row="1" column="0">
+          <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,2,0">
+           <item row="0" column="0">
             <widget class="QLabel" name="label_18">
              <property name="text">
               <string>&amp;Width:</string>
@@ -103,7 +103,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="0" column="1">
             <widget class="QSpinBox" name="spinWidth">
              <property name="maximumSize">
               <size>
@@ -119,7 +119,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="1" column="0">
             <widget class="QLabel" name="label_19">
              <property name="text">
               <string> &amp;Height:</string>
@@ -129,7 +129,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="1" column="1">
             <widget class="QSpinBox" name="spinHeight">
              <property name="maximumSize">
               <size>
@@ -145,7 +145,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_21">
              <property name="text">
               <string>&amp;Left:</string>
@@ -155,7 +155,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="1">
             <widget class="QSpinBox" name="spinLeft">
              <property name="maximumSize">
               <size>
@@ -171,7 +171,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_20">
              <property name="text">
               <string>&amp;Top:</string>
@@ -181,7 +181,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="3" column="1">
             <widget class="QSpinBox" name="spinTop">
              <property name="maximumSize">
               <size>
@@ -197,17 +197,48 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="0" column="0" colspan="2">
-            <widget class="QCheckBox" name="chkFullImage">
+           <item row="0" column="2">
+            <widget class="QPushButton" name="btnFull">
              <property name="text">
-              <string>&amp;Full Image</string>
+              <string>&amp;Full</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="btn32">
+             <property name="text">
+              <string>&amp;32 x 32</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QPushButton" name="btn16">
+             <property name="text">
+              <string>1&amp;6 x 16</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QPushButton" name="btn8">
+             <property name="text">
+              <string>&amp;8 x 8</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QPushButton" name="btnCenter">
+             <property name="text">
+              <string>&amp;center</string>
              </property>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="1" column="1">
+         <item row="1" column="2">
           <layout class="QFormLayout" name="formLayout_3">
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_15">
              <property name="text">
@@ -260,32 +291,28 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_17">
-             <property name="text">
-              <string>&amp;Cropped Mode:</string>
-             </property>
-             <property name="buddy">
-              <cstring>chkCroppedMode</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="chkCroppedMode">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
-         <item row="0" column="0" colspan="2">
+         <item row="0" column="0" colspan="4">
           <widget class="JKQTFastPlotter" name="plotter" native="true"/>
+         </item>
+         <item row="1" column="1">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="1" column="1">
        <widget class="QGroupBox" name="groupBox">
         <property name="title">
          <string> Image Sequence Setup </string>
@@ -463,23 +490,23 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="6" column="0" colspan="2">
+         <item row="6" column="0" colspan="3">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;acquisition mode:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;  - &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;preview:&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; single image mode&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;  - acquisition: kinetic mode&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;acquisition mode:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;  - preview: single image mode&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;  - acquisition: kinetic mode&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="2" column="2">
+      <item row="2" column="1">
        <widget class="QGroupBox" name="groupBox_3">
         <property name="title">
          <string> Sensor Setup </string>
@@ -668,7 +695,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </item>
-      <item row="3" column="2">
+      <item row="3" column="1">
        <widget class="QGroupBox" name="grpCameraInfo">
         <property name="title">
          <string> Camera Info </string>
@@ -734,13 +761,6 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </item>
-      <item row="1" column="1" rowspan="3">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -780,14 +800,12 @@ p, li { white-space: pre-wrap; }
   <tabstop>cmbVerticalShiftAmplitude</tabstop>
   <tabstop>cmbVerticalShiftSpeed</tabstop>
   <tabstop>cmbHorizontalShiftSpeed</tabstop>
-  <tabstop>chkFullImage</tabstop>
   <tabstop>spinWidth</tabstop>
   <tabstop>spinHeight</tabstop>
   <tabstop>spinLeft</tabstop>
   <tabstop>spinTop</tabstop>
   <tabstop>spinHorizontalBinning</tabstop>
   <tabstop>spinVerticalBinning</tabstop>
-  <tabstop>chkCroppedMode</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
@@ -801,8 +819,8 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>722</y>
+     <x>266</x>
+     <y>686</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -817,8 +835,8 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>722</y>
+     <x>334</x>
+     <y>686</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -826,5 +844,72 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>spinWidth</sender>
+   <signal>editingFinished()</signal>
+   <receiver>AndorSettingsDialog</receiver>
+   <slot>updateSubregion()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>513</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>480</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinHeight</sender>
+   <signal>editingFinished()</signal>
+   <receiver>AndorSettingsDialog</receiver>
+   <slot>updateSubregion()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>539</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>530</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinLeft</sender>
+   <signal>editingFinished()</signal>
+   <receiver>AndorSettingsDialog</receiver>
+   <slot>updateSubregion()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>101</x>
+     <y>566</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinTop</sender>
+   <signal>editingFinished()</signal>
+   <receiver>AndorSettingsDialog</receiver>
+   <slot>updateSubregion()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>593</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>600</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>updateSubregion()</slot>
+ </slots>
 </ui>

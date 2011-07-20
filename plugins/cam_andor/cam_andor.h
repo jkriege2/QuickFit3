@@ -169,6 +169,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief set the shutter mode */
         bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50);
 
+        /** \brief get camera info */
+        QString getCameraInfo(int camera);
+
         /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
         QString detectorsIniPath;
         QString detectorsIniPath_init;
