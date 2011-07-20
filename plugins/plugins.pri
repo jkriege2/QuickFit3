@@ -1,14 +1,12 @@
 
 
-debug {
+release {
     MOC_DIR = ./.mocs/
     UI_DIR = ./.uis/
     RCC_DIR = ./.rccs/
     OBJECTS_DIR = ./.objs/
     QFOUTPUT = ../../output
-}
-
-!debug {
+} else {
     MOC_DIR = ./.mocsd/
     UI_DIR = ./.uis/
     RCC_DIR = ./.rccsd/

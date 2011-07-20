@@ -1,9 +1,7 @@
-debug {
-    message("building in DEBUG mode, output is in ./output/")
-}
-
-!debug {
+release {
     message("building in RELEASE mode, output is in ./output_release/")
+} else {
+    message("building in DEBUG mode, output is in ./output/")
 }
 
 

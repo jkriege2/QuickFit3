@@ -1,7 +1,7 @@
 # only write new version files in release mode
 # in debug mode: only make sure that the files exist, but do not update them
 
-!debug {
+release {
     # try to read the SVN version
     SVNVERSION = $$system(svnversion)
     isEmpty(SVNVERSION){

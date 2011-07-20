@@ -66,7 +66,7 @@ AndorSettingsDialog::~AndorSettingsDialog()
 }
 
 void AndorSettingsDialog::readSettings(const QSettings& settings, const QString& prefix) {
-    ui->cmbAcquisitionMode->setCurrentIndex(settings.value(prefix+"acquisition_mode", 0).toInt());
+    //ui->cmbAcquisitionMode->setCurrentIndex(settings.value(prefix+"acquisition_mode", 0).toInt());
     ui->cmbReadMode->setCurrentIndex(settings.value(prefix+"read_mode", 0).toInt());
     ui->cmbFileFormat->setCurrentIndex(settings.value(prefix+"fileformat", 0).toInt());
     ui->spinExposure->setValue(settings.value(prefix+"exposure_time", 100).toDouble());
@@ -94,7 +94,7 @@ void AndorSettingsDialog::readSettings(const QSettings& settings, const QString&
 
 void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& prefix) const {
     settings.setValue(prefix+"head_model", m_headModel);
-    settings.setValue(prefix+"acquisition_mode", ui->cmbAcquisitionMode->currentIndex());
+    //settings.setValue(prefix+"acquisition_mode", ui->cmbAcquisitionMode->currentIndex());
     settings.setValue(prefix+"read_mode", ui->cmbReadMode->currentIndex());
     settings.setValue(prefix+"fileformat", ui->cmbFileFormat->currentIndex());
     settings.setValue(prefix+"exposure_time", ui->spinExposure->value());
