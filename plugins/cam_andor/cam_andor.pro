@@ -23,14 +23,14 @@ HEADERS += cam_andor.h \
            camandoracquisitionthread.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/highrestimer.h \
-    andorglobalcamerasettingswidget.h \
-    andorsettingsdialog.h
+           andorglobalcamerasettingswidget.h \
+           andorsettingsdialog.h
 
 SOURCES += cam_andor.cpp \
            camandoracquisitionthread.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
-    andorglobalcamerasettingswidget.cpp \
-    andorsettingsdialog.cpp
+           andorglobalcamerasettingswidget.cpp \
+           andorsettingsdialog.cpp
 
 FORMS = \
     andorglobalcamerasettingswidget.ui \

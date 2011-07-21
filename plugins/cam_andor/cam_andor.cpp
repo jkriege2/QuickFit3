@@ -184,7 +184,7 @@ void QFExtensionCameraAndor::initExtension() {
     // these settings will be modified by a special dialog available through a menu entry!
     QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
     camGlobalSettings.clear();
-    for (int i=0; i<getCameraCount(); i++) {
+    for (unsigned int i=0; i<getCameraCount(); i++) {
         CameraGlobalSettings global;
         global.readSettings(inifile, i);
         camGlobalSettings[i]=global;
@@ -355,7 +355,7 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     progress.open();
     QApplication::processEvents();
 
-    at_32 *data = NULL;
+    //at_32 *data = NULL;
 
     //Initialise and setup defaults
     char path[2048];
@@ -532,7 +532,7 @@ bool QFExtensionCameraAndor::selectCamera (int iSelectedCamera) {
     #endif
     GetCurrentCamera(&SelectedCamera);
     if (iSelectedCamera==SelectedCamera) return true;
-    if ((iSelectedCamera < getCameraCount()) && (iSelectedCamera >= 0) ) {
+    if ((iSelectedCamera < (long)getCameraCount()) && (iSelectedCamera >= 0) ) {
         at_32 lCameraHandle;
         GetCameraHandle(iSelectedCamera, &lCameraHandle);
         SetCurrentCamera(lCameraHandle);
@@ -850,7 +850,7 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
 
 
 void QFExtensionCameraAndor::updateTemperatures() {
-    for (int i=0; i<getCameraCount(); i++) {
+    for (unsigned int i=0; i<getCameraCount(); i++) {
         AndorGlobalCameraSettingsWidget* widget=camGlobalSettingsWidgets.value(i, NULL);
         if (!widget) {
             widget=new AndorGlobalCameraSettingsWidget(i, dlgGlobalSettings);

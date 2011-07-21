@@ -14,6 +14,7 @@
 #include "andorglobalcamerasettingswidget.h"
 #include "flowlayout.h"
 #include <unistd.h>
+#include <QtPlugin>
 
 
 
