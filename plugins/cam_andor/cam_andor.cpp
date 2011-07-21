@@ -135,6 +135,10 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     ADchannel=0;
     bitDepth=1;
     preampGainF=1;
+    pixelWidth=0;
+    pixelHeight=0;
+    verticalSpeed=0;
+    horizontalSpeed=0;readoutTime=0;
 
 }
 
@@ -292,8 +296,9 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
         headModel=" ["+camInfos[camera].headModel+"]";
     }
     dlg->setWindowTitle(tr("Andor Camera #%1%2 Settings").arg(camera).arg(headModel));
+    dlg->setupWidgets();
     dlg->readSettings(settings, "cam_andor/");
-    dlg->setInfo(getCameraInfo(camera, false, false, true, true));
+    dlg->setInfo(getCameraInfo(camera, false, false, true, false));
     if ( dlg->exec()==QDialog::Accepted ) {
          dlg->writeSettings(settings, "cam_andor/");
     }
@@ -549,7 +554,7 @@ QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bo
         QString s="";
         if (showHeadModel) s+=tr("<i>head:</i> %1<br>").arg(camInfos[i].headModel);
         s+=tr("<i>serial no:</i> %1<br>").arg(camInfos[i].serialNumber);
-        if (showSensorSize) s+=tr("<i>size:</i> %1&times;%2").arg(camInfos[i].width).arg(camInfos[i].height);
+        if (showSensorSize) s+=tr("<i>size:</i> %1&times;%2<br>").arg(camInfos[i].width).arg(camInfos[i].height);
         if (currentSettings) {
             s+=tr("<i>preamp gain:</i> %1&times;<br>").arg(camInfos[i].preampGainF);
             s+=tr("<i>bit depth:</i> %1<br>").arg(camInfos[i].bitDepth);
@@ -558,11 +563,13 @@ QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bo
             s+=tr("<i>horizontal speed:</i> %1 MHz<br>").arg(camInfos[i].horizontalSpeed);
         }
         if (extendedInfo) {
-            s+=tr("<i>pixel size:</i> %1 &times; &2 &mu;m<sup>2</sup><br>").arg(camInfos[i].pixelWidth).arg(camInfos[i].pixelHeight);
+            s+=tr("<i>pixel size:</i> %1 &times; %2 &mu;m<sup>2</sup><br>").arg(camInfos[i].pixelWidth).arg(camInfos[i].pixelHeight);
             s+=tr("<i>controller card:</i> %1<br>").arg(camInfos[i].controllerCard);
             s+=tr("<i>Andor SDK ver.:</i> %1<br>").arg(SDKVersion);
             s+=tr("<i>Andor driver ver.:</i> %1<br>").arg(deviceDriverVersion);
         }
+
+        if (s.endsWith("<br>")) s=s.left(s.size()-QString("<br>").size());
         return s;
     } else {
         return "";
@@ -575,12 +582,6 @@ void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraA
     char text[MAX_PATH];
     CHECK_NO_RETURN(GetHeadModel(text), tr("error while retrieving head model"));
     info.headModel=text;
-    info.QE.clear();
-    for (float lambda=200; lambda<1000; lambda++) {
-        float qe=0;
-        GetQE(text, lambda, &qe);
-        info.QE.append(qMakePair(lambda, qe));
-    }
     CHECK_NO_RETURN(GetCameraSerialNumber(&(info.serialNumber)), tr("error while reading camera serial number"));
     CHECK_NO_RETURN(GetControllerCardModel(text), tr("error while reading controller card"));
     info.controllerCard=text;
@@ -861,6 +862,7 @@ void QFExtensionCameraAndor::updateTemperatures() {
 
         if (isConnected(i)) {
             if (widget) {
+                widget->setSettings(camGlobalSettings[i].fanMode, camGlobalSettings[i].coolerOn, camGlobalSettings[i].setTemperature, camGlobalSettings[i].shutterMode);
                 widget->setVisible(true);
                 widget->setInfo(getCameraInfo(i, true, true, true, true));
                 if (selectCamera(i)) {

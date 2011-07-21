@@ -11,13 +11,15 @@ namespace Ui {
 /*! \brief settings dialog for andor camera
     \ingroup qf3ext_andor
 
-    Note that this class is designed to be initialized for a given camera. The selected camera may NOT be changed.
+    \note Note that this class is designed to be initialized for a given camera. The selected camera may NOT be changed.
     So the savest way to use this dialog is:
       -# create it
       -# use it
       -# destroy it
     .
     for every single use of the dialog
+
+    \note call setupWidgets() before showing the dialog, so all comboboxes and other widgets are setup properly.
  */
 class AndorSettingsDialog : public QDialog
 {
@@ -34,12 +36,15 @@ public:
 
     /** \brief set the camera information */
     void setInfo(const QString& info);
+
+    void setupWidgets();
 private:
     Ui::AndorSettingsDialog *ui;
     QString m_headModel;
     int m_sensorWidth;
     int m_sensorHeight;
     int m_camera;
+    bool m_updatingSensorSetup;
 
     /** select an Andor camera */
     void selectCamera(int iSelectedCamera);
@@ -50,13 +55,21 @@ private:
     /** \brief resize subregion to given size and keep the center */
     void resizeSubregion(int width, int height);
 
+    /*! \brief update sensor setting widgets
+
+        if \c leaveout==-1 then all widgets are update
+        if \c leaveout==0 then preamp gain is not updated
+        if \c leaveout==1 then hor. shift speed is not updated
+     */
+    void updateSensorSetup(int leaveout=-1);
+
+    /** \brief get the readmode, as set by the widgets */
+    int getReadMode();
+
+
 private slots:
     /** \brief update widgets that allow to set subregion */
     void updateSubregion();
-
-
-
-
 
     void on_cmbReadMode_currentIndexChanged(int currentIndex);
     void on_btnCenter_clicked();
@@ -64,6 +77,11 @@ private slots:
     void on_btn32_clicked();
     void on_btn16_clicked();
     void on_btn8_clicked();
+    void on_cmbADChannel_currentIndexChanged(int currentIndex);
+    void on_cmbAmplifier_currentIndexChanged(int currentIndex);
+    void on_cmbHorizontalShiftSpeed_currentIndexChanged(int currentIndex);
+    void on_cmbPreampGain_currentIndexChanged(int currentIndex);
+    void on_cmbVerticalShiftSpeed_currentIndexChanged(int currentIndex);
 };
 
 #endif // ANDORSETTINGSDIALOG_H

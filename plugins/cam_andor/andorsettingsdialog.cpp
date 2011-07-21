@@ -41,8 +41,18 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     m_sensorWidth=0;
     m_sensorHeight=0;
     m_camera=camera;
+    m_updatingSensorSetup=false;
     ui->setupUi(this);
 
+}
+
+AndorSettingsDialog::~AndorSettingsDialog()
+{
+    delete ui;
+}
+
+void AndorSettingsDialog::setupWidgets() {
+    int camera=m_camera;
 
     setInfo("");
     selectCamera(camera);
@@ -58,7 +68,6 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
 
     GetMaximumExposure(&f1);
     ui->spinExposure->setValue(f1*1000.0);
-    //GetMaximumBinning()
 
     ui->labSensorSize->setTextFormat(Qt::RichText);
     ui->labCameraHead->setText(m_headModel);
@@ -80,11 +89,49 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     ui->plotter->set_yTickDistance(10);
 
 
-}
 
-AndorSettingsDialog::~AndorSettingsDialog()
-{
-    delete ui;
+
+    int NumChannels, NumAmp, NumPreampGains;
+    int BitDepth;
+    int NumVSSpeeds;
+    float VSSpeed;
+    float PreampGain;
+    QString AmpDescription="---";
+
+
+    ui->cmbADChannel->clear();
+    GetNumberADChannels(&NumChannels);
+    for (int channel =0; channel<NumChannels; channel++) {
+        GetBitDepth(channel, &BitDepth);
+        ui->cmbADChannel->addItem(QString("%1 bits").arg(BitDepth));
+    }
+
+    ui->cmbAmplifier->clear();
+    GetNumberAmp(&NumAmp);
+    for (int amp=0; amp<NumAmp; amp++) {
+        GetAmpDesc(amp, text, 512);
+        //AmpDescription=QString("%1").arg(text);
+        //ui->cmbAmplifier->addItem(AmpDescription);
+        ui->cmbAmplifier->addItem(text);
+    }
+
+    ui->cmbPreampGain->clear();
+    GetNumberPreAmpGains(&NumPreampGains);
+    for (int gain=0; gain<NumPreampGains; gain++) {
+        GetPreAmpGain(gain, &PreampGain);
+        ui->cmbPreampGain->addItem(QString("%1x").arg(PreampGain), gain);
+    }
+
+
+    ui->cmbVerticalShiftSpeed->clear();
+    GetNumberVSSpeeds(&NumVSSpeeds);
+    for (int vsspeed=0; vsspeed<NumVSSpeeds; vsspeed++) {
+        GetVSSpeed(vsspeed, &VSSpeed);
+        ui->cmbVerticalShiftSpeed->addItem(QString("%1 µs/pixel").arg(VSSpeed), VSSpeed);
+    }
+
+
+    updateSensorSetup();
 }
 
 void AndorSettingsDialog::readSettings(const QSettings& settings, const QString& prefix) {
@@ -99,7 +146,7 @@ void AndorSettingsDialog::readSettings(const QSettings& settings, const QString&
     ui->chkFrameTransfer->setChecked(settings.value(prefix+"frame_transfer", true).toBool());
     ui->chkBaselineClamp->setChecked(settings.value(prefix+"baseline_clamp", true).toBool());
     ui->spinBaselineOffset->setValue(settings.value(prefix+"baseline_offset", 0).toInt());
-    ui->chkEMGain->setChecked(settings.value(prefix+"emgain_enabled", false).toBool());
+    //ui->chkEMGain->setChecked(settings.value(prefix+"emgain_enabled", false).toBool());
     ui->spinEMGain->setValue(settings.value(prefix+"emgain", 1).toInt());
     ui->cmbPreampGain->setCurrentIndex(settings.value(prefix+"preamp_gain", 0).toInt());
     ui->cmbVerticalShiftSpeed->setCurrentIndex(settings.value(prefix+"vertical_shift_speed", 0).toInt());
@@ -111,6 +158,10 @@ void AndorSettingsDialog::readSettings(const QSettings& settings, const QString&
     ui->spinHeight->setValue(settings.value(prefix+"subimage_height", m_sensorHeight).toInt());
     ui->spinHorizontalBinning->setValue(settings.value(prefix+"horizontal_binning", 1).toInt());
     ui->spinVerticalBinning->setValue(settings.value(prefix+"vertical_binning", 1).toInt());
+    ui->cmbAmplifier->setCurrentIndex(settings.value(prefix+"amplifier", 0).toInt());
+    ui->cmbADChannel->setCurrentIndex(settings.value(prefix+"ad_channel", 0).toInt());
+
+    updateSensorSetup();
 }
 
 void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& prefix) const {
@@ -126,7 +177,7 @@ void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& pref
     settings.setValue(prefix+"frame_transfer", ui->chkFrameTransfer->isChecked());
     settings.setValue(prefix+"baseline_clamp", ui->chkBaselineClamp->isChecked());
     settings.setValue(prefix+"baseline_offset", ui->spinBaselineOffset->value());
-    settings.setValue(prefix+"emgain_enabled", ui->chkEMGain->isChecked());
+    //settings.setValue(prefix+"emgain_enabled", ui->chkEMGain->isChecked());
     settings.setValue(prefix+"emgain", ui->spinEMGain->value());
     settings.setValue(prefix+"preamp_gain", ui->cmbPreampGain->currentIndex());
     settings.setValue(prefix+"vertical_shift_speed", ui->cmbVerticalShiftSpeed->currentIndex());
@@ -138,6 +189,8 @@ void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& pref
     settings.setValue(prefix+"subimage_height", ui->spinHeight->value());
     settings.setValue(prefix+"horizontal_binning", ui->spinHorizontalBinning->value());
     settings.setValue(prefix+"vertical_binning", ui->spinVerticalBinning->value());
+    settings.value(prefix+"amplifier", ui->cmbAmplifier->currentIndex());
+    settings.value(prefix+"ad_channel", ui->cmbADChannel->currentIndex());
 }
 
 
@@ -200,8 +253,19 @@ void AndorSettingsDialog::updateSubregion() {
     if (ui->spinTop->value()!=r.top()) ui->spinTop->setValue(r.top());
 
     ui->btnCenter->setEnabled(mode==0);
+
+    int maxBinning;
+    GetMaximumBinning(getReadMode(), 0, &maxBinning);
+    ui->spinHorizontalBinning->setRange(1,maxBinning);
+    GetMaximumBinning(getReadMode(), 1, &maxBinning);
+    ui->spinVerticalBinning->setRange(1,maxBinning);
 }
-/** \brief resize subregion to given size and keep the center */
+
+int  AndorSettingsDialog::getReadMode() {
+    if (ui->cmbReadMode->currentIndex()==1) return 0;
+    else return 4;
+}
+
 void AndorSettingsDialog::resizeSubregion(int width, int height) {
     QRect r=calcImageRect();
     QPoint c=r.center();
@@ -213,7 +277,47 @@ void AndorSettingsDialog::resizeSubregion(int width, int height) {
     updateSubregion();
 }
 
+void AndorSettingsDialog::updateSensorSetup(int leaveout) {
+    m_updatingSensorSetup=true;
+    int NumPreampGains;
+    int NumHSpeeds, IsPreAmpAvailable;
+    float HSSpeed, PreampGain;
+    QString AmpDescription;
 
+    float oldHSSpeed=ui->cmbHorizontalShiftSpeed->itemData(ui->cmbHorizontalShiftSpeed->currentIndex()).toFloat();
+    float oldPreampGain=ui->cmbPreampGain->itemData(ui->cmbPreampGain->currentIndex()).toFloat();
+
+    GetNumberPreAmpGains(&NumPreampGains);
+
+
+
+    int channel=ui->cmbADChannel->currentIndex();
+    int amp=ui->cmbAmplifier->currentIndex();
+    if (leaveout!=1) {
+        ui->cmbHorizontalShiftSpeed->clear();
+        GetNumberHSSpeeds(channel, amp, &NumHSpeeds);
+        for (int hs=0; hs<NumHSpeeds; hs++) {
+            GetHSSpeed(channel, amp, hs, &HSSpeed);
+            ui->cmbHorizontalShiftSpeed->addItem(QString("%1 MHz").arg(HSSpeed), QVariant(HSSpeed));
+        }
+        ui->cmbHorizontalShiftSpeed->setCurrentIndex(qMax(0, ui->cmbHorizontalShiftSpeed->findData(oldHSSpeed)));
+    }
+
+    if (leaveout!=0) {
+        int hspeed=ui->cmbHorizontalShiftSpeed->currentIndex();
+        ui->cmbPreampGain->clear();
+        for (int gain=0; gain<NumPreampGains; gain++) {
+            GetPreAmpGain(gain, &PreampGain);
+            IsPreAmpGainAvailable(channel, amp, hspeed, gain, &IsPreAmpAvailable);
+            if (IsPreAmpAvailable!=0) {
+                ui->cmbPreampGain->addItem(QString("%1x").arg(PreampGain), QVariant(PreampGain));
+            }
+        }
+        ui->cmbPreampGain->setCurrentIndex(qMax(0, ui->cmbPreampGain->findData(oldPreampGain)));
+    }
+
+    m_updatingSensorSetup=false;
+}
 
 
 
@@ -260,5 +364,23 @@ void AndorSettingsDialog::on_btn8_clicked() {
     resizeSubregion(8,8);
 }
 
+void AndorSettingsDialog::on_cmbADChannel_currentIndexChanged(int currentIndex) {
+    if (!m_updatingSensorSetup) updateSensorSetup();
+}
 
+void AndorSettingsDialog::on_cmbAmplifier_currentIndexChanged(int currentIndex) {
+    if (!m_updatingSensorSetup) updateSensorSetup();
+}
+
+void AndorSettingsDialog::on_cmbHorizontalShiftSpeed_currentIndexChanged(int currentIndex) {
+    if (!m_updatingSensorSetup) updateSensorSetup(1);
+}
+
+void AndorSettingsDialog::on_cmbPreampGain_currentIndexChanged(int currentIndex) {
+    if (!m_updatingSensorSetup) updateSensorSetup(0);
+}
+
+void AndorSettingsDialog::on_cmbVerticalShiftSpeed_currentIndexChanged(int currentIndex) {
+    if (!m_updatingSensorSetup) updateSensorSetup();
+}
 

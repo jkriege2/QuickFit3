@@ -148,35 +148,6 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief called when global settings have changed */
         void globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode);
     protected:
-        /** \brief are we connected? */
-        bool conn;
-        /** \brief timer */
-        HighResTimer timer;
-
-
-
-        /** \brief select the given camera */
-        bool selectCamera (int iSelectedCamera);
-
-        /** \brief get temperature from camera i */
-        int getTemperature(int cam);
-
-        /** \brief set the temperature and cooler of the given camera,
-         *
-         * fan mode of the inertanl fan 0: full, 1: low, 0: off
-         */
-        bool setTemperature(int camera, bool coolerOn, int temperature, int fanMode=0);
-
-        /** \brief set the shutter mode */
-        bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50);
-
-        /** \brief get camera info as HTML string for the given \A camera. The other options switch on/off parts of the report*/
-        QString getCameraInfo(int camera, bool showHeadModel=true, bool showSensorSize=true, bool extendedInfo=false, bool currentSettings=false);
-
-        /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
-        QString detectorsIniPath;
-        QString detectorsIniPath_init;
-
         /*! \brief stores global settings for a camera
 
              stores global settings for a camera, which are not included in CameraInfo and therefore should not be set on a
@@ -307,15 +278,49 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief speed of horizontal shift in MHz (read by readCameraProperties() from camera, so not change) */
             float horizontalSpeed;
 
-            /** \brief quantum efficiency curve [0..100%] (read by readCameraProperties() from camera, so not change) */
-            QList<QPair<float, float> > QE;
-
             /** \brief readout time of sensor */
             float readoutTime;
 
 
             CameraInfo();
         };
+
+
+
+
+
+
+
+        /** \brief are we connected? */
+        bool conn;
+        /** \brief timer */
+        HighResTimer timer;
+
+
+
+        /** \brief select the given camera */
+        bool selectCamera (int iSelectedCamera);
+
+        /** \brief get temperature from camera i */
+        int getTemperature(int cam);
+
+        /** \brief set the temperature and cooler of the given camera,
+         *
+         * fan mode of the inertanl fan 0: full, 1: low, 0: off
+         */
+        bool setTemperature(int camera, bool coolerOn, int temperature, int fanMode=0);
+
+        /** \brief set the shutter mode */
+        bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50);
+
+        /** \brief get camera info as HTML string for the given \A camera. The other options switch on/off parts of the report*/
+        QString getCameraInfo(int camera, bool showHeadModel=true, bool showSensorSize=true, bool extendedInfo=false, bool currentSettings=false);
+
+        /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
+        QString detectorsIniPath;
+        QString detectorsIniPath_init;
+
+
 
         /** \brief a set of all connected cameras */
         QSet<int> camConnected;

@@ -1,7 +1,7 @@
 release {
-    message("building in RELEASE mode, output is in ./output_release/")
+    message("building in RELEASE mode")
 } else {
-    message("building in DEBUG mode, output is in ./output/")
+    message("building in DEBUG mode")
 }
 
 

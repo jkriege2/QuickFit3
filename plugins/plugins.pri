@@ -4,16 +4,17 @@ MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
+QFOUTPUT = ../../output
 
-release {
-    QFOUTPUT = ../../output_release
-} else {
-    #MOC_DIR = ./.mocsd/
-    #UI_DIR = ./.uisd/
-    #RCC_DIR = ./.rccsd/
-    #OBJECTS_DIR = ./.objsd/
-    QFOUTPUT = ../../output
-}
+#release {
+#    QFOUTPUT = ../../output_release
+#} else {
+#    #MOC_DIR = ./.mocsd/
+#    #UI_DIR = ./.uisd/
+#    #RCC_DIR = ./.rccsd/
+#    #OBJECTS_DIR = ./.objsd/
+#    QFOUTPUT = ../../output
+#}
 
 
 

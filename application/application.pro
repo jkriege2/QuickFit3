@@ -11,6 +11,12 @@ INCLUDEPATH += . \
 
 include(../quickfit3.pri)
 
+release {
+    message("building in RELEASE mode, output is in $$QFOUTPUT")
+} else {
+    message("building in DEBUG mode, output is in $$QFOUTPUT")
+}
+
 
 DESTDIR = $$QFOUTPUT
 

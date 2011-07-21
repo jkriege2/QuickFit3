@@ -21,10 +21,10 @@ AndorGlobalCameraSettingsWidget::~AndorGlobalCameraSettingsWidget()
 
 void AndorGlobalCameraSettingsWidget::setSettings(int fan_mode, bool cooling_on, int temperature, int shutterMode) {
     m_emit=false;
-    ui->cmbFanMode->setCurrentIndex(fan_mode);
-    ui->chkCooling->setChecked(cooling_on);
-    ui->spinTemperature->setValue(temperature);
-    ui->cmbShutter->setCurrentIndex(shutterMode);
+    if (ui->cmbFanMode->currentIndex()!=fan_mode) ui->cmbFanMode->setCurrentIndex(fan_mode);
+    if (ui->chkCooling->isChecked()!=cooling_on) ui->chkCooling->setChecked(cooling_on);
+    if (ui->spinTemperature->value()!=temperature) ui->spinTemperature->setValue(temperature);
+    if (ui->cmbShutter->currentIndex()!=shutterMode) ui->cmbShutter->setCurrentIndex(shutterMode);
     m_emit=true;
 }
 

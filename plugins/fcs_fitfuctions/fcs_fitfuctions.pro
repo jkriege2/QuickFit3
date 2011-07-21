@@ -5,6 +5,7 @@ TARGET = qffcsfitfuncs
 DEPENDPATH += ./
 
 include(../plugins.pri)
+
 DESTDIR = $$QFOUTPUT/plugins
 #DLLDESTDIR = $$DESTDIR
 LIBS +=

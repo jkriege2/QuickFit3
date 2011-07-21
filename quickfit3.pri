@@ -5,16 +5,17 @@ MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
+QFOUTPUT = ../output
 
-release {
-    QFOUTPUT = ../output_release
-} else {
-    #MOC_DIR = ./.mocsd/
-    #UI_DIR = ./.uisd/
-    #RCC_DIR = ./.rccsd/
-    #OBJECTS_DIR = ./.objsd/
-    QFOUTPUT = ../output
-}
+#release {
+#    QFOUTPUT = ../output_release
+#} else {
+#    #MOC_DIR = ./.mocsd/
+#    #UI_DIR = ./.uisd/
+#    #RCC_DIR = ./.rccsd/
+#    #OBJECTS_DIR = ./.objsd/
+#    QFOUTPUT = ../output
+#}
 
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/help/
@@ -31,9 +32,3 @@ ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
 
 OTHER_FILES +=
-
-release {
-    message("building in RELEASE mode, output is in $$QFOUTPUT")
-} else {
-    message("building in DEBUG mode, output is in $$QFOUTPUT")
-}

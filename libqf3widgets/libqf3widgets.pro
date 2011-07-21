@@ -3,6 +3,12 @@ TARGET = quickfit3widgets
 
 include(../quickfit3.pri)
 
+release {
+    message("building in RELEASE mode, output is in $$QFOUTPUT")
+} else {
+    message("building in DEBUG mode, output is in $$QFOUTPUT")
+}
+
 DEPENDPATH += .
 
 INCLUDEPATH += ../../../../LIB/trunk/ \
