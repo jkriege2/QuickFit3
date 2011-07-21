@@ -169,8 +169,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief set the shutter mode */
         bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50);
 
-        /** \brief get camera info */
-        QString getCameraInfo(int camera);
+        /** \brief get camera info as HTML string for the given \A camera. The other options switch on/off parts of the report*/
+        QString getCameraInfo(int camera, bool showHeadModel=true, bool showSensorSize=true, bool extendedInfo=false, bool currentSettings=false);
 
         /** \brief path supplied to the Initialize() function (i.e. path containing detectors.ini) */
         QString detectorsIniPath;
@@ -221,9 +221,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief stores information about a camera */
         struct CameraInfo {
-            /** \brief width of image in pixel */
+            /** \brief width of image in pixel  (read by readCameraProperties() from camera, so not change) */
             int width;
-            /** \brief height of image in pixel */
+            /** \brief height of image in pixel  (read by readCameraProperties() from camera, so not change) */
             int height;
 
             /** \brief acquisition mode: 1: single scan, 2: accumulate, 3: kinetics, 4: fast kinetics, 5: run till abort */
@@ -283,10 +283,35 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief enable/disable baseline clamp */
             bool baselineClamp;
 
-            /** \brief camera head model (read by connectDevice() ) */
+            /** \brief camera head model (read by readCameraProperties() from camera, so not change ) */
             QString headModel;
-            /** \brief camera serial number (read by connectDevice() ) */
+            /** \brief controller card (read by readCameraProperties() from camera, so not change ) */
+            QString controllerCard;
+            /** \brief camera serial number (read by readCameraProperties() from camera, so not change ) */
             int serialNumber;
+
+            /** \brief the AD channel to use for reading */
+            int ADchannel;
+            /** \brief bit depth of the AD channel (read by readCameraProperties() from camera, so not change) */
+            int bitDepth;
+            /** \brief preamp gain (read by readCameraProperties() from camera, so not change) */
+            float preampGainF;
+
+            /** \brief width of the pixels in microns (read by readCameraProperties() from camera, so not change) */
+            float pixelWidth;
+            /** \brief height of the pixels in microns (read by readCameraProperties() from camera, so not change) */
+            float pixelHeight;
+            /** \brief speed of vertical shift in microns/pixelshift (read by readCameraProperties() from camera, so not change) */
+            int verticalSpeed;
+            /** \brief speed of horizontal shift in MHz (read by readCameraProperties() from camera, so not change) */
+            float horizontalSpeed;
+
+            /** \brief quantum efficiency curve [0..100%] (read by readCameraProperties() from camera, so not change) */
+            QList<QPair<float, float> > QE;
+
+            /** \brief readout time of sensor */
+            float readoutTime;
+
 
             CameraInfo();
         };
@@ -296,6 +321,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief configure the given camera with the settings from the provided CameraInfo object */
         bool setCameraSettings(int camera, CameraInfo& info);
+
+        /** \brief read the settings of the current camera (fill some of the fields in CameraInfo) */
+        void readCameraProperties(int camera, CameraInfo& info);
 
         /** \brief this map stores infos about all connected cameras. If a camer is not in the map, it is not connected */
         QMap<int, CameraInfo> camInfos;
@@ -326,7 +354,10 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief this map contains all threads that control the available cameras. Each camera has it's own thread! */
         QMap<int, CamAndorAcquisitionThread*> camThreads;
 
-
+        /** \brief the SDK version */
+        QString SDKVersion;
+        /** \brief device driver version */
+        QString deviceDriverVersion;
 };
 
 #endif // CAM_ANDOR

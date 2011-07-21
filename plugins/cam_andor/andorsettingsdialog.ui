@@ -606,18 +606,44 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_12">
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_14">
            <property name="text">
-            <string>&amp;Vertical Shift Amplitude:</string>
+            <string>&amp;Horizontal  Shift Speed:</string>
            </property>
            <property name="buddy">
-            <cstring>cmbVerticalShiftAmplitude</cstring>
+            <cstring>cmbHorizontalShiftSpeed</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="cmbHorizontalShiftSpeed">
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>&amp;Preamplifier Gain:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cmbPreampGain</cstring>
            </property>
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QComboBox" name="cmbVerticalShiftAmplitude">
+          <widget class="QComboBox" name="cmbPreampGain">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>150</width>
@@ -646,49 +672,23 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_14">
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>&amp;Horizontal  Shift Speed:</string>
+            <string>&amp;Vertical Shift Amplitude:</string>
            </property>
            <property name="buddy">
-            <cstring>cmbHorizontalShiftSpeed</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QComboBox" name="cmbHorizontalShiftSpeed">
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
+            <cstring>cmbVerticalShiftAmplitude</cstring>
            </property>
           </widget>
          </item>
          <item row="6" column="1">
-          <widget class="QComboBox" name="cmbPreampGain">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
+          <widget class="QComboBox" name="cmbVerticalShiftAmplitude">
            <property name="maximumSize">
             <size>
              <width>150</width>
              <height>16777215</height>
             </size>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>&amp;Preamplifier Gain:</string>
-           </property>
-           <property name="buddy">
-            <cstring>cmbPreampGain</cstring>
            </property>
           </widget>
          </item>
@@ -797,9 +797,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinBaselineOffset</tabstop>
   <tabstop>chkEMGain</tabstop>
   <tabstop>spinEMGain</tabstop>
-  <tabstop>cmbVerticalShiftAmplitude</tabstop>
-  <tabstop>cmbVerticalShiftSpeed</tabstop>
-  <tabstop>cmbHorizontalShiftSpeed</tabstop>
   <tabstop>spinWidth</tabstop>
   <tabstop>spinHeight</tabstop>
   <tabstop>spinLeft</tabstop>

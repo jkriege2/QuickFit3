@@ -89,7 +89,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
         //int maxCol=qMax(corrcolumn, taucolumn);
 
 		QTextStream stream(&file);
-		bool last_empty, empty;
+                bool last_empty, empty=true;
 		QVector<QVector<QPair<double, double> > > data_matrix;
 		QVector<QPair<double, double> > current_set;
 		int NN=0;

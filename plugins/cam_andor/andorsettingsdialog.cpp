@@ -52,8 +52,13 @@ AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     m_headModel=text;
 
     int i1, i2;
+    float f1;
     GetEMGainRange(&i1, &i2);
     ui->spinEMGain->setRange(i1, i2);
+
+    GetMaximumExposure(&f1);
+    ui->spinExposure->setValue(f1*1000.0);
+    //GetMaximumBinning()
 
     ui->labSensorSize->setTextFormat(Qt::RichText);
     ui->labCameraHead->setText(m_headModel);

@@ -52,6 +52,14 @@
     } \
 }
 
+#define CHECK_NO_RETURN(s, msg) \
+{ \
+    unsigned int error=s; \
+    if (error!=DRV_SUCCESS) { \
+        log_warning(QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s)); \
+    } \
+}
+
 #define CHECK_ON_ERROR(s, msg, onError) \
 { \
     unsigned int error=s; \
@@ -124,6 +132,10 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     headModel="";
     serialNumber=0;
 
+    ADchannel=0;
+    bitDepth=1;
+    preampGainF=1;
+
 }
 
 
@@ -160,8 +172,10 @@ void QFExtensionCameraAndor::initExtension() {
     // read and output version infos:
     char version[1024];
     GetVersionInfo(AT_SDKVersion, version, 1023);
+    SDKVersion=version;
     services->log_global_text(tr("%2    SDK version: %1\n").arg(QString(version)).arg(LOG_PREFIX));
     GetVersionInfo(AT_DeviceDriverVersion, version, 1023);
+    deviceDriverVersion=version;
     services->log_global_text(tr("%2    device driver version: %1\n").arg(QString(version)).arg(LOG_PREFIX));
 
 
@@ -279,6 +293,7 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
     }
     dlg->setWindowTitle(tr("Andor Camera #%1%2 Settings").arg(camera).arg(headModel));
     dlg->readSettings(settings, "cam_andor/");
+    dlg->setInfo(getCameraInfo(camera, false, false, true, true));
     if ( dlg->exec()==QDialog::Accepted ) {
          dlg->writeSettings(settings, "cam_andor/");
     }
@@ -391,16 +406,12 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
 
         if (setCameraSettings(camera, info)) {
             camConnected.insert(camera);
+            readCameraProperties(camera, info);
             log_text(tr("connected to Andor Camera #%1, width=%2, height=%3\n").arg(camera).arg(info.width).arg(info.height));
             log_text(tr("    width=%1, height=%2\n").arg(info.width).arg(info.height));
-            char text[MAX_PATH];
-            GetHeadModel(text);
-            info.headModel=text;
             log_text(tr("    head model = %1\n").arg(info.headModel));
-            GetCameraSerialNumber(&(info.serialNumber));
             log_text(tr("    serial number = %1\n").arg(info.serialNumber));
-            GetControllerCardModel(text);
-            log_text(tr("    controller card = %1\n").arg(text));
+            log_text(tr("    controller card = %1\n").arg(info.controllerCard));
 
             camInfos[camera]=info;
             if (!setGlobalSettings(camera)) {
@@ -532,36 +543,83 @@ bool QFExtensionCameraAndor::selectCamera (int iSelectedCamera) {
 }
 
 
+QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bool showSensorSize, bool extendedInfo, bool currentSettings) {
+    int i=camera;
+    if (camInfos.contains(i)) {
+        QString s="";
+        if (showHeadModel) s+=tr("<i>head:</i> %1<br>").arg(camInfos[i].headModel);
+        s+=tr("<i>serial no:</i> %1<br>").arg(camInfos[i].serialNumber);
+        if (showSensorSize) s+=tr("<i>size:</i> %1&times;%2").arg(camInfos[i].width).arg(camInfos[i].height);
+        if (currentSettings) {
+            s+=tr("<i>preamp gain:</i> %1&times;<br>").arg(camInfos[i].preampGainF);
+            s+=tr("<i>bit depth:</i> %1<br>").arg(camInfos[i].bitDepth);
+            s+=tr("<i>readout time:</i> %1 &mu;s<br>").arg(camInfos[i].readoutTime*1.0e6);
+            s+=tr("<i>vertical speed:</i> %1 &mu;s/pixel<br>").arg(camInfos[i].verticalSpeed);
+            s+=tr("<i>horizontal speed:</i> %1 MHz<br>").arg(camInfos[i].horizontalSpeed);
+        }
+        if (extendedInfo) {
+            s+=tr("<i>pixel size:</i> %1 &times; &2 &mu;m<sup>2</sup><br>").arg(camInfos[i].pixelWidth).arg(camInfos[i].pixelHeight);
+            s+=tr("<i>controller card:</i> %1<br>").arg(camInfos[i].controllerCard);
+            s+=tr("<i>Andor SDK ver.:</i> %1<br>").arg(SDKVersion);
+            s+=tr("<i>Andor driver ver.:</i> %1<br>").arg(deviceDriverVersion);
+        }
+        return s;
+    } else {
+        return "";
+    }
+}
+
+void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraAndor::CameraInfo& info) {
+    CHECK_NO_RETURN(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
+
+    char text[MAX_PATH];
+    CHECK_NO_RETURN(GetHeadModel(text), tr("error while retrieving head model"));
+    info.headModel=text;
+    info.QE.clear();
+    for (float lambda=200; lambda<1000; lambda++) {
+        float qe=0;
+        GetQE(text, lambda, &qe);
+        info.QE.append(qMakePair(lambda, qe));
+    }
+    CHECK_NO_RETURN(GetCameraSerialNumber(&(info.serialNumber)), tr("error while reading camera serial number"));
+    CHECK_NO_RETURN(GetControllerCardModel(text), tr("error while reading controller card"));
+    info.controllerCard=text;
+    CHECK_NO_RETURN(GetBitDepth(info.ADchannel, &(info.bitDepth)), tr("error while reading bit depth"));
+    CHECK_NO_RETURN(GetPixelSize(&(info.pixelWidth), &(info.pixelHeight)), tr("error while reading pixel size"));
+    CHECK_NO_RETURN(GetReadOutTime(&(info.readoutTime)), tr("error while reading readout time"));
+    CHECK_NO_RETURN(GetPreAmpGain(info.preamp_gain, &(info.preampGainF)), tr("error while reading preamplifier gain"));
+    CHECK_NO_RETURN(GetVerticalSpeed(info.vsSpeed, &(info.verticalSpeed)), tr("error while reading preamplifier gain"));
+    CHECK_NO_RETURN(GetHSSpeed(info.ADchannel, info.outputAmplifier, info.hsSpeed, &(info.horizontalSpeed)), tr("error while reading horicontal shift speed"));
+
+}
 
 bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndor::CameraInfo& info) {
 
     if (selectCamera(camera)) {
-        CHECK(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
 
 
         CHECK(SetTriggerMode(info.trigMode), tr("error while setting trigger mode"));
         CHECK(SetAcquisitionMode(info.AcqMode), tr("error while setting acquisition mode"));
         CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
-        CHECK(SetHSSpeed(0, 0), tr("error while setting HSSpeed"));
         CHECK(SetImageRotate(0), tr("error while switching image rotation off"));
         CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
+        CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
+        CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
+        CHECK(SetOutputAmplifier(info.outputAmplifier), tr("error while setting output amplifier"));
         CHECK(SetFrameTransferMode((info.frameTransfer)?1:0), tr("error while setting frame transfer mode"));
-
-        CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
-        CHECK(SetBaselineClamp((info.baselineClamp)?1:0), tr("error while setting baseline clamp mode"));
-
+        CHECK(SetADChannel(info.ADchannel), tr("while setting AD converter channel"));
+        CHECK(SetPreAmpGain(info.preamp_gain), tr("while setting pre-amplifier gain"));
+        CHECK(SetHSSpeed(info.outputAmplifier, info.hsSpeed), tr("error while setting horicontal shift speed"));
         CHECK(SetImage(info.hbin,info.vbin,info.subImage.left(), info.subImage.right(), info.subImage.top(), info.subImage.bottom()), tr("error while settings image size"));
         CHECK(SetIsolatedCropMode((info.cropMode)?1:0, info.subImage.height(), info.subImage.width(), info.vbin, info.hbin), tr("error while settings isolated crop mode"));
-
         CHECK(SetExposureTime(info.expoTime), tr("error while setting exposure time"));
         CHECK(SetAccumulationCycleTime(info.accTime), tr("error while settings accumulation cycle time"));
         CHECK(SetNumberAccumulations(info.numAccs), tr("error while setting number of accumulations"));
         CHECK(SetKineticCycleTime(info.kinTime), tr("error while setting kinetic cycle time"));
         CHECK(SetNumberKinetics(info.numKins), tr("error while setting number of kinetic cycles"));
+        CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
+        CHECK(SetBaselineClamp((info.baselineClamp)?1:0), tr("error while setting baseline clamp mode"));
 
-        CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
-        CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
-        CHECK(SetOutputAmplifier(info.outputAmplifier), tr("error while setting output amplifier"));
 
         return true;
     }
@@ -790,11 +848,6 @@ QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
     return "";
 }
 
-QString QFExtensionCameraAndor::getCameraInfo(int camera) {
-    int i=camera;
-    if (camInfos.contains(i)) return tr("<i>head:</i> %3<br><i>serial no:</i> %4<br><i>size:</i> %1&times;%2").arg(camInfos[i].width).arg(camInfos[i].height).arg(camInfos[i].headModel).arg(camInfos[i].serialNumber);
-    else return "";
-}
 
 void QFExtensionCameraAndor::updateTemperatures() {
     for (int i=0; i<getCameraCount(); i++) {
@@ -809,7 +862,7 @@ void QFExtensionCameraAndor::updateTemperatures() {
         if (isConnected(i)) {
             if (widget) {
                 widget->setVisible(true);
-                widget->setInfo(getCameraInfo(i));
+                widget->setInfo(getCameraInfo(i, true, true, true, true));
                 if (selectCamera(i)) {
                     int min, max;
                     if (GetTemperatureRange(&min, &max)==DRV_SUCCESS) {
@@ -862,7 +915,7 @@ void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, boo
 }
 
 
-Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraAndor)
+Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)
 
 
 
