@@ -47,6 +47,7 @@
 { \
     unsigned int error=s; \
     if (error!=DRV_SUCCESS) { \
+        qDebug()<<QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s); \
         log_error(QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s)); \
         return false; \
     } \
@@ -56,6 +57,7 @@
 { \
     unsigned int error=s; \
     if (error!=DRV_SUCCESS) { \
+        qDebug()<<QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s); \
         log_warning(QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s)); \
     } \
 }
@@ -64,6 +66,7 @@
 { \
     unsigned int error=s; \
     if (error!=DRV_SUCCESS) { \
+        qDebug()<<QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s); \
         log_error(QString(msg)+tr("\n%3    error code was: %1 [%2]\n%3    instruction was: %4").arg(error).arg(andorErrorToString(error)).arg(LOG_PREFIX).arg(#s)); \
         { onError; }; \
         return false; \
@@ -138,7 +141,8 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     pixelWidth=0;
     pixelHeight=0;
     verticalSpeed=0;
-    horizontalSpeed=0;readoutTime=0;
+    horizontalSpeed=0;
+    readoutTime=0;
 
 }
 
@@ -274,6 +278,8 @@ unsigned int QFExtensionCameraAndor::getCameraCount() {
 }
 
 void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSettings& settings) {
+    camInfos[camera].AcqMode=1; // single scan
+    setCameraSettings(camera, camInfos[camera]);
 }
 
 bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
@@ -290,29 +296,45 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-    AndorSettingsDialog* dlg=new AndorSettingsDialog(camera, parent);
-    QString headModel="";
-    if (camInfos.contains(camera)) {
-        headModel=" ["+camInfos[camera].headModel+"]";
+    if (selectCamera(camera)) {
+        AndorSettingsDialog* dlg=new AndorSettingsDialog(camera, parent);
+        QString headModel="";
+        CameraInfo info;
+        if (camInfos.contains(camera)) {
+            headModel=" ["+camInfos[camera].headModel+"]";
+            info=camInfos[camera];
+        }
+        dlg->setWindowTitle(tr("Andor Camera #%1%2 Settings").arg(camera).arg(headModel));
+        dlg->setupWidgets();
+        dlg->readSettings(settings);
+        dlg->setInfo(getCameraInfo(camera, false, false, true, false));
+
+        uint32_t* data=(uint32_t*)calloc(info.width*info.height, sizeof(uint32_t));
+        useCameraSettings(camera, settings);
+        acquireFullFrame(camera, data);
+        dlg->setImage(data);
+        int oldShutterMode=camGlobalSettings[camera].shutterMode;
+        camGlobalSettings[camera].shutterMode=2; // close shutter
+        setGlobalSettings(camera);
+        if ( dlg->exec()==QDialog::Accepted ) {
+             dlg->writeSettings(settings);
+        }
+        camGlobalSettings[camera].shutterMode=oldShutterMode; // reset shutter mode
+        setGlobalSettings(camera);
+
+        free(data);
+        delete dlg;
     }
-    dlg->setWindowTitle(tr("Andor Camera #%1%2 Settings").arg(camera).arg(headModel));
-    dlg->setupWidgets();
-    dlg->readSettings(settings, "cam_andor/");
-    dlg->setInfo(getCameraInfo(camera, false, false, true, false));
-    if ( dlg->exec()==QDialog::Accepted ) {
-         dlg->writeSettings(settings, "cam_andor/");
-    }
-    delete dlg;
 }
 
 int QFExtensionCameraAndor::getImageWidth(unsigned int camera) {
     if (!isConnected(camera)) return 0;
-    return camInfos[camera].width;
+    return camInfos[camera].subImage.width();
 }
 
 int QFExtensionCameraAndor::getImageHeight(unsigned int camera) {
     if (!isConnected(camera)) return 0;
-    return camInfos[camera].height;
+    return camInfos[camera].subImage.height();
 }
 
 bool QFExtensionCameraAndor::isConnected(unsigned int camera) {
@@ -324,7 +346,8 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
     if (!selectCamera(camera)) return false;
 
-    CHECK(StartAcquisition(), tr(""));
+    CHECK(SetAcquisitionMode(1), tr("error while setting \"single scan\" acquisition mode"));
+    CHECK(StartAcquisition(), tr("error starting acquisition"));
 
     CameraInfo info;
     if (camInfos.contains(camera)) info=camInfos[camera];
@@ -339,15 +362,49 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
 
 	//log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
-	at_32* imageData = (at_32*)malloc(info.width*info.height*sizeof(at_32));
-	CHECK_ON_ERROR(GetAcquiredData(imageData, info.width*info.height), tr("error while acquiring frame"), free(imageData));
+        int imagesize=info.subImage.width()*info.subImage.height();
+        at_32* imageData = (at_32*)malloc(imagesize*sizeof(at_32));
+        CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), free(imageData));
 
-	for(int i=0;i<info.width*info.height;i++) data[i]=imageData[i];
+        for(int i=0;i<imagesize;i++) data[i]=imageData[i];
 	free(imageData);
 
     return true;
 }
 
+
+
+bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+    if (!isConnected(camera)) return false;
+
+    if (!selectCamera(camera)) return false;
+
+
+    CameraInfo info;
+    if (camInfos.contains(camera)) info=camInfos[camera];
+
+    CHECK(SetAcquisitionMode(1), tr("error while setting \"single scan\" acquisition mode"));
+    CHECK(SetFullImage(1,1), tr("error while settings full sensor size as image size"));
+    CHECK(StartAcquisition(), tr("error while starting acquisition"));
+
+    int status;
+
+        //Loop until acquisition finished
+        CHECK(GetStatus(&status), tr("error while waiting for frame"));
+        while(status==DRV_ACQUIRING) {
+            CHECK(GetStatus(&status), tr("error while waiting for frame"));
+        }
+
+
+        //log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
+        at_32* imageData = (at_32*)malloc(info.width*info.height*sizeof(at_32));
+        CHECK_ON_ERROR(GetAcquiredData(imageData, info.width*info.height), tr("error while acquiring frame"), free(imageData));
+
+        for(int i=0;i<info.width*info.height;i++) data[i]=imageData[i];
+        free(imageData);
+
+    return true;
+}
 
 
 bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
@@ -577,8 +634,8 @@ QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bo
 }
 
 void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraAndor::CameraInfo& info) {
-    CHECK_NO_RETURN(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
 
+    CHECK_NO_RETURN(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
     char text[MAX_PATH];
     CHECK_NO_RETURN(GetHeadModel(text), tr("error while retrieving head model"));
     info.headModel=text;
@@ -604,6 +661,7 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
         CHECK(SetImageRotate(0), tr("error while switching image rotation off"));
         CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
+        CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
         CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
         CHECK(SetOutputAmplifier(info.outputAmplifier), tr("error while setting output amplifier"));

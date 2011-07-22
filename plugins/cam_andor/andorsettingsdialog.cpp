@@ -1,7 +1,7 @@
 #include "andorsettingsdialog.h"
 #include "ui_andorsettingsdialog.h"
-
-
+#include "jkqtfastplotter.h"
+#include "cam_andor.h"
 
 
 
@@ -31,19 +31,35 @@
 #endif
 
 
+#define CHECK(s) \
+{ \
+    unsigned int error=s; \
+    if (error!=DRV_SUCCESS) { \
+        ok=false; \
+        qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(QFExtensionCameraAndor::andorErrorToString(error)).arg(#s); \
+    } \
+}
 
-
+/* qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(QFExtensionCameraAndor::andorErrorToString(error)).arg(#s); \
+*/
 AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AndorSettingsDialog)
 {
+    m_image=NULL;
     m_headModel="";
     m_sensorWidth=0;
     m_sensorHeight=0;
     m_camera=camera;
-    m_updatingSensorSetup=false;
+    m_updatingSubregion=true;
+    m_updatingPreview=true;
+    m_calcTiming=true;
+    m_updatingSensorSetup=true;
     ui->setupUi(this);
-
+    m_updatingSubregion=false;
+    m_updatingPreview=false;
+    m_calcTiming=false;
+    m_updatingSensorSetup=false;
 }
 
 AndorSettingsDialog::~AndorSettingsDialog()
@@ -52,6 +68,9 @@ AndorSettingsDialog::~AndorSettingsDialog()
 }
 
 void AndorSettingsDialog::setupWidgets() {
+    if (m_updatingSubregion) return;
+    bool old_m_updatingSensorSetup=m_updatingSubregion;
+    m_updatingSubregion=true;
     int camera=m_camera;
 
     setInfo("");
@@ -81,12 +100,13 @@ void AndorSettingsDialog::setupWidgets() {
     ui->spinTop->setRange(0, m_sensorHeight-1);
     ui->spinLeft->setValue(0);
     ui->spinTop->setValue(0);
-    ui->plotter->set_aspectRatio(1);
+    /*ui->plotter->set_aspectRatio(1);
     ui->plotter->set_maintainAspectRatio(true);
     ui->plotter->setXRange(0, m_sensorWidth-1);
     ui->plotter->setYRange(0, m_sensorHeight-1);
     ui->plotter->set_xTickDistance(10);
-    ui->plotter->set_yTickDistance(10);
+    ui->plotter->set_yTickDistance(10);*/
+    ui->labPlot->setText("");
 
 
 
@@ -96,7 +116,9 @@ void AndorSettingsDialog::setupWidgets() {
     int NumVSSpeeds;
     float VSSpeed;
     float PreampGain;
-    QString AmpDescription="---";
+    int fastestVSS=0;
+    float fastestVSSF=0;
+    //QString AmpDescription="---";
 
 
     ui->cmbADChannel->clear();
@@ -110,10 +132,10 @@ void AndorSettingsDialog::setupWidgets() {
     GetNumberAmp(&NumAmp);
     for (int amp=0; amp<NumAmp; amp++) {
         GetAmpDesc(amp, text, 512);
-        //AmpDescription=QString("%1").arg(text);
-        //ui->cmbAmplifier->addItem(AmpDescription);
         ui->cmbAmplifier->addItem(text);
     }
+    //ui->cmbAmplifier->addItem("EMCCD register");
+    //ui->cmbAmplifier->addItem("CCD register");
 
     ui->cmbPreampGain->clear();
     GetNumberPreAmpGains(&NumPreampGains);
@@ -125,17 +147,23 @@ void AndorSettingsDialog::setupWidgets() {
 
     ui->cmbVerticalShiftSpeed->clear();
     GetNumberVSSpeeds(&NumVSSpeeds);
+    GetFastestRecommendedVSSpeed(&fastestVSS, &fastestVSSF);
     for (int vsspeed=0; vsspeed<NumVSSpeeds; vsspeed++) {
         GetVSSpeed(vsspeed, &VSSpeed);
-        ui->cmbVerticalShiftSpeed->addItem(QString("%1 µs/pixel").arg(VSSpeed), VSSpeed);
+        if (vsspeed>fastestVSS) ui->cmbVerticalShiftSpeed->addItem(QString("[%1 µs/pixel]").arg(VSSpeed), VSSpeed);
+        else ui->cmbVerticalShiftSpeed->addItem(QString("%1 µs/pixel").arg(VSSpeed), VSSpeed);
     }
 
 
+    m_updatingSubregion=old_m_updatingSensorSetup;
     updateSensorSetup();
 }
 
-void AndorSettingsDialog::readSettings(const QSettings& settings, const QString& prefix) {
-    //ui->cmbAcquisitionMode->setCurrentIndex(settings.value(prefix+"acquisition_mode", 0).toInt());
+void AndorSettingsDialog::readSettings(QSettings& settings) {
+    if (m_updatingSubregion) return;
+    bool old_m_updatingSensorSetup=m_updatingSubregion;
+    m_updatingSubregion=true;
+    QString prefix="cam_andor/";
     ui->cmbReadMode->setCurrentIndex(settings.value(prefix+"read_mode", 0).toInt());
     ui->cmbFileFormat->setCurrentIndex(settings.value(prefix+"fileformat", 0).toInt());
     ui->spinExposure->setValue(settings.value(prefix+"exposure_time", 100).toDouble());
@@ -146,7 +174,6 @@ void AndorSettingsDialog::readSettings(const QSettings& settings, const QString&
     ui->chkFrameTransfer->setChecked(settings.value(prefix+"frame_transfer", true).toBool());
     ui->chkBaselineClamp->setChecked(settings.value(prefix+"baseline_clamp", true).toBool());
     ui->spinBaselineOffset->setValue(settings.value(prefix+"baseline_offset", 0).toInt());
-    //ui->chkEMGain->setChecked(settings.value(prefix+"emgain_enabled", false).toBool());
     ui->spinEMGain->setValue(settings.value(prefix+"emgain", 1).toInt());
     ui->cmbPreampGain->setCurrentIndex(settings.value(prefix+"preamp_gain", 0).toInt());
     ui->cmbVerticalShiftSpeed->setCurrentIndex(settings.value(prefix+"vertical_shift_speed", 0).toInt());
@@ -161,12 +188,14 @@ void AndorSettingsDialog::readSettings(const QSettings& settings, const QString&
     ui->cmbAmplifier->setCurrentIndex(settings.value(prefix+"amplifier", 0).toInt());
     ui->cmbADChannel->setCurrentIndex(settings.value(prefix+"ad_channel", 0).toInt());
 
+    m_updatingSubregion=old_m_updatingSensorSetup;
     updateSensorSetup();
+    updateSubregion();
 }
 
-void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& prefix) const {
+void AndorSettingsDialog::writeSettings(QSettings& settings) const {
+    QString prefix="cam_andor/";
     settings.setValue(prefix+"head_model", m_headModel);
-    //settings.setValue(prefix+"acquisition_mode", ui->cmbAcquisitionMode->currentIndex());
     settings.setValue(prefix+"read_mode", ui->cmbReadMode->currentIndex());
     settings.setValue(prefix+"fileformat", ui->cmbFileFormat->currentIndex());
     settings.setValue(prefix+"exposure_time", ui->spinExposure->value());
@@ -177,7 +206,6 @@ void AndorSettingsDialog::writeSettings(QSettings& settings, const QString& pref
     settings.setValue(prefix+"frame_transfer", ui->chkFrameTransfer->isChecked());
     settings.setValue(prefix+"baseline_clamp", ui->chkBaselineClamp->isChecked());
     settings.setValue(prefix+"baseline_offset", ui->spinBaselineOffset->value());
-    //settings.setValue(prefix+"emgain_enabled", ui->chkEMGain->isChecked());
     settings.setValue(prefix+"emgain", ui->spinEMGain->value());
     settings.setValue(prefix+"preamp_gain", ui->cmbPreampGain->currentIndex());
     settings.setValue(prefix+"vertical_shift_speed", ui->cmbVerticalShiftSpeed->currentIndex());
@@ -235,6 +263,12 @@ QRect AndorSettingsDialog::calcImageRect() {
 }
 
 void AndorSettingsDialog::updateSubregion() {
+    qDebug()<<"updateSubregion()";
+    if (m_updatingSubregion) return;
+    bool old_m_updatingSensorSetup=m_updatingSubregion;
+    m_updatingSubregion=true;
+
+
     int mode=ui->cmbReadMode->currentIndex();
 
     ui->spinWidth->setEnabled(mode!=1);
@@ -259,6 +293,10 @@ void AndorSettingsDialog::updateSubregion() {
     ui->spinHorizontalBinning->setRange(1,maxBinning);
     GetMaximumBinning(getReadMode(), 1, &maxBinning);
     ui->spinVerticalBinning->setRange(1,maxBinning);
+    updatePreview();
+    calcTiming();
+    m_updatingSubregion=old_m_updatingSensorSetup;
+    qDebug()<<"updateSubregion() ... DONE";
 }
 
 int  AndorSettingsDialog::getReadMode() {
@@ -266,7 +304,13 @@ int  AndorSettingsDialog::getReadMode() {
     else return 4;
 }
 
+int AndorSettingsDialog::getPreamp() {
+    return ui->cmbPreampGain->itemData(ui->cmbPreampGain->currentIndex()).toInt();
+}
+
 void AndorSettingsDialog::resizeSubregion(int width, int height) {
+    if (m_updatingSubregion) return;
+    qDebug()<<"resizeSubregion()";
     QRect r=calcImageRect();
     QPoint c=r.center();
 
@@ -275,14 +319,18 @@ void AndorSettingsDialog::resizeSubregion(int width, int height) {
     ui->spinWidth->setValue(width);
     ui->spinHeight->setValue(height);
     updateSubregion();
+    qDebug()<<"resizeSubregion() ... DONE";
 }
 
 void AndorSettingsDialog::updateSensorSetup(int leaveout) {
+    if (m_updatingSensorSetup) return;
+    qDebug()<<"updateSensorSetup()";
+
+    bool old_m_updatingSensorSetup=m_updatingSensorSetup;
     m_updatingSensorSetup=true;
     int NumPreampGains;
     int NumHSpeeds, IsPreAmpAvailable;
     float HSSpeed, PreampGain;
-    QString AmpDescription;
 
     float oldHSSpeed=ui->cmbHorizontalShiftSpeed->itemData(ui->cmbHorizontalShiftSpeed->currentIndex()).toFloat();
     float oldPreampGain=ui->cmbPreampGain->itemData(ui->cmbPreampGain->currentIndex()).toFloat();
@@ -310,13 +358,113 @@ void AndorSettingsDialog::updateSensorSetup(int leaveout) {
             GetPreAmpGain(gain, &PreampGain);
             IsPreAmpGainAvailable(channel, amp, hspeed, gain, &IsPreAmpAvailable);
             if (IsPreAmpAvailable!=0) {
-                ui->cmbPreampGain->addItem(QString("%1x").arg(PreampGain), QVariant(PreampGain));
+                ui->cmbPreampGain->addItem(QString("%1x").arg(PreampGain), QVariant(gain));
             }
         }
         ui->cmbPreampGain->setCurrentIndex(qMax(0, ui->cmbPreampGain->findData(oldPreampGain)));
     }
 
-    m_updatingSensorSetup=false;
+    m_updatingSensorSetup=old_m_updatingSensorSetup;
+    qDebug()<<"updateSensorSetup() ... DONE";
+}
+
+void AndorSettingsDialog::setImage(uint32_t* image)  {
+    m_image=image;
+    QImage pix(m_sensorWidth, m_sensorHeight, QImage::Format_RGB32);
+    if (m_image) {
+        JKQTFPimagePlot_array2image<uint32_t>(image, m_sensorWidth, m_sensorHeight, pix, JKQTFP_GRAY, 0, 0);
+    }
+    m_pix=pix;
+    updatePreview();
+}
+
+void AndorSettingsDialog::updatePreview() {
+    bool old_m_updatingPreview=m_updatingPreview;
+    if (m_updatingPreview) return;
+    qDebug()<<"updatePreview()";
+    m_updatingPreview=true;
+    ui->labPlot->setText("");
+    int scaleX=qMax(1, (int)floor(ui->labPlot->width()/m_sensorWidth));
+    int scaleY=qMax(1, (int)floor(ui->labPlot->height()/m_sensorHeight));
+    int scale=qMin(scaleX, scaleY);
+    QPixmap pixmap((m_sensorWidth+16)*scale, (m_sensorHeight+16)*scale);
+    pixmap.fill(QColor("lightgray"));
+    QPainter painter;
+    painter.begin(&pixmap);
+    painter.scale(scale, scale);
+    //painter.translate(8+m_pix.width()/2, 8+m_pix.height()/2);
+    //painter.rotate(180);
+    painter.drawImage(8,8,m_pix);
+    QRect sub=calcImageRect();
+    painter.setPen(QColor("red"));
+    painter.drawRect(sub.translated(8,8));
+    painter.end();
+    ui->labPlot->setPixmap(pixmap);
+    m_updatingPreview=old_m_updatingPreview;
+    qDebug()<<"updatePreview() ... DONE";
+}
+
+void AndorSettingsDialog::calcTiming() {
+    if (m_calcTiming) return;
+    qDebug()<<"calcTiming()";
+    bool old_m_calcTiming=m_calcTiming;
+    m_calcTiming=true;
+    selectCamera(m_camera);
+    bool ok=true;
+    CHECK(SetAcquisitionMode(3)); // kinetic
+    if (ui->cmbReadMode->currentIndex()==2) { // cropped
+        CHECK(SetReadMode(4)); // image
+    } else if (ui->cmbReadMode->currentIndex()==1) { // FVB
+        CHECK(SetReadMode(0)); // FVB
+    } else { // imaging mode
+        CHECK(SetReadMode(4)); // image
+    }
+    if (ui->chkFrameTransfer->isChecked()) {
+        CHECK(SetFrameTransferMode(1));
+    } else {
+        CHECK(SetFrameTransferMode(0));
+    }
+    CHECK(SetADChannel(ui->cmbADChannel->currentIndex()));
+    CHECK(SetOutputAmplifier(ui->cmbAmplifier->currentIndex()));
+    CHECK(SetHorizontalSpeed(ui->cmbHorizontalShiftSpeed->currentIndex()));
+    CHECK(SetPreAmpGain(getPreamp()));
+    CHECK(SetVSSpeed(ui->cmbVerticalShiftSpeed->currentIndex()));
+    CHECK(SetVSAmplitude(ui->cmbVerticalShiftAmplitude->currentIndex()));
+    CHECK(SetExposureTime(ui->spinExposure->value()/1000.0));
+    CHECK(SetAccumulationCycleTime(ui->spinAccCycleTime->value()/1000.0));
+    CHECK(SetNumberAccumulations(ui->spinAccumulates->value()));
+    CHECK(SetNumberKinetics(ui->spinKineticCycles->value()));
+    CHECK(SetKineticCycleTime(ui->spinKineticCycleTime->value()/1000.0));
+
+    if (ui->cmbReadMode->currentIndex()==2) { // cropped
+        CHECK(SetIsolatedCropMode(1, ui->spinHeight->value(), ui->spinWidth->value(), ui->spinVerticalBinning->value(), ui->spinHorizontalBinning->value()));
+    } else if (ui->cmbReadMode->currentIndex()==1) { // FVB
+        CHECK(SetIsolatedCropMode(1, ui->spinHeight->value(), ui->spinWidth->value(), ui->spinVerticalBinning->value(), ui->spinHorizontalBinning->value()));
+    } else { // imaging mode
+        CHECK(SetIsolatedCropMode(0, ui->spinHeight->value(), ui->spinWidth->value(), ui->spinVerticalBinning->value(), ui->spinHorizontalBinning->value()));
+    }
+
+    qDebug()<<"SetImage: "<<ui->spinHorizontalBinning->value()<< ui->spinVerticalBinning->value()<< ui->spinLeft->value()+1<< ui->spinLeft->value()+ui->spinWidth->value()<< ui->spinTop->value()+1<< ui->spinTop->value()+ui->spinHeight->value();
+    CHECK(SetImage(ui->spinHorizontalBinning->value(), ui->spinVerticalBinning->value(),
+             ui->spinLeft->value()+1, ui->spinLeft->value()+ui->spinWidth->value(),
+             ui->spinTop->value()+1, ui->spinTop->value()+ui->spinHeight->value()));
+    float exposure=0, accumulate=0, kinetic=0;
+    if (ok) {
+        CHECK(GetAcquisitionTimings(&exposure, &accumulate, &kinetic));
+
+        if (exposure!=ui->spinExposure->value()) ui->spinExposure->setValue(exposure*1000.0);
+        if (accumulate!=ui->spinAccCycleTime->value()) ui->spinAccCycleTime->setValue(accumulate*1000.0);
+        if (kinetic!=ui->spinKineticCycleTime->value()) ui->spinKineticCycleTime->setValue(kinetic*1000.0);
+
+        ui->labAccumulateCycleRate->setText(QString("%1 Hz").arg(1.0/accumulate));
+        ui->labKineticCycleRate->setText(QString("%1 Hz").arg(1.0/kinetic));
+        ui->labError->setText("");
+    } else {
+        ui->labError->setText("error calculating timings ...");
+    }
+
+    m_calcTiming=old_m_calcTiming;
+    qDebug()<<"calcTiming() ... done";
 }
 
 
@@ -327,12 +475,29 @@ void AndorSettingsDialog::updateSensorSetup(int leaveout) {
 
 
 
-void AndorSettingsDialog::on_cmbReadMode_currentIndexChanged(int currentIndex) {
 
+
+
+
+
+void AndorSettingsDialog::resizeEvent(QResizeEvent* event) {
+    QDialog::resizeEvent(event);
+    updatePreview();
+}
+
+void AndorSettingsDialog::showEvent(QShowEvent* event) {
+    QDialog::showEvent(event);
+    updatePreview();
+}
+
+void AndorSettingsDialog::on_cmbReadMode_currentIndexChanged(int currentIndex) {
+    if (m_updatingSubregion) return;
     ui->chkFrameTransfer->setEnabled(currentIndex==0);
+    ui->spinAccCycleTime->setEnabled(false);
     if (currentIndex!=0) ui->chkFrameTransfer->setChecked(true);
 
     updateSubregion();
+    updateSensorSetup();
 }
 
 
@@ -365,22 +530,107 @@ void AndorSettingsDialog::on_btn8_clicked() {
 }
 
 void AndorSettingsDialog::on_cmbADChannel_currentIndexChanged(int currentIndex) {
-    if (!m_updatingSensorSetup) updateSensorSetup();
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSensorSetup();
+    calcTiming();
 }
 
 void AndorSettingsDialog::on_cmbAmplifier_currentIndexChanged(int currentIndex) {
-    if (!m_updatingSensorSetup) updateSensorSetup();
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSensorSetup();
+    calcTiming();
 }
 
 void AndorSettingsDialog::on_cmbHorizontalShiftSpeed_currentIndexChanged(int currentIndex) {
-    if (!m_updatingSensorSetup) updateSensorSetup(1);
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSensorSetup(1);
+    calcTiming();
 }
 
 void AndorSettingsDialog::on_cmbPreampGain_currentIndexChanged(int currentIndex) {
-    if (!m_updatingSensorSetup) updateSensorSetup(0);
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSensorSetup(0);
+    calcTiming();
 }
 
 void AndorSettingsDialog::on_cmbVerticalShiftSpeed_currentIndexChanged(int currentIndex) {
-    if (!m_updatingSensorSetup) updateSensorSetup();
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSensorSetup();
+    calcTiming();
+
 }
+
+
+void AndorSettingsDialog::on_spinWidth_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSubregion();
+}
+
+
+void AndorSettingsDialog::on_spinHeight_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSubregion();
+}
+
+
+void AndorSettingsDialog::on_spinLeft_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSubregion();
+}
+
+
+void AndorSettingsDialog::on_spinTop_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSubregion();
+}
+
+
+void AndorSettingsDialog::on_spinHorizontalBinning_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSubregion();
+}
+
+
+void AndorSettingsDialog::on_spinVerticalBinning_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    updateSubregion();
+}
+
+void AndorSettingsDialog::on_chkFrameTransfer_toggled(bool value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+void AndorSettingsDialog::on_spinKineticCycles_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+void AndorSettingsDialog::on_spinAccumulates_valueChanged(int value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+
+void AndorSettingsDialog::on_spinExposure_valueChanged(double value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+
+void AndorSettingsDialog::on_spinKineticCycleTime_valueChanged(double value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+
+void AndorSettingsDialog::on_spinAccCycleTime_valueChanged(double value) {
+    if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
+    calcTiming();
+}
+
+void AndorSettingsDialog::on_chkBaselineClamp_toggled(bool value) {
+    ui->spinBaselineOffset->setEnabled(!value);
+}
+
 

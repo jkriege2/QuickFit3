@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Jan Krieger</author>
  <class>AndorSettingsDialog</class>
  <widget class="QDialog" name="AndorSettingsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>818</width>
-    <height>696</height>
+    <width>748</width>
+    <height>691</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,7 +91,7 @@ p, li { white-space: pre-wrap; }
         <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0" columnstretch="1,0,1,0">
+        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0,0,0" columnstretch="1,0,0">
          <item row="1" column="0">
           <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,2,0">
            <item row="0" column="0">
@@ -122,7 +123,7 @@ p, li { white-space: pre-wrap; }
            <item row="1" column="0">
             <widget class="QLabel" name="label_19">
              <property name="text">
-              <string> &amp;Height:</string>
+              <string>&amp;Height:</string>
              </property>
              <property name="buddy">
               <cstring>spinHeight</cstring>
@@ -293,9 +294,6 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="0" column="0" colspan="4">
-          <widget class="JKQTFastPlotter" name="plotter" native="true"/>
-         </item>
          <item row="1" column="1">
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
@@ -308,6 +306,79 @@ p, li { white-space: pre-wrap; }
             </size>
            </property>
           </spacer>
+         </item>
+         <item row="0" column="0" colspan="3">
+          <widget class="QLabel" name="labPlot">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="0" colspan="3">
+          <widget class="QLabel" name="labError">
+           <property name="palette">
+            <palette>
+             <active>
+              <colorrole role="WindowText">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>255</red>
+                 <green>0</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </active>
+             <inactive>
+              <colorrole role="WindowText">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>255</red>
+                 <green>0</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </inactive>
+             <disabled>
+              <colorrole role="WindowText">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>118</red>
+                 <green>116</green>
+                 <blue>108</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </disabled>
+            </palette>
+           </property>
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -478,6 +549,18 @@ p, li { white-space: pre-wrap; }
          </item>
          <item row="4" column="2">
           <widget class="QLabel" name="labAccumulateCycleRate">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -485,6 +568,18 @@ p, li { white-space: pre-wrap; }
          </item>
          <item row="2" column="2">
           <widget class="QLabel" name="labKineticCycleRate">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -546,7 +641,10 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QCheckBox" name="chkBaselineClamp">
              <property name="text">
@@ -714,6 +812,9 @@ p, li { white-space: pre-wrap; }
            <property name="text">
             <string>&amp;EM-Gain:</string>
            </property>
+           <property name="buddy">
+            <cstring>spinEMGain</cstring>
+           </property>
           </widget>
          </item>
          <item row="6" column="1">
@@ -813,14 +914,6 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>JKQTFastPlotter</class>
-   <extends>QWidget</extends>
-   <header>../../../../../LIB/trunk/qt/jkqtfastplotter.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>widget</tabstop>
   <tabstop>cmbReadMode</tabstop>

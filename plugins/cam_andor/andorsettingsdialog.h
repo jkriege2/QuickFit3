@@ -30,21 +30,31 @@ public:
     ~AndorSettingsDialog();
 
     /** \brief read dialog contents from QSettings object */
-    void readSettings(const QSettings& settings, const QString& prefix);
+    void readSettings(QSettings& settings);
     /** \brief write dialog contents to QSettings object */
-    void writeSettings(QSettings& settings, const QString& prefix) const;
+    void writeSettings(QSettings& settings) const;
 
     /** \brief set the camera information */
     void setInfo(const QString& info);
 
+    /** \brief setup the contents of some of the widgets */
     void setupWidgets();
+
+    /** \brief set an image to use for current image */
+    void setImage(uint32_t* image);
 private:
     Ui::AndorSettingsDialog *ui;
     QString m_headModel;
     int m_sensorWidth;
     int m_sensorHeight;
     int m_camera;
+    bool m_updatingSubregion;
+    bool m_updatingPreview;
+    bool m_calcTiming;
     bool m_updatingSensorSetup;
+
+    uint32_t* m_image;
+    QImage m_pix;
 
     /** select an Andor camera */
     void selectCamera(int iSelectedCamera);
@@ -66,6 +76,18 @@ private:
     /** \brief get the readmode, as set by the widgets */
     int getReadMode();
 
+    /** \brief get the current preamp gain index */
+    int getPreamp();
+
+    /** \brief update the preview image */
+    void updatePreview();
+
+    /** \brief calculate actual image timing (may contain tampering with camera settings !) */
+    void calcTiming();
+
+protected:
+    virtual void resizeEvent(QResizeEvent* event);
+    virtual void showEvent(QShowEvent* event);
 
 private slots:
     /** \brief update widgets that allow to set subregion */
@@ -82,6 +104,22 @@ private slots:
     void on_cmbHorizontalShiftSpeed_currentIndexChanged(int currentIndex);
     void on_cmbPreampGain_currentIndexChanged(int currentIndex);
     void on_cmbVerticalShiftSpeed_currentIndexChanged(int currentIndex);
+
+    void on_spinWidth_valueChanged(int value);
+    void on_spinHeight_valueChanged(int value);
+    void on_spinLeft_valueChanged(int value);
+    void on_spinTop_valueChanged(int value);
+    void on_spinHorizontalBinning_valueChanged(int value);
+    void on_spinVerticalBinning_valueChanged(int value);
+
+    void on_chkFrameTransfer_toggled(bool value);
+    void on_chkBaselineClamp_toggled(bool value);
+    void on_spinKineticCycles_valueChanged(int value);
+    void on_spinAccumulates_valueChanged(int value);
+    void on_spinExposure_valueChanged(double value);
+    void on_spinKineticCycleTime_valueChanged(double value);
+    void on_spinAccCycleTime_valueChanged(double value);
+
 };
 
 #endif // ANDORSETTINGSDIALOG_H

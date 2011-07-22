@@ -193,9 +193,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief stores information about a camera */
         struct CameraInfo {
-            /** \brief width of image in pixel  (read by readCameraProperties() from camera, so not change) */
+            /** \brief width of sensor in pixel  (read by readCameraProperties() from camera, so not change) */
             int width;
-            /** \brief height of image in pixel  (read by readCameraProperties() from camera, so not change) */
+            /** \brief height of sensor in pixel  (read by readCameraProperties() from camera, so not change) */
             int height;
 
             /** \brief acquisition mode: 1: single scan, 2: accumulate, 3: kinetics, 4: fast kinetics, 5: run till abort */
@@ -364,6 +364,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         QString SDKVersion;
         /** \brief device driver version */
         QString deviceDriverVersion;
+
+        /** \brief acquire a single frame with current settings, but before set the image size to full sensor! */
+        bool acquireFullFrame(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL);
 };
 
 #endif // CAM_ANDOR
