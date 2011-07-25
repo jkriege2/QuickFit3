@@ -387,29 +387,6 @@ void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSetti
 
 
 
-bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
-    useCameraSettings(camera, settings);
-
-    CameraInfo info;//=camInfos[camera];
-    readCameraProperties(camera, info);
-
-    setSettingsFromQSettings(info, settings);
-
-    info.acquisitionFilenamePrefix=filenamePrefix;
-
-    if (info.subImage_vend>info.height) info.subImage_vend=info.height;
-    if (info.subImage_hend>info.width) info.subImage_hend=info.width;
-    if (info.subImage_vstart<1) info.subImage_vstart=1;
-    if (info.subImage_hstart<1) info.subImage_hstart=1;
-
-    setCameraSettings(camera, info);
-    readCameraProperties(camera, info);
-    camInfos[camera]=info;
-
-    return true;
-}
-
-
 
 int QFExtensionCameraAndor::getImageWidth(unsigned int camera) {
     if (!isConnected(camera)) return 0;
@@ -493,7 +470,7 @@ bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* dat
     CHECK(StartAcquisition(), tr("error while starting acquisition"));
 
     int status;
-
+    CHECK(GetStatus(&status), tr("error while waiting for frame"));
     QTime time;
 
 	time.start();
@@ -662,15 +639,59 @@ double QFExtensionCameraAndor::getExposureTime(unsigned int camera) {
 
 
 
+bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+    useCameraSettings(camera, settings);
+
+    CameraInfo info;//=camInfos[camera];
+    readCameraProperties(camera, info);
+
+    setSettingsFromQSettings(info, settings);
+
+    info.acquisitionFilenamePrefix=filenamePrefix;
+
+    if (info.subImage_vend>info.height) info.subImage_vend=info.height;
+    if (info.subImage_hend>info.width) info.subImage_hend=info.width;
+    if (info.subImage_vstart<1) info.subImage_vstart=1;
+    if (info.subImage_hstart<1) info.subImage_hstart=1;
+
+    setCameraSettings(camera, info);
+    readCameraProperties(camera, info);
+    camInfos[camera]=info;
+
+    // check whether an acquisition thread is still alive ... if so, kill it, as it has to be erronemous
+    if (camThreads.contains(camera)) {
+        CamAndorAcquisitionThread* oldthread=camThreads[camera];
+        if (oldthread) {
+            oldthread->terminate();
+            oldthread->wait();
+            oldthread->deleteLater();
+        }
+    }
+
+
+    // now create a new acquisition thread
+    CamAndorAcquisitionThread* thread=new CamAndorAcquisitionThread(this);
+
+    camThreads[camera]=thread;
+
+    return true;
+}
+
+
 bool QFExtensionCameraAndor::startAcquisition(unsigned int camera) {
-    return false;
+    CHECK(SetSpool(1, 7, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+    CHECK(StartAcquisition(), tr("error while starting acquisition"));
+
+    return true;
 }
 
 void QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
 }
 
 bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
-    return false;
+    int status;
+    CHECK(GetStatus(&status), tr("error while waiting for frame"));
+    return (status==DRV_ACQUIRING);
 }
 
 void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
@@ -681,7 +702,9 @@ bool QFExtensionCameraAndor::getAcquisitionPreview(unsigned int camera, uint32_t
 }
 
 int QFExtensionCameraAndor::getAcquisitionProgress(unsigned int camera) {
-    return 0;
+    int p=0;
+    CHECK(GetSpoolProgress(&p), tr("error acquiring spool progress"));
+    return 100*p/camInfos[camera].numKins;
 }
 
 void QFExtensionCameraAndor::log_text(QString message) {
