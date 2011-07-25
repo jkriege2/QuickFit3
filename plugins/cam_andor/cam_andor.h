@@ -215,8 +215,14 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             float kinTime;
             /** \brief accumulation cycle time in seconds */
             float accTime;
-            /** \brief defines the subregion to read out */
-            QRect subImage;
+            /** \brief defines the subregion to read out, horizontal start  */
+            int subImage_hstart;
+            /** \brief defines the subregion to read out, horizontal end  */
+            int subImage_hend;
+            /** \brief defines the subregion to read out, vertical start  */
+            int subImage_vstart;
+            /** \brief defines the subregion to read out, vertical end  */
+            int subImage_vend;
             /** \brief horicontal binning */
             int hbin;
             /** \brief vertical binning */
@@ -281,6 +287,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief readout time of sensor */
             float readoutTime;
 
+            /** \brief fileformat of output 0: TIFF */
+            int fileformat;
+
 
             CameraInfo();
         };
@@ -330,6 +339,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief read the settings of the current camera (fill some of the fields in CameraInfo) */
         void readCameraProperties(int camera, CameraInfo& info);
+
+        /** \brief load the settings stored in \a settings into \a info */
+        void setSettingsFromQSettings(CameraInfo& info, const QSettings& settings);
 
         /** \brief this map stores infos about all connected cameras. If a camer is not in the map, it is not connected */
         QMap<int, CameraInfo> camInfos;

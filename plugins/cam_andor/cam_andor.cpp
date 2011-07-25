@@ -98,8 +98,8 @@ void QFExtensionCameraAndor::CameraGlobalSettings::writeSettings(QSettings& sett
 }
 
 QFExtensionCameraAndor::CameraInfo::CameraInfo() {
-    width=10;
-    height=10;
+    width=128;
+    height=128;
 
 
     AcqMode=1;
@@ -110,7 +110,12 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     numAccs=1;
     kinTime=0;
     accTime=0;
-    subImage=QRect(1,1,512,512);
+
+    subImage_hstart=1;
+    subImage_hend=128;
+    subImage_vstart=1;
+    subImage_vend=128;
+
     hbin=1;
     vbin=1;
     spool=0;
@@ -143,6 +148,7 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     verticalSpeed=0;
     horizontalSpeed=0;
     readoutTime=0;
+    fileformat=0;
 
 }
 
@@ -169,9 +175,9 @@ void QFExtensionCameraAndor::deinit() {
 }
 
 void QFExtensionCameraAndor::projectChanged(QFProject* oldProject, QFProject* project) {
-	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
-	   But: possibly you could read config information from the project here
-	 */
+    /* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
+       But: possibly you could read config information from the project here
+     */
 }
 
 void QFExtensionCameraAndor::initExtension() {
@@ -277,17 +283,6 @@ unsigned int QFExtensionCameraAndor::getCameraCount() {
     return lNumCameras;
 }
 
-void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSettings& settings) {
-    camInfos[camera].AcqMode=1; // single scan
-    setCameraSettings(camera, camInfos[camera]);
-}
-
-bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
-    useCameraSettings(camera, settings);
-    return true;
-}
-
-
 void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
 	/* open a dialog that configures the camera.
 
@@ -327,14 +322,82 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
     }
 }
 
+
+void QFExtensionCameraAndor::setSettingsFromQSettings(QFExtensionCameraAndor::CameraInfo& info, const QSettings& settings) {
+    QString prefix="cam_andor/";
+    int readMode=settings.value(prefix+"read_mode", 0).toInt();
+    info.ReadMode=4;
+    if (readMode==1) info.ReadMode=0;
+
+    info.trigMode=settings.value(prefix+"trigger_mode", info.trigMode).toInt();
+    info.AcqMode=settings.value(prefix+"acquisition_mode", info.AcqMode).toInt();
+    info.fileformat=settings.value(prefix+"fileformat", info.fileformat).toInt();
+    info.expoTime=settings.value(prefix+"exposure_time", info.expoTime*1e6).toDouble()/1e6;
+    info.kinTime=settings.value(prefix+"kinetic_cycle_time", info.kinTime*1e6).toDouble()/1e6;
+    info.numKins=settings.value(prefix+"kinetic_cycles", info.numKins).toInt();
+    info.numAccs=settings.value(prefix+"accumulate_cycles", info.numAccs).toInt();
+    info.accTime=settings.value(prefix+"accumulate_cycles_time", info.accTime*1e6).toDouble()/1e6;
+    info.frameTransfer=settings.value(prefix+"frame_transfer", info.frameTransfer).toBool();
+    info.baselineClamp=settings.value(prefix+"baseline_clamp", info.baselineClamp).toBool();
+    info.baselineOffset=settings.value(prefix+"baseline_offset", info.baselineOffset).toInt();
+    info.emgain=settings.value(prefix+"emgain", info.emgain).toInt();
+    info.preamp_gain=settings.value(prefix+"preamp_gain", info.preamp_gain).toInt();
+    info.vsSpeed=settings.value(prefix+"vertical_shift_speed", info.vsSpeed).toInt();
+    info.vsAmplitude=settings.value(prefix+"vertical_shift_amplitude", info.vsAmplitude).toInt();
+    info.hsSpeed=settings.value(prefix+"horizontal_shift_speed", info.hsSpeed).toInt();
+    info.subImage_hstart=settings.value(prefix+"subimage_hstart", 1).toInt();
+    info.subImage_hend=settings.value(prefix+"subimage_hend", info.width).toInt();
+    info.subImage_vstart=settings.value(prefix+"subimage_vstart", 1).toInt();
+    info.subImage_vend=settings.value(prefix+"subimage_vend", info.height).toInt();
+    if (info.subImage_vstart>info.subImage_vend) qSwap(info.subImage_vstart, info.subImage_vend);
+    if (info.subImage_hstart>info.subImage_hend) qSwap(info.subImage_hstart, info.subImage_hend);
+
+    info.hbin=settings.value(prefix+"horizontal_binning", info.hbin).toInt();
+    info.vbin=settings.value(prefix+"vertical_binning", info.vbin).toInt();
+    info.outputAmplifier=settings.value(prefix+"amplifier", info.outputAmplifier).toInt();
+    info.ADchannel=settings.value(prefix+"ad_channel", info.ADchannel).toInt();
+    info.advancedEMGain=settings.value(prefix+"advanced_emgain", info.advancedEMGain).toBool();
+}
+
+
+void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSettings& settings) {
+    CameraInfo info;//=camInfos[camera];
+    readCameraProperties(camera, info);
+
+    setSettingsFromQSettings(info, settings);
+
+    // simplifications for preview mode
+    info.AcqMode=3; // single scan mode for preview
+    info.numKins=1;
+
+    if (info.subImage_vend>info.height) info.subImage_vend=info.height;
+    if (info.subImage_hend>info.width) info.subImage_hend=info.width;
+    if (info.subImage_vstart<1) info.subImage_vstart=1;
+    if (info.subImage_hstart<1) info.subImage_hstart=1;
+
+    setCameraSettings(camera, info);
+    readCameraProperties(camera, info);
+    camInfos[camera]=info;
+
+}
+
+
+
+bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+    useCameraSettings(camera, settings);
+    return true;
+}
+
+
+
 int QFExtensionCameraAndor::getImageWidth(unsigned int camera) {
     if (!isConnected(camera)) return 0;
-    return camInfos[camera].subImage.width();
+    return (abs(camInfos[camera].subImage_hend-camInfos[camera].subImage_hstart)+1)/camInfos[camera].hbin;
 }
 
 int QFExtensionCameraAndor::getImageHeight(unsigned int camera) {
     if (!isConnected(camera)) return 0;
-    return camInfos[camera].subImage.height();
+    return (abs(camInfos[camera].subImage_vend-camInfos[camera].subImage_vstart)+1)/camInfos[camera].vbin;
 }
 
 bool QFExtensionCameraAndor::isConnected(unsigned int camera) {
@@ -362,7 +425,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
 
 	//log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
-        int imagesize=info.subImage.width()*info.subImage.height();
+        int imagesize=getImageWidth(camera)*getImageHeight(camera);
         at_32* imageData = (at_32*)malloc(imagesize*sizeof(at_32));
         CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), free(imageData));
 
@@ -464,7 +527,11 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
         //if (camInfos.contains(camera)) info=camInfos[camera];
 
         CHECK(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
-        info.subImage=QRect(1,1,info.width, info.height);
+        //info.subImage=QRect(1,1,info.width, info.height);
+        info.subImage_hstart=1;
+        info.subImage_vstart=1;
+        info.subImage_hend=info.width;
+        info.subImage_vend=info.height;
 
         if (setCameraSettings(camera, info)) {
             camConnected.insert(camera);
@@ -654,31 +721,38 @@ void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraA
 bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndor::CameraInfo& info) {
 
     if (selectCamera(camera)) {
-
-
         CHECK(SetTriggerMode(info.trigMode), tr("error while setting trigger mode"));
         CHECK(SetAcquisitionMode(info.AcqMode), tr("error while setting acquisition mode"));
         CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
+        CHECK(SetFrameTransferMode((info.frameTransfer)?1:0), tr("error while setting frame transfer mode"));
+        CHECK(SetADChannel(info.ADchannel), tr("while setting AD converter channel"));
+        CHECK(SetOutputAmplifier(info.outputAmplifier), tr("error while setting output amplifier"));
+        CHECK(SetHSSpeed(info.outputAmplifier, info.hsSpeed), tr("error while setting horicontal shift speed"));
+        CHECK(SetPreAmpGain(info.preamp_gain), tr("while setting pre-amplifier gain"));
+        CHECK(SetVSAmplitude(info.vsAmplitude), tr("while setting pre-amplifier gain"));
+        CHECK(SetVSSpeed(info.vsSpeed), tr("while setting pre-amplifier gain"));
+        CHECK(SetExposureTime(info.expoTime), tr("error while setting exposure time"));
+        CHECK(SetNumberAccumulations(info.numAccs), tr("error while setting number of accumulations"));
+        CHECK(SetAccumulationCycleTime(info.accTime), tr("error while settings accumulation cycle time"));
+        CHECK(SetNumberKinetics(info.numKins), tr("error while setting number of kinetic cycles"));
+        CHECK(SetKineticCycleTime(info.kinTime), tr("error while setting kinetic cycle time"));
+        CHECK(SetIsolatedCropMode((info.cropMode)?1:0, abs(info.subImage_vend-info.subImage_vstart)+1, abs(info.subImage_hend-info.subImage_hstart)+1, info.vbin, info.hbin), tr("error while settings isolated crop mode"));
+        qDebug()<<"setImage("<<info.hbin<<info.vbin<<info.subImage_hstart<< info.subImage_hend<< info.subImage_vstart<< info.subImage_vend;
+        CHECK(SetImage(info.hbin,info.vbin,info.subImage_hstart, info.subImage_hend, info.subImage_vstart, info.subImage_vend), tr("error while settings image size"));
         CHECK(SetImageRotate(0), tr("error while switching image rotation off"));
         CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
         CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
-        CHECK(SetOutputAmplifier(info.outputAmplifier), tr("error while setting output amplifier"));
-        CHECK(SetFrameTransferMode((info.frameTransfer)?1:0), tr("error while setting frame transfer mode"));
-        CHECK(SetADChannel(info.ADchannel), tr("while setting AD converter channel"));
-        CHECK(SetPreAmpGain(info.preamp_gain), tr("while setting pre-amplifier gain"));
-        CHECK(SetHSSpeed(info.outputAmplifier, info.hsSpeed), tr("error while setting horicontal shift speed"));
-        CHECK(SetImage(info.hbin,info.vbin,info.subImage.left(), info.subImage.right(), info.subImage.top(), info.subImage.bottom()), tr("error while settings image size"));
-        CHECK(SetIsolatedCropMode((info.cropMode)?1:0, info.subImage.height(), info.subImage.width(), info.vbin, info.hbin), tr("error while settings isolated crop mode"));
-        CHECK(SetExposureTime(info.expoTime), tr("error while setting exposure time"));
-        CHECK(SetAccumulationCycleTime(info.accTime), tr("error while settings accumulation cycle time"));
-        CHECK(SetNumberAccumulations(info.numAccs), tr("error while setting number of accumulations"));
-        CHECK(SetKineticCycleTime(info.kinTime), tr("error while setting kinetic cycle time"));
-        CHECK(SetNumberKinetics(info.numKins), tr("error while setting number of kinetic cycles"));
         CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
         CHECK(SetBaselineClamp((info.baselineClamp)?1:0), tr("error while setting baseline clamp mode"));
 
+        // read back actual settings
+        float exposure=0, accumulate=0, kinetic=0;
+        CHECK(GetAcquisitionTimings(&exposure, &accumulate, &kinetic), tr("error reading acquisition timings"));
+        info.expoTime=exposure;
+        info.accTime=accumulate;
+        info.kinTime=kinetic;
 
         return true;
     }

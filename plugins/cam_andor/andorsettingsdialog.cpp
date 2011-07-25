@@ -166,11 +166,11 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     QString prefix="cam_andor/";
     ui->cmbReadMode->setCurrentIndex(settings.value(prefix+"read_mode", 0).toInt());
     ui->cmbFileFormat->setCurrentIndex(settings.value(prefix+"fileformat", 0).toInt());
-    ui->spinExposure->setValue(settings.value(prefix+"exposure_time", 100).toDouble());
-    ui->spinKineticCycleTime->setValue(settings.value(prefix+"kinetic_cycle_time", 100).toDouble());
+    ui->spinExposure->setValue(settings.value(prefix+"exposure_time", 100000.0).toDouble()/1000.0);
+    ui->spinKineticCycleTime->setValue(settings.value(prefix+"kinetic_cycle_time", 100000.0).toDouble()/1000.0);
     ui->spinKineticCycles->setValue(settings.value(prefix+"kinetic_cycles", 1).toInt());
     ui->spinAccumulates->setValue(settings.value(prefix+"accumulate_cycles", 1).toInt());
-    ui->spinAccCycleTime->setValue(settings.value(prefix+"accumulate_cycles_time", 100).toDouble());
+    ui->spinAccCycleTime->setValue(settings.value(prefix+"accumulate_cycles_time", 100000.0).toDouble()/1000.0);
     ui->chkFrameTransfer->setChecked(settings.value(prefix+"frame_transfer", true).toBool());
     ui->chkBaselineClamp->setChecked(settings.value(prefix+"baseline_clamp", true).toBool());
     ui->spinBaselineOffset->setValue(settings.value(prefix+"baseline_offset", 0).toInt());
@@ -179,10 +179,16 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     ui->cmbVerticalShiftSpeed->setCurrentIndex(settings.value(prefix+"vertical_shift_speed", 0).toInt());
     ui->cmbVerticalShiftAmplitude->setCurrentIndex(settings.value(prefix+"vertical_shift_amplitude", 0).toInt());
     ui->cmbHorizontalShiftSpeed->setCurrentIndex(settings.value(prefix+"horizontal_shift_speed", 0).toInt());
-    ui->spinLeft->setValue(settings.value(prefix+"subimage_left", 0).toInt());
-    ui->spinTop->setValue(settings.value(prefix+"subimage_top", 0).toInt());
-    ui->spinWidth->setValue(settings.value(prefix+"subimage_width", m_sensorWidth).toInt());
-    ui->spinHeight->setValue(settings.value(prefix+"subimage_height", m_sensorHeight).toInt());
+
+    int hstart=settings.value(prefix+"subimage_hstart", 1).toInt()-1;
+    int vstart=settings.value(prefix+"subimage_vstart", 1).toInt()-1;
+    int hend=settings.value(prefix+"subimage_hend", m_sensorWidth).toInt();
+    int vend=settings.value(prefix+"subimage_vend", m_sensorHeight).toInt();
+
+    ui->spinLeft->setValue(hstart);
+    ui->spinTop->setValue(m_sensorHeight-vstart);
+    ui->spinWidth->setValue(abs(hend-hstart));
+    ui->spinHeight->setValue(abs(vend-vstart));
     ui->spinHorizontalBinning->setValue(settings.value(prefix+"horizontal_binning", 1).toInt());
     ui->spinVerticalBinning->setValue(settings.value(prefix+"vertical_binning", 1).toInt());
     ui->cmbAmplifier->setCurrentIndex(settings.value(prefix+"amplifier", 0).toInt());
@@ -196,25 +202,28 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
 void AndorSettingsDialog::writeSettings(QSettings& settings) const {
     QString prefix="cam_andor/";
     settings.setValue(prefix+"head_model", m_headModel);
+    settings.setValue(prefix+"acquisition_mode", 3); // linetic
+    settings.setValue(prefix+"trigger_mode", 0); // internal
     settings.setValue(prefix+"read_mode", ui->cmbReadMode->currentIndex());
     settings.setValue(prefix+"fileformat", ui->cmbFileFormat->currentIndex());
-    settings.setValue(prefix+"exposure_time", ui->spinExposure->value());
-    settings.setValue(prefix+"kinetic_cycle_time", ui->spinKineticCycleTime->value());
+    settings.setValue(prefix+"exposure_time", ui->spinExposure->value()*1000.0);
+    settings.setValue(prefix+"kinetic_cycle_time", ui->spinKineticCycleTime->value()*1000.0);
     settings.setValue(prefix+"kinetic_cycles", ui->spinKineticCycles->value());
     settings.setValue(prefix+"accumulate_cycles", ui->spinAccumulates->value());
-    settings.setValue(prefix+"accumulate_cycles_time", ui->spinAccCycleTime->value());
+    settings.setValue(prefix+"accumulate_cycles_time", ui->spinAccCycleTime->value()*1000.0);
     settings.setValue(prefix+"frame_transfer", ui->chkFrameTransfer->isChecked());
     settings.setValue(prefix+"baseline_clamp", ui->chkBaselineClamp->isChecked());
     settings.setValue(prefix+"baseline_offset", ui->spinBaselineOffset->value());
+    settings.setValue(prefix+"advanced_emgain", false); // no advanced EM gain
     settings.setValue(prefix+"emgain", ui->spinEMGain->value());
     settings.setValue(prefix+"preamp_gain", ui->cmbPreampGain->currentIndex());
     settings.setValue(prefix+"vertical_shift_speed", ui->cmbVerticalShiftSpeed->currentIndex());
     settings.setValue(prefix+"vertical_shift_amplitude", ui->cmbVerticalShiftAmplitude->currentIndex());
     settings.setValue(prefix+"horizontal_shift_speed", ui->cmbHorizontalShiftSpeed->currentIndex());
-    settings.setValue(prefix+"subimage_left", ui->spinLeft->value());
-    settings.setValue(prefix+"subimage_top", ui->spinTop->value());
-    settings.setValue(prefix+"subimage_width", ui->spinWidth->value());
-    settings.setValue(prefix+"subimage_height", ui->spinHeight->value());
+    settings.setValue(prefix+"subimage_hstart", ui->spinLeft->value()+1);
+    settings.setValue(prefix+"subimage_hend", ui->spinLeft->value()+ui->spinWidth->value());
+    settings.setValue(prefix+"subimage_vend", m_sensorHeight-ui->spinTop->value());
+    settings.setValue(prefix+"subimage_vstart", m_sensorHeight-(ui->spinTop->value()+ui->spinHeight->value())+1);
     settings.setValue(prefix+"horizontal_binning", ui->spinHorizontalBinning->value());
     settings.setValue(prefix+"vertical_binning", ui->spinVerticalBinning->value());
     settings.value(prefix+"amplifier", ui->cmbAmplifier->currentIndex());
@@ -426,10 +435,10 @@ void AndorSettingsDialog::calcTiming() {
     }
     CHECK(SetADChannel(ui->cmbADChannel->currentIndex()));
     CHECK(SetOutputAmplifier(ui->cmbAmplifier->currentIndex()));
-    CHECK(SetHorizontalSpeed(ui->cmbHorizontalShiftSpeed->currentIndex()));
+    CHECK(SetHSSpeed(ui->cmbAmplifier->currentIndex(), ui->cmbHorizontalShiftSpeed->currentIndex()));
     CHECK(SetPreAmpGain(getPreamp()));
-    CHECK(SetVSSpeed(ui->cmbVerticalShiftSpeed->currentIndex()));
     CHECK(SetVSAmplitude(ui->cmbVerticalShiftAmplitude->currentIndex()));
+    CHECK(SetVSSpeed(ui->cmbVerticalShiftSpeed->currentIndex()));
     CHECK(SetExposureTime(ui->spinExposure->value()/1000.0));
     CHECK(SetAccumulationCycleTime(ui->spinAccCycleTime->value()/1000.0));
     CHECK(SetNumberAccumulations(ui->spinAccumulates->value()));
