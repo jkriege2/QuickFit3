@@ -10,10 +10,11 @@ release {
             SVNVERSION = $$system(git svn info -r HEAD ../ | grep 'evision' | cut -d: -f2)
         }
     }
+    message("RELEASE MODE: svnversion is: $$SVNVERSION")
     !isEmpty(SVNVERSION) {
-        system(echo ' $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" ' > svnversion.h )
+        system(echo \' $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" \' > svnversion.h )
     } else {
-        system(echo ' $$LITERAL_HASH define SVNVERSION \"---\" ' > svnversion.h )
+        system(echo \' $$LITERAL_HASH define SVNVERSION \"---\" \' > svnversion.h )
     }
 
     win32 {
@@ -35,10 +36,11 @@ release {
         DATESTR = $$system(date +%Y/%M/%d)
     }
 
+    message("RELEASE MODE: svnversion is: $$DATESTR")
     !isEmpty(DATESTR) {
-        system(echo ' $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" ' > compiledate.h )
+        system(echo \' $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" \' > compiledate.h )
     } else {
-        system(echo ' $$LITERAL_HASH define COMPILEDATE \"---\" ' > compiledate.h )
+        system(echo \' $$LITERAL_HASH define COMPILEDATE \"---\" \' > compiledate.h )
     }
 } else {
     message("DEBUG MODE: here we do not read the new svn version, but only make sure that the autoversioning files do exist")

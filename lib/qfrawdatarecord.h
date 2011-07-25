@@ -177,7 +177,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
             evaluationResultType type;  /**< type of data */
             double dvalue;  /**< doubl data value */
             double derror;  /**< error of double data */
-            int64_t ivalue;  /**< value as 64-bit signed integer */
+            /*int64_t*/qlonglong ivalue;  /**< value as 64-bit signed integer */
             bool bvalue;  /**< value as boolean */
             QString svalue;  /**< value as string */
             QString unit; /**< unit name of the stored values */

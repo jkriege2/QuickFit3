@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <inttypes.h>
 
 namespace Ui {
     class AndorSettingsDialog;

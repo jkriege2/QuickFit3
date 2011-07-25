@@ -150,6 +150,8 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     readoutTime=0;
     fileformat=0;
 
+    acquisitionFilenamePrefix="";
+
 }
 
 
@@ -275,6 +277,8 @@ void QFExtensionCameraAndor::storeSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings());
 
     if (detectorsIniPath!=detectorsIniPath_init) settings.setValue(getID()+"/detectorsIniPath", detectorsIniPath);
+
+    storeGlobalSettings();
 }
 
 unsigned int QFExtensionCameraAndor::getCameraCount() {
@@ -385,6 +389,23 @@ void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSetti
 
 bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
+
+    CameraInfo info;//=camInfos[camera];
+    readCameraProperties(camera, info);
+
+    setSettingsFromQSettings(info, settings);
+
+    info.acquisitionFilenamePrefix=filenamePrefix;
+
+    if (info.subImage_vend>info.height) info.subImage_vend=info.height;
+    if (info.subImage_hend>info.width) info.subImage_hend=info.width;
+    if (info.subImage_vstart<1) info.subImage_vstart=1;
+    if (info.subImage_hstart<1) info.subImage_hstart=1;
+
+    setCameraSettings(camera, info);
+    readCameraProperties(camera, info);
+    camInfos[camera]=info;
+
     return true;
 }
 
@@ -399,6 +420,17 @@ int QFExtensionCameraAndor::getImageHeight(unsigned int camera) {
     if (!isConnected(camera)) return 0;
     return (abs(camInfos[camera].subImage_vend-camInfos[camera].subImage_vstart)+1)/camInfos[camera].vbin;
 }
+
+double QFExtensionCameraAndor::getPixelWidth(unsigned int camera) {
+    if (!isConnected(camera)) return 1;
+    return camInfos[camera].pixelWidth*(double)(camInfos[camera].hbin);
+}
+
+double QFExtensionCameraAndor::getPixelHeight(unsigned int camera) {
+    if (!isConnected(camera)) return 1;
+    return camInfos[camera].pixelHeight*(double)(camInfos[camera].vbin);
+}
+
 
 bool QFExtensionCameraAndor::isConnected(unsigned int camera) {
     return camConnected.contains(camera);
@@ -419,20 +451,30 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
 	//Loop until acquisition finished
 	CHECK(GetStatus(&status), tr("error while waiting for frame"));
-	while(status==DRV_ACQUIRING) {
+	QTime time;
+	time.start();
+	double timeout=(info.expoTime*10.0+0.1)*1000.0;
+	while ((status==DRV_ACQUIRING)&&(time.elapsed()<=timeout)) {
 		CHECK(GetStatus(&status), tr("error while waiting for frame"));
 	}
+	if (time.elapsed()<=timeout)  {
 
 
-	//log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
         int imagesize=getImageWidth(camera)*getImageHeight(camera);
         at_32* imageData = (at_32*)malloc(imagesize*sizeof(at_32));
         CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), free(imageData));
 
         for(int i=0;i<imagesize;i++) data[i]=imageData[i];
-	free(imageData);
 
-    return true;
+        free(imageData);
+
+		return true;
+	} else {
+		log_error(tr("\n%1    error: acquiring image (exposure time %2 ms) timed out after %3 seconds ").arg(LOG_PREFIX).arg(info.expoTime*1000.0).arg(timeout/1000.0));
+		return false;
+	}
+
+
 }
 
 
@@ -447,26 +489,32 @@ bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* dat
     if (camInfos.contains(camera)) info=camInfos[camera];
 
     CHECK(SetAcquisitionMode(1), tr("error while setting \"single scan\" acquisition mode"));
-    CHECK(SetFullImage(1,1), tr("error while settings full sensor size as image size"));
+    CHECK(SetFullImage(1, 1), tr("error while settings full sensor size (no binnig) as image size"));
     CHECK(StartAcquisition(), tr("error while starting acquisition"));
 
     int status;
 
-        //Loop until acquisition finished
-        CHECK(GetStatus(&status), tr("error while waiting for frame"));
-        while(status==DRV_ACQUIRING) {
-            CHECK(GetStatus(&status), tr("error while waiting for frame"));
-        }
+    QTime time;
+
+	time.start();
+	double timeout=(info.expoTime*10.0+0.1)*1000.0;
+	while ((status==DRV_ACQUIRING)&&(time.elapsed()<=timeout)) {
+		CHECK(GetStatus(&status), tr("error while waiting for frame"));
+	}
+	if (time.elapsed()<=timeout)  {
 
 
-        //log_text(tr("acquiring image w=%1, h=%2\n").arg(info.width).arg(info.height));
         at_32* imageData = (at_32*)malloc(info.width*info.height*sizeof(at_32));
         CHECK_ON_ERROR(GetAcquiredData(imageData, info.width*info.height), tr("error while acquiring frame"), free(imageData));
 
         for(int i=0;i<info.width*info.height;i++) data[i]=imageData[i];
         free(imageData);
 
-    return true;
+		return true;
+	} else {
+		log_error(tr("\n%1    error: acquiring full-frame image (exposure time %2 ms) timed out after %3 seconds ").arg(LOG_PREFIX).arg(info.expoTime*1000.0).arg(timeout/1000.0));
+		return false;
+	}
 }
 
 
@@ -680,11 +728,10 @@ QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bo
         s+=tr("<i>serial no:</i> %1<br>").arg(camInfos[i].serialNumber);
         if (showSensorSize) s+=tr("<i>size:</i> %1&times;%2<br>").arg(camInfos[i].width).arg(camInfos[i].height);
         if (currentSettings) {
-            s+=tr("<i>preamp gain:</i> %1&times;<br>").arg(camInfos[i].preampGainF);
-            s+=tr("<i>bit depth:</i> %1<br>").arg(camInfos[i].bitDepth);
+            s+=tr("<i>readout:</i> %1&times;, %2 MHz, %3 bit<br>").arg(camInfos[i].preampGainF).arg(camInfos[i].horizontalSpeed).arg(camInfos[i].bitDepth);
             s+=tr("<i>readout time:</i> %1 &mu;s<br>").arg(camInfos[i].readoutTime*1.0e6);
             s+=tr("<i>vertical speed:</i> %1 &mu;s/pixel<br>").arg(camInfos[i].verticalSpeed);
-            s+=tr("<i>horizontal speed:</i> %1 MHz<br>").arg(camInfos[i].horizontalSpeed);
+            //s+=tr("<i>horizontal speed:</i> <br>").arg(camInfos[i].horizontalSpeed);
         }
         if (extendedInfo) {
             s+=tr("<i>pixel size:</i> %1 &times; %2 &mu;m<sup>2</sup><br>").arg(camInfos[i].pixelWidth).arg(camInfos[i].pixelHeight);
@@ -703,7 +750,11 @@ QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bo
 void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraAndor::CameraInfo& info) {
 
     CHECK_NO_RETURN(GetDetector(&(info.width), &(info.height)), tr("error while getting detector info"));
+  #ifdef MAX_PATH
     char text[MAX_PATH];
+  #else
+    char text[1024];
+  #endif
     CHECK_NO_RETURN(GetHeadModel(text), tr("error while retrieving head model"));
     info.headModel=text;
     CHECK_NO_RETURN(GetCameraSerialNumber(&(info.serialNumber)), tr("error while reading camera serial number"));

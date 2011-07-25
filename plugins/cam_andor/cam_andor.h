@@ -105,6 +105,11 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
 
+        /** \copydoc QFExtensionCamera::getPixelWidth() */
+        virtual double getPixelWidth(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getPixelHeight() */
+        virtual double getPixelHeight(unsigned int camera);
+
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
         virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
@@ -289,6 +294,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
             /** \brief fileformat of output 0: TIFF */
             int fileformat;
+
+            /** \brief prefix for acquisition output filenames */
+            QString acquisitionFilenamePrefix;
 
 
             CameraInfo();

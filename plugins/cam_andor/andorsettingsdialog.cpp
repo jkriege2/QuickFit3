@@ -76,7 +76,11 @@ void AndorSettingsDialog::setupWidgets() {
     setInfo("");
     selectCamera(camera);
     GetDetector(&m_sensorWidth, &m_sensorHeight);
+  #ifdef MAX_PATH
     char text[MAX_PATH];
+  #else
+    char text[1024];
+  #endif
     GetHeadModel(text);
     m_headModel=text;
 

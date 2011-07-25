@@ -204,7 +204,11 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     break;
                 case qfrdreInteger:
                     w.writeAttribute("type", "integer");
+                  #ifdef Q_OS_WIN32
                     w.writeAttribute("value", QLocale::c().toString(r.ivalue));
+                  #else
+                    w.writeAttribute("value", QLocale::c().toString(r.ivalue));
+                  #endif
                     w.writeAttribute("unit", r.unit);
                     break;
                 case qfrdreString:
