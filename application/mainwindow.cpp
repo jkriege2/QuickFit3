@@ -10,6 +10,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 {
     settings=s;
     splashPix=splash->pixmap();
+		project=NULL;
 
     newProjectTimer.setInterval(500);
     newProjectTimer.stop();
@@ -168,6 +169,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         evaluationFactory->distribute(NULL, settings, this, this);
         extensionManager->distribute(NULL);
         extensionManager->deinit();
+				newProjectTimer.stop();
         event->accept();
     } else {
         event->ignore();
@@ -202,6 +204,7 @@ void MainWindow::closeProject() {
         extensionManager->distribute(NULL);
 
         delete project;
+				project=NULL;
     }
 }
 
@@ -1182,6 +1185,7 @@ QString MainWindow::getPluginsDirectory() {
 }
 
 void MainWindow::saveProjectFirstTime() {
+	  if (!project) return;
     if (project->getRawDataCount()+project->getEvaluationCount()>0) {
         newProjectTimer.stop();
         int ret = QMessageBox::question(this, tr("QuickFit %1.%2").arg(AutoVersion::MAJOR).arg(AutoVersion::MINOR),
