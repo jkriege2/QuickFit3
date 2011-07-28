@@ -131,10 +131,11 @@ void CamAndorAcquisitionThread::run() {
                The main (waiting) loop is stalled using the wait() command for max. 1ms in every cycle!
 
             */
+            setPriority(QThread::NormalPriority);
             int status=DRV_ACQUIRING;
             while ((!canceled) && ok && (status==DRV_ACQUIRING)) {
                 selectCamera(m_camera);
-                CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while waiting for frame"));
+                CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
                 int p=0;
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetSpoolProgress(&p), tr("error acquiring spool progress"));
@@ -148,16 +149,25 @@ void CamAndorAcquisitionThread::run() {
                images are available and if so, write them to the filesystem
 
             */
+            setPriority(QThread::HighestPriority);
             int status=DRV_ACQUIRING;
+            int64_t imageCount=0;
+            uint16_t* imageBuffer=(uint16_t*)calloc(m_width*m_height, sizeof(uint16_t));
             while ((!canceled) && ok && (status==DRV_ACQUIRING)) {
                 selectCamera(m_camera);
-                CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while waiting for frame"));
-                int p=0;
-                selectCamera(m_camera);
-                CHECK_NO_RETURN_OK(ok, GetSpoolProgress(&p), tr("error acquiring spool progress"));
-                progress=100.0*(double)p/(double)m_numKinetics;
-                wait(qMin(1, (int)round(m_numKinetics/1000*m_exposureTime)));
+                CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
+                while (GetOldestImage16(imageBuffer, m_width*m_height)==DRV_SUCCESS) {
+                    if (m_fileformat==0) {
+                        TinyTIFFWriter_writeImage(tiff, imageBuffer);
+                    } else if (m_fileformat==4) {
+                        raw->write((char*)imageBuffer, m_width*m_height*sizeof(uint16_t));
+                    }
+                    imageCount++;
+                }
+                if (imageCount%(m_numKinetics/1000)==0) progress=100.0*(double)imageCount/(double)m_numKinetics;
             }
+
+            free(imageBuffer);
 
         }
 
