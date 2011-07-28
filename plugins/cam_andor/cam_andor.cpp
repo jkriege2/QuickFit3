@@ -106,6 +106,7 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     ReadMode=4;
     expoTime=0.1;
     trigMode=0;
+    trigInvert=false;
     numKins=2;
     numAccs=1;
     kinTime=0;
@@ -151,6 +152,8 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     fileformat=0;
 
     acquisitionFilenamePrefix="";
+
+    spooling=false;
 
 }
 
@@ -361,6 +364,9 @@ void QFExtensionCameraAndor::setSettingsFromQSettings(QFExtensionCameraAndor::Ca
     info.outputAmplifier=settings.value(prefix+"amplifier", info.outputAmplifier).toInt();
     info.ADchannel=settings.value(prefix+"ad_channel", info.ADchannel).toInt();
     info.advancedEMGain=settings.value(prefix+"advanced_emgain", info.advancedEMGain).toBool();
+
+    info.trigMode=settings.value(prefix+"trigger_mode", info.trigMode).toInt();
+    info.trigInvert=settings.value(prefix+"trigger_invert", info.trigInvert).toInt();
 }
 
 
@@ -671,7 +677,10 @@ bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSett
 
     // now create a new acquisition thread
     CamAndorAcquisitionThread* thread=new CamAndorAcquisitionThread(this);
-
+    connect(thread, SIGNAL(log_error(QString)), this, SLOT(tlog_error(QString)));
+    connect(thread, SIGNAL(log_warning(QString)), this, SLOT(tlog_warning(QString)));
+    connect(thread, SIGNAL(log_text(QString)), this, SLOT(tlog_text(QString)));
+    thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getImageWidth(camera), getImageHeight(camera), info.expoTime, LOG_PREFIX);
     camThreads[camera]=thread;
 
     return true;
@@ -679,19 +688,61 @@ bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSett
 
 
 bool QFExtensionCameraAndor::startAcquisition(unsigned int camera) {
-    CHECK(SetSpool(1, 7, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
-    CHECK(StartAcquisition(), tr("error while starting acquisition"));
+    //if (selectCamera(camera)) {
+        CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+        if (!thread) return false;
+        thread->start();
+        /*bool spooling=false;
+        CameraInfo info=camInfos[camera];
+        if (info.fileformat==1) { // TIFF (spooling)
+            CHECK(SetSpool(1, 7, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            spooling = true;
+        } else if (info.fileformat==2) { // Andor SIF (spooling)
+            CHECK(SetSpool(1, 6, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            spooling = true;
+        } else if (info.fileformat==3) { // FITS (spooling)
+            CHECK(SetSpool(1, 5, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            spooling = true;
+        } else if (info.fileformat==4) { // 16-bit raw
+            //CHECK(SetSpool(1, 2, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+        }
+        if (!spooling) {
 
-    return true;
+            thread->start(QThread::HighestPriority);
+        }
+        CHECK(StartAcquisition(), tr("error while starting acquisition"));*/
+
+        return true;
+    //} else {
+    //    return false;
+    //}
 }
 
 void QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
+    /*if (selectCamera(camera)) {
+        CHECK_NO_RETURN(AbortAcquisition(), tr("error while aborting acquisition"));
+    }*/
+    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+    if (thread) {
+        thread->cancelAcquisition();
+    }
 }
 
 bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
-    int status;
-    CHECK(GetStatus(&status), tr("error while waiting for frame"));
-    return (status==DRV_ACQUIRING);
+    /*if (selectCamera(camera)) {
+        if (percentageDone) *percentageDone=getAcquisitionProgress(camera);
+        int status;
+        CHECK(GetStatus(&status), tr("error while waiting for frame"));
+        return (status==DRV_ACQUIRING);
+    } else {
+        return false;
+    }*/
+    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+    if (thread) {
+        return thread->isRunning();
+    } else {
+        return false;
+    }
 }
 
 void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
@@ -702,9 +753,19 @@ bool QFExtensionCameraAndor::getAcquisitionPreview(unsigned int camera, uint32_t
 }
 
 int QFExtensionCameraAndor::getAcquisitionProgress(unsigned int camera) {
-    int p=0;
-    CHECK(GetSpoolProgress(&p), tr("error acquiring spool progress"));
-    return 100*p/camInfos[camera].numKins;
+    /*if (selectCamera(camera)) {
+        int p=0;
+        CHECK(GetSpoolProgress(&p), tr("error acquiring spool progress"));
+        return 100*p/camInfos[camera].numKins;
+    }  else {
+        return 0;
+    }*/
+    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+    if (thread) {
+        return (int)round(thread->getProgress());
+    } else {
+        return 0;
+    }
 }
 
 void QFExtensionCameraAndor::log_text(QString message) {
@@ -722,25 +783,6 @@ void QFExtensionCameraAndor::log_error(QString message) {
 	else if (services) services->log_error(LOG_PREFIX+message);
 }
 
-
-bool QFExtensionCameraAndor::selectCamera (int iSelectedCamera) {
-    //std::cout<<"select ANDOR camera "<<iSelectedCamera<<std::endl;
-    #ifdef __WINDOWS__
-    long int SelectedCamera=0;
-    #else
-    int SelectedCamera=0;
-    #endif
-    GetCurrentCamera(&SelectedCamera);
-    if (iSelectedCamera==SelectedCamera) return true;
-    if ((iSelectedCamera < (long)getCameraCount()) && (iSelectedCamera >= 0) ) {
-        at_32 lCameraHandle;
-        GetCameraHandle(iSelectedCamera, &lCameraHandle);
-        SetCurrentCamera(lCameraHandle);
-        return true;
-    } else  {
-        return false;
-    }
-}
 
 
 QString QFExtensionCameraAndor::getCameraInfo(int camera, bool showHeadModel, bool showSensorSize, bool extendedInfo, bool currentSettings) {
@@ -795,7 +837,23 @@ void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraA
 bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndor::CameraInfo& info) {
 
     if (selectCamera(camera)) {
-        CHECK(SetTriggerMode(info.trigMode), tr("error while setting trigger mode"));
+        switch (info.trigMode) {
+            case 1: { CHECK(SetTriggerMode(1), tr("error while setting trigger mode: external")); } break;
+            case 2: { CHECK(SetTriggerMode(6), tr("error while setting trigger mode: external start")); } break;
+            case 3: { CHECK(SetTriggerMode(7), tr("error while setting trigger mode: external exposure (bulb)")); } break;
+
+            default:
+            case 0: { CHECK(SetTriggerMode(0), tr("error while setting trigger mode: internal")); } break;
+        }
+        if (info.trigMode>0) {
+            if (info.trigInvert) {
+                CHECK(SetTriggerInvert(1), tr("error while setting trigger mode: falling edge"));
+            } else {
+                CHECK(SetTriggerInvert(0), tr("error while setting trigger mode: rising edge"));
+            }
+        }
+
+
         CHECK(SetAcquisitionMode(info.AcqMode), tr("error while setting acquisition mode"));
         CHECK(SetReadMode(info.ReadMode), tr("error while setting read mode"));
         CHECK(SetFrameTransferMode((info.frameTransfer)?1:0), tr("error while setting frame transfer mode"));
@@ -810,9 +868,14 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetAccumulationCycleTime(info.accTime), tr("error while settings accumulation cycle time"));
         CHECK(SetNumberKinetics(info.numKins), tr("error while setting number of kinetic cycles"));
         CHECK(SetKineticCycleTime(info.kinTime), tr("error while setting kinetic cycle time"));
-        CHECK(SetIsolatedCropMode((info.cropMode)?1:0, abs(info.subImage_vend-info.subImage_vstart)+1, abs(info.subImage_hend-info.subImage_hstart)+1, info.vbin, info.hbin), tr("error while settings isolated crop mode"));
-        qDebug()<<"setImage("<<info.hbin<<info.vbin<<info.subImage_hstart<< info.subImage_hend<< info.subImage_vstart<< info.subImage_vend;
-        CHECK(SetImage(info.hbin,info.vbin,info.subImage_hstart, info.subImage_hend, info.subImage_vstart, info.subImage_vend), tr("error while settings image size"));
+        if (info.cropMode) {
+            CHECK(SetIsolatedCropMode(1, abs(info.subImage_vend-info.subImage_vstart)+1, abs(info.subImage_hend-info.subImage_hstart)+1, info.vbin, info.hbin), tr("error while settings isolated crop mode"));
+        } else {
+            CHECK(SetIsolatedCropMode(0, abs(info.subImage_vend-info.subImage_vstart)+1, abs(info.subImage_hend-info.subImage_hstart)+1, info.vbin, info.hbin), tr("error while settings isolated crop mode"));
+            //qDebug()<<"setImage("<<info.hbin<<info.vbin<<info.subImage_hstart<< info.subImage_hend<< info.subImage_vstart<< info.subImage_vend;
+            CHECK(SetImage(info.hbin,info.vbin,info.subImage_hstart, info.subImage_hend, info.subImage_vstart, info.subImage_vend), tr("error while settings image size"));
+        }
+
         CHECK(SetImageRotate(0), tr("error while switching image rotation off"));
         CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
@@ -910,150 +973,6 @@ bool QFExtensionCameraAndor::setGlobalSettings(int cam) {
     return ok;
 }
 
-QString QFExtensionCameraAndor::andorErrorToString(unsigned int error) {
-    switch (error) {
-        case DRV_SUCCESS: return tr("success"); break;
-        case DRV_ERROR_CODES : return tr("DRV_ERROR_CODES"); break;
-        case DRV_VXDNOTINSTALLED : return tr("VxD not installed"); break;
-        case DRV_ERROR_SCAN : return tr("DRV_ERROR_SCAN"); break;
-        case DRV_ERROR_CHECK_SUM : return tr("DRV_ERROR_CHECK_SUM"); break;
-        case DRV_ERROR_FILELOAD : return tr("DRV_ERROR_FILELOAD"); break;
-        case DRV_UNKNOWN_FUNCTION : return tr("unknown function"); break;
-        case DRV_ERROR_VXD_INIT : return tr("DRV_ERROR_VXD_INIT"); break;
-        case DRV_ERROR_ADDRESS : return tr("DRV_ERROR_ADDRESS"); break;
-        case DRV_ERROR_PAGELOCK : return tr("DRV_ERROR_PAGELOCK"); break;
-        case DRV_ERROR_PAGEUNLOCK : return tr("DRV_ERROR_PAGEUNLOCK"); break;
-        case DRV_ERROR_BOARDTEST : return tr("DRV_ERROR_BOARDTEST"); break;
-        case DRV_ERROR_ACK : return tr("DRV_ERROR_ACK"); break;
-        case DRV_ERROR_UP_FIFO : return tr("DRV_ERROR_UP_FIFO"); break;
-        case DRV_ERROR_PATTERN : return tr("DRV_ERROR_PATTERN"); break;
-
-        case DRV_ACQUISITION_ERRORS : return tr("RV_ACQUISITION_ERRORS"); break;
-        case DRV_ACQ_BUFFER : return tr("DRV_ACQ_BUFFER"); break;
-        case DRV_ACQ_DOWNFIFO_FULL : return tr("DRV_ACQ_DOWNFIFO_FULL"); break;
-        case DRV_PROC_UNKONWN_INSTRUCTION : return tr("DRV_PROC_UNKONWN_INSTRUCTION"); break;
-        case DRV_ILLEGAL_OP_CODE : return tr("illegal opcode"); break;
-        case DRV_KINETIC_TIME_NOT_MET : return tr("kinetic time not met"); break;
-        case DRV_ACCUM_TIME_NOT_MET : return tr("accumulation time not met"); break;
-        case DRV_NO_NEW_DATA : return tr("no new data"); break;
-        case DRV_SPOOLERROR : return tr("DRV_SPOOLERROR"); break;
-        case DRV_SPOOLSETUPERROR : return tr("DRV_SPOOLSETUPERROR"); break;
-        case DRV_FILESIZELIMITERROR : return tr("DRV_FILESIZELIMITERROR"); break;
-        case DRV_ERROR_FILESAVE : return tr("DRV_ERROR_FILESAVE"); break;
-
-        case DRV_TEMPERATURE_CODES : return tr("DRV_TEMPERATURE_CODES"); break;
-        case DRV_TEMPERATURE_OFF : return tr("DRV_TEMPERATURE_OFF"); break;
-        case DRV_TEMPERATURE_NOT_STABILIZED : return tr("temperature not stabilized"); break;
-        case DRV_TEMPERATURE_STABILIZED : return tr("temperature stabilized"); break;
-        case DRV_TEMPERATURE_NOT_REACHED : return tr("temperature not reached"); break;
-        case DRV_TEMPERATURE_OUT_RANGE : return tr("temperature out of range"); break;
-        case DRV_TEMPERATURE_NOT_SUPPORTED : return tr("temperature not supported"); break;
-        case DRV_TEMPERATURE_DRIFT : return tr("DRV_TEMPERATURE_DRIFT"); break;
-
-
-        case DRV_GENERAL_ERRORS : return tr("general error"); break;
-        case DRV_INVALID_AUX : return tr("DRV_INVALID_AUX"); break;
-        case DRV_COF_NOTLOADED : return tr("DRV_COF_NOTLOADED"); break;
-        case DRV_FPGAPROG : return tr("DRV_FPGAPROG"); break;
-        case DRV_FLEXERROR : return tr("DRV_FLEXERROR"); break;
-        case DRV_GPIBERROR : return tr("GPIB error"); break;
-        case DRV_EEPROMVERSIONERROR : return tr("DRV_EEPROMVERSIONERROR"); break;
-
-        case DRV_DATATYPE : return tr("DRV_DATATYPE"); break;
-        case DRV_DRIVER_ERRORS : return tr("DRV_DRIVER_ERRORS"); break;
-        case DRV_P1INVALID : return tr("parameter 1 invalid"); break;
-        case DRV_P2INVALID : return tr("parameter 2 invalid"); break;
-        case DRV_P3INVALID : return tr("parameter 3 invalid"); break;
-        case DRV_P4INVALID : return tr("parameter 4 invalid"); break;
-        case DRV_INIERROR : return tr("DRV_INIERROR"); break;
-        case DRV_COFERROR : return tr("DRV_COFERROR"); break;
-        case DRV_ACQUIRING : return tr("DRV_ACQUIRING"); break;
-        case DRV_IDLE : return tr("DRV_IDLE"); break;
-        case DRV_TEMPCYCLE : return tr("DRV_TEMPCYCLE"); break;
-        case DRV_NOT_INITIALIZED : return tr("system not initialized"); break;
-        case DRV_P5INVALID : return tr("parameter 5 invalid"); break;
-        case DRV_P6INVALID : return tr("parameter 6 invalid"); break;
-        case DRV_INVALID_MODE : return tr("invalid mode"); break;
-        case DRV_INVALID_FILTER : return tr("invalid filter"); break;
-
-        case DRV_I2CERRORS : return tr("DRV_I2CERRORS"); break;
-        case DRV_I2CDEVNOTFOUND : return tr("DRV_I2CDEVNOTFOUND"); break;
-        case DRV_I2CTIMEOUT : return tr("DRV_I2CTIMEOUT"); break;
-        case DRV_P7INVALID : return tr("DRV_P7INVALID"); break;
-        case DRV_P8INVALID : return tr("DRV_P8INVALID"); break;
-        case DRV_P9INVALID : return tr("DRV_P9INVALID"); break;
-        case DRV_P10INVALID : return tr("DRV_P10INVALID"); break;
-
-
-        case DRV_USBERROR : return tr("DRV_USBERROR"); break;
-        case DRV_IOCERROR : return tr("DRV_IOCERROR"); break;
-        case DRV_VRMVERSIONERROR : return tr("DRV_VRMVERSIONERROR"); break;
-        case DRV_USB_INTERRUPT_ENDPOINT_ERROR : return tr("DRV_USB_INTERRUPT_ENDPOINT_ERROR"); break;
-        case DRV_RANDOM_TRACK_ERROR : return tr("DRV_RANDOM_TRACK_ERROR"); break;
-        case DRV_INVALID_TRIGGER_MODE : return tr("DRV_INVALID_TRIGGER_MODE"); break;
-        case DRV_LOAD_FIRMWARE_ERROR : return tr("DRV_LOAD_FIRMWARE_ERROR"); break;
-        case DRV_DIVIDE_BY_ZERO_ERROR : return tr("DRV_DIVIDE_BY_ZERO_ERROR"); break;
-        case DRV_INVALID_RINGEXPOSURES : return tr("DRV_INVALID_RINGEXPOSURES"); break;
-        case DRV_BINNING_ERROR : return tr("DRV_BINNING_ERROR"); break;
-        case DRV_INVALID_AMPLIFIER : return tr("DRV_INVALID_AMPLIFIER"); break;
-
-        case DRV_ERROR_NOCAMERA: return tr("no camera"); break;
-        case DRV_NOT_SUPPORTED: return tr("not supported"); break;
-        case DRV_NOT_AVAILABLE: return tr("feature not available"); break;
-
-        case DRV_ERROR_MAP: return tr("DRV_ERROR_MAP"); break;
-        case DRV_ERROR_UNMAP: return tr("DRV_ERROR_UNMAP"); break;
-        case DRV_ERROR_MDL: return tr("DRV_ERROR_MDL"); break;
-        case DRV_ERROR_UNMDL: return tr("DRV_ERROR_UNMDL"); break;
-        case DRV_ERROR_BUFFSIZE: return tr("DRV_ERROR_BUFFSIZE"); break;
-        case DRV_ERROR_NOHANDLE: return tr("DRV_ERROR_NOHANDLE"); break;
-
-        case DRV_GATING_NOT_AVAILABLE: return tr("gating not available"); break;
-        case DRV_FPGA_VOLTAGE_ERROR: return tr("FPGA voltage error"); break;
-
-        case DRV_OW_CMD_FAIL: return tr("DRV_OW_CMD_FAIL"); break;
-        case DRV_OWMEMORY_BAD_ADDR: return tr("DRV_OWMEMORY_BAD_ADDR"); break;
-        case DRV_OWCMD_NOT_AVAILABLE: return tr("DRV_OWCMD_NOT_AVAILABLE"); break;
-        case DRV_OW_NO_SLAVES: return tr("DRV_OW_NO_SLAVES"); break;
-        case DRV_OW_NOT_INITIALIZED: return tr("DRV_OW_NOT_INITIALIZED"); break;
-        case DRV_OW_ERROR_SLAVE_NUM: return tr("DRV_OW_ERROR_SLAVE_NUM"); break;
-        case DRV_MSTIMINGS_ERROR: return tr("DRV_MSTIMINGS_ERROR"); break;
-
-        case DRV_OA_NULL_ERROR: return tr("DRV_OA_NULL_ERROR"); break;
-        case DRV_OA_PARSE_DTD_ERROR: return tr("DRV_OA_PARSE_DTD_ERROR"); break;
-        case DRV_OA_DTD_VALIDATE_ERROR: return tr("DRV_OA_DTD_VALIDATE_ERROR"); break;
-        case DRV_OA_FILE_ACCESS_ERROR: return tr("DRV_OA_FILE_ACCESS_ERROR"); break;
-        case DRV_OA_FILE_DOES_NOT_EXIST: return tr("DRV_OA_FILE_DOES_NOT_EXIST"); break;
-        case DRV_OA_XML_INVALID_OR_NOT_FOUND_ERROR: return tr("DRV_OA_XML_INVALID_OR_NOT_FOUND_ERROR"); break;
-        case DRV_OA_PRESET_FILE_NOT_LOADED: return tr("DRV_OA_PRESET_FILE_NOT_LOADED"); break;
-        case DRV_OA_USER_FILE_NOT_LOADED: return tr("DRV_OA_USER_FILE_NOT_LOADED"); break;
-        case DRV_OA_PRESET_AND_USER_FILE_NOT_LOADED: return tr("DRV_OA_PRESET_AND_USER_FILE_NOT_LOADED"); break;
-        case DRV_OA_INVALID_FILE: return tr("DRV_OA_INVALID_FILE"); break;
-        case DRV_OA_FILE_HAS_BEEN_MODIFIED: return tr("DRV_OA_FILE_HAS_BEEN_MODIFIED"); break;
-        case DRV_OA_BUFFER_FULL: return tr("DRV_OA_BUFFER_FULL"); break;
-        case DRV_OA_INVALID_STRING_LENGTH: return tr("DRV_OA_INVALID_STRING_LENGTH"); break;
-        case DRV_OA_INVALID_CHARS_IN_NAME: return tr("DRV_OA_INVALID_CHARS_IN_NAME"); break;
-        case DRV_OA_INVALID_NAMING: return tr("DRV_OA_INVALID_NAMING"); break;
-        case DRV_OA_MODE_ALREADY_EXISTS: return tr("DRV_OA_MODE_ALREADY_EXISTS"); break;
-        case DRV_OA_STRINGS_NOT_EQUAL: return tr("DRV_OA_STRINGS_NOT_EQUAL"); break;
-        case DRV_OA_NO_USER_DATA: return tr("DRV_OA_NO_USER_DATA"); break;
-        case DRV_OA_VALUE_NOT_SUPPORTED: return tr("DRV_OA_VALUE_NOT_SUPPORTED"); break;
-        case DRV_OA_MODE_DOES_NOT_EXIST: return tr("DRV_OA_MODE_DOES_NOT_EXIST"); break;
-
-    #ifdef __LINUX__
-        case DRV_PROCESSING_FAILED: return tr("processing failed"); break;
-        case DRV_OA_FAILED_TO_GET_MODE: return tr("DRV_OA_FAILED_TO_GET_MODE"); break;
-        case DRV_OA_CAMERA_NOT_SUPPORTED: return tr("DRV_OA_CAMERA_NOT_SUPPORTED"); break;
-        case DRV_OA_GET_CAMERA_ERROR: return tr("DRV_OA_GET_CAMERA_ERROR"); break;
-        case KERN_MEM_ERROR : return tr("KERN_MEM_ERROR"); break;
-        case DRV_P11INVALID : return tr("DRV_P11INVALID"); break;
-        case DRV_INVALID_COUNTCONVERT_MODE: return tr("DRV_INVALID_COUNTCONVERT_MODE"); break;
-    #endif
-
-        default: return tr(""); break;
-    }
-    return "";
-}
 
 
 void QFExtensionCameraAndor::updateTemperatures() {

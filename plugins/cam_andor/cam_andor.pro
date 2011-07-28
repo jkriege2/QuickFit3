@@ -24,13 +24,17 @@ HEADERS += cam_andor.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/highrestimer.h \
            andorglobalcamerasettingswidget.h \
-           andorsettingsdialog.h
+           andorsettingsdialog.h \
+           andortools.h \
+           ../../../../../LIB/trunk/tinytiffwriter.h
 
 SOURCES += cam_andor.cpp \
            camandoracquisitionthread.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
            andorglobalcamerasettingswidget.cpp \
-           andorsettingsdialog.cpp
+           andorsettingsdialog.cpp \
+           andortools.cpp \
+           ../../../../../LIB/trunk/tinytiffwriter.cpp
 
 FORMS = \
     andorglobalcamerasettingswidget.ui \

@@ -15,7 +15,7 @@
 #include "flowlayout.h"
 #include <unistd.h>
 #include <QtPlugin>
-
+#include "andortools.h"
 
 
 
@@ -139,7 +139,6 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
          */
         virtual void log_error(QString message);
 
-        static QString andorErrorToString(unsigned int error);
 
     signals:
         /** \brief signal that may be used to display the current exposure time as a string */
@@ -152,6 +151,10 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief called when global settings have changed */
         void globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode);
+
+        void tlog_error(QString message) { log_error(message); };
+        void tlog_warning(QString message) { log_warning(message); };
+        void tlog_text(QString message) { log_text(message); };
     protected:
         /*! \brief stores global settings for a camera
 
@@ -210,8 +213,12 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
             /** \brief exposure time in seconds */
             float expoTime;
-            /** \brief trigger mode 0:internal, 1: external, 6: external start, 7: external exposure (bulb) 9: external FVB EM, 10: software trigger  */
+            /*! \brief trigger mode 0:internal, 1: external, 2: external start, 3: external exposure (bulb)
+
+                Andor: 0:internal, 1: external, 6: external start, 7: external exposure (bulb) 9: external FVB EM, 10: software trigger  */
             int trigMode;
+            /** \brief trigger inverted? */
+            bool trigInvert;
             /** \brief number of frames in kinetic series */
             int numKins;
             /** \brief number of accumulations */
@@ -292,12 +299,18 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief readout time of sensor */
             float readoutTime;
 
-            /** \brief fileformat of output 0: TIFF */
+            /** \brief fileformat of output 0: TIFF, 1: TIFF (spooling, may create multiple files), 2: Andor SIF (spooling), 3: FITS (spooling), 4: 16-bit raw */
             int fileformat;
 
-            /** \brief prefix for acquisition output filenames */
-            QString acquisitionFilenamePrefix;
+            /*! \brief state variable: indicates whether acquisition uses spooling or not.
 
+                \note This is set by startAcquisition() and depends on the choice of fileformat. FOR INTERNAL USE ONLY!!! */
+            bool spooling;
+
+            /*! \brief prefix for acquisition output filenames
+
+            */
+            QString acquisitionFilenamePrefix;
 
             CameraInfo();
         };
@@ -314,9 +327,6 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         HighResTimer timer;
 
 
-
-        /** \brief select the given camera */
-        bool selectCamera (int iSelectedCamera);
 
         /** \brief get temperature from camera i */
         int getTemperature(int cam);

@@ -2,6 +2,7 @@
 #include "ui_andorsettingsdialog.h"
 #include "jkqtfastplotter.h"
 #include "cam_andor.h"
+#include "andortools.h"
 
 
 
@@ -36,11 +37,11 @@
     unsigned int error=s; \
     if (error!=DRV_SUCCESS) { \
         ok=false; \
-        qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(QFExtensionCameraAndor::andorErrorToString(error)).arg(#s); \
+        qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(andorErrorToString(error)).arg(#s); \
     } \
 }
 
-/* qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(QFExtensionCameraAndor::andorErrorToString(error)).arg(#s); \
+/* qDebug()<<QString("error during '%4'\n  error code was: %1 [%2]").arg(error).arg(andorErrorToString(error)).arg(#s); \
 */
 AndorSettingsDialog::AndorSettingsDialog(int camera, QWidget *parent) :
     QDialog(parent),
@@ -154,7 +155,7 @@ void AndorSettingsDialog::setupWidgets() {
     GetFastestRecommendedVSSpeed(&fastestVSS, &fastestVSSF);
     for (int vsspeed=0; vsspeed<NumVSSpeeds; vsspeed++) {
         GetVSSpeed(vsspeed, &VSSpeed);
-        if (vsspeed>fastestVSS) ui->cmbVerticalShiftSpeed->addItem(QString("[%1 µs/pixel]").arg(VSSpeed), VSSpeed);
+        if (vsspeed<fastestVSS) ui->cmbVerticalShiftSpeed->addItem(QString("[%1 µs/pixel]").arg(VSSpeed), VSSpeed);
         else ui->cmbVerticalShiftSpeed->addItem(QString("%1 µs/pixel").arg(VSSpeed), VSSpeed);
     }
 
@@ -168,6 +169,10 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     bool old_m_updatingSensorSetup=m_updatingSubregion;
     m_updatingSubregion=true;
     QString prefix="cam_andor/";
+    ui->cmbTriggerMode->setCurrentIndex(settings.value(prefix+"trigger_mode", 0).toInt());
+    ui->chkTriggerInvert->setChecked(settings.value(prefix+"trigger_invert", false).toBool());
+
+
     ui->cmbReadMode->setCurrentIndex(settings.value(prefix+"read_mode", 0).toInt());
     ui->cmbFileFormat->setCurrentIndex(settings.value(prefix+"fileformat", 0).toInt());
     ui->spinExposure->setValue(settings.value(prefix+"exposure_time", 100000.0).toDouble()/1000.0);
@@ -230,8 +235,11 @@ void AndorSettingsDialog::writeSettings(QSettings& settings) const {
     settings.setValue(prefix+"subimage_vstart", m_sensorHeight-(ui->spinTop->value()+ui->spinHeight->value())+1);
     settings.setValue(prefix+"horizontal_binning", ui->spinHorizontalBinning->value());
     settings.setValue(prefix+"vertical_binning", ui->spinVerticalBinning->value());
-    settings.value(prefix+"amplifier", ui->cmbAmplifier->currentIndex());
-    settings.value(prefix+"ad_channel", ui->cmbADChannel->currentIndex());
+    settings.setValue(prefix+"amplifier", ui->cmbAmplifier->currentIndex());
+    settings.setValue(prefix+"ad_channel", ui->cmbADChannel->currentIndex());
+    settings.setValue(prefix+"trigger_mode", ui->cmbTriggerMode->currentIndex());
+    settings.setValue(prefix+"trigger_invert", ui->chkTriggerInvert->isChecked());
+
 }
 
 
