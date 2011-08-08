@@ -11,10 +11,19 @@ release {
         }
     }
     message("RELEASE MODE: svnversion is: $$SVNVERSION")
-    !isEmpty(SVNVERSION) {
-        system(echo \' $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" \' > svnversion.h )
+
+    win32:!isEmpty(QMAKE_SH) {
+        !isEmpty(SVNVERSION) {
+            system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
+        } else {
+            system(echo $$LITERAL_HASH define SVNVERSION \"---\"  > svnversion.h )
+        }
     } else {
-        system(echo \' $$LITERAL_HASH define SVNVERSION \"---\" \' > svnversion.h )
+        !isEmpty(SVNVERSION) {
+            system(echo \" $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" \" > svnversion.h )
+        } else {
+            system(echo \" $$LITERAL_HASH define SVNVERSION \"---\" \" > svnversion.h )
+        }
     }
 
     win32 {
@@ -37,11 +46,23 @@ release {
     }
 
     message("RELEASE MODE: svnversion is: $$DATESTR")
-    !isEmpty(DATESTR) {
-        system(echo \' $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" \' > compiledate.h )
+
+    win32:!isEmpty(QMAKE_SH) {
+        !isEmpty(SVNVERSION) {
+            system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
+        } else {
+            system(echo $$LITERAL_HASH define COMPILEDATE \"---\"  > compiledate.h )
+        }
     } else {
-        system(echo \' $$LITERAL_HASH define COMPILEDATE \"---\" \' > compiledate.h )
+        !isEmpty(SVNVERSION) {
+            system(echo \" $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" \" > compiledate.h )
+        } else {
+            system(echo \" $$LITERAL_HASH define COMPILEDATE \"---\" \" > compiledate.h )
+        }
     }
+
+
+
 } else {
     message("DEBUG MODE: here we do not read the new svn version, but only make sure that the autoversioning files do exist")
     message("DEBUG MODE: compile in RELEASE mode in order to update autoversion!!!")

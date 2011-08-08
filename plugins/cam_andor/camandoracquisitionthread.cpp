@@ -136,7 +136,11 @@ void CamAndorAcquisitionThread::run() {
             while ((!canceled) && ok && (status==DRV_ACQUIRING)) {
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
+            #ifdef __WINDOWS__
+                long p=0;
+            #else
                 int p=0;
+            #endif
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetSpoolProgress(&p), tr("error acquiring spool progress"));
                 progress=100.0*(double)p/(double)m_numKinetics;
