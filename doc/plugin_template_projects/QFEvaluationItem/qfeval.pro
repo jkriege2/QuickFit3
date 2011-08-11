@@ -1,7 +1,6 @@
 TEMPLATE = lib
 CONFIG += plugin
 
-
 TARGET = target_id
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
@@ -13,17 +12,17 @@ DESTDIR = $$QFOUTPUT/plugins
 LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
-HEADERS += qfrdr.h \
-           qfrdr_data.h \
-		   qfrdr_dataeditor.h
+HEADERS += qfeval.h \
+           qfeval_item.h \
+           qfeval_editor.h
 
-SOURCES += qfrdr.cpp \
-           qfrdr_data.cpp \
-		   qfrdr_dataeditor.cpp
+SOURCES += qfeval.cpp \
+           qfeval_item.cpp \
+           qfeval_editor.cpp
 
-FORMS = 
+FORMS = qfeval_editor.ui   
 
-RESOURCES += qfrdr.qrc
+RESOURCES += qfeval.qrc
 
 TRANSLATIONS= ./translations/de.target_id.ts
 

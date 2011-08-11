@@ -10,7 +10,7 @@ function replace_in_all {
 
 CLASSNAME=$1
 TARGETNAME=$2
-BASENAME=qfrdr
+BASENAME=qfeval
 
 echo "This script will create a set of usable files from this template. 
 In this course you will be asked for some information (e.g. class names ...)!
@@ -18,10 +18,10 @@ In this course you will be asked for some information (e.g. class names ...)!
 "
 
 if [ "$CLASSNAME" == "" ]; then
-	echo -n "class name for QFRawDataRecord implementation: "
+	echo -n "class name for QFEvaluationItem implementation: "
 	read -e CLASSNAME
 else
-	echo -n "class name for QFRawDataRecord implementation: " $CLASSNAME "
+	echo -n "class name for QFEvaluationItem implementation: " $CLASSNAME "
 "
 fi
 
@@ -36,7 +36,7 @@ fi
 CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
 
 FNAME=`echo $CLASSNAME | tr A-Z a-z`
-echo -n "file name for QFRawDataRecord implementation: " $FNAME ".*
+echo -n "file name for QFEvaluationItem implementation: " $FNAME ".*
 "
 mkdir -p $FNAME
 
@@ -53,25 +53,28 @@ cp -v tutorial.html $FNAME/help/tutorial.html
 mkdir -p $FNAME/images
 mv $FNAME/*.png $FNAME/images/
 mv $FNAME/*.svg $FNAME/images/
-
+ 
 replace_in_all 's/target_id/'$TARGETNAME'/g'
-replace_in_all 's/qf3rdrdp_GROUPNAME/qf3rdrdp_'$TARGETNAME'/g'
+replace_in_all 's/qf3evalp_GROUPNAME/qf3evalp_'$TARGETNAME'/g'
 
 replace_in_all 's/'$BASENAME'.png/'$FNAME'.png/g'
 replace_in_all 's/'$BASENAME'_small.png/'$FNAME'_small.png/g'
-replace_in_all 's/QFRDR/'$CLASSNAME'/g'
-replace_in_all 's/QFPRDR/'$CLASSNAME'Plugin/g'
+replace_in_all 's/'$BASENAME'_print.png/'$FNAME'_print.png/g'
+replace_in_all 's/'$BASENAME'_save.png/'$FNAME'_save.png/g'
+replace_in_all 's/'$BASENAME'_evaluate.png/'$FNAME'_evaluate.png/g'
+replace_in_all 's/QFEVAL/'$CLASSNAME'/g'
+replace_in_all 's/QFPEVAL/'$CLASSNAME'Plugin/g'
 replace_in_all 's/'$BASENAME'.h/'$FNAME'.h/g'
 replace_in_all 's/'$BASENAME'.cpp/'$FNAME'.cpp/g'
 replace_in_all 's/'$BASENAME'.qrc/'$FNAME'.qrc/g'
 replace_in_all 's/HEADER_H/'$CLASSNAME_UC'/g'
-replace_in_all 's/'$BASENAME'_data.png/'$FNAME'_data.png/g'
-replace_in_all 's/'$BASENAME'_data.h/'$FNAME'_data.h/g'
-replace_in_all 's/'$BASENAME'_data.cpp/'$FNAME'_data.cpp/g'
-replace_in_all 's/'$BASENAME'_data.qrc/'$FNAME'_data.qrc/g'
-replace_in_all 's/'$BASENAME'_data.ui/'$FNAME'_data.ui/g'
-replace_in_all 's/'$BASENAME'_dataeditor.png/'$FNAME'_dataeditor.png/g'
-replace_in_all 's/'$BASENAME'_dataeditor.h/'$FNAME'_dataeditor.h/g'
-replace_in_all 's/'$BASENAME'_dataeditor.cpp/'$FNAME'_dataeditor.cpp/g'
-replace_in_all 's/'$BASENAME'_dataeditor.qrc/'$FNAME'_dataeditor.qrc/g'
-replace_in_all 's/'$BASENAME'_dataeditor.ui/'$FNAME'_dataeditor.ui/g'
+replace_in_all 's/'$BASENAME'_item.png/'$FNAME'_item.png/g'
+replace_in_all 's/'$BASENAME'_item.h/'$FNAME'_item.h/g'
+replace_in_all 's/'$BASENAME'_item.cpp/'$FNAME'_item.cpp/g'
+replace_in_all 's/'$BASENAME'_item.qrc/'$FNAME'_item.qrc/g'
+replace_in_all 's/'$BASENAME'_item.ui/'$FNAME'_item.ui/g'
+replace_in_all 's/'$BASENAME'_editor.png/'$FNAME'_editor.png/g'
+replace_in_all 's/'$BASENAME'_editor.h/'$FNAME'_editor.h/g'
+replace_in_all 's/'$BASENAME'_editor.cpp/'$FNAME'_editor.cpp/g'
+replace_in_all 's/'$BASENAME'_editor.qrc/'$FNAME'_editor.qrc/g'
+replace_in_all 's/'$BASENAME'_editor.ui/'$FNAME'_editor.ui/g'
