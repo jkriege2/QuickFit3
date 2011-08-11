@@ -66,7 +66,3 @@ SUBDIRS += plg_stage_pi
 plg_stage_pi.subdir=./plugins/stage_pi
 plg_stage_pi.depends = lib libqf3widgets
 
-
-
-
-

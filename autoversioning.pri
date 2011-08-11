@@ -12,19 +12,19 @@ release {
     }
     message("RELEASE MODE: svnversion is: $$SVNVERSION")
 
-    win32:!isEmpty(QMAKE_SH) {
+    #win32:isEmpty(QMAKE_SH) {
         !isEmpty(SVNVERSION) {
             system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
         } else {
             system(echo $$LITERAL_HASH define SVNVERSION \"---\"  > svnversion.h )
         }
-    } else {
-        !isEmpty(SVNVERSION) {
-            system(echo \" $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" \" > svnversion.h )
-        } else {
-            system(echo \" $$LITERAL_HASH define SVNVERSION \"---\" \" > svnversion.h )
-        }
-    }
+    #} else {
+    #    !isEmpty(SVNVERSION) {
+    #        system(echo \" $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" \" > svnversion.h )
+    #    } else {
+    #        system(echo \" $$LITERAL_HASH define SVNVERSION \"---\" \" > svnversion.h )
+    #    }
+    #}
 
     win32 {
 	    # first we have to check whether a MS Windows style date command is called. If you call this without the /T option, it will
@@ -47,19 +47,19 @@ release {
 
     message("RELEASE MODE: svnversion is: $$DATESTR")
 
-    win32:!isEmpty(QMAKE_SH) {
+    #win32:isEmpty(QMAKE_SH) {
         !isEmpty(SVNVERSION) {
             system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
         } else {
             system(echo $$LITERAL_HASH define COMPILEDATE \"---\"  > compiledate.h )
         }
-    } else {
-        !isEmpty(SVNVERSION) {
-            system(echo \" $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" \" > compiledate.h )
-        } else {
-            system(echo \" $$LITERAL_HASH define COMPILEDATE \"---\" \" > compiledate.h )
-        }
-    }
+    #} else {
+    #    !isEmpty(SVNVERSION) {
+    #        system(echo \" $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" \" > compiledate.h )
+    #    } else {
+    #        system(echo \" $$LITERAL_HASH define COMPILEDATE \"---\" \" > compiledate.h )
+    #    }
+    #}
 
 
 
