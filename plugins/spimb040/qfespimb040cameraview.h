@@ -25,6 +25,11 @@
 #include "tools.h"
 #include "qfextensionmanager.h"
 
+
+
+/** \brief defines the type of the internal image representation of QFESPIMB040CameraView::image, may be uint32_t OR double OR float (nothing else!!!)  */
+#define QFESPIMB040CameraView_internalImageType uint32_t
+
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) camera view widget
     \ingroup qf3ext_spimb040
 
@@ -102,7 +107,9 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief spin edit for upper count range bound */
         QDoubleSpinBox* spinCountsUpper;
         /** \brief check box to use automatic count range determination */
-        QCheckBox* chkCountsRangeAuto;
+        QCheckBox* chkCountsRangeAutoLow;
+        /** \brief check box to use automatic count range determination */
+        QCheckBox* chkCountsRangeAutoHigh;
         /** \brief label for the image statistics output */
         QLabel* labImageStatistics;
         /** \brief spin edit for number of histogram bins */
@@ -122,6 +129,11 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief label for image sie and framerate */
         QLabel* labVideoSettings;
+
+        /** \brief checkbox to switch image statistics with histogram on/off */
+        QCheckBox* chkImageStatisticsHistogram;
+        /** \brief button to manually calculate image statistics */
+        QPushButton* btnImageStatisticsHistogram;
 
 
 
@@ -144,7 +156,7 @@ class QFESPIMB040CameraView : public QWidget {
             \a rawImage (which represents the raw data read from the camera) into \a image and may possibly apply some
             filtering or data transformations!
          */
-        JKImage<double> image;
+        JKImage<QFESPIMB040CameraView_internalImageType> image;
         /*! \brief the raw image data
 
             The image in this data member is NOT directly drawn by redrawFrame(). The function prepareImage() copies the contents of
@@ -160,6 +172,8 @@ class QFESPIMB040CameraView : public QWidget {
         */
         JKImage<bool> mask;
 
+        bool maskEmpty;
+
         /** \brief indicates whether the statistics of the raw image have already been calculated */
         bool imageStatisticsCalculated;
         /** \brief image statistics: number of broken pixels */
@@ -171,9 +185,9 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief image statistics: standard deviation of pixel values */
         double imageStddev;
         /** \brief image statistics: minimum pixel value */
-        double imageImin;
+        QFESPIMB040CameraView_internalImageType imageImin;
         /** \brief image statistics: maximum pixel value */
-        double imageImax;
+        QFESPIMB040CameraView_internalImageType imageImax;
         /** \brief time index of the last frame in seconds */
         double imageTimeindex;
         /** \brief exposure time of the last frame in seconds */
@@ -188,6 +202,7 @@ class QFESPIMB040CameraView : public QWidget {
         uint32_t histogram_n;
         /** \brief when was the count rate histogram updated the last time */
         QTime histogramUpdateTime;
+        QTime labelUpdateTime;
 
         /** \brief path last used to save/load masks (*.msk) */
         QString lastMaskpath;
@@ -195,6 +210,9 @@ class QFESPIMB040CameraView : public QWidget {
         QString lastImagepath;
         /** \brief filter last used to save images */
         QString lastImagefilter;
+
+        /** \brief flag to indicate that we are currently redrawing */
+        bool currentlyRedrawing;
 
 
     protected slots:
@@ -206,8 +224,9 @@ class QFESPIMB040CameraView : public QWidget {
          *
          * This method en/disables the input widgets for the upper/lower counts. It does not trigger a redraw, as
          * the input fields are only en-/disabled and the values are not changed, so the display should be up to date!
+         * \note parameter is just dummy
          */
-        void setCountsAutoscale(bool autoscale);
+        void setCountsAutoscale(bool autoscale=true);
         /** \brief en/disables autoscaling of histogram bins
          *
          * This method en/disables the input widget for the histogram bins. It does not trigger a redraw, as
@@ -226,7 +245,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief redraws the frame with the current settings for color scale ... and recalculate statistics and transforms */
         void redrawFrameRecalc();
         /** \brief calculate image statistics */
-        void displayImageStatistics();
+        void displayImageStatistics(bool withHistogram=true);
         /** \brief clear mask */
         void clearMask();
         /** \brief save mask */
@@ -235,6 +254,8 @@ class QFESPIMB040CameraView : public QWidget {
         void loadMask();
         /** \brief save the current image */
         void saveRaw();
+
+        void histogramChecked(bool checked);
 
 };
 

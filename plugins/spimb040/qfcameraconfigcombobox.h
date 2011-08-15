@@ -90,6 +90,7 @@ class QFCameraConfigEditorWidget : public QWidget {
         void connectTo(QFCameraComboBox* combo) { combobox->connectTo(combo); };
 
         QString currentConfigFilename() const { return combobox->currentConfigFilename(); };
+        QString currentConfigName() const { return combobox->currentText(); };
         void setCurrentConfig(QString name) { combobox->setCurrentConfig(name); }
 
         QAction* configAction() const { return actConfig; }

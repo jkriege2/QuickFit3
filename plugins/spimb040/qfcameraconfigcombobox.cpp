@@ -50,10 +50,10 @@ void QFCameraConfigComboBox::rereadConfigFiles() {
 
 void QFCameraConfigComboBox::connectTo(QFCameraComboBox* combo) {
     if (!combo) {
-        disconnect(this, SLOT(cameraChanged(QFExtension*, QFExtensionCamera, int)));
+        disconnect(this, SLOT(cameraChanged(QFExtension*, QFExtensionCamera*, int)));
         clear();
     } else {
-        connect(combo, SIGNAL(cameraChanged(QFExtension*, QFExtensionCamera, int)), this, SLOT(cameraChanged(QFExtension*, QFExtensionCamera, int)));
+        connect(combo, SIGNAL(cameraChanged(QFExtension*, QFExtensionCamera*, int)), this, SLOT(cameraChanged(QFExtension*, QFExtensionCamera*, int)));
         cameraChanged(combo->currentExtension(), combo->currentExtensionCamera(), combo->currentCameraID());
     }
 }

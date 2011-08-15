@@ -10,7 +10,8 @@
 #include <cmath>
 #include "andorsettingsdialog.h"
 
-
+// if defined: enables some timing measurements
+//#define DEBUG_TIMING
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
@@ -387,6 +388,7 @@ void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSetti
 
     setCameraSettings(camera, info);
     readCameraProperties(camera, info);
+    CHECK_NO_RETURN(SetAcquisitionMode(1), tr("error while setting \"single scan\" acquisition mode"));
     camInfos[camera]=info;
 
 }
@@ -424,8 +426,17 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
     if (!selectCamera(camera)) return false;
 
-    CHECK(SetAcquisitionMode(1), tr("error while setting \"single scan\" acquisition mode"));
+#ifdef DEBUG_TIMING
+    HighResTimer timer;
+    timer.start();
+#endif
+
     CHECK(StartAcquisition(), tr("error starting acquisition"));
+
+#ifdef DEBUG_TIMING
+    qDebug()<<"init "<<timer.get_time()<<" us";
+    timer.start();
+#endif
 
     CameraInfo info;
     if (camInfos.contains(camera)) info=camInfos[camera];
@@ -440,7 +451,11 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 	while ((status==DRV_ACQUIRING)&&(time.elapsed()<=timeout)) {
 		CHECK(GetStatus(&status), tr("error while waiting for frame"));
 	}
-	if (time.elapsed()<=timeout)  {
+#ifdef DEBUG_TIMING
+    qDebug()<<"acquisition "<<timer.get_time()<<" us";
+    timer.start();
+#endif
+    if (time.elapsed()<=timeout)  {
 
 
         int imagesize=getImageWidth(camera)*getImageHeight(camera);
@@ -450,6 +465,10 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
         for(int i=0;i<imagesize;i++) data[i]=imageData[i];
 
         free(imageData);
+#ifdef DEBUG_TIMING
+        qDebug()<<"data read "<<timer.get_time()<<" us";
+        timer.start();
+#endif
 
 		return true;
 	} else {
@@ -471,7 +490,6 @@ bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* dat
     CameraInfo info;
     if (camInfos.contains(camera)) info=camInfos[camera];
 
-    CHECK(SetAcquisitionMode(1), tr("error while setting \"single scan\" acquisition mode"));
     CHECK(SetFullImage(1, 1), tr("error while settings full sensor size (no binnig) as image size"));
     CHECK(StartAcquisition(), tr("error while starting acquisition"));
 
@@ -510,6 +528,8 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     progress.setHasCancel(false);
     progress.open();
     QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::processEvents();
 
     //at_32 *data = NULL;
 
@@ -529,6 +549,8 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
         // initialize camera, if init fails, call ShutDown and the Initialize again ... if this also fails -> exit with an error!
         strcpy(path, detectorsIniPath.toStdString().c_str());
         progress.setLabelText(tr("initializing camera %1 ...<br>&nbsp;&nbsp;&nbsp;&nbsp;detectorsIniPath='%2'").arg(camera).arg(detectorsIniPath));
+        QApplication::processEvents();
+        QApplication::processEvents();
         QApplication::processEvents();
         { unsigned int error1=Initialize(path);
             if (error1!=DRV_SUCCESS) {

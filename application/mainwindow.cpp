@@ -119,6 +119,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
 
     autoWriteSettings();
     timerAutosave->start();
+
+    setWindowIcon(QIcon(":/icon.png"));
 }
 
 

@@ -170,6 +170,13 @@ void CamAndorAcquisitionThread::run() {
                 }
                 if (imageCount%(m_numKinetics/1000)==0) progress=100.0*(double)imageCount/(double)m_numKinetics;
             }
+            if (m_fileformat==0) {
+                TinyTIFFWriter_close(tiff);
+            } else if (m_fileformat==4) {
+                raw->close();
+                delete raw;
+                raw=NULL;
+            }
 
             free(imageBuffer);
 

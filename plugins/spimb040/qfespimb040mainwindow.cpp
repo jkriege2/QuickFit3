@@ -14,6 +14,8 @@ QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFExtensionServices* pluginServices
     // create widgets and actions
     createWidgets(pluginServices->getExtensionManager());
     createActions();
+    setWindowTitle("B040 SPIM Control");
+    setWindowIcon(QIcon(":/spimb040_logo.png"));
 }
 
 QFESPIMB040MainWindow::~QFESPIMB040MainWindow()

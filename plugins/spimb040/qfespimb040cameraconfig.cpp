@@ -98,13 +98,16 @@ void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString pr
 
     settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigFilename());
-    settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigFilename());
+    settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
+    settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
 }
 
 void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
     // disconnect devices and close camera view:
-    if (actDisConnect->isChecked()) actDisConnect->setChecked(false);
+    if (actDisConnect->isChecked()) {
+        disconnectDevice();
+        actDisConnect->setChecked(false);
+    }
     if (camView) {
         camView->close();
     }
@@ -390,8 +393,8 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
             } else {
                 displayStates(QFESPIMB040CameraConfig::Connected);
                 m_parent->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
-                camView->show();
-                previewSingle();
+                //camView->show();
+                //previewSingle();
             }
         } else {
             //disconnect from the current device and delete the settings widget

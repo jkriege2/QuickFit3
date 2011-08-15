@@ -2,15 +2,23 @@
 
 #include <QtGui>
 
+#define LABEL_UPDATE_INTERVAL_MS 50
+#define HISTOGRAM_UPDATE_INTERVAL_MS 50
+
 QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionServices* pluginServices, QWidget* parent):
     QWidget(parent)
 {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
     setWindowIcon(QIcon(":/spimb040_logo.png"));
 
+    chkCountsRangeAutoHigh=NULL;
+    chkCountsRangeAutoLow=NULL;
+    maskEmpty=true;
+
 
     // more variable initialisation
     imageStatisticsCalculated=false;
+    currentlyRedrawing=false;
     m_pluginServices=pluginServices;
 
     //initialise image histogram data arrays
@@ -127,6 +135,20 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     QWidget* w=new QWidget(this);
     vbl=new QVBoxLayout(w);
     w->setLayout(vbl);
+
+    QHBoxLayout* stathbl=new QHBoxLayout(w);
+    vbl->addLayout(stathbl);
+    stathbl->setContentsMargins(0,0,0,0);
+    chkImageStatisticsHistogram=new QCheckBox(tr("image histogram"), w);
+    stathbl->addWidget(chkImageStatisticsHistogram);
+    stathbl->addStretch();
+    btnImageStatisticsHistogram=new QPushButton(tr("calculate ..."), w);
+    btnImageStatisticsHistogram->setEnabled(false);
+    connect(chkImageStatisticsHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramChecked(bool)));
+    connect(btnImageStatisticsHistogram, SIGNAL(clicked()), this, SLOT(displayImageStatistics()));
+    stathbl->addWidget(btnImageStatisticsHistogram);
+
+
     pltCountsHistogram=new JKQTFastPlotter(w);
     QColor bt=QColor("blue");
     bt.setAlphaF(0.5);
@@ -138,14 +160,18 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     pltCountsHistogram->set_yAxisLabel("# pixels");
 
     vbl->addWidget(pltCountsHistogram);
-    QHBoxLayout* hbl=new QHBoxLayout(w);
+    QHBoxLayout* hbl;
+
+    QGridLayout* gl=new QGridLayout(w);
     spinCountsLower=new QDoubleSpinBox(w);
     spinCountsLower->setMaximum(0xEFFFFF);
     spinCountsLower->setMinimum(-0xEFFFFF);
     QLabel* l=new QLabel(tr("m&in. gray:"), w);
     l->setBuddy(spinCountsLower);
-    hbl->addWidget(l);
-    hbl->addWidget(spinCountsLower);
+    gl->addWidget(l, 0, 0);
+    gl->addWidget(spinCountsLower,0,1);
+    chkCountsRangeAutoLow=new QCheckBox(tr("&auto"), w);
+    gl->addWidget(chkCountsRangeAutoLow,1,1);
     spinCountsUpper=new QDoubleSpinBox(w);
     spinCountsUpper->setMaximum(0xEFFFFF);
     spinCountsUpper->setMinimum(-0xEFFFFF);
@@ -155,13 +181,17 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
 
     l=new QLabel(tr("m&ax. gray:"), w);
     l->setBuddy(spinCountsUpper);
-    hbl->addWidget(l);
-    hbl->addWidget(spinCountsUpper);
-    chkCountsRangeAuto=new QCheckBox(tr("&auto"), w);
-    connect(chkCountsRangeAuto, SIGNAL(clicked(bool)), this, SLOT(setCountsAutoscale(bool)));
-    hbl->addWidget(chkCountsRangeAuto);
-    hbl->addStretch(2);
-    vbl->addLayout(hbl);
+    gl->addWidget(l,0,2);
+    gl->addWidget(spinCountsUpper,0,3);
+    chkCountsRangeAutoHigh=new QCheckBox(tr("&auto"), w);
+
+    gl->addWidget(chkCountsRangeAutoHigh,1,3);
+    gl->addWidget(new QWidget(w),0,4);
+    gl->setColumnStretch(4,1);
+    vbl->addLayout(gl);
+
+    connect(chkCountsRangeAutoLow, SIGNAL(clicked(bool)), this, SLOT(setCountsAutoscale(bool)));
+    connect(chkCountsRangeAutoHigh, SIGNAL(clicked(bool)), this, SLOT(setCountsAutoscale(bool)));
 
 
     hbl=new QHBoxLayout(w);
@@ -262,10 +292,10 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
 
     spinCountsLower->setValue((settings->getQSettings())->value(prefix+"histogram.min", 0).toInt());
     spinCountsUpper->setValue((settings->getQSettings())->value(prefix+"histogram.max", 255).toInt());
-    bool b=(settings->getQSettings())->value(prefix+"histogram.auto", true).toBool();
-    chkCountsRangeAuto->setChecked(b);
-    setCountsAutoscale(b);
-    b=(settings->getQSettings())->value(prefix+"histogram.log", false).toBool();
+    chkCountsRangeAutoLow->setChecked((settings->getQSettings())->value(prefix+"histogram.autolow", true).toBool());
+    chkCountsRangeAutoHigh->setChecked((settings->getQSettings())->value(prefix+"histogram.autohigh", true).toBool());
+    setCountsAutoscale();
+    bool b=(settings->getQSettings())->value(prefix+"histogram.log", false).toBool();
     chkHistogramLog->setChecked(b);
     histogram_n=(settings->getQSettings())->value(prefix+"histogram.items", histogram_n).toUInt();
     spinHistogramBins->setValue(histogram_n);
@@ -289,6 +319,8 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
     lastImagepath=(settings->getQSettings())->value(prefix+"last_imagepath", lastImagepath).toString();
     lastMaskpath=(settings->getQSettings())->value(prefix+"last_maskpath", lastMaskpath).toString();
     lastImagefilter=(settings->getQSettings())->value(prefix+"last_imagefilter", lastImagefilter).toString();
+
+    chkImageStatisticsHistogram->setChecked((settings->getQSettings())->value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
 }
 
 void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString prefix) {
@@ -302,13 +334,16 @@ void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString pref
 
     (settings->getQSettings())->setValue(prefix+"histogram.min", spinCountsLower->value());
     (settings->getQSettings())->setValue(prefix+"histogram.max", spinCountsUpper->value());
-    (settings->getQSettings())->setValue(prefix+"histogram.auto", chkCountsRangeAuto->isChecked());
+    (settings->getQSettings())->setValue(prefix+"histogram.autolow", chkCountsRangeAutoLow->isChecked());
+    (settings->getQSettings())->setValue(prefix+"histogram.autohigh", chkCountsRangeAutoHigh->isChecked());
     (settings->getQSettings())->setValue(prefix+"histogram.log", chkHistogramLog->isChecked());
     (settings->getQSettings())->setValue(prefix+"histogram.items", histogram_n);
 
     (settings->getQSettings())->setValue(prefix+"imagesettings.palette", cmbColorscale->currentIndex());
     (settings->getQSettings())->setValue(prefix+"imagesettings.mask_color", cmbMaskColor->currentIndex());
     (settings->getQSettings())->setValue(prefix+"imagesettings.rotation", cmbRotation->currentIndex());
+
+    (settings->getQSettings())->setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
 
 }
 
@@ -343,6 +378,7 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
 
         if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
             mask(xx, yy)=!mask(xx, yy);
+            maskEmpty=false;
         }
     }
     redrawFrameRecalc();
@@ -350,15 +386,20 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
 
 
 void QFESPIMB040CameraView::setCountsAutoscale(bool autoscale) {
-    if (autoscale) {
-        spinCountsUpper->setEnabled(false);
+    if (!chkCountsRangeAutoLow) return;
+    if (chkCountsRangeAutoLow->isChecked()) {
         spinCountsLower->setEnabled(false);
         disconnect(spinCountsLower, SIGNAL(valueChanged(double)), this, SLOT(redrawFrameRecalc()));
+    } else {
+        spinCountsLower->setEnabled(true);
+        connect(spinCountsLower, SIGNAL(valueChanged(double)), this, SLOT(redrawFrameRecalc()));
+    }
+    if (!chkCountsRangeAutoHigh) return;
+    if (chkCountsRangeAutoHigh->isChecked()) {
+        spinCountsUpper->setEnabled(false);
         disconnect(spinCountsUpper, SIGNAL(valueChanged(double)), this, SLOT(redrawFrameRecalc()));
     } else {
         spinCountsUpper->setEnabled(true);
-        spinCountsLower->setEnabled(true);
-        connect(spinCountsLower, SIGNAL(valueChanged(double)), this, SLOT(redrawFrameRecalc()));
         connect(spinCountsUpper, SIGNAL(valueChanged(double)), this, SLOT(redrawFrameRecalc()));
     }
 }
@@ -408,19 +449,33 @@ void QFESPIMB040CameraView::redrawFrame() {
     plteFrame->set_colorMin(spinCountsLower->value());
     plteFrame->set_colorMax(spinCountsUpper->value());
     //plteFrame->set_image(image, JKQTFP_double, image.width(), image.height());
-    plteFrame->set_image(image.data(), JKQTFP_double, image.width(), image.height());
+    #if (QFESPIMB040CameraView_internalImageType==uint32_t)
+        plteFrame->set_image(image.data(), JKQTFP_uint32, image.width(), image.height());
+    #elif (QFESPIMB040CameraView_internalImageType==double)
+        plteFrame->set_image(image.data(), JKQTFP_double, image.width(), image.height());
+    #elif (QFESPIMB040CameraView_internalImageType==float)
+        plteFrame->set_image(image.data(), JKQTFP_float, image.width(), image.height());
+    #endif
     pltMain->set_doDrawing(true);
     pltMain->update_data_immediate();
 
 }
 
 void QFESPIMB040CameraView::redrawFrameRecalc() {
+    if (currentlyRedrawing) return;
+    currentlyRedrawing=true;
     prepareImage();
-    displayImageStatistics();
+    if (chkImageStatisticsHistogram->isChecked()) {
+        displayImageStatistics(true);
+    } else {
+        // possibly we still need the min/max value of the image for color scaling!
+        displayImageStatistics(false);
+    }
     redrawFrame();
+    currentlyRedrawing=false;
 }
 
-void QFESPIMB040CameraView::displayImageStatistics() {
+void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
     if (!histogram_x || !histogram_y) return;
 
     // DISABLE UPDATING OF GRAPHS (we only want to do this once per function call!!!)
@@ -431,73 +486,88 @@ void QFESPIMB040CameraView::displayImageStatistics() {
     double histogram_max=0;
     double histogram_fmax=0;
     histogram_n=spinHistogramBins->value();
-    image.calcImageStatistics(mask.data(), &imageBrokenPixels, &imageSum, &imageMean, &imageStddev, &imageImin, &imageImax, &histogram_x, &histogram_y, &histogram_n, &histogram_min, &histogram_max, &histogram_fmax, chkHistogramBinsAuto->isChecked());
+    if (!imageStatisticsCalculated) {
+        if (withHistogram) {
+            if (!maskEmpty) image.calcImageStatistics(mask.data(), &imageBrokenPixels, &imageSum, &imageMean, &imageStddev, &imageImin, &imageImax, &histogram_x, &histogram_y, &histogram_n, &histogram_min, &histogram_max, &histogram_fmax, chkHistogramBinsAuto->isChecked());
+            else {
+                imageBrokenPixels=0;
+                image.calcImageStatistics(&imageSum, &imageMean, &imageStddev, &imageImin, &imageImax, &histogram_x, &histogram_y, &histogram_n, &histogram_min, &histogram_max, &histogram_fmax, chkHistogramBinsAuto->isChecked());
+            }
+        } else {
+            if (!maskEmpty) image.calcImageStatistics(mask.data(), &imageBrokenPixels, &imageSum, &imageMean, &imageStddev, &imageImin, &imageImax);
+            else {
+                imageBrokenPixels=0;
+                image.calcImageStatistics(&imageSum, &imageMean, &imageStddev, &imageImin, &imageImax);
+            }
+        }
+    }
     imageStatisticsCalculated=true;
-    double cmin= spinCountsLower->value();
-    double cmax= spinCountsUpper->value();
-    if (chkCountsRangeAuto->isChecked()) {
-        cmin=imageImin;
-        cmax=imageImax;
-    }
+    QFESPIMB040CameraView_internalImageType cmin= spinCountsLower->value();
+    QFESPIMB040CameraView_internalImageType cmax= spinCountsUpper->value();
+    if (chkCountsRangeAutoLow->isChecked()) cmin=imageImin;
+    if (chkCountsRangeAutoHigh->isChecked()) cmax=imageImax;
     double hrange=imageImax-imageImin;
+    if (chkCountsRangeAutoLow->isChecked()) spinCountsLower->setValue(cmin);
+    if (chkCountsRangeAutoHigh->isChecked()) spinCountsUpper->setValue(cmax);
 
 
-    spinHistogramBins->setValue(histogram_n);
-    plteHistogram->set_data(histogram_x, histogram_y, histogram_n);
-    double dt=pow(10,floor(log10(histogram_max-histogram_min)));
-    pltCountsHistogram->set_xTickDistance(dt);
-    dt=pow(10,floor(log10(histogram_fmax)));
-    pltCountsHistogram->set_yTickDistance(dt);
-
-    bool logarithmic=false;
-    double ymin, ymax, xmin, xmax;
-    static bool last_log=false;
-    if (chkHistogramLog->isChecked()) {
-        logarithmic=true;
-        ymin=0.9;
-        ymax=histogram_fmax;
-        pltCountsHistogram->set_yZeroTick(1);
-    } else {
-        ymin=0;
-        ymax=histogram_fmax;
-        logarithmic=false;
-        pltCountsHistogram->set_yZeroTick(0);
-    }
-    xmin=histogram_min-0.01*(double)hrange;
-    xmax=histogram_max+0.01*(double)hrange;
-
-
-    if ((histogramUpdateTime.elapsed()>1000) || (last_log!=chkHistogramLog->isChecked())) {
-        pltCountsHistogram->setYRange(ymin, ymax, logarithmic);
-        pltCountsHistogram->setXRange(xmin, xmax, false);
+    if (withHistogram && (histogramUpdateTime.elapsed()>HISTOGRAM_UPDATE_INTERVAL_MS)) {
         histogramUpdateTime.start();
-    } else {
-        if (xmin<pltCountsHistogram->get_xMin()) pltCountsHistogram->setXRange(xmin, pltCountsHistogram->get_xMax(), false);
-        if (xmax>pltCountsHistogram->get_xMax()) pltCountsHistogram->setXRange(pltCountsHistogram->get_xMin(), xmax, false);
-        if (ymin<pltCountsHistogram->get_yMin()) pltCountsHistogram->setYRange(ymin, pltCountsHistogram->get_yMax(), logarithmic);
-        if (ymax>pltCountsHistogram->get_yMax()) pltCountsHistogram->setYRange(ymin, pltCountsHistogram->get_yMax(), logarithmic);
+        spinHistogramBins->setValue(histogram_n);
+        plteHistogram->set_data(histogram_x, histogram_y, histogram_n);
+
+        bool logarithmic=false;
+        double ymin, ymax, xmin, xmax;
+        static bool last_log=false;
+        if (chkHistogramLog->isChecked()) {
+            logarithmic=true;
+            ymin=0.9;
+            ymax=histogram_fmax;
+            pltCountsHistogram->set_yZeroTick(1);
+        } else {
+            ymin=0;
+            ymax=histogram_fmax;
+            logarithmic=false;
+            pltCountsHistogram->set_yZeroTick(0);
+        }
+        xmin=histogram_min-0.01*(double)hrange;
+        xmax=histogram_max+0.01*(double)hrange;
+
+        double dt=pow(10,floor(log10(fabs(xmax))));
+        pltCountsHistogram->set_xTickDistance(dt);
+        dt=pow(10,floor(log10(fabs(ymax))));
+        pltCountsHistogram->set_yTickDistance(dt);
+
+        //if (last_log!=chkHistogramLog->isChecked()) {
+            pltCountsHistogram->setYRange(ymin, ymax, logarithmic);
+            pltCountsHistogram->setXRange(xmin, xmax, false);
+        //} else {
+            if (xmin<pltCountsHistogram->get_xMin()) pltCountsHistogram->setXRange(xmin, pltCountsHistogram->get_xMax(), false);
+            if (xmax>pltCountsHistogram->get_xMax()) pltCountsHistogram->setXRange(pltCountsHistogram->get_xMin(), xmax, false);
+            if (ymin<pltCountsHistogram->get_yMin()) pltCountsHistogram->setYRange(ymin, pltCountsHistogram->get_yMax(), logarithmic);
+            if (ymax>pltCountsHistogram->get_yMax()) pltCountsHistogram->setYRange(ymin, pltCountsHistogram->get_yMax(), logarithmic);
+        //}
+        last_log=chkHistogramLog->isChecked();
+
+        plteHistogramRange->set_xmin((double)cmin);
+        plteHistogramRange->set_xmax((double)cmax);
+
+        pltCountsHistogram->set_doDrawing(true);
+        pltCountsHistogram->update_plot();
     }
-    last_log=chkHistogramLog->isChecked();
 
-    plteHistogramRange->set_xmin((double)cmin);
-    plteHistogramRange->set_xmax((double)cmax);
 
-    if (chkCountsRangeAuto->isChecked()) {
-        spinCountsLower->setValue(cmin);
-        spinCountsUpper->setValue(cmax);
+    if (labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) {
+        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>").arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str()).arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str()).arg(imageMean).arg(imageStddev).arg(imageMean/imageExposureTime/1000.0).arg(imageStddev/imageExposureTime/1000.0).arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0);
+        labImageStatistics->setText(s);
+        labelUpdateTime.start();
     }
-
-
-    pltCountsHistogram->set_doDrawing(true);
-    pltCountsHistogram->update_plot();
-
-    QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>").arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str()).arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str()).arg(imageMean).arg(imageStddev).arg(imageMean/imageExposureTime/1000.0).arg(imageStddev/imageExposureTime/1000.0).arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0);
-    labImageStatistics->setText(s);
 }
 
 void QFESPIMB040CameraView::clearMask() {
     if (QMessageBox::question(this, tr("QuickFit SPIM Control"), tr("Do your really want to clear the mask?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes )==QMessageBox::No ) return;
     mask.setAll(false);
+    maskEmpty=true;
     redrawFrameRecalc();
 }
 
@@ -532,6 +602,7 @@ void QFESPIMB040CameraView::loadMask() {
                           tr("Cannot open file %1")
                           .arg(fileName));
     }
+    maskEmpty=false;
     redrawFrameRecalc();
     QApplication::restoreOverrideCursor();
 }
@@ -552,10 +623,21 @@ void QFESPIMB040CameraView::saveRaw() {
     imageFilters<<tr("Color Coded BMP (*.bmp)");
     imageFilters<<tr("Color Coded TIFF (*.tif)");
 
+    QString imFilter=lastImagefilter;
+
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Raw Image"),
                             lastImagepath,
-                            imageFilters.join(";;"),&lastImagefilter);
+                            imageFilters.join(";;"),&imFilter);
+
+    /*QFileDialog dialog(this, tr("Save Raw Image as ..."), lastImagepath);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setNameFilters(imageFilters);
+    dialog.setNameFilter(imFilter);
+    if (dialog.exec() != QDialog::Accepted) return ;
+    imFilter = dialog.selectedNameFilter();
+    QString fileName = dialog.selectedFiles()[0];*/
+
     if (fileName.isEmpty()) return;
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
@@ -566,7 +648,9 @@ void QFESPIMB040CameraView::saveRaw() {
         return;
     }
     file.close();
+    file.remove();
     lastImagepath=QFileInfo(fileName).absolutePath();
+    lastImagefilter=imFilter;
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
 
@@ -588,6 +672,9 @@ void QFESPIMB040CameraView::saveRaw() {
         QImage img;
         JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), img, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
         img.save(fileName, "TIFF");
+    } else {
+            rawImage.save_tiffuint16(fileName.toStdString());
+
     }
 
 
@@ -600,6 +687,7 @@ void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& image, double timein
     rawImage.assign(image);
     imageTimeindex=timeindex;
     imageExposureTime=exposuretime;
+    imageStatisticsCalculated=false;
     redrawFrameRecalc();
 }
 
@@ -621,4 +709,8 @@ void QFESPIMB040CameraView::addUserAction(QAction* action) {
 
 void QFESPIMB040CameraView::deleteUserAction(QAction* action) {
     toolbar->removeAction(action);
+}
+
+void QFESPIMB040CameraView::histogramChecked(bool checked) {
+    btnImageStatisticsHistogram->setEnabled(!checked);
 }

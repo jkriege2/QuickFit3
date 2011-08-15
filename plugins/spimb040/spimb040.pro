@@ -9,7 +9,6 @@ DEPENDPATH += ./
 include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
-
 LIBS += -L../../extlibs/libtiff/ -ltiff -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
