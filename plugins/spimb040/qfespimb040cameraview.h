@@ -95,10 +95,48 @@ class QFESPIMB040CameraView : public QWidget {
         JKQTFPimagePlot* plteFrame;
         /** \brief plot used to display an overlay with the broken pixels saved in mask */
         JKQTFPimageOverlayPlot* plteMask;
+        /** \brief plot used to display the position where the marginal plots are taken */
+        JKQTFPVCrossPlot* plteMarginalPos;
         /** \brief plot used to display the range in the histogram */
         JKQTFPXRangePlot* plteHistogramRange;
         /** \brief plot used to display the histogram */
         JKQTFPVBarPlot* plteHistogram;
+
+        /** \brief bottom marginal plotter widget */
+        JKQTFastPlotter* pltMarginalBottom;
+        /** \brief bottom marginal plot */
+        JKQTFPLinePlot* plteMarginalBottom;
+        /** \brief bottom marginal plot x data */
+        double* pltDataMarginalBottomX;
+        /** \brief position where to take marginal plot (if single line is selected) */
+        uint32_t pltDataMarginalXPixel;
+        double pltDataMarginalXPixelF;
+        /** \brief bottom marginal plot y data */
+        double* pltDataMarginalBottomY;
+        /** \brief bottom marginal plot number of points */
+        uint32_t pltDataMarginalBottomN;
+        /** \brief left marginal plotter widget */
+        JKQTFastPlotter* pltMarginalLeft;
+        /** \brief left marginal plot */
+        JKQTFPLinePlot* plteMarginalLeft;
+        /** \brief bottom marginal plot x data */
+        double* pltDataMarginalLeftX;
+        /** \brief bottom marginal plot y data */
+        double* pltDataMarginalLeftY;
+        /** \brief bottom marginal plot number of points */
+        uint32_t pltDataMarginalLeftN;
+        /** \brief position where to take marginal plot (if single line is selected) */
+        uint32_t pltDataMarginalYPixel;
+        double pltDataMarginalYPixelF;
+        /** \brief combobox to select the type of marginal plot */
+        QComboBox* cmbMarginalPlots;
+
+        double pltDataMarginalLeftYMin;
+        double pltDataMarginalLeftYMax;
+        double pltDataMarginalBottomYMin;
+        double pltDataMarginalBottomYMax;
+
+
 
         /** \brief main image plotter widget */
         JKQTFastPlotter* pltCountsHistogram;
@@ -118,6 +156,25 @@ class QFESPIMB040CameraView : public QWidget {
         QCheckBox* chkHistogramBinsAuto;
         /** \brief check box to use logarithmic histogram y-scale */
         QCheckBox* chkHistogramLog;
+
+        /** \brief combobox to select fit function */
+        QComboBox* cmbMarginalFitFunction;
+        /** \brief label for marginal fit results */
+        QLabel* labMarginalFitResults;
+        /** \brief left marginal fit plot */
+        JKQTFPLinePlot* plteMarginalFitLeft;
+        /** \brief bottom marginal fit plot */
+        JKQTFPLinePlot* plteMarginalFitBottom;
+        /** \brief bottom marginal fit plot y data */
+        double* pltDataMarginalFitBottomY;
+        /** \brief left marginal fit plot y data */
+        double* pltDataMarginalFitLeftY;
+        /** \brief bottom marginal fit plot x data */
+        double* pltDataMarginalFitBottomX;
+        /** \brief left marginal fit plot x data */
+        double* pltDataMarginalFitLeftX;
+        /** \brief marginal fit results as string */
+        QString marginalResults;
 
 
         /** \brief combobox to select color bar */

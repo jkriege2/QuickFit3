@@ -58,13 +58,14 @@ void QFESPIMB040::storeSettings(ProgramOptions* settings) {
 }
 
 void QFESPIMB040::startPlugin() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QMessageBox::information(parentWidget, getName(), getDescription());
     if (!main) {
         main=new QFESPIMB040MainWindow(services, NULL);
     }
     if (settings) main->loadSettings(settings);
     main->show();
-
+    QApplication::restoreOverrideCursor();
 }
 
 

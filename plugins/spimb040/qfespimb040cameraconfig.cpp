@@ -103,13 +103,13 @@ void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString pr
 }
 
 void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
-    // disconnect devices and close camera view:
-    if (actDisConnect->isChecked()) {
-        disconnectDevice();
-        actDisConnect->setChecked(false);
-    }
     if (camView) {
         camView->close();
+    }
+    // disconnect devices and close camera view:
+    if (actDisConnect->isChecked()) {
+        actDisConnect->setChecked(false);
+        disconnectDevice();
     }
 }
 

@@ -1,9 +1,34 @@
 #include "qfespimb040cameraview.h"
+#include "qftools.h"
+#include "statistics_tools.h"
+#include "lmcurve.h"
 
 #include <QtGui>
 
+
+double fGauss( double t, const double *p )
+{
+    double offset=p[0];
+    double A=p[1];
+    double avg=p[2];
+    double var=p[3];
+    return offset+A*exp(-0.5*(t-avg)*(t-avg)/var);
+}
+
+double fSlit( double t, const double *p )
+{
+    double offset=p[0];
+    double A=p[1];
+    double avg=p[2];
+    double d=p[3];
+    double x=M_PI*(t-avg)/d;
+    double s=sin(x)/x;
+    return offset+A*s*s;
+}
+
 #define LABEL_UPDATE_INTERVAL_MS 50
 #define HISTOGRAM_UPDATE_INTERVAL_MS 50
+#define MARGINAL_FIT_SIZE_FACTOR 3
 
 QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionServices* pluginServices, QWidget* parent):
     QWidget(parent)
@@ -42,6 +67,22 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfil
     }
     image.assign(rawImage);
 
+    pltDataMarginalBottomN=image.width();
+    pltDataMarginalLeftN=image.height();
+    pltDataMarginalBottomX=(double*)calloc(pltDataMarginalBottomN,sizeof(double));
+    pltDataMarginalBottomY=(double*)calloc(pltDataMarginalBottomN,sizeof(double));
+    pltDataMarginalLeftX=(double*)calloc(pltDataMarginalLeftN,sizeof(double));
+    pltDataMarginalLeftY=(double*)calloc(pltDataMarginalLeftN,sizeof(double));
+    pltDataMarginalFitBottomY=(double*)calloc(pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
+    pltDataMarginalFitLeftY=(double*)calloc(pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
+    pltDataMarginalFitBottomX=(double*)calloc(pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
+    pltDataMarginalFitLeftX=(double*)calloc(pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
+    pltDataMarginalXPixelF=pltDataMarginalXPixel=0;
+    pltDataMarginalYPixelF=pltDataMarginalYPixel=0;
+    pltDataMarginalLeftYMin=0;
+    pltDataMarginalLeftYMax=250;
+    pltDataMarginalBottomYMin=0;
+    pltDataMarginalBottomYMax=250;
 
 
 
@@ -60,6 +101,14 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
 {
     free(histogram_x);
     free(histogram_y);
+    free(pltDataMarginalLeftX);
+    free(pltDataMarginalLeftY);
+    free(pltDataMarginalBottomX);
+    free(pltDataMarginalBottomY);
+    free(pltDataMarginalFitBottomY);
+    free(pltDataMarginalFitLeftY);
+    free(pltDataMarginalFitBottomX);
+    free(pltDataMarginalFitLeftX);
 }
 
 void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
@@ -94,21 +143,62 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     ///////////////////////////////////////////////////////////////
     // create main plotter
     ///////////////////////////////////////////////////////////////
+    QGridLayout* layPlt=new QGridLayout(wPltMain);
+    layPlt->setContentsMargins(0,0,0,0);
     pltMain=new JKQTFastPlotter(wPltMain);
     pltMain->set_maintainAspectRatio(true);
     pltMain->setXRange(0,100);
     pltMain->setYRange(0,100);
     pltMain->set_xTickDistance(10);
     pltMain->set_yTickDistance(10);
+    pltMain->set_xAxisLabelVisible(false);
+    pltMain->set_yAxisLabelVisible(false);
+    pltMain->set_plotBorderLeft(30);
+    pltMain->set_plotBorderBottom(20);
     plteFrame=new JKQTFPimagePlot(pltMain, image.data(), JKQTFP_double, image.width(), image.height(), JKQTFP_GRAY);
     pltMain->addPlot(plteFrame);
     plteMask=new JKQTFPimageOverlayPlot(pltMain, mask.data(), mask.width(), mask.height());
     pltMain->addPlot(plteMask);
+    plteMarginalPos=new JKQTFPVCrossPlot(pltMain, 1, &pltDataMarginalXPixelF, &pltDataMarginalYPixelF);
+    plteMarginalPos->set_crossWidth(15);
+    pltMain->addPlot(plteMarginalPos);
     connect(pltMain, SIGNAL(mouseMoved(double, double)), this, SLOT(imageMouseMoved(double, double)));
     connect(pltMain, SIGNAL(clicked(double, double)), this, SLOT(imageMouseClicked(double, double)));
-    vbl->addWidget(pltMain);
-    vbl->setStretchFactor(pltMain, 10);
+    layPlt->addWidget(pltMain, 0, 1);
+    //vbl->setStretchFactor(pltMain, 10);
+    ///////////////////////////////////////////////////////////////
+    // create main marginal plotters
+    ///////////////////////////////////////////////////////////////
+    pltMarginalBottom=new JKQTFastPlotter(wPltMain);
+    layPlt->addWidget(pltMarginalBottom, 1,1);
+    pltMarginalBottom->setMaximumHeight(150);
+    pltMarginalBottom->set_synchronizeX(pltMain);
+    pltMarginalBottom->set_xAxisLabelVisible(false);
+    pltMarginalBottom->set_yAxisLabelVisible(false);
+    pltMarginalBottom->set_plotBorderTop(5);
+    pltMarginalBottom->set_plotBorderBottom(5);
+    plteMarginalBottom=new JKQTFPLinePlot(pltMarginalBottom, pltDataMarginalBottomN, pltDataMarginalBottomX, pltDataMarginalBottomY);
+    plteMarginalFitBottom=new JKQTFPLinePlot(pltMarginalBottom, pltDataMarginalBottomN, pltDataMarginalBottomX, pltDataMarginalBottomY, QColor("blue"));
+    pltMarginalBottom->addPlot(plteMarginalBottom);
+    pltMarginalLeft=new JKQTFastPlotter(wPltMain);
+    layPlt->addWidget(pltMarginalLeft, 0,0);
+    pltMarginalLeft->setMaximumWidth(150);
+    pltMarginalLeft->set_synchronizeY(pltMain);
+    pltMarginalLeft->set_xAxisLabelVisible(false);
+    pltMarginalLeft->set_yAxisLabelVisible(false);
+    pltMarginalLeft->set_plotBorderLeft(5);
+    pltMarginalLeft->set_plotBorderRight(5);
+    plteMarginalLeft=new JKQTFPLinePlot(pltMarginalLeft, pltDataMarginalLeftN, pltDataMarginalLeftY, pltDataMarginalLeftX);
+    plteMarginalFitLeft=new JKQTFPLinePlot(pltMarginalLeft, pltDataMarginalLeftN, pltDataMarginalLeftY, pltDataMarginalLeftX, QColor("blue"));
+    pltMarginalLeft->addPlot(plteMarginalLeft);
 
+    layPlt->setColumnStretch(0,2);
+    layPlt->setColumnStretch(1,5);
+    layPlt->setRowStretch(0,5);
+    layPlt->setRowStretch(1,2);
+
+
+    vbl->addLayout(layPlt, 10);
     tabSettings=new QTabWidget(this);
     tabResults=new QTabWidget(this);
 
@@ -215,6 +305,9 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     labImageStatistics=new QLabel(w);
     vbl->addWidget(labImageStatistics);
 
+    labMarginalFitResults=new QLabel(w);
+    vbl->addWidget(labMarginalFitResults);
+
     tabSettings->addTab(w, tr("&Statistics"));
     setCountsAutoscale(false);
 
@@ -252,6 +345,26 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     cmbRotation->setMaximumWidth(100);
     fl->addRow(tr("&rotation:"), cmbRotation);
     connect(cmbRotation, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
+
+    cmbMarginalPlots=new QComboBox(w);
+    cmbMarginalPlots->addItem(tr("none"));
+    cmbMarginalPlots->addItem(tr("marked line/column"));
+    cmbMarginalPlots->addItem(tr("average"));
+    cmbMarginalPlots->setMaximumWidth(200);
+    fl->addRow(tr("&marginal plots:"), cmbMarginalPlots);
+    connect(cmbMarginalPlots, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
+
+
+    cmbMarginalFitFunction=new QComboBox(w);
+    cmbMarginalFitFunction->addItem(tr("none"));
+    cmbMarginalFitFunction->addItem(tr("average+variance"));
+    cmbMarginalFitFunction->addItem(tr("gaussian fit"));
+    cmbMarginalFitFunction->addItem(tr("slit function fit"));
+    cmbMarginalFitFunction->setMaximumWidth(200);
+    fl->addRow(tr("&marginal evluation:"), cmbMarginalFitFunction);
+    connect(cmbMarginalFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
+
+
 
     tabSettings->addTab(w, tr("Settings"));
 }
@@ -315,6 +428,10 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
     cmbColorscale->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.palette", 6).toInt());
     cmbMaskColor->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.mask_color", 0).toInt());
     cmbRotation->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.rotation", 0).toInt());
+    cmbMarginalPlots->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.marginal", 1).toInt());
+    cmbMarginalFitFunction->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.marginal_fitfunction", 0).toInt());
+    pltDataMarginalXPixel=(settings->getQSettings())->value(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel).toInt();
+    pltDataMarginalYPixel=(settings->getQSettings())->value(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel).toInt();
 
     lastImagepath=(settings->getQSettings())->value(prefix+"last_imagepath", lastImagepath).toString();
     lastMaskpath=(settings->getQSettings())->value(prefix+"last_maskpath", lastMaskpath).toString();
@@ -342,8 +459,13 @@ void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString pref
     (settings->getQSettings())->setValue(prefix+"imagesettings.palette", cmbColorscale->currentIndex());
     (settings->getQSettings())->setValue(prefix+"imagesettings.mask_color", cmbMaskColor->currentIndex());
     (settings->getQSettings())->setValue(prefix+"imagesettings.rotation", cmbRotation->currentIndex());
+    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal", cmbMarginalPlots->currentIndex());
+    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_fitfunction", cmbMarginalFitFunction->currentIndex());
+    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel);
+    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
 
     (settings->getQSettings())->setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
+
 
 }
 
@@ -363,25 +485,32 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
 }
 
 void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
+    uint32_t xx=floor(x);
+    uint32_t yy=floor(y);
+
+    uint32_t xxold=xx;
+    uint32_t yyold=yy;
+
+    switch(cmbRotation->currentIndex()) {
+        case 1: yy=xxold; xx=image.width()-yyold-1; break;
+        case 2: yy=image.height()-yyold-1; xx=image.width()-xxold-1; break;
+        case 3: yy=image.height()-xxold-1; xx=yyold; break;
+    };
+
     if (actMaskEdit->isChecked()) {
-        uint32_t xx=floor(x);
-        uint32_t yy=floor(y);
-
-        uint32_t xxold=xx;
-        uint32_t yyold=yy;
-
-        switch(cmbRotation->currentIndex()) {
-            case 1: yy=xxold; xx=image.width()-yyold-1; break;
-            case 2: yy=image.height()-yyold-1; xx=image.width()-xxold-1; break;
-            case 3: yy=image.height()-xxold-1; xx=yyold; break;
-        };
-
         if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
             mask(xx, yy)=!mask(xx, yy);
             maskEmpty=false;
         }
+        redrawFrameRecalc();
+    } else {
+        if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
+            pltDataMarginalXPixel=xx;
+            pltDataMarginalYPixel=yy;
+        }
+        redrawFrameRecalc();
+        //qDebug()<<pltDataMarginalXPixelF<<pltDataMarginalYPixelF;
     }
-    redrawFrameRecalc();
 }
 
 
@@ -420,27 +549,36 @@ void QFESPIMB040CameraView::redrawFrame() {
     pltMain->set_doDrawing(false);
     plteMask->set_color(cmbMaskColor->currentColor());
 
+    int xtickdist=image.width();
+    int ytickdist=image.height();
+
     if (cmbRotation->currentIndex()%2==1) {
+        xtickdist=pow(10,floor(log10(image.height())));
+        ytickdist=pow(10,floor(log10(image.width())));
         plteFrame->set_xmax(image.height());
         plteFrame->set_ymax(image.width());
         pltMain->setXRange(0, image.height());
         pltMain->setYRange(0, image.width());
-        pltMain->set_xTickDistance(pow(10,floor(log10(image.height()))));
-        pltMain->set_yTickDistance(pow(10,floor(log10(image.width()))));
+        pltMain->set_xTickDistance(xtickdist);
+        pltMain->set_yTickDistance(ytickdist);
         plteMask->set_xmax(image.height());
         plteMask->set_ymax(image.width());
         pltMain->set_aspectRatio((double)image.height()/(double)image.width());
     } else {
+        xtickdist=pow(10,floor(log10(image.width())));
+        ytickdist=pow(10,floor(log10(image.height())));
         plteFrame->set_xmax(image.width());
         plteFrame->set_ymax(image.height());
         pltMain->setXRange(0, image.width());
         pltMain->setYRange(0, image.height());
-        pltMain->set_xTickDistance(pow(10,floor(log10(image.width()))));
-        pltMain->set_yTickDistance(pow(10,floor(log10(image.height()))));
+        pltMain->set_xTickDistance(xtickdist);
+        pltMain->set_yTickDistance(ytickdist);
         plteMask->set_xmax(image.width());
         plteMask->set_ymax(image.height());
         pltMain->set_aspectRatio((double)image.width()/(double)image.height());
+
     }
+
     plteFrame->set_rotation(cmbRotation->currentIndex());
     plteMask->set_rotation(cmbRotation->currentIndex());
 
@@ -459,6 +597,66 @@ void QFESPIMB040CameraView::redrawFrame() {
     pltMain->set_doDrawing(true);
     pltMain->update_data_immediate();
 
+    if (cmbMarginalPlots->currentIndex()!=0) { // single line marginal plot
+        pltMarginalBottom->set_doDrawing(false);
+        pltMarginalLeft->set_doDrawing(false);
+        pltMarginalBottom->setVisible(true);
+        pltMarginalLeft->setVisible(true);
+        if (cmbRotation->currentIndex()%2==1) {
+            // DISPLAY MARGINALS
+                pltMarginalBottom->setXRange(0, image.height());
+                pltMarginalBottom->setYRange(qMax(pltDataMarginalBottomYMin, spinCountsLower->value()), qMin(pltDataMarginalBottomYMax, spinCountsUpper->value()));
+                pltMarginalLeft->setXRange(qMax(pltDataMarginalLeftYMin, spinCountsLower->value()), qMin(pltDataMarginalLeftYMax, spinCountsUpper->value()));
+                pltMarginalLeft->setYRange(0, image.width());
+
+                pltMarginalBottom->set_xTickDistance(xtickdist);
+                pltMarginalLeft->set_yTickDistance(ytickdist);
+                double bcsize= fabs(pltMarginalBottom->get_yMax()-pltMarginalBottom->get_yMin());
+                if (bcsize<1e-15); bcsize=1;
+                double lcsize= fabs(pltMarginalLeft->get_yMax()-pltMarginalLeft->get_yMin());
+                if (lcsize<1e-15); lcsize=1;
+                pltMarginalBottom->set_yTickDistance(pow(10,floor(log10(bcsize))));
+                pltMarginalLeft->set_xTickDistance(pow(10,floor(log10(lcsize))));
+        } else {
+            // DISPLAY MARGINALS
+
+            pltMarginalBottom->setXRange(0, image.width());
+            pltMarginalBottom->setYRange(qMax(pltDataMarginalBottomYMin, spinCountsLower->value()), qMin(pltDataMarginalBottomYMax, spinCountsUpper->value()));
+            pltMarginalLeft->setXRange(qMax(pltDataMarginalLeftYMin, spinCountsLower->value()), qMin(pltDataMarginalLeftYMax, spinCountsUpper->value()));
+            pltMarginalLeft->setYRange(0, image.height());
+
+            pltMarginalBottom->set_xTickDistance(xtickdist);
+            pltMarginalLeft->set_yTickDistance(ytickdist);
+            double bcsize= fabs(pltMarginalBottom->get_yMax()-pltMarginalBottom->get_yMin());
+            if (bcsize<1e-15); bcsize=1;
+            double lcsize= fabs(pltMarginalLeft->get_yMax()-pltMarginalLeft->get_yMin());
+            if (lcsize<1e-15); lcsize=1;
+            pltMarginalBottom->set_yTickDistance(pow(10,floor(log10(bcsize))));
+            pltMarginalLeft->set_xTickDistance(pow(10,floor(log10(lcsize))));
+
+        }
+        plteMarginalBottom->set_data(pltDataMarginalBottomX, pltDataMarginalBottomY, pltDataMarginalBottomN);
+        plteMarginalLeft->set_data(pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
+
+        pltMarginalLeft->deletePlot(plteMarginalFitLeft);
+        pltMarginalBottom->deletePlot(plteMarginalFitBottom);
+        if (cmbMarginalFitFunction->currentIndex()>0) {
+            plteMarginalFitBottom->set_data(pltDataMarginalFitBottomX, pltDataMarginalFitBottomY, pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR);
+            plteMarginalFitLeft->set_data(pltDataMarginalFitLeftY, pltDataMarginalFitLeftX, pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR);
+            pltMarginalLeft->addPlot(plteMarginalFitLeft);
+            pltMarginalBottom->addPlot(plteMarginalFitBottom);
+        }
+        pltMarginalBottom->set_doDrawing(true);
+        pltMarginalLeft->set_doDrawing(true);
+        pltMarginalBottom->update_plot();
+        pltMarginalLeft->update_plot();
+    } else {
+        pltMarginalBottom->setVisible(false);
+        pltMarginalLeft->setVisible(false);
+    }
+    labMarginalFitResults->setText(marginalResults);
+
+
 }
 
 void QFESPIMB040CameraView::redrawFrameRecalc() {
@@ -473,6 +671,221 @@ void QFESPIMB040CameraView::redrawFrameRecalc() {
     }
     redrawFrame();
     currentlyRedrawing=false;
+}
+
+void QFESPIMB040CameraView::prepareImage() {
+    marginalResults="";
+    image.assign(rawImage);
+    if (image.sizeDiffersFrom(mask)) {
+        mask.assign(image.width(), image.height(), false);
+    }
+
+    if (pltDataMarginalXPixel<0) pltDataMarginalXPixel=0;
+    if (pltDataMarginalXPixel>=image.width()) pltDataMarginalXPixel=image.width()-1;
+    if (pltDataMarginalYPixel<0) pltDataMarginalYPixel=0;
+    if (pltDataMarginalYPixel>=image.height()) pltDataMarginalYPixel=image.height()-1;
+
+    if (cmbMarginalPlots->currentIndex()!=0) {
+        bool changed=false;
+        if (cmbRotation->currentIndex()%2==0) {
+            if (pltDataMarginalBottomN!=image.width()) {
+                pltDataMarginalBottomN=image.width();
+                changed=true;
+            }
+            if (pltDataMarginalLeftN!=image.height()) {
+                pltDataMarginalLeftN=image.height();
+                changed=true;
+            }
+        } else {
+            if (pltDataMarginalBottomN!=image.height()) {
+                pltDataMarginalBottomN=image.height();
+                changed=true;
+            }
+            if (pltDataMarginalLeftN!=image.width()) {
+                pltDataMarginalLeftN=image.width();
+                changed=true;
+            }
+        }
+        if (changed) {
+            pltDataMarginalBottomX=(double*)realloc((void*)pltDataMarginalBottomX, pltDataMarginalBottomN*sizeof(double));
+            pltDataMarginalBottomY=(double*)realloc((void*)pltDataMarginalBottomY, pltDataMarginalBottomN*sizeof(double));
+            pltDataMarginalLeftX=(double*)realloc((void*)pltDataMarginalLeftX, pltDataMarginalLeftN*sizeof(double));
+            pltDataMarginalLeftY=(double*)realloc((void*)pltDataMarginalLeftY, pltDataMarginalLeftN*sizeof(double));
+            pltDataMarginalFitBottomY=(double*)realloc((void*)pltDataMarginalFitBottomY, pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
+            pltDataMarginalFitLeftY=(double*)realloc((void*)pltDataMarginalFitLeftY, pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
+            pltDataMarginalFitBottomX=(double*)realloc((void*)pltDataMarginalFitBottomX, pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
+            pltDataMarginalFitLeftX=(double*)realloc((void*)pltDataMarginalFitLeftX, pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
+        }
+        if (cmbRotation->currentIndex()==0) {
+            // +x-
+            // y
+            // |
+            //qDebug()<<image.width()<<pltDataMarginalBottomN<<image.height()<<pltDataMarginalLeftN;
+            if (cmbMarginalPlots->currentIndex()==1) {
+                image.copyLine(pltDataMarginalYPixel, pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyColumn(pltDataMarginalXPixel, pltDataMarginalLeftY, pltDataMarginalLeftX);
+            } else if (cmbMarginalPlots->currentIndex()==2) {
+                image.copyLineAverage(pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyColumnAverage(pltDataMarginalLeftY, pltDataMarginalLeftX);
+            }
+            pltDataMarginalXPixelF=pltDataMarginalXPixel+0.5;
+            pltDataMarginalYPixelF=pltDataMarginalYPixel+0.5;
+
+        } else if (cmbRotation->currentIndex()==1) {
+            // |
+            // x
+            // +y-
+            //qDebug()<<image.height()<<pltDataMarginalBottomN<<image.width()<<pltDataMarginalLeftN;
+            if (cmbMarginalPlots->currentIndex()==1) {
+                image.copyColumn(pltDataMarginalXPixel, pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyLineReverse(pltDataMarginalYPixel, pltDataMarginalLeftY, pltDataMarginalLeftX);
+            } else if (cmbMarginalPlots->currentIndex()==2) {
+                //qDebug()<<"-";
+                image.copyColumnAverage(pltDataMarginalBottomY, pltDataMarginalBottomX);
+                //qDebug()<<"--";
+                image.copyLineAverageReverse(pltDataMarginalLeftY, pltDataMarginalLeftX);
+                //qDebug()<<"---";
+            }
+            pltDataMarginalXPixelF=pltDataMarginalYPixel+0.5;
+            pltDataMarginalYPixelF=image.width()-1-pltDataMarginalXPixel+0.5;
+        } else if (cmbRotation->currentIndex()==2) {
+            //   |
+            //   y
+            // -x+
+            //qDebug()<<image.width()<<pltDataMarginalBottomN<<image.height()<<pltDataMarginalLeftN;
+            if (cmbMarginalPlots->currentIndex()==1) {
+                image.copyLineReverse(pltDataMarginalYPixel, pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyColumnReverse(pltDataMarginalXPixel, pltDataMarginalLeftY, pltDataMarginalLeftX);
+            } else if (cmbMarginalPlots->currentIndex()==2) {
+                image.copyLineAverageReverse(pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyColumnAverageReverse(pltDataMarginalLeftY, pltDataMarginalLeftX);
+            }
+            pltDataMarginalXPixelF=image.width()-1-pltDataMarginalXPixel+0.5;
+            pltDataMarginalYPixelF=image.height()-1-pltDataMarginalYPixel+0.5;
+        } else if (cmbRotation->currentIndex()==3) {
+            // -y+
+            //   x
+            //   |
+            //qDebug()<<image.height()<<pltDataMarginalBottomN<<image.width()<<pltDataMarginalLeftN;
+            if (cmbMarginalPlots->currentIndex()==1) {
+                image.copyColumnReverse(pltDataMarginalXPixel, pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyLine(pltDataMarginalYPixel, pltDataMarginalLeftY, pltDataMarginalLeftX);
+            } else if (cmbMarginalPlots->currentIndex()==2) {
+                image.copyColumnAverageReverse(pltDataMarginalBottomY, pltDataMarginalBottomX);
+                image.copyLineAverage(pltDataMarginalLeftY, pltDataMarginalLeftX);
+            }
+            pltDataMarginalXPixelF=image.height()-1-pltDataMarginalYPixel+0.5;
+            pltDataMarginalYPixelF=pltDataMarginalXPixel;
+        }
+        statisticsMinMax(pltDataMarginalBottomY, pltDataMarginalBottomN, pltDataMarginalBottomYMin, pltDataMarginalBottomYMax);
+        statisticsMinMax(pltDataMarginalLeftY, pltDataMarginalLeftN, pltDataMarginalLeftYMin, pltDataMarginalLeftYMax);
+        if (cmbMarginalFitFunction->currentIndex()>0) {
+            // CALCULATE MARGINAL FITS
+            marginalResults="";
+            if (cmbMarginalFitFunction->currentIndex()==1) {
+                marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
+                double var=0;
+                double avg=statisticsAverageVariance(var, pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
+                for (uint32_t i=0; i<pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR; i++) {
+                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                    pltDataMarginalFitLeftX[i]=x;
+                    pltDataMarginalFitLeftY[i]=pltDataMarginalLeftYMin+(pltDataMarginalLeftYMax-pltDataMarginalLeftYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
+                }
+                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
+                var=0;
+                avg=statisticsAverageVariance(var, pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
+                for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
+                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                    pltDataMarginalFitBottomX[i]=x;
+                    pltDataMarginalFitBottomY[i]=pltDataMarginalBottomYMin+(pltDataMarginalBottomYMax-pltDataMarginalBottomYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
+                }
+                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
+                marginalResults+=tr("</table></center>");
+        } else if (cmbMarginalFitFunction->currentIndex()==2) {
+                marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
+                double pout[4];
+                int n_par = 4; // number of parameters
+                int m_dat = pltDataMarginalLeftN; // number of data pairs
+                pout[2]=statisticsAverageVariance(pout[3], pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
+                pout[0]=pltDataMarginalLeftYMin;
+                pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fGauss, &control, &status );
+                for (uint32_t i=0; i<pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR; i++) {
+                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                    pltDataMarginalFitLeftX[i]=x;
+                    pltDataMarginalFitLeftY[i]=fGauss(x, pout);
+                }
+                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;std dev = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(pout[3]), 2)).arg(roundError(sqrt(pout[3]), 2));
+                marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func:</td><td>gauss</td></tr>").arg(status.fnorm);
+
+
+
+                m_dat=pltDataMarginalBottomN;
+                pout[2]=statisticsAverageVariance(pout[3], pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
+                pout[0]=pltDataMarginalBottomYMin;
+                pout[1]=pltDataMarginalBottomYMax-pltDataMarginalBottomYMin;
+                control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fGauss, &control, &status );
+                for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
+                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                    pltDataMarginalFitBottomX[i]=x;
+                    pltDataMarginalFitBottomY[i]=fGauss(x, pout);
+                }
+                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;std dev = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(pout[3]), 2)).arg(roundError(sqrt(pout[3]), 2));
+                marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func</td><td>gauss</td></tr>").arg(status.fnorm);
+
+
+                marginalResults+=tr("</table></center>");
+        } else if (cmbMarginalFitFunction->currentIndex()==3) {
+                marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
+                double pout[4];
+                int n_par = 4; // number of parameters
+                int m_dat = pltDataMarginalLeftN; // number of data pairs
+                pout[2]=statisticsAverageVariance(pout[3], pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
+                pout[0]=pltDataMarginalLeftYMin;
+                pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fSlit, &control, &status );
+                for (uint32_t i=0; i<pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR; i++) {
+                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                    pltDataMarginalFitLeftX[i]=x;
+                    pltDataMarginalFitLeftY[i]=fSlit(x, pout);
+                }
+                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;|x<sub>1</sub>-x<sub>-1</sub>| = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], 2.0*fabs(pout[3]), 2)).arg(roundError(2.0*fabs(pout[3]), 2));
+                marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func:</td><td>slit</td></tr>").arg(status.fnorm);
+
+
+
+                m_dat=pltDataMarginalBottomN;
+                pout[2]=statisticsAverageVariance(pout[3], pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
+                pout[0]=pltDataMarginalBottomYMin;
+                pout[1]=pltDataMarginalBottomYMax-pltDataMarginalBottomYMin;
+                control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fSlit, &control, &status );
+                for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
+                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                    pltDataMarginalFitBottomX[i]=x;
+                    pltDataMarginalFitBottomY[i]=fSlit(x, pout);
+                }
+                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;|x<sub>1</sub>-x<sub>-1</sub>| = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], 2.0*fabs(pout[3]), 2)).arg(roundError(2.0*fabs(pout[3]), 2));
+                marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func:</td><td>slit</td></tr>").arg(status.fnorm);
+
+
+                marginalResults+=tr("</table></center>");
+            }
+        }
+    }
 }
 
 void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
@@ -558,7 +971,12 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
 
 
     if (labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) {
-        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>").arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str()).arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str()).arg(imageMean).arg(imageStddev).arg(imageMean/imageExposureTime/1000.0).arg(imageStddev/imageExposureTime/1000.0).arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0);
+        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
+                        .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
+                        .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str())
+                        .arg(roundWithError(imageMean, imageStddev, 2)).arg(roundError(imageStddev, 2))
+                        .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 2)).arg(roundError(imageStddev/imageExposureTime/1000.0, 2))
+                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0);
         labImageStatistics->setText(s);
         labelUpdateTime.start();
     }
@@ -607,12 +1025,6 @@ void QFESPIMB040CameraView::loadMask() {
     QApplication::restoreOverrideCursor();
 }
 
-void QFESPIMB040CameraView::prepareImage() {
-    image.assign(rawImage);
-    if (image.sizeDiffersFrom(mask)) {
-        mask.assign(image.width(), image.height(), false);
-    }
-}
 
 void QFESPIMB040CameraView::saveRaw() {
     QStringList imageFilters;

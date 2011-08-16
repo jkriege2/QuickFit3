@@ -9,7 +9,7 @@ DEPENDPATH += ./
 include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
-LIBS += -L../../extlibs/libtiff/ -ltiff -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+LIBS += -L../../extlibs/lmfit/ -llmmin -L../../extlibs/libtiff/ -ltiff -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += spimb040.h \
@@ -22,7 +22,8 @@ HEADERS += spimb040.h \
            ../../../../../LIB/trunk/highrestimer.h \
            qfcameracombobox.h \
            qfstagecombobox.h \
-           qfcameraconfigcombobox.h
+           qfcameraconfigcombobox.h \
+    ../../../../../LIB/trunk/statistics_tools.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -32,7 +33,8 @@ SOURCES += spimb040.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
            qfcameracombobox.cpp \
            qfstagecombobox.cpp \
-           qfcameraconfigcombobox.cpp
+           qfcameraconfigcombobox.cpp \
+    ../../../../../LIB/trunk/statistics_tools.cpp
 
 FORMS =
 
@@ -49,8 +51,3 @@ INCLUDEPATH += ../../lib/ \
 QT += gui xml svg opengl
 
 CONFIG += exceptions rtti stl
-
-
-
-
-
