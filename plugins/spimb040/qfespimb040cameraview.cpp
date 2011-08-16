@@ -39,6 +39,8 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfil
     chkCountsRangeAutoHigh=NULL;
     chkCountsRangeAutoLow=NULL;
     maskEmpty=true;
+    pixelWidth=1;
+    pixelHeight=1;
 
 
     // more variable initialisation
@@ -109,6 +111,11 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
     free(pltDataMarginalFitLeftY);
     free(pltDataMarginalFitBottomX);
     free(pltDataMarginalFitLeftX);
+}
+
+void QFESPIMB040CameraView::setPixelSize(double pixelWidth, double pixelHeight) {
+    this->pixelHeight=pixelHeight;
+    this->pixelWidth=pixelWidth;
 }
 
 void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
@@ -604,19 +611,19 @@ void QFESPIMB040CameraView::redrawFrame() {
         pltMarginalLeft->setVisible(true);
         if (cmbRotation->currentIndex()%2==1) {
             // DISPLAY MARGINALS
-                pltMarginalBottom->setXRange(0, image.height());
-                pltMarginalBottom->setYRange(qMax(pltDataMarginalBottomYMin, spinCountsLower->value()), qMin(pltDataMarginalBottomYMax, spinCountsUpper->value()));
-                pltMarginalLeft->setXRange(qMax(pltDataMarginalLeftYMin, spinCountsLower->value()), qMin(pltDataMarginalLeftYMax, spinCountsUpper->value()));
-                pltMarginalLeft->setYRange(0, image.width());
+            pltMarginalBottom->setXRange(0, image.height());
+            pltMarginalBottom->setYRange(qMax(pltDataMarginalBottomYMin, spinCountsLower->value()), qMin(pltDataMarginalBottomYMax, spinCountsUpper->value()));
+            pltMarginalLeft->setXRange(qMax(pltDataMarginalLeftYMin, spinCountsLower->value()), qMin(pltDataMarginalLeftYMax, spinCountsUpper->value()));
+            pltMarginalLeft->setYRange(0, image.width());
 
-                pltMarginalBottom->set_xTickDistance(xtickdist);
-                pltMarginalLeft->set_yTickDistance(ytickdist);
-                double bcsize= fabs(pltMarginalBottom->get_yMax()-pltMarginalBottom->get_yMin());
-                if (bcsize<1e-15); bcsize=1;
-                double lcsize= fabs(pltMarginalLeft->get_yMax()-pltMarginalLeft->get_yMin());
-                if (lcsize<1e-15); lcsize=1;
-                pltMarginalBottom->set_yTickDistance(pow(10,floor(log10(bcsize))));
-                pltMarginalLeft->set_xTickDistance(pow(10,floor(log10(lcsize))));
+            pltMarginalBottom->set_xTickDistance(xtickdist);
+            pltMarginalLeft->set_yTickDistance(ytickdist);
+            double bcsize= fabs(pltMarginalBottom->get_yMax()-pltMarginalBottom->get_yMin());
+            //if (bcsize<1e-15); bcsize=1;
+            double lcsize= fabs(pltMarginalLeft->get_xMax()-pltMarginalLeft->get_xMin());
+            //if (lcsize<1e-15); lcsize=1;
+            pltMarginalBottom->set_yTickDistance(pow(10,floor(log10(bcsize))));
+            pltMarginalLeft->set_xTickDistance(pow(10,floor(log10(lcsize))));
         } else {
             // DISPLAY MARGINALS
 
@@ -628,9 +635,9 @@ void QFESPIMB040CameraView::redrawFrame() {
             pltMarginalBottom->set_xTickDistance(xtickdist);
             pltMarginalLeft->set_yTickDistance(ytickdist);
             double bcsize= fabs(pltMarginalBottom->get_yMax()-pltMarginalBottom->get_yMin());
-            if (bcsize<1e-15); bcsize=1;
-            double lcsize= fabs(pltMarginalLeft->get_yMax()-pltMarginalLeft->get_yMin());
-            if (lcsize<1e-15); lcsize=1;
+            //if (bcsize<1e-15); bcsize=1;
+            double lcsize= fabs(pltMarginalLeft->get_xMax()-pltMarginalLeft->get_xMin());
+            //if (lcsize<1e-15); lcsize=1;
             pltMarginalBottom->set_yTickDistance(pow(10,floor(log10(bcsize))));
             pltMarginalLeft->set_xTickDistance(pow(10,floor(log10(lcsize))));
 
@@ -685,8 +692,11 @@ void QFESPIMB040CameraView::prepareImage() {
     if (pltDataMarginalYPixel<0) pltDataMarginalYPixel=0;
     if (pltDataMarginalYPixel>=image.height()) pltDataMarginalYPixel=image.height()-1;
 
+
     if (cmbMarginalPlots->currentIndex()!=0) {
         bool changed=false;
+        double pixelW=pixelWidth;
+        double pixelH=pixelHeight;
         if (cmbRotation->currentIndex()%2==0) {
             if (pltDataMarginalBottomN!=image.width()) {
                 pltDataMarginalBottomN=image.width();
@@ -697,6 +707,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 changed=true;
             }
         } else {
+            pixelW=pixelHeight;
+            pixelH=pixelWidth;
             if (pltDataMarginalBottomN!=image.height()) {
                 pltDataMarginalBottomN=image.height();
                 changed=true;
@@ -792,6 +804,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=pltDataMarginalLeftYMin+(pltDataMarginalLeftYMax-pltDataMarginalLeftYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
                 marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2));
                 var=0;
                 avg=statisticsAverageVariance(var, pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
                 for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
@@ -800,6 +813,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=pltDataMarginalBottomYMin+(pltDataMarginalBottomYMax-pltDataMarginalBottomYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 2)).arg(roundError(sqrt(var)*pixelW, 2));
                 marginalResults+=tr("</table></center>");
         } else if (cmbMarginalFitFunction->currentIndex()==2) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
@@ -807,6 +821,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 int n_par = 4; // number of parameters
                 int m_dat = pltDataMarginalLeftN; // number of data pairs
                 pout[2]=statisticsAverageVariance(pout[3], pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
+                if (sqrt(pout[3])>pltDataMarginalLeftN/4.0) pout[3]/=10;
                 pout[0]=pltDataMarginalLeftYMin;
                 pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
                 lm_status_struct status;
@@ -819,6 +834,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fGauss(x, pout);
                 }
                 marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;std dev = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(pout[3]), 2)).arg(roundError(sqrt(pout[3]), 2));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(pout[3])*pixelH, 2)).arg(roundError(sqrt(pout[3])*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func:</td><td>gauss</td></tr>").arg(status.fnorm);
 
@@ -837,6 +853,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=fGauss(x, pout);
                 }
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;std dev = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(pout[3]), 2)).arg(roundError(sqrt(pout[3]), 2));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(pout[3])*pixelW, 2)).arg(roundError(sqrt(pout[3])*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func</td><td>gauss</td></tr>").arg(status.fnorm);
 
@@ -848,6 +865,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 int n_par = 4; // number of parameters
                 int m_dat = pltDataMarginalLeftN; // number of data pairs
                 pout[2]=statisticsAverageVariance(pout[3], pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
+                if (sqrt(pout[3])>pltDataMarginalLeftN/4.0) pout[3]/=10;
                 pout[0]=pltDataMarginalLeftYMin;
                 pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
                 lm_status_struct status;
@@ -860,6 +878,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fSlit(x, pout);
                 }
                 marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;|x<sub>1</sub>-x<sub>-1</sub>| = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], 2.0*fabs(pout[3]), 2)).arg(roundError(2.0*fabs(pout[3]), 2));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(pout[3])*pixelH, 2)).arg(roundError(sqrt(pout[3])*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func:</td><td>slit</td></tr>").arg(status.fnorm);
 
@@ -877,7 +896,8 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=fSlit(x, pout);
                 }
-                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;|x<sub>1</sub>-x<sub>-1</sub>| = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], 2.0*fabs(pout[3]), 2)).arg(roundError(2.0*fabs(pout[3]), 2));
+                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;|x<sub>1</sub>-x<sub>-1</sub>| = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], 2.0*fabs(pout[3]), 2)).arg(roundError(2.0*fabs(pout[3]), 2));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(pout[3])*pixelW, 2)).arg(roundError(sqrt(pout[3])*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func:</td><td>slit</td></tr>").arg(status.fnorm);
 

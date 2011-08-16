@@ -562,6 +562,14 @@ void QFECamTestCamera::seriesStep2() {
 }
 
 
+double QFECamTestCamera::getPixelWidth(unsigned int camera) {
+    return 10;
+}
+
+
+double QFECamTestCamera::getPixelHeight(unsigned int camera) {
+    return 10;
+}
 
 
 void QFECamTestCamera::log_text(QString message) {

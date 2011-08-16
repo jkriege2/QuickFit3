@@ -124,6 +124,14 @@ int QFExtensionCameraImplementation::getImageHeight(unsigned int camera) {
     return /* height of the next image from the given camera */;
 }
 
+double QFExtensionCameraImplementation::getPixelWidth() {
+    return /* width of pixel in microns */;
+}
+
+double QFExtensionCameraImplementation::getPixelHeight() {
+    return /* width of pixel in microns */;
+}
+
 bool QFExtensionCameraImplementation::isConnected(unsigned int camera) {
     return /* are we connected to the specified camera */;
 }

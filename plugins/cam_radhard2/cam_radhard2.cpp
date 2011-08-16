@@ -403,6 +403,15 @@ void QFExtensionCameraRadhard2::log_error(QString message) {
 }
 
 
+double QFExtensionCameraRadhard2::getPixelWidth(unsigned int camera) {
+	return 30;
+}
+
+double QFExtensionCameraRadhard2::getPixelHeight(unsigned int camera) {
+	return 30;
+}
+
+
 //Q_EXPORT_PLUGIN2(cam_radhard2, QFExtensionCameraRadhard2)
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraRadhard2)
 

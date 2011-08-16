@@ -106,6 +106,10 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         virtual double getExposureTime(unsigned int camera);
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
+        /** \copydoc QFExtensionCamera::getPixelWidth() */
+        virtual double getPixelWidth(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getPixelHeight() */
+        virtual double getPixelHeight(unsigned int camera);
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
         virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));

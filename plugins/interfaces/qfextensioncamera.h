@@ -66,6 +66,10 @@ class QFExtensionCamera {
          virtual int getImageWidth(unsigned int camera)=0;
          /** \brief return the height of images */
          virtual int getImageHeight(unsigned int camera)=0;
+         /** \brief return width of a sensor pixel in microns */
+         virtual double getPixelWidth(unsigned int camera)=0;
+         /** \brief return hieght of a sensor pixel in microns */
+         virtual double getPixelHeight(unsigned int camera)=0;
          /** \brief returns \c true if the device is connected */
          virtual bool isConnected(unsigned int camera)=0;
          /*! \brief acquire single frame

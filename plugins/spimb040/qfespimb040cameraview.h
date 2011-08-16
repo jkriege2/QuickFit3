@@ -46,6 +46,9 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief save settings */
         void storeSettings(ProgramOptions* settings, QString prefix);
 
+        /** \brief set size of pixels */
+        void setPixelSize(double pixelWidth, double pixelHeight);
+
     public slots:
         /** \brief display a new image in the widget
 
@@ -270,6 +273,11 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief flag to indicate that we are currently redrawing */
         bool currentlyRedrawing;
+
+        /** \brief width of a pixel in microns */
+        double pixelWidth;
+        /** \brief height of a pixel in microns */
+        double pixelHeight;
 
 
     protected slots:

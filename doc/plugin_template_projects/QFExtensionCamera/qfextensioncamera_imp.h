@@ -74,7 +74,12 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
         virtual int getImageHeight(unsigned int camera);
-        /** \copydoc QFExtensionCamera::isConnected() */
+	/** \copydoc QFExtensionCamera::getPixelWidth() */
+	virtual double getPixelWidth();
+	/** \copydoc QFExtensionCamera::getPixelHeight() */
+	virtual double getPixelHeight();
+
+	/** \copydoc QFExtensionCamera::isConnected() */
         virtual bool isConnected(unsigned int camera);
         /** \copydoc QFExtensionCamera::acquire() */
         virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL);

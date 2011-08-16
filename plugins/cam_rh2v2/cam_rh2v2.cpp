@@ -240,4 +240,13 @@ void QFExtensionCameraRh2v2::log_error(QString message) {
 }
 
 
+double QFExtensionCameraRh2v2::getPixelWidth(unsigned int camera) {
+	return 30;
+}
+
+double QFExtensionCameraRh2v2::getPixelHeight(unsigned int camera) {
+	return 30;
+}
+
+
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraRh2v2)
