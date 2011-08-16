@@ -105,6 +105,8 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief plot used to display the histogram */
         JKQTFPVBarPlot* plteHistogram;
 
+        /** \brief distance measure plot */
+        JKQTFPLinePlot* plteMainDistance;
         /** \brief bottom marginal plotter widget */
         JKQTFastPlotter* pltMarginalBottom;
         /** \brief bottom marginal plot */
@@ -192,8 +194,6 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief checkbox to switch image statistics with histogram on/off */
         QCheckBox* chkImageStatisticsHistogram;
-        /** \brief button to manually calculate image statistics */
-        QPushButton* btnImageStatisticsHistogram;
 
 
 
@@ -208,6 +208,12 @@ class QFESPIMB040CameraView : public QWidget {
         QAction* actMaskSave;
         /** \brief action to load mask */
         QAction* actMaskLoad;
+
+        /** \brief action to activate/disactivate measuring mode */
+        QAction* actMeasure;
+        QAction* actCursor;
+
+        bool measureFirst;
 
 
         /*! \brief image data
@@ -279,6 +285,9 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief height of a pixel in microns */
         double pixelHeight;
 
+
+        double measureX[2];
+        double measureY[2];
 
     protected slots:
         /** \brief called when the mouse moves over the image plot window */

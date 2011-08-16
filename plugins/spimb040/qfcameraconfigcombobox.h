@@ -60,6 +60,8 @@ class QFCameraConfigComboBox : public QComboBox {
 
         /*! \brief save the current configuration under a new name */
         void saveAsCurrent();
+        /*! \brief rename the current configuration under a new name */
+        void renameCurrent();
     protected slots:
         void directoryChanged(const QString& path);
     protected:
@@ -116,11 +118,14 @@ class QFCameraConfigEditorWidget : public QWidget {
         QToolButton* btnDelete;
         /** \brief button to save the current preview configuration as a different name */
         QToolButton* btnSaveAs;
+        /** \brief button to rename the current preview configuration as a different name */
+        QToolButton* btnRename;
 
 
         QAction* actConfig;
         QAction* actDelete;
         QAction* actSaveAs;
+        QAction* actRename;
 };
 
 #endif // QFCAMERACONFIGCOMBOBOX_H

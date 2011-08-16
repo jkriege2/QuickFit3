@@ -87,8 +87,12 @@ void QFESPIMB040CameraConfig::releaseCamera() {
 void QFESPIMB040CameraConfig::loadSettings(ProgramOptions* settings, QString prefix) {
     if (camView) camView->loadSettings(settings, prefix+"cam_view/");
 
+    loadObjectives();
+
     cmbAcquisitionDevice->setCurrentIndex(settings->getQSettings()->value(prefix+"last_device", 0).toInt());
     spinAcquisitionDelay->setValue(settings->getQSettings()->value(prefix+"acquisition_delay", 0).toDouble());
+    cmbObjecive->setCurrentIndex(cmbObjecive->findText(settings->getQSettings()->value(prefix+"objective", "").toString()));
+    cmbObjeciveProjection->setCurrentIndex(cmbObjeciveProjection->findText(settings->getQSettings()->value(prefix+"objective_projection", "").toString()));
     cmbPreviewConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"preview_config", "default").toString());
     cmbAcquisitionConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"acquisition_config", "default").toString());
 }
@@ -98,8 +102,11 @@ void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString pr
 
     settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
+    settings->getQSettings()->setValue(prefix+"objective", cmbObjecive->currentText());
+    settings->getQSettings()->setValue(prefix+"objective_projection", cmbObjeciveProjection->currentText());
     settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
     settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
+
 }
 
 void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
@@ -143,6 +150,37 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     cmbAcquisitionDevice->setEnabled(false);
 
 
+    QGridLayout* ogl=new QGridLayout(this);
+    ogl->addWidget(new QLabel("detection:"), 0,0);
+    ogl->addWidget(new QLabel("lightsheet:"), 1,0);
+    cmbObjecive=new QComboBox(this);
+    connect(cmbObjecive, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
+    ogl->addWidget(cmbObjecive, 0,1);
+    cmbObjeciveProjection=new QComboBox(this);
+    connect(cmbObjeciveProjection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
+    ogl->addWidget(cmbObjeciveProjection, 1,1);
+    btnAddObjective=new QToolButton(this);
+    btnAddObjective->setToolTip(tr("add a new objective"));
+    btnAddObjective->setIcon(QIcon(":/spimb040/objective_add.png"));
+    connect(btnAddObjective, SIGNAL(clicked()), this, SLOT(addObjective()));
+    ogl->addWidget(btnAddObjective, 0,2);
+    btnDeleteObjective=new QToolButton(this);
+    btnDeleteObjective->setToolTip(tr("delete an objective"));
+    btnDeleteObjective->setIcon(QIcon(":/spimb040/objective_delete.png"));
+    connect(btnDeleteObjective, SIGNAL(clicked()), this, SLOT(deleteObjective()));
+    ogl->addWidget(btnDeleteObjective, 0,3);
+    btnEditObjective=new QToolButton(this);
+    btnEditObjective->setToolTip(tr("edit an objective"));
+    btnEditObjective->setIcon(QIcon(":/spimb040/objective_rename.png"));
+    connect(btnEditObjective, SIGNAL(clicked()), this, SLOT(editObjective()));
+    ogl->addWidget(btnEditObjective, 0,4);
+    labDetectObjectiveDescription=new QLabel(this);
+    ogl->addWidget(labDetectObjectiveDescription, 0,5);
+    labProjectObjectiveDescription=new QLabel(this);
+    ogl->addWidget(labProjectObjectiveDescription, 1,5);
+    ogl->setColumnStretch(5, 1);
+
+    camlayout->addRow(tr("<b>Objectives:</b>"), ogl);
 
     cmbPreviewConfiguration=new QFCameraConfigEditorWidget(m_pluginServices->getConfigFileDirectory(), this);
     cmbPreviewConfiguration->connectTo(cmbAcquisitionDevice);
@@ -415,7 +453,7 @@ void QFESPIMB040CameraConfig::previewSingle() {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
         //QFExtension* extension=viewData.extension;
-        //QFExtensionCamera* cam=viewData.camera;
+        QFExtensionCamera* cam=viewData.camera;
         if (viewData.camera->isConnected(camIdx)) {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QString filename="";
@@ -425,6 +463,7 @@ void QFESPIMB040CameraConfig::previewSingle() {
             viewData.camera->useCameraSettings(camIdx, *settings);
             if (acquireSingle()) {
                 camView->show();
+                camView->setPixelSize(cam->getPixelWidth(camIdx)/magnification(), cam->getPixelHeight(camIdx)/magnification());
                 camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             } else {
                 m_parent->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
@@ -483,6 +522,7 @@ void QFESPIMB040CameraConfig::previewContinuous() {
                 viewData.continuous_is_first=false;
             }
             if (acquireSingle()) {
+                camView->setPixelSize(cam->getPixelWidth(camIdx)/magnification(), cam->getPixelHeight(camIdx)/magnification());
                 camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             }
         } else {
@@ -517,5 +557,124 @@ void QFESPIMB040CameraConfig::previewContinuous() {
     }
 }
 
+double QFESPIMB040CameraConfig::magnification() {
+    return objective().magnification;
+}
+
+void QFESPIMB040CameraConfig::loadObjectives() {
+    QSettings inifile(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
+    QStringList groups=inifile.childGroups();
+    objectives.clear();
+    QString currentO=cmbObjecive->currentText();
+    QString currentP=cmbObjeciveProjection->currentText();
+    cmbObjecive->clear();
+    cmbObjeciveProjection->clear();
+    for (int i=0; i<groups.size(); i++) {
+        QString g=groups[i];
+        ObjectiveDescription o;
+        o.name=inifile.value(g+"/name", "").toString();
+        o.manufacturer=inifile.value(g+"/manufacturer", "").toString();
+        o.magnification=inifile.value(g+"/magnification", 1).toDouble();
+        o.NA=inifile.value(g+"/na", 1).toDouble();
+        objectives.append(o);
+        cmbObjecive->addItem(o.name);
+        cmbObjeciveProjection->addItem(o.name);
+    }
+    int i=cmbObjecive->findText(currentO);
+    if (i<0) i=0;
+    cmbObjecive->setCurrentIndex(i);
+    i=cmbObjeciveProjection->findText(currentP);
+    if (i<0) i=0;
+    cmbObjeciveProjection->setCurrentIndex(i);
+}
+
+void QFESPIMB040CameraConfig::storeObjectives() {
+    QSettings inifile(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
+    inifile.clear();
+    for (int i=0; i<objectives.size(); i++) {
+        ObjectiveDescription o=objectives[i];
+        QString g="objective"+QString::number(i);
+        inifile.setValue(g+"/name", o.name);
+        inifile.setValue(g+"/manufacturer", o.manufacturer);
+        inifile.setValue(g+"/magnification", o.magnification);
+        inifile.setValue(g+"/na", o.NA);
+    }
+}
+
+void QFESPIMB040CameraConfig::deleteObjective() {
+    int i=cmbObjecive->currentIndex();
+    if (i>=0 && i<objectives.size()) {
+        objectives.removeAt(i);
+    }
+    storeObjectives();
+    loadObjectives();
+}
 
 
+void QFESPIMB040CameraConfig::editObjective() {
+    int i=cmbObjecive->currentIndex();
+    if (i>=0 && i<objectives.size()) {
+        ObjectiveDescription d=objectives[i];
+
+        QFESPIMB040ObjectiveEditor dlg(d, NULL);
+        if (dlg.exec()==QDialog::Accepted) {
+            objectives[i]=dlg.getData();
+        }
+
+    }
+    storeObjectives();
+    loadObjectives();
+}
+
+void QFESPIMB040CameraConfig::addObjective() {
+    ObjectiveDescription d;
+    d.name=tr("new objective");
+    QFESPIMB040ObjectiveEditor dlg(d, NULL);
+    if (dlg.exec()==QDialog::Accepted) {
+        d=dlg.getData();
+        while (objectiveExists(d.name)) {
+            QMessageBox::critical(this, "Objective Editor", "An objective with the same name already exists. Please rename!", QMessageBox::Ok, QMessageBox::Ok);
+            if (dlg.exec()!=QDialog::Accepted) return;
+            d=dlg.getData();
+        }
+        qDebug()<<d.name;
+        objectives.append(d);
+    }
+    storeObjectives();
+    loadObjectives();
+}
+
+ObjectiveDescription QFESPIMB040CameraConfig::getObjectiveDescription(int i) {
+    return objectives[i];
+}
+
+ObjectiveDescription QFESPIMB040CameraConfig::objective() {
+    ObjectiveDescription d;
+    int i=cmbObjecive->currentIndex();
+    if (i>=0 && i<objectives.size()) return objectives[i];
+    return d;
+}
+
+ObjectiveDescription QFESPIMB040CameraConfig::objectiveProjection() {
+    ObjectiveDescription d;
+    int i=cmbObjeciveProjection->currentIndex();
+    if (i>=0 && i<objectives.size()) return objectives[i];
+    return d;
+}
+
+bool QFESPIMB040CameraConfig::objectiveExists(QString name) {
+    for (int i=0; i<objectives.size(); i++) {
+        if (name==objectives[i].name) return true;
+    }
+    return false;
+
+}
+
+void QFESPIMB040CameraConfig::currentObjectiveChanged(int idx) {
+    int iD=cmbObjecive->currentIndex();
+    if (iD>=0 && iD<objectives.size()) labDetectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iD].magnification).arg(objectives[iD].NA));
+    else labDetectObjectiveDescription->setText("");
+    int iP=cmbObjeciveProjection->currentIndex();
+    if (iP>=0 && iP<objectives.size()) labProjectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
+    else labProjectObjectiveDescription->setText("");
+}

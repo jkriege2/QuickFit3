@@ -156,6 +156,30 @@ void QFCameraConfigComboBox::saveAsCurrent() {
     }
 }
 
+void QFCameraConfigComboBox::renameCurrent() {
+        QString filename=currentConfigFilename();
+        if (filename.size()>0) {
+        bool ok;
+        QString newname = QInputDialog::getText(this, tr("Rename Camera Configurtion As ..."),
+                                          tr("New Name:"), QLineEdit::Normal,
+                                          QFileInfo(filename).baseName(), &ok);
+        if (ok && !newname.isEmpty()) {
+            QString newfilename=QFileInfo(filename).absolutePath()+"/"+newname+".ccf";
+            if (QFile::exists(newfilename)) {
+                int ret = QMessageBox::question(this, tr("Save Camera Configurtion As ..."),
+                                tr("A camera configuration with the name '%1' already exists.\n"
+                                   "Do you want to overwrite?").arg(newname),
+                                QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
+                if (ret==QMessageBox::No) ok=false;
+            }
+            if (ok) {
+                copy_file(filename.toStdString(), newfilename.toStdString());
+                if (m_notifier) m_notifier->emitUpdate();
+                setCurrentConfig(newname);
+            }
+        }
+    }
+}
 
 
 
@@ -184,6 +208,9 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, 
     actSaveAs = new QAction(QIcon(":/spimb040/config_saveas.png"), tr("&Save Camera Configuration As ..."), this);
     connect(actSaveAs, SIGNAL(triggered()), combobox, SLOT(saveAsCurrent()));
 
+    actRename = new QAction(QIcon(":/spimb040/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
+    connect(actRename, SIGNAL(triggered()), combobox, SLOT(renameCurrent()));
+
     layout->addSpacing(5);
 
     btnConfig=new QToolButton(this);
@@ -193,6 +220,10 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, 
     btnDelete=new QToolButton(this);
     btnDelete->setDefaultAction(actDelete);
     layout->addWidget(btnDelete, 0);
+
+    btnRename=new QToolButton(this);
+    btnRename->setDefaultAction(actRename);
+    layout->addWidget(btnRename, 0);
 
     btnSaveAs=new QToolButton(this);
     btnSaveAs->setDefaultAction(actSaveAs);

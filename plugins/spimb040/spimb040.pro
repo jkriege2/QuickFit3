@@ -23,7 +23,8 @@ HEADERS += spimb040.h \
            qfcameracombobox.h \
            qfstagecombobox.h \
            qfcameraconfigcombobox.h \
-    ../../../../../LIB/trunk/statistics_tools.h
+           ../../../../../LIB/trunk/statistics_tools.h \
+    objectives.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -34,9 +35,11 @@ SOURCES += spimb040.cpp \
            qfcameracombobox.cpp \
            qfstagecombobox.cpp \
            qfcameraconfigcombobox.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp
+           ../../../../../LIB/trunk/statistics_tools.cpp \
+    objectives.cpp
 
-FORMS =
+FORMS = \
+    qfespimb040objectiveeditor.ui
 
 RESOURCES += spimb040.qrc
 

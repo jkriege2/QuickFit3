@@ -36,6 +36,8 @@ class QFESPIMB040MainWindow; // forward
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"
 
+#include "objectives.h"
+
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
     \ingroup qf3ext_spimb040
 
@@ -47,6 +49,9 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         /** \brief states used in conjunction with displayStates() */
         enum States {Disconnected, Connected, Previewing,Inactive,Locked};
     public:
+
+
+
         /** Default constructor */
         QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionServices* pluginServices);
         /** Default destructor */
@@ -78,6 +83,21 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         /*! \brief release a locked camera, for more details see lockCamera() */
         void releaseCamera();
 
+        /** \brief return the current magnification */
+        double magnification();
+
+        /** \brief return the current objective */
+        ObjectiveDescription objective();
+
+        /** \brief return the current projection objective */
+        ObjectiveDescription objectiveProjection();
+
+
+        /** brief return the i-th objective description */
+        ObjectiveDescription getObjectiveDescription(int i);
+
+        bool objectiveExists(QString name);
+
     signals:
         /** \brief emitted when the set of configuration files changes */
         void configFilesChanged();
@@ -88,6 +108,17 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         int m_camViewID;
         QFExtensionManager* m_extManager;
         QFExtensionServices* m_pluginServices;
+
+        QList<ObjectiveDescription> objectives;
+
+        void loadObjectives();
+        void storeObjectives();
+
+    protected slots:
+        void addObjective();
+        void deleteObjective();
+        void editObjective();
+        void currentObjectiveChanged(int idx);
 
     protected:
         /** \brief struct that holds dta about the different camera devices, including the last raw image, ... */
@@ -143,6 +174,10 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QFCameraComboBox* cmbAcquisitionDevice;
         /** \brief spinbox to select delay between two subsequent frames */
         QDoubleSpinBox* spinAcquisitionDelay;
+        /** \brief select an objective */
+        QComboBox* cmbObjecive;
+        /** \brief select an objective */
+        QComboBox* cmbObjeciveProjection;
         /** \brief view for images from camera */
         QFESPIMB040CameraView* camView;
         /** \brief combobox for the selected camera preview configuration */
@@ -158,6 +193,11 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         /** \brief button to acquire a single frame */
         QToolButton* btnPreviewSingle;
 
+        QToolButton* btnAddObjective;
+        QToolButton* btnEditObjective;
+        QToolButton* btnDeleteObjective;
+        QLabel* labDetectObjectiveDescription;
+        QLabel* labProjectObjectiveDescription;
 
         /** \brief action to connect/disconnect to acquisition device */
         QAction* actDisConnect;
@@ -229,7 +269,6 @@ class QFESPIMB040CameraConfig : public QGroupBox {
 
         /** \brief set enabled/disabled states of the actions and widgets according to the given parameter */
         void displayStates(States state);
-
 
 
 
