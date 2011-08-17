@@ -24,7 +24,8 @@ HEADERS += spimb040.h \
            qfstagecombobox.h \
            qfcameraconfigcombobox.h \
            ../../../../../LIB/trunk/statistics_tools.h \
-    objectives.h
+           objectives.h \
+    qfespimb040imagestackconfigwidget.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -36,16 +37,19 @@ SOURCES += spimb040.cpp \
            qfstagecombobox.cpp \
            qfcameraconfigcombobox.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
-    objectives.cpp
+           objectives.cpp \
+           qfespimb040imagestackconfigwidget.cpp
 
 FORMS = \
-    qfespimb040objectiveeditor.ui
+    qfespimb040objectiveeditor.ui \
+    qfespimb040imagestackconfigwidget.ui
 
 RESOURCES += spimb040.qrc
 
 TRANSLATIONS= ./translations/de.spimb040.ts
 
-INCLUDEPATH += ../../lib/ \
+INCLUDEPATH += . \
+               ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/ \

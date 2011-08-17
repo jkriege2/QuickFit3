@@ -16,7 +16,7 @@
         <file alias="spimb040/acquisitionsettings.png">../../images/22x22/camerasetup.png</file>
         <file alias="spimb040/stageconnect.png">../../images/22x22/stage_connect.png</file>
         <file alias="spimb040/stagedisconnect.png">../../images/22x22/stage_disconnect.png</file>
-        <file alias="spimb040/stagesettings.png">../../images/22x22/configure.png</file>
+        <file alias="spimb040/stagesettings.png">icons/configure_alt.png</file>
         <file alias="spimb040/stagemove.png">../../images/22x22/2rightarrow.png</file>
         <file alias="spimb040/stage_error.png">../../images/16x16/stage_error.png</file>
         <file alias="spimb040/stage_ready.png">../../images/16x16/stage_ready.png</file>
@@ -28,12 +28,16 @@
         <file alias="spimb040/config_add.png">../../images/16x16/list_add.png</file>
         <file alias="spimb040/config_delete.png">../../images/16x16/list_remove.png</file>
         <file alias="spimb040/config_saveas.png">../../images/16x16/save_all.png</file>
-        <file alias="spimb040/config_rename.png">../../images/16x16/edit_rename.png</file>
         <file alias="spimb040/camera_config.png">icons/camera_config.png</file>
         <file alias="spimb040/objective_add.png">icons/list_add.png</file>
         <file alias="spimb040/objective_delete.png">icons/list_delete.png</file>
-        <file alias="spimb040/objective_rename.png">icons/edit_rename.png</file>
         <file alias="spimb040/cursor.png">icons/cursor.png</file>
         <file alias="spimb040/measure.png">icons/measure.png</file>
+        <file alias="spimb040/objective_rename.png">icons/edit.png</file>
+        <file alias="spimb040/config_rename.png">icons/config_rename.png</file>
+    </qresource>
+    <qresource prefix="/spimb040">
+        <file alias="report_print.png">icons/report_print.png</file>
+        <file alias="report_save.png">icons/report_save.png</file>
     </qresource>
 </RCC>

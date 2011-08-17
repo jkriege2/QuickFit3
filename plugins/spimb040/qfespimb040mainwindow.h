@@ -33,6 +33,7 @@
 #include "tools.h"
 #include "qfespimb040cameraconfig.h"
 #include "qfespimb040samplestageconfig.h"
+#include "qfespimb040imagestackconfigwidget.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -72,6 +73,10 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         QLineEdit* edtAcquisitionPrefix1;
         QLineEdit* edtAcquisitionPrefix2;
         QPushButton* btnAcquire;
+        QSpinBox* spinAcquisitionCount;
+
+        QFESPIMB040ImageStackConfigWidget* widImageStack;
+
 
 
         /** \brief handles the close event, also close all camera views in camViews
@@ -85,14 +90,22 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
 
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
         void createWidgets(QFExtensionManager* extManager);
-        /** \brief Create ll QActions for this window, clled after createWidgets() in the constructor.
-         *         So you also have to connect and add (e.g. to toolbars) QAction's here! */
-        void createActions();
 
 
 
     protected slots:
+        /*! \brief runs an image acquisition
+
+            This function starts an image acquisition for every of the cameras. Then it waits until the acquisitions are completed.
+          */
         void doAcquisition();
+        /*! \brief runs an image stack acquisition
+
+            This function is configured by widImageStack (QFESPIMB040ImageStackConfigWidget). It takes a stage and scans it over a range of values
+            (given by start, delta and steps). At each position it records a single frame from every camera. The frames are stored in a multi-frame
+            16-bit TIFF file for eachcamera separately.
+          */
+        void doImageStack();
 
 
     public:

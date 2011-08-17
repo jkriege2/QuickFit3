@@ -38,6 +38,21 @@ class QFESPIMB040MainWindow; // forward
 
 #include "objectives.h"
 
+/*! \brief This class is used to notify all QFESPIMB040CameraConfig in the application to update their contents,
+           if e.g. a configuration is deleted or added
+    \ingroup qf3ext_spimb040
+
+ */
+class QFCameraConfigNotifier: public QObject {
+        Q_OBJECT
+    public:
+        QFCameraConfigNotifier(QObject* parent) {};
+    public slots:
+        void emitUpdate() { emit doUpdate(); };
+    signals:
+        void doUpdate();
+};
+
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
     \ingroup qf3ext_spimb040
 
@@ -111,10 +126,9 @@ class QFESPIMB040CameraConfig : public QGroupBox {
 
         QList<ObjectiveDescription> objectives;
 
+    protected slots:
         void loadObjectives();
         void storeObjectives();
-
-    protected slots:
         void addObjective();
         void deleteObjective();
         void editObjective();
@@ -206,6 +220,8 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         /** \brief action to acquire a single frame */
         QAction* actPreviewSingle;
 
+
+        static QFCameraConfigNotifier* m_notifier;
 
         /** \brief handles the close event, also close all camera views in camViews
          *

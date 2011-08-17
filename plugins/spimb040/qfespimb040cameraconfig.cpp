@@ -21,9 +21,14 @@ void QFESPIMB040CameraConfig::viewDataStruct::reset() {
 }
 
 
+QFCameraConfigNotifier* QFESPIMB040CameraConfig::m_notifier=NULL;
+
+
+
 QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionServices* pluginServices):
     QGroupBox(parent)
 {
+    if (m_notifier==NULL) m_notifier=new QFCameraConfigNotifier(this);
     m_camViewID=camViewID;
     m_parent=parent;
     m_pluginServices=pluginServices;
@@ -41,7 +46,7 @@ QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, 
     createActions();
     displayStates(QFESPIMB040CameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040CameraConfig::Inactive);
-
+    connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(loadObjectives()));
 }
 
 QFESPIMB040CameraConfig::~QFESPIMB040CameraConfig()
@@ -599,6 +604,7 @@ void QFESPIMB040CameraConfig::storeObjectives() {
         inifile.setValue(g+"/magnification", o.magnification);
         inifile.setValue(g+"/na", o.NA);
     }
+    emit m_notifier->emitUpdate();
 }
 
 void QFESPIMB040CameraConfig::deleteObjective() {
@@ -678,3 +684,4 @@ void QFESPIMB040CameraConfig::currentObjectiveChanged(int idx) {
     if (iP>=0 && iP<objectives.size()) labProjectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
     else labProjectObjectiveDescription->setText("");
 }
+

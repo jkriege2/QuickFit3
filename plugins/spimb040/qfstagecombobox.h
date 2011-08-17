@@ -3,7 +3,6 @@
 
 #include <QComboBox>
 #include "qfextensionmanager.h"
-#include "qfextensionmanager.h"
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
 
@@ -15,9 +14,11 @@
 class QFStageComboBox : public QComboBox {
         Q_OBJECT
     public:
+        QFStageComboBox(QWidget* parent=NULL);
         QFStageComboBox(QFExtensionManager* extManager, QWidget* parent);
         virtual ~QFStageComboBox();
 
+        void init(QFExtensionManager* extManager);
         QFExtension* currentExtension() const;
         QFExtensionLinearStage* currentExtensionLinearStage() const;
         int currentAxisID() const;

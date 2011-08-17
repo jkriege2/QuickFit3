@@ -2,9 +2,10 @@
 #include "qftools.h"
 #include "statistics_tools.h"
 #include "lmcurve.h"
+#include "qmoretextobject.h"
 
 #include <QtGui>
-
+#include <QtCore>
 
 double fGauss( double t, const double *p )
 {
@@ -390,6 +391,11 @@ void QFESPIMB040CameraView::createActions() {
     actMaskLoad = new QAction(QIcon(":/spimb040/maskload.png"), tr("&Load mask (broken pixels)"), this);
     connect(actMaskLoad, SIGNAL(triggered()), this, SLOT(loadMask()));
 
+    actPrintReport = new QAction(QIcon(":/spimb040/report_print.png"), tr("&Print a report"), this);
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
+    actSaveReport = new QAction(QIcon(":/spimb040/report_save.png"), tr("&Save a report"), this);
+    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+
 
     QActionGroup* actgMouse=new QActionGroup(this);
     actCursor=actgMouse->addAction(QIcon(":/spimb040/cursor.png"), tr("default mouse cursor"));
@@ -404,6 +410,8 @@ void QFESPIMB040CameraView::createActions() {
     actCursor->setChecked(true);
 
     toolbar->addAction(actSaveRaw);
+    toolbar->addAction(actSaveReport);
+    toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
     toolbar->addAction(actMaskLoad);
     toolbar->addAction(actMaskSave);
@@ -1044,12 +1052,12 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
 
 
     if (labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) {
-        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
+        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td>= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
                         .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str())
                         .arg(roundWithError(imageMean, imageStddev, 2)).arg(roundError(imageStddev, 2))
                         .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 2)).arg(roundError(imageStddev/imageExposureTime/1000.0, 2))
-                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0);
+                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight);
         labImageStatistics->setText(s);
         labelUpdateTime.start();
     }
@@ -1101,8 +1109,8 @@ void QFESPIMB040CameraView::loadMask() {
 
 void QFESPIMB040CameraView::saveRaw() {
     QStringList imageFilters;
-    imageFilters<<tr("16-Bit Grayscal TIFF (*.tif)");
-    imageFilters<<tr("Float Grayscal TIFF (*.tif)");
+    imageFilters<<tr("16-Bit Grayscal TIFF (*.tif *.tiff16)");
+    imageFilters<<tr("Float Grayscal TIFF (*.tif *.tiff)");
     imageFilters<<tr("Comma Separated Values (*.dat)");
     imageFilters<<tr("Color Coded PNG (*.png)");
     imageFilters<<tr("Color Coded BMP (*.bmp)");
@@ -1184,7 +1192,7 @@ void QFESPIMB040CameraView::clearImage() {
 }
 
 void QFESPIMB040CameraView::displayCameraConfig(QString camera, double framerate) {
-    labVideoSettings->setText(tr("<div align=\"right\"><b>camera:</b> %1<br><b>framerate:</b> %2 fps&nbsp;&nbsp;<b>exposure:</b> %7ms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>size:</b> %3&times;%4&nbsp;&nbsp;<b>FOV:</b> %5&times;%6&mu;m<sup>2</sup></div>").arg(camera).arg(framerate).arg(rawImage.width()).arg(rawImage.height()).arg((double)rawImage.width()*pixelWidth).arg((double)rawImage.height()*pixelHeight).arg(imageExposureTime*1e3));
+    labVideoSettings->setText(tr("<div align=\"right\"><b>camera:</b> %1<br><b>framerate:</b> %2 fps&nbsp;&nbsp;<b>exposure:</b> %5ms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>size:</b> %3&times;%4").arg(camera).arg(framerate).arg(rawImage.width()).arg(rawImage.height()).arg(imageExposureTime*1e3));
 }
 
 
@@ -1197,4 +1205,187 @@ void QFESPIMB040CameraView::deleteUserAction(QAction* action) {
 }
 
 void QFESPIMB040CameraView::histogramChecked(bool checked) {
+}
+
+
+
+
+void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
+    // make text object for QPicture available
+    int PicTextFormat=QTextFormat::UserObject + 1;
+    QObject *picInterface = new QPictureTextObject;
+    document->documentLayout()->registerHandler(PicTextFormat, picInterface);
+
+    // collect images from plots
+    QPicture picMain; QSize sizeMain;
+    QPainter* p=new QPainter(&picMain); pltMain->draw(p, &sizeMain); p->end(); delete p;
+    QPicture picMarginLeft; QSize sizeMarginLeft;
+    p=new QPainter(&picMarginLeft); pltMarginalLeft->draw(p, &sizeMarginLeft); p->end(); delete p;
+    QPicture picMarginBottom; QSize sizeMarginBottom;
+    p=new QPainter(&picMarginBottom); pltMarginalBottom->draw(p, &sizeMarginBottom); p->end(); delete p;
+    QPicture picHist; QSize sizeHist;
+    p=new QPainter(&picHist); pltCountsHistogram->draw(p, &sizeHist); p->end(); delete p;
+
+
+    // we use this QTextCursor to write the document
+    QTextCursor cursor(document);
+
+    // here we define some generic formats
+    QTextCharFormat fText=cursor.charFormat();
+    fText.setFontPointSize(8);
+    QTextCharFormat fTextSmall=fText;
+    fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fTextBold=fText;
+    fTextBold.setFontWeight(QFont::Bold);
+    QTextCharFormat fTextBoldSmall=fTextBold;
+    fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fHeading1=fText;
+    QTextBlockFormat bfLeft;
+    bfLeft.setAlignment(Qt::AlignLeft);
+    QTextBlockFormat bfRight;
+    bfRight.setAlignment(Qt::AlignRight);
+    QTextBlockFormat bfCenter;
+    bfCenter.setAlignment(Qt::AlignHCenter);
+
+    fHeading1.setFontPointSize(2*fText.fontPointSize());
+    fHeading1.setFontWeight(QFont::Bold);
+
+
+    // insert heading
+    cursor.insertText(QString("%1:\n\n").arg(windowTitle()), fHeading1);
+    cursor.insertBlock();
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertHtml(labVideoSettings->text());
+
+
+    cursor.insertBlock();
+    QTextTableFormat tableFormat1;
+    tableFormat1.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+    tableFormat1.setWidth(QTextLength(QTextLength::PercentageLength, 98));
+    QVector<QTextLength> constraints;
+    constraints << QTextLength(QTextLength::PercentageLength, 20);
+    constraints << QTextLength(QTextLength::PercentageLength, 80);
+    tableFormat1.setColumnWidthConstraints(constraints);
+    QTextTable* table = cursor.insertTable(3, 2, tableFormat1);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
+
+
+        double pixelW=pixelWidth;
+        double pixelH=pixelHeight;
+        if (cmbRotation->currentIndex()%2==1) {
+            pixelW=pixelHeight;
+            pixelH=pixelWidth;
+        }
+
+        if (actMeasure->isChecked()) {
+            double dx=measureX[0]-measureX[1];
+            double dy=measureY[0]-measureY[1];
+            double d=sqrt(dx*dx+dy*dy);
+            double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
+            tabCursor.insertHtml(tr("distance = %1px = %2&mu;m").arg(d).arg(du));
+        }
+
+
+    }
+    {
+        QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
+        QPicture& pic=picMain;
+        double scale=document->textWidth()*0.78/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    {
+        QTextCursor tabCursor=table->cellAt(1, 0).firstCursorPosition();
+        QPicture& pic=picMarginLeft;
+        double scale=document->textWidth()*0.18/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    {
+        QTextCursor tabCursor=table->cellAt(2, 1).firstCursorPosition();
+        QPicture& pic=picMarginBottom;
+        double scale=document->textWidth()*0.78/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    QApplication::processEvents();
+
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertBlock();
+    cursor.insertBlock();
+    constraints.clear();
+    constraints << QTextLength(QTextLength::PercentageLength, 50);
+    constraints << QTextLength(QTextLength::PercentageLength, 50);
+    tableFormat1.setColumnWidthConstraints(constraints);
+    table = cursor.insertTable(1,2, tableFormat1);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture& pic=picHist;
+        double scale=document->textWidth()*0.48/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        tabCursor.insertText(QString("Histogram:\n"), fTextBold);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    {
+        QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        tabCursor.insertHtml(labImageStatistics->text());
+        tabCursor.insertBlock();
+        tabCursor.insertBlock();
+        tabCursor.insertHtml(labMarginalFitResults->text());
+    }
+}
+
+void QFESPIMB040CameraView::saveReport() {
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+
+    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+                                lastImagepath,
+                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+
+    if (!fn.isEmpty()) {
+        lastImagepath=QFileInfo(fn).absolutePath();
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+        QFileInfo fi(fn);
+        QPrinter* printer=new QPrinter();
+        printer->setPaperSize(QPrinter::A4);
+        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+        printer->setOrientation(QPrinter::Portrait);
+        printer->setOutputFormat(QPrinter::PdfFormat);
+        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+        printer->setOutputFileName(fn);
+        QTextDocument* doc=new QTextDocument();
+        doc->setTextWidth(printer->pageRect().size().width());
+        createReportDoc(doc);
+        doc->print(printer);
+        delete doc;
+        delete printer;
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+void QFESPIMB040CameraView::printReport() {
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+    QPrinter* p=new QPrinter();
+
+    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+    p->setOrientation(QPrinter::Portrait);
+    QPrintDialog *dialog = new QPrintDialog(p, this);
+    dialog->setWindowTitle(tr("Print Report"));
+    if (dialog->exec() != QDialog::Accepted) {
+        delete p;
+        return;
+    }
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QTextDocument* doc=new QTextDocument();
+    doc->setTextWidth(p->pageRect().size().width());
+    createReportDoc(doc);
+    doc->print(p);
+    delete p;
+    delete doc;
+    QApplication::restoreOverrideCursor();
 }

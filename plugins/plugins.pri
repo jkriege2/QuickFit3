@@ -37,3 +37,4 @@ release {
 } else {
     message("building in DEBUG mode, output is in $$QFOUTPUT")
 }
+

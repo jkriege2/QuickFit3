@@ -3,8 +3,13 @@
 QFStageComboBox::QFStageComboBox(QFExtensionManager* extManager, QWidget* parent):
     QComboBox(parent)
 {
-    m_extManager=extManager;
-    findExtensions();
+    init(extManager);
+}
+
+QFStageComboBox::QFStageComboBox(QWidget* parent):
+    QComboBox(parent)
+{
+    m_extManager=NULL;
 }
 
 QFStageComboBox::~QFStageComboBox()
@@ -12,10 +17,15 @@ QFStageComboBox::~QFStageComboBox()
     //dtor
 }
 
+void QFStageComboBox::init(QFExtensionManager* extManager) {
+    m_extManager=extManager;
+    findExtensions();
+}
 
 void QFStageComboBox::findExtensions() {
     stages.clear();
     clear();
+    if (!m_extManager) return;
     // load available acquisition devices from extManager
     QStringList ids=m_extManager->getIDList();
     for (int i=0; i<ids.size(); i++) {

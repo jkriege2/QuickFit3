@@ -71,8 +71,15 @@ class QFESPIMB040CameraView : public QWidget {
         void addUserAction(QAction* action);
         /** \brief delete a QAction from the main toolbar */
         void deleteUserAction(QAction* action);
+    protected slots:
+        /** \brief save a report of the evaluation results */
+        void saveReport();
+        /** \brief print a report of the evaluation results */
+        void printReport();
     protected:
 
+        /*! \brief create an evaluation report for the current record */
+        void createReportDoc(QTextDocument* document);
         /** \brief create main widgets */
         void createMainWidgets(const QString& logfile);
         /** \brief create actions and register them to toolbar */
@@ -211,7 +218,14 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief action to activate/disactivate measuring mode */
         QAction* actMeasure;
+        /** \brief action to activate/disactivate normal cursor mode mode */
         QAction* actCursor;
+
+        /** \brief action to print a report */
+        QAction* actPrintReport;
+
+        /** \brief action to save a report */
+        QAction* actSaveReport;
 
         bool measureFirst;
 
