@@ -665,6 +665,9 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
             labPos->setText(QString::number(position, 'f', 2));
         }
 
+
+        updateStates();
+
     /*if ((!locked) && anyconn && automatic) {
         QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
     }*/
