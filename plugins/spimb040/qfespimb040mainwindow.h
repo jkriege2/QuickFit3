@@ -91,7 +91,30 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
         void createWidgets(QFExtensionManager* extManager);
 
+        /*! \brief save a description of an acquisition to a QSettings object
 
+            Settings will be stored to the file \c <filenamePrefix>_configuration.ini .
+
+            \param extension QFExtension object describing the used camera (must be castable to QFExtensionCamera)
+            \param camera =0,1 which camera was used?
+            \param filenamePrefix prefix for the acquisition output files
+            \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
+            \return filename of the settings file
+        */
+        QString saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription);
+
+        /*! \brief save a description of an acquisition in preview mode to a QSettings object
+
+            Settings will be stored to the file \c <filenamePrefix>_configuration.ini .
+
+            \param extension QFExtension object describing the used camera (must be castable to QFExtensionCamera)
+            \param camera =0,1 which camera was used?
+            \param filenamePrefix prefix for the acquisition output files
+            \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
+            \param files files that have been stored (see  QFExtensionCamera::AcquititonFileDescription)
+            \return filename of the settings file
+        */
+        QString savePreviewDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files);
 
     protected slots:
         /*! \brief runs an image acquisition

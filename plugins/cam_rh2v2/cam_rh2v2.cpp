@@ -213,7 +213,7 @@ bool QFExtensionCameraRh2v2::isAcquisitionRunning(unsigned int camera, double* p
     return pc->isRunning();
 }
 
-void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
 }
 
 bool QFExtensionCameraRh2v2::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
@@ -223,7 +223,13 @@ bool QFExtensionCameraRh2v2::getAcquisitionPreview(unsigned int camera, uint32_t
 int QFExtensionCameraRh2v2::getAcquisitionProgress(unsigned int camera) {
     return 0;
 }
+QString QFExtensionCameraRh2v2::getCameraName(unsigned int camera) {
+    return QString("RadHard2");
+}
 
+QString QFExtensionCameraRh2v2::getCameraSensorName(unsigned int camera) {
+	return QString("Radhard2");
+}
 void QFExtensionCameraRh2v2::log_text(QString message) {
 	if (logService) logService->log_text(message);
 	else if (services) services->log_text(message);

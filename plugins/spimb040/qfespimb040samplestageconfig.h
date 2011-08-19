@@ -154,7 +154,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QTimer timerDisplayUpdate;
 
 
-
+    public:
 
         /** \brief return a pointer to the x-axis stage class */
         QFExtensionLinearStage* getXStage();

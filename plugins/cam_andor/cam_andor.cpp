@@ -411,6 +411,16 @@ double QFExtensionCameraAndor::getPixelWidth(unsigned int camera) {
     return camInfos[camera].pixelWidth*(double)(camInfos[camera].hbin);
 }
 
+QString QFExtensionCameraAndor::getCameraName(unsigned int camera) {
+    if (!camInfos.contains(camera)) return "";
+    return camInfos[camera].headModel;
+}
+
+QString QFExtensionCameraAndor::getCameraSensorName(unsigned int camera) {
+    if (!camInfos.contains(camera)) return "";
+    return camInfos[camera].headModel;
+}
+
 double QFExtensionCameraAndor::getPixelHeight(unsigned int camera) {
     if (!isConnected(camera)) return 1;
     return camInfos[camera].pixelHeight*(double)(camInfos[camera].vbin);
@@ -767,12 +777,13 @@ bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* p
     }
 }
 
-void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
 }
 
 bool QFExtensionCameraAndor::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
+
 
 int QFExtensionCameraAndor::getAcquisitionProgress(unsigned int camera) {
     /*if (selectCamera(camera)) {

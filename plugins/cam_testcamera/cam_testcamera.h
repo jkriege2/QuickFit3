@@ -110,6 +110,10 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         virtual double getPixelWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getPixelHeight() */
         virtual double getPixelHeight(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getCameraName() */
+        virtual QString getCameraName(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getCameraSensorName() */
+        virtual QString getCameraSensorName(unsigned int camera);
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
         virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
@@ -120,7 +124,7 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
         virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
-        virtual void getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters);
+        virtual void getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
         /** \copydoc QFExtensionCamera::getAcquisitionProgress() */

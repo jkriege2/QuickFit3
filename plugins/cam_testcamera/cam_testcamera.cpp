@@ -328,6 +328,15 @@ double QFECamTestCamera::getExposureTime(unsigned int camera) {
     return 1e-3;
 }
 
+QString QFECamTestCamera::getCameraName(unsigned int camera) {
+    return QString("Test Camera");
+}
+
+QString QFECamTestCamera::getCameraSensorName(unsigned int camera) {
+    return QString("TestSensor %1").arg(camera+1);
+}
+
+
 
 
 
@@ -382,11 +391,18 @@ bool QFECamTestCamera::isAcquisitionRunning(unsigned int camera, double* percent
     return seriesRunning[camera];
 }
 
-void QFECamTestCamera::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
-    if (files) files->append(seriesFilenamePrefix[camera]);
+void QFECamTestCamera::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+    if (files) {
+        QFExtensionCamera::AcquititonFileDescription d;
+        d.type="TIFF8";
+        d.name=seriesFilenamePrefix[camera];
+        d.description="TIFF image series";
+        files->append(d);
+    }
     if (parameters) {
-        (*parameters)["images"]=seriesCount[camera];
-        (*parameters)["fileformat"]="TIFF, 8-bit";
+        (*parameters)["sequence_length"]=seriesCount[camera];
+        (*parameters)["image_width"]=width[camera];
+        (*parameters)["image_height"]=height[camera];
     }
 }
 

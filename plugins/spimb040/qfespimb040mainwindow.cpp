@@ -1,6 +1,7 @@
 #include "qfespimb040mainwindow.h"
 #include <QtGui>
-
+#include <tiffio.h>
+#include "libtiff_tools.h"
 
 
 
@@ -174,9 +175,345 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     connect(widImageStack, SIGNAL(doStack()), this, SLOT(doImageStack()));
 }
 
-void QFESPIMB040MainWindow::doImageStack() {
+#define IMAGESTACK_ERROR(message) \
+    log_error(QString("  - ")+(message)+QString("\n")); \
+    QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition Error"), (message));
 
+
+void QFESPIMB040MainWindow::doImageStack() {
+    if (!(widImageStack->use1() || widImageStack->use2())) {
+        QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No camera selected!"));
+        return;
+    }
+
+
+    log_text(tr("starting image stack acquisition:\n"));
+
+    bool ok=true;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // CHECK/CONNECT SELECTED STAGE
+    //////////////////////////////////////////////////////////////////////////////////////
+    QFExtensionLinearStage* stage=widImageStack->stage();
+    int stageAxis=widImageStack->currentAxisID();
+    if (!stage) {
+        IMAGESTACK_ERROR(tr("no stage selected"));
+        QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage selected!"));
+        return;
+    }
+    if (ok && (!stage->isConnected(stageAxis))) {
+        log_text(tr("  - connecting to stage '%1', axis %2!\n").arg(widImageStack->stageExtension()->getName()).arg(stageAxis));
+        stage->connectDevice(stageAxis);
+    }
+    if (ok && (!stage->isConnected(stageAxis)))  {
+        ok=false;
+        IMAGESTACK_ERROR(tr("error connecting to stage '%1', axis %2").arg(widImageStack->stageExtension()->getName()).arg(stageAxis));
+    }
+    if (ok) stage->setJoystickActive(stageAxis, false);
+
+    if (!ok) return;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // LOCK/INIT CAMERA 1
+    //////////////////////////////////////////////////////////////////////////////////////
+    bool useCam1=false;
+    QFExtension* extension1=NULL;
+    QFExtensionCamera* ecamera1=NULL;
+    int camera1=0;
+    QString acquisitionSettingsFilename1="", previewSettingsFilename1="";
+    QString acquisitionPrefix1=widImageStack->prefix1();
+    QString TIFFFIlename1=acquisitionPrefix1+".tif";
+    TIFF* tiff1=NULL;
+    if (widImageStack->use1()) {
+        if (!(useCam1=camConfig1->lockCamera(&extension1, &ecamera1, &camera1, &acquisitionSettingsFilename1, &previewSettingsFilename1))) {
+            IMAGESTACK_ERROR(tr("error locking camer 1!\n"));
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // LOCK/INIT CAMERA 2
+    //////////////////////////////////////////////////////////////////////////////////////
+    bool useCam2=false;
+    QFExtension* extension2=NULL;
+    QFExtensionCamera* ecamera2=NULL;
+    QString acquisitionSettingsFilename2="", previewSettingsFilename2="";
+    QString acquisitionPrefix2=widImageStack->prefix2();
+    QString TIFFFIlename2=acquisitionPrefix2+".tif";
+    TIFF* tiff2=NULL;
+    int camera2=0;
+    if (widImageStack->use2()) {
+        if(!(useCam2=camConfig2->lockCamera(&extension2, &ecamera2, &camera2, &acquisitionSettingsFilename2, &previewSettingsFilename2))) {
+            IMAGESTACK_ERROR(tr("error locking camer 2!\n"));
+        }
+    }
+
+    if (ok && !useCam1 && !useCam2) {
+        IMAGESTACK_ERROR(tr("Cannot start image acquisition: No camera selected, or both cameras not usable!"));
+        ok=false;
+    }
+
+    QProgressDialog progress(tr("Image Stack Acquisition"), tr("&Cancel"), 0, 100, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
+    progress.setValue(0);
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PREPARE CAMERA 1
+    //////////////////////////////////////////////////////////////////////////////////////
+    int width1=0, height1=0;
+    uint32_t* buffer1=NULL;
+    if (ok && useCam1) {
+        progress.setLabelText(tr("preparing camera 1 ..."));
+        QApplication::processEvents();
+        QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
+        ecamera1->useCameraSettings(camera1, settings);
+        log_text(tr("  - prepared camer 1!\n"));
+        width1=ecamera1->getImageWidth(camera1);
+        height1=ecamera1->getImageHeight(camera1);
+        buffer1=(uint32_t*)calloc(width1*height1, sizeof(uint32_t));
+        if (!buffer1) {
+            ok=false;
+            IMAGESTACK_ERROR(tr("could not allocate image buffer for camera 1!\n"));
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PREPARE CAMERA 2
+    //////////////////////////////////////////////////////////////////////////////////////
+    int width2=0, height2=0;
+    uint32_t* buffer2=NULL;
+    if (ok && useCam2) {
+        progress.setLabelText(tr("preparing camera 2 ..."));
+        QApplication::processEvents();
+        QSettings settings(acquisitionSettingsFilename2, QSettings::IniFormat);
+        ecamera2->useCameraSettings(camera2, settings);
+        log_text(tr("  - prepared camera 2!\n"));
+        width2=ecamera2->getImageWidth(camera2);
+        height2=ecamera2->getImageHeight(camera2);
+        buffer2=(uint32_t*)calloc(width2*height2, sizeof(uint32_t));
+        if (!buffer2) {
+            ok=false;
+            IMAGESTACK_ERROR(tr("could not allocate image buffer for camera 2!\n"));
+        }
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // OPEN OUTPUT TIFF FILES
+    //////////////////////////////////////////////////////////////////////////////////////
+    progress.setLabelText(tr("opening output files ..."));
+    QApplication::processEvents();
+    if (ok && useCam1) {
+        QDir().mkpath(QFileInfo(TIFFFIlename1.toAscii().data()).absolutePath());
+        tiff1=TIFFOpen(TIFFFIlename1.toAscii().data(), "w");
+        if (!tiff1) {
+            ok=false;
+            IMAGESTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlename1));
+        }
+    }
+    if (ok && useCam2) {
+        QDir().mkpath(QFileInfo(TIFFFIlename2.toAscii().data()).absolutePath());
+        tiff2=TIFFOpen(TIFFFIlename2.toAscii().data(), "w");
+        if (!tiff2) {
+            ok=false;
+            IMAGESTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlename2));
+        }
+    }
+
+
+    double stageStart=widImageStack->stackStart();
+    double stageDelta=widImageStack->stackDelta();
+    int images=widImageStack->stackCount();
+
+
+    if (progress.wasCanceled()) {
+        log_warning(tr("canceled by user!\n"));
+        ok=false;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // ACQUIRE IMAGE, MOVE, ACQUIRE IMAGE, MOVE, ...
+    //    images are stored in TIFF files using libtiff and they are (possibly) downscaled to 16-bit
+    //////////////////////////////////////////////////////////////////////////////////////
+    QList<QVariant> positions;
+    QTime timAcquisition=QTime::currentTime();
+    QDateTime timStart;
+    double duration=0;
+    if (ok) {
+        progress.setLabelText(tr("acquiring images ..."));
+        bool running=ok;
+        int prog=0;
+        double newPos=stageStart;
+        while (running && (prog<images)) {
+
+            log_text(tr("  - moving to position %1 micron ...").arg(newPos));
+            stage->move(stageAxis, newPos);
+            while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving) {
+                progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
+                QApplication::processEvents();
+                if (progress.wasCanceled()) break;
+                QApplication::processEvents();
+            }
+            if (ok) {
+                if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready) {
+                    log_text(tr(" OK\n"));
+                    positions.append(stage->getPosition(stageAxis));
+                } else {
+                    IMAGESTACK_ERROR(tr("error moving to position %1 micron!\n").arg(newPos));
+                    ok=false;
+                }
+            }
+
+
+            QApplication::processEvents();
+            QApplication::processEvents();
+
+            if (progress.wasCanceled()) {
+                running=false;
+                log_warning(tr("  - acquisition canceled by user!\n"));
+            } else {
+                log_text(tr("acquiring images (%2/%3) @ %1 micron ...").arg(fabs(stage->getPosition(stageAxis))).arg(prog+1).arg(images));
+                progress.setLabelText(tr("acquiring images (%2/%3) @ %1 micron ...").arg(fabs(stage->getPosition(stageAxis))).arg(prog+1).arg(images));
+                QApplication::processEvents();
+                if (prog==0) {
+                    timAcquisition.start();
+                    timStart=QDateTime::currentDateTime();
+                }
+                if (useCam1) {
+                    if (ecamera1->acquire(camera1, buffer1)) {
+                        TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
+                        TIFFWriteDirectory(tiff1);
+                    } else {
+                        ok=false;
+                        IMAGESTACK_ERROR(tr("error acquiring image %1/%2 on camera 1!\n").arg(prog+1).arg(images));
+                    }
+                }
+                QApplication::processEvents();
+                if (useCam2) {
+                    if (ecamera2->acquire(camera2, buffer2)) {
+                        TIFFTWriteUint16from32(tiff2, buffer2, width2, height2);
+                        TIFFWriteDirectory(tiff2);
+                    } else {
+                        ok=false;
+                        IMAGESTACK_ERROR(tr("error acquiring image %1/%2 on camera 2!\n").arg(prog+1).arg(images));
+                    }
+                }
+
+                QApplication::processEvents();
+            }
+            if (!ok) running=false;
+
+            prog++;
+            newPos+=stageDelta;
+            progress.setValue((int)round((double)prog/(double)images*100.0));
+            QApplication::processEvents();
+        }
+        duration=timAcquisition.elapsed()/1000.0;
+    }
+    progress.setValue(100);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // close tiff files and free buffers
+    //////////////////////////////////////////////////////////////////////////////////////
+    progress.setLabelText(tr("closing output files ..."));
+    QApplication::processEvents();
+    if (tiff1) TIFFClose(tiff1);
+    if (tiff2) TIFFClose(tiff2);
+    tiff1=tiff2=NULL;
+    if (buffer1) free(buffer1);
+    if (buffer2) free(buffer2);
+    buffer1=buffer2=NULL;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // collect acquisition data common to all cameras
+    //////////////////////////////////////////////////////////////////////////////////////
+    QMap<QString, QVariant> acquisitionDescription;
+    if (ok) {
+        acquisitionDescription["type"]="stack";
+        acquisitionDescription["axis"]="other";
+        if (sampleStages->getXStage()==stage && sampleStages->getXStageAxis()==stageAxis) acquisitionDescription["axis"]="x";
+        if (sampleStages->getYStage()==stage && sampleStages->getYStageAxis()==stageAxis) acquisitionDescription["axis"]="y";
+        if (sampleStages->getZStage()==stage && sampleStages->getZStageAxis()==stageAxis) acquisitionDescription["axis"]="z";
+        acquisitionDescription["stage_name"]=widImageStack->stageExtension()->getName();
+        acquisitionDescription["stage_axis"]=stageAxis;
+        acquisitionDescription["stack_start"]=stageStart;
+        acquisitionDescription["stack_delta"]=stageDelta;
+        acquisitionDescription["sequence_length"]=images;
+        acquisitionDescription["start_time"]=timStart;
+        acquisitionDescription["duration"]=duration;
+        acquisitionDescription["stack_positions"]=positions;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // write image stack properties to files, also collects camera specific information
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (ok && useCam1) {
+        QMap<QString, QVariant> acquisitionDescription1=acquisitionDescription;
+        QList<QFExtensionCamera::AcquititonFileDescription> files;
+        QFExtensionCamera::AcquititonFileDescription d;
+        d.name=TIFFFIlename1;
+        d.description="image stack from camera 1";
+        d.type="TIFF16";
+        files.append(d);
+
+        acquisitionDescription1["image_width"]=width1;
+        acquisitionDescription1["image_height"]=height1;
+        acquisitionDescription1["pixel_width"]=ecamera1->getPixelWidth(camera1);
+        acquisitionDescription1["pixel_height"]=ecamera1->getPixelHeight(camera1);
+        acquisitionDescription1["exposure_time"]=ecamera1->getExposureTime(camera1);
+        acquisitionDescription1["camera_model"]=ecamera1->getCameraName(camera1);
+        acquisitionDescription1["sensor_model"]=ecamera1->getCameraSensorName(camera1);
+
+        log_text(tr("  - writing acquisition description 1 ..."));
+        savePreviewDescription(extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files);
+        log_text(tr(" DONE!\n"));
+    }
+    if (ok && useCam2) {
+        QMap<QString, QVariant> acquisitionDescription2=acquisitionDescription;
+        QList<QFExtensionCamera::AcquititonFileDescription> files;
+        QFExtensionCamera::AcquititonFileDescription d;
+        d.name=TIFFFIlename1;
+        d.description="image stack from camera 2";
+        d.type="TIFF16";
+        files.append(d);
+
+        acquisitionDescription2["image_width"]=width2;
+        acquisitionDescription2["image_height"]=height2;
+        acquisitionDescription2["pixel_width"]=ecamera2->getPixelWidth(camera2);
+        acquisitionDescription2["pixel_height"]=ecamera2->getPixelHeight(camera2);
+        acquisitionDescription2["camera_model"]=ecamera2->getCameraName(camera2);
+        acquisitionDescription2["sensor_model"]=ecamera2->getCameraSensorName(camera2);
+        acquisitionDescription2["exposure_time"]=ecamera2->getExposureTime(camera2);
+
+        log_text(tr("  - writing acquisition description 2 ..."));
+        savePreviewDescription(extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files);
+        log_text(tr(" DONE!\n"));
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // release cameras
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (useCam1) {
+        camConfig1->releaseCamera();
+        log_text(tr("  - released camera 1!\n"));
+    }
+    if (useCam2) {
+        camConfig2->releaseCamera();
+        log_text(tr("  - released camera 2!\n"));
+    }
+
+
+    if (ok) log_text(tr("image stack acquisition DONE!\n"));
+    if (ok) widImageStack->incCounter();
 }
+
+
+#define ACQUISITION_ERROR(message) \
+    log_error(QString("  - ")+(message)+QString("\n")); \
+    QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition Error"), (message));
 
 void QFESPIMB040MainWindow::doAcquisition() {
     if (!(chkAcquisitionUseCam1->isChecked() || chkAcquisitionUseCam2->isChecked())) return;
@@ -186,11 +523,18 @@ void QFESPIMB040MainWindow::doAcquisition() {
 
     bool ok=true;
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // lock cameras for use by this routine
+    //////////////////////////////////////////////////////////////////////////////////////
     bool useCam1=false;
     QFExtension* extension1=NULL;
     QFExtensionCamera* ecamera1=NULL;
     int camera1=0;
     QString acquisitionSettingsFilename1="", previewSettingsFilename1="";
+    QString acquisitionPrefix1=edtAcquisitionPrefix1->text();
+    acquisitionPrefix1=acquisitionPrefix1.replace("%counter%", QString::number(cnt));
+    QString acquisitionPrefix2=edtAcquisitionPrefix2->text();
+    acquisitionPrefix2=acquisitionPrefix2.replace("%counter%", QString::number(cnt));
     if (chkAcquisitionUseCam1->isChecked()) {
         useCam1=camConfig1->lockCamera(&extension1, &ecamera1, &camera1, &acquisitionSettingsFilename1, &previewSettingsFilename1);
     }
@@ -209,46 +553,48 @@ void QFESPIMB040MainWindow::doAcquisition() {
     progress.setValue(0);
     log_text(tr("starting image series acquisition:\n"));
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // prepare cameras  (set camera settings)
+    //////////////////////////////////////////////////////////////////////////////////////
     if (ok && useCam1) {
-        progress.setLabelText("preparing camera 1 ...");
+        progress.setLabelText(tr("preparing camera 1 ..."));
         QApplication::processEvents();
         QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
-        QString filename= edtAcquisitionPrefix1->text();
-        filename=filename.replace("%counter%", QString::number(cnt));
-        ok=ecamera1->prepareAcquisition(camera1, settings, filename);
+        ok=ecamera1->prepareAcquisition(camera1, settings, acquisitionPrefix1);
         if (ok) {
-            log_text("  - prepared camer 1!\n");
+            log_text(tr("  - prepared camer 1!\n"));
         } else {
-            log_error("  - error preparing camer 1!\n");
+            ACQUISITION_ERROR(tr("  - error preparing camer 1!\n"));
         }
     }
     if (ok && useCam2) {
         progress.setLabelText("preparing camera 2 ...");
         QApplication::processEvents();
         QSettings settings(acquisitionSettingsFilename2, QSettings::IniFormat);
-        QString filename= edtAcquisitionPrefix2->text();
-        filename=filename.replace("%counter%", QString::number(cnt));
-        ok=ecamera2->prepareAcquisition(camera2, settings, filename);
+        ok=ecamera2->prepareAcquisition(camera2, settings, acquisitionPrefix2);
         if (ok) {
-            log_text("  - prepared camer 2!\n");
+            log_text(tr("  - prepared camer 2!\n"));
         } else {
-            log_error("  - error preparing camer 2!\n");
+            ACQUISITION_ERROR(tr("  - error preparing camer 2!\n"));
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // start acquisition and wait until finished
+    //////////////////////////////////////////////////////////////////////////////////////
     if (ok) {
-        progress.setLabelText("acquiring images ...");
-        log_text("  - acquiring images!\n");
+        progress.setLabelText(tr("acquiring images ..."));
+        log_text(tr("  - acquiring images!\n"));
         if (useCam1) {
             ok=ecamera1->startAcquisition(camera1);
             if (!ok) {
-                log_error("  - error starting acquisition on camera 1!\n");
+                ACQUISITION_ERROR(tr("  - error starting acquisition on camera 1!\n"));
             }
         }
         if (ok && useCam2) {
             ok=ecamera2->startAcquisition(camera2);
             if (!ok) {
-                log_error("  - error starting acquisition on camera 1!\n");
+                ACQUISITION_ERROR(tr("  - error starting acquisition on camera 1!\n"));
             }
         }
         bool running=ok;
@@ -275,11 +621,32 @@ void QFESPIMB040MainWindow::doAcquisition() {
         }
     }
     progress.setValue(100);
-    //QSettings* settings=new QSettings(filename, QSettings::IniFormat);
-    //viewData.camera->useCameraSettings(viewData.usedCamera, *settings);
-    //delete settings;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // collect common acquisition data
+    //////////////////////////////////////////////////////////////////////////////////////
+    QMap<QString, QVariant> acquisitionDescription;
+    acquisitionDescription["type"]="acquisition";
 
 
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // write acquisition data
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (ok && useCam1) {
+        log_text(tr("  - writing acquisition description 1 ..."));
+        saveAcquisitionDescription(extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription);
+        log_text(tr(" DONE!\n"));
+    }
+    if (ok && useCam2) {
+        log_text(tr("  - writing acquisition description 2 ..."));
+        saveAcquisitionDescription(extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription);
+        log_text(tr(" DONE!\n"));
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // release cameras
+    //////////////////////////////////////////////////////////////////////////////////////
     if (useCam1) {
         camConfig1->releaseCamera();
         log_text(tr("  - released camera 1!\n"));
@@ -288,11 +655,122 @@ void QFESPIMB040MainWindow::doAcquisition() {
         camConfig2->releaseCamera();
         log_text(tr("  - released camera 2!\n"));
     }
+
     log_text(tr("image series acquisition DONE!\n"));
 }
 
 
+QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription) {
+    QString iniFilename=filenamePrefix+"_configuration.ini";
+    QSettings settings(iniFilename, QSettings::IniFormat);
 
+    QFESPIMB040CameraConfig* cam=camConfig1;
+    if (camera==1) cam=camConfig2;
+
+    QList<QFExtensionCamera::AcquititonFileDescription> files;
+    QMap<QString, QVariant> parameters;
+    ecamera->getAcquisitionDescription(camera, &files, &parameters);
+
+    // WRITE ACQUISITION SETTINGS
+    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera));
+    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera));
+    settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
+    settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
+
+    QMapIterator <QString, QVariant> it1(acquisitionDescription);
+    while (it1.hasNext()) {
+        it1.next();
+        it1.next();
+        if (it1.value().type()==QVariant::List) {
+            settings.setValue("acquisition/"+it1.key(), jkVariantListToString(it1.value().toList(), "; "));
+        } else {
+            settings.setValue("acquisition/"+it1.key(), it1.value().toString());
+        }
+    }
+    QMapIterator <QString, QVariant> it(parameters);
+    while (it.hasNext()) {
+        it.next();
+        it1.next();
+        if (it.value().type()==QVariant::List) {
+            settings.setValue("acquisition/"+it.key(), jkVariantListToString(it.value().toList(), "; "));
+        } else {
+            settings.setValue("acquisition/"+it.key(), it.value().toString());
+        }
+    }
+
+    // WRITE OBJECTIVE SETTINGS
+    settings.setValue("objective_detection/name", cam->objective().name);
+    settings.setValue("objective_detection/manufacturer", cam->objective().manufacturer);
+    settings.setValue("objective_detection/magnification", cam->objective().magnification);
+    settings.setValue("objective_detection/numerical_aperature", cam->objective().NA);
+
+    settings.setValue("objectives_projection/name", cam->objectiveProjection().name);
+    settings.setValue("objectives_projection/manufacturer", cam->objectiveProjection().manufacturer);
+    settings.setValue("objectives_projection/magnification", cam->objectiveProjection().magnification);
+    settings.setValue("objectives_projection/numerical_aperature", cam->objectiveProjection().NA);
+
+    // WRITE FILES LIST
+    settings.setValue("files/count", files.size());
+    for (int i=0; i<files.size(); i++) {
+        settings.setValue("files/name"+QString::number(i), files[i].name);
+        settings.setValue("files/type"+QString::number(i), files[i].type);
+        settings.setValue("files/description"+QString::number(i), files[i].description);
+    }
+
+    settings.sync();
+    return iniFilename;
+}
+
+
+QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files) {
+    QString iniFilename=filenamePrefix+"_configuration.ini";
+    QSettings settings(iniFilename, QSettings::IniFormat);
+
+    QFESPIMB040CameraConfig* cam=camConfig1;
+    if (camera==1) cam=camConfig2;
+
+    QMap<QString, QVariant> parameters;
+
+    // WRITE ACQUISITION SETTINGS
+    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera));
+    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera));
+    settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
+    settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
+    settings.setValue("acquisition/exposure", ecamera->getExposureTime(camera));
+    settings.setValue("acquisition/image_width", ecamera->getImageWidth(camera));
+    settings.setValue("acquisition/image_height", ecamera->getImageHeight(camera));
+    QMapIterator <QString, QVariant> it1(acquisitionDescription);
+    while (it1.hasNext()) {
+        it1.next();
+        if (it1.value().type()==QVariant::List) {
+            settings.setValue("acquisition/"+it1.key(), jkVariantListToString(it1.value().toList(), "; "));
+        } else {
+            settings.setValue("acquisition/"+it1.key(), it1.value().toString());
+        }
+    }
+
+    // WRITE OBJECTIVE SETTINGS
+    settings.setValue("objective_detection/name", cam->objective().name);
+    settings.setValue("objective_detection/manufacturer", cam->objective().manufacturer);
+    settings.setValue("objective_detection/magnification", cam->objective().magnification);
+    settings.setValue("objective_detection/numerical_aperature", cam->objective().NA);
+
+    settings.setValue("objectives_projection/name", cam->objectiveProjection().name);
+    settings.setValue("objectives_projection/manufacturer", cam->objectiveProjection().manufacturer);
+    settings.setValue("objectives_projection/magnification", cam->objectiveProjection().magnification);
+    settings.setValue("objectives_projection/numerical_aperature", cam->objectiveProjection().NA);
+
+    // WRITE FILES LIST
+    settings.setValue("files/count", files.size());
+    for (int i=0; i<files.size(); i++) {
+        settings.setValue("files/name"+QString::number(i), files[i].name);
+        settings.setValue("files/type"+QString::number(i), files[i].type);
+        settings.setValue("files/description"+QString::number(i), files[i].description);
+    }
+
+    settings.sync();
+    return iniFilename;
+}
 
 void QFESPIMB040MainWindow::log_text(QString message) {
     logMain->log_text(message);
@@ -305,6 +783,7 @@ void QFESPIMB040MainWindow::log_warning(QString message) {
 void QFESPIMB040MainWindow::log_error(QString message) {
     logMain->log_error(message);
 };
+
 
 
 
