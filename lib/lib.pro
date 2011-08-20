@@ -93,4 +93,3 @@ TRANSLATIONS= ./translations/de.lib.ts
 INCLUDEPATH +=
 
 CONFIG += exceptions rtti stl
-

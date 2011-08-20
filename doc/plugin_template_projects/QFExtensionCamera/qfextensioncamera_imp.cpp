@@ -132,6 +132,15 @@ double QFExtensionCameraImplementation::getPixelHeight() {
     return /* width of pixel in microns */;
 }
 
+
+virtual QString QFExtensionCameraImplementation::getCameraName(unsigned int camera) {
+    return /* name of the camera */;
+}
+
+virtual QString QFExtensionCameraImplementation::getCameraSensorName(unsigned int camera) {
+    return /* name of the camera's sensor */;
+}
+
 bool QFExtensionCameraImplementation::isConnected(unsigned int camera) {
     return /* are we connected to the specified camera */;
 }

@@ -74,12 +74,16 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
         virtual int getImageHeight(unsigned int camera);
-	/** \copydoc QFExtensionCamera::getPixelWidth() */
-	virtual double getPixelWidth();
-	/** \copydoc QFExtensionCamera::getPixelHeight() */
-	virtual double getPixelHeight();
+        /** \copydoc QFExtensionCamera::getPixelWidth() */
+        virtual double getPixelWidth();
+        /** \copydoc QFExtensionCamera::getPixelHeight() */
+        virtual double getPixelHeight();
+        /** \copydoc QFExtensionCameragetCameraName::() */
+        virtual QString getCameraName(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getCameraSensorName() */
+        virtual QString getCameraSensorName(unsigned int camera);
 
-	/** \copydoc QFExtensionCamera::isConnected() */
+        /** \copydoc QFExtensionCamera::isConnected() */
         virtual bool isConnected(unsigned int camera);
         /** \copydoc QFExtensionCamera::acquire() */
         virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL);
@@ -123,7 +127,7 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
          */
         virtual void log_error(QString message);
 
-	protected:
+    protected:
         QFPluginLogService* logService;
 
 };

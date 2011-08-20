@@ -25,10 +25,11 @@ HEADERS += spimb040.h \
            qfcameraconfigcombobox.h \
            ../../../../../LIB/trunk/statistics_tools.h \
            objectives.h \
-    qfespimb040imagestackconfigwidget.h \
-    ../../../../../LIB/trunk/tinytiffwriter.h \
-    ../../../../../LIB/trunk/libtiff_tools.h \
-    ../interfaces/qfextensionlinearstage.h
+           qfespimb040imagestackconfigwidget.h \
+           ../../../../../LIB/trunk/tinytiffwriter.h \
+           ../../../../../LIB/trunk/libtiff_tools.h \
+           ../interfaces/qfextensionlinearstage.h \
+           ../interfaces/qfextensionparameterdevice.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -42,8 +43,8 @@ SOURCES += spimb040.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
            objectives.cpp \
            qfespimb040imagestackconfigwidget.cpp \
-    ../../../../../LIB/trunk/tinytiffwriter.cpp \
-    ../../../../../LIB/trunk/libtiff_tools.cpp
+           ../../../../../LIB/trunk/tinytiffwriter.cpp \
+           ../../../../../LIB/trunk/libtiff_tools.cpp
 
 FORMS = \
     qfespimb040objectiveeditor.ui \
