@@ -13,13 +13,18 @@
       - the assets directory <b>[AssetsDir]</b> contains additional data files that are usually NOT changed by the running
         program (e.g. help files, firmware files for external hardware ...)
       - the configuration directory <b>[ConfigDir]</b> contains configuration and log-files.
+      - the global configuration directory <b>[GlobalConfigDir]</b> contains configuration files that are valid system-wide. Do not expect
+        to necessarily have write access to this directory, as it may be writeable by administrators/root only! So store your config data
+        as human-readable/editable there. \b Note that you can select a different global config directory in the options dialog! So there is
+        the possibility to use different configs.
     .
 
-    On windows these pathes will be:
+    On windows these pathes will default to:
       - <b>[AppDir]</b> = \c c:\\Program_Files\\QuickFit3\\
       - <b>[PluginDir]</b> = \c c:\\Program_Files\\QuickFit3\\plugins
       - <b>[AssetsDir]</b> = \c c:\\Program_Files\\QuickFit3\\assets
       - <b>[ConfigDir]</b> = \c c:\\Documents_and_Settings\\<WINDOWS_USERNAME>\\.quickfit3
+      - <b>[GlobalConfigDir]</b> = \c c:\\Program_Files\\QuickFit3\\globalconfig\\
     .
 
     The last three directory are available over the ProgramOptions object or the QFPluginServices interface
@@ -27,28 +32,24 @@
 
     So if you are planning/writing an extension or plugin for QuickFit, here is a guide of where the files
     you create should be installed:
-      - Plugin shared libraries (SO/DLL):
-        - for raw data/evaluation plugin: \c [PluginsDir]
-        - for QFExtension plugin: \c [PluginsDir]
-        - for QFFitAlgorithm plugin: \c [PluginDir]
-        - for QFFitFunction plugin: \c [PluginDir]
-      .
+      - Plugin shared libraries (SO/DLL): \c [PluginsDir]
       - Configuration files / log files:
-        - for raw data/evaluation plugin: \c [PluginDir]/plugins/<PluginID>/
-        - for QFExtension plugin: \c [PluginDir]/plugins/<PluginID>/
+        - for raw data/evaluation plugin: \c [ConfigDir]/plugins/<PluginID>/
+        - for QFExtension plugin: \c [ConfigDir]/plugins/<PluginID>/
       .
       - Help files:
         - QuickFit directly: \c [AssetsDir]/help/
-        - for raw data/evaluation plugin: \c [AssetsDir]/plugins/help/<PluginID>/
-        - for QFExtension plugin: \c [AssetsDir]/plugins/help/<PluginID>/
+        - for raw data/evaluation plugin: \c [AssetsDir]/plugins/help/<PluginID>/<PluginID>.html
+        - for QFExtension plugin: \c [AssetsDir]/plugins/help/<PluginID>/<PluginID>.html
         - for QFFitAlgorithm plugin: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
         - for QFFitFunction plugin: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
+        - tutorials for any plugin: \c [AssetsDir]/plugins/help/<PluginID>/tutorial.html
+        - images for online help: \c [AssetsDir]/plugins/help/<PluginID>/pic/
       .
       - any other additional files:
         - QuickFit directly: \c [AssetsDir]
-        - for raw data/evaluation plugin: \c [AssetsDir]/plugins/<PluginID>/
-        - for QFExtension plugin: \c [AssetsDir]/plugins/<PluginID>/
-        - translations \c [AssetDir]/translations/<languageID>.<yourname>.ts
+        - for plugins: \c [AssetsDir]/plugins/<PluginID>/
+        - translations \c [AssetDir]/translations/<languageID>.<PluginID>.ts
         - stylesheets  \c [AssetDir]/stylesheets/<yourname>.qss
       .
     .

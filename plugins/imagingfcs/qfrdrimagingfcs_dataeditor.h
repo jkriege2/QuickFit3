@@ -7,6 +7,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
+#include "qvisiblehandlesplitter.h"
 #include <QSplitter>
 #include <QComboBox>
 #include <QLabel>
@@ -74,9 +75,9 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         /** \brief sliders to set the cut of the correlation curve */
         DataCutSliders* sliders;
         /** \brief splitter between plot and rhs widgets */
-        QSplitter* splitter;
+        QVisibleHandleSplitter* splitter;
         /** \brief splitter between plot and bottom widgets */
-        QSplitter* splitterBot;
+        QVisibleHandleSplitter* splitterBot;
         /** \brief a listwidget to display only a subset of runs */
         QListView* lstRunsSelect;
         /** \brief a combobox to select how the error of the average run are displayed */

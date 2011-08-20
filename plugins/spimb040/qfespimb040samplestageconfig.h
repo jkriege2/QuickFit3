@@ -6,6 +6,7 @@
 class QFESPIMB040MainWindow; // forward
 
 #include <QWidget>
+#include "qvisiblehandlesplitter.h"
 #include <QSplitter>
 #include <QComboBox>
 #include <QSettings>

@@ -24,6 +24,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
 {
     QFileInfo fi(QApplication::applicationFilePath());
 
+    globalConfigDir=QApplication::applicationDirPath()+"/globalconfig/";
     configDir=QDir::homePath()+"/."+fi.completeBaseName()+"/";
     assetsDir=QApplication::applicationDirPath()+"/assets/";
     pluginsDir=QApplication::applicationDirPath()+"/plugins/";
@@ -34,11 +35,13 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
 
     #ifdef __LINUX__
     //configDir=QApplication::applicationDirPath();
+    globalConfigDir="/usr/share/quickfit3/"
     #endif
 
 
     QDir d(QApplication::applicationDirPath());
     d.mkpath(configDir);
+    d.mkpath(globalConfigDir);
 
     this->app=app;
     iniFilename=ini;
@@ -46,7 +49,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
         iniFilename= configDir+"/"+fi.completeBaseName()+".ini";
     }
     currentRawDataDir=fi.absolutePath();
-    std::cout<<"config file is: "<<iniFilename.toStdString()<<std::endl;
+    //std::cout<<"config file is: "<<iniFilename.toStdString()<<std::endl;
     settings=NULL;
 
     // default values
@@ -136,6 +139,10 @@ void ProgramOptions::readSettings() {
 
 QString ProgramOptions::getConfigFileDirectory() const {
     return configDir;
+}
+
+QString ProgramOptions::getGlobalConfigFileDirectory() const {
+    return globalConfigDir;
 }
 
 QString ProgramOptions::getPluginDirectory() const {

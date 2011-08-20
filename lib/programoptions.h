@@ -61,6 +61,9 @@ class ProgramOptions: public QObject {
 
         /** \brief the directory in which to save configuration data, see \ref qf3whereiswhat */
         QString getConfigFileDirectory() const;
+
+        /** \brief the directory from which to read global configuration data (do not expect to necessarily have write access to this directory!), see \ref qf3whereiswhat */
+        QString getGlobalConfigFileDirectory() const;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString getPluginDirectory() const;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
@@ -112,6 +115,8 @@ class ProgramOptions: public QObject {
         int autosave;
         /** \brief the directory in which to save configuration data, see \ref qf3whereiswhat */
         QString configDir;
+        /** \brief the directory from which to load global configuration data, see \ref qf3whereiswhat */
+        QString globalConfigDir;
         /** \brief assetsDir is a directory that contains QuickFit assets, like Help-Files, additional needed files, lik
          *         data files ... that are NOT changed by QuickFit, see \ref qf3whereiswhat */
         QString assetsDir;

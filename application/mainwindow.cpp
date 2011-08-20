@@ -471,9 +471,9 @@ void MainWindow::aboutPlugins() {
     delete widget;
 }
 void MainWindow::createWidgets() {
-    spCenter=new QSplitter(Qt::Horizontal, this);
+    spCenter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     spCenter->setOrientation(Qt::Horizontal);
-    spMain=new QSplitter(Qt::Vertical, this);
+    spMain=new QVisibleHandleSplitter(Qt::Vertical, this);
     spMain->setOrientation(Qt::Vertical);
     tvMain=new QTreeView(this);
     connect(tvMain, SIGNAL(doubleClicked ( const QModelIndex &)), this, SLOT(projectElementDoubleClicked(const QModelIndex&)));
@@ -1178,6 +1178,9 @@ QString MainWindow::getConfigFileDirectory() {
     return settings->getConfigFileDirectory();
 }
 
+QString MainWindow::getGlobalConfigFileDirectory() {
+    return settings->getGlobalConfigFileDirectory();
+}
 QString MainWindow::getAssetsDirectory() {
     return settings->getAssetsDirectory();
 }

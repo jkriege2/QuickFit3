@@ -83,6 +83,8 @@ class QFPluginServices {
         virtual ProgramOptions* getOptions()=0;
         /** \brief return a base path under which to store additional configuration files */
         virtual QString getConfigFileDirectory()=0;
+        /** \brief return a base path from which to read global configuration files */
+        virtual QString getGlobalConfigFileDirectory()=0;
         /** \brief return a base path where to find assets files */
         virtual QString getAssetsDirectory()=0;
         /** \brief return a base path where to find plugins */

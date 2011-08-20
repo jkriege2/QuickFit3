@@ -132,8 +132,8 @@ void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
     vbl->setContentsMargins(0,0,0,0);
     toolbar=new QToolBar(tr("camera_toolbar"), this);
     vbl->addWidget(toolbar);
-    splitVert=new QSplitter(Qt::Horizontal, this);
-    splitHor=new QSplitter(Qt::Vertical, this);
+    splitVert=new QVisibleHandleSplitter(Qt::Horizontal, this);
+    splitHor=new QVisibleHandleSplitter(Qt::Vertical, this);
     vbl->addWidget(splitHor);
 
 

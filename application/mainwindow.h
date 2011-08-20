@@ -21,6 +21,7 @@
 #include "../lib/qfextensionmanager.h"
 #include "../lib/qfextension.h"
 #include "version.h"
+#include "qvisiblehandlesplitter.h"
 
 
 #define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm, Tabea Elbel, Jan Buchholz"
@@ -81,6 +82,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         virtual ProgramOptions* getOptions();
         /** \copydoc QFPluginServices::getConfigFileDirectory() */
         virtual QString getConfigFileDirectory();
+        /** \copydoc QFPluginServices::getGlobalConfigFileDirectory() */
+        virtual QString getGlobalConfigFileDirectory();
 
         /** \copydoc QFPluginServices::getHTMLReplacementList() */
         virtual QList<QPair<QString, QString> >* getHTMLReplacementList();
@@ -229,8 +232,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         QAction* insertRDTableFileAct;*/
 
         QTreeView* tvMain;
-        QSplitter* spMain;
-        QSplitter* spCenter;
+        QVisibleHandleSplitter* spMain;
+        QVisibleHandleSplitter* spCenter;
 
         QLabel* labFile;
         QPlainTextEdit* pteDescription;

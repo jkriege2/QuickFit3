@@ -164,11 +164,11 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     mainLayout->addWidget(topWidget, 0);
 
-    splitModel=new QSplitter(this),
+    splitModel=new QVisibleHandleSplitter(this),
     splitModel->setOrientation(Qt::Horizontal);
     mainLayout->addWidget(splitModel, 10);
 
-    splitPlot=new QSplitter(this),
+    splitPlot=new QVisibleHandleSplitter(this),
     splitPlot->setOrientation(Qt::Vertical);
     splitModel->addWidget(splitPlot);
 
@@ -226,7 +226,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     vbl->addWidget(datacut,0);
     splitPlot->addWidget(widgetResiduals);
 
-    splitFitStatistics=new QSplitter(this);
+    splitFitStatistics=new QVisibleHandleSplitter(this);
     splitPlot->addWidget(splitFitStatistics);
     tabResidulas=new QTabWidget(this);
     //tabResidulas->setTabPosition(QTabWidget::West);

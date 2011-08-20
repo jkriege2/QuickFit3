@@ -2,6 +2,7 @@
 #define QFESPIMB040MAINWINDOW_H
 
 #include <QWidget>
+#include "qvisiblehandlesplitter.h"
 #include <QSplitter>
 #include <QWidget>
 #include <QComboBox>

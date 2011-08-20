@@ -167,16 +167,19 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     btnAddObjective=new QToolButton(this);
     btnAddObjective->setToolTip(tr("add a new objective"));
     btnAddObjective->setIcon(QIcon(":/spimb040/objective_add.png"));
+    btnAddObjective->setEnabled(objectivesWritable());
     connect(btnAddObjective, SIGNAL(clicked()), this, SLOT(addObjective()));
     ogl->addWidget(btnAddObjective, 0,2);
     btnDeleteObjective=new QToolButton(this);
     btnDeleteObjective->setToolTip(tr("delete an objective"));
     btnDeleteObjective->setIcon(QIcon(":/spimb040/objective_delete.png"));
+    btnDeleteObjective->setEnabled(objectivesWritable());
     connect(btnDeleteObjective, SIGNAL(clicked()), this, SLOT(deleteObjective()));
     ogl->addWidget(btnDeleteObjective, 0,3);
     btnEditObjective=new QToolButton(this);
     btnEditObjective->setToolTip(tr("edit an objective"));
     btnEditObjective->setIcon(QIcon(":/spimb040/objective_rename.png"));
+    btnEditObjective->setEnabled(objectivesWritable());
     connect(btnEditObjective, SIGNAL(clicked()), this, SLOT(editObjective()));
     ogl->addWidget(btnEditObjective, 0,4);
     labDetectObjectiveDescription=new QLabel(this);
@@ -566,8 +569,12 @@ double QFESPIMB040CameraConfig::magnification() {
     return objective().magnification;
 }
 
+bool QFESPIMB040CameraConfig::objectivesWritable() const {
+    return QSettings(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat).isWritable();
+}
+
 void QFESPIMB040CameraConfig::loadObjectives() {
-    QSettings inifile(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
+    QSettings inifile(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
     QStringList groups=inifile.childGroups();
     objectives.clear();
     QString currentO=cmbObjecive->currentText();
@@ -594,17 +601,20 @@ void QFESPIMB040CameraConfig::loadObjectives() {
 }
 
 void QFESPIMB040CameraConfig::storeObjectives() {
-    QSettings inifile(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
-    inifile.clear();
-    for (int i=0; i<objectives.size(); i++) {
-        ObjectiveDescription o=objectives[i];
-        QString g="objective"+QString::number(i);
-        inifile.setValue(g+"/name", o.name);
-        inifile.setValue(g+"/manufacturer", o.manufacturer);
-        inifile.setValue(g+"/magnification", o.magnification);
-        inifile.setValue(g+"/na", o.NA);
+    QSettings inifile(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
+    if (inifile.isWritable()) {
+        inifile.clear();
+        for (int i=0; i<objectives.size(); i++) {
+            ObjectiveDescription o=objectives[i];
+            QString g="objective"+QString::number(i);
+            inifile.setValue(g+"/name", o.name);
+            inifile.setValue(g+"/manufacturer", o.manufacturer);
+            inifile.setValue(g+"/magnification", o.magnification);
+            inifile.setValue(g+"/na", o.NA);
+        }
+        emit m_notifier->emitUpdate();
     }
-    emit m_notifier->emitUpdate();
+    loadObjectives();
 }
 
 void QFESPIMB040CameraConfig::deleteObjective() {

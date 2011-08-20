@@ -2,6 +2,7 @@
 #define QFESPIMB040CAMERAVIEW_H
 
 #include <QWidget>
+#include "qvisiblehandlesplitter.h"
 #include <QSplitter>
 #include <QWidget>
 #include <QComboBox>
@@ -86,8 +87,8 @@ class QFESPIMB040CameraView : public QWidget {
         void createActions();
 
 
-        QSplitter* splitHor;
-        QSplitter* splitVert;
+        QVisibleHandleSplitter* splitHor;
+        QVisibleHandleSplitter* splitVert;
         QToolBar* toolbar;
         QTabWidget* tabSettings;
         QTabWidget* tabResults;

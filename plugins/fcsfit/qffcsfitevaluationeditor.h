@@ -32,6 +32,7 @@
 #include "jkverticalscrollarea.h"
 #include "dlgqffitalgorithmprogressdialog.h"
 #include "qffitalgorithmthreaddedfit.h"
+#include "qvisiblehandlesplitter.h"
 
 
 /*! \brief editor class for FCS least-square fits
@@ -87,9 +88,9 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief DataCutSliders */
         DataCutSliders* datacut;
         /** \brief Splitter between Plots  */
-        QSplitter* splitPlot;
+        QVisibleHandleSplitter* splitPlot;
         /** \brief Splitter between Plots and Model */
-        QSplitter* splitModel;
+        QVisibleHandleSplitter* splitModel;
         /** \brief pushbutton to configure Fitting Algorithm */
         QPushButton* btnConfigAlgorithm;
         /** \brief pushbutton to show help on Fitting Algorithm */
@@ -139,7 +140,7 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief spin box to set the number of bins in residuals histogram */
         QSpinBox* spinResidualHistogramBins;
         /** \brief splitter between residual statistics plotter pltResidualHistogram and fit results txtFitStatistics */
-        QSplitter* splitFitStatistics;
+        QVisibleHandleSplitter* splitFitStatistics;
         /** \brief layout used to configure the residuals evaluation */
         QFormLayout* layResidualAnalysis;
         /** \brief toolbox to switch between residual histogram and parameters */

@@ -94,7 +94,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     hl->addWidget(cmbRateDisplay);
     l->addLayout(hl);*/
 
-    splitter=new QSplitter(Qt::Horizontal, this);
+    splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     l->addWidget(splitter);
 
     QWidget* w=new QWidget(this);

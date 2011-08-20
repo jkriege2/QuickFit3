@@ -53,7 +53,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            datacutslider.h \
            qffitparameterbasicinterface.h \
            qffitparameterwidget.h \
-           qfdlgcsvparameters.h
+           qfdlgcsvparameters.h \
+    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -83,7 +84,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
-           qfdlgcsvparameters.cpp
+           qfdlgcsvparameters.cpp \
+    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.cpp
 
 FORMS += qfdlg_csvparameters.ui
 
@@ -97,5 +99,3 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
 CONFIG += exceptions rtti stl
-
-

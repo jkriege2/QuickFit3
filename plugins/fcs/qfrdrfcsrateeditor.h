@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QAbstractTableModel>
+#include "qvisiblehandlesplitter.h"
 
 // forward declaration
 class QFRDRFCSData;
@@ -78,7 +79,7 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
         /** \brief sliders to set the cut of the count rate curve */
         //DataCutSliders* sliders;
         /** \brief splitter between plot and other widgets */
-        QSplitter* splitter;
+        QVisibleHandleSplitter* splitter;
         /** \brief a listwidget to display only a subset of runs */
         QListView* lstRunsSelect;
         /** \brief a button which excludes the selected runs from the evaluation */

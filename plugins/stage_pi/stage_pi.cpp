@@ -31,21 +31,23 @@ QFExtensionLinearStagePI::~QFExtensionLinearStagePI() {
 
 void QFExtensionLinearStagePI::deinit() {
 	/* add code for cleanup here */
-    QSettings inifile(services->getConfigFileDirectory()+"/stage_pi863.ini", QSettings::IniFormat);
-    inifile.setValue("driver/port", COMPort);
-    inifile.setValue("driver/port_speed", COMPortSpeed);
-    inifile.setValue("driver/pterm", PTerm);
-    inifile.setValue("driver/iterm", iTerm);
-    inifile.setValue("driver/dterm", DTerm);
-    inifile.setValue("driver/ilimit", iLimit);
-    inifile.setValue("driver/acceleration", acceleration);
-    inifile.setValue("driver/initvelocity", initVelocity);
-    inifile.setValue("driver/maxvelocity", maxVelocity);
+    QSettings inifile(services->getGlobalConfigFileDirectory()+"/stage_pi863.ini", QSettings::IniFormat);
+    if (inifile.isWritable()) {
+        inifile.setValue("driver/port", COMPort);
+        inifile.setValue("driver/port_speed", COMPortSpeed);
+        inifile.setValue("driver/pterm", PTerm);
+        inifile.setValue("driver/iterm", iTerm);
+        inifile.setValue("driver/dterm", DTerm);
+        inifile.setValue("driver/ilimit", iLimit);
+        inifile.setValue("driver/acceleration", acceleration);
+        inifile.setValue("driver/initvelocity", initVelocity);
+        inifile.setValue("driver/maxvelocity", maxVelocity);
 
 
-    for (int i=0; i<axes.size(); i++) {
-        QString axisname=axes[i].name;
-        inifile.setValue(axisname+"/id", QString(QChar(axes[i].ID)));
+        for (int i=0; i<axes.size(); i++) {
+            QString axisname=axes[i].name;
+            inifile.setValue(axisname+"/id", QString(QChar(axes[i].ID)));
+        }
     }
 }
 
@@ -57,8 +59,9 @@ void QFExtensionLinearStagePI::projectChanged(QFProject* oldProject, QFProject* 
 
 void QFExtensionLinearStagePI::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
-    QString ini=services->getConfigFileDirectory()+QString("/stage_pi863.ini");
-    if (!QFile::exists(ini)) QFile::copy(services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/stage_pi863.ini"), ini);
+    QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863.ini");
+    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863.ini");
+    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/stage_pi863.ini");
     QSettings inifile(ini, QSettings::IniFormat);
     COMPort=inifile.value("driver/port", COMPort).toString();
     COMPortSpeed=inifile.value("driver/port_speed", COMPortSpeed).toUInt();
@@ -69,7 +72,6 @@ void QFExtensionLinearStagePI::initExtension() {
     acceleration=inifile.value("driver/acceleration", acceleration).toDouble();
     initVelocity=inifile.value("driver/initvelocity", initVelocity).toDouble();
     maxVelocity=inifile.value("driver/maxvelocity", maxVelocity).toDouble();
-
 
     axes.clear();
     for (int i=0; i<=15; i++) {
@@ -115,63 +117,73 @@ unsigned int QFExtensionLinearStagePI::getAxisCount() {
 }
 
 void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* parent) {
-	/* open a dialog that configures the camera.
 
-	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK
-
-	   alternatively you may also display a window which stays open and allows the suer to set settings also
-	   during the measurement.
-	*/
+    bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863.ini", QSettings::IniFormat).isWritable();
 
 
-	/////////////////////////////////////////////////////////////////////////////////
-	// if you want the settings dialog to be modal, you may uncomment the next lines
-	// and add implementations
-	/////////////////////////////////////////////////////////////////////////////////
+    /* open a dialog that configures the camera.
 
-	QDialog* dlg=new QDialog(parent);
+       usually you should display a modal QDialog descendent which writes back config when the user clicks OK
 
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
-    dlg->setLayout(lay);
+       alternatively you may also display a window which stays open and allows the suer to set settings also
+       during the measurement.
 
-    QFormLayout* formlayout=new QFormLayout(dlg);
+       if the global ini file is not writable, there is no point in displaying a config dialog, as the data may not be stored
+    */
 
 
-    formlayout->addRow("", new QLabel(tr("<b>All settings marked with * will be<br>used when connecting the next time!</b>"), dlg));
+    if (globalIniWritable) {
+        /////////////////////////////////////////////////////////////////////////////////
+        // if you want the settings dialog to be modal, you may uncomment the next lines
+        // and add implementations
+        /////////////////////////////////////////////////////////////////////////////////
 
-    QComboBox* cmbPort=new QComboBox(dlg);
-    std::vector<std::string> ports=JKSerialConnection::listPorts();
-    for (int i=0; i<ports.size(); i++) {
-        cmbPort->addItem(ports[i].c_str());
+        QDialog* dlg=new QDialog(parent);
+
+        QVBoxLayout* lay=new QVBoxLayout(dlg);
+        dlg->setLayout(lay);
+
+        QFormLayout* formlayout=new QFormLayout(dlg);
+
+
+        formlayout->addRow("", new QLabel(tr("<b>All settings marked with * will be<br>used when connecting the next time!</b>"), dlg));
+
+        QComboBox* cmbPort=new QComboBox(dlg);
+        std::vector<std::string> ports=JKSerialConnection::listPorts();
+        for (int i=0; i<ports.size(); i++) {
+            cmbPort->addItem(ports[i].c_str());
+        }
+        cmbPort->setEditable(false);
+        cmbPort->setCurrentIndex(cmbPort->findText(COMPort));
+        formlayout->addRow(tr("serial &port*:"), cmbPort);
+
+        QComboBox* cmbSpeed=new QComboBox(dlg);
+        cmbSpeed->setEditable(false);
+        cmbSpeed->addItem("9600");
+        cmbSpeed->addItem("19200");
+        cmbSpeed->addItem("38400");
+        cmbSpeed->setCurrentIndex(cmbSpeed->findText(QString::number(COMPortSpeed)));
+        formlayout->addRow(tr("serial port &baudrate*:"), cmbSpeed);
+
+
+        lay->addLayout(formlayout);
+
+        QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
+        lay->addWidget(buttonBox);
+
+        connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
+        connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
+
+        if ( dlg->exec()==QDialog::Accepted ) {
+             //  read back values entered into the widgets and store in settings
+             COMPort=cmbPort->currentText();
+             COMPortSpeed=cmbSpeed->itemText(cmbSpeed->currentIndex()).toInt();
+        }
+        delete dlg;
+
+    } else {
+        QMessageBox::information(parent, getName(), tr("Your user account is not allowd to write to the global config directory!"));
     }
-    cmbPort->setEditable(false);
-    cmbPort->setCurrentIndex(cmbPort->findText(COMPort));
-    formlayout->addRow(tr("serial &port*:"), cmbPort);
-
-    QComboBox* cmbSpeed=new QComboBox(dlg);
-    cmbSpeed->setEditable(false);
-    cmbSpeed->addItem("9600");
-    cmbSpeed->addItem("19200");
-    cmbSpeed->addItem("38400");
-    cmbSpeed->setCurrentIndex(cmbSpeed->findText(QString::number(COMPortSpeed)));
-    formlayout->addRow(tr("serial port &baudrate*:"), cmbSpeed);
-
-
-    lay->addLayout(formlayout);
-
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
-    lay->addWidget(buttonBox);
-
-    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
-
-    if ( dlg->exec()==QDialog::Accepted ) {
-         //  read back values entered into the widgets and store in settings
-         COMPort=cmbPort->currentText();
-         COMPortSpeed=cmbSpeed->itemText(cmbSpeed->currentIndex()).toInt();
-    }
-    delete dlg;
-
 	//QMessageBox::information(parent, getName(), tr("There is currently no configuration dialog!"));
 }
 

@@ -6,6 +6,7 @@
 class QFESPIMB040MainWindow; // forward
 
 #include <QWidget>
+#include "qvisiblehandlesplitter.h"
 #include <QSplitter>
 #include <QWidget>
 #include <QComboBox>
@@ -125,6 +126,7 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QFExtensionServices* m_pluginServices;
 
         QList<ObjectiveDescription> objectives;
+        bool objectivesWritable() const;
 
     protected slots:
         void loadObjectives();

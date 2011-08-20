@@ -94,7 +94,7 @@ QFRDRImagingFCSDataEditor::~QFRDRImagingFCSDataEditor()
 void QFRDRImagingFCSDataEditor::createWidgets() {
     QVBoxLayout* l=new QVBoxLayout(this);
     setLayout(l);
-    splitter=new QSplitter(Qt::Horizontal, this);
+    splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     l->addWidget(splitter);
 
     QWidget* w=new QWidget(this);
