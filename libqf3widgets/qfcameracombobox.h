@@ -3,25 +3,26 @@
 
 #include <QComboBox>
 #include "qfextensionmanager.h"
-#include "qfextensionmanager.h"
 #include "../interfaces/qfextensioncamera.h"
 #include "qfextension.h"
 
 /*! \brief QComboBox which is filled with all available cameras
     \ingroup qf3ext_spimb040
 
-
+    If this QComboBox is initialized with a valid QFExtensionManager object, it will be automatically
+    filled with all available cameras.
  */
 class QFCameraComboBox : public QComboBox {
         Q_OBJECT
     public:
         QFCameraComboBox(QFExtensionManager* extManager, QWidget* parent=NULL);
         virtual ~QFCameraComboBox();
-
+        /** \brief return the currently selected camera extension as QFExtension */
         QFExtension* currentExtension() const;
+        /** \brief return the currently selected camera extension as QFExtensionCamera */
         QFExtensionCamera* currentExtensionCamera() const;
+        /** \brief return the ID of the current camera device inside a QFExtensionCamera */
         int currentCameraID() const;
-        int currentExtensionID() const;
     public slots:
         /** \brief update the filled combobox */
         void findExtensions();
@@ -31,6 +32,9 @@ class QFCameraComboBox : public QComboBox {
     protected:
         /** \brief list of all available QFExtensionCamera plugins, initialized by findExtensions() */
         QList<QObject*> cameras;
+
+        /** \brief return the ID of the current camera device inside cameras */
+        int currentExtensionID() const;
 
         QFExtensionManager* m_extManager;
     protected slots:

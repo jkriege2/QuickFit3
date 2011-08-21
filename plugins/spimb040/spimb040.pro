@@ -20,11 +20,7 @@ HEADERS += spimb040.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
            ../../../../../LIB/trunk/highrestimer.h \
-           qfcameracombobox.h \
-           qfstagecombobox.h \
-           qfcameraconfigcombobox.h \
            ../../../../../LIB/trunk/statistics_tools.h \
-           objectives.h \
            qfespimb040imagestackconfigwidget.h \
            ../../../../../LIB/trunk/tinytiffwriter.h \
            ../../../../../LIB/trunk/libtiff_tools.h \
@@ -37,17 +33,12 @@ SOURCES += spimb040.cpp \
            qfespimb040cameraconfig.cpp \
            qfespimb040samplestageconfig.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
-           qfcameracombobox.cpp \
-           qfstagecombobox.cpp \
-           qfcameraconfigcombobox.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
-           objectives.cpp \
            qfespimb040imagestackconfigwidget.cpp \
            ../../../../../LIB/trunk/tinytiffwriter.cpp \
            ../../../../../LIB/trunk/libtiff_tools.cpp
 
 FORMS = \
-    qfespimb040objectiveeditor.ui \
     qfespimb040imagestackconfigwidget.ui
 
 RESOURCES += spimb040.qrc

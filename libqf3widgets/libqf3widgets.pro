@@ -13,7 +13,8 @@ DEPENDPATH += .
 
 INCLUDEPATH += ../../../../LIB/trunk/ \
                . \
-               ../lib/
+               ../lib/ \
+               ../plugins/interfaces/
 
 LIBS += -L$$QFOUTPUT -lquickfit3lib
 
@@ -54,7 +55,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            qffitparameterbasicinterface.h \
            qffitparameterwidget.h \
            qfdlgcsvparameters.h \
-    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.h
+    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.h \
+    qfstagecombobox.h \
+    qfcameraconfigcombobox.h \
+    qfcameracombobox.h \
+    objectives.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -85,13 +90,19 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
            qfdlgcsvparameters.cpp \
-    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.cpp
+    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.cpp \
+    qfstagecombobox.cpp \
+    qfcameraconfigcombobox.cpp \
+    qfcameracombobox.cpp \
+    objectives.cpp
 
-FORMS += qfdlg_csvparameters.ui
+FORMS += qfdlg_csvparameters.ui \
+    qf3objectiveeditor.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
-             ../../../../LIB/trunk/qt/jkstyledbutton.qrc
+             ../../../../LIB/trunk/qt/jkstyledbutton.qrc \
+    libqf3widgets.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 

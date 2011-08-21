@@ -632,7 +632,7 @@ void QFESPIMB040CameraConfig::editObjective() {
     if (i>=0 && i<objectives.size()) {
         ObjectiveDescription d=objectives[i];
 
-        QFESPIMB040ObjectiveEditor dlg(d, NULL);
+        QF3ObjectiveEditor dlg(d, NULL);
         if (dlg.exec()==QDialog::Accepted) {
             objectives[i]=dlg.getData();
         }
@@ -645,7 +645,7 @@ void QFESPIMB040CameraConfig::editObjective() {
 void QFESPIMB040CameraConfig::addObjective() {
     ObjectiveDescription d;
     d.name=tr("new objective");
-    QFESPIMB040ObjectiveEditor dlg(d, NULL);
+    QF3ObjectiveEditor dlg(d, NULL);
     if (dlg.exec()==QDialog::Accepted) {
         d=dlg.getData();
         while (objectiveExists(d.name)) {

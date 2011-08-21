@@ -90,7 +90,7 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
     // fill comboboxes
     for (int i=0; i<filenames.size(); i++) {
         QString fn=QFileInfo(filenames[i]).baseName();
-        addItem(QIcon(":/spimb040/camera_config.png"), fn, filenames[i]);
+        addItem(QIcon(":/libqf3widgets/camera_config.png"), fn, filenames[i]);
     }
 
 
@@ -199,16 +199,16 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, 
     combobox=new QFCameraConfigComboBox(configDirectory, this);
     layout->addWidget(combobox, 2);
 
-    actConfig = new QAction(QIcon(":/spimb040/acquisitionsettings.png"), tr("&Configure Camera"), this);
+    actConfig = new QAction(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure Camera"), this);
     connect(actConfig, SIGNAL(triggered()), combobox, SLOT(editCurrent()));
 
-    actDelete = new QAction(QIcon(":/spimb040/config_delete.png"), tr("&Delete Camera Configuration"), this);
+    actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
     connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
 
-    actSaveAs = new QAction(QIcon(":/spimb040/config_saveas.png"), tr("&Save Camera Configuration As ..."), this);
+    actSaveAs = new QAction(QIcon(":/libqf3widgets/config_saveas.png"), tr("&Save Camera Configuration As ..."), this);
     connect(actSaveAs, SIGNAL(triggered()), combobox, SLOT(saveAsCurrent()));
 
-    actRename = new QAction(QIcon(":/spimb040/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
+    actRename = new QAction(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
     connect(actRename, SIGNAL(triggered()), combobox, SLOT(renameCurrent()));
 
     layout->addSpacing(5);

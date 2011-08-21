@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/libqf3widgets">
+        <file alias="config_add.png">icons/list_add.png</file>
+        <file alias="config_delete.png">icons/list_remove.png</file>
+        <file alias="config_saveas.png">icons/save_all.png</file>
+        <file alias="config_rename.png">icons/config_rename.png</file>
+        <file alias="camera_config.png">icons/camera_config.png</file>
+        <file alias="acquisition_configuration.png">icons/acquisition_configure.png</file>
+    </qresource>
+</RCC>
