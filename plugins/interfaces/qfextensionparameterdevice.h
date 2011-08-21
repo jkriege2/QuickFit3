@@ -20,11 +20,16 @@
     types (QFExtensionParameterDevice::ParameterDeviceParameterType):
         - \b double value is a floating point number
         - \b string value is a string
-        - \b stringDisplay value is displayed as a non-editable string which is updated every 100ms
         - \b integer value is an integer
         - \b integerCombo value is an integer and displayed as a QComboBox with user-selectable contents
         - \b boolean value is boolean
+        - \b doubleGraph values are QList<QVariant> with \f$ 2+k+n\cdot (k+1) \f$ entries where each entry has to convert
+             to a double (except the first \f$ 2+k \f$, which convert to a string). This draws a plot widget that displays
+             \f$ k \f$ curves. The values in the list are in this layout: <code>[ (xlabel: string, ylabel: string), (keyEntry\\_1:string,...,keyEntry\\_k:string), (x, y\\_1, y\\_2, ..., y\\_k), (x, y\\_1, y\\_2, ..., y\\_k), ... ]</code>
     .
+
+    Devices may be display/readonly, if getParameterDeviceParameterIsDisplay() returns \c true. Display parameters are
+    updated ever getParameterDeviceDisplayInterval() milliseconds.
 
     As it may take the device some time to reach a new set of settings, this interface contains the method
     isParameterDeviceConnected() which is used to make sure that all parameters have reached their desired end
@@ -51,10 +56,10 @@ class QFExtensionParameterDevice {
         enum ParameterDeviceParameterType {
             sdptDouble,
             sdptString,
-            sdptStringDisplay,
             sdptInteger,
             sdptIntegerCombo,
-            sdptBoolean
+            sdptBoolean,
+            sdptDoubleGraph
         };
 
         /** Default destructor */
@@ -72,6 +77,12 @@ class QFExtensionParameterDevice {
 
         /** \brief return the human-readable name of the given parameter */
         virtual QString getParameterDeviceParameterName(unsigned int device, unsigned int parameter)=0;
+
+        /** \brief return whether the given parameter is display-only */
+        virtual bool getParameterDeviceParameterIsDisplay(unsigned int device, unsigned int parameter)=0;
+
+        /** \brief return whether the update interval for display-only parameters in milliseconds */
+        virtual unsigned long getParameterDeviceDisplayInterval(unsigned int device)=0;
 
         /** \brief return the ID (short name) of the given parameter */
         virtual QString getParameterDeviceParameterID(unsigned int device, unsigned int parameter)=0;
