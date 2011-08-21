@@ -59,7 +59,12 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfstagecombobox.h \
     qfcameraconfigcombobox.h \
     qfcameracombobox.h \
-    objectives.h
+    objectives.h \
+    ../plugins/interfaces/qfrdrfcsdatainterface.h \
+    ../plugins/interfaces/qfrdrcountratesinterface.h \
+    ../plugins/interfaces/qfextensionparameterdevice.h \
+    ../plugins/interfaces/qfextensionlinearstage.h \
+    ../plugins/interfaces/qfextensioncamera.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
