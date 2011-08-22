@@ -62,6 +62,9 @@ class QFCameraConfigComboBox : public QComboBox {
         /*! \brief edit the current configuration */
         void editCurrent();
 
+        /*! \brief add (&edit) new configuration */
+        void addNew();
+
         /*! \brief delete the current configuration */
         void deleteCurrent();
 
@@ -126,12 +129,15 @@ class QFCameraConfigEditorWidget : public QWidget {
         QToolButton* btnConfig;
         /** \brief button to delete the current preview configuration */
         QToolButton* btnDelete;
+        /** \brief button to add a new configuration */
+        QToolButton* btnAdd;
         /** \brief button to save the current preview configuration as a different name */
         QToolButton* btnSaveAs;
         /** \brief button to rename the current preview configuration as a different name */
         QToolButton* btnRename;
 
 
+        QAction* actAdd;
         QAction* actConfig;
         QAction* actDelete;
         QAction* actSaveAs;

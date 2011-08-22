@@ -564,7 +564,7 @@ void QFESPIMB040MainWindow::doAcquisition() {
         if (ok) {
             log_text(tr("  - prepared camer 1!\n"));
         } else {
-            ACQUISITION_ERROR(tr("  - error preparing camer 1!\n"));
+            ACQUISITION_ERROR(tr("  - error preparing camera 1!\n"));
         }
     }
     if (ok && useCam2) {
@@ -575,7 +575,7 @@ void QFESPIMB040MainWindow::doAcquisition() {
         if (ok) {
             log_text(tr("  - prepared camer 2!\n"));
         } else {
-            ACQUISITION_ERROR(tr("  - error preparing camer 2!\n"));
+            ACQUISITION_ERROR(tr("  - error preparing camera 2!\n"));
         }
     }
 
@@ -677,24 +677,26 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
     settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
 
-    QMapIterator <QString, QVariant> it1(acquisitionDescription);
-    while (it1.hasNext()) {
-        it1.next();
-        it1.next();
-        if (it1.value().type()==QVariant::List) {
-            settings.setValue("acquisition/"+it1.key(), jkVariantListToString(it1.value().toList(), "; "));
-        } else {
-            settings.setValue("acquisition/"+it1.key(), it1.value().toString());
+    {
+        QMapIterator <QString, QVariant> it1(acquisitionDescription);
+        while (it1.hasNext()) {
+            it1.next();
+            if (it1.value().type()==QVariant::List) {
+                settings.setValue("acquisition/"+it1.key(), jkVariantListToString(it1.value().toList(), "; "));
+            } else {
+                settings.setValue("acquisition/"+it1.key(), it1.value().toString());
+            }
         }
     }
-    QMapIterator <QString, QVariant> it(parameters);
-    while (it.hasNext()) {
-        it.next();
-        it1.next();
-        if (it.value().type()==QVariant::List) {
-            settings.setValue("acquisition/"+it.key(), jkVariantListToString(it.value().toList(), "; "));
-        } else {
-            settings.setValue("acquisition/"+it.key(), it.value().toString());
+    {
+        QMapIterator <QString, QVariant> it(parameters);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().type()==QVariant::List) {
+                settings.setValue("acquisition/"+it.key(), jkVariantListToString(it.value().toList(), "; "));
+            } else {
+                settings.setValue("acquisition/"+it.key(), it.value().toString());
+            }
         }
     }
 

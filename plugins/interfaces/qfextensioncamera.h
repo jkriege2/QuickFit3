@@ -142,7 +142,7 @@ class QFExtensionCamera {
              is in any way required and you can create any other key/value pairs, you like to describe your acquisition)!
                - \c sequence_length number of images in the sequence
                - \c image_width / \c image_height width/height of the image in pixel
-               - \c pixel_width / \c pixel_height width/height of each pixel in microns (without magnification optics!)
+               - \c pixel_width / \c pixel_height width/height of each pixel in microns (without magnification optics, but caring for binning!)
                - \c start_time QTime/QDate/QDateTime secribing when the acquisition started
                - \c duration duration of the acquisition in seconds (\c double )
                - \c exposure_time exposure time in seconds (double)
@@ -154,12 +154,16 @@ class QFExtensionCamera {
                - \c sensor_temperature_series / \c sensor_temperature_series_times (QList<double>) temperature [°C] of the sensor
                  during acquisition at different times (times stored in sensor_temperature_series_times in seconds).
                - \c camera_model model name of the camera
+               - \c camera_serial_number serial number of the camera
+               - \c camera_controler_card frame grabber card
                - \c sensor_model name of the sensor head
                - \c quantum_efficiency / \c quantum_efficiency_wavelength (QList<double>) quantum efficiency [0..1] of the sensor
                  given at several wavelengths [nanometers]
                - \c filter_name description of a possible filter
                - \c filter_center_wavelength center wavelength of filter [nanometers]
                - \c filter_width  width of the filter [nanometers]
+               - \c roi_xstart \c roi_xend \c roi_ystart \c roi_yend size of the region of interest
+               - \c emgain EMGain factor on EMCCD cameras (\c double )
              .
           */
          virtual void getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters)=0;

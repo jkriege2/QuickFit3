@@ -69,25 +69,30 @@ bool CamAndorAcquisitionThread::init(int camera, QString filenamePrefix, int fil
     progress=0;
     canceled=false;
     outputFilenames.clear();
+    outputFilenameTypes.clear();
     if (selectCamera(camera)) {
 
         // set spooling for those formats with spooling ... depending on the value of the member spooling
         // the methid run() will execute different code!
         if (fileformat==1) { // TIFF (spooling)
             CHECK(SetSpool(1, 7, filenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            outputFilenameTypes.append("TIFF16");
             outputFilenames.append(filenamePrefix+".tif");
             spooling = true;
         } else if (fileformat==2) { // Andor SIF (spooling)
             CHECK(SetSpool(1, 6, filenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            outputFilenameTypes.append("AndorSIF");
             outputFilenames.append(filenamePrefix+".sif");
             spooling = true;
         } else if (fileformat==3) { // FITS (spooling)
             CHECK(SetSpool(1, 5, filenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            outputFilenameTypes.append("FITS");
             outputFilenames.append(filenamePrefix+".fits");
             spooling = true;
         } else { // make sure spooling is switched off
             CHECK(SetSpool(0, 7, filenamePrefix.toAscii().data(), 100), tr("error while disabling spooling mode"));
             if (fileformat==0) { // TIFF
+                outputFilenameTypes.append("TIFF16");
                 QString filename=filenamePrefix+".tif";
                 outputFilenames.append(filename);
                 tiff=TinyTIFFWriter_open(filename.toAscii().data(), 16, m_width, m_height);
@@ -97,6 +102,7 @@ bool CamAndorAcquisitionThread::init(int camera, QString filenamePrefix, int fil
                 }
             } else if (fileformat==4) { // RAW
                 QString filename=filenamePrefix+".raw";
+                outputFilenameTypes.append("RAW");
                 outputFilenames.append(filename);
                 raw=new QFile(filename);
                 if (!raw->open(QIODevice::WriteOnly)) {

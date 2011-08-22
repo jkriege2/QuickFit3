@@ -25,6 +25,8 @@ class CamAndorAcquisitionThread : public QThread {
         /** \brief progress of acquisition 0..100 */
         double getProgress() { return progress; };
 
+        QStringList getOutputFilenames() { return outputFilenames; }
+        QStringList getOutputFilenameTypes() { return outputFilenameTypes; }
     public slots:
         /** \brief cancel the acquisition */
         void cancelAcquisition() { canceled=true; }
@@ -46,6 +48,7 @@ class CamAndorAcquisitionThread : public QThread {
         double progress;
         QString m_log_prefix;
         QStringList outputFilenames;
+        QStringList outputFilenameTypes;
 
         TinyTIFFFile* tiff;
         QFile* raw;

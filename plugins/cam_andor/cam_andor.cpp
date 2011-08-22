@@ -724,34 +724,10 @@ bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSett
 
 
 bool QFExtensionCameraAndor::startAcquisition(unsigned int camera) {
-    //if (selectCamera(camera)) {
-        CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
-        if (!thread) return false;
-        thread->start();
-        /*bool spooling=false;
-        CameraInfo info=camInfos[camera];
-        if (info.fileformat==1) { // TIFF (spooling)
-            CHECK(SetSpool(1, 7, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
-            spooling = true;
-        } else if (info.fileformat==2) { // Andor SIF (spooling)
-            CHECK(SetSpool(1, 6, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
-            spooling = true;
-        } else if (info.fileformat==3) { // FITS (spooling)
-            CHECK(SetSpool(1, 5, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
-            spooling = true;
-        } else if (info.fileformat==4) { // 16-bit raw
-            //CHECK(SetSpool(1, 2, camInfos[camera].acquisitionFilenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
-        }
-        if (!spooling) {
-
-            thread->start(QThread::HighestPriority);
-        }
-        CHECK(StartAcquisition(), tr("error while starting acquisition"));*/
-
-        return true;
-    //} else {
-    //    return false;
-    //}
+    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+    if (!thread) return false;
+    thread->start();
+    return true;
 }
 
 void QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
@@ -782,6 +758,106 @@ bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* p
 }
 
 void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+    QStringList fileNames, fileTypes;
+    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+    char text[512];
+    if (thread) {
+        fileNames=thread->getOutputFilenames();
+        fileTypes=thread->getOutputFilenameTypes();
+    }
+    for (int i=0; i<fileNames.size(); i++) {
+        QFExtensionCamera::AcquititonFileDescription d;
+        d.name=fileNames[i];
+        d.type=fileTypes[i];
+        d.description=tr("Andor camera acquisition image series");
+    }
+    QFExtensionCameraAndor::CameraInfo info=camInfos[camera];
+
+    switch(info.ReadMode) {
+        case 0: (*parameters)["read_mode"]=QString("full vertical binning (%1)").arg(info.ReadMode); break;
+        case 1: (*parameters)["read_mode"]=QString("multi-track (%1)").arg(info.ReadMode); break;
+        case 2: (*parameters)["read_mode"]=QString("random-track (%1)").arg(info.ReadMode); break;
+        case 3: (*parameters)["read_mode"]=QString("single-track (%1)").arg(info.ReadMode); break;
+        case 4: (*parameters)["read_mode"]=QString("image (%1)").arg(info.ReadMode); break;
+        default: (*parameters)["read_mode"]=info.ReadMode; break;
+    }
+    switch(info.AcqMode) {
+        case 1: (*parameters)["acquisition_mode"]=QString("single scan (%1)").arg(info.AcqMode); break;
+        case 2: (*parameters)["acquisition_mode"]=QString("accumulate (%1)").arg(info.AcqMode); break;
+        case 3: (*parameters)["acquisition_mode"]=QString("kinetics (%1)").arg(info.AcqMode); break;
+        case 4: (*parameters)["acquisition_mode"]=QString("fast kinetics (%1)").arg(info.AcqMode); break;
+        case 5: (*parameters)["acquisition_mode"]=QString("run till abort (%1)").arg(info.AcqMode); break;
+        default: (*parameters)["acquisition_mode"]=info.AcqMode; break;
+    }
+
+    (*parameters)["sensor_width"]=info.width;
+    (*parameters)["sensor_height"]=info.height;
+    (*parameters)["exposure_time"]=info.expoTime;
+    (*parameters)["roi_xstart"]=info.subImage_hstart;
+    (*parameters)["roi_xend"]=info.subImage_hend;
+    (*parameters)["roi_ystart"]=info.subImage_vstart;
+    (*parameters)["roi_yend"]=info.subImage_vend;
+    (*parameters)["image_width"]=getImageWidth(camera);
+    (*parameters)["image_height"]=getImageHeight(camera);
+    (*parameters)["sensor_temperature"]=getTemperature(camera);
+
+    switch(camGlobalSettings[camera].shutterMode) { //0: auto, 1: open, 2: close
+        case 0:  (*parameters)["shutter_state"]=QString("auto"); break;
+        case 1:  (*parameters)["shutter_state"]=QString("open"); break;
+        case 2:  (*parameters)["shutter_state"]=QString("closed"); break;
+    }
+    (*parameters)["cooler_enabled"]=camGlobalSettings[camera].coolerOn;
+    (*parameters)["cooler_target_temperature"]=camGlobalSettings[camera].setTemperature;
+    switch(camGlobalSettings[camera].fanMode) { //0: full, 1: low, 2: off
+        case 0:  (*parameters)["fan_mode"]=QString("full"); break;
+        case 1:  (*parameters)["fan_mode"]=QString("low"); break;
+        case 2:  (*parameters)["fan_mode"]=QString("off"); break;
+    }
+
+    (*parameters)["camera_sdk_version"]=SDKVersion;
+    (*parameters)["camera_driver_version"]=deviceDriverVersion;
+    (*parameters)["pixel_units"]=QString("arbitrary");
+    selectCamera(camera);
+    GetAmpDesc(info.outputAmplifier, text, 512);
+    (*parameters)["output_amplifier"]=QString(text);
+    (*parameters)["sequence_length"]=info.numAccs;
+    (*parameters)["frame_time"]=info.kinTime;
+    (*parameters)["accumulation_time"]=info.accTime;
+    (*parameters)["spooling"]=info.spooling;
+    (*parameters)["readout_time"]=info.readoutTime;
+    (*parameters)["horizontal_shift_speed"]=info.horizontalSpeed;
+    (*parameters)["vertical_shift_speed"]=info.verticalSpeed;
+    (*parameters)["pixel_width"]=info.pixelWidth*info.hbin;
+    (*parameters)["pixel_height"]=info.pixelHeight*info.vbin;
+    (*parameters)["preamplifier_gain"]=info.preampGainF;
+    (*parameters)["bit_depth"]=info.bitDepth;
+    (*parameters)["camera_serial_number"]=info.serialNumber;
+    (*parameters)["camera_controller_card"]=info.controllerCard;
+    (*parameters)["camera_sensor"]=info.headModel;
+    (*parameters)["baseline_clamp"]=info.baselineClamp;
+    if (!info.baselineClamp) (*parameters)["baseline_offset"]=info.baselineOffset;
+    (*parameters)["frame_transfer"]=info.frameTransfer;
+    (*parameters)["crop_mode"]=info.cropMode;
+    (*parameters)["vertical_shift_amplitude"]=info.vsAmplitude;
+    (*parameters)["emgain"]=info.emgain;
+    (*parameters)["emgain_advanced"]=info.advancedEMGain;
+    (*parameters)["spooling_mode"]=info.spool;
+    (*parameters)["binning_vertical"]=info.vbin;
+    (*parameters)["binning_horizontal"]=info.hbin;
+    (*parameters)["kinetic_time"]=info.kinTime;
+    (*parameters)["accumulations"]=info.numAccs;
+    (*parameters)["images"]=info.numKins;
+    (*parameters)["trigger_invert"]=info.trigInvert;
+    switch(info.trigMode) {
+        case 0: (*parameters)["trigger_mode"]="internal (0)"; break;
+        case 1: (*parameters)["trigger_mode"]="external (1)"; break;
+        case 6: (*parameters)["trigger_mode"]="external start (6)"; break;
+        case 7: (*parameters)["trigger_mode"]="external exposure, bulb (7)"; break;
+        case 9: (*parameters)["trigger_mode"]="external FVB EM (9)"; break;
+        case 10: (*parameters)["trigger_mode"]="software (10)"; break;
+        default: (*parameters)["trigger_mode"]=info.trigMode; break;
+    }
+
 }
 
 bool QFExtensionCameraAndor::getAcquisitionPreview(unsigned int camera, uint32_t* data) {

@@ -151,6 +151,7 @@ void QFCameraConfigComboBox::saveAsCurrent() {
             if (ok) {
                 copy_file(filename.toStdString(), newfilename.toStdString());
                 if (m_notifier) m_notifier->emitUpdate();
+                setCurrentConfig(newname);
             }
         }
     }
@@ -182,6 +183,44 @@ void QFCameraConfigComboBox::renameCurrent() {
 }
 
 
+void QFCameraConfigComboBox::addNew() {
+    QString tempFile="qf3b040spim_XXXXX.tmp";
+    {
+        QTemporaryFile file;
+        if (file.open()) {
+            tempFile=file.fileName();
+            file.close();
+        }
+    }
+
+    QSettings* settings=new QSettings(tempFile, QSettings::IniFormat);
+    m_cam->showCameraSettingsDialog(m_camIdx, *settings, this);
+    settings->sync();
+    delete settings;
+
+    QString filename=currentConfigFilename();
+    bool ok;
+    QString newname = QInputDialog::getText(this, tr("Save Camera Configurtion As ..."),
+                                      tr("New Name:"), QLineEdit::Normal,
+                                      "new_config_name", &ok);
+    if (ok && !newname.isEmpty()) {
+        QString newfilename=QFileInfo(filename).absolutePath()+"/"+newname+".ccf";
+        if (QFile::exists(newfilename)) {
+            int ret = QMessageBox::question(this, tr("Save Camera Configurtion As ..."),
+                            tr("A camera configuration with the name '%1' already exists.\n"
+                               "Do you want to overwrite?").arg(newname),
+                            QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
+            if (ret==QMessageBox::No) ok=false;
+        }
+        if (ok) {
+            //copy_file(tempFile.toStdString(), newfilename.toStdString());
+            QFile::copy(tempFile, newfilename);
+            QFile::remove(tempFile);
+            if (m_notifier) m_notifier->emitUpdate();
+            setCurrentConfig(newname);
+        }
+    }
+}
 
 
 
@@ -196,39 +235,48 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, 
     QHBoxLayout* layout=new QHBoxLayout();
     setLayout(layout);
     layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(1);
     combobox=new QFCameraConfigComboBox(configDirectory, this);
     layout->addWidget(combobox, 2);
 
     actConfig = new QAction(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure Camera"), this);
     connect(actConfig, SIGNAL(triggered()), combobox, SLOT(editCurrent()));
 
-    actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
-    connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
+    actAdd = new QAction(QIcon(":/libqf3widgets/config_add.png"), tr("&Add new Camera Configuration"), this);
+    connect(actAdd, SIGNAL(triggered()), combobox, SLOT(addNew()));
+
+    actRename = new QAction(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
+    connect(actRename, SIGNAL(triggered()), combobox, SLOT(renameCurrent()));
 
     actSaveAs = new QAction(QIcon(":/libqf3widgets/config_saveas.png"), tr("&Save Camera Configuration As ..."), this);
     connect(actSaveAs, SIGNAL(triggered()), combobox, SLOT(saveAsCurrent()));
 
-    actRename = new QAction(QIcon(":/libqf3widgets/config_rename.png"), tr("&Rename Camera Configuration As ..."), this);
-    connect(actRename, SIGNAL(triggered()), combobox, SLOT(renameCurrent()));
+    actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
+    connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
 
     layout->addSpacing(5);
 
     btnConfig=new QToolButton(this);
     btnConfig->setDefaultAction(actConfig);
-    layout->addWidget(btnConfig, 0);
+
+    btnAdd=new QToolButton(this);
+    btnAdd->setDefaultAction(actAdd);
 
     btnDelete=new QToolButton(this);
     btnDelete->setDefaultAction(actDelete);
-    layout->addWidget(btnDelete, 0);
 
     btnRename=new QToolButton(this);
     btnRename->setDefaultAction(actRename);
-    layout->addWidget(btnRename, 0);
 
     btnSaveAs=new QToolButton(this);
     btnSaveAs->setDefaultAction(actSaveAs);
-    layout->addWidget(btnSaveAs, 0);
 
+    layout->addWidget(btnConfig, 0);
+    layout->addSpacing(5);
+    layout->addWidget(btnAdd, 0);
+    layout->addWidget(btnRename, 0);
+    layout->addWidget(btnSaveAs, 0);
+    layout->addWidget(btnDelete, 0);
 
 }
 

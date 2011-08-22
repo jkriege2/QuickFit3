@@ -156,6 +156,9 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
 
 
     QGridLayout* ogl=new QGridLayout(this);
+    ogl->setContentsMargins(0,0,0,0);
+    ogl->setHorizontalSpacing(1);
+    ogl->setVerticalSpacing(1);
     ogl->addWidget(new QLabel("detection:"), 0,0);
     ogl->addWidget(new QLabel("lightsheet:"), 1,0);
     cmbObjecive=new QComboBox(this);

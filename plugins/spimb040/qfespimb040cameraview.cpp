@@ -863,7 +863,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=pltDataMarginalLeftYMin+(pltDataMarginalLeftYMax-pltDataMarginalLeftYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
-                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
+                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">standard deviation = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2));
                 var=0;
                 avg=statisticsAverageVariance(var, pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
@@ -893,7 +893,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=fGauss(x, pout);
                 }
-                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
+                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>gauss</td></tr>").arg(status.fnorm);
@@ -915,7 +915,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
-                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>func</td><td>gauss</td></tr>").arg(status.fnorm);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func</td><td>gauss</td></tr>").arg(status.fnorm);
 
 
                 marginalResults+=tr("</table></center>");
@@ -937,7 +937,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=fSlit(x, pout);
                 }
-                marginalResults+=tr("<tr><td><b>left:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 2)).arg(roundError(fabs(pout[3]), 2));
+                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 2)).arg(roundError(fabs(pout[3]), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, fabs(pout[3])*pixelH, 2)).arg(roundError(fabs(pout[3])*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
@@ -1052,7 +1052,7 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
 
 
     if (labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) {
-        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td>size = </td><td>%1 &times; %2</td><td>= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
+        QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
                         .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str())
                         .arg(roundWithError(imageMean, imageStddev, 2)).arg(roundError(imageStddev, 2))
