@@ -35,7 +35,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
 
     #ifdef __LINUX__
     //configDir=QApplication::applicationDirPath();
-    globalConfigDir="/usr/share/quickfit3/"
+    globalConfigDir="/usr/share/quickfit3/";
     #endif
 
 

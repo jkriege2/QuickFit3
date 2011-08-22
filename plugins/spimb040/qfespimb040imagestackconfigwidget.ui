@@ -349,7 +349,7 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>QFStageComboBox</class>
    <extends>QComboBox</extends>
-   <header>../qfstagecombobox.h</header>
+   <header>qfstagecombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources>
