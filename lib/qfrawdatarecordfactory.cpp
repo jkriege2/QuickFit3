@@ -1,10 +1,10 @@
 #include "qfrawdatarecordfactory.h"
 #include "qfrawdatarecord.h"
 
-QFRawDataRecordFactory::QFRawDataRecordFactory(QObject* parent):
+QFRawDataRecordFactory::QFRawDataRecordFactory(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
-
+    m_options=options;
 }
 
 QFRawDataRecordFactory::~QFRawDataRecordFactory()
@@ -55,4 +55,79 @@ int QFRawDataRecordFactory::getMinorVersion(QString id) {
         return mi;
     }
     return 0;
+}
+
+
+QStringList QFRawDataRecordFactory::getIDList() {
+    return items.keys();
+}
+
+QString QFRawDataRecordFactory::getDescription(QString ID) {
+    if (items.contains(ID)) return items[ID]->getDescription();
+    return QString("");
+};
+
+QString QFRawDataRecordFactory::getName(QString ID) {
+    if (items.contains(ID)) return items[ID]->getName();
+    return QString("");
+};
+
+QString QFRawDataRecordFactory::getAuthor(QString ID) {
+    if (items.contains(ID)) return items[ID]->getAuthor();
+    return QString("");
+};
+
+QString QFRawDataRecordFactory::getCopyright(QString ID) {
+    if (items.contains(ID)) return items[ID]->getCopyright();
+    return QString("");
+};
+
+QString QFRawDataRecordFactory::getWeblink(QString ID) {
+    if (items.contains(ID)) return items[ID]->getWeblink();
+    return QString("");
+};
+
+QString QFRawDataRecordFactory::getIconFilename(QString ID) {
+    if (items.contains(ID)) return items[ID]->getIconFilename();
+    return QString("");
+};
+
+QString QFRawDataRecordFactory::getPluginFilename(QString ID) {
+    if (items.contains(ID)) return filenames[ID];
+    return QString("");
+};
+
+
+QFRawDataRecord* QFRawDataRecordFactory::createRecord(QString ID, QFProject* parent)  {
+    if (items.contains(ID)) return items[ID]->createRecord(parent);
+    return NULL;
+};
+
+void QFRawDataRecordFactory::registerMenu(QString ID, QMenu* menu)  {
+    if (items.contains(ID)) {
+        return items[ID]->registerToMenu(menu);
+    }
+};
+
+
+QString QFRawDataRecordFactory::getPluginHelp(QString ID) {
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+    }
+    return "";
+}
+
+QString QFRawDataRecordFactory::getPluginTutorial(QString ID) {
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(ID);
+    }
+    return "";
 }

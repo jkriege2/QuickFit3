@@ -19,7 +19,7 @@ class QFExtensionManager : public QObject {
         Q_OBJECT
     public:
         /** \brief class constructor */
-        QFExtensionManager(QObject* parent=NULL);
+        QFExtensionManager(ProgramOptions* options, QObject* parent=NULL);
         /** \brief class destructor */
         virtual ~QFExtensionManager();
 
@@ -42,26 +42,26 @@ class QFExtensionManager : public QObject {
         /*! \brief write settings in the plugins */
         void writePluginSettings(ProgramOptions* settings);
 
-        /** \brief returns a list of the IDs of all available QFRawDataRecords. */
+        /** \brief returns a list of the IDs of all available QFExtensions. */
         inline QStringList getIDList() { return items.keys(); }
 
-        /** \brief returns the description for a specified QFRawDataRecord ID. */
+        /** \brief returns the description for a specified QFExtension ID. */
         QString getDescription(QString ID);
 
-        /** \brief returns the name for a specified QFRawDataRecord ID. */
+        /** \brief returns the name for a specified QFExtension ID. */
         QString getName(QString ID);
 
 
-        /** \brief returns the author for a specified QFRawDataRecord ID. */
+        /** \brief returns the author for a specified QFExtension ID. */
         QString getAuthor(QString ID);
 
-        /** \brief returns the copyright for a specified QFRawDataRecord ID. */
+        /** \brief returns the copyright for a specified QFExtension ID. */
         QString getCopyright(QString ID);
-        /** \brief returns the weblink for a specified QFRawDataRecord ID. */
+        /** \brief returns the weblink for a specified QFExtension ID. */
         QString getWeblink(QString ID);
-        /** \brief returns the icon filename for a specified QFRawDataRecord ID. */
+        /** \brief returns the icon filename for a specified QFExtension ID. */
         QString getIconFilename(QString ID);
-        /** \brief returns the plugins filename for a specified QFRawDataRecord ID. */
+        /** \brief returns the plugins filename for a specified QFExtension ID. */
         QString getPluginFilename(QString ID);
         /** \brief get plugins major version number */
         int getMajorVersion(QString id);
@@ -73,24 +73,29 @@ class QFExtensionManager : public QObject {
         /** \brief return a pointer to the given Object instance */
         QObject* getQObjectInstance(QString id);
 
-
+        /** \brief returns the plugins main help file (html) for a specified QFExtension ID. */
+        QString getPluginHelp(QString ID);
+        /** \brief returns the plugins tutorial file (html) for a specified QFExtension ID. */
+        QString getPluginTutorial(QString ID);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);
         /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
         void showLongMessage(const QString& message);
     protected:
-        /** \brief this map is used to internally manage the available QFRawDataRecord s.
+        /** \brief this map is used to internally manage the available QFExtension s.
          *         It maps from  the ID to the internal description.
          */
         QMap<QString, QFExtension*> items;
-        /** \brief this map is used to internally manage the available QFRawDataRecord s.
+        /** \brief this map is used to internally manage the available QFExtension s.
          *         It maps from  the ID to the internal description.
          */
         QMap<QString, QObject*> itemobjects;
 
         /** \brief this map contains the filenames of the plugin DLLs */
         QMap<QString, QString> filenames;
+
+        ProgramOptions* m_options;
 
 };
 

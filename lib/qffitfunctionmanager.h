@@ -8,6 +8,7 @@
 #include <QMap>
 #include "qffitfunction.h"
 #include "qfpluginfitfunction.h"
+#include "programoptions.h"
 
 /*! \brief this class manages the available fitting functions
     \ingroup qf3lib_fitting
@@ -20,7 +21,7 @@ class QFFitFunctionManager : public QObject {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFFitFunctionManager(QObject* parent);
+        QFFitFunctionManager(ProgramOptions* options, QObject* parent);
         /** Default destructor */
         virtual ~QFFitFunctionManager();
 
@@ -34,7 +35,7 @@ class QFFitFunctionManager : public QObject {
         virtual QString getName(int i) const;
 
         /** \brief plugin filename */
-        virtual QString getFilename(int i) const;
+        virtual QString getPluginFilename(int i) const;
 
         /** \brief short description for the plugin */
         virtual QString getDescription(int i) const;
@@ -54,6 +55,12 @@ class QFFitFunctionManager : public QObject {
         /** \brief weblink for the plugin */
         virtual QString getWeblink(int i) const;
 
+        /** \brief returns the plugins main help file (html) for a specified  ID. */
+        QString getPluginHelp(int ID);
+        /** \brief returns the plugins tutorial file (html) for a specified  ID. */
+        QString getPluginTutorial(int ID);
+        /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
+        QString getPluginHelp(int ID, QString faID);
         /** \brief search for raw data record plugins in the given directory */
         void searchPlugins(QString directory);
 
@@ -76,6 +83,7 @@ class QFFitFunctionManager : public QObject {
     private:
         QList<QFPluginFitFunction*> fitPlugins;
         QStringList filenames;
+        ProgramOptions* m_options;
 };
 
 #endif // QFFITFUNCTIONMANAGER_H

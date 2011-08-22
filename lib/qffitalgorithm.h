@@ -41,7 +41,7 @@ class QFFitAlgorithmReporter {
     \ingroup qf3lib_fitting
 
     When implementing a fitting algorithm you will have to implement this:
-      - implement name(), id() and helpFile()
+      - implement name(), id()
       - in the cosntructor you will have to set the parameters of your fitting algorithm using setParameter()
         later on you can read it back using getParameter(). Note that is is possible that the main application
         overwrites these parameters by calling setParameter() with externally defined values (e.g. from an INI
@@ -351,9 +351,7 @@ class QFFitAlgorithm {
         virtual QString name() const=0;
         /** \brief return a short unique algorithm ID string */
         virtual QString id() const=0;
-        /** \brief return a HTML file to be displayed as algorithm help. This file has to be positioned in
-         *         \verbatim plugins/help/<plugin_id> \endverbatim */
-        virtual QString helpFile() const { return id()+".html"; };;
+
         /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
         virtual bool get_supportsBoxConstraints() const =0;
 };

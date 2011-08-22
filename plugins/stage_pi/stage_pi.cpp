@@ -94,7 +94,7 @@ void QFExtensionLinearStagePI::loadSettings(ProgramOptions* settingspo) {
 	/* here you could read config information from the quickfit.ini file using settings object */
     if (!settingspo) return;
 	if (settingspo->getQSettings()==NULL) return;
-    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+    //QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
 	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
@@ -105,7 +105,7 @@ void QFExtensionLinearStagePI::storeSettings(ProgramOptions* settingspo) {
 	/* here you could write config information to the quickfit.ini file using settings object */
     if (!settingspo) return;
 	if (settingspo->getQSettings()==NULL) return;
-    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+    //QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
 	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
@@ -150,7 +150,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* pa
 
         QComboBox* cmbPort=new QComboBox(dlg);
         std::vector<std::string> ports=JKSerialConnection::listPorts();
-        for (int i=0; i<ports.size(); i++) {
+        for (unsigned int i=0; i<ports.size(); i++) {
             cmbPort->addItem(ports[i].c_str());
         }
         cmbPort->setEditable(false);

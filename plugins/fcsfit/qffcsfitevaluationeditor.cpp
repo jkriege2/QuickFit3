@@ -2249,31 +2249,47 @@ void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
     hlpFunction->clear();
     if (!current) return;
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    QStringList sl;
-    sl<<":/";
-    QString ppid=cmbModel->itemData(cmbModel->currentIndex()).toString();
-    int pid=services->getFitFunctionManager()->getPluginForID(ppid);
-    QString dll=services->getFitFunctionManager()->getFilename(pid);
-    if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
-    else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
-    hlpFunction->show();
+    //QStringList sl;
+    //sl<<":/";
+    QString pid=cmbModel->itemData(cmbModel->currentIndex()).toString();
+    int ppid=services->getFitFunctionManager()->getPluginForID(pid);
+    //QString dll=services->getFitFunctionManager()->getPluginFilename(pid);
+    //if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
+    //else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
+    //hlpFunction->show();
+    QFFitFunction* function=data->getFitFunction(pid);
+    QString help=services->getFitFunctionManager()->getPluginHelp(ppid, pid);
+    if (QFile::exists(help) && function) {
+        hlpFunction->updateHelp(function->name(), help);
+        hlpFunction->show();
+    } else {
+        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit function available."));
+    }
 }
 
 void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     hlpAlgorithm->clear();
     if (!current) return;
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    QStringList sl;
-    sl<<":/";
+    //QStringList sl;
+    //sl<<":/";
     QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
     int ppid=services->getFitAlgorithmManager()->getPluginForID(pid);
     //std::cout<<pid.toStdString()<<"   "<<ppid<<std::endl;
-    QString dll=services->getFitAlgorithmManager()->getFilename(ppid);
+    //QString dll=services->getFitAlgorithmManager()->getPluginFilename(ppid);
+    //QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
+    //if (algorithm) {
+    //    if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->id()+".html");
+    //    else hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->helpFile());
+    //    hlpAlgorithm->show();
+    //}
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
-    if (algorithm) {
-        if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->id()+".html");
-        else hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->helpFile());
+    QString help=services->getFitAlgorithmManager()->getPluginHelp(ppid, pid);
+    if (QFile::exists(help) && algorithm) {
+        hlpAlgorithm->updateHelp(algorithm->name(), help);
         hlpAlgorithm->show();
+    } else {
+        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit algorithm available."));
     }
 }
 

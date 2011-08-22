@@ -25,8 +25,10 @@ QMAKE_RPATHDIR += $$DESTDIR
 LIBS += -L$$DESTDIR -lquickfit3lib -lquickfit3widgets
 # Input
 HEADERS += mainwindow.h \
-           version.h \
-           optionsdialog.h
+           optionsdialog.h \
+    ../version.h \
+    ../svnversion.h \
+    ../compiledate.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \

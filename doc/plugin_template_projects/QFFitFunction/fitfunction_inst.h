@@ -1,4 +1,4 @@
-#ifndef HEADER_H
+x#ifndef HEADER_H
 #define HEADER_H
 
 #include "qfpluginfitfunction.h"

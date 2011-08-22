@@ -35,9 +35,11 @@ class QFRawDataRecordFactory : public QObject {
         /** \brief this map contains the filenames of the plugin DLLs */
         QMap<QString, QString> filenames;
 
+        ProgramOptions* m_options;
+
     public:
         /** Default constructor */
-        QFRawDataRecordFactory(QObject* parent=NULL);
+        QFRawDataRecordFactory(ProgramOptions* options, QObject* parent=NULL);
         /** Default destructor */
         virtual ~QFRawDataRecordFactory();
 
@@ -49,49 +51,32 @@ class QFRawDataRecordFactory : public QObject {
 
 
         /** \brief returns a list of the IDs of all available QFRawDataRecords. */
-        inline QStringList getIDList() { return items.keys(); }
+        QStringList getIDList();
 
         /** \brief returns the description for a specified QFRawDataRecord ID. */
-        inline QString getDescription(QString ID) {
-            if (items.contains(ID)) return items[ID]->getDescription();
-            return QString("");
-        };
+        QString getDescription(QString ID);
 
         /** \brief returns the name for a specified QFRawDataRecord ID. */
-        inline QString getName(QString ID) {
-            if (items.contains(ID)) return items[ID]->getName();
-            return QString("");
-        };
+        QString getName(QString ID);
 
 
 
         /** \brief returns the author for a specified QFRawDataRecord ID. */
-        inline QString getAuthor(QString ID) {
-            if (items.contains(ID)) return items[ID]->getAuthor();
-            return QString("");
-        };
+        QString getAuthor(QString ID);
 
         /** \brief returns the copyright for a specified QFRawDataRecord ID. */
-        inline QString getCopyright(QString ID) {
-            if (items.contains(ID)) return items[ID]->getCopyright();
-            return QString("");
-        };
+        QString getCopyright(QString ID);
         /** \brief returns the weblink for a specified QFRawDataRecord ID. */
-        inline QString getWeblink(QString ID) {
-            if (items.contains(ID)) return items[ID]->getWeblink();
-            return QString("");
-        };
+        QString getWeblink(QString ID);
         /** \brief returns the icon filename for a specified QFRawDataRecord ID. */
-        inline QString getIconFilename(QString ID) {
-            if (items.contains(ID)) return items[ID]->getIconFilename();
-            return QString("");
-        };
+        QString getIconFilename(QString ID);
         /** \brief returns the plugins filename for a specified QFRawDataRecord ID. */
-        inline QString getPluginFilename(QString ID) {
-            if (items.contains(ID)) return filenames[ID];
-            return QString("");
-        };
+        QString getPluginFilename(QString ID);
 
+        /** \brief returns the plugins main help file (html) for a specified QFRawDataRecord ID. */
+        QString getPluginHelp(QString ID);
+        /** \brief returns the plugins tutorial file (html) for a specified QFRawDataRecord ID. */
+        QString getPluginTutorial(QString ID);
 
         /** \brief get plugins major version number */
         int getMajorVersion(QString id);
@@ -101,17 +86,10 @@ class QFRawDataRecordFactory : public QObject {
 
 
         /** \brief returns a new object (created by new) for a specified QFRawDataRecord ID. */
-        inline QFRawDataRecord* createRecord(QString ID, QFProject* parent)  {
-            if (items.contains(ID)) return items[ID]->createRecord(parent);
-            return NULL;
-        };
+        QFRawDataRecord* createRecord(QString ID, QFProject* parent);
 
         /** \brief register menu items for specified ID. */
-        inline void registerMenu(QString ID, QMenu* menu)  {
-            if (items.contains(ID)) {
-                return items[ID]->registerToMenu(menu);
-            }
-        };
+        void registerMenu(QString ID, QMenu* menu);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

@@ -6,10 +6,10 @@
 #include "qfpluginservices.h"
 
 
-QFExtensionManager::QFExtensionManager(QObject* parent):
+QFExtensionManager::QFExtensionManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
-    //ctor
+    m_options=options;
 }
 
 QFExtensionManager::~QFExtensionManager()
@@ -149,4 +149,26 @@ int QFExtensionManager::getMinorVersion(QString id) {
         return mi;
     }
     return 0;
+}
+
+QString QFExtensionManager::getPluginHelp(QString ID) {
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+    }
+    return "";
+}
+
+QString QFExtensionManager::getPluginTutorial(QString ID) {
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(ID);
+    }
+    return "";
 }

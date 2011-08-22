@@ -39,16 +39,12 @@
       .
       - Help files:
         - QuickFit directly: \c [AssetsDir]/help/
-        - for QFFitAlgorithm and QFFitFunction plugins (<i>note that \c <PluginDLL.baseName> NEVER contains a \c lib at the start, or \c .ddl/.so/... at the end. So although a plugin file is \c libfcs.so on Linux the used basename is still \c fcs !</i>):
-            - help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
-            - tutorials: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>_tutorial.html
-            - images for online help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/pic/
-          .
-        - for any other plugins:
+        - for any plugins (<i>note that \c <PluginDLL.baseName> NEVER contains a \c lib at the start, or \c .ddl/.so/... at the end. So although a plugin file is \c libfcs.so on Linux the used basename is still \c fcs !</i>):
             - help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
             - tutorials: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/tutorial.html
             - images for online help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/pic/
           .
+		- for QFFitAlgorithm and QFFitFunction the plugins may contain several algorithms/functions, so there should also be a help file for each of these. Thes reside in  \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<FuncAlgID>.html where \c <FuncAlgID> is the ID of the QFFitAlgorithm or QFFitFunction. The above mentioned plugin-wide help file should contain a listing of the contained functions/algorithms with links to their description.
         .
       - any other additional files:
         - QuickFit directly: \c [AssetsDir]

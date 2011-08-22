@@ -6,6 +6,7 @@
 #include <QString>
 #include <QStringList>
 #include <QMap>
+#include "programoptions.h"
 
 class QFPluginFitAlgorithm; // forward
 class QFFitAlgorithm;
@@ -19,14 +20,14 @@ class QFFitAlgorithmManager : public QObject {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFFitAlgorithmManager(QObject* parent);
+        QFFitAlgorithmManager(ProgramOptions* options, QObject* parent);
         /** Default destructor */
         virtual ~QFFitAlgorithmManager();
 
-        /** \brief returns a list of the IDs of all available QFRawDataRecords. */
+        /** \brief returns a list of the IDs of all available QFFitAlgorthm s. */
         QStringList getIDList() const;
 
-        /** \brief returns a list of the IDs of all available QFRawDataRecords. */
+        /** \brief returns a list of the IDs of all available QFFitAlgorthm s. */
         QStringList getIDList(int i) const;
 
         /** \brief return number of available plugins */
@@ -36,7 +37,7 @@ class QFFitAlgorithmManager : public QObject {
         virtual QString getName(int i) const;
 
         /** \brief plugin filename */
-        virtual QString getFilename(int i) const;
+        virtual QString getPluginFilename(int i) const;
 
         /** \brief plugin filename */
         virtual QString getIconFilename(int i) const;
@@ -68,6 +69,16 @@ class QFFitAlgorithmManager : public QObject {
         /** \brief get plugins minor version number */
         int getMinorVersion(int i);
 
+        /** \brief returns the plugins main help file (html) for a specified plugin \a ID. */
+        QString getPluginHelp(int ID);
+        /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
+        QString getPluginTutorial(int ID);
+
+        /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
+        QString getPluginHelp(int ID, QString faID);
+
+
+
         /** \brief create a new fit algorithm object instance */
         QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;
     signals:
@@ -79,6 +90,7 @@ class QFFitAlgorithmManager : public QObject {
     private:
         QList<QFPluginFitAlgorithm*> fitPlugins;
         QStringList filenames;
+        ProgramOptions* m_options;
     private:
 };
 

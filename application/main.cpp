@@ -1,8 +1,7 @@
 #include "mainwindow.h"
-#include "version.h"
+#include "../version.h"
 #include "../lib/programoptions.h"
-#include "../svnversion.h"
-#include "../compiledate.h"
+
 
 #include <QtGui>
 #include <QSplashScreen>
@@ -32,14 +31,15 @@ int main(int argc, char * argv[])
     QApplication app(argc, argv);
 
     app.setOrganizationName("");
-    app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(AutoVersion::FULLVERSION_STRING).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
-    app.setOrganizationDomain("http://www.jkrieger.de/");
-    app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(VERSION_FULL).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    //app.setOrganizationDomain("http://www.dkfz.de/Macromol");
+    app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    app.setWindowIcon(QIcon(":/icon.png"));
 
     QPixmap pixmap(":/splash.png");
     QPainter* painter=new QPainter(&pixmap);
     painter->setFont(QFont("Arial", 9));
-    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4)").arg(AutoVersion::FULLVERSION_STRING).arg(AutoVersion::STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
     delete painter;
     painter=NULL;
     QSplashScreen splash(pixmap,Qt::WindowStaysOnTopHint);

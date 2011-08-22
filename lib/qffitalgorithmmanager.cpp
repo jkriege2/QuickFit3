@@ -6,10 +6,10 @@
 #include "qffitalgorithm.h"
 
 
-QFFitAlgorithmManager::QFFitAlgorithmManager(QObject* parent):
+QFFitAlgorithmManager::QFFitAlgorithmManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
-    //ctor
+    m_options=options;
 }
 
 QFFitAlgorithmManager::~QFFitAlgorithmManager()
@@ -35,30 +35,37 @@ void QFFitAlgorithmManager::searchPlugins(QString directory) {
 }
 
 QString QFFitAlgorithmManager::getName(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getName();
 }
 
-QString QFFitAlgorithmManager::getFilename(int i) const {
+QString QFFitAlgorithmManager::getPluginFilename(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return filenames[i];
 }
 
 QString QFFitAlgorithmManager::getDescription(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getDescription();
 }
 
 QString QFFitAlgorithmManager::getAuthor(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getAuthor();
 }
 
 QString QFFitAlgorithmManager::getCopyright(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getCopyright();
 }
 
 QString QFFitAlgorithmManager::getWeblink(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getWeblink();
 }
 
 QStringList QFFitAlgorithmManager::getIDList(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return QStringList();
     return fitPlugins[i]->getIDs();
 }
 
@@ -92,7 +99,7 @@ QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(QString id, QObject* pare
 
 int QFFitAlgorithmManager::getMajorVersion(int id) {
     int ma, mi;
-    if (id<fitPlugins.size()) {
+    if ((id>=0) && (id<fitPlugins.size())) {
         fitPlugins[id]->getVersion(ma, mi);
         return ma;
     }
@@ -101,7 +108,7 @@ int QFFitAlgorithmManager::getMajorVersion(int id) {
 
 int QFFitAlgorithmManager::getMinorVersion(int id) {
     int ma, mi;
-    if (id<fitPlugins.size()) {
+    if ((id>=0) && (id<fitPlugins.size())) {
         fitPlugins[id]->getVersion(ma, mi);
         return mi;
     }
@@ -110,10 +117,55 @@ int QFFitAlgorithmManager::getMinorVersion(int id) {
 
 
 QString QFFitAlgorithmManager::getID(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getID();
 }
 
 
 QString QFFitAlgorithmManager::getIconFilename(int i) const {
+    if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getIconFilename();
 }
+
+
+QString QFFitAlgorithmManager::getPluginHelp(int ID) {
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(getID(ID));
+    }
+    return "";
+}
+
+QString QFFitAlgorithmManager::getPluginTutorial(int ID) {
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+    }
+    return "";
+}
+
+
+
+
+
+
+QString QFFitAlgorithmManager::getPluginHelp(int ID, QString faID) {
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        //QStringList ids=getIDList(ID);
+        //if ((faID<0) || (faID>=ids.size())) return "";
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(faID);
+    }
+    return "";
+}
+
+
