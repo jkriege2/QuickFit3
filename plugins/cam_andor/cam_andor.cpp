@@ -712,7 +712,11 @@ bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSett
     connect(thread, SIGNAL(log_error(QString)), this, SLOT(tlog_error(QString)));
     connect(thread, SIGNAL(log_warning(QString)), this, SLOT(tlog_warning(QString)));
     connect(thread, SIGNAL(log_text(QString)), this, SLOT(tlog_text(QString)));
-    thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getImageWidth(camera), getImageHeight(camera), info.expoTime, LOG_PREFIX);
+    bool ok=thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getImageWidth(camera), getImageHeight(camera), info.expoTime, LOG_PREFIX);
+    if (!ok) {
+        delete thread;
+        return false;
+    }
     camThreads[camera]=thread;
 
     return true;
