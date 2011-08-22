@@ -39,13 +39,17 @@
       .
       - Help files:
         - QuickFit directly: \c [AssetsDir]/help/
-        - for raw data/evaluation plugin: \c [AssetsDir]/plugins/help/<PluginID>/<PluginID>.html
-        - for QFExtension plugin: \c [AssetsDir]/plugins/help/<PluginID>/<PluginID>.html
-        - for QFFitAlgorithm plugin: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
-        - for QFFitFunction plugin: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
-        - tutorials for any plugin: \c [AssetsDir]/plugins/help/<PluginID>/tutorial.html
-        - images for online help: \c [AssetsDir]/plugins/help/<PluginID>/pic/
-      .
+        - for QFFitAlgorithm and QFFitFunction plugins (<i>note that \c <PluginDLL.baseName> NEVER contains a \c lib at the start, or \c .ddl/.so/... at the end. So although a plugin file is \c libfcs.so on Linux the used basename is still \c fcs !</i>):
+            - help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
+            - tutorials: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>_tutorial.html
+            - images for online help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/pic/
+          .
+        - for any other plugins:
+            - help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/<PluginID>.html
+            - tutorials: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/tutorial.html
+            - images for online help: \c [AssetsDir]/plugins/help/<PluginDLL.baseName>/pic/
+          .
+        .
       - any other additional files:
         - QuickFit directly: \c [AssetsDir]
         - for plugins: \c [AssetsDir]/plugins/<PluginID>/

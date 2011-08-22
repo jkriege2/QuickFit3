@@ -336,8 +336,6 @@ QString MainWindow::createPluginDoc(bool docLinks) {
 
 QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
     QString text="";
-    //if (docLink) text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><a href=\"%4/plugins/help/%5/%3.html\"><img src=\"%2\">&nbsp;<b>%1</b></a></td></tr>").arg(name).arg(iconfilename).arg(id).arg(settings->getAssetsDirectory());
-    //else
     text+=QString("<tr><td>&nbsp;</td><td></td></tr><tr><td colspan=\"2\" bgcolor=\"silver\"><img src=\"%2\">&nbsp;<b>%1</b></td></tr>").arg(name).arg(iconfilename);
     text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2.%3</td></tr>").arg(tr("version:")).arg(verMajor).arg(verMinor);
     text+=QString("<tr><td><i>%1</i></td><td bgcolor=\"silver\">%2</td></tr>").arg(tr("description:")).arg(description);
@@ -361,7 +359,10 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
         QString id=getRawDataRecordFactory()->getIDList().at(i);
-        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(QFileInfo(getRawDataRecordFactory()->getPluginFilename(id)).baseName());
+        QString basename=QFileInfo(getRawDataRecordFactory()->getPluginFilename(id)).baseName();
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+        qDebug()<<id<<dir<<QFile::exists(dir);
         if (QFile::exists(dir)) text+=item_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir);
     }
     text+=mainitem_after;
@@ -370,7 +371,10 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
         QString id=getEvaluationItemFactory()->getIDList().at(i);
-        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(QFileInfo(getEvaluationItemFactory()->getPluginFilename(id)).baseName());
+        QString basename=QFileInfo(getEvaluationItemFactory()->getPluginFilename(id)).baseName();
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);//QFileInfo(getEvaluationItemFactory()->getPluginFilename(id)).baseName());
+        qDebug()<<id<<dir<<QFile::exists(dir);
         if (QFile::exists(dir)) text+=item_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir);
     }
     text+=mainitem_after;
@@ -379,7 +383,10 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
-        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(QFileInfo(fitAlgorithmManager->getFilename(id)).baseName());
+        QString basename=QFileInfo(fitAlgorithmManager->getFilename(id)).baseName();
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/%2_tutorial.html").arg(basename).arg(fitAlgorithmManager->getID(id));
+        qDebug()<<id<<basename<<dir<<QFile::exists(dir);
         if (QFile::exists(dir)) text+=item_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
@@ -387,7 +394,10 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
-        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(QFileInfo(fitFunctionManager->getFilename(id)).baseName());
+        QString basename=QFileInfo(fitFunctionManager->getFilename(id)).baseName();
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/%2_tutorial.html").arg(basename).arg(fitAlgorithmManager->getID(id));
+        qDebug()<<id<<basename<<dir<<QFile::exists(dir);
         if (QFile::exists(dir)) text+=item_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
@@ -396,7 +406,10 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
-        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(QFileInfo(getExtensionManager()->getPluginFilename(id)).baseName());
+        QString basename=QFileInfo(getExtensionManager()->getPluginFilename(id)).baseName();
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+        QString dir=settings->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);//QFileInfo(getExtensionManager()->getPluginFilename(id)).baseName());
+        qDebug()<<id<<dir<<QFile::exists(dir);
         if (QFile::exists(dir)) text+=item_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir);
     }
     text+=mainitem_after;
