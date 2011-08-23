@@ -439,7 +439,8 @@ void QFECamTestCamera::seriesStep1() {
     }
     uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
     for (register unsigned int i=0; i<frame_width*frame_height; i++) {
-        register uint64_t v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
+        register uint64_t v=255;
+        if (frame_max-frame_min!=0) v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
         if (v>255) v=255;
         frame[i]=v;
     }
@@ -491,7 +492,9 @@ void QFECamTestCamera::seriesStep1() {
     seriesRunning[camera] = seriesRunning[camera] && (seriesCount[camera]<seriesAcquisitions);
 
     if (seriesRunning[camera]) {
-        QTimer::singleShot(seriesDelay, this,SLOT(seriesStep1()));
+        QTimer::singleShot(seriesDelay, this, SLOT(seriesStep1()));
+        //QApplication::processEvents();
+        //seriesStep1();
     } else {
         TIFFClose(tif[camera]);
     }

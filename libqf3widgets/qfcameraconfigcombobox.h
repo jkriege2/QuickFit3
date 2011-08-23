@@ -7,9 +7,21 @@
 #include "qfextension.h"
 #include "qfcameracombobox.h"
 
+/*! \brief Interface that allows to stop/resume an acquisition
+    \ingroup qf3lib_widgets
+ */
+class QFCameraConfigComboBoxStartResume {
+public:
+   ~QFCameraConfigComboBoxStartResume() {};
+
+   virtual void stop()=0;
+   virtual void resume()=0;
+};
+
+
 /*! \brief This class is used to notify all QFCameraConfigComboBox in the application to update their contents,
            if e.g. a configuration is deleted or added
-    \ingroup qf3ext_spimb040
+    \ingroup qf3lib_widgets
 
  */
 class QFCameraConfigComboBoxNotifier: public QObject {
@@ -27,7 +39,7 @@ class QFCameraConfigComboBoxNotifier: public QObject {
 
 
 /*! \brief QComboBox which is filled with all available camera config from the plugin config directory
-    \ingroup qf3ext_spimb040
+    \ingroup qf3lib_widgets
 
     Using the QFCameraConfigComboBoxNotifier object, this class will keep contact to all its siblings and update
     it's contents whenever it is altered (using editCurrent(),  deleteCurrent(), saveAsCurrent() or renameCurrent() ).
@@ -49,6 +61,8 @@ class QFCameraConfigComboBox : public QComboBox {
 
         /** \brief select a given camera configuration */
         void setCurrentConfig(QString name);
+
+        void setStopResume(QFCameraConfigComboBoxStartResume* stopresume);
     public slots:
         /*! \brief may be used to connect this widget to a QFCameraComboBox
 
@@ -72,12 +86,14 @@ class QFCameraConfigComboBox : public QComboBox {
         void saveAsCurrent();
         /*! \brief rename the current configuration under a new name */
         void renameCurrent();
+
     protected slots:
         void directoryChanged(const QString& path);
     protected:
         QString m_configDirectory;
         QFExtension* m_extension;
         QFExtensionCamera* m_cam;
+        QFCameraConfigComboBoxStartResume* m_stopresume;
         int m_camIdx;
         static QFCameraConfigComboBoxNotifier* m_notifier;
 
@@ -89,7 +105,7 @@ class QFCameraConfigComboBox : public QComboBox {
 
 
 /*! \brief this widget contains a QFCameraConfigComboBox and some buttons to edit it's contents
-    \ingroup qf3ext_spimb040
+    \ingroup qf3lib_widgets
 
  */
 class QFCameraConfigEditorWidget : public QWidget {
@@ -109,6 +125,11 @@ class QFCameraConfigEditorWidget : public QWidget {
         void setCurrentConfig(QString name) { combobox->setCurrentConfig(name); }
         /** \brief this QAction triggers the configuration of the currently selected camera settings, provided for convenience, if you need this functionality at additional buttons in your GUI */
         QAction* configAction() const { return actConfig; }
+
+        void setStopResume(QFCameraConfigComboBoxStartResume* stopresume) {
+            combobox->setStopResume(stopresume);
+        };
+
     public slots:
         /*! \brief may be used to connect this widget to a QFCameraComboBox
 
@@ -122,6 +143,15 @@ class QFCameraConfigEditorWidget : public QWidget {
         void rereadConfigFiles() {
             combobox->rereadConfigFiles();
         }
+
+
+        void cmbCurrentIndexChanged(int index) {
+            emit currentIndexChanged(index);
+        }
+
+    signals:
+        /** \brief current item changed */
+        void currentIndexChanged(int index);
 
     protected:
         QFCameraConfigComboBox* combobox;

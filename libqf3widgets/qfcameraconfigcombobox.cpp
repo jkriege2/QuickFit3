@@ -29,6 +29,7 @@ QFCameraConfigComboBox::QFCameraConfigComboBox(QString configDirectory, QWidget*
     m_cam=NULL;
     m_camIdx=-1;
     m_extension=NULL;
+    m_stopresume=NULL;
 //    std::cout<<"m_notifier="<<m_notifier<<std::endl;
     if (m_notifier==NULL) m_notifier=new QFCameraConfigComboBoxNotifier(NULL);
     connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(rereadConfigFiles()));
@@ -107,14 +108,24 @@ void QFCameraConfigComboBox::setCurrentConfig(QString name) {
     setCurrentIndex(configidx);
 }
 
+void QFCameraConfigComboBox::setStopResume(QFCameraConfigComboBoxStartResume* stopresume) {
+    m_stopresume=stopresume;
+}
+
 void QFCameraConfigComboBox::editCurrent() {
     QString filename=currentConfigFilename();
     if (filename.size()>0) {
+        //qDebug()<<"stop"<<m_stopresume;
+        if (m_stopresume) m_stopresume->stop();
         QSettings* settings=new QSettings(filename, QSettings::IniFormat);
+
+        //qDebug()<<"show dialog";
         m_cam->showCameraSettingsDialog(m_camIdx, *settings, this);
         settings->sync();
         delete settings;
         if (m_notifier) m_notifier->emitUpdate();
+        if (m_stopresume) m_stopresume->resume();
+        //qDebug()<<"resume"<<m_stopresume;
     }
 }
 
@@ -193,10 +204,12 @@ void QFCameraConfigComboBox::addNew() {
         }
     }
 
+    if (m_stopresume) m_stopresume->stop();
     QSettings* settings=new QSettings(tempFile, QSettings::IniFormat);
     m_cam->showCameraSettingsDialog(m_camIdx, *settings, this);
     settings->sync();
     delete settings;
+    if (m_stopresume) m_stopresume->resume();
 
     QString filename=currentConfigFilename();
     bool ok;
@@ -238,6 +251,7 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, 
     layout->setSpacing(1);
     combobox=new QFCameraConfigComboBox(configDirectory, this);
     layout->addWidget(combobox, 2);
+    connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 
     actConfig = new QAction(QIcon(":/libqf3widgets/acquisition_configuration.png"), tr("&Configure Camera"), this);
     connect(actConfig, SIGNAL(triggered()), combobox, SLOT(editCurrent()));

@@ -59,7 +59,7 @@ class QFCameraConfigNotifier: public QObject {
 
 
  */
-class QFESPIMB040CameraConfig : public QGroupBox {
+class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxStartResume {
         Q_OBJECT
     protected:
         /** \brief states used in conjunction with displayStates() */
@@ -114,11 +114,15 @@ class QFESPIMB040CameraConfig : public QGroupBox {
 
         bool objectiveExists(QString name);
 
+        virtual void stop();
+        virtual void resume();
+
     signals:
         /** \brief emitted when the set of configuration files changes */
         void configFilesChanged();
 
-
+        /** \brief selected preview config  changed */
+        void previewConfigChanged();
     protected:
         QFESPIMB040MainWindow* m_parent;
         int m_camViewID;
@@ -128,6 +132,7 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QList<ObjectiveDescription> objectives;
         bool objectivesWritable() const;
 
+
     protected slots:
         void loadObjectives();
         void storeObjectives();
@@ -136,6 +141,7 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         void editObjective();
         void currentObjectiveChanged(int idx);
 
+        void previewCurrentIndexChanged(int index);
     protected:
         /** \brief struct that holds dta about the different camera devices, including the last raw image, ... */
         struct viewDataStruct {
@@ -221,6 +227,13 @@ class QFESPIMB040CameraConfig : public QGroupBox {
         QAction* actStartStopPreview;
         /** \brief action to acquire a single frame */
         QAction* actPreviewSingle;
+        /** \brief action to configure preview */
+        QAction* actPreviewConfig;
+
+        bool restartPreview;
+
+        QTimer* previewTimer;
+
 
 
         static QFCameraConfigNotifier* m_notifier;
@@ -271,11 +284,14 @@ class QFESPIMB040CameraConfig : public QGroupBox {
          */
         void disConnectAcquisitionDevice();
         /** \brief start/stop image continuous acquisition (depending on actStartStopAcquisition)
-         *
-         * \note this function is a wrapper slot function and calls the respective protected function stopAcquisition()
          */
         void startStopPreview();
-        /** \brief acquire a single frame from continuous series
+        /** \brief stop image continuous acquisition
+         *
+         * \note This function ensures that \c viewData.abort_continuous_acquisition=true so any preview is really stopped!
+         */
+        void stopPreview();
+         /** \brief acquire a single frame from continuous series
          *
          *  This function is called by a QTimer. The continuous series is started by startStopAcquisition1()
          *  This function actually reads one image from the connected camera and displays it.
@@ -287,8 +303,6 @@ class QFESPIMB040CameraConfig : public QGroupBox {
 
         /** \brief set enabled/disabled states of the actions and widgets according to the given parameter */
         void displayStates(States state);
-
-
 
     private:
 };

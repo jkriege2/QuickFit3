@@ -7,7 +7,7 @@
 #include "qfextension.h"
 
 /*! \brief QComboBox which is filled with all available cameras
-    \ingroup qf3ext_spimb040
+    \ingroup qf3lib_widgets
 
     If this QComboBox is initialized with a valid QFExtensionManager object, it will be automatically
     filled with all available cameras.

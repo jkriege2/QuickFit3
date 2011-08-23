@@ -7,7 +7,7 @@
 #include "qfextension.h"
 
 /*! \brief QComboBox which is filled with all available stages
-    \ingroup qf3ext_spimb040
+    \ingroup qf3lib_widgets
 
 
  */
