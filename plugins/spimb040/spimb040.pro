@@ -25,7 +25,8 @@ HEADERS += spimb040.h \
            ../../../../../LIB/trunk/tinytiffwriter.h \
            ../../../../../LIB/trunk/libtiff_tools.h \
            ../interfaces/qfextensionlinearstage.h \
-           ../interfaces/qfextensionparameterdevice.h
+           ../interfaces/qfextensionparameterdevice.h \
+    qfespimb040acquisitionconfigwidget.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -36,10 +37,12 @@ SOURCES += spimb040.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
            qfespimb040imagestackconfigwidget.cpp \
            ../../../../../LIB/trunk/tinytiffwriter.cpp \
-           ../../../../../LIB/trunk/libtiff_tools.cpp
+           ../../../../../LIB/trunk/libtiff_tools.cpp \
+    qfespimb040acquisitionconfigwidget.cpp
 
 FORMS = \
-    qfespimb040imagestackconfigwidget.ui
+    qfespimb040imagestackconfigwidget.ui \
+    qfespimb040acquisitionconfigwidget.ui
 
 RESOURCES += spimb040.qrc
 

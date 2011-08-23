@@ -35,6 +35,8 @@
 #include "qfespimb040cameraconfig.h"
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget.h"
+#include "qfespimb040acquisitionconfigwidget.h"
+#include "qfhtmlhelpwindow.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -69,14 +71,11 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         QFExtensionServices* m_pluginServices;
 
         QTabWidget* tabAcquisition;
-        QCheckBox* chkAcquisitionUseCam1;
-        QCheckBox* chkAcquisitionUseCam2;
-        QLineEdit* edtAcquisitionPrefix1;
-        QLineEdit* edtAcquisitionPrefix2;
-        QPushButton* btnAcquire;
-        QSpinBox* spinAcquisitionCount;
-
+        QFESPIMB040AcquisitionConfigWidget* widAcquisition;
         QFESPIMB040ImageStackConfigWidget* widImageStack;
+
+        QTabWidget* tabMain;
+        QFHTMLHelpWindow* help;
 
 
 

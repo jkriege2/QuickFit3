@@ -1218,21 +1218,24 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
 
     // collect images from plots
     QPicture picMain; QSize sizeMain;
-    QPainter* p=new QPainter(&picMain); pltMain->draw(p, &sizeMain); p->end(); delete p;
+    QPainter* p=new QPainter(&picMain); pltMain->draw(p, QColor(Qt::white), &sizeMain); p->end(); delete p;
     QPicture picMarginLeft; QSize sizeMarginLeft;
-    p=new QPainter(&picMarginLeft); pltMarginalLeft->draw(p, &sizeMarginLeft); p->end(); delete p;
+    p=new QPainter(&picMarginLeft); pltMarginalLeft->draw(p, QColor(Qt::white), &sizeMarginLeft); p->end(); delete p;
     QPicture picMarginBottom; QSize sizeMarginBottom;
-    p=new QPainter(&picMarginBottom); pltMarginalBottom->draw(p, &sizeMarginBottom); p->end(); delete p;
+    p=new QPainter(&picMarginBottom); pltMarginalBottom->draw(p, QColor(Qt::white), &sizeMarginBottom); p->end(); delete p;
     QPicture picHist; QSize sizeHist;
-    p=new QPainter(&picHist); pltCountsHistogram->draw(p, &sizeHist); p->end(); delete p;
+    p=new QPainter(&picHist); pltCountsHistogram->draw(p, QColor(Qt::white), &sizeHist); p->end(); delete p;
 
 
     // we use this QTextCursor to write the document
     QTextCursor cursor(document);
+    QFont f;
+    f.setPointSize(7);;
+    document->setDefaultFont(f);
 
     // here we define some generic formats
     QTextCharFormat fText=cursor.charFormat();
-    fText.setFontPointSize(8);
+    fText.setFontPointSize(7);
     QTextCharFormat fTextSmall=fText;
     fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
     QTextCharFormat fTextBold=fText;
@@ -1247,24 +1250,32 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     QTextBlockFormat bfCenter;
     bfCenter.setAlignment(Qt::AlignHCenter);
 
-    fHeading1.setFontPointSize(2*fText.fontPointSize());
+    fHeading1.setFontPointSize(1.5*fText.fontPointSize());
     fHeading1.setFontWeight(QFont::Bold);
 
 
     // insert heading
-    cursor.insertText(QString("%1:\n\n").arg(windowTitle()), fHeading1);
+    cursor.insertText(QString("%1:").arg(windowTitle()), fHeading1);
     cursor.insertBlock();
-    cursor.movePosition(QTextCursor::End);
-    cursor.insertHtml(labVideoSettings->text());
+//    cursor.movePosition(QTextCursor::End);
 
+    cursor.insertHtml(labVideoSettings->text());
+    double scale=1;
+    double all_width=picMain.boundingRect().width()+picMarginLeft.boundingRect().width();
+    double all_height=picMain.boundingRect().height()+picMarginBottom.boundingRect().height();
+    double page_width=(double)document->textWidth()*0.95;
+    scale=page_width/all_width;
+    int percentMain=round(100.0*(double)picMain.boundingRect().width()/all_width);
+    if (percentMain>99) percentMain=99;
+    if (percentMain<1) percentMain=1;
 
     cursor.insertBlock();
     QTextTableFormat tableFormat1;
     tableFormat1.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat1.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     QVector<QTextLength> constraints;
-    constraints << QTextLength(QTextLength::PercentageLength, 20);
-    constraints << QTextLength(QTextLength::PercentageLength, 80);
+    constraints << QTextLength(QTextLength::PercentageLength, 100-percentMain);
+    constraints << QTextLength(QTextLength::PercentageLength, percentMain);
     tableFormat1.setColumnWidthConstraints(constraints);
     QTextTable* table = cursor.insertTable(3, 2, tableFormat1);
     {
@@ -1291,23 +1302,28 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
         QPicture& pic=picMain;
-        double scale=document->textWidth()*0.78/pic.boundingRect().width();
-        if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        //double scale=document->textWidth()*0.78/pic.boundingRect().width();
+        //if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     {
         QTextCursor tabCursor=table->cellAt(1, 0).firstCursorPosition();
         QPicture& pic=picMarginLeft;
-        double scale=document->textWidth()*0.18/pic.boundingRect().width();
-        if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        //double scale=document->textWidth()*0.18/pic.boundingRect().width();
+        //if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     {
         QTextCursor tabCursor=table->cellAt(2, 1).firstCursorPosition();
         QPicture& pic=picMarginBottom;
-        double scale=document->textWidth()*0.78/pic.boundingRect().width();
-        if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        //double scale=document->textWidth()*0.78/pic.boundingRect().width();
+        //if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    {
+        QTextCursor tabCursor=table->cellAt(2, 0).firstCursorPosition();
+        tabCursor.insertHtml(QString("<i>marginals:</i> %1<br>").arg(cmbMarginalPlots->currentText()));
+        tabCursor.insertHtml(QString("<i>legend:</i> <font color=\"red\"> - data</font>, <font color=\"blue\"> - fit</font>"));
     }
     QApplication::processEvents();
 
@@ -1315,14 +1331,14 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     cursor.insertBlock();
     cursor.insertBlock();
     constraints.clear();
-    constraints << QTextLength(QTextLength::PercentageLength, 50);
-    constraints << QTextLength(QTextLength::PercentageLength, 50);
+    constraints << QTextLength(QTextLength::PercentageLength, 30);
+    constraints << QTextLength(QTextLength::PercentageLength, 70);
     tableFormat1.setColumnWidthConstraints(constraints);
     table = cursor.insertTable(1,2, tableFormat1);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture& pic=picHist;
-        double scale=document->textWidth()*0.48/pic.boundingRect().width();
+        double scale=document->textWidth()*0.28/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(QString("Histogram:\n"), fTextBold);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);

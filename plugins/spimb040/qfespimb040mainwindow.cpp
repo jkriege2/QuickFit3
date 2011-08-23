@@ -39,11 +39,8 @@ void QFESPIMB040MainWindow::loadSettings(ProgramOptions* settings) {
     if (camConfig2) camConfig2->loadSettings(settings, "plugin_spim_b040/cam_config2/");
     if (sampleStages) sampleStages->loadSettings(settings, "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
+    if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
 
-    chkAcquisitionUseCam1->setChecked((*settings->getQSettings()).value("plugin_spim_b040/acquisition/use_cam1", true).toBool());
-    chkAcquisitionUseCam2->setChecked((*settings->getQSettings()).value("plugin_spim_b040/acquisition/use_cam2", true).toBool());
-    edtAcquisitionPrefix1->setText((*settings->getQSettings()).value("plugin_spim_b040/acquisition/prefix1", "camera1").toString());
-    edtAcquisitionPrefix2->setText((*settings->getQSettings()).value("plugin_spim_b040/acquisition/prefix2", "camera2").toString());
 }
 
 void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
@@ -52,11 +49,8 @@ void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
     if (camConfig2) camConfig2->storeSettings(settings, "plugin_spim_b040/cam_config2/");
     if (sampleStages) sampleStages->storeSettings(settings, "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
+    if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
 
-    (*settings->getQSettings()).setValue("plugin_spim_b040/acquisition/use_cam1", chkAcquisitionUseCam1->isChecked());
-    (*settings->getQSettings()).setValue("plugin_spim_b040/acquisition/prefix1", edtAcquisitionPrefix1->text());
-    (*settings->getQSettings()).setValue("plugin_spim_b040/acquisition/use_cam2", chkAcquisitionUseCam2->isChecked());
-    (*settings->getQSettings()).setValue("plugin_spim_b040/acquisition/prefix2", edtAcquisitionPrefix2->text());
 }
 
 void QFESPIMB040MainWindow::closeEvent ( QCloseEvent * event ) {
@@ -79,10 +73,28 @@ void QFESPIMB040MainWindow::showEvent( QShowEvent * event )  {
 
 void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    // create main tab and help widget
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    QHBoxLayout* mainl=new QHBoxLayout(this);
+    mainl->setContentsMargins(0,0,0,0);
+    setLayout(mainl);
+    tabMain=new QTabWidget(this);
+    mainl->addWidget(tabMain);
+    QWidget* mainWid=new QWidget(this);
+    tabMain->addTab(mainWid, tr("Imaging"));
+    help=new QFHTMLHelpWindow(tabMain);
+    tabMain->addTab(help, QIcon(":/lib/help.png"), tr("Help"));
+    help->setHtmlReplacementList(m_pluginServices->getHTMLReplacementList());
+    help->updateHelp( extManager->getPluginHelp("ext_spimb040") );
+    qDebug()<<extManager->getPluginHelp("ext_spimb040");
+    tabMain->setCurrentIndex(0);
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QGridLayout* mainlayout=new QGridLayout(this);
-    setLayout(mainlayout);
+    QGridLayout* mainlayout=new QGridLayout(mainWid);
+    mainWid->setLayout(mainlayout);
 
 
 
@@ -119,51 +131,10 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create tab for image series acquisition
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QWidget* w=new QWidget(tabAcquisition);
-    QGridLayout* grid=new QGridLayout(w);
-    w->setLayout(grid);
-    grid->addWidget(new QLabel(tr("<b>counter:</b>"), w), 0,0);
-    spinAcquisitionCount=new QSpinBox(w);
-    spinAcquisitionCount->setRange(0,100000);
-    spinAcquisitionCount->setValue(0);
-    spinAcquisitionCount->setMaximumWidth(100);
-    grid->addWidget(spinAcquisitionCount, 0,1,1,2);
-    grid->addWidget(new QLabel(tr("<b>camera 1:</b>"), w), 2,0);
-    grid->addWidget(new QLabel(tr("<b>camera 2:</b>"), w), 3,0);
-    grid->addWidget(new QLabel(tr("<b>use:</b>"), w), 1,1);
-    grid->addWidget(new QLabel(tr("<b>filename prefix:</b>"), w), 1,2);
-    chkAcquisitionUseCam1=new QCheckBox(w);
-    grid->addWidget(chkAcquisitionUseCam1, 2,1);
-    chkAcquisitionUseCam2=new QCheckBox(w);
-    grid->addWidget(chkAcquisitionUseCam2, 3,1);
-    edtAcquisitionPrefix1=new QLineEdit(w);
-    grid->addWidget(edtAcquisitionPrefix1, 2,2);
-    connect(chkAcquisitionUseCam1,SIGNAL(clicked(bool)), edtAcquisitionPrefix1, SLOT(setEnabled(bool)));
-    edtAcquisitionPrefix2=new QLineEdit(w);
-    grid->addWidget(edtAcquisitionPrefix2, 3,2);
-    connect(chkAcquisitionUseCam2,SIGNAL(clicked(bool)), edtAcquisitionPrefix2, SLOT(setEnabled(bool)));
+    widAcquisition=new QFESPIMB040AcquisitionConfigWidget(this, m_pluginServices);
+    tabAcquisition->addTab(widAcquisition, tr("Image Series Acquisition"));
+    connect(widAcquisition, SIGNAL(doAcquisition()), this, SLOT(doAcquisition()));
 
-    grid->addWidget(new QLabel(tr("<i>%counter% will be replace by the value of the above counter spin box!</i>"), w), 4,2);
-    btnAcquire=new QPushButton(tr("&Acquire"), w);
-    btnAcquire->setMaximumWidth(100);
-    grid->addWidget(btnAcquire, 5, 2);
-    connect(btnAcquire, SIGNAL(clicked()), this, SLOT(doAcquisition()));
-    QFrame* f=new QFrame(this);
-    f->setFrameStyle(QFrame::HLine | QFrame::Raised);
-    grid->addWidget(f, 6,0, 1,3);
-    QLabel* l=new QLabel(w);
-    l->setWordWrap(true);
-    l->setText(tr("<img src=\":/lib/help.png\">&nbsp;<b>Help:</b><br>"
-                  "This acquisition mode sets one or two cameras into the above selected acquisition mode. "
-                  "Then it runs until both acquisitions are complete (they do not have to have the same length). "
-                  "The results are stored by the camera plugins into files with the given prefixes. In addition "
-                  "a file <i>prefix.settings.ini</i> is create (for every camera separately), which contains the "
-                  "acqusition settings and serves to document the acquisition."));
-    grid->addWidget(l, 7,0, 1,3);
-
-    tabAcquisition->addTab(w, tr("Image &Series"));
-    chkAcquisitionUseCam1->setEnabled(true);
-    chkAcquisitionUseCam2->setEnabled(true);
 
 
 
@@ -516,10 +487,10 @@ void QFESPIMB040MainWindow::doImageStack() {
     QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition Error"), (message));
 
 void QFESPIMB040MainWindow::doAcquisition() {
-    if (!(chkAcquisitionUseCam1->isChecked() || chkAcquisitionUseCam2->isChecked())) return;
+    if (!(widAcquisition->use1() || widAcquisition->use2())) return;
 
-    int cnt=spinAcquisitionCount->value();
-    spinAcquisitionCount->setValue(cnt+1);
+    int cnt=widAcquisition->counter();
+    widAcquisition->incCounter();
 
     bool ok=true;
 
@@ -531,11 +502,9 @@ void QFESPIMB040MainWindow::doAcquisition() {
     QFExtensionCamera* ecamera1=NULL;
     int camera1=0;
     QString acquisitionSettingsFilename1="", previewSettingsFilename1="";
-    QString acquisitionPrefix1=edtAcquisitionPrefix1->text();
-    acquisitionPrefix1=acquisitionPrefix1.replace("%counter%", QString::number(cnt));
-    QString acquisitionPrefix2=edtAcquisitionPrefix2->text();
-    acquisitionPrefix2=acquisitionPrefix2.replace("%counter%", QString::number(cnt));
-    if (chkAcquisitionUseCam1->isChecked()) {
+    QString acquisitionPrefix1=widAcquisition->prefix1();
+    QString acquisitionPrefix2=widAcquisition->prefix2();
+    if (widAcquisition->use1()) {
         useCam1=camConfig1->lockCamera(&extension1, &ecamera1, &camera1, &acquisitionSettingsFilename1, &previewSettingsFilename1);
     }
     bool useCam2=false;
@@ -543,7 +512,7 @@ void QFESPIMB040MainWindow::doAcquisition() {
     QFExtensionCamera* ecamera2=NULL;
     QString acquisitionSettingsFilename2="", previewSettingsFilename2="";
     int camera2=0;
-    if (chkAcquisitionUseCam2->isChecked()) {
+    if (widAcquisition->use2()) {
         useCam2=camConfig2->lockCamera(&extension2, &ecamera2, &camera2, &acquisitionSettingsFilename2, &previewSettingsFilename2);
     }
 

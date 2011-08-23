@@ -161,8 +161,8 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(spinMoveZ, 1,2);
     btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/stagemove.png"), tr("&abs"), this);
     btnMoveRelative=new QPushButton(QIcon(":/spimb040/stagemove.png"), tr("&rel"), this);
-    gl->addWidget(btnMoveRelative, 1, 4);
-    gl->addWidget(btnMoveAbsolute, 1, 3);
+    gl->addWidget(btnMoveRelative, 1, 3);
+    gl->addWidget(btnMoveAbsolute, 1, 4);
     gl->addWidget(new QWidget(this), 1, 5);
     gl->setColumnStretch(5,10);
     connect(btnMoveAbsolute, SIGNAL(clicked()), this, SLOT(moveAbsolute()));

@@ -39,6 +39,8 @@ void QFESPIMB040ImageStackConfigWidget::loadSettings(QSettings& settings, QStrin
     ui->spinStart->setValue(settings.value(prefix+"start", 0).toDouble());
     ui->spinDelta->setValue(settings.value(prefix+"delta", 0).toDouble());
     ui->spinSteps->setValue(settings.value(prefix+"steps", 0).toInt());
+    ui->spinDelay->setValue(settings.value(prefix+"delay", 15).toInt());
+    on_chkUse1_clicked(true);
 }
 
 
@@ -51,9 +53,12 @@ void QFESPIMB040ImageStackConfigWidget::storeSettings(QSettings& settings, QStri
     settings.setValue(prefix+"start", ui->spinStart->value());
     settings.setValue(prefix+"delta", ui->spinDelta->value());
     settings.setValue(prefix+"steps", ui->spinSteps->value());
+    settings.setValue(prefix+"delay", ui->spinDelay->value());
 }
 
-
+int QFESPIMB040ImageStackConfigWidget::delay() const {
+    return ui->spinDelay->value();
+}
 
 int QFESPIMB040ImageStackConfigWidget::counter() const {
     return ui->spinCounter->value();
@@ -140,7 +145,7 @@ void QFESPIMB040ImageStackConfigWidget::updateLabel() {
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConfig_clicked() {
-
+    if (stage()) stage()->showSettingsDialog(currentAxisID());
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConnect_clicked() {
@@ -151,6 +156,18 @@ void QFESPIMB040ImageStackConfigWidget::on_btnConnect_clicked() {
             stage()->connectDevice(currentAxisID());
         }
     }
+}
+
+void QFESPIMB040ImageStackConfigWidget::on_chkUse1_clicked(bool enabled) {
+    ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->edtPrefix1->setEnabled(enabled);
+}
+
+void QFESPIMB040ImageStackConfigWidget::on_chkUse2_clicked(bool enabled) {
+    ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->edtPrefix2->setEnabled(enabled);
 }
 
 void QFESPIMB040ImageStackConfigWidget::checkStage() {

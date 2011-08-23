@@ -41,6 +41,7 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         QString prefix2() const;
         bool use1() const;
         bool use2() const;
+        int delay() const;
 
         QFExtensionLinearStage* stage() const;
         QFExtension* stageExtension() const;
@@ -50,6 +51,8 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         double stackDelta() const;
     protected slots:
         void on_btnAcquire_clicked();
+        void on_chkUse1_clicked(bool enabled);
+        void on_chkUse2_clicked(bool enabled);
         void on_spinStart_valueChanged(double value);
         void on_spinDelta_valueChanged(double value);
         void on_spinSteps_valueChanged(int value);

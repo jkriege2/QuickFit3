@@ -116,7 +116,7 @@ QString QFRawDataRecordFactory::getPluginHelp(QString ID) {
     #ifndef Q_OS_WIN32
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
-        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(ID);
     }
     return "";
 }
@@ -127,7 +127,7 @@ QString QFRawDataRecordFactory::getPluginTutorial(QString ID) {
     #ifndef Q_OS_WIN32
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
-        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(ID);
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
     }
     return "";
 }
