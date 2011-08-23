@@ -40,7 +40,7 @@ class QFPEvalFCSFit : public QObject, public QFPluginEvaluationItemBase {
         virtual QString getAuthor() const  { return tr("Jan Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2010 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010-2011 by Jan Krieger"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr(""); };

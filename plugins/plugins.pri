@@ -1,4 +1,9 @@
-
+INCLUDEPATH += ../../lib/ \
+               ../../libqf3widgets/ \
+               ../../../../../LIB/trunk/ \
+               ../../../../../LIB/trunk/qt/ \
+               ../interfaces \
+               ../base_classes
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

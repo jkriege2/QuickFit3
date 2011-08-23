@@ -1,0 +1,1 @@
+store in this directory common C++ (base) classes, that may be used by different plugins (i.e. to implement common data access methods or GUI elements)
