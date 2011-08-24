@@ -41,6 +41,7 @@ void QFESPIMB040ImageStackConfigWidget::loadSettings(QSettings& settings, QStrin
     ui->spinSteps->setValue(settings.value(prefix+"steps", 0).toInt());
     ui->spinDelay->setValue(settings.value(prefix+"delay", 15).toInt());
     on_chkUse1_clicked(true);
+    on_chkUse2_clicked(true);
 }
 
 
@@ -161,13 +162,13 @@ void QFESPIMB040ImageStackConfigWidget::on_btnConnect_clicked() {
 void QFESPIMB040ImageStackConfigWidget::on_chkUse1_clicked(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
-    ui->edtPrefix1->setEnabled(enabled);
+    ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_chkUse2_clicked(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
-    ui->edtPrefix2->setEnabled(enabled);
+    ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());
 }
 
 void QFESPIMB040ImageStackConfigWidget::checkStage() {

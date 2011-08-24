@@ -26,6 +26,7 @@ QFESPIMB040AcquisitionConfigWidget::~QFESPIMB040AcquisitionConfigWidget()
 
 
 void QFESPIMB040AcquisitionConfigWidget::loadSettings(QSettings& settings, QString prefix) {
+    ui->chkOverview->setChecked(settings.value(prefix+"overview", true).toBool());
     ui->chkUse1->setChecked(settings.value(prefix+"use1", true).toBool());
     ui->chkUse2->setChecked(settings.value(prefix+"use2", true).toBool());
     ui->edtPrefix1->setText(settings.value(prefix+"prefix1", "stack_cam1_%counter%").toString());
@@ -39,6 +40,7 @@ void QFESPIMB040AcquisitionConfigWidget::storeSettings(QSettings& settings, QStr
     settings.setValue(prefix+"use2", ui->chkUse2->isChecked());
     settings.setValue(prefix+"prefix1", ui->edtPrefix1->text());
     settings.setValue(prefix+"prefix2", ui->edtPrefix2->text());
+    settings.setValue(prefix+"overview", ui->chkOverview->isChecked());
 }
 
 
@@ -71,6 +73,9 @@ bool QFESPIMB040AcquisitionConfigWidget::use2() const {
     return ui->chkUse2->isChecked();
 }
 
+bool QFESPIMB040AcquisitionConfigWidget::overview() const {
+    return ui->chkOverview->isChecked();
+}
 
 void QFESPIMB040AcquisitionConfigWidget::on_btnAcquire_clicked() {
     emit doAcquisition();
@@ -78,10 +83,12 @@ void QFESPIMB040AcquisitionConfigWidget::on_btnAcquire_clicked() {
 
 void QFESPIMB040AcquisitionConfigWidget::on_chkUse1_clicked(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
-    ui->edtPrefix1->setEnabled(enabled);
+    ui->chkOverview->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
 }
 
 void QFESPIMB040AcquisitionConfigWidget::on_chkUse2_clicked(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
-    ui->edtPrefix2->setEnabled(enabled);
+    ui->chkOverview->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->edtPrefix2->setEnabled(ui->chkUse1->isChecked());
 }

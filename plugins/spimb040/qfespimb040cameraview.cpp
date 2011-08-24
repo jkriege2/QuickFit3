@@ -31,7 +31,7 @@ double fSlit( double t, const double *p )
 #define HISTOGRAM_UPDATE_INTERVAL_MS 50
 #define MARGINAL_FIT_SIZE_FACTOR 3
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionServices* pluginServices, QWidget* parent):
+QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, QFExtensionServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent):
     QWidget(parent)
 {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
@@ -45,6 +45,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfil
     measureX[0]=measureX[1]=0;
     measureY[0]=measureY[1]=0;
     measureFirst=true;
+    m_stopresume=stopresume;
 
 
     // more variable initialisation
@@ -93,7 +94,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, const QString& logfil
 
 
     // create widgets and actions
-    createMainWidgets(logfile);
+    createMainWidgets();
     createActions();
 
 
@@ -122,7 +123,7 @@ void QFESPIMB040CameraView::setPixelSize(double pixelWidth, double pixelHeight) 
     this->pixelWidth=pixelWidth;
 }
 
-void QFESPIMB040CameraView::createMainWidgets(const QString& logfile) {
+void QFESPIMB040CameraView::createMainWidgets() {
 
     ///////////////////////////////////////////////////////////////
     // create main layout, toolbar and Splitters
@@ -1064,13 +1065,16 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
 }
 
 void QFESPIMB040CameraView::clearMask() {
+    if (m_stopresume) m_stopresume->stop();
     if (QMessageBox::question(this, tr("QuickFit SPIM Control"), tr("Do your really want to clear the mask?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes )==QMessageBox::No ) return;
     mask.setAll(false);
     maskEmpty=true;
     redrawFrameRecalc();
+    if (m_stopresume) m_stopresume->resume();
 }
 
 void QFESPIMB040CameraView::saveMask() {
+    if (m_stopresume) m_stopresume->stop();
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Mask Data"),
                             lastMaskpath,
                             tr("Image Mask (*.msk)"));
@@ -1085,9 +1089,11 @@ void QFESPIMB040CameraView::saveMask() {
         return;
     }
     QApplication::restoreOverrideCursor();
+    if (m_stopresume) m_stopresume->resume();
 }
 
 void QFESPIMB040CameraView::loadMask() {
+    if (m_stopresume) m_stopresume->stop();
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Mask Data"),
                             lastMaskpath,
                             tr("Image Mask (*.msk)"));
@@ -1104,10 +1110,12 @@ void QFESPIMB040CameraView::loadMask() {
     maskEmpty=false;
     redrawFrameRecalc();
     QApplication::restoreOverrideCursor();
+    if (m_stopresume) m_stopresume->resume();
 }
 
 
 void QFESPIMB040CameraView::saveRaw() {
+    if (m_stopresume) m_stopresume->stop();
     QStringList imageFilters;
     imageFilters<<tr("16-Bit Grayscal TIFF (*.tif *.tiff16)");
     imageFilters<<tr("Float Grayscal TIFF (*.tif *.tiff)");
@@ -1138,6 +1146,7 @@ void QFESPIMB040CameraView::saveRaw() {
                           tr("Cannot write file %1:\n%2.")
                           .arg(fileName)
                           .arg(file.errorString()));
+        if (m_stopresume) m_stopresume->resume();
         return;
     }
     file.close();
@@ -1172,6 +1181,7 @@ void QFESPIMB040CameraView::saveRaw() {
 
 
     QApplication::restoreOverrideCursor();
+    if (m_stopresume) m_stopresume->resume();
 
 }
 
@@ -1264,7 +1274,9 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     double all_width=picMain.boundingRect().width()+picMarginLeft.boundingRect().width();
     double all_height=picMain.boundingRect().height()+picMarginBottom.boundingRect().height();
     double page_width=(double)document->textWidth()*0.95;
+    double page_height=1.0*page_width;
     scale=page_width/all_width;
+    if (scale*all_height>page_height) scale=page_height/all_height;
     int percentMain=round(100.0*(double)picMain.boundingRect().width()/all_width);
     if (percentMain>99) percentMain=99;
     if (percentMain<1) percentMain=1;
@@ -1301,6 +1313,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     }
     {
         QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
+        tabCursor.setBlockFormat(bfLeft);
         QPicture& pic=picMain;
         //double scale=document->textWidth()*0.78/pic.boundingRect().width();
         //if (scale<=0) scale=1;
@@ -1308,6 +1321,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     }
     {
         QTextCursor tabCursor=table->cellAt(1, 0).firstCursorPosition();
+        tabCursor.setBlockFormat(bfRight);
         QPicture& pic=picMarginLeft;
         //double scale=document->textWidth()*0.18/pic.boundingRect().width();
         //if (scale<=0) scale=1;
@@ -1315,6 +1329,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     }
     {
         QTextCursor tabCursor=table->cellAt(2, 1).firstCursorPosition();
+        tabCursor.setBlockFormat(bfLeft);
         QPicture& pic=picMarginBottom;
         //double scale=document->textWidth()*0.78/pic.boundingRect().width();
         //if (scale<=0) scale=1;
@@ -1322,6 +1337,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     }
     {
         QTextCursor tabCursor=table->cellAt(2, 0).firstCursorPosition();
+        tabCursor.setBlockFormat(bfCenter);
         tabCursor.insertHtml(QString("<i>marginals:</i> %1<br>").arg(cmbMarginalPlots->currentText()));
         tabCursor.insertHtml(QString("<i>legend:</i> <font color=\"red\"> - data</font>, <font color=\"blue\"> - fit</font>"));
     }
@@ -1331,14 +1347,14 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     cursor.insertBlock();
     cursor.insertBlock();
     constraints.clear();
-    constraints << QTextLength(QTextLength::PercentageLength, 30);
-    constraints << QTextLength(QTextLength::PercentageLength, 70);
+    constraints << QTextLength(QTextLength::PercentageLength, 35);
+    constraints << QTextLength(QTextLength::PercentageLength, 65);
     tableFormat1.setColumnWidthConstraints(constraints);
     table = cursor.insertTable(1,2, tableFormat1);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture& pic=picHist;
-        double scale=document->textWidth()*0.28/pic.boundingRect().width();
+        double scale=document->textWidth()*0.33/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(QString("Histogram:\n"), fTextBold);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
@@ -1353,6 +1369,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
 }
 
 void QFESPIMB040CameraView::saveReport() {
+    if (m_stopresume) m_stopresume->stop();
     /* it is often a good idea to have a possibility to save or print a report about the fit results.
        This is implemented in a generic way here.    */
 
@@ -1380,9 +1397,11 @@ void QFESPIMB040CameraView::saveReport() {
         delete printer;
         QApplication::restoreOverrideCursor();
     }
+    if (m_stopresume) m_stopresume->resume();
 }
 
 void QFESPIMB040CameraView::printReport() {
+    if (m_stopresume) m_stopresume->stop();
     /* it is often a good idea to have a possibility to save or print a report about the fit results.
        This is implemented in a generic way here.    */
     QPrinter* p=new QPrinter();
@@ -1393,6 +1412,7 @@ void QFESPIMB040CameraView::printReport() {
     dialog->setWindowTitle(tr("Print Report"));
     if (dialog->exec() != QDialog::Accepted) {
         delete p;
+        if (m_stopresume) m_stopresume->resume();
         return;
     }
 
@@ -1404,4 +1424,5 @@ void QFESPIMB040CameraView::printReport() {
     delete p;
     delete doc;
     QApplication::restoreOverrideCursor();
+    if (m_stopresume) m_stopresume->resume();
 }

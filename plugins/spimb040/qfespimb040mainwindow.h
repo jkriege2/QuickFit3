@@ -99,9 +99,10 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
             \param camera =0,1 which camera was used?
             \param filenamePrefix prefix for the acquisition output files
             \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
+            \param moreFiles a list of additionally created files
             \return filename of the settings file
         */
-        QString saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription);
+        QString saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles);
 
         /*! \brief save a description of an acquisition in preview mode to a QSettings object
 
@@ -130,7 +131,22 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
           */
         void doImageStack();
 
+    protected:
+        /*! \brief save an image from the given camera as a 16-bit TIFF image into \a filename
 
+            \note This function configures the camera with the preview settings, acquires ONE frame and saves it to the given file.
+                  If the gray value range of the frame exceeds 16-bit it is compressed to 16-bit (i.e. gray_max -> 65535) and a 32-bit
+                  version is saved!
+
+            \param extension QFExtension of the used camera
+            \param ecamera QFExtensionCamera of the used camera
+            \param camera device index of the camera inside ecamera
+            \param previewSettingsFilename the preview settings file used for this acquisition
+            \param filename the file to save to (if a 32-version is created, its filename is the same as \A filename, but with the extension \c .32.tiff !).
+            \param[out] filename32 may be used to return the filename of the potentially created 32-bit TIFF (is set to an empty string, if no 32-bit TIFF was created)
+            \return \c true on success
+         */
+        bool savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32);
     public:
 
         /** \brief log project text message

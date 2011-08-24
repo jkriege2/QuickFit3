@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Plugin: Camera Configuration</title>
+  </head>
+  <body>
+	 <a href="ext_spimb040.html">Contents</a> | <a href="../../../help/quickfit.html">QuickFit $$version basics</a><hr><br>
+	 <a name="camconfig"></a><h1>SPIM Plugin: Camera Configuration</h1>
+	 <p>Before you can use a selcted camera you have to connect to it, using <img width="16" src=":/spimb040/acquisitionconnect.png">.</p>
+	 <p>The camera configuration follows a simple principle: Each camera is set up by a set of parameters (usually the exposure time, frames to acquire, gains, EM-gain, filetype for acquisition ...). These settings are combined into <b><img width="16" src=":/libqf3widgets/camera_config.png"> camera configuration</b>. You can select one of these for the preview and the acquisition separately (Preview and Acquisition drop down boxes). Next to these drop down boxes you can edit the current configuration:
+     <ol>
+	   <li><img width="16" src=":/libqf3widgets/acquisition_configuration.png"> change the settings (camera-specific dialog)</li>
+	   <li><img width="16" src=":/libqf3widgets/config_add.png"> add a new configuration (displays the camera-specific dialog and then asks for a new name)</li>
+	   <li><img width="16" src=":/libqf3widgets/config_rename.png"> rename the current configuration</li>
+	   <li><img width="16" src=":/libqf3widgets/config_saveas.png"> save a copy of the current configuration under a new name</li>
+	   <li><img width="16" src=":/libqf3widgets/config_delete.png"> delete the current configuration</li>
+	 </ol>
+	 <p>You can also select the objectives used for detection and projection. The magnification set by this is used to calculate the real pixel size (for distance measurements) for the <a href="#preview">preview</a>. In addition these objectives are also stored in the metadata of every <a href="#acquisition">acquisition</a>, so you know lateron the details of the measurement setup. Also here you have the possibility to add (<img width="16" src=":/spimb040/objective_add.png">), remove (<img width="16" src=":/spimb040/objective_delete.png">) and edit (<img width="16" src=":/spimb040/objective_rename.png">) the available objectives (if you have write-access to the global configuration directory, where the objective data is stored). For each objective you can supply a name, a manufacturer, the magnification and the numerical aperture (NA).</p>
+	 <p>Below the preview configuration, you start/stop the preview for this camera. After starting the preview, a new window is opened (see <a href="#preview">next chapter</a>):
+	 <ol>
+	   <li><img src="./pic/btn_preview_single.png"> reads one frame using the current preview configuration and opens the <a href="#preview">preview window</a> for this camera to display it.</li>
+	   <li><img src="./pic/btn_start_preview.png"> starts a continuous preview (video) using the current preview configuration and opens the <a href="#preview">preview window</a> for this camera to display it.</li>
+	 </ol>
+	 </p>
+
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Plugin: Preview Windows</title>
+  </head>
+  <body>
+	 <a href="ext_spimb040.html">Contents</a> | <a href="../../../help/quickfit.html">QuickFit $$version basics</a><hr><br>
+
+	 <a name="preview"></a><h1>SPIM Plugin: Preview Windows</h1>
+	 <p>As already mentioned the preview can be started in the <a href="#camconfig">camera configuration boxes</a> using the <img src="./pic/btn_preview_single.png"> and <img src="./pic/btn_start_preview.png"> buttons. A continuous preview reads single frames with only a short delay (configurable in the camera configuration) between them. The delay helps to not completely block the user interface. Every preview frame is displayed in the preview window: <br>
+	 <center><img src="./pic/cam_preview.png"></center></p>
+	 <p>In the center of the image you see a color-coded version of the <strong>current image</strong>. The plot axes are given in pixels. It is potentially surounded by <strong>marginal plots</strong>, which either contain an average along one axis or simply a horizontal/vertical cut through the image (in that case the position of the cut is marked by a red cross). In the marginal plots the data is shown in red and (possibly) fits to the data re shown in blue. Below the some <strong>information about the acquisition</strong> (exposure time, size, ...) are shown. ABove the plot the current position of the mouse is shown in pixels and micrometers (taking the current detection objective into account). Also the grey value of the pixel below the mouse is shown.</p>
+	 <p>In the <strong>statistics tab</strong> on the right-hand side of the preview window, several image statistics informations are shown:
+	 <ul>
+	   <li>The <strong>histogram</strong> (if activated) shows a grey histogram of the current image. You can choose whether the y-axis scaling should be linear or logarithmic below. </li>
+	   <li>The range that is spanned by the <strong>color coding of the main plot</strong> is indicated in blue in the histogram and may be set by the two edit field directly below this plot:<center><img src="./pic/histogram_controls.png"></center> If the "auto" boxes are checked, the color coding of the main plot spans the whole grey value range, if one is not checked the user may supply a value. This function is also activated when the histogram is deactivated! You may also decide how many bins the histogram should use.</li>
+	   <li>The <strong>image statistics</strong> show several basic image statistics values (the size of the image, how many broken pixels there are in the mask, ...). The sum, average and min/max of the image's grey values are given in the unit of the image pixels directly, or as rate in kHz, which is calculated by dividing the value by the exposure time!</li>
+	   <li>The <strong>marginal fit results</strong> show the fit parameters resulting from fits to the marginal plots. The depend on which settings are done for these (see below)</li>
+	 </ul>
+	 </p>
+	 <p>In the <strong>settings tab</strong> on the right-hand side of the preview window, you set several options for the window and image display:
+	 <ul>
+	   <li>The <strong>color palette</strong> select the type of color coding. </li>
+	   <li>The <strong>maks color</strong> select the color in which masked pixels are displayed. </li>
+	   <li>With <strong>rotation</strong> you can rotate the acquired image in steps of 90°. </li>
+	   <li>The <strong>marginal plots</strong> combo decides about the type of marginal plot to be displayed and also allows to switch them off completely. </li>
+	   <li>The <strong>marginal evaluation</strong> sets which evaluation to perform for the marginal plots:
+            <ol>
+			<li><strong>average+variance</strong>: calculates the image-weighted mean and variance of the plots</li>
+			<li><strong>gaussian fit</strong>: fits a gaussian to the plot. The width of the gaussian is given as 1/e<sup>2</sup> width (from center to 1/e<sup>2</sup>). If you need the 1/e<sup>2</sup> diameter, mjultiply the value by 2!</li>
+			<li><strong>slit function fit</strong>: fits a slit function (sin(<i>x</i>)/<i>x</i>)<sup>2</sup> to the plot, which is a good estimate for an airy disk. Here the width is the distance <i>x</i><sub>1,Zero</sub> from the center of the slit function to the 1-th order (first) minimum, so the diameter of the function (minimum to minimum) is twice the given value <i>x</i><sub>1,Zero</sub>.</li>
+            </ol>			
+	   </li>
+	 </ul>
+	 </p>
+	 <p>You can also <strong>mask broken pixels</strong>. Then they are not taken into account for the color scaling and statistics. This function can be used to exclude broen pixels from your camera. The mask is altered by these buttons:
+	 <ul>
+	     <li><img src=":/spimb040/maskclear.png"> removes all pixels from the mask (deactivates the mask)</li>
+	     <li><img src=":/spimb040/maskedit.png"> after a click on this button you can click single pixels that you want to exclude on the image. They will be added/be removed (on a second click) from the mask.</li>
+	     <li><img src=":/spimb040/maskload.png"> This allows you to load a predefined mask from a file</li>
+	     <li><img src=":/spimb040/masksave.png"> This saves the current mask to a file. The file is a text-file that will conatin the pixel coordinates of the broken pixels.</li>
+	 </ul>
+	 </p>
+	 <p>The button <img src=":/spimb040/measure.png"> activates the <strong>measure mode</strong>. Now you can click any two points on the image and their distance will be measured (displayed above the image, as long as the mouse hovers over the image). The distance is also indicated by a red line.</p>
+	 <p>The button <img src=":/spimb040/cursor.png"> activates the <strong>standard mouse cursor mode</strong>. Now you can no longer edit the mask or measure distance. If the marginal <style>plots option "marked line/column"</style> is activated, you can move the center of the marginal image cuts to a new psoition (red cross) by a click on the image!</p>
+	 <p>There are also buttons to control the image acquisition:
+	 <ul>
+	     <li><img src=":/spimb040/acquisitionstart.png">/<img src=":/spimb040/acquisitionstop.png"> will start and stop the continuous preview (video)</li>
+	     <li><img src=":/spimb040/stagesettings.png"> allows to edit the currently selected acqusition settings</li>
+	     <li><img src=":/spimb040/acquisitionsingle.png"> will acquire one single preview frame and display it.</li>
+	 </ul>
+	 </p>
+	 <p></p>
+	 <p>Finally you can save the current image:
+	 <ul>
+	     <li><img src=":/spimb040/saveraw.png"> will save the current frame only in different formats (PNG, TIFF, ... color coded or as raw data)</li>
+	     <li><img src=":/spimb040/report_save.png"> Will save the contents of the window (including marginals, statistics and fit results) to a PDF or PostSCript file.</li>
+	     <li><img src=":/spimb040/report_print.png"> Will print the contents of the window (including marginals, statistics and fit results).</li>
+	 </ul>
+	 </p>
+  </body>
+</html>

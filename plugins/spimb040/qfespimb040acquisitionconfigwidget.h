@@ -38,6 +38,7 @@ public:
     QString prefix2() const;
     bool use1() const;
     bool use2() const;
+    bool overview() const;
 
 protected slots:
     void on_btnAcquire_clicked();

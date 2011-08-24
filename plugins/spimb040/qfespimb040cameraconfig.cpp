@@ -162,7 +162,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create camera view widgets ... and hide them
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    camView=new QFESPIMB040CameraView(m_camViewID, QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_cam1.log"), m_pluginServices, NULL);
+    camView=new QFESPIMB040CameraView(m_camViewID, m_pluginServices, this, NULL);
     camView->close();
 
 

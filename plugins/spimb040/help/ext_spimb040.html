@@ -5,51 +5,20 @@
   <title>SPIM Control Plugin (department B040, DKFZ, Heidelberg)</title>
   </head>
   <body>
+	 <a href="../../../help/quickfit.html">QuickFit $$version basics</a><hr><br>
 	 <h1>SPIM Control Plugin (department B040, DKFZ, Heidelberg)</h1>
-	 <h2>Introduction &amp; Main Screen</h2>
-	 <img style="float:right;" border="1" src="./pic/spim_principle.png">
-     <p>This plugin is designed to control the Single Plane Illumination Microscope (SPIM) of the group B040 Biophysics of Macromolecules at the DKFZ. THe image shows the principle of this microscopy type.</p>
-	 <p>The plugin supports up to two cameras (of any type that is implemented as QFExtensionCamera plugin in QuickFit) and an XYZ-stage to translate the sample with respect to the lightsheet. In the upper two panels you can <a href="#camconfig">configure the cameras</a> and also the objectives used for illumination and detection. The objective data is used as metadata in the description files saved together with any acquisition data. Below the cameras you can <a href="#stages">configure the stages</a>. In the lower part of the window one pane displays a logging output that is used to show system and error messages from the used components and procedures. Above that some tabs allow to do <a href="#acquisition">acquisitions of different types</a>.</p>
-	 <p></p>
-	 <p></p>
-	 <p></p>
-	 <a name="#camconfig"></a><h2>Camera Configuration</h2>
-	 <p>Before you can use a selcted camera you have to connect to it, using <img width="16" src=":/spimb040/acquisitionconnect.png">.</p>
-	 <p>The camera configuration follows a simple principle: Each camera is set up by a set of parameters (usually the exposure time, frames to acquire, gains, EM-gain, filetype for acquisition ...). These settings are combined into <b><img width="16" src=":/libqf3widgets/camera_config.png"> camera configuration</b>. You can select one of these for the preview and the acquisition separately (Preview and Acquisition drop down boxes). Next to these drop down boxes you can edit the current configuration:
-     <ol>
-	   <li><img width="16" src=":/libqf3widgets/acquisition_configuration.png"> change the settings (camera-specific dialog)</li>
-	   <li><img width="16" src=":/libqf3widgets/config_add.png"> add a new configuration (displays the camera-specific dialog and then asks for a new name)</li>
-	   <li><img width="16" src=":/libqf3widgets/config_rename.png"> rename the current configuration</li>
-	   <li><img width="16" src=":/libqf3widgets/config_saveas.png"> save a copy of the current configuration under a new name</li>
-	   <li><img width="16" src=":/libqf3widgets/config_delete.png"> delete the current configuration</li>
-	 </ol>
-	 <p>You can also select the objectives used for detection and projection. The magnification set by this is used to calculate the real pixel size (for distance measurements) for the <a href="#preview">preview</a>. In addition these objectives are also stored in the metadata of every <a href="#acquisition">acquisition</a>, so you know lateron the details of the measurement setup. Also here you have the possibility to add (<img width="16" src=":/spimb040/objective_add.png">), remove (<img width="16" src=":/spimb040/objective_delete.png">) and edit (<img width="16" src=":/spimb040/objective_rename.png">) the available objectives (if you have write-access to the global configuration directory, where the objective data is stored). For each objective you can supply a name, a manufacturer, the magnification and the numerical aperture (NA).</p>
-	 <p>Below the preview configuration, you start/stop the preview for this camera. After starting the preview, a new window is opened (see <a href="#preview">next chapter</a>):
 	 <ol>
-	   <li><img src="./pic/btn_preview_single.png"> reads one frame using the current preview configuration and opens the <a href="#preview">preview window</a> for this camera to display it.</li>
-	   <li><img src="./pic/btn_start_preview.png"> starts a continuous preview (video) using the current preview configuration and opens the <a href="#preview">preview window</a> for this camera to display it.</li>
+		<li><a href="ext_spimb040_intro.html">Introduction &amp; Main Screen</a></li>
+		<li><a href="ext_spimb040_camconfig.html">Camera Configuration</a></li>
+		<li><a href="ext_spimb040_preview.html">Preview Windows</a></li>
+		<li><a href="ext_spimb040_stageconfig.html">Sample Translation Stage Configuration</a></li>
+		<li><a href="ext_spimb040_acquisition.html">Image Acquisition</a></li>
 	 </ol>
-	 </p>
 	 <p></p>
 	 <p></p>
-	 <a name="#preview"></a><h2>Preview Windows</h2>
-	 <p></p>
-	 <p></p>
-	 <p></p>
-	 <a name="#stages"></a><h2>Stage Configuration</h2>
-	 <p>Here you can select one available stage for every direction (x, y, z). After selecting the stages you will have to connect to them (<img width="16" src=":/spimb040/stageconnect.png">). You can also open a configuration dialog for every stage (<img width="16" src=":/spimb040/stagesettings.png">). Below the stages you can en-/disable a possibly available joystick and perform absolute or relative movements. For the movements you can supply the new position (<i>abs</i>olute movement) or relative distances (<i>rel</i>ative movement in the three edit fields. For the joystick you can set the maximum available velocity in micrometer/second. Below that the status of the stages (current positions, velocities and status as image: <img width="16" src=":/spimb040/stage_ready.png">: ready, <img width="16" src=":/spimb040/stage_moving.png">: moving, <img width="16" src=":/spimb040/stage_error.png">: error, <img width="16" src=":/spimb040/stage_disconnected.png">: disconnected) are displayed.</p>
-	 <p></p>
-	 <p></p>
-	 <a name="#acquisition"></a><h2>Image Series Acquisition</h2>
-	 <p>This is the simples acquisition. It uses the acquisition functionality implemented in the camera drivers, so you should set the length of the image sequence and all parameters there (in the <a href="#camconfig">camera configuration</a>). If you select two cameras, the acquisitions will be started at nearly the same time. If you need exact timing, you will have to implement it using the trigger functionality of your cameras!</p>
-	 <p>The data is written to files with a given prefix, which may also contain a path, e.g. <tt>c:/data/2011_08_25/cam1_%counter%</tt>. In the given example the files <tt>c:/data/2011_08_25/cam1_0.tif</tt> and <tt>c:/data/2011_08_25/cam1_0configuration.ini</tt>c ould be created where the first one contains the acquired images and the second one all the available meta-data (exposure times, objectives, ...). In the prefix strings these special sequences are replaced:
-		<ul>
-		  <li><i>%counter%</i> is replaced by the value of the counter (which is increased after each acquisition!)</li>
-		</ul>
-	 After setting all options, you just have to click on <img src="./pic/btn_acquire.png"> and wait until the acquisition is complete. If there are any errors, they will be displayed as a message box and in the logging pane at the bottom of the window.</p> 
-	 <p></p>
-	 <a name="#stacks"></a><h2>Image Stack Acquisition</h2>
-	 <p></p>
+	
+	 <a name="notes"></a><h2><hr>Notes</h2>
+	 <p>For standard TIFF-I/O this plugin uses <a href="http://www.libtiff.org/">libtiff</a>. </p>
 	 <p></p>
 	 <p></p>
 

@@ -25,6 +25,8 @@
 #include "colorcombobox.h"
 #include "tools.h"
 #include "qfextensionmanager.h"
+#include "qfcameracombobox.h"
+#include "qfcameraconfigcombobox.h"
 
 
 
@@ -40,7 +42,14 @@
 class QFESPIMB040CameraView : public QWidget {
         Q_OBJECT
     public:
-        QFESPIMB040CameraView(int cameraID, const QString& logfile, QFExtensionServices* pluginServices, QWidget* parent=NULL);
+        /*! \brief class contructor
+
+            \param cameraID ID of the camera to use
+            \param pluginServices  QFExtensionServices object used to access QuickFit basic services
+            \param stopresume (if supplied) allows to stop/resume a preview in order to save an image
+            \param parent the parent widget
+         */
+        QFESPIMB040CameraView(int cameraID, QFExtensionServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent=NULL);
         virtual ~QFESPIMB040CameraView();
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings, QString prefix);
@@ -82,7 +91,7 @@ class QFESPIMB040CameraView : public QWidget {
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
         /** \brief create main widgets */
-        void createMainWidgets(const QString& logfile);
+        void createMainWidgets();
         /** \brief create actions and register them to toolbar */
         void createActions();
 
@@ -94,6 +103,7 @@ class QFESPIMB040CameraView : public QWidget {
         QTabWidget* tabResults;
 
         QFExtensionServices* m_pluginServices;
+        QFCameraConfigComboBoxStartResume* m_stopresume;
 
 
 

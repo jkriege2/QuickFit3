@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Plugin: Image Acquisiton</title>
+  </head>
+  <body>
+	 <a href="ext_spimb040.html">Contents</a> | <a href="../../../help/quickfit.html">QuickFit $$version basics</a><hr><br>
+	 <h1>SPIM Plugin: Image Acquisiton</h2>
+
+	 <p>This is the simples acquisition. It uses the acquisition functionality implemented in the camera drivers, so you should set the length of the image sequence and all parameters there (in the <a href="#camconfig">camera configuration</a>, use <img width="16" src=":/libqf3widgets/acquisition_configuration.png">). If you select two cameras, the acquisitions will be started at nearly the same time. If you need exact timing, you will have to implement it using the trigger functionality of your cameras!</p>
+	 <p>The data is written to files with a given prefix, which may also contain a path, e.g. <tt>c:/data/2011_08_25/cam1_%counter%</tt>. In the given example the files <tt>c:/data/2011_08_25/cam1_0.tif</tt> and <tt>c:/data/2011_08_25/cam1_0configuration.ini</tt>c ould be created where the first one contains the acquired images and the second one all the available meta-data (exposure times, objectives, ...). In the prefix strings these special sequences are replaced:
+		<ul>
+		  <li><i>%counter%</i> is replaced by the value of the counter (which is increased after each acquisition!)</li>
+		</ul>
+	 </p>
+     <p>It is also possible to save a preview image as an overview (e.g. when you just acquire a region of interest of your camera). If this functionality is enabled an additional 16-bit (+ possibly 32-bit) TIFF file is recorded, using the preview camera configuration. The files are save as <tt><i>[prefix]</i>_overview.tif</tt> and <tt><i>[prefix]</i>_overview.32.tif</tt>. The 32-bit TIFF is created only if the camera returns 32-bit data. In that case the 16-bit TIFF file contains a down-scaled version of the image (highes gray-value is set to 65535 and all others are scaled accordingly!</p>	
+	 <p>After setting all options, you just have to click on <img src="./pic/btn_acquire.png"> and wait until the acquisition is complete. If there are any errors, they will be displayed as a message box and in the logging pane at the bottom of the window.</p> 
+	 <p></p>
+	 <p></p>
+	 <p></p>
+	 <a name="stacks"></a><h2><hr>Image Stack Acquisition</h2>
+	 <p></p>
+	 <p></p>
+	 <p></p>
+
+  </body>
+</html>
