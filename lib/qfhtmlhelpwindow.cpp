@@ -232,11 +232,11 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     if (!result.isEmpty()) {
         if (replaces) for (int i=0; i<replaces->size(); i++) {
             //std::cout<<"replace \""<<(QString("$$")+(*replaces)[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
-            result=result.replace(QString("$$")+(*replaces)[i].first, (*replaces)[i].second);
+            result=result.replace(QString("$$")+(*replaces)[i].first+QString("$$"), (*replaces)[i].second);
         }
         for (int i=0; i<internal_replaces.size(); i++) {
             //std::cout<<"replace \""<<(QString("$$")+internal_replaces[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
-            result=result.replace(QString("$$")+internal_replaces[i].first, internal_replaces[i].second);
+            result=result.replace(QString("$$")+internal_replaces[i].first+QString("$$"), internal_replaces[i].second);
         }
     }
     return result;

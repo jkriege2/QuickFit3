@@ -12,6 +12,8 @@
     \section qf3todo_rdrplugins Raw Data Plugins
     \todo implement RDR plugin for images and image series
     \todo make evaluation result table sortable via header
+	\todo add a description name + category name to the fit results and also use this for fit results display. 
+	\todo let the user select which category of fit results to display in the fit result table (also in the evaluation plugins!)
 
     \section qf3todo_evalplugins Evaluation Plugins
     \todo implement FCS correlation curve transform to RMS(tau) curve
@@ -36,6 +38,12 @@
     \todo implement fit function which is editable by user (math parser)
 
     \section qf3todo_fitalgorthms Fit Algorithms
+
+	
+	\section qf3todo_spim SPIM B040 Extension
+	\todo add functionality to scan two axes:\code for (ax1=ax1min...ax1max) { for (ax2=ax2min...ax2max) { acquire(); } }	\endcode
+	\todo add radiobuttons to select x, y, z, or custom axis (only in thelast case activate axis dropdown, in the other cases set it automatically to the right stage!
+	\todo add button to scan acquisition that allows to scan AROUND the current position (let the user enter steps in +/- direction in a modal dialog -> also display the scan size in microns there!)
 
 */
 
