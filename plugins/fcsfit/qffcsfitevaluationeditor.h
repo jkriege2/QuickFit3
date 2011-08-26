@@ -44,9 +44,7 @@
       - the diffusion time \f$ \tau_D \f$ is read from \c diff_tau or \c diff_tau1 (this class recognizes these units for \f$ \tau_D \f$: \c msec, \c ms, \c msecs, \c milliseconds, \c sec, \c s, \c secs, \c seconds
       - the focal size \f$ w_{xy} \f$ is written back into \c focus_struct_fac
     .
-    Then the focal size \f$ w_{xy} \f$ is calculated as:
-      \f[ w_{xy}=\sqrt{4\cdot D\cdot\tau_D} \f]
-      \f[ \Delta w_{xy}=\sqrt{ \left(\frac{\Delta D\cdot \tau_D}{\sqrt{D\cdot\tau_D}}\right)^2 + \left(\frac{\Delta\tau_D\cdot D}{\sqrt{D\cdot\tau_D}}\right)^2 } \f]
+    Then the focal size \f$ w_{xy} \f$ is calculated as described in the documentation of dlgEstimateFocalVolume
 */
 class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT

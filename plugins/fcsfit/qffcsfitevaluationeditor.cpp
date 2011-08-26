@@ -2662,7 +2662,7 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
             particles_error=fabs(eval->getFitError(id)/(eval->getFitValue(id)*eval->getFitValue(id)));
             has_nparticles=true;
         }
-        if ((id.toLower()=="focus_struct_fac") && (!has_nparticles)) {
+        if ((id.toLower()=="focus_struct_fac") && (!has_gamma)) {
             gamma=eval->getFitValue(id);
             gamma_error=eval->getFitError(id);
             has_gamma=true;

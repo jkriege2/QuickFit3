@@ -6,6 +6,20 @@
 #include "programoptions.h"
 
 
+/*! \brief estimates the focal parameter \f$ w_{xy} \f$ from a given diffusion coefficient or concentration
+    \ingroup qf3evalp_fcsfit
+
+    The focus width is calculated in nanometers! The diffusion time \f$ \tau_D\f$ is given in microseconds.
+
+    If a diffusion coefficient \f$ (D\pm\Delta D) \f$ in micron^2/s is known, this dialog calculates:
+      \f[ w_{xy}=\sqrt{4\cdot D\cdot\tau_D\cdot10^{-6}}\cdot10^{3} \f]
+      \f[ \Delta w_{xy}=\sqrt{\frac{\tau_D\cdot10^{-6}\cdot\Delta D^2}{D}+\frac{D\cdot\Delta\tau_D^2\cdot10^{-6}}{\tau_D}}\cdot10^{3} \f]
+    If a concentration \f$ (C\pm\Delta C) \f$ in mMolar is known, this dialog calculates:
+      \f[ w_{xy}=\sqrt[3]{\frac{N}{6.022\cdot\pi^{3/2}\cdot\gamma\cdot C}\cdot10^{10}} \f]
+      \f[ \Delta w_{xy}=\sqrt{\left(\Delta N\cdot\frac{h}{3\cdot(N\cdot h)^{2/3}}\right)^2 + \left(\Delta\gamma\cdot\frac{N\cdot h}{3\cdot\gamma\cdot(N\cdot h)^{2/3}}\right)^2 + \left(\Delta C\cdot\frac{N\cdot h}{3\cdot C\cdot(N\cdot h)^{2/3}}\right)^2} \f]
+      where \f[ h:=\frac{10^{10}}{\pi^{3/2}\cdot\gamma\cdot C\cdot 6.022} \f]
+*/
+
 class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolume {
         Q_OBJECT
     public:
@@ -33,7 +47,7 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         void calc_from_C();
         void calc_from_D();
     protected slots:
-        void on_dlgEstimateFocalVolume_accepted();
+        void on_buttonBox_accepted();
 
         void on_spinC_valueChanged(double d);
         void on_spinCError_valueChanged(double d);
