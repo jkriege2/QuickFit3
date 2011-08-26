@@ -11,21 +11,23 @@ DESTDIR = $$QFOUTPUT/plugins
 LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
-HEADERS += qfpevalfcsfit.h \
+HEADERS += ../base_classes/qffitresultsevaluation.h \
+           qfpevalfcsfit.h \
            qffcsfitevaluation.h \
            qffcsfitevaluationeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
 		   ../interfaces/qfrdrcountratesinterface.h \
            ../../../../../LIB/trunk/statistics_tools.h \
-           dlgestimatefocalvolume.h \
-    ../base_classes/qffitresultsevaluation.h
+           dlgestimatefocalvolume.h
 
-SOURCES += qfpevalfcsfit.cpp \
+
+SOURCES += ../base_classes/qffitresultsevaluation.cpp \
+           qfpevalfcsfit.cpp \
            qffcsfitevaluation.cpp \
            qffcsfitevaluationeditor.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
-           dlgestimatefocalvolume.cpp \
-    ../base_classes/qffitresultsevaluation.cpp
+           dlgestimatefocalvolume.cpp
+
 
 FORMS =    estimatefocalvolumedlg.ui
 

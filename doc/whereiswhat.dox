@@ -27,6 +27,14 @@
       - <b>[GlobalConfigDir]</b> = \c c:\\Program_Files\\QuickFit3\\globalconfig\\
     .
 
+    On windows these pathes will default to:
+      - <b>[AppDir]</b> = \c ???
+      - <b>[PluginDir]</b> = \c [AppDir]/plugins/
+      - <b>[AssetsDir]</b> = \c [AppDir]/assets/
+      - <b>[ConfigDir]</b> = \c /home/user_name/.quickfit3
+      - <b>[GlobalConfigDir]</b> = \c /usr/share/quickfit3/
+    .
+
     The last three directory are available over the ProgramOptions object or the QFPluginServices interface
     (which one ever is easier accessible at your point of code).
 

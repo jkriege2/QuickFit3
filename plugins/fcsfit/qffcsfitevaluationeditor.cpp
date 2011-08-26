@@ -1753,7 +1753,7 @@ void QFFCSFitEvaluationEditor::resetCurrent() {
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    eval->resetAllFitResultsCurrentCurrentRun();
+    eval->resetAllFitResultsCurrent();
     updateParameterValues();
     replotData();
     QApplication::restoreOverrideCursor();

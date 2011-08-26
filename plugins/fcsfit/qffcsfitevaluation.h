@@ -11,6 +11,7 @@
 #include "qffitfunction.h"
 #include "qffitalgorithm.h"
 #include "qffitparameterbasicinterface.h"
+#include "../base_classes/qffitresultsevaluation.h"
 
 /*! \brief evaluation item class for FCS least square fits
     \ingroup qf3evalp_fcsfit
@@ -22,7 +23,7 @@
     \note If a fit function has a parameter with name count_rate this is filled with the count rate stored in the FCS dataset (if
           implemented, i.e. if the QFRawDataset also implements QFRDRCountRatesInterface)
 */
-class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
+class QFFCSFitEvaluation : public QFFitResultsEvaluation {
         Q_OBJECT
     public:
         /** \brief which data weighting should be applied */
@@ -58,213 +59,14 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
 
 
         /** \brief set the current fitting algorithm */
-        void setFitAlgorithm(QString fitAlgorithm) { m_fitAlgorithm=fitAlgorithm; };
-        /** \brief get the current fitting algorithm */
-        QFFitAlgorithm* getFitAlgorithm() const { return getFitAlgorithm(m_fitAlgorithm); };
-
-        /** \brief set the current fitting algorithm */
         void setFitDataWeighting(DataWeight weighting) { m_weighting=weighting; };
         /** \brief get the current fitting algorithm */
         DataWeight getFitDataWeighting() const { return m_weighting; };
 
-        /*! \brief set the current fitting algorithm
-
-            This function also tries to transform the parameters between different models. The transformation is based on the parameter
-            name. If the new model has some parameters with the same name as the old model, the new model parameters are set to the value
-            of the old parameter.
-        */
-        void setFitFunction(QString fitFunction);
-        /** \brief get the current fitting algorithm */
-        QFFitFunction* getFitFunction();
 
         /** \brief set the current run to use, -1 = average, 0..N = runs, <-1: invalid */
         int getCurrentRun();//{ return m_currentRun; }
 
-        /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
-
-            The value may be stored at different positions:
-              - If no item is highlighted the parameter is not stored at all
-              - If a current raw data record is highlighted and no fit has been carried out so far for this record, the value
-                is stored in the preset value store of this QFEvaluationItem
-              - If a current raw data record is highlighted and a fit has already been carried out for this record, the value
-                is stored as a result in the highlighted QFRawDataRecord
-            .
-            This function also checks whether the value is to be stored (i.e. it's userEditable property is set)
-
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param value value to be stored
-
-         */
-        void setFitValue(const QString& id, double value);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         */
-        void setFitResultValue(const QString& id, double value);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         *  \param unit unit associated with \a value
-         */
-        void setFitResultValue(const QString& id, double value, QString unit);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         */
-        void setFitResultValueString(const QString& id, QString value);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         */
-        void setFitResultValueInt(const QString& id, int64_t value);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         *  \param unit unit associated with \a value
-         */
-        void setFitResultValueInt(const QString& id, int64_t value, QString unit);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         */
-        void setFitResultValueBool(const QString& id, bool value);
-
-        /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         *  \param error error associated with \a value
-         */
-        void setFitResultValue(const QString& id, double value, double error);
-
-        /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param error error to be stored
-         */
-        void setFitResultError(const QString& id, double error);
-
-        /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param values values to be stored
-         *  \param errors errors to be stored
-         */
-        void setFitResultValues(double* values, double* errors);
-
-        /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord
-         *  \param values values to be stored
-         *  \param errors errors to be stored
-         */
-        void setFitResultValuesVisible(double* values, double* errors);
-
-        /*! \brief return the value of a given parameter
-            \param id the parameter id
-            \return the value of the given parameter \a id
-
-            This function looks for the value at several positions:
-              -# if a fit has already been performed for the current record, the value is read from raw data record
-              -# if no fit has been performed, the value is taken from this evaluation (i.e. the preset value)
-              -# if also locally no value is available, the value is looked up in the application INI
-              -# if this also fails, the value is taken from the initial value stored in the fitFunction
-            .
-        */
-        double getFitValue(const QString& id);
-
-        /*! \brief return the fit error of a given parameter
-
-            \param id the parameter id
-            \return the error associated with the given parameter.
-        */
-        double getFitError(const QString& id);
-
-        /*! \brief set the error of a given parameter
-
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param error error to be set
-        */
-        void setFitError(const QString& id, double error);
-
-        /*! \brief set the fix property of a fit parameter of the current fit function (see m_fitFunction)
-
-            For a description of when data is stored, see setFitValue()
-
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param fix fix to be stored
-
-         */
-        void setFitFix(const QString& id, bool fix);
-
-        /** \brief stores the given fix property as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param fix fix to be stored
-         */
-        void setFitResultFix(const QString& id, bool fix);
-
-        /*! \brief return the fix property of a given parameter
-
-            \param id the parameter id
-            For a detailed description of where the value is searched, see getFitValue()
-        */
-        bool getFitFix(const QString& id);
-
-
-        /*! \brief set the value range of a fit parameter of the current fit function (see m_fitFunction)
-
-            This range is stored locally in the evaluation, never in the raw data record
-
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param min lower bound for the value
-            \param max upper bound for the value
-
-         */
-        void setFitRange(const QString& id, double min, double max);
-
-        /*! \brief set the value range of a fit parameter of the current fit function (see m_fitFunction)
-
-            This range is stored locally in the evaluation, never in the raw data record
-
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param min lower bound for the value
-
-         */
-        void setFitMin(const QString& id, double min);
-
-        /*! \brief set the value range of a fit parameter of the current fit function (see m_fitFunction)
-
-            This range is stored locally in the evaluation, never in the raw data record
-
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param max upper bound for the value
-
-         */
-        void setFitMax(const QString& id, double max);
-        /*! \brief return the lower value bound of a given parameter
-
-            \param id set the range min of the parameter with this id (see QFFitFunction)
-            For a detailed description of where the value is searched, see getFitValue()
-        */
-        double getFitMin(const QString& id);
-
-
-        /*! \brief return the upper value bound of a given parameter
-
-            \param id set the range max of the parameter with this id (see QFFitFunction)
-            For a detailed description of where the value is searched, see getFitValue()
-        */
-        double getFitMax(const QString& id);
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -285,7 +87,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             \param value value to be stored
 
          */
-        void setFitValue(QFRawDataRecord* r, int run, const QString& id, double value);
+        virtual void setFitValue(QFRawDataRecord* r, int run, const QString& id, double value);
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -293,32 +95,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param value value to be stored
          */
-        void setFitResultValue(QFRawDataRecord* r, int run, const QString& id, double value);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param r the record to adress
-         *  \param run the run in which to adress
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         *  \param unit unit associated with \a value
-         */
-        void setFitResultValue(QFRawDataRecord* r, int run, const QString& id, double value, QString unit);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param r the record to adress
-         *  \param run the run in which to adress
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         */
-        void setFitResultValueString(QFRawDataRecord* r, int run, const QString& id, QString value);
-
-        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
-         *  \param r the record to adress
-         *  \param run the run in which to adress
-         *  \param id set the value of the parameter with this id (see QFFitFunction)
-         *  \param value value to be stored
-         */
-        void setFitResultValueInt(QFRawDataRecord* r, int run, const QString& id, int64_t value);
+        virtual void setFitResultValue(QFRawDataRecord* r, int run, const QString& id, double value);
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -327,7 +104,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param value value to be stored
          *  \param unit unit associated with \a value
          */
-        void setFitResultValueInt(QFRawDataRecord* r, int run, const QString& id, int64_t value, QString unit);
+        virtual void setFitResultValue(QFRawDataRecord* r, int run, const QString& id, double value, QString unit);
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -335,7 +112,32 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param value value to be stored
          */
-        void setFitResultValueBool(QFRawDataRecord* r, int run, const QString& id, bool value);
+        virtual void setFitResultValueString(QFRawDataRecord* r, int run, const QString& id, QString value);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+         *  \param r the record to adress
+         *  \param run the run in which to adress
+         *  \param id set the value of the parameter with this id (see QFFitFunction)
+         *  \param value value to be stored
+         */
+        virtual void setFitResultValueInt(QFRawDataRecord* r, int run, const QString& id, int64_t value);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+         *  \param r the record to adress
+         *  \param run the run in which to adress
+         *  \param id set the value of the parameter with this id (see QFFitFunction)
+         *  \param value value to be stored
+         *  \param unit unit associated with \a value
+         */
+        virtual void setFitResultValueInt(QFRawDataRecord* r, int run, const QString& id, int64_t value, QString unit);
+
+        /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
+         *  \param r the record to adress
+         *  \param run the run in which to adress
+         *  \param id set the value of the parameter with this id (see QFFitFunction)
+         *  \param value value to be stored
+         */
+        virtual void setFitResultValueBool(QFRawDataRecord* r, int run, const QString& id, bool value);
 
         /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -344,7 +146,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param value value to be stored
          *  \param error error associated with \a value
          */
-        void setFitResultValue(QFRawDataRecord* r, int run, const QString& id, double value, double error);
+        virtual void setFitResultValue(QFRawDataRecord* r, int run, const QString& id, double value, double error);
 
         /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -352,7 +154,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param error error to be stored
          */
-        void setFitResultError(QFRawDataRecord* r, int run, const QString& id, double error);
+        virtual void setFitResultError(QFRawDataRecord* r, int run, const QString& id, double error);
 
         /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -360,7 +162,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        void setFitResultValues(QFRawDataRecord* r, int run, double* values, double* errors);
+        virtual void setFitResultValues(QFRawDataRecord* r, int run, double* values, double* errors);
 
         /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -368,7 +170,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        void setFitResultValuesVisible(QFRawDataRecord* r, int run, double* values, double* errors);
+        virtual void setFitResultValuesVisible(QFRawDataRecord* r, int run, double* values, double* errors);
 
         /*! \brief return the value of a given parameter
             \param r the record to adress
@@ -383,7 +185,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        double getFitValue(QFRawDataRecord* r, int run, const QString& id);
+        virtual double getFitValue(QFRawDataRecord* r, int run, const QString& id);
 
         /*! \brief return the fit error of a given parameter
             \param r the record to adress
@@ -391,7 +193,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             \param id the parameter id
             \return the error associated with the given parameter.
         */
-        double getFitError(QFRawDataRecord* r, int run, const QString& id);
+        virtual double getFitError(QFRawDataRecord* r, int run, const QString& id);
 
         /*! \brief set the error of a given parameter
 
@@ -400,7 +202,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param error error to be set
         */
-        void setFitError(QFRawDataRecord* r, int run, const QString& id, double error);
+        virtual void setFitError(QFRawDataRecord* r, int run, const QString& id, double error);
 
         /*! \brief set the fix property of a fit parameter of the current fit function (see m_fitFunction)
 
@@ -412,7 +214,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             \param fix fix to be stored
 
          */
-        void setFitFix(QFRawDataRecord* r, int run, const QString& id, bool fix);
+        virtual void setFitFix(QFRawDataRecord* r, int run, const QString& id, bool fix);
 
         /** \brief stores the given fix property as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -420,7 +222,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param fix fix to be stored
          */
-        void setFitResultFix(QFRawDataRecord* r, int run, const QString& id, bool fix);
+        virtual void setFitResultFix(QFRawDataRecord* r, int run, const QString& id, bool fix);
 
         /*! \brief return the fix property of a given parameter
 
@@ -429,59 +231,7 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             \param id the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        bool getFitFix(QFRawDataRecord* r, int run, const QString& id);
-
-
-
-
-
-
-        /** \brief fill the given array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
-         *  \param param parameter vector to fill
-         */
-        void fillParameters(double* param);
-        /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
-         *  \param param parameter error vector to fill
-        */
-        void fillParameterErrors(double* param);
-        /** \brief fill the given array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
-         *  \param param parameter minimums vector to fill
-        */
-        void fillParametersMin(double* param);
-        /** \brief fill the given array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
-         *  \param param parameter maximums vector to fill
-        */
-        void fillParametersMax(double* param);
-        /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
-         *  \param param parameter fix vector to fill
-        */
-        void fillFix(bool* param);
-
-        /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
-            \return parameter vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
-        */
-        double* allocFillParameters();
-        /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
-            \return parameter error vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
-        */
-        double* allocFillParameterErrors();
-        /*! \brief fill a newly allocated array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
-            \return parameter minimums vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
-        */
-        double* allocFillParametersMin();
-        /*! \brief fill a newly allocated array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
-            \return parameter maximums vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
-        */
-        double* allocFillParametersMax();
-        /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
-            \return parameter fix vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
-        */
-        bool* allocFillFix();
+        virtual bool getFitFix(QFRawDataRecord* r, int run, const QString& id);
 
 
 
@@ -492,19 +242,19 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \param run run in \a r this applies to
          *  \param param parameter vector to fill
          */
-        void fillParameters(QFRawDataRecord* r, int run, double* param);
+        virtual void fillParameters(QFRawDataRecord* r, int run, double* param);
         /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param run run in \a r this applies to
          *  \param param parameter error vector to fill
         */
-        void fillParameterErrors(QFRawDataRecord* r, int run, double* param);
+        virtual void fillParameterErrors(QFRawDataRecord* r, int run, double* param);
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param run run in \a r this applies to
          *  \param param parameter fix vector to fill
         */
-        void fillFix(QFRawDataRecord* r, int run, bool* param);
+        virtual void fillFix(QFRawDataRecord* r, int run, bool* param);
 
         /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
@@ -512,21 +262,21 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
             \return parameter vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        double* allocFillParameters(QFRawDataRecord* r, int run);
+        virtual double* allocFillParameters(QFRawDataRecord* r, int run);
         /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param run run in \a r this applies to
             \return parameter error vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        double* allocFillParameterErrors(QFRawDataRecord* r, int run);
+        virtual double* allocFillParameterErrors(QFRawDataRecord* r, int run);
         /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param run run in \a r this applies to
             \return parameter fix vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        bool* allocFillFix(QFRawDataRecord* r, int run);
+        virtual bool* allocFillFix(QFRawDataRecord* r, int run);
 
 
 
@@ -535,35 +285,8 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
 
 
 
-        /** \brief returns a list of all FCS fitting functions available for this evaluation
-         *  \note This class uses only those fit functions where the ID starts with \c "fcs_"
-         */
-        QStringList getAvailableFitFunctions() const { return m_fitFunctions.keys(); };
-        /** \brief returns the given fit function instance (DO NEVER DELETE THIS INSTANCE!) */
-        QFFitFunction* getFitFunction(const QString& id) const {
-            if (m_fitFunctions.contains(id)) return m_fitFunctions[id];
-            else return NULL;
-        };
-
-        /** \brief returns a list of all available fit algorithms */
-        QStringList getAvailableFitAlgorithms() const { return m_fitAlgorithms.keys(); };
-        /** \brief return the instance of a given fit algorithm for this evaluation (DO NEVER DELETE THIS INSTANCE!)  */
-        QFFitAlgorithm* getFitAlgorithm(const QString& id) const {
-            if (m_fitAlgorithms.contains(id)) return m_fitAlgorithms[id];
-            return NULL;
-        };
 
 
-
-
-
-        /** \brief determine whether a fit has been carried out for the currently highlighted record and current run
-         *
-         *  \param r the given record, if \c NULL the currently highlighted record is checked
-         *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
-         *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
-         */
-        bool hasFit(QFRawDataRecord* r=NULL);
 
         /** \brief determine whether a fit has been carried out for the given record and run
          *
@@ -572,20 +295,12 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
          *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
          *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
          */
-        bool hasFit(QFRawDataRecord* r, int run);
+        virtual bool hasFit(QFRawDataRecord* r, int run);
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files and all runs */
         virtual void setAllFitValues(const QString& id, double value, double error=0.0);
         /*! \brief set the given parameter \a id to the given fix value and all runs */
         virtual void setAllFitFixes(const QString& id, bool fix);
-        /*! \brief reset the given parameter \a id to the initial/global/default value */
-        virtual void resetDefaultFitValue(const QString& id);
-        /*! \brief reset the given parameter \a id to the initial/global/default fix */
-        virtual void resetDefaultFitFix(const QString& id);
-        /*! \brief return the default/initial/global value of a given parameter        */
-        virtual double getDefaultFitValue(const QString& id);
-        /*! \brief return the default/initial/global fix of a given parameter        */
-        virtual bool getDefaultFitFix(const QString& id);
         /*! \brief reset all parameters to the initial/global/default value in all files and all runs */
         virtual void resetAllFitValue();
         /*! \brief reset all fit results to the initial/global/default value in all files and all runs */
@@ -593,163 +308,108 @@ class QFFCSFitEvaluation : public QFEvaluationItem, public QFFitParameterBasicIn
         /*! \brief reset all parameters to the initial/global/default fix in all files and all runs */
         virtual void resetAllFitFix();
         /*! \brief reset all fit results to the initial/global/default value in the current file but all runs */
-        virtual void resetAllFitResultsCurrent();
-        /*! \brief reset the all fit results to the initial/global/default value in the current file and current run */
-        virtual void resetAllFitResultsCurrentCurrentRun();
-        /*! \brief reset all parameters to the initial/global/default value in current file and run */
-        virtual void resetAllFitValueCurrent();
-        /*! \brief reset all parameters to the initial/global/default fix in current file and run */
-        virtual void resetAllFitFixCurrent();
-        /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param value value to be stored
-            \param error error assigned to \a value
-
-         */
-        virtual void setInitFitValue(const QString& id, double value, double error=0.0);
-        /*! \brief set the fix property of a fit parameter in the initial parameters
-            \param id set the value of the parameter with this id (see QFFitFunction)
-            \param fix value to be stored
-         */
-        virtual void setInitFitFix(const QString& id, bool fix);
+        virtual void resetAllFitResultsCurrentFileAllRuns();
+        /*! \brief reset all fit results to the initial/global/default value in the current file but all runs */
+        virtual void resetAllFitResultsAllFilesAllRuns();
 
 
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function */
-        inline QString getEvaluationResultID() {
+        virtual QString getEvaluationResultID() {
             return getEvaluationResultID(m_fitFunction, m_currentRun);
         }
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        inline QString getEvaluationResultID(QString fitFunction) {
+        virtual QString getEvaluationResultID(QString fitFunction) {
             return getEvaluationResultID(fitFunction, m_currentRun);
         }
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        inline QString getEvaluationResultID(QString fitFunction, int currentRun) {
+        virtual QString getEvaluationResultID(QString fitFunction, int currentRun) {
             if (currentRun<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
             return QString("%1_%2_%3_run%4").arg(getType()).arg(getID()).arg(fitFunction).arg(currentRun);
         }
 
+        /** \brief extract the run number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
+        int getRunFromEvaluationResultID(const QString& resultID);
+
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        inline QString getEvaluationResultID(int currentRun) {
+        virtual QString getEvaluationResultID(int currentRun) {
             return getEvaluationResultID(m_fitFunction, currentRun);
         }
 
-        /** \brief returns an ID for a given fit parameter (i.e. prepends \c fitparam_ and if \a fix is \c true, also appends \c _fix ) */
-        inline QString getFitParamID(QString fitparam) {
-            return QString("fitparam_%1").arg(fitparam);
-        }
-
-        /** \brief returns an ID for a given fit parameter fix (i.e. prepends \c fitparam_ and appends \c _fix ) */
-        inline QString getFitParamFixID(QString fitparam) {
-            return QString("%1_fix").arg(getFitParamID(fitparam));
-        }
-
-        /*! \brief save all parameters of a given QFFitAlgorithm to the internal fit algorithm parameter store algorithm_parameterstore
-        */
-        void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
-        /*! \brief load all parameters of a given QFFitAlgorithm from the internal fit algorithm parameter store algorithm_parameterstore
-        */
-        void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
     public slots:
         /** \brief set the current run to use, -1 = average, 0..N = runs, <-1: invalid */
         void setCurrentRun(int run);
 
     protected:
-        /*! \brief struct used to locally store fit parameter properties
+        /*! \copydoc QFFitResultsEvaluation::intWriteDataAlgorithm()      */
+        virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const;
 
-            For each parameter that is stored in parameterStore this saves also whether it is really set, so each
-            parameter is represented by two datamemeber: \c value and \c valueSet which is \c true only if the user
-            has explicitly set the \c value. This information is used in the \c getFitXYZ() functions and set in the
-            \c setFitXYZ() functions.
-        */
-        struct FitParameter {
-            double value;
-            double error;
-            bool fix;
-            double min;
-            double max;
-            bool valueSet;
-            bool fixSet;
-            bool minSet;
-            bool maxSet;
-            bool errorSet;
-            FitParameter() {
-                value=0;
-                error=0;
-                fix=false;
-                min=0;
-                max=0;
-                valueSet=false;
-                fixSet=false;
-                minSet=false;
-                maxSet=false;
-                errorSet=false;
-            }
-        };
+        /*! \copydoc QFFitResultsEvaluation::intReadDataAlgorithm()      */
+        virtual void intReadDataAlgorithm(QDomElement& e);
 
-        /*! \brief datastore for fit parameter values
-
-            Internally a uniquie key for every fit parameter is used to adress the contents. The key is calculated
-            from the \code fit_fuction_id+"___"+parameter_id \endcode
-         */
-        QMap<QString, FitParameter> parameterStore;
-
-        /*! \brief parameter store for fit algorithm parameters
-
-            This map effectively has two strings as key. the first is the fit algorithm ID and the second the parameter name
-            The value stored for each key is a QVariant.
-         */
-         QMap<QString, QMap<QString, QVariant> > algorithm_parameterstore;
-
-        /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-        inline QString getParameterStoreID(QString parameter) {
-            QString ff="";
-            if (getFitFunction()!=NULL) {
-                ff=getFitFunction()->id();
-            }
-            return getParameterStoreID(ff, parameter);
-        };
-
-        /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-        inline QString getParameterStoreID(QString fitfunction, QString parameter) {
-            return QString(fitfunction+"___"+parameter).trimmed().toLower();
-        };
+        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error);
 
 
-        /** \brief write object contents into XML file
-         *
-         *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to
-         *  the given XML file.
-         */
-        virtual void intWriteData(QXmlStreamWriter& w);
-        /** \brief read back the data stored by intWriteXML() */
-        virtual void intReadData(QDomElement* e);
-
-
-        /** \brief the current fitting function */
-        QString m_fitFunction;
-        /** \brief the current fitting algorithm */
-        QString m_fitAlgorithm;
         /** \brief type of data weighting */
         DataWeight m_weighting;
-        /** \brief map with all available fit functions */
-        QMap<QString, QFFitFunction*> m_fitFunctions;
-        /** \brief map with all available fit algorithms */
-        QMap<QString, QFFitAlgorithm*> m_fitAlgorithms;
-
-        /** \brief settings object to access fit parameters */
-        QSettings* fitParamSettings;
 
         /** \brief current run to use, -1 = average, 0..N = runs, <-1: invalid */
         int m_currentRun;
 
-    private:
+    public:
+
+        /* explicitly make some functions visible again, as the C++ compiler hides function definitions
+           from a base class that are also declared in the derived class, but with different parameter sets!
+
+           see http://www.parashift.com/c++-faq-lite/strange-inheritance.html#faq-23.9
+         */
+
+
+        using QFFitResultsEvaluation::setFitValue;
+        using QFFitResultsEvaluation::setFitResultValue;
+        using QFFitResultsEvaluation::setFitResultValueString;
+        using QFFitResultsEvaluation::setFitResultValueInt;
+        using QFFitResultsEvaluation::setFitResultValueBool;
+        using QFFitResultsEvaluation::setFitResultError;
+        using QFFitResultsEvaluation::setFitResultValues;
+        using QFFitResultsEvaluation::setFitResultValuesVisible;
+        using QFFitResultsEvaluation::getFitValue;
+        using QFFitResultsEvaluation::getFitError;
+        using QFFitResultsEvaluation::setFitFix;
+        using QFFitResultsEvaluation::setFitResultFix;
+        using QFFitResultsEvaluation::getFitFix;
+        using QFFitResultsEvaluation::setFitError;
+        using QFFitResultsEvaluation::setFitRange;
+        using QFFitResultsEvaluation::setFitMin;
+        using QFFitResultsEvaluation::setFitMax;
+        using QFFitResultsEvaluation::hasFit;
+        using QFFitResultsEvaluation::fillParameters;
+        using QFFitResultsEvaluation::fillParameterErrors;
+        using QFFitResultsEvaluation::fillParametersMin;
+        using QFFitResultsEvaluation::fillParametersMax;
+        using QFFitResultsEvaluation::fillFix;
+        using QFFitResultsEvaluation::allocFillParameters;
+        using QFFitResultsEvaluation::allocFillParameterErrors;
+        using QFFitResultsEvaluation::allocFillParametersMin;
+        using QFFitResultsEvaluation::allocFillParametersMax;
+        using QFFitResultsEvaluation::allocFillFix;
+        using QFFitResultsEvaluation::resetDefaultFitValue;
+        using QFFitResultsEvaluation::resetDefaultFitFix;
+        using QFFitResultsEvaluation::getDefaultFitValue;
+        using QFFitResultsEvaluation::getDefaultFitFix;
+        using QFFitResultsEvaluation::resetAllFitResultsCurrent;
+
+
+
+
+
 };
 
 #endif // QFFCSFITEVALUATION_H
+

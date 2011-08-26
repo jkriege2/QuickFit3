@@ -2,5 +2,23 @@
 /*! \page qf3helpsystem QuickFit 3 Online Help System
     \ingroup quickfit3
 
-	QuickFit 3 contains a simple help system based on enriched HTML pages. 
+	QuickFit 3 contains a simple help system based on enriched HTML pages. The application will recognize a set of specially named HTML files as main help file for a plugin. For details on filename and location information, see \ref qf3whereiswhat .
+	
+	These HTML files are displayed using a <a href="http://qt.nokia.com">Qt</a> widget which supports only a <a href="http://doc.qt.nokia.com/latest/richtext-html-subset.html">subset of HTML and CSS</a>. In addition QuickFit 3 does some string replacements in the files before they are displayed. This way you can uzse common elements and information in your help file:
+      - version information:	
+	     - \c $$version.svnrevision$$ will be replaced by the SVN revision of the QuickFit 
+	     - \c $$version.status$$ will be replaced by the application status (beta, alpha, final, ...)
+	     - \c $$version.date$$ will be replaced by the compile date
+	     - \c $$version$$ will be replaced by the version number (e.g. 3.0)
+	     - \c $$version_full$$ will be replaced by the full version string
+		. 
+      - copyright information:	
+	     - \c $$thanksto$$ will be replaced by a list of people that our thanks go to for helping with QuickFit
+	     - \c $$copyright$$ will be replaced by a copyright note
+		. 
+      - plugin help:	
+	     - \c $$tutorials_contents$$ will be replaced by a list of plugin tutorials (complete with links as unordered list!)
+	     - \c $$help_contents$$ will be replaced by a list of plugin main help files (complete with links as unordered list!)
+        .
+	.  
 */

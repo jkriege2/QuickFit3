@@ -1,15 +1,7 @@
 #include "qffitresultsevaluation.h"
 
 
-/** \brief returns an ID for a given fit parameter (i.e. prepends \c fitparam_ and if \a fix is \c true, also appends \c _fix ) */
-inline QString getFitParamID(QString fitparam) {
-    return QString("fitparam_%1").arg(fitparam);
-}
 
-/** \brief returns an ID for a given fit parameter fix (i.e. prepends \c fitparam_ and appends \c _fix ) */
-inline QString getFitParamFixID(QString fitparam) {
-    return QString("fitparam_%1_fix").arg(fitparam);
-}
 
 
 
@@ -496,7 +488,12 @@ void QFFitResultsEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, const
 
     }
 }
-double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) {
+
+bool QFFitResultsEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) {
+    return false;
+}
+
+double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID/*, const QMap<QString, double>& specials*/) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) {
         return 0;
@@ -512,6 +509,11 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
             res=parameterStore[psID].value;
         }
     }
+    //if (specials.contains(parameterID)) res=specials[parameterID];
+    double sval=res, serr=0;
+    if (hasSpecial(r, resultID, parameterID, sval, serr)) {
+        res=sval;
+    }
     if (hasFit(r, resultID)) {
         QString en=resultID;
         QString pid=getFitParamID(parameterID);
@@ -520,11 +522,16 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
     return res;
 }
 
-double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID)  {
+double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID/*, const QMap<QString, double>& specials*/)  {
     if (hasFit(r, resultID)) {
         if (r!=NULL) {
             return r->resultsGetErrorAsDouble(resultID, getFitParamID(parameterID));
         }
+    }
+    //if (specials.contains(parameterID)) return specials[parameterID];
+    double sval=0, serr=0;
+    if (hasSpecial(r, resultID, parameterID, sval, serr)) {
+       return serr;
     }
     QString psID=getParameterStoreID(parameterID);
     if (parameterStore.contains(psID)) {
@@ -892,7 +899,7 @@ void QFFitResultsEvaluation::resetAllFitFixCurrent() {
 
 
 /*! \brief reset the all fit results to the initial/global/default value in the current file and current run */
-void QFFitResultsEvaluation::resetAllFitResultsCurrentCurrentRun() {
+void QFFitResultsEvaluation::resetAllFitResultsCurrent() {
     QFRawDataRecord* re=getHighlightedRecord();
     if (!re) return;
     re->resultsClear(getEvaluationResultID());

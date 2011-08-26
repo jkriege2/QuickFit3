@@ -205,6 +205,8 @@ public:
      */
     virtual void setFitResultValuesVisible(QFRawDataRecord* r, const QString& resultID, double* values, double* errors);
 
+
+
     /*! \brief return the value of a given parameter
         \param r the record to adress
         \param resultID the result ID which to access in the raw data records result store
@@ -219,7 +221,6 @@ public:
         .
     */
     virtual double getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
-
     /*! \brief return the fit error of a given parameter
         \param r the record to adress
         \param resultID the result ID which to access in the raw data records result store
@@ -573,8 +574,8 @@ public:
     virtual double getDefaultFitValue(const QString& id);
     /*! \brief return the default/initial/global fix of a given parameter        */
     virtual bool getDefaultFitFix(const QString& id);
-    /*! \brief reset the all fit results to the initial/global/default value in the current file and current resultID */
-    virtual void resetAllFitResultsCurrentCurrentRun();
+    /*! \brief reset the all fit results to the initial/global/default value in the currently displayed curve/data */
+    virtual void resetAllFitResultsCurrent();
     /*! \brief reset all parameters to the initial/global/default value in current file and resultID */
     virtual void resetAllFitValueCurrent();
     /*! \brief reset all parameters to the initial/global/default fix in current file and resultID */
@@ -595,6 +596,12 @@ public:
 
 
 
+    /*! \brief save all parameters of a given QFFitAlgorithm to the internal fit algorithm parameter store algorithm_parameterstore
+    */
+    virtual void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
+    /*! \brief load all parameters of a given QFFitAlgorithm from the internal fit algorithm parameter store algorithm_parameterstore
+    */
+    virtual void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
 
 
 
@@ -708,15 +715,28 @@ protected:
     */
     virtual void intReadDataAlgorithm(QDomElement& e) {};
 
-    /*! \brief save all parameters of a given QFFitAlgorithm to the internal fit algorithm parameter store algorithm_parameterstore
-    */
-    virtual void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
-    /*! \brief load all parameters of a given QFFitAlgorithm from the internal fit algorithm parameter store algorithm_parameterstore
-    */
-    virtual void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
 
 
+    /** \brief returns an ID for a given fit parameter (i.e. prepends \c fitparam_ and if \a fix is \c true, also appends \c _fix ) */
+    inline QString getFitParamID(QString fitparam) {
+        return QString("fitparam_%1").arg(fitparam);
+    }
 
+    /** \brief returns an ID for a given fit parameter fix (i.e. prepends \c fitparam_ and appends \c _fix ) */
+    inline QString getFitParamFixID(QString fitparam) {
+        return QString("fitparam_%1_fix").arg(fitparam);
+    }
+    /*! \brief allows to draw certain fit parameters from other sources (e.g. copy a property of the underlying record
+
+        \param r record this appplies to
+        \param resultID the result ID which to access in the raw data records result store
+        \param paramid the parameter we are looking up
+        \param[out] value in this parameter the value is returned, if the function returns \c true
+        \param[out] error in this parameter the value' error is returned, if the function returns \c true
+        \return \c true if a special value is found. In that case it returns the value in \a value and \a error
+
+     */
+    virtual bool hasSpecial(QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error);
 };
 
 #endif // QFFITRESULTSEVALUATION_H
