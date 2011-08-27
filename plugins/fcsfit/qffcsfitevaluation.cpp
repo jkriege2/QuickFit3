@@ -132,6 +132,7 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
 }
 
 int QFFCSFitEvaluation::getRunFromEvaluationResultID(const QString& resultID) {
+    if (resultID.size()<=0) return -1;
     if (resultID.endsWith("avg")) return -1;
     int l=0;
     while (resultID[resultID.size()-1-l].isDigit()) {
@@ -141,13 +142,7 @@ int QFFCSFitEvaluation::getRunFromEvaluationResultID(const QString& resultID) {
     return -1;
 }
 
-double QFFCSFitEvaluation::getFitValue(const QString& id) {
-    return getFitValue(getHighlightedRecord(), getEvaluationResultID(), id);
-}
 
-double QFFCSFitEvaluation::getFitError(const QString& id)  {
-    return getFitError(getHighlightedRecord(), getEvaluationResultID(), id);
-}
 
 void QFFCSFitEvaluation::setFitFix(QFRawDataRecord* r, int run, const QString& id, bool fix) {
     setFitFix(r, getEvaluationResultID(run), id, fix);

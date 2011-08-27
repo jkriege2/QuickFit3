@@ -528,6 +528,14 @@ void QFFitParameterWidgetWrapper::setIncrement(double increment) {
     }
 }
 
+void QFFitParameterWidgetWrapper::setEditRange(int range) {
+    setEditRange(range!=0);
+}
+
+void QFFitParameterWidgetWrapper::unsetEditValues(int range) {
+    unsetEditValues(range!=0);
+}
+
 void QFFitParameterWidgetWrapper::setEditRange(bool editRange) {
     if (!m_editRangeAllowed) {
         m_editRange=false;

@@ -326,15 +326,24 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     labFitParameters=new QLabel(this);
     layModel->addWidget(labFitParameters);
-    btnEditRanges=new QPushButton(tr("Edit &Ranges"), this);
+    /*btnEditRanges=new QPushButton(tr("Edit &Ranges"), this);
     btnEditRanges->setCheckable(true);
     btnEditRanges->setChecked(false);
     QHBoxLayout* hblfp=new QHBoxLayout(this);
     hblfp->addWidget(labFitParameters);
     hblfp->addStretch();
     hblfp->addWidget(btnEditRanges);
+    layModel->addLayout(hblfp);*/
+    tbEditRanges=new QTabBar(this);
+    tbEditRanges->addTab(tr("Parameter Values"));
+    tbEditRanges->addTab(tr("Parameter Ranges"));
+    tbEditRanges->setShape(QTabBar::TriangularNorth);
+    tbEditRanges->setDrawBase(false);
+    tbEditRanges->setCurrentIndex(0);
+    QVBoxLayout* hblfp=new QVBoxLayout(this);
+    hblfp->addWidget(labFitParameters);
+    hblfp->addWidget(tbEditRanges);
     layModel->addLayout(hblfp);
-
 
 
     scrollParameters=new JKVerticalScrollArea(this);
@@ -571,7 +580,8 @@ void QFFCSFitEvaluationEditor::readSettings() {
         loadSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsfitevaleditor/splitter_fitstatistics");
         m_parameterWidgetWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth).toInt();
         m_parameterCheckboxWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth).toInt();
-        btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", false).toBool());
+        //btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", false).toBool());
+        tbEditRanges->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", 0).toInt());
         spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
         tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
         currentFPSSaveDir=settings->getQSettings()->value("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir).toString();
@@ -594,7 +604,8 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         saveSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsfitevaleditor/splitter_fitstatistics");
         settings->getQSettings()->setValue("fcsfitevaleditor/parameterWidgetWidth", m_parameterWidgetWidth);
         settings->getQSettings()->setValue("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth);
-        settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", btnEditRanges->isChecked());
+        //settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", btnEditRanges->isChecked());
+        settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", tbEditRanges->currentIndex());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_toolbox_current", tabResidulas->currentIndex());
         settings->getQSettings()->setValue("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir);
@@ -651,7 +662,8 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
-                disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                //disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                disconnect(tbEditRanges, SIGNAL(currentChanged(int)), m_fitParameters[i], SLOT(setEditRange(int)));
                 disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));
                 disconnect(m_fitParameters[i], SIGNAL(errorChanged(QString, double)), this, SLOT(parameterValueChanged()));
                 disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged()));
@@ -671,8 +683,10 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
-                disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
-                disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(unsetEditValues(bool)));
+                //disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(setEditRange(bool)));
+                //disconnect(btnEditRanges, SIGNAL(toggled(bool)), m_fitParameters[i], SLOT(unsetEditValues(bool)));
+                disconnect(tbEditRanges, SIGNAL(currentChanged(int)), m_fitParameters[i], SLOT(setEditRange(int)));
+                disconnect(tbEditRanges, SIGNAL(currentChanged(int)), m_fitParameters[i], SLOT(unsetEditValues(int)));
                 disconnect(m_fitParameters[i], SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));
                 disconnect(m_fitParameters[i], SIGNAL(errorChanged(QString, double)), this, SLOT(parameterValueChanged()));
                 disconnect(m_fitParameters[i], SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged()));
@@ -692,10 +706,14 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         QFFitParameterWidgetWrapper* header=new QFFitParameterWidgetWrapper(eval, layParameters, 0, "", QFFitParameterWidgetWrapper::Header, true, true, QFFitFunction::DisplayError, true, this, tr("parameter"));
         m_fitParameters.append(header);
-        connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
-        connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(unsetEditValues(bool)));
-        header->setEditRange(btnEditRanges->isChecked());
-        header->unsetEditValues(!btnEditRanges->isChecked());
+        //connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
+        //connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(unsetEditValues(bool)));
+        connect(tbEditRanges, SIGNAL(currentChanged(int)), header, SLOT(setEditRange(int)));
+        connect(tbEditRanges, SIGNAL(currentChanged(int)), header, SLOT(unsetEditValues(int)));
+        //header->setEditRange(btnEditRanges->isChecked());
+        //header->unsetEditValues(!btnEditRanges->isChecked());
+        header->setEditRange(tbEditRanges->currentIndex());
+        header->unsetEditValues(tbEditRanges->currentIndex());
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create new parameter widgets
@@ -737,15 +755,19 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             if (falg) fpw->setRangeEnabled(falg->get_supportsBoxConstraints());
             fpw->setToolTip(d.name);
             m_fitParameters.append(fpw);
-            connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(unsetEditValues(bool)));
-            connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
+            //connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(unsetEditValues(bool)));
+            //connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
+            connect(tbEditRanges, SIGNAL(currentChanged(int)), fpw, SLOT(unsetEditValues(int)));
+            connect(tbEditRanges, SIGNAL(currentChanged(int)), fpw, SLOT(setEditRange(int)));
             connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));
             connect(fpw, SIGNAL(errorChanged(QString, double)), this, SLOT(parameterValueChanged()));
             connect(fpw, SIGNAL(fixChanged(QString, bool)), this, SLOT(parameterFixChanged()));
             connect(fpw, SIGNAL(rangeChanged(QString, double, double)), this, SLOT(parameterRangeChanged()));
             connect(fpw, SIGNAL(enterPressed(QString)), this, SLOT(fitCurrent()));
-            fpw->setEditRange(btnEditRanges->isChecked());
-            fpw->unsetEditValues(btnEditRanges->isChecked());
+            //fpw->setEditRange(btnEditRanges->isChecked());
+            //fpw->unsetEditValues(btnEditRanges->isChecked());
+            fpw->setEditRange(tbEditRanges->currentIndex());
+            fpw->unsetEditValues(tbEditRanges->currentIndex());
         }
         btnCalibrateFocalVolume->setEnabled((has_tauD||(has_particles&&has_gamma))&&has_wxy);
         // add stretcher item in bottom row
@@ -2716,3 +2738,5 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
         QApplication::restoreOverrideCursor();
     }
 }
+
+

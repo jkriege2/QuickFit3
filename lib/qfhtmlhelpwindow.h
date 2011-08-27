@@ -65,6 +65,8 @@ class QFHTMLHelpWindow : public QWidget {
 
         QList<QPair<QString, QString> > internal_replaces;
 
+        QList<QPair<QString, QString> > fromHTML_replaces;
+
         QString loadHTML(QString filename);
 
         /** \brief a label for the model name */

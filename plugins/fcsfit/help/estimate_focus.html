@@ -2,11 +2,12 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Estime focus parameter <i>w</i><sub>xy</sub> from fit results</title>
+  <title>FCS Fit: Estime focus parameter <i>w</i><sub>xy</sub> from fit results</title>
   </head>
   <body>
-     <b>FCS Fit Documentation</b> | <a href="tutorial.html">FCS Fit Tutorial</a> | <a href="../../../help/quickfit.html">QuickFit $$version$$ basics</a> | <a href="../../../help/qf3_evalscreen.html">basic evaluation dialog features</a><hr>
-     <h1>FCS Fit: Estime focus parameter <i>w</i><sub>xy</sub> from fit results</h1>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="fcs_fit.html">FCS Fit Documentation</a> $$rel_tutorial$$ $$qf_commondoc_header.eval$$ $$qf_commondoc_header.end$$  
+     <!--<b>FCS Fit Documentation</b> | <a href="tutorial.html">FCS Fit Tutorial</a> | <a href="../../../help/quickfit.html">QuickFit $$version$$ basics</a> | <a href="../../../help/qf3_evalscreen.html">basic evaluation dialog features</a><hr>
+     <h1>FCS Fit: Estime focus parameter <i>w</i><sub>xy</sub> from fit results</h1>-->
 	 <h2>Usage</h2>
 	 <ol> 
 	 <li>The button <img src="./pic/focus_button.png"> allows to estimate the focus parameter <i>w</i><sub>xy</sub> from the results of an FCS fit and some supplied and known values. </li>
@@ -16,6 +17,7 @@
 	 </ol>
 	 <p></p>
 	 <p></p>
+	 $$qf_commondoc_backtop$$
 	 <h2>Background &amp; Derivation</h2>
 	 <img src="./pic/focus_shape.png" style="float: right;">
 	 <p>As one-focus FCS measurements lack an intrinsically well known "ruler" (e.g. the distance between two pixels or two foci), we have to establish the size of the focus by a calibration measurement. To do so, use a dye with a known diffusion coefficient or known concentration in your solution. Then you do an FCS measurement of this dye free in solution and fit a simple FCS model for normal diffusion to the acquired curve. Finally you can use this tool to estimate the size of the focus <i>w</i><sub>xy</sub>:
@@ -35,13 +37,16 @@
 	   <tr><th>Dye</th><th>Diffusion coefficient [&mu;<sup>2</sup>/s]</th><th>environment</th><th>excitation max.</th><th>emission max.</th><th>Ref</th></tr>
 	   <tr><td>Alexa-488</td><td align="center">435</td><td align="center">22.5°C in H<sub>2</sub>O</td><td align="center">494nm</td><td align="center">517nm</td><td align="center">[1]</td></tr>
 	   <tr><td>&nbsp;</td><td align="center">585</td><td align="center">37°C in H<sub>2</sub>O</td><td align="center">494nm</td><td align="center">517nm</td><td align="center">[1]</td></tr>
+	   <tr><td>Alexa-546</td><td align="center">341</td><td align="center">22.5°C in H<sub>2</sub>O</td><td align="center">554nm</td><td align="center">570nm</td><td align="center">[2]</td></tr>
 	   <tr><td>EGFP</td><td align="center">95</td><td align="center">22.5°C in 100mM phosphate-citrate buffer @ pH=7.5</td><td align="center">489nm</td><td align="center">508nm</td><td align="center">[2]</td></tr>
 	   <tr><td>Rhodamine 6G</td><td align="center">426</td><td align="center">22.5°C in H<sub>2</sub>O</td><td align="center">529.75nm</td><td align="center">555nm</td><td align="center">[2]</td></tr>
+	   <tr><td>Fluorescein</td><td align="center">436</td><td align="center">22.5°C in H<sub>2</sub>O</td><td align="center">485nm</td><td align="center">514nm</td><td align="center">[2]</td></tr>
 	 </table></center>
 	 </p>
 	 <p>The equations above can be derived using the standard FCS normal diffusion model for a gaussian focus:
 	 <center><img src="./pic/fcs_simplediff_modelequations.png"></center>
 	 </p>
+	 $$qf_commondoc_backtop$$
 	 <h3>References:</h3>
 	 <p>[1] N. Dross, C. Spriet, M. Zwerger, G. Müller, W. Waldeck, and J. Langowski. <b>Mapping EGFP oligomer mobility in living cell nuclei</b>. <i>PLoS ONE</i>, 4(4):e5041, 2009. <br><small><a href="http://www.dkfz.de/Macromol/publications/files/Dross2009.pdf">http://www.dkfz.de/Macromol/publications/files/Dross2009.pdf</a></small>.</p>
      <p>[2] Z. Petrásek and P. Schwille. <strong>Precise measurement of diffusion coefficients using scanning fluorescence correlation spectroscopy</strong>. <i>Biophysical Journal</i>, 94:1437–1448, 2008. <br><small><a href="http://www.pubmedcentral.nih.gov/picrender.fcgi?artid=2212689&blobtype=pdf">http://www.pubmedcentral.nih.gov/picrender.fcgi?artid=2212689&blobtype=pdf</a></small>.</p>

@@ -107,7 +107,8 @@ FORMS += qfdlg_csvparameters.ui \
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
              ../../../../LIB/trunk/qt/jkstyledbutton.qrc \
-    libqf3widgets.qrc
+    libqf3widgets.qrc \
+    ../../../../LIB/trunk/qt/libqt.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 

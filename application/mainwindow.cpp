@@ -92,6 +92,19 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></div>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"), tr("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">$$rel_prev$$</td><td align=\"left\">$$rel_contents$$</td><td align=\"left\">$$rel_next$$</td><td width=\"90%\" align=\"left\">$$qf_commondoc_header.default_links$$ ")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table>")));// </div>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <h1>$$title$$</h1>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
+
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.simplest"), tr("back: <a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_rdrscreen.html\">basic raw data record dialog</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">basic evaluation dialog</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.extension"), tr("")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("")));
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
@@ -468,6 +481,7 @@ void MainWindow::createWidgets() {
     spMain=new QVisibleHandleSplitter(Qt::Vertical, this);
     spMain->setOrientation(Qt::Vertical);
     tvMain=new QTreeView(this);
+    tvMain->setHeaderHidden(true);
     connect(tvMain, SIGNAL(doubleClicked ( const QModelIndex &)), this, SLOT(projectElementDoubleClicked(const QModelIndex&)));
     spCenter->addWidget(tvMain);
     setCentralWidget(spMain);

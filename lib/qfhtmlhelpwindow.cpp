@@ -5,6 +5,13 @@
 #include <QDir>
 #include <QDesktopServices>
 
+QString removeHTMLComments(const QString& data) {
+     QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
+     rxComments.setMinimal(true);
+     QString data1=data;
+     data1.remove(rxComments);
+     return data1;
+}
 
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
     QWidget(parent)
@@ -146,11 +153,17 @@ void QFHTMLHelpWindow::displayTitle() {
 
 void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
     //std::cout<<"scheme = "<<link.scheme().toStdString()<<std::endl;
+    //qDebug()<<link.toString();
+    QString linkstr=link.toString();
     QString scheme=link.scheme().toLower();
     QDir spd(searchPath);
     QString cl=spd.cleanPath(spd.absoluteFilePath(link.toString()));
     QString s=spd.absoluteFilePath(cl); //absoluteFilePath
     searchPath=QFileInfo(s).absolutePath();
+
+    if (linkstr.startsWith("#")) {
+        descriptionBrowser->scrollToAnchor(linkstr.right(linkstr.size()-1));
+    }
 
     if ((scheme!="http") && (scheme!="https") && (scheme!="ftp") && (scheme!="ftps") && (scheme!="mailto") && (scheme!="sftp") && (scheme!="svn") && (scheme!="ssh") && QFile::exists(QFileInfo(s).absoluteFilePath())) {
         //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
@@ -220,24 +233,106 @@ void QFHTMLHelpWindow::print() {
     delete p;
 }
 
+
+
 QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QString result;
+    // read HTML file
     QFile file(QFileInfo(filename).absoluteFilePath());
+    fromHTML_replaces.clear();
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&file);
-        result=in.readAll();
+        result=removeHTMLComments(in.readAll());
     } else {
-        result="";
+        result=tr("<html><header><title>Error: Help page does not exist</title></header><body>$$qf_commondoc_header.start$$ $$qf_commondoc_header.simplest$$ $$qf_commondoc_header.end$$<center>The Quickfit online-help page you are trying to access does not exist!<br><br>File was: <i>%1</i></center></body></html>").arg(filename);
     }
+    // find special information in file
+    QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
+    if (rxTitle.indexIn(result) != -1) fromHTML_replaces.append(qMakePair(QString("title"), rxTitle.cap(1)));
+
+    QRegExp rxMeta("(<meta\\s*content\\s*=\\s*\"([^\"']*)\"\\s*name\\s*=\\s*\"([^\"']*)\"[^>]*>|<meta\\s*name\\s*=\\s*\"([^\"']*)\"\\s*content\\s*=\\s*\"([^\"']*)\"[^>]*>)", Qt::CaseInsensitive);
+    rxMeta.setMinimal(false);
+    int count = 0;
+    int pos = 0;
+    while ((pos = rxMeta.indexIn(result, pos)) != -1) {
+
+        QString name=rxMeta.cap(2);
+        QString content=rxMeta.cap(1);
+        if (name.isEmpty() && content.isEmpty()) {
+            name=rxMeta.cap(3);
+            content=rxMeta.cap(4);
+        }
+        if ((!name.isEmpty())&&(!content.isEmpty())) {
+            fromHTML_replaces.append(qMakePair(QString("meta_")+name,content));
+        }
+
+        ++count;
+        pos += rxMeta.matchedLength();
+    }
+
+    QRegExp rxLink("<link\\s*rel\\s*=\\s*\"([^\"']*)\"[^\\>]*href\\s*=\\s*\"([^\"']*)\"[^>]*>", Qt::CaseInsensitive);
+    rxLink.setMinimal(false);
+    count = 0;
+    pos = 0;
+    while ((pos = rxLink.indexIn(result, pos)) != -1) {
+
+        QString rel=rxLink.cap(1).toLower();
+        QString href=rxLink.cap(2);
+        if (!href.isEmpty()) {
+            if (rel=="contents") fromHTML_replaces.append(qMakePair(QString("rel_contents"), tr("<a href=\"%1\">Contents</a> ").arg(href)));
+            if (rel=="index") fromHTML_replaces.append(qMakePair(QString("rel_index"), tr("<a href=\"%1\">Index</a> ").arg(href)));
+            if (rel=="copyright") fromHTML_replaces.append(qMakePair(QString("rel_copyright"), tr("<a href=\"%1\">Copyright</a> ").arg(href)));
+            if (rel=="top") fromHTML_replaces.append(qMakePair(QString("rel_top"), tr("<a href=\"%1\">Top</a> ").arg(href)));
+            if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), tr("<a href=\"%1\"><img src=\":/lib/help/help_prev.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Previous</a>--> ").arg(href)));
+            if (rel=="next") fromHTML_replaces.append(qMakePair(QString("rel_next"), tr("<a href=\"%1\"><img src=\":/lib/help/help_next.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Next</a>--> ").arg(href)));
+            if (rel=="up") fromHTML_replaces.append(qMakePair(QString("rel_up"), tr("<a href=\"%1\"><img src=\":/lib/help/help_up.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Up</a>--> ").arg(href)));
+            //if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), tr("<a href=\"%1\"><img src=\":/lib/help/help_prev.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Previous</a> ").arg(href)));
+        }
+
+        ++count;
+        pos += rxLink.matchedLength();
+    }
+
+    QString basepath=QFileInfo(filename).absolutePath();
+    QDir basedir=QFileInfo(filename).absoluteDir();
+    if (basedir.exists("tutorial.html")) {
+        if (QFileInfo(filename).fileName()=="tutorial.html") {
+            fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), tr("<b><img src=\":/lib/help/help_tutorial.png\" border=\"0\">&nbsp;Tutorial</b> ")));
+        } else {
+            fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), tr("<a href=\"%1\"><img src=\":/lib/help/help_tutorial.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Tutorial</a> ").arg(basedir.absoluteFilePath("tutorial.html"))));
+        }
+    } else {
+        fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), QString(" ")));
+    }
+
+    // handle replaces
     if (!result.isEmpty()) {
-        if (replaces) for (int i=0; i<replaces->size(); i++) {
-            //std::cout<<"replace \""<<(QString("$$")+(*replaces)[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
-            result=result.replace(QString("$$")+(*replaces)[i].first+QString("$$"), (*replaces)[i].second);
+        bool replaced=true;
+        int cnt=0;
+        while (replaced && (cnt<15)) {
+            replaced=false;
+            if (replaces) for (int i=0; i<replaces->size(); i++) {
+                //std::cout<<"replace \""<<(QString("$$")+(*replaces)[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
+                if (result.contains(QString("$$")+(*replaces)[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+(*replaces)[i].first+QString("$$"), (*replaces)[i].second);
+            }
+            for (int i=0; i<internal_replaces.size(); i++) {
+                //std::cout<<"replace \""<<(QString("$$")+internal_replaces[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
+                if (result.contains(QString("$$")+internal_replaces[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+internal_replaces[i].first+QString("$$"), internal_replaces[i].second);
+            }
+            for (int i=0; i<fromHTML_replaces.size(); i++) {
+                //std::cout<<"replace \""<<(QString("$$")+internal_replaces[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
+                if (result.contains(QString("$$")+fromHTML_replaces[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+fromHTML_replaces[i].first+QString("$$"), fromHTML_replaces[i].second);
+            }
+            cnt++;
         }
-        for (int i=0; i<internal_replaces.size(); i++) {
-            //std::cout<<"replace \""<<(QString("$$")+internal_replaces[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
-            result=result.replace(QString("$$")+internal_replaces[i].first+QString("$$"), internal_replaces[i].second);
-        }
+
+        // remove all unreplaces $$name$$ sequences
+        QRegExp rxSpecials("\\$\\$.+\\$\\$");
+        rxSpecials.setMinimal(true);
+        result=result.remove(rxSpecials);
     }
     return result;
 }

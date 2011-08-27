@@ -20,5 +20,26 @@
 	     - \c $$tutorials_contents$$ will be replaced by a list of plugin tutorials (complete with links as unordered list!)
 	     - \c $$help_contents$$ will be replaced by a list of plugin main help files (complete with links as unordered list!)
         .
+      - page header:	
+	     - \c $$qf_commondoc_header.start$$ starts the page header
+	     - \c $$qf_commondoc_header.end$$ ends the page header and adds a heading with the title-tag contents 
+	     - \c $$qf_commondoc_header.end_notitle$$ ends the page header
+	     - \c $$qf_commondoc_header.rdr$$ link to basic info about raw data records
+	     - \c $$qf_commondoc_header.eval$$ link to basic info about evaluations
+	     - \c $$qf_commondoc_header.extension$$ link to basic info about extensions
+	     - \c $$qf_commondoc_header.fitfunc$$ link to basic info about fit functions 
+	     - \c $$qf_commondoc_header.fitalg$$ link to basic info about fit algorithms
+	     - \c $$qf_commondoc_header.separator$$ separator between two entries in the header
+        .
+      - go back to top bar:	
+	     - \c $$qf_commondoc_backtop$$ displays a blue bar with an upward arrow that allows to jump back to the top of the page
+        .
 	.  
+	In the default header some of the metadata from the HTML page are used to display buttons to go to the next, previous and contents page:
+	\code
+<title>SPIM Plugin: Preview Windows</title>
+<link rel="prev" href="ext_spimb040_camconfig.html"> 
+<link rel="next" href="ext_spimb040_stageconfig.html"> 
+<link rel="contents" href="ext_spimb040.html"> 	
+\endcode
 */

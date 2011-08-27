@@ -100,6 +100,12 @@ class QFFitParameterWidgetWrapper : public QObject {
         void setToolTip(QString paramDescription);
         /** \brief show/hide the complete widget */
         void setVisible(bool visible);
+
+        /** \brief switch between editing parameters (!=0) and parameter ranges (==0) (allows to connect to widgets with a currentIndexChanged(int) signal) */
+        void setEditRange(int range);
+
+        /** \brief switch between editing parameters (!=0) and parameter ranges (==0) (allows to connect to widgets with a currentIndexChanged(int) signal) */
+        void unsetEditValues(int range);
     signals:
         /** \brief emited when a value changed */
         void valueChanged(QString id, double value);

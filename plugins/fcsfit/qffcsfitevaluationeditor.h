@@ -22,6 +22,7 @@
 #include <QToolBox>
 #include <QTabWidget>
 #include <QGridLayout>
+#include <QTabBar>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
@@ -125,8 +126,9 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         QLabel* labMousePosition;
         /** \brief label that displays whether the current fit parameters are global or local */
         QLabel* labFitParameters;
-        /** \brief button to toggle editing ranges  */
-        QPushButton* btnEditRanges;
+        /** \brief widget to switch between editing fit parameter values and ranges  */
+        QTabBar* tbEditRanges;
+        //QPushButton* btnEditRanges;
         /** \brief plotter for residual distribution histogram */
         JKQtPlotter* pltResidualHistogram;
         /** \brief plotter for residual autocorrelation */

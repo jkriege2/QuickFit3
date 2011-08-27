@@ -532,7 +532,7 @@ bool QFESPIMB040MainWindow::savePreview(QFExtension* extension, QFExtensionCamer
             }
             bool is32bit=false;
             for (int i=0; i<width*height; i++) {
-                if (buffer[i]&0xFFFF0000 != 0) {
+                if ((buffer[i]&0xFFFF0000) != 0) {
                     is32bit=true;
                     break;
                 }
@@ -570,8 +570,6 @@ bool QFESPIMB040MainWindow::savePreview(QFExtension* extension, QFExtensionCamer
 void QFESPIMB040MainWindow::doAcquisition() {
     if (!(widAcquisition->use1() || widAcquisition->use2())) return;
 
-    int cnt=widAcquisition->counter();
-    widAcquisition->incCounter();
 
     bool ok=true;
 
@@ -769,6 +767,7 @@ void QFESPIMB040MainWindow::doAcquisition() {
     }
 
     log_text(tr("image series acquisition DONE!\n"));
+    widAcquisition->incCounter();
 }
 
 

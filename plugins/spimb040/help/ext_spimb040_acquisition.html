@@ -3,11 +3,13 @@
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
   <title>SPIM Plugin: Image Acquisiton</title>
+  <link rel="prev" href="ext_spimb040_stageconfig.html"> 
+  <link rel="contents" href="ext_spimb040.html"> 
   </head>
   <body>
-	 <a href="ext_spimb040.html">Contents</a> | <a href="../../../help/quickfit.html">QuickFit $$version$$ basics</a><hr><br>
-	 <h1>SPIM Plugin: Image Acquisiton</h2>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="ext_spimb040.html">B040 SPIM Help</a> $$rel_tutorial$$ $$qf_commondoc_header.extension$$ $$qf_commondoc_header.end$$  
 
+	 <a name="acquisition"></a><h2><hr>Image Acquisition</h2>	 
 	 <p>This is the simples acquisition. It uses the acquisition functionality implemented in the camera drivers, so you should set the length of the image sequence and all parameters there (in the <a href="#camconfig">camera configuration</a>, use <img width="16" src=":/libqf3widgets/acquisition_configuration.png">). If you select two cameras, the acquisitions will be started at nearly the same time. If you need exact timing, you will have to implement it using the trigger functionality of your cameras!</p>
 	 <p>The data is written to files with a given prefix, which may also contain a path, e.g. <tt>c:/data/2011_08_25/cam1_%counter%</tt>. In the given example the files <tt>c:/data/2011_08_25/cam1_0.tif</tt> and <tt>c:/data/2011_08_25/cam1_0configuration.ini</tt>c ould be created where the first one contains the acquired images and the second one all the available meta-data (exposure times, objectives, ...). In the prefix strings these special sequences are replaced:
 		<ul>
@@ -19,6 +21,7 @@
 	 <p></p>
 	 <p></p>
 	 <p></p>
+	 $$qf_commondoc_backtop$$
 	 <a name="stacks"></a><h2><hr>Image Stack Acquisition</h2>
 	 <p></p>
 	 <p></p>

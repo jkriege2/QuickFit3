@@ -49,6 +49,7 @@ mkdir -p $FNAME/assets
 mkdir -p $FNAME/help
 mkdir -p $FNAME/help/pic
 cp ftarget.html $FNAME/help/${TARGETNAME}.html
+cp tutorial.html $FNAME/help/tutorial.html
 
 replace_in_all 's/QFFitAlgorithmInst/'$CLASSNAME'/g'
 replace_in_all 's/target_id/'$TARGETNAME'/g'

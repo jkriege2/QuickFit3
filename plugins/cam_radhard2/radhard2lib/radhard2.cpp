@@ -282,7 +282,7 @@ bool Radhard2::ReadImage(uint32_t* destination)
 int Radhard2::OpenUsbDevice()
 {
     struct usb_bus* bus;
-    int flag, magic, retry_count;
+    int flag;//, magic, retry_count;
 
     DEBUG("RHCS     >> DEBUG(Radhard2::OpenUsbDevice) -- Opening USB channel...");
     VERB("RHCS     >> INFO -- Opening USB channel...");

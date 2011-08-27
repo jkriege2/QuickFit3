@@ -77,6 +77,7 @@ mkdir -p $FNAME/help
 mkdir -p $FNAME/help/pic
 cp ftarget.html $FNAME/help/${TARGETNAME}.html
 cp f1.html $FNAME/help/${FITFUNCNAME}.html
+cp tutorial.html $FNAME/help/tutorial.html
 
 
 replace_in_all 's/QFFitAlgorithmInst/'$CLASSNAME'/g'
