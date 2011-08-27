@@ -90,21 +90,37 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     htmlReplaceList.append(qMakePair(QString("version_full"), QApplication::applicationVersion()));
     htmlReplaceList.append(qMakePair(QString("thanksto"), QString(QF_THANKS_TO)));
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
+    htmlReplaceList.append(qMakePair(QString("author"), QString(QF_AUTHOR)));
+    htmlReplaceList.append(qMakePair(QString("weblink"), QString(QF_WEBLINK)));
+    htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getAssetsDirectory()+QString("/help/")));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></div>")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"), tr("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">$$rel_prev$$</td><td align=\"left\">$$rel_contents$$</td><td align=\"left\">$$rel_next$$</td><td width=\"90%\" align=\"left\">$$qf_commondoc_header.default_links$$ ")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table>")));// </div>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a></div>")));
+
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"),
+         tr("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
+            "<table width=\"100%\">"
+            "<tr><td align=\"center\" colspan=\"3\">$$local_plugin_icon$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\"><b>$$local_plugin_name$$</b>  </td></tr> "
+            "<tr><td align=\"left\" rowspan=\"2\">$$rel_prev$$</td><td align=\"left\" rowspan=\"2\">$$rel_contents$$</td><td align=\"left\" rowspan=\"2\">$$rel_next$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\">$$qf_commondoc_header.default_links$$  ")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table></td></tr></table>")));// </div>")));
+
+
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <h1>$$title$$</h1>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
 
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$").arg(settings->getAssetsDirectory()+"/help/")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.simplest"), tr("back: <a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getAssetsDirectory()+"/help/")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_rdrscreen.html\">basic raw data record dialog</a>").arg(settings->getAssetsDirectory()+"/help/")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">basic evaluation dialog</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_rdrscreen.html\">Basic Raw Data Record Dialog Help</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Basic Evaluation Dialog Help</a>").arg(settings->getAssetsDirectory()+"/help/")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.extension"), tr("")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Fit Functions Help</a>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
+
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
+         tr("<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
+            "<table width=\"100%\">"
+            "<tr><td align=\"center\" ><a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" >$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
@@ -140,11 +156,11 @@ MainWindow::~MainWindow() {
 
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
-    rawDataFactory->searchPlugins(settings->getPluginDirectory());
-    evaluationFactory->searchPlugins(settings->getPluginDirectory());
-    fitFunctionManager->searchPlugins(settings->getPluginDirectory());
-    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory());
-    extensionManager->searchPlugins(settings->getPluginDirectory());
+    rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
+    evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
+    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
+    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
+    extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
 
 
     // distribute application hooks
@@ -312,7 +328,7 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     }
     text+="</table></center>";
 
-    text+=tr("<br><br><h2>Fit Algorithm Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_fitalg.html\">Fit Algorithm Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
@@ -321,7 +337,7 @@ QString MainWindow::createPluginDoc(bool docLinks) {
         text+=createPluginDocItem(docLinks, fitAlgorithmManager->getID(id), fitAlgorithmManager->getName(id), fitAlgorithmManager->getDescription(id), fitAlgorithmManager->getIconFilename(id), fitAlgorithmManager->getAuthor(id), fitAlgorithmManager->getCopyright(id), fitAlgorithmManager->getWeblink(id), fitAlgorithmManager->getPluginFilename(id), fitAlgorithmManager->getMajorVersion(id), fitAlgorithmManager->getMinorVersion(id), additional);
     }
     text+="</table></center>";
-    text+=tr("<br><br><h2>Fit Function Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
@@ -331,7 +347,7 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     }
     text+="</table></center>";
 
-    text+=tr("<br><br><h2>Extension Plugins:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_extension.html\">Extension Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
@@ -362,7 +378,7 @@ QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, 
 
 
 QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString mainitem_after) {
-    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</a></li>");
+    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
     QString text=mainitem_before.arg(tr("Raw Data Record"));
     // gather information about plugins
     for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
@@ -381,7 +397,7 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Fit Algorithm"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">Fit Algorithm</a>"));
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
@@ -389,7 +405,7 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
         if (QFile::exists(dir)) text+=item_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
-    text+=mainitem_before.arg(tr("Fit Function"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function</a>"));
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
@@ -398,7 +414,7 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Extension"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
@@ -412,7 +428,7 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
 
 
 QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainitem_after) {
-    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</a></li>");
+    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
     QString text=mainitem_before.arg(tr("Raw Data Record"));
     // gather information about plugins
     for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
@@ -431,7 +447,7 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Fit Algorithm"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">Fit Algorithm</a>"));
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
@@ -439,7 +455,7 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
         if (QFile::exists(dir)) text+=item_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
-    text+=mainitem_before.arg(tr("Fit Function"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function</a>"));
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
@@ -448,7 +464,7 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Extension"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
@@ -526,7 +542,8 @@ void MainWindow::createWidgets() {
     statusBar()->addPermanentWidget(prgMainProgress);
 
     helpWindow=new QFHTMLHelpWindow(0);
-    helpWindow->setHtmlReplacementList(&htmlReplaceList);
+    //helpWindow->setHtmlReplacementList(&htmlReplaceList);
+    helpWindow->initFromPluginServices(this);
     helpWindow->close();
 
 }
@@ -960,7 +977,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(index);
             if (rec) {
                 QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
-                edt->setHtmlReplacementList(&htmlReplaceList);
+                //edt->setHtmlReplacementList(&htmlReplaceList);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 rawDataPropEditors.append(edt);
                 edt->show();
@@ -969,7 +986,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
                 QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
-                edt->setHtmlReplacementList(&htmlReplaceList);
+                //edt->setHtmlReplacementList(&htmlReplaceList);
                 //QFEvaluationPropertyEditor* edt=rec->createPropertyEditor(settings, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 evaluationPropEditors.append(edt);
@@ -1214,4 +1231,9 @@ void MainWindow::saveProjectFirstTime() {
 
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {
     return &htmlReplaceList;
+}
+
+QList<QFPluginServices::HelpDirectoryInfo>* MainWindow::getPluginHelpList() {
+    return &pluginHelpList;
+
 }

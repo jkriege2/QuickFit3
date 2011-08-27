@@ -125,6 +125,7 @@ void QFRawDataPropertyEditor::createWidgets() {
 
 
     helpWidget=new QFHTMLHelpWindow(this);
+    helpWidget->initFromPluginServices(services);
     tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));
 
 }

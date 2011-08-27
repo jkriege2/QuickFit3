@@ -85,6 +85,8 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
 
         /** \copydoc QFPluginServices::getHTMLReplacementList() */
         virtual QList<QPair<QString, QString> >* getHTMLReplacementList();
+        /** \copydocQFPluginServices::getPluginHelpList() */
+        virtual QList<QFPluginServices::HelpDirectoryInfo>* getPluginHelpList();
         /** \copydoc QFPluginServices::getAssetsDirectory() */
         virtual QString getAssetsDirectory();
         /** \copydoc QFPluginServices::getPluginsDirectory() */
@@ -194,6 +196,7 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         QPointer<QFProject> project;
 
         QList<QPair<QString, QString> > htmlReplaceList;
+        QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
 
         QTimer newProjectTimer;
 

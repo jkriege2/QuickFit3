@@ -1,5 +1,6 @@
 
-/*! \page qf3helpsystem QuickFit 3 Online Help System
+/*! 
+    \page qf3helpsystem QuickFit 3 Online Help System
     \ingroup quickfit3
 
 	QuickFit 3 contains a simple help system based on enriched HTML pages. The application will recognize a set of specially named HTML files as main help file for a plugin. For details on filename and location information, see \ref qf3whereiswhat .
@@ -15,10 +16,12 @@
       - copyright information:	
 	     - \c $$thanksto$$ will be replaced by a list of people that our thanks go to for helping with QuickFit
 	     - \c $$copyright$$ will be replaced by a copyright note
+	     - \c $$author$$ will be replaced by QuickFit's author
+	     - \c $$weblink$$ will be replaced by the QuickFit webpage
 		. 
-      - plugin help:	
-	     - \c $$tutorials_contents$$ will be replaced by a list of plugin tutorials (complete with links as unordered list!)
-	     - \c $$help_contents$$ will be replaced by a list of plugin main help files (complete with links as unordered list!)
+      - page footer:	
+	     - \c $$qf_commondoc_footer.start$$ starts the page footer
+	     - \c $$qf_commondoc_footer.end$$ ends the page footer
         .
       - page header:	
 	     - \c $$qf_commondoc_header.start$$ starts the page header
@@ -30,6 +33,30 @@
 	     - \c $$qf_commondoc_header.fitfunc$$ link to basic info about fit functions 
 	     - \c $$qf_commondoc_header.fitalg$$ link to basic info about fit algorithms
 	     - \c $$qf_commondoc_header.separator$$ separator between two entries in the header
+        .
+      - plugin info: If in a plugin directory, these infos are available:
+	     - \c $$local_plugin_icon$$ displays plugin icon
+	     - \c $$local_plugin_iconfilename$$ displays plugin icon filename
+	     - \c $$local_plugin_name$$ displays plugin name
+	     - \c $$local_plugin_author$$ displays plugin author
+	     - \c $$local_plugin_copyright$$ displays plugin copyright message
+	     - \c $$local_plugin_weblink_url$$ displays plugin weblink url
+	     - \c $$local_plugin_weblink$$ displays plugin weblink as a link
+	     - \c $$local_plugin_id$$ displays plugin id
+	     - \c $$local_plugin_tutorial_file$$ displays plugin tutorial filename
+	     - \c $$local_plugin_tutorial_link$$ displays a link to the plugin tutorial
+	     - \c $$local_plugin_mainhelp_file$$ displays plugin main help page filename
+	     - \c $$local_plugin_mainhelp_link$$ displays a link to the plugin main help page
+	     - \c $$local_plugin_version$$ displays plugin version (major.minor)
+		 - \c $$local_plugin_typehelp_link$$ link to a helppage covering the basic plugin type
+		 - \c $$local_plugin_typehelp_file$$ file containing a helppage covering the basic plugin type
+        .
+      - lists of available plugins
+		 - \c $$list:extension:INTERFACENAME$$ makes a list (unorder HTML list) of all available extensions of type \c INTERFACENAME (can also be empty, then the list contains all extensions)
+		 - \c $$list:fitfunc:STARTSWITH$$ makes a list (unorder HTML list) of all fit functions that start with \c STARTSWITH (can also be empty, then the list contains all fit functions)
+		 - \c $$list:fitalg:$$ (<b>note the second colon!!!</b>) makes a list (unorder HTML list) of all fit algorithms
+	     - \c $$tutorials_contents$$ will be replaced by a list of plugin tutorials (complete with links as unordered list!)
+	     - \c $$help_contents$$ will be replaced by a list of plugin main help files (complete with links as unordered list!)
         .
       - go back to top bar:	
 	     - \c $$qf_commondoc_backtop$$ displays a blue bar with an upward arrow that allows to jump back to the top of the page

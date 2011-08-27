@@ -14,7 +14,7 @@ QFFitFunctionManager::~QFFitFunctionManager()
     //dtor
 }
 
-void QFFitFunctionManager::searchPlugins(QString directory) {
+void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -26,6 +26,19 @@ void QFFitFunctionManager::searchPlugins(QString directory) {
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
                 emit showLongMessage(tr("loaded fit function plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
+                // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
+                if (pluginHelpList) {
+                    QFPluginServices::HelpDirectoryInfo info;
+                    info.plugin=iRecord;
+                    info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
+                    info.mainhelp=info.directory+iRecord->getID()+QString(".html");
+                    info.tutorial=info.directory+QString("tutorial.html");
+                    if (!QFile::exists(info.mainhelp)) info.mainhelp="";
+                    if (!QFile::exists(info.tutorial)) info.tutorial="";
+                    info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
+                    info.plugintypename=tr("Fit Function Plugins");
+                    pluginHelpList->append(info);
+                }
             }
         }
     }
@@ -117,7 +130,9 @@ int QFFitFunctionManager::getMinorVersion(int id) {
 
 QString QFFitFunctionManager::getIconFilename(int i) const {
     if ((i<0) || (i>=fitPlugins.size())) return "";
-    return fitPlugins[i]->getIconFilename();
+    QString ic= fitPlugins[i]->getIconFilename();
+    if (QFile::exists(ic)) return ic;
+    else return QString(":/lib/fitfunc_icon.png");
 }
 
 

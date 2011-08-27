@@ -83,8 +83,9 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     QWidget* mainWid=new QWidget(this);
     tabMain->addTab(mainWid, tr("Imaging"));
     help=new QFHTMLHelpWindow(tabMain);
+    help->initFromPluginServices(m_pluginServices);
     tabMain->addTab(help, QIcon(":/lib/help.png"), tr("Help"));
-    help->setHtmlReplacementList(m_pluginServices->getHTMLReplacementList());
+    help->initFromPluginServices(m_pluginServices);
     help->updateHelp( extManager->getPluginHelp("ext_spimb040") );
     qDebug()<<extManager->getPluginHelp("ext_spimb040");
     tabMain->setCurrentIndex(0);

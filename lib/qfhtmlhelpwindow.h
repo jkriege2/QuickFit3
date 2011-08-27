@@ -11,6 +11,8 @@
 #include <QHBoxLayout>
 #include <QStack>
 #include <QUrl>
+#include "qfplugin.h"
+#include "qfpluginservices.h"
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
@@ -27,6 +29,9 @@ class QFHTMLHelpWindow : public QWidget {
         Q_OBJECT
 
     public:
+
+
+
         /** \brief class constructor */
         QFHTMLHelpWindow(QWidget* parent=0);
 
@@ -46,6 +51,12 @@ class QFHTMLHelpWindow : public QWidget {
         /** \brief set a pointer to an external (global) replacement list */
         void setHtmlReplacementList(QList<QPair<QString, QString> >* list);
 
+        /** \brief init with a list of plugin help directories */
+        void setPluginDirList(QList<QFPluginServices::HelpDirectoryInfo>* pluginList);
+
+        /** \brief init object from plugin servies object (then you don't need setHtmlReplacementList() and setPluginDirList() ), also stores the services object for further use */
+        void initFromPluginServices(QFPluginServices* services);
+
         /** \brief clear the INTERNAL list of replacements */
         void clearInternalReplaces() { internal_replaces.clear(); }
 
@@ -63,6 +74,8 @@ class QFHTMLHelpWindow : public QWidget {
     private:
         QList<QPair<QString, QString> >* replaces;
 
+        QList<QFPluginServices::HelpDirectoryInfo>* pluginList;
+
         QList<QPair<QString, QString> > internal_replaces;
 
         QList<QPair<QString, QString> > fromHTML_replaces;
@@ -71,6 +84,8 @@ class QFHTMLHelpWindow : public QWidget {
 
         /** \brief a label for the model name */
         QLabel* labelTitle;
+
+        QFPluginServices* m_pluginServices;
 
         QPushButton* btnPrevious;
         QPushButton* btnNext;

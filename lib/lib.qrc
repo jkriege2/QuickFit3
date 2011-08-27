@@ -25,5 +25,11 @@
         <file alias="help_prev.png">icons/help_prev.png</file>
         <file alias="help_up.png">icons/help_up.png</file>
         <file alias="help_top.png">icons/help_top.png</file>
+        <file alias="help_contents.png">icons/help_contents.png</file>
+        <file alias="help_tutorial.png">icons/help_tutorial.png</file>
+    </qresource>
+    <qresource prefix="/lib">
+        <file alias="fitalg_icon.png">icons/fitalg_icon.png</file>
+        <file alias="fitfunc_icon.png">icons/fitfunc_icon.png</file>
     </qresource>
 </RCC>

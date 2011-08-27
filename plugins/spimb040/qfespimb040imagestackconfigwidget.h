@@ -9,6 +9,7 @@
 
 class QFESPIMB040MainWindow; // forward
 class QFExtensionServices; // forward
+class QFExtension;
 
 namespace Ui {
     class QFESPIMB040ImageStackConfigWidget;

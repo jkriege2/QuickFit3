@@ -7,6 +7,7 @@
 #include <QStringList>
 #include <QMap>
 #include "programoptions.h"
+#include "qfpluginservices.h"
 
 class QFPluginFitAlgorithm; // forward
 class QFFitAlgorithm;
@@ -58,7 +59,7 @@ class QFFitAlgorithmManager : public QObject {
         virtual QString getWeblink(int i) const;
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList);
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;

@@ -7,10 +7,10 @@
 #include <QString>
 #include "qfproject.h"
 #include "programoptions.h"
+#include "qfpluginservices.h"
 
 // FORWARD DECLARATIONS
 class QFExtension; // forward
-class QFExtensionServices;
 
 /*! \brief manager class for QFExtension plugins
     \ingroup qf3extensionplugins
@@ -25,7 +25,7 @@ class QFExtensionManager : public QObject {
 
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project);

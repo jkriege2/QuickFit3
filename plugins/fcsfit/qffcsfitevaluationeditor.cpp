@@ -15,7 +15,8 @@
 #include "dlgestimatefocalvolume.h"
 #include "qmoretextobject.h"
 #include "qmodernprogresswidget.h"
-
+#include "qffitfunctionmanager.h"
+#include "qffitalgorithmmanager.h"
 
 
 
@@ -425,8 +426,10 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     splitModel->setStretchFactor(1,1);
 
     hlpAlgorithm=new QFHTMLHelpWindow(0);
+    hlpAlgorithm->initFromPluginServices(services);
     hlpAlgorithm->close();
     hlpFunction=new QFHTMLHelpWindow(0);
+    hlpFunction->initFromPluginServices(services);
     hlpFunction->close();
 
     toolbar->addAction(actSaveReport);

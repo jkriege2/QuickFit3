@@ -1,6 +1,7 @@
 #include "qffitresultsevaluation.h"
 
-
+#include "qffitfunctionmanager.h"
+#include "qffitalgorithmmanager.h"
 
 
 

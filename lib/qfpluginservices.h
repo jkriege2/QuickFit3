@@ -3,10 +3,15 @@
 
 #include <QString>
 #include <QSettings>
-#include "qffitalgorithmmanager.h"
-#include "qffitfunctionmanager.h"
-#include "programoptions.h"
-#include "qfextensionmanager.h"
+#include <QToolBar>
+#include <QMenu>
+
+class QFFitAlgorithmManager; // forward declarations
+class QFFitFunctionManager;
+class QFExtensionManager;
+class ProgramOptions;
+class QFPlugin;
+
 
 /*! \brief wrapper class that allows plugins to access basic logging services
     \ingroup qf3plugintools
@@ -40,6 +45,15 @@ class QFPluginLogService {
 */
 class QFPluginServices {
     public:
+        struct HelpDirectoryInfo {
+            QString directory;
+            QFPlugin* plugin;
+            QString tutorial;
+            QString mainhelp;
+            QString plugintypehelp;
+            QString plugintypename;
+        };
+
         /** Default destructor */
         virtual ~QFPluginServices() {}
 
@@ -77,6 +91,8 @@ class QFPluginServices {
         virtual QFFitFunctionManager* getFitFunctionManager()=0;
         /** \brief return a pointer to a fit function manager object */
         virtual QFFitAlgorithmManager* getFitAlgorithmManager()=0;
+        /** \brief returns a QFExtensionManager object that allows access to all currently loaded QFExtensions */
+        virtual QFExtensionManager* getExtensionManager()=0;
         /** \brief return a pointer to a valid QSettings object for the main settings INI file */
         virtual QSettings* getSettings()=0;
         /** \brief return a pointer to the applications ProgramOptions object */
@@ -95,6 +111,9 @@ class QFPluginServices {
          *  occurence of \c $$key and replace any such occurence by the given value.
          */
         virtual QList<QPair<QString, QString> >* getHTMLReplacementList()=0;
+        /** \brief a list of the online help directories of all plugins with metadata.
+         */
+        virtual QList<HelpDirectoryInfo>* getPluginHelpList()=0;
 };
 
 
@@ -157,9 +176,8 @@ class QFExtensionServices: public QFPluginServices {
          */
         virtual void insertToolBar(QString toolbarname, QToolBar* newToolbar)=0;
 
-        /** \brief returns a QFExtensionManager object that allows access to all currently loaded QFExtensions */
-        virtual QFExtensionManager* getExtensionManager()=0;
 };
+
 
 
 #endif // QFPLUGINSERVICES_H

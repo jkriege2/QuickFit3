@@ -45,7 +45,7 @@ class QFEvaluationItemFactory : public QObject {
 
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);

@@ -4,6 +4,12 @@
 #include <iostream>
 #include <QDir>
 #include <QDesktopServices>
+#include "qfpluginservices.h"
+#include "qffitalgorithmmanager.h"
+#include "qffitfunctionmanager.h"
+#include "qfextensionmanager.h"
+#include "qffitalgorithm.h"
+#include "qffitfunction.h"
 
 QString removeHTMLComments(const QString& data) {
      QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
@@ -16,6 +22,7 @@ QString removeHTMLComments(const QString& data) {
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
     QWidget(parent)
 {
+    m_pluginServices=NULL;
     searchPath=QApplication::applicationDirPath();
     replaces=NULL;
     m_baseFont=font();
@@ -64,6 +71,8 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
 
     Qt::WindowFlags flags = Qt::Tool | Qt::WindowStaysOnTopHint;
     setWindowFlags(flags);
+    setWindowTitle(tr("QuickFit Online-Help"));
+    setWindowIcon(QIcon(":/lib/help.png"));
 }
 
 void QFHTMLHelpWindow::readSettings(QSettings& settings, QString prefix) {
@@ -279,7 +288,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         QString rel=rxLink.cap(1).toLower();
         QString href=rxLink.cap(2);
         if (!href.isEmpty()) {
-            if (rel=="contents") fromHTML_replaces.append(qMakePair(QString("rel_contents"), tr("<a href=\"%1\">Contents</a> ").arg(href)));
+            if (rel=="contents") fromHTML_replaces.append(qMakePair(QString("rel_contents"), tr("<a href=\"%1\"><img src=\":/lib/help/help_contents.png\" border=\"0\"><!--Contents--></a> ").arg(href)));
             if (rel=="index") fromHTML_replaces.append(qMakePair(QString("rel_index"), tr("<a href=\"%1\">Index</a> ").arg(href)));
             if (rel=="copyright") fromHTML_replaces.append(qMakePair(QString("rel_copyright"), tr("<a href=\"%1\">Copyright</a> ").arg(href)));
             if (rel=="top") fromHTML_replaces.append(qMakePair(QString("rel_top"), tr("<a href=\"%1\">Top</a> ").arg(href)));
@@ -305,27 +314,168 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), QString(" ")));
     }
 
-    // handle replaces
+    // collectspecial replaces based on current directory
+    bool foundPlugin=false;
+    if (pluginList) {
+        for (int i=0; i<pluginList->size(); i++) {
+            if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"%1\">").arg(pluginList->at(i).plugin->getIconFilename())));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), pluginList->at(i).plugin->getIconFilename()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), pluginList->at(i).plugin->getAuthor()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), pluginList->at(i).plugin->getCopyright()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), pluginList->at(i).plugin->getWeblink()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), tr("<a href=\"%1\">Plugin Webpage</a>").arg(pluginList->at(i).plugin->getWeblink())));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pluginList->at(i).plugin->getID()));
+                if (!pluginList->at(i).tutorial.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\">Plugin Tutorial</a>").arg(pluginList->at(i).tutorial)));
+                }
+                if (!pluginList->at(i).mainhelp.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_file"), pluginList->at(i).mainhelp));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\">Plugin Help</a>").arg(pluginList->at(i).mainhelp)));
+                }
+                int major=0, minor=0;
+                pluginList->at(i).plugin->getVersion(major, minor);
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_version"), QString("%1.%2").arg(major).arg(minor)));
+                if (!pluginList->at(i).plugintypehelp.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_typehelp_file"), pluginList->at(i).plugintypehelp));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_typehelp_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\">%2</a>").arg(pluginList->at(i).plugintypehelp).arg(pluginList->at(i).plugintypename)));
+                }
+                foundPlugin=true;
+                break;
+            }
+        }
+
+    }
+
+    if (!foundPlugin) {
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\":/icon.png\">")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString(":/icon.png")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), tr("QuickFit $$version$$: Online-Help")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), QString("$$author$$")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("$$copyright$$")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), QString("$$weblink$$")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), tr("<a href=\"$$weblink$$\">QuickFit Webpage</a>")));
+    }
+
+    // handle replaces, also handles special commands, like $$list:...$$
     if (!result.isEmpty()) {
+        if (!result.contains("$$qf_commondoc_footer")) {
+            result=result.replace(QString("</body>"), QString("<br><br><br><br><br>$$qf_commondoc_footer.start$$ $$qf_commondoc_footer.end$$</body>"));
+        }
+        if (!result.contains("$$qf_commondoc_header")) {
+            result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
+        }
         bool replaced=true;
         int cnt=0;
         while (replaced && (cnt<15)) {
             replaced=false;
             if (replaces) for (int i=0; i<replaces->size(); i++) {
-                //std::cout<<"replace \""<<(QString("$$")+(*replaces)[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
                 if (result.contains(QString("$$")+(*replaces)[i].first+QString("$$"))) replaced=true;
                 result=result.replace(QString("$$")+(*replaces)[i].first+QString("$$"), (*replaces)[i].second);
             }
             for (int i=0; i<internal_replaces.size(); i++) {
-                //std::cout<<"replace \""<<(QString("$$")+internal_replaces[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
                 if (result.contains(QString("$$")+internal_replaces[i].first+QString("$$"))) replaced=true;
                 result=result.replace(QString("$$")+internal_replaces[i].first+QString("$$"), internal_replaces[i].second);
             }
             for (int i=0; i<fromHTML_replaces.size(); i++) {
-                //std::cout<<"replace \""<<(QString("$$")+internal_replaces[i].first).toStdString()<<"\" by \""<<(*replaces)[i].second.toStdString()<<"\"\n";
                 if (result.contains(QString("$$")+fromHTML_replaces[i].first+QString("$$"))) replaced=true;
                 result=result.replace(QString("$$")+fromHTML_replaces[i].first+QString("$$"), fromHTML_replaces[i].second);
             }
+            QRegExp rxList("\\$\\$list\\:([a-z]+)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            rxList.setMinimal(true);
+            int count = 0;
+            int pos = 0;
+            while ((pos = rxList.indexIn(result, pos)) != -1) {
+                QString list=rxList.cap(1).toLower().trimmed();
+                QString filter=rxList.cap(2).trimmed();
+                qDebug()<<pos<<list<<filter;
+                if (m_pluginServices) {
+                    if (list=="fitalg") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                        for (int i=0; i<m_pluginServices->getFitAlgorithmManager()->pluginCount(); i++) {
+                            int id=i;
+                            QString aID="";
+                            QStringList fa=m_pluginServices->getFitAlgorithmManager()->getIDList(id);
+                            QString dir=m_pluginServices->getFitAlgorithmManager()->getPluginHelp(id);
+                            QString name=m_pluginServices->getFitAlgorithmManager()->getName(id);
+                            QString icon=m_pluginServices->getFitAlgorithmManager()->getIconFilename(id);
+                            for (int j=0; j<fa.size(); j++) {
+                                aID=fa[j];
+                                QFFitAlgorithm* a=m_pluginServices->getFitAlgorithmManager()->createAlgorithm(aID);
+                                if (a) {
+                                    name=a->name();
+                                    dir=dir=m_pluginServices->getFitAlgorithmManager()->getPluginHelp(id, aID);
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="fitfunc") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                        for (int i=0; i<m_pluginServices->getFitFunctionManager()->pluginCount(); i++) {
+                            int id=i;
+                            QString aID="";
+                            QString dir=m_pluginServices->getFitFunctionManager()->getPluginHelp(id);
+                            QString name=m_pluginServices->getFitFunctionManager()->getName(id);
+                            QString icon=m_pluginServices->getFitFunctionManager()->getIconFilename(id);
+                            QMap<QString, QFFitFunction*> models= m_pluginServices->getFitFunctionManager()->getModels(filter);
+                            QMapIterator<QString, QFFitFunction*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                QFFitFunction* a=j.value();
+                                if (a) {
+                                    name=a->name();
+                                    dir=dir=m_pluginServices->getFitFunctionManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="extension") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                        QStringList ids=m_pluginServices->getExtensionManager()->getIDList();
+                        for (int i=0; i<ids.size(); i++) {
+                            QString id=ids[i];
+                            QString dir=m_pluginServices->getExtensionManager()->getPluginHelp(id);
+                            QString name=m_pluginServices->getExtensionManager()->getName(id);
+                            QString icon=m_pluginServices->getExtensionManager()->getIconFilename(id);
+                            if (filter.isEmpty() || ((!filter.isEmpty()) && (m_pluginServices->getExtensionManager()->getQObjectInstance(id)->inherits(filter.toAscii().data())))) {
+                                if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                else text+=item_template_nolink.arg(icon).arg(name);
+                            }
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    }
+                }
+
+                ++count;
+                pos += rxList.matchedLength();
+            }
+
+
+
+
             cnt++;
         }
 
@@ -339,6 +489,16 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 void QFHTMLHelpWindow::setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
     replaces=list;
+}
+
+void QFHTMLHelpWindow::setPluginDirList(QList<QFPluginServices::HelpDirectoryInfo>* pluginList) {
+    this->pluginList=pluginList;
+}
+
+void QFHTMLHelpWindow::initFromPluginServices(QFPluginServices* services) {
+    m_pluginServices=services;
+    setHtmlReplacementList(services->getHTMLReplacementList());
+    setPluginDirList(services->getPluginHelpList());
 }
 
 void QFHTMLHelpWindow::updateButtons() {

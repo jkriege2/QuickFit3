@@ -9,6 +9,7 @@
 #include "qffitfunction.h"
 #include "qfpluginfitfunction.h"
 #include "programoptions.h"
+#include "qfpluginservices.h"
 
 /*! \brief this class manages the available fitting functions
     \ingroup qf3lib_fitting
@@ -62,7 +63,7 @@ class QFFitFunctionManager : public QObject {
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID);
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList);
 
         /** \brief return a list of the models which start with the specified string
          *         all instance are newly created with the given parent in every call! */

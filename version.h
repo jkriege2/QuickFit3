@@ -12,4 +12,8 @@
 
 #define QF_COPYRIGHT "&copy; 2010-2011 by Jan Krieger"
 
+#define QF_AUTHOR "Jan Krieger"
+
+#define QF_WEBLINK "http://www.dkfz.de/Macromol/quickfit/"
+
 #endif //VERSION_H

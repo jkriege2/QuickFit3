@@ -8,11 +8,14 @@
   <link rel="contents" href="ext_spimb040.html"> 
   </head>
   <body>
-	 $$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="ext_spimb040.html">B040 SPIM Help</a> $$rel_tutorial$$ $$qf_commondoc_header.extension$$ $$qf_commondoc_header.end$$  
+	 $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 	 
 	 <a name="stages"></a>
-	 <p>Here you can select one available stage for every direction (x, y, z). After selecting the stages you will have to connect to them (<img width="16" src=":/spimb040/stageconnect.png">). You can also open a configuration dialog for every stage (<img width="16" src=":/spimb040/stagesettings.png">). Below the stages you can en-/disable a possibly available joystick and perform absolute or relative movements. For the movements you can supply the new position (<i>abs</i>olute movement) or relative distances (<i>rel</i>ative movement in the three edit fields. For the joystick you can set the maximum available velocity in micrometer/second. Below that the status of the stages (current positions, velocities and status as image: <img width="16" src=":/spimb040/stage_ready.png">: ready, <img width="16" src=":/spimb040/stage_moving.png">: moving, <img width="16" src=":/spimb040/stage_error.png">: error, <img width="16" src=":/spimb040/stage_disconnected.png">: disconnected) are displayed.</p>
+	 <p>Here you can select one available <a href="$$mainhelpdir$$ext_stages.html">Motion Stage</a> for every direction (x, y, z). After selecting the stages you will have to connect to them (<img width="16" src=":/spimb040/stageconnect.png">). You can also open a configuration dialog for every stage (<img width="16" src=":/spimb040/stagesettings.png">). Below the stages you can en-/disable a possibly available joystick and perform absolute or relative movements. For the movements you can supply the new position (<i>abs</i>olute movement) or relative distances (<i>rel</i>ative movement in the three edit fields. For the joystick you can set the maximum available velocity in micrometer/second. Below that the status of the stages (current positions, velocities and status as image: <img width="16" src=":/spimb040/stage_ready.png">: ready, <img width="16" src=":/spimb040/stage_moving.png">: moving, <img width="16" src=":/spimb040/stage_error.png">: error, <img width="16" src=":/spimb040/stage_disconnected.png">: disconnected) are displayed.</p>
 	 <p></p>
+	<p>You can use any motion stage that is installed as a <a href="$$mainhelpdir$$ext_stages.html">motion stage plugin</a> to QuickFit:
+	$$list:extension:QFExtensionLinearStage$$
+	</p>
 	 <p></p>
 	 
   </body>

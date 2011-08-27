@@ -362,6 +362,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
     helpWidget=new QFHTMLHelpWindow(this);
+    helpWidget->initFromPluginServices(services);
     tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));
 }
 
