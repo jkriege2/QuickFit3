@@ -9,62 +9,62 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 
 <p>This class implements a 3D diffusion model for the fitting routines in QuickFit3. This model has one diffusing and one non-fluorescent species, plus it implements analytical derivatives. The model may be denoted as: </p>
 <p>
-<img alt="\[ G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="form_29.png">
+<img alt="\[ G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="./pic/form_29.png">
 </p>
 <p> The parameters are: </p>
 <ul>
-<li><img alt="$ G_\infty $" src="form_4.png">: offset of the correlation function</li>
-<li><img alt="$ N $" src="form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
-<li><img alt="$ \Theta_{trip} $" src="form_30.png">: fraction of the particles in the triplet state</li>
-<li><img alt="$ \tau_{trip} $" src="form_31.png">: decay time of the triplet state</li>
-<li><img alt="$ \tau_{diff} $" src="form_32.png">: diffusion decay time</li>
-<li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
-<li><img alt="$ w_{xy} $" src="form_12.png">: lateral half axis of the focus gaussian</li>
-<li><img alt="$ z_0 $" src="form_13.png">: longitudinal half axis of the focus gaussian</li>
+<li><img alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>
+<li><img alt="$ N $" src="./pic/form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><img alt="$ \Theta_{trip} $" src="./pic/form_30.png">: fraction of the particles in the triplet state</li>
+<li><img alt="$ \tau_{trip} $" src="./pic/form_31.png">: decay time of the triplet state</li>
+<li><img alt="$ \tau_{diff} $" src="./pic/form_32.png">: diffusion decay time</li>
+<li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
+<li><img alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
+<li><img alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
 </ul>
-<p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="form_12.png"> of the laser focus (xy plane) is known, as: </p>
+<p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
 <p>
-<img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="form_20.png">
+<img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_20.png">
 </p>
-<p> where <img alt="$ \tau_D $" src="form_21.png"> is the diffusion time. Also the effective focal volume <img alt="$ V_{eff} $" src="form_22.png"> is calculated: </p>
+<p> where <img alt="$ \tau_D $" src="./pic/form_21.png"> is the diffusion time. Also the effective focal volume <img alt="$ V_{eff} $" src="./pic/form_22.png"> is calculated: </p>
 <p>
-<img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="form_14.png">
+<img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_14.png">
 </p>
 <p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
 <p>
-<img alt="\[ C=\frac{N}{V_{eff}} \]" src="form_15.png">
+<img alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_15.png">
 </p>
 <p>The plugin also calculates some parameter errors: </p>
 <p>
-<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="form_16.png">
+<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_16.png">
 </p>
  <p>
-<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="form_23.png">
+<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_23.png">
 </p>
  <p>
-<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="form_17.png">
+<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_17.png">
 </p>
  <p>
-<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="form_18.png">
+<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_18.png">
 </p>
-<p>The analytical derivatives of <img alt="$ g(\tau) $" src="form_33.png"> are:</p>
+<p>The analytical derivatives of <img alt="$ g(\tau) $" src="./pic/form_33.png"> are:</p>
 <p>
-<img alt="\[ \frac{\partial g}{\partial N}= -\frac{1}{N^2}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="form_34.png">
+<img alt="\[ \frac{\partial g}{\partial N}= -\frac{1}{N^2}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="./pic/form_34.png">
 </p>
  <p>
-<img alt="\[ \frac{\partial g}{\partial \Theta_{trip}}= \frac{1}{N}\cdot\left(\frac{\mathrm{e}^{-\tau/\tau_{trip}}}{(1-\Theta_{trip})^2}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="form_35.png">
+<img alt="\[ \frac{\partial g}{\partial \Theta_{trip}}= \frac{1}{N}\cdot\left(\frac{\mathrm{e}^{-\tau/\tau_{trip}}}{(1-\Theta_{trip})^2}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="./pic/form_35.png">
 </p>
  <p>
-<img alt="\[ \frac{\partial g}{\partial \tau_{trip}}= -\frac{1}{N}\cdot\left(\frac{\Theta_{trip}\cdot \tau\cdot \mathrm{e}^{-\tau/\tau_{trip}}}{(1-\Theta_{trip})\cdot \tau_{trip}^2}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="form_36.png">
+<img alt="\[ \frac{\partial g}{\partial \tau_{trip}}= -\frac{1}{N}\cdot\left(\frac{\Theta_{trip}\cdot \tau\cdot \mathrm{e}^{-\tau/\tau_{trip}}}{(1-\Theta_{trip})\cdot \tau_{trip}^2}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="./pic/form_36.png">
 </p>
  <p>
-<img alt="\[ \frac{\partial g}{\partial \tau_{diff}}= \frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot \left\{\frac{\tau}{\tau_{diff}^2}\left(1+\frac{\tau}{\tau_{diff}}\right)^{-2}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} + \frac{\tau}{2\gamma^2\tau_{diff}^2}\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-3/2}\right\} \]" src="form_37.png">
+<img alt="\[ \frac{\partial g}{\partial \tau_{diff}}= \frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot \left\{\frac{\tau}{\tau_{diff}^2}\left(1+\frac{\tau}{\tau_{diff}}\right)^{-2}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} + \frac{\tau}{2\gamma^2\tau_{diff}^2}\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-3/2}\right\} \]" src="./pic/form_37.png">
 </p>
  <p>
-<img alt="\[ \frac{\partial g}{\partial \gamma}= \frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-3/2}\cdot\frac{\tau}{\gamma^3\tau_{diff}} \]" src="form_38.png">
+<img alt="\[ \frac{\partial g}{\partial \gamma}= \frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-3/2}\cdot\frac{\tau}{\gamma^3\tau_{diff}} \]" src="./pic/form_38.png">
 </p>
  <p>
-<img alt="\[ \frac{\partial g}{\partial G_\infty}= 1 \]" src="form_39.png">
+<img alt="\[ \frac{\partial g}{\partial G_\infty}= 1 \]" src="./pic/form_39.png">
 </p>
 
 

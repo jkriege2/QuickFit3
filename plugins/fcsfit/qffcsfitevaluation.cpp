@@ -102,6 +102,11 @@ void QFFCSFitEvaluation::setFitResultValues(QFRawDataRecord* r, int run, double*
 void QFFCSFitEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int run, double* values, double* errors) {
     setFitResultValuesVisible(r, getEvaluationResultID(run),  values, errors);
 }
+
+void QFFCSFitEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int run, double* values, double* errors, const QString& group) {
+    setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(run),  values, errors, group);
+}
+
 double QFFCSFitEvaluation::getFitValue(QFRawDataRecord* r, int run, const QString& id) {
     /*QMap<QString, double> specials;
     QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
@@ -142,7 +147,21 @@ int QFFCSFitEvaluation::getRunFromEvaluationResultID(const QString& resultID) {
     return -1;
 }
 
+void QFFCSFitEvaluation::setFitResultGroup(QFRawDataRecord* r, int run, const QString& parameterID, const QString& group) {
+    setFitResultGroup(r, getEvaluationResultID(run), parameterID, group);
+}
 
+void QFFCSFitEvaluation::setFitResultLabel(QFRawDataRecord* r, int run, const QString& parameterID, const QString& label, const QString& label_richtext) {
+    setFitResultLabel(r, getEvaluationResultID(run), parameterID, label, label_richtext);
+}
+
+void QFFCSFitEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, int run, const QString& group) {
+    setFitResultEvaluationGroup(r, getEvaluationResultID(run), group);
+}
+
+void QFFCSFitEvaluation::setFitResultEvaluationDescription(QFRawDataRecord* r, int run, const QString& description) {
+    setFitResultEvaluationDescription(r, getEvaluationResultID(run), description);
+}
 
 void QFFCSFitEvaluation::setFitFix(QFRawDataRecord* r, int run, const QString& id, bool fix) {
     setFitFix(r, getEvaluationResultID(run), id, fix);

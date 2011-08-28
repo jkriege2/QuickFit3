@@ -490,6 +490,28 @@ void QFFitResultsEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, const
     }
 }
 
+void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group) {
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction();
+        if (f) {
+            for (int i=0; i<f->paramCount(); i++) {
+                if (f->isParameterVisible(i, values)) {
+                    QString pid=f->getParameterID(i);
+                    //setFitResultValue(pid, values[i], errors[i]);
+                    QString unit=f->getDescription(pid).unit;
+                    QString fpid=getFitParamID(pid);
+                    r->resultsSetNumberError(resultID, fpid, values[i], errors[i], unit);
+                    r->resultsSetGroup(resultID, fpid, group);
+                    r->resultsSetLabel(resultID, fpid, f->getDescription(pid).name, f->getDescription(pid).label);
+                }
+            }
+            emit propertiesChanged();
+            emit resultsChanged();
+        }
+
+    }
+}
+
 bool QFFitResultsEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) {
     return false;
 }
@@ -593,6 +615,62 @@ bool QFFitResultsEvaluation::getFitFix(QFRawDataRecord* r, const QString& result
         if (r->resultsExists(en, pid)) res=r->resultsGetAsDouble(en, pid);
     }
     return res;
+}
+
+void QFFitResultsEvaluation::setFitResultGroup(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group) {
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction();
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+        }
+        r->resultsSetGroup(resultID, getFitParamID(parameterID), group);
+        emit resultsChanged();
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext) {
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction();
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+        }
+        r->resultsSetLabel(resultID, getFitParamID(parameterID), label, label_richtext);
+        emit resultsChanged();
+    }
+}
+
+
+void QFFitResultsEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, const QString& resultID, const QString& group) {
+    if (r!=NULL) {
+        r->resultsSetEvaluationGroup(resultID, group);
+        emit resultsChanged();
+    }
+}
+
+
+void QFFitResultsEvaluation::setFitResultEvaluationDescription(QFRawDataRecord* r, const QString& resultID, const QString& description) {
+    if (r!=NULL) {
+        r->resultsSetEvaluationDescription(resultID, description);
+        emit resultsChanged();
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultGroup(const QString& parameterID, const QString& group) {
+    setFitResultGroup(getHighlightedRecord(), getEvaluationResultID(), parameterID, group);
+}
+
+void QFFitResultsEvaluation::setFitResultLabel(const QString& parameterID, const QString& label, const QString& label_richtext) {
+    setFitResultLabel(getHighlightedRecord(), getEvaluationResultID(), parameterID, label, label_richtext);
+}
+
+void QFFitResultsEvaluation::setFitResultEvaluationGroup(const QString& group) {
+    setFitResultEvaluationGroup(getHighlightedRecord(), getEvaluationResultID(), group);
+}
+
+void QFFitResultsEvaluation::setFitResultEvaluationDescription(const QString& description) {
+    setFitResultEvaluationDescription(getHighlightedRecord(), getEvaluationResultID(), description);
 }
 
 
@@ -1028,3 +1106,4 @@ double QFFitResultsEvaluation::getFitMax(const QString& id) {
     //std::cout<<"getFitMax("<<id.toStdString()<<") = "<<res<<"\n";
     return res;
 }
+

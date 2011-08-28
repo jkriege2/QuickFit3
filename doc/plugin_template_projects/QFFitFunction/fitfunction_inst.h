@@ -14,17 +14,16 @@ x#ifndef HEADER_H
 /*! \brief plugin class for Fit Functions
     \ingroup doxygen_GROUPNAME
 */
-class QFPFitFunctionInst : public QObject, public QFPluginFitFunction {
+class QFFitAlgorithmInst : public QObject, public QFPluginFitFunction {
         Q_OBJECT
         Q_INTERFACES(QFPluginFitFunction)
         Q_INTERFACES(QFPlugin)
     public:
-        QF_PLUGIN
 
         /** Default constructor */
-        QFPFitFunctionInst(QObject* parent=NULL) {}
+        QFFitAlgorithmInst(QObject* parent=NULL) {}
         /** Default destructor */
-        virtual ~QFPFitFunctionInst() {}
+        virtual ~QFFitAlgorithmInst() {}
 
         /** \brief name for the plugin */
         virtual QString getName() const {

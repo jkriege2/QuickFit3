@@ -101,6 +101,69 @@ public:
 
 
 
+    /** \brief sets the group of the given fit result
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param group group to be stored
+     */
+    virtual void setFitResultGroup(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group);
+
+    /** \brief sets the label of the given fit result
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param label label to be stored
+     *  \param label_richtext richtext-ed label to be stored
+     */
+    virtual void setFitResultLabel(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext=QString(""));
+
+    /** \brief sets the group of the given evaluation result ID \a resultID
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param group group to be stored
+     */
+    virtual void setFitResultEvaluationGroup(QFRawDataRecord* r, const QString& resultID, const QString& group);
+
+    /** \brief sets the description of the given evaluation result ID \a resultID
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param description description to be stored
+     */
+    virtual void setFitResultEvaluationDescription(QFRawDataRecord* r, const QString& resultID, const QString& description);
+
+    /** \brief sets the group of the current fit result
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param group group to be stored
+     */
+    virtual void setFitResultGroup(const QString& parameterID, const QString& group);
+
+    /** \brief sets the label of the current fit result
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+     *  \param label label to be stored
+     *  \param label_richtext richtext-ed label to be stored
+     */
+    virtual void setFitResultLabel(const QString& parameterID, const QString& label, const QString& label_richtext=QString(""));
+
+    /** \brief sets the group of the current evaluation result ID \a resultID
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param group group to be stored
+     */
+    virtual void setFitResultEvaluationGroup(const QString& group);
+
+    /** \brief sets the description of the current evaluation result ID \a resultID
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param description description to be stored
+     */
+    virtual void setFitResultEvaluationDescription(const QString& description);
+
+
+
+
 
 
     /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
@@ -204,6 +267,15 @@ public:
      *  \param errors errors to be stored
      */
     virtual void setFitResultValuesVisible(QFRawDataRecord* r, const QString& resultID, double* values, double* errors);
+
+    /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord.
+     *          Also imports the fit parameter description from the QFFitFunction and sets the parameter group to the given value
+     *  \param r the record to adress
+     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param values values to be stored
+     *  \param errors errors to be stored
+     */
+    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group);
 
 
 

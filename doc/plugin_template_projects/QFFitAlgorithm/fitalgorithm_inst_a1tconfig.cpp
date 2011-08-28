@@ -1,7 +1,7 @@
-#include "fitalgorithm_instconfig.h"
+#include "fitalgorithm_inst_a1config.h"
 
 
-QFFitAlgorithmInstConfigDialog::QFFitAlgorithmInstConfigDialog(QWidget *parent):
+QFFitAlgorithmInst_A1ConfigDialog::QFFitAlgorithmInst_A1ConfigDialog(QWidget *parent):
     QDialog(parent)
 {
     // setup widgets
@@ -38,7 +38,7 @@ QFFitAlgorithmInstConfigDialog::QFFitAlgorithmInstConfigDialog(QWidget *parent):
 }
 
 
-void QFFitAlgorithmInstConfigDialog::setParamName(double value, double inc){
+void QFFitAlgorithmInst_A1ConfigDialog::setParamName(double value, double inc){
     spinParam->setValue(value);
     spinParam->setSingleStep(inc);
 }

@@ -12,10 +12,12 @@ LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += fitalgorithm_inst.h \
-           fitalgorithm_instconfig.h
+           fitalgorithm_inst_a1config.h \
+		   fitalgorithm_inst_a1.h 
 
 SOURCES += fitalgorithm_inst.cpp \
-           fitalgorithm_instconfig.cpp
+           fitalgorithm_inst_a1config.cpp \
+		   fitalgorithm_inst_a1.cpp
 
 FORMS +=
 

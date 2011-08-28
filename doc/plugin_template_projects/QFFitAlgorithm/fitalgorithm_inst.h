@@ -11,30 +11,6 @@
 
 
 
-/*! \brief QQFFitAlgorithm implementation
-    \ingroup doxygen_GROUPNAME
-
-
-*/
-class QFFitAlgorithmInst: public QFFitAlgorithm {
-    protected:
-
-        /** \copydoc QFFitAlgorithm::intFit() */
-        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax);
-
-
-    public:
-        /** \brief class constructor */
-        QFFitAlgorithmInst();
-        /** \copydoc QFFitAlgorithm::name() */
-        virtual QString name() const { return QObject::tr("levmar: Levenberg-Marquardt Fitting Algorithm with box constraints"); };
-        /** \copydoc QFFitAlgorithm::id() */
-        virtual QString id() const { return QString("target_id"); };
-        /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
-        virtual bool get_supportsBoxConstraints() const { return true; };
-        /** \copydoc QFFitAlgorithm::displayConfig() */
-        virtual bool displayConfig();
-};
 
 
 
@@ -101,17 +77,10 @@ class QFFitAlgorithmInstPlugin : public QObject, public QFPluginFitAlgorithm {
         };
 
         /** \brief return list of plugin IDs */
-        virtual QStringList getIDs() const {
-            QStringList sl;
-            sl<<"target_id";
-            return sl;
-        }
+        virtual QStringList getIDs() const;
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
-        virtual QFFitAlgorithm* get(QString id, QObject* parent) const {
-            if (id=="target_id") return new QFFitAlgorithmInst();
-            return NULL;
-        }
+        virtual QFFitAlgorithm* get(QString id, QObject* parent) const;
     private:
 };
 

@@ -53,7 +53,9 @@ HEADERS += dlgnewproperty.h \
            qfevaluationresultsmodel.h \
            qfplugin.h \
            qflib_version.h \
-           csvtools.h
+           csvtools.h \
+    qtriple.h \
+    qvisiblehandlesplitter.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -81,7 +83,8 @@ SOURCES += dlgnewproperty.cpp \
            qffitalgorithmthreaddedfit.cpp \
            qfextensionmanager.cpp \
            qfevaluationresultsmodel.cpp \
-           csvtools.cpp
+           csvtools.cpp \
+    qvisiblehandlesplitter.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui

@@ -15,9 +15,9 @@
       \f[ w_{xy}=\sqrt{4\cdot D\cdot\tau_D\cdot10^{-6}}\cdot10^{3} \f]
       \f[ \Delta w_{xy}=\sqrt{\frac{\tau_D\cdot10^{-6}\cdot\Delta D^2}{D}+\frac{D\cdot\Delta\tau_D^2\cdot10^{-6}}{\tau_D}}\cdot10^{3} \f]
     If a concentration \f$ (C\pm\Delta C) \f$ in mMolar is known, this dialog calculates:
-      \f[ w_{xy}=\sqrt[3]{\frac{N}{6.022\cdot\pi^{3/2}\cdot\gamma\cdot C}\cdot10^{10}} \f]
+      \f[ w_{xy}=\sqrt[3]{\frac{N}{6.02214179\cdot\pi^{3/2}\cdot\gamma\cdot C}\cdot10^{10}} \f]
       \f[ \Delta w_{xy}=\sqrt{\left(\Delta N\cdot\frac{h}{3\cdot(N\cdot h)^{2/3}}\right)^2 + \left(\Delta\gamma\cdot\frac{N\cdot h}{3\cdot\gamma\cdot(N\cdot h)^{2/3}}\right)^2 + \left(\Delta C\cdot\frac{N\cdot h}{3\cdot C\cdot(N\cdot h)^{2/3}}\right)^2} \f]
-      where \f[ h:=\frac{10^{10}}{\pi^{3/2}\cdot\gamma\cdot C\cdot 6.022} \f]
+      where \f[ h:=\frac{10^{10}}{\pi^{3/2}\cdot\gamma\cdot C\cdot 6.02214179} \f]
 */
 
 class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolume {

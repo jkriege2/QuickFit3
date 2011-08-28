@@ -14,7 +14,9 @@ class QFFitAlgorithmInst_F1: public QFFitFunction {
         QFFitAlgorithmInst_F1();
         virtual ~QFFitAlgorithmInst_F1() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString(""); };
+        virtual QString name() const { return QString("long fit function name"); };
+        /** \copydoc QFFitFunction::shortName() */
+        virtual QString shortName() const { return QObject::tr("short name"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("ff_id"); };
 

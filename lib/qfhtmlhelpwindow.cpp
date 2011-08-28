@@ -85,7 +85,16 @@ void QFHTMLHelpWindow::writeSettings(QSettings& settings, QString prefix) {
      settings.setValue(prefix+"htmlhelpwin.pos", pos());
 }
 
-void QFHTMLHelpWindow::updateHelp(QString title, QString filename) {
+void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
+    QString filename=filename1;
+    QString fragment="";
+    int hashpos=filename1.indexOf("#");
+    if (hashpos>=0) {
+        filename=filename1.left(hashpos);
+        fragment=filename1.mid(hashpos);
+    }
+    //qDebug()<<filename<<fragment;
+
     m_home=filename;
     searchPath=QFileInfo(filename).canonicalPath();
     //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
@@ -107,6 +116,9 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename) {
     //QStringList(QApplication::applicationDirPath()+"/models/help/"+QFileInfo(model->getFilename()).completeBaseName()+"/")
     //std::cout<<QString(QApplication::applicationDirPath()+"/models/help/"+QFileInfo(model->getFilename()).completeBaseName()+"/").toStdString()<<std::endl;
     descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
+    if (!fragment.isEmpty()) {
+        descriptionBrowser->scrollToAnchor(fragment);
+    }
 
 
     //descriptionBrowser->setSource(QFileInfo(filename).fileName());
@@ -115,7 +127,16 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename) {
 }
 
 
-void QFHTMLHelpWindow::updateHelp(QString filename) {
+void QFHTMLHelpWindow::updateHelp(QString filename1) {
+    QString filename=filename1;
+    QString fragment="";
+    int hashpos=filename1.indexOf("#");
+    if (hashpos>=0) {
+        filename=filename1.left(hashpos);
+        fragment=filename1.mid(hashpos);
+    }
+    //qDebug()<<filename<<fragment;
+
     m_home=filename;
     searchPath=QFileInfo(filename).canonicalPath();
     //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
@@ -139,6 +160,9 @@ void QFHTMLHelpWindow::updateHelp(QString filename) {
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
     labelTitle->setVisible(!title.isEmpty());
+    if (!fragment.isEmpty()) {
+        descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+    }
 
     connect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
 }
@@ -165,16 +189,23 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
     //qDebug()<<link.toString();
     QString linkstr=link.toString();
     QString scheme=link.scheme().toLower();
-    QDir spd(searchPath);
-    QString cl=spd.cleanPath(spd.absoluteFilePath(link.toString()));
-    QString s=spd.absoluteFilePath(cl); //absoluteFilePath
-    searchPath=QFileInfo(s).absolutePath();
 
     if (linkstr.startsWith("#")) {
         descriptionBrowser->scrollToAnchor(linkstr.right(linkstr.size()-1));
+        return;
     }
 
-    if ((scheme!="http") && (scheme!="https") && (scheme!="ftp") && (scheme!="ftps") && (scheme!="mailto") && (scheme!="sftp") && (scheme!="svn") && (scheme!="ssh") && QFile::exists(QFileInfo(s).absoluteFilePath())) {
+    if ((scheme!="http") && (scheme!="https") && (scheme!="ftp") && (scheme!="ftps") && (scheme!="mailto") && (scheme!="sftp") && (scheme!="svn") && (scheme!="ssh") /*&& QFile::exists(QFileInfo(s).absoluteFilePath())*/) {
+
+        QDir spd(searchPath);
+        QString filename=link.toString(QUrl::RemoveFragment);
+        QString fragment=link.fragment();
+        QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
+        QString s=spd.absoluteFilePath(cl); //absoluteFilePath
+        searchPath=QFileInfo(s).absolutePath();
+
+        //qDebug()<<filename<<fragment;
+
         //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
         descriptionBrowser->setSearchPaths(QStringList(searchPath));
         //descriptionBrowser->setSource(QFileInfo(s).fileName());
@@ -186,12 +217,24 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
         history.push(HistoryEntry(s, descriptionBrowser->documentTitle()));
         history_idx=history.size()-1;
         updateButtons();
+        if (link.hasFragment()) {
+            descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+        }
     } else {
         QDesktopServices::openUrl(link);
     }
 }
 
-void QFHTMLHelpWindow::showFile(QString filename) {
+void QFHTMLHelpWindow::showFile(QString filename1) {
+    QString filename=filename1;
+    QString fragment="";
+    int hashpos=filename1.indexOf("#");
+    if (hashpos>=0) {
+        filename=filename1.left(hashpos);
+        fragment=filename1.mid(hashpos);
+    }
+    //qDebug()<<filename<<fragment;
+
     QDir spd(filename);
     QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
     QString s=spd.absoluteFilePath(cl); //absoluteFilePath
@@ -202,6 +245,9 @@ void QFHTMLHelpWindow::showFile(QString filename) {
     //descriptionBrowser->setSource(QFileInfo(s).fileName());
     //descriptionBrowser->reload();
     descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
+    if (!fragment.isEmpty()) {
+        descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+    }
 }
 
 void QFHTMLHelpWindow::previous() {
@@ -390,7 +436,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
             while ((pos = rxList.indexIn(result, pos)) != -1) {
                 QString list=rxList.cap(1).toLower().trimmed();
                 QString filter=rxList.cap(2).trimmed();
-                qDebug()<<pos<<list<<filter;
+                //qDebug()<<pos<<list<<filter;
                 if (m_pluginServices) {
                     if (list=="fitalg") {
                         QString text="";

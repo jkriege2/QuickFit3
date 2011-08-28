@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Imaging FCS Plugin: Data Formats</title>
+	  <link rel="prev" href="imaging_usage.html"> 
+	  <link rel="next" href="tutorial.html"> 
+	  <link rel="contents" href="imaging_fcs.html">   
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="#formats"><h2>Fileformat Descriptions</h2>
+	<p>This plugin is designed to import imaging FCS data as output by the program <tt>video_correlator</tt> programmed by Jan Krieger in the group B040 at the German Camcer Research Center. It reads in a video (e.g. in the TIFF file format) and outputs several files that contain auto- and crosscorrelation functions of different type calculated from the video data. Usually if you input an image series <tt><i>BASENAME</i><b>.tiff</b></tt>, some of these files will be output:
+	<ul>
+	    <li><tt><i>BASENAME</i><b>.autocorrelation.dat</b></tt>: contains the single-pixel autocorrelation functions.<br> They are stored as a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">comma-separated values file</a> with two or three columns. The first column contains the lag time <i>&tau;</i> in seconds, the second column the ACF amplitude <i>g(&tau;)</i>. These two columns are strictly required. If a third column is present, it is interpreted as measurement errors (e.g. the standard deviation) of the ACF <i>&Delta;g(&tau;)</i>:
+		<blockquote><i>&tau;, g(&tau;), &Delta;g(&tau;)</i></blockquote>
+		The ACF of the single pixels are ordered into "datasets" separated by two empty lines. The datasets are ordered in row-major order, i.e. first of these datasets is assigned to pixel (x,y)=(0,0), the second to (1,0) and on until (width-1,0). Then comes pixels (0,1), (1,1), (2,1) ... (width-1, height-1). This format has the advantage, that it can be loaded conventiently using the <tt>index</tt> keyword of <a href="http://www.gnuplot.info">gnuplot</a>, but comes at the cost of repeating the lag times column for every dataset.
+		</li>
+		<li><tt><i>BASENAME</i><b>.crosscorrelation.dat</b></tt>: contains the pixel-pixel crosscorrelation functions.<br> It follows the same format, as above, but with several columns:
+		<blockquote>
+		   <i>&tau;, g<sub>left</sub>(&tau;), g<sub>right</sub>(&tau;), g<sub>up</sub>(&tau;), g<sub>down</sub>(&tau;), &Delta;g<sub>left</sub>(&tau;), &Delta;g<sub>right</sub>(&tau;), &Delta;g<sub>up</sub>(&tau;), &Delta;g<sub>down</sub>(&tau;)</i>
+		</blockquote>
+		Here again the errors <i>&Delta;g(&tau;)</i> are optional.
+		</li>
+		<li><tt><i>BASENAME</i><b>.evalsettings.txt</b></tt>: contains the settings of the program that created the correlation data.<br>This file is again a text file and organized in a simple fashion. Every line of the format <blockquote><tt>DESCRIPTION : VALUE</tt></blockquote> is interpreted by this plugin. It looks for a certain <tt>DESCRIPTION</tt> and the used the supplied <tt>VALUE</tt>. Any additional whitespace characters will be ignored. These <tt>DESCRIPTION</tt>s are read and interpreted:  
+		<table border="1" cellspacing="0">
+		  <tr><th align="left"><tt>DESCRIPTION</tt></th><th align="left">value/usage</th><th align="left">stored in property</th></tr>
+		  <tr><td align="left"><tt>width</tt></td><td align="left"> width of the imaging FCS data in pixels </td><td align="left"> WIDTH </td></tr>
+		  <tr><td align="left"><tt>height</tt></td><td align="left"> height of the imaging FCS data in pixels </td><td align="left"> HEIGHT </td></tr>
+		  <tr><td align="left"><tt>reading frame count</tt></td><td align="left"> number of frames correlated </td><td align="left"> FRAME_COUNT </td></tr>
+		  <tr><td align="left"><tt>first frame</tt></td><td align="left"> first frame used for correlation </td><td align="left"> FIRST_FRAME </td></tr>
+		  <tr><td align="left"><tt>last frame</tt></td><td align="left"> last frame used for correlation </td><td align="left"> LAST_FRAME </td></tr>
+		  <tr><td align="left"><tt>summing over # frames</tt></td><td align="left"> number of frames averaged over, before correlating </td><td align="left"> SUMMED_FRAMES </td></tr>
+		  <tr><td align="left"><tt>correlator s</tt></td><td align="left"> number of linear correlators in a multi-&tau; correlator </td><td align="left"> CORR_S </td></tr>
+		  <tr><td align="left"><tt>correlator p</tt></td><td align="left"> number of channels in each block of a multi-&tau; correlator </td><td align="left"> CORR_P </td></tr>
+		  <tr><td align="left"><tt>correlator m</tt></td><td align="left"> time factor between two subsequent blocks of a multi-&tau; correlator </td><td align="left"> CORR_M </td></tr>
+		  <tr><td align="left"><tt>baseline</tt></td><td align="left"> the baseline value that was subtracted from the images before correlation </td><td align="left"> BASELINE </td></tr>
+		  <!--<tr><td align="left"><tt></tt></td><td align="left">  </td><td align="left">  </td></tr>-->
+		</table>
+		</li>
+		
+	</ul>
+	</p>
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>
+	<a name="#formats_other_software"><h2>Usage of Fileformats in other Software</h2>
+	<p>The above described dataformats can also be used by other software (e.g. Matlab or <a href="http://www.gnuplot.info">gnuplot</a>). This section contains some sample scripts to make it easier for you to reuse the data:
+	<ul>
+	    <li><tt><i>BASENAME</i><b>.autocorrelation.dat</b></tt>:
+		  <ul>
+		    <li>In <strong>Gnuplot</strong> this dataformat can be easily used by the <tt>index</tt> feature. This allows to selectively acces one special record:
+			<blockquote><pre><code>
+set logscale x
+plot '<i>BASENAME</i>.autocorrelation.dat' index 0 axes x1y1 title 'acf' with lines,\
+     '<i>BASENAME</i>.crosscorrelation.dat' index 0 using 1:2 axes x1y2 title 'ccf left' with lines,\
+     '<i>BASENAME</i>.crosscorrelation.dat' index 0 using 1:3 axes x1y2 title 'ccf right' with lines,\
+     '<i>BASENAME</i>.crosscorrelation.dat' index 0 using 1:4 axes x1y2 title 'ccf up' with lines,\
+     '<i>BASENAME</i>.crosscorrelation.dat' index 0 using 1:5 axes x1y2 title 'ccf down' with lines</code></pre></blockquote>
+			</li>
+			<li>In <strong>Matlab</strong> this dataformat can be read using a simple trick: Matlab does not understand the concept of datasets, as Gnuplot does, so we have to work around it:
+			<blockquote><pre><code>
+data=dlmread('BASENAME.autocorrelation.dat');
+taumin=data(1,1);
+startpos=find(data(:,1)==taumin);
+datalen=length(data)/length(startpos);
+taus=data(1:datalen, 1);
+use=[ 11 14 52 53 54 55 56 57 58 84 85 ];
+display_min=taus(1);
+for idx=1:length(use)
+    start=startpos(use(idx));
+    corr(idx,:)=data(start:(start+datalen-1), 2);
+end
+corravg=mean(corr, 1);
+
+figure(1)
+semilogx(taus, corravg, 'r');
+xlabel('lag time \tau [s]');
+ylabel('correlation function g(\tau)');</code></pre></blockquote>
+				Here the file is first read with <tt>dlmread()</tt> then the first number is extracted as <tt>taumin</tt>. We now have all correlation in a 2&times;(width*height*N) array <tt>data</tt>. In order to find the number of correlation curves in this array, we simply count (<tt>length(startpos)</tt>) the occurences of <tt>taumin</tt> in the first colmun. After that the script averages over the pixels given in <tt>use</tt> (as 1-based indexes) and plots this average.
+			</li>
+		  </ul>
+		</li>
+	</ul>
+	</p>
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>
+
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

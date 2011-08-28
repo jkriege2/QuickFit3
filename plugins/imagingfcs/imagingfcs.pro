@@ -16,6 +16,7 @@ HEADERS += qfrdrimagingfcs.h \
            qfrdrimagingfcs_data.h \
 		   qfrdrimagingfcs_dataeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
+    ../interfaces/qfevaluationimagetoruninterface.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \

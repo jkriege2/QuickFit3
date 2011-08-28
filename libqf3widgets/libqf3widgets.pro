@@ -55,7 +55,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            qffitparameterbasicinterface.h \
            qffitparameterwidget.h \
            qfdlgcsvparameters.h \
-    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.h \
     qfstagecombobox.h \
     qfcameraconfigcombobox.h \
     qfcameracombobox.h \
@@ -95,7 +94,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
            qfdlgcsvparameters.cpp \
-    ../../../../LIB/trunk/qt/qvisiblehandlesplitter.cpp \
     qfstagecombobox.cpp \
     qfcameraconfigcombobox.cpp \
     qfcameracombobox.cpp \

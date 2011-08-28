@@ -11,6 +11,7 @@
 #include "qfhtmlhelpwindow.h"
 #include "qfevaluationresultsmodel.h"
 #include "qenhancedtableview.h"
+#include "qvisiblehandlesplitter.h"
 
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
@@ -144,7 +145,7 @@ class QFEvaluationPropertyEditor : public QWidget {
         /** \brief QListView to display raw data records to which an evaluation is applicable */
         QListView* lstRawData;
         /** \brief splitter between files list and evaluation tab */
-        QSplitter* splitMain;
+        QVisibleHandleSplitter* splitMain;
         /** \brief Layout widget for the evaluation editor widget */
         QHBoxLayout* layWidgets;
 

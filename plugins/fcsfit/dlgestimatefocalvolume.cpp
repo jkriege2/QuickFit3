@@ -3,6 +3,7 @@
 #include "qftools.h"
 #include <cmath>
 
+#define F_AVOGADRO_PRE 6.02214179
 
 inline double sqr(double x) { return x*x; }
 
@@ -91,9 +92,9 @@ void dlgEstimateFocalVolume::calc_from_C() {
         double C=spinC->value();
         double Ce=spinCError->value();
         double p32=sqrt(M_PI*M_PI*M_PI);
-        double h = 1.0e10/6.022/p32/C/gamma;
+        double h = 1.0e10/F_AVOGADRO_PRE/p32/C/gamma;
         double h23=cbrt(sqr(particles*h)); // ^2/3
-        wxy=cbrt(particles*1.0e10/6.022/p32/C/gamma);
+        wxy=cbrt(particles*1.0e10/F_AVOGADRO_PRE/p32/C/gamma);
         wxy_error=sqrt(sqr(particles_error*h/3.0/h23)+sqr(gamma_error*particles*h/gamma/h23/3.0)+sqr(Ce*particles*h/3.0/C/h23));
         labFocusparamConcentration->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
     }

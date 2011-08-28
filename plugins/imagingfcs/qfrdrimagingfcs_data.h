@@ -15,6 +15,7 @@
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
+#include "../interfaces/qfevaluationimagetoruninterface.h"
 #include "csvtools.h"
 
 
@@ -23,9 +24,9 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFEvaluationImageToRunInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFEvaluationImageToRunInterface)
     public:
         /** Default constructor */
         QFRDRImagingFCSData(QFProject* parent);
@@ -92,11 +93,6 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double* getCorrelationRunErrors();
 
 
-        /** \brief return width of the image */
-		virtual int getDataImageWidth() const { return width; }
-		/** \brief return height of the image */
-		virtual int getDataImageHeight() const { return height; }
-
 
 
 
@@ -125,45 +121,43 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         bool loadVideoCorrelatorFile(QString filename);
 
     private:
-		/** \brief width of the image */
-		int width;
-		/** \brief height of the image */
-		int height;
-		/** \brief number of points in correlation curve */
-		int N;
-		/** \brief points to the correlation curves */
-		double* correlations;
-		/** \brief average over all correlation curves */
-		double* correlationMean;
-		/** \brief average over all correlation curves */
-		double* correlationStdDev;
-		/** \brief points to the correlation curve erorrs */
-		double* sigmas;
-		/** \brief time axis [seconds] */
-		double* tau;
+        /** \brief width of the image */
+        int width;
+        /** \brief height of the image */
+        int height;
+        /** \brief number of points in correlation curve */
+        int N;
+        /** \brief points to the correlation curves */
+        double* correlations;
+        /** \brief average over all correlation curves */
+        double* correlationMean;
+        /** \brief average over all correlation curves */
+        double* correlationStdDev;
+        /** \brief points to the correlation curve erorrs */
+        double* sigmas;
+        /** \brief time axis [seconds] */
+        double* tau;
 
 		/** \brief the leaveout list */
         QList<int> leaveout;
-
-
-        /** \brief convert a pixel coordinate to a rund index */
-		inline int xyToRun(int x, int y) {
-		    return y*width+x;
-		}
-		/** \brief convert a run to a pixel x-coordinate */
-        inline int runToX(int run) {
-            return run%width;
-        }
-		/** \brief convert a run to a pixel y-coordinate */
-        inline int runToY(int run) {
-            return run/width;
-        }
-        /** \brief convert a pixel coordinate to an array index (in correlations and sigmas) */
-		inline int xyToIndex(int x, int y) {
-		    return (y*width+x)*N;
-		}
+    protected:
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
-        void allocateContents(int x, int y, int N);
+        virtual void allocateContents(int x, int y, int N);
+
+
+    public:
+        /** \brief return width of the image */
+        virtual int getDataImageWidth() const;
+        /** \brief return height of the image */
+        virtual int getDataImageHeight() const;
+        /** \brief convert a pixel coordinate to a rund index */
+        virtual int xyToRun(int x, int y) const;
+        /** \brief convert a run to a pixel x-coordinate */
+        virtual int runToX(int run) const;
+        /** \brief convert a run to a pixel y-coordinate */
+        virtual int runToY(int run) const;
+        /** \brief convert a pixel coordinate to an array index (in correlations and sigmas) */
+        virtual int xyToIndex(int x, int y) const;
 
 };
 

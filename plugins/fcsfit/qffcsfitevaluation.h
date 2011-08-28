@@ -172,6 +172,15 @@ class QFFCSFitEvaluation : public QFFitResultsEvaluation {
          */
         virtual void setFitResultValuesVisible(QFRawDataRecord* r, int run, double* values, double* errors);
 
+        /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord.
+         *          Also imports the fit parameter description from the QFFitFunction and sets the parameter group to the given value
+         *  \param r the record to adress
+         *  \param resultID the result ID which to access in the raw data records result store
+         *  \param values values to be stored
+         *  \param errors errors to be stored
+         */
+        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int run, double* values, double* errors, const QString& group);
+
         /*! \brief return the value of a given parameter
             \param r the record to adress
             \param run the run in which to adress
@@ -233,6 +242,36 @@ class QFFCSFitEvaluation : public QFFitResultsEvaluation {
         */
         virtual bool getFitFix(QFRawDataRecord* r, int run, const QString& id);
 
+        /** \brief sets the group of the given fit result
+         *  \param r the record to adress
+            \param run the run in which to adress
+         *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+         *  \param group group to be stored
+         */
+        virtual void setFitResultGroup(QFRawDataRecord* r, int run, const QString& parameterID, const QString& group);
+
+        /** \brief sets the label of the given fit result
+         *  \param r the record to adress
+            \param run the run in which to adress
+         *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+         *  \param label label to be stored
+         *  \param label_richtext richtext-ed label to be stored
+         */
+        virtual void setFitResultLabel(QFRawDataRecord* r, int run, const QString& parameterID, const QString& label, const QString& label_richtext=QString(""));
+
+        /** \brief sets the group of the given evaluation result ID \a resultID
+         *  \param r the record to adress
+            \param run the run in which to adress
+         *  \param group group to be stored
+         */
+        virtual void setFitResultEvaluationGroup(QFRawDataRecord* r, int run, const QString& group);
+
+        /** \brief sets the description of the given evaluation result ID \a resultID
+         *  \param r the record to adress
+            \param run the run in which to adress
+         *  \param description description to be stored
+         */
+        virtual void setFitResultEvaluationDescription(QFRawDataRecord* r, int run, const QString& description);
 
 
 
@@ -404,7 +443,11 @@ class QFFCSFitEvaluation : public QFFitResultsEvaluation {
         using QFFitResultsEvaluation::getDefaultFitValue;
         using QFFitResultsEvaluation::getDefaultFitFix;
         using QFFitResultsEvaluation::resetAllFitResultsCurrent;
-
+        using QFFitResultsEvaluation::setFitResultGroup;
+        using QFFitResultsEvaluation::setFitResultLabel;
+        using QFFitResultsEvaluation::setFitResultEvaluationGroup;
+        using QFFitResultsEvaluation::setFitResultEvaluationDescription;
+        using QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel;
 
 
 

@@ -88,13 +88,13 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
         if (corrcolumn<0) corrcolumn=1;
         //int maxCol=qMax(corrcolumn, taucolumn);
 
-		QTextStream stream(&file);
-                bool last_empty, empty=true;
-		QVector<QVector<QPair<double, double> > > data_matrix;
-		QVector<QPair<double, double> > current_set;
-		int NN=0;
-		int runs=0;
-		while ((!stream.atEnd()) && (runs<=width*height)) {
+        QTextStream stream(&file);
+        bool last_empty, empty=true;
+        QVector<QVector<QPair<double, double> > > data_matrix;
+        QVector<QPair<double, double> > current_set;
+        int NN=0;
+        int runs=0;
+        while ((!stream.atEnd()) && (runs<=width*height)) {
             QVector<double> data=csvReadline(stream, ',', '#');
             last_empty=empty;
             empty=data.isEmpty();
@@ -112,7 +112,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
             }
             //if (stream.atEnd()) qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
-		}
+        }
         width=getProperty("WIDTH").toInt();
         height=getProperty("HEIGHT").toInt();
         //std::cout<<"width="<<width<<"   height="<<height<<"   NN="<<NN<<std::endl;
@@ -256,4 +256,46 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             }
         }
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int QFRDRImagingFCSData::getDataImageWidth() const {
+    return width;
+}
+
+int QFRDRImagingFCSData::getDataImageHeight() const {
+    return height;
+}
+
+int QFRDRImagingFCSData::xyToRun(int x, int y) const {
+    return y*width+x;
+}
+
+int QFRDRImagingFCSData::runToX(int run) const {
+    return run%width;
+}
+
+int QFRDRImagingFCSData::runToY(int run) const {
+    return run/width;
+}
+
+int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
+    return (y*width+x)*N;
 }

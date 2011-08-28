@@ -54,7 +54,7 @@ else
 fi
 
 CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
-CLASSNAMEFF_UC=`echo ${CLASSNAME}_${FITFUNCNAME} | tr a-z A-Z`
+CLASSNAMEFF_UC=`echo ${FITFUNCCLASSNAME} | tr a-z A-Z`
 
 FNAME=`echo $CLASSNAME | tr A-Z a-z`
 echo -n "file name for QFFitFunction plugin implementation: " $FNAME ".*
@@ -80,10 +80,14 @@ cp f1.html $FNAME/help/${FITFUNCNAME}.html
 cp tutorial.html $FNAME/help/tutorial.html
 
 
+replace_in_all 's/QFFitAlgorithmInst_F1/'$FITFUNCCLASSNAME'/g'
 replace_in_all 's/QFFitAlgorithmInst/'$CLASSNAME'/g'
-replace_in_all 's/QFFitAlgorithmInst_F1/'$CLASSNAMEFF_UC'/g'
 replace_in_all 's/target_id/'$TARGETNAME'/g'
 replace_in_all 's/ff_id/'$FITFUNCNAME'/g'
+
+replace_in_all 's/'$BASENAME'_f1.h/'$FNAMEFF'.h/g'
+replace_in_all 's/'$BASENAME'_f1.cpp/'$FNAMEFF'.cpp/g'
+replace_in_all 's/HEADER_F1_H/'$CLASSNAMEFF_UC'_H/g'
 
 replace_in_all 's/'$BASENAME'.png/'$FNAME'.png/g'
 replace_in_all 's/'$BASENAME'.h/'$FNAME'.h/g'
@@ -91,10 +95,6 @@ replace_in_all 's/'$BASENAME'.cpp/'$FNAME'.cpp/g'
 replace_in_all 's/'$BASENAME'.qrc/'$FNAME'.qrc/g'
 replace_in_all 's/'$BASENAME'.ui/'$FNAME'.ui/g'
 replace_in_all 's/HEADER_H/'$CLASSNAME_UC'_H/g'
-
-replace_in_all 's/'$BASENAME'_f1.h/'$FNAMEFF'.h/g'
-replace_in_all 's/'$BASENAME'_f1.cpp/'$FNAMEFF'.cpp/g'
-replace_in_all 's/HEADER_F1_H/'$CLASSNAMEFF_UC'_H/g'
 
 replace_in_all 's/doxygen_GROUPNAME/qf3fitfunp_'$TARGETNAME'/g'
 replace_in_all 's/f1.html/'$FITFUNCNAME'.html/g'

@@ -349,6 +349,8 @@ class QFFitAlgorithm {
     public:
         /** \brief return a name for the algorithm */
         virtual QString name() const=0;
+        /** \brief return a short name for the algorithm (max. around 10-20 characters) */
+        virtual QString shortName() const { return name(); };
         /** \brief return a short unique algorithm ID string */
         virtual QString id() const=0;
 

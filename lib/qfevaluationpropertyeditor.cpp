@@ -301,7 +301,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     pteDescription=new QPlainTextEdit(w);
     fl->addRow(tr("&Description:"), pteDescription);
 
-    splitMain=new QSplitter(tabMain);
+    splitMain=new QVisibleHandleSplitter(tabMain);
     lstRawData=new QListView(splitMain);
     //tabEditors=new QTabWidget(splitMain);
     layWidgets=new QHBoxLayout(this);

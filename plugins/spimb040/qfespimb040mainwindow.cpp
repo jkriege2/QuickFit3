@@ -325,7 +325,15 @@ void QFESPIMB040MainWindow::doImageStack() {
                 progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
                 QApplication::processEvents();
                 if (progress.wasCanceled()) break;
+            }
+            // wait additional time-span after moving stages!
+            QTime t;
+            int DeltaT=qMin(5000,qMax(1,widImageStack->delay()));
+            t.start();
+            while (t.elapsed()<DeltaT) {
+                progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
                 QApplication::processEvents();
+                if (progress.wasCanceled()) break;
             }
             if (ok) {
                 if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready) {
@@ -338,7 +346,6 @@ void QFESPIMB040MainWindow::doImageStack() {
             }
 
 
-            QApplication::processEvents();
             QApplication::processEvents();
 
             if (progress.wasCanceled()) {
@@ -623,16 +630,16 @@ void QFESPIMB040MainWindow::doAcquisition() {
             ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview.tif", &filename32);
             if (ok) {
                 log_text(tr("  - acquired overview image from camer 1!\n"));
-                acquisitionDescription1["preview_image_width"]=ecamera1->getImageWidth(camera1);
-                acquisitionDescription1["preview_image_height"]=ecamera1->getImageHeight(camera1);
-                acquisitionDescription1["preview_exposure_time"]=ecamera1->getExposureTime(camera1);
+                acquisitionDescription1["overview_image_width"]=ecamera1->getImageWidth(camera1);
+                acquisitionDescription1["overview_image_height"]=ecamera1->getImageHeight(camera1);
+                acquisitionDescription1["overvieww_exposure_time"]=ecamera1->getExposureTime(camera1);
                 QFExtensionCamera::AcquititonFileDescription d;
-                d.description="overview with preview settings";
-                d.name=acquisitionPrefix1+"_preview.tif";
+                d.description="overview before acquisition  with preview settings";
+                d.name=acquisitionPrefix1+"_overview.tif";
                 d.type="TIFF16";
                 moreFiles1.append(d);
                 if (!filename32.isEmpty()) {
-                    d.description="overview with preview settings";
+                    d.description="overview before acquisition with preview settings";
                     d.name=filename32;
                     d.type="TIFF32";
                     moreFiles1.append(d);
@@ -648,16 +655,16 @@ void QFESPIMB040MainWindow::doAcquisition() {
             ok=savePreview(extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview.tif", &filename32);
             if (ok) {
                 log_text(tr("  - acquired overview image from camer 2!\n"));
-                acquisitionDescription2["preview_image_width"]=ecamera2->getImageWidth(camera2);
-                acquisitionDescription2["preview_image_height"]=ecamera2->getImageHeight(camera2);
-                acquisitionDescription2["preview_exposure_time"]=ecamera2->getExposureTime(camera2);
+                acquisitionDescription2["overview_image_width"]=ecamera2->getImageWidth(camera2);
+                acquisitionDescription2["overview_image_height"]=ecamera2->getImageHeight(camera2);
+                acquisitionDescription2["overview_exposure_time"]=ecamera2->getExposureTime(camera2);
                 QFExtensionCamera::AcquititonFileDescription d;
-                d.description="overview with preview settings";
-                d.name=acquisitionPrefix2+"_preview.tif";
+                d.description="overview before acquisition  with preview settings";
+                d.name=acquisitionPrefix2+"_overview.tif";
                 d.type="TIFF16";
                 moreFiles2.append(d);
                 if (!filename32.isEmpty()) {
-                    d.description="overview with preview settings";
+                    d.description="overview before acquisition  with preview settings";
                     d.name=filename32;
                     d.type="TIFF32";
                     moreFiles2.append(d);
@@ -741,6 +748,67 @@ void QFESPIMB040MainWindow::doAcquisition() {
 
 
 
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // acquire second set of overview images
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (widAcquisition->overview()) {
+        if (ok && useCam1) {
+            progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
+            QApplication::processEvents();
+            QString filename32="";
+            ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview_after.tif", &filename32);
+            if (ok) {
+                log_text(tr("  - acquired overview image from camer 1!\n"));
+                acquisitionDescription1["overview_image_width"]=ecamera1->getImageWidth(camera1);
+                acquisitionDescription1["overview_image_height"]=ecamera1->getImageHeight(camera1);
+                acquisitionDescription1["overview_exposure_time"]=ecamera1->getExposureTime(camera1);
+                QFExtensionCamera::AcquititonFileDescription d;
+                d.description="overview with preview settings";
+                d.name=acquisitionPrefix1+"_overview_after.tif";
+                d.type="TIFF16";
+                moreFiles1.append(d);
+                if (!filename32.isEmpty()) {
+                    d.description="overview with preview settings";
+                    d.name=filename32;
+                    d.type="TIFF32";
+                    moreFiles1.append(d);
+                }
+            } else {
+                ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1!\n"));
+            }
+        }
+        if (ok && useCam2) {
+            progress.setLabelText(tr("acquiring overview image from camera 2 ..."));
+            QApplication::processEvents();
+            QString filename32="";
+            ok=savePreview(extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview_after.tif", &filename32);
+            if (ok) {
+                log_text(tr("  - acquired overview image from camer 2!\n"));
+                acquisitionDescription2["overview_image_width"]=ecamera2->getImageWidth(camera2);
+                acquisitionDescription2["overview_image_height"]=ecamera2->getImageHeight(camera2);
+                acquisitionDescription2["overview_exposure_time"]=ecamera2->getExposureTime(camera2);
+                QFExtensionCamera::AcquititonFileDescription d;
+                d.description="overview after acquisition with preview settings";
+                d.name=acquisitionPrefix2+"_overview_after.tif";
+                d.type="TIFF16";
+                moreFiles2.append(d);
+                if (!filename32.isEmpty()) {
+                    d.description="overview after acquisition with preview settings";
+                    d.name=filename32;
+                    d.type="TIFF32";
+                    moreFiles2.append(d);
+                }
+            } else {
+                ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2!\n"));
+            }
+        }
+
+    }
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////
     // write acquisition data
     //////////////////////////////////////////////////////////////////////////////////////
@@ -773,7 +841,7 @@ void QFESPIMB040MainWindow::doAcquisition() {
 
 
 QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles) {
-    QString iniFilename=filenamePrefix+"_configuration.ini";
+    QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
     QFESPIMB040CameraConfig* cam=camConfig1;
@@ -841,7 +909,7 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
 
 
 QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files) {
-    QString iniFilename=filenamePrefix+"_configuration.ini";
+    QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
     QFESPIMB040CameraConfig* cam=camConfig1;

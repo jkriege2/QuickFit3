@@ -175,7 +175,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
                 columns=0;
             }
             evaluationResultType type;  /**< type of data */
-            double dvalue;  /**< doubl data value */
+            double dvalue;  /**< double data value */
             double derror;  /**< error of double data */
             /*int64_t*/qlonglong ivalue;  /**< value as 64-bit signed integer */
             bool bvalue;  /**< value as boolean */
@@ -183,11 +183,21 @@ class QFRawDataRecord : public QObject, public QFProperties {
             QString unit; /**< unit name of the stored values */
             QVector<double> dvec;  /**< data as double vector */
             int columns;  /**< number of columns if matrix is stored in dvec (\c type \c == evaluationResultType::qfrdreNumberMatrix) */
+            QString label;  /**< a label describing the result (no richtext markup!) */
+            QString label_rich; /**< a label describing the result (with richtext markup!) */
+            QString group; /**< this result belongs to a group with the given name */
         };
     protected:
+        /*! \brief this struct holds the metadata and also the data about an evaluationID */
+        struct evaluationIDMetadata {
+            QString group; /**< group this evaluationID belongs to \b (optional) */
+            QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
+            QMap<QString, evaluationResult> results; /**< the real results */
+        };
+
         /** \brief evaluation results are stored in this QMap which maps an evaluation name to
          *         to a list of evaluation results (which is indexed by result names! */
-        QMap<QString, QMap<QString, evaluationResult> > results;
+        QMap<QString, evaluationIDMetadata > results;
         /** \brief table used to display the results */
         QFRDRResultsModel* resultsmodel;
 
@@ -202,7 +212,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \brief clear all evaluation results of a specific evaluation name */
         inline void resultsClear(QString name) {
             if (results.contains(name)) {
-                results[name].clear();
+                results[name].results.clear();
                 results.remove(name);
                 if (doEmitResultsChanged) emit resultsChanged();
             }
@@ -210,14 +220,14 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */
         virtual void resultsClear(QString name, QString postfix);
         /** \brief check whether a result exists */
-        inline bool resultsExists(QString evalName, QString resultName) {
+        inline bool resultsExists(QString evalName, QString resultName) const {
             if (results.contains(evalName)) {
-                return results[evalName].contains(resultName);
+                return results[evalName].results.contains(resultName);
             }
             return false;
         };
         /** \brief check whether there are any results from a given evauation */
-        inline bool resultsExistsFromEvaluation(QString evalName) {
+        inline bool resultsExistsFromEvaluation(QString evalName) const {
             return results.contains(evalName);
         };
         /** \brief set a result of type number */
@@ -243,15 +253,15 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \brief set result from evaluationResult */
         void resultsSet(QString evaluationName, QString resultName, const evaluationResult& result);
         /** \brief return a specified result as variant */
-        inline evaluationResult resultsGet(QString evalName, QString resultName) {
+        inline evaluationResult resultsGet(QString evalName, QString resultName) const {
             evaluationResult r;
             if (resultsExists(evalName, resultName)) {
-                r=results[evalName].value(resultName);
+                r=results[evalName].results.value(resultName);
             }
             return r;
         };
         /** \brief return a specified result as string */
-        QString  resultsGetAsString(QString evalName, QString resultName);
+        QString  resultsGetAsString(QString evalName, QString resultName) const;
         /** \brief remove the value stored in the given position
          *
          *  If the results for the given \a evalName are empty after the delete, the entry for the
@@ -267,20 +277,43 @@ class QFRawDataRecord : public QObject, public QFProperties {
             The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
             a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberVector).
         */
-        QVariant resultsGetAsQVariant(QString evalName, QString resultName);
+        QVariant resultsGetAsQVariant(QString evalName, QString resultName) const;
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
-        double resultsGetAsDouble(QString evalName, QString resultName, bool* ok=NULL);
+        double resultsGetAsDouble(QString evalName, QString resultName, bool* ok=NULL) const;
         /** \brief return a specified result as boolean (or \c false if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
-        bool resultsGetAsBoolean(QString evalName, QString resultName, bool* ok=NULL);
+        bool resultsGetAsBoolean(QString evalName, QString resultName, bool* ok=NULL) const;
         /** \brief return a specified result as integer (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        int64_t resultsGetAsInteger(QString evalName, QString resultName, bool* ok=NULL);
+        int64_t resultsGetAsInteger(QString evalName, QString resultName, bool* ok=NULL) const;
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        QVector<double> resultsGetAsDoubleList(QString evalName, QString resultName, bool* ok=NULL);
+        QVector<double> resultsGetAsDoubleList(QString evalName, QString resultName, bool* ok=NULL) const;
         /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        double resultsGetErrorAsDouble(QString evalName, QString resultName, bool* ok=NULL);
+        double resultsGetErrorAsDouble(QString evalName, QString resultName, bool* ok=NULL) const;
+
+        /** \brief set the label of a result (the result already has to exist!) */
+        void resultsSetLabel(QString evaluationName, QString resultName, QString label, QString label_rich=QString(""));
+        /** \brief return the label of a result (the non-richtext version!) */
+        QString resultsGetLabel(QString evaluationName, QString resultName) const;
+        /** \brief return the label of a result, potentially with richtext markup! */
+        QString resultsGetLabelRichtext(QString evaluationName, QString resultName) const;
+
+        /** \brief set the group of a result (the result already has to exist!) */
+        void resultsSetGroup(QString evaluationName, QString resultName, QString group);
+        /** \brief return the group of a result  */
+        QString resultsGetGroup(QString evaluationName, QString resultName) const;
+
+        /** \brief set the group of an evaluation ID */
+        void resultsSetEvaluationGroup(QString evaluationName, QString group);
+        /** \brief return the group of an evaluation ID, returns an empty string, if the evaluationName does not exist  */
+        QString resultsGetEvaluationGroup(QString evaluationName) const;
+        /** \brief set the description of an evaluation ID */
+        void resultsSetEvaluationDescription(QString evaluationName, QString description);
+        /** \brief return the description of an evaluation ID, returns evaluationName, if no description is set, if the evaluationName does not exist  */
+        QString resultsGetEvaluationDescription(QString evaluationName) const;
+
+
         /** \brief get number of results for a specified evaluation */
         inline int resultsGetCount(QString evalName) const {
-            if (results.contains(evalName)) return results[evalName].size();
+            if (results.contains(evalName)) return results[evalName].results.size();
             return 0;
         };
         /** \brief get number of evaluations in this object */
@@ -332,9 +365,36 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel();
 
-        /** \brief return a list of all result names for this raw data record */
-        QList<QString> resultsCalcNames() const;
+        /*! \brief return a list of all result names for this raw data record
 
+            If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
+            If \a group is non-empty the resultant list is filtered by result groups.
+         */
+        QList<QString> resultsCalcNames(const QString& evalName=QString(""), const QString& group=QString("")) const;
+
+        /*! \brief return a list of all result labels (first field) for this raw data record, together ith the parameter IDs (second field)
+
+            If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
+            If \a group is non-empty the resultant list is filtered by result groups.
+         */
+        QList<QPair<QString, QString> > resultsCalcNamesAndLabels(const QString& evalName=QString(""), const QString& group=QString("")) const;
+
+        /*! \brief return a list of all richtexted result labels (first field) for this raw data record, together ith the parameter IDs (second field)
+
+            If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
+            If \a group is non-empty the resultant list is filtered by result groups.
+         */
+        QList<QPair<QString, QString> > resultsCalcNamesAndLabelsRichtext(const QString& evalName=QString(""), const QString& group=QString("")) const;
+
+        /*! \brief return a list of all result Groups, restricted to a given evaluation
+
+            If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
+            If \a group is non-empty the resultant list is filtered by result groups.
+         */
+        QList<QString> resultsCalcGroups(const QString& evalName=QString("")) const;
+
+        /*! \brief returns a list of evaluationIDs in a given evaluation group */
+        QList<QString> resultsCalcEvaluationsInGroup(const QString& evalGroup) const;
 
     public:
         /** \brief return type (short type string) */

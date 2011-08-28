@@ -100,13 +100,18 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
     // set whatever you want (FILETYPE is just an example)!
     initParams["FILETYPE"]="VIDEO_CORRELATOR";
     QString evalFilename="";
+    QString evalFilename1="";
     bool isCross=false;
     if (filename.endsWith(".autocorrelation.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".autocorrelation.dat", ".evalsettings.txt");
+        evalFilename1=filename;
+        evalFilename1=evalFilename1.replace(".autocorrelation.dat", ".configuration.ini");
     } else if (filename.endsWith(".crosscorrelation.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".crosscorrelation.dat", ".evalsettings.txt");
+        evalFilename1=filename;
+        evalFilename1=evalFilename1.replace(".crosscorrelation.dat", ".configuration.ini");
         isCross=true;
     }
 
@@ -163,6 +168,9 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
                     }
                 } while (!line.isNull());
             }
+        }
+        if (QFile::exists(evalFilename1)) {
+
         }
         if (width<=0) {
             bool okk=true;

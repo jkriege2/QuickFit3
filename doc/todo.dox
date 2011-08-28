@@ -26,6 +26,7 @@
     \todo possibly implement additional possibilities to estimate parameter confidence intervals (additional to jacobian), like monte-carlo methods
     \todo fit current file when <ENTER> is pressed in current widget
     \todo store jacobian matrix in fit results
+	\todo store fit statistics as fit results
 
     \section qf3todo_fitfunctions Fit Functions
     \todo FCS-Fit-Function with diffusion and rotation
