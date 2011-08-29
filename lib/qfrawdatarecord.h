@@ -191,6 +191,7 @@ class QFRawDataRecord : public QObject, public QFProperties {
         /*! \brief this struct holds the metadata and also the data about an evaluationID */
         struct evaluationIDMetadata {
             QString group; /**< group this evaluationID belongs to \b (optional) */
+            int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
             QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
             QMap<QString, evaluationResult> results; /**< the real results */
         };
@@ -305,6 +306,10 @@ class QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetEvaluationGroup(QString evaluationName, QString group);
         /** \brief return the group of an evaluation ID, returns an empty string, if the evaluationName does not exist  */
         QString resultsGetEvaluationGroup(QString evaluationName) const;
+        /** \brief set the group index of an evaluation ID */
+        void resultsSetEvaluationGroupIndex(QString evaluationName, int64_t groupIndex);
+        /** \brief return the group index of an evaluation ID, returns \c -1, if the evaluationName does not exist  */
+        int64_t resultsGetEvaluationGroupIndex(QString evaluationName) const;
         /** \brief set the description of an evaluation ID */
         void resultsSetEvaluationDescription(QString evaluationName, QString description);
         /** \brief return the description of an evaluation ID, returns evaluationName, if no description is set, if the evaluationName does not exist  */

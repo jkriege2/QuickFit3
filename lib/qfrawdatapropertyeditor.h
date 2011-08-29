@@ -38,7 +38,7 @@ class QFRawDataPropertyEditor : public QWidget {
         }
     protected:
         /** \brief points to the record currently displayed */
-        QFRawDataRecord* current;
+        QPointer<QFRawDataRecord> current;
         /** \brief read the settings */
         void readSettings();
         void closeEvent( QCloseEvent * event );
@@ -63,7 +63,8 @@ class QFRawDataPropertyEditor : public QWidget {
         void deletePropClicked();
         /** \brief resize the cells in the properties table */
         void resizePropertiesTable();
-
+        /** \brief remove the current record */
+        void deleteRecord();
         void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
         /** \brief delete selected results */
@@ -102,6 +103,8 @@ class QFRawDataPropertyEditor : public QWidget {
         QPushButton* btnDeleteProperty;
         /** \brief button to switch to previous record */
         QPushButton* btnPrevious;
+        /** \brief button to delete the current record */
+        QPushButton* btnDeleteReord;
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief tabel display the evaluation results associated with this file  */

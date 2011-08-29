@@ -13,6 +13,8 @@ QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix,
     // open ini-file to superseede fit parameter defaults from QFFitFunction
     QString inifn=parent->getServices()->getOptions()->getConfigFileDirectory()+QString("/fitparams_%1.ini").arg(getType());
     fitParamSettings=new QSettings(inifn, QSettings::IniFormat);
+    QString inifng=parent->getServices()->getOptions()->getGlobalConfigFileDirectory()+QString("/fitparams_%1.ini").arg(getType());
+    fitParamGlobalSettings=new QSettings(inifng, QSettings::IniFormat);
 
     m_fitAlgorithm="";
     m_fitFunction="";
@@ -525,6 +527,7 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
     int pid=f->getParameterNum(parameterID);
     double res=0;
     if (pid>-1) res=f->getDescription(pid).initialValue;
+    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
     QString psID=getParameterStoreID(parameterID);
     if (parameterStore.contains(psID)) {
@@ -602,6 +605,7 @@ bool QFFitResultsEvaluation::getFitFix(QFRawDataRecord* r, const QString& result
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
     bool res=false;
+    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
     QString psID=getParameterStoreID(parameterID);
     if (parameterStore.contains(psID)) {
@@ -901,6 +905,7 @@ double QFFitResultsEvaluation::getDefaultFitValue(const QString& id) {
     int pid=f->getParameterNum(id);
     double res=0;
     if (pid>-1) res=f->getDescription(pid).initialValue;
+    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+id), res).toDouble();
     QString psID=getParameterStoreID(id);
     if (parameterStore.contains(psID)) {
@@ -916,6 +921,7 @@ bool QFFitResultsEvaluation::getDefaultFitFix(const QString& id) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
     bool res=false;
+    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id+"_fix"), res).toBool();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+id+"_fix"), res).toBool();
     QString psID=getParameterStoreID(id);
     if (parameterStore.contains(psID)) {
@@ -1078,6 +1084,7 @@ double QFFitResultsEvaluation::getFitMin(const QString& id)  {
         return 0;
     }
     double res=f->getDescription(id).minValue;
+    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id+"_min"), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+id+"_min"), res).toDouble();
     QString psID=getParameterStoreID(id);
     if (parameterStore.contains(psID)) {
@@ -1096,6 +1103,7 @@ double QFFitResultsEvaluation::getFitMax(const QString& id) {
         return 0;
     }
     double res=f->getDescription(id).maxValue;
+    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id+"_max"), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+id+"_max"), res).toDouble();
     QString psID=getParameterStoreID(id);
     if (parameterStore.contains(psID)) {

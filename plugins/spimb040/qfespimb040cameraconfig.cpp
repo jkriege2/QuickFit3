@@ -125,8 +125,9 @@ void QFESPIMB040CameraConfig::loadSettings(ProgramOptions* settings, QString pre
 
     cmbAcquisitionDevice->setCurrentIndex(settings->getQSettings()->value(prefix+"last_device", 0).toInt());
     spinAcquisitionDelay->setValue(settings->getQSettings()->value(prefix+"acquisition_delay", 0).toDouble());
-    cmbObjecive->setCurrentIndex(cmbObjecive->findText(settings->getQSettings()->value(prefix+"objective", "").toString()));
-    cmbObjeciveProjection->setCurrentIndex(cmbObjeciveProjection->findText(settings->getQSettings()->value(prefix+"objective_projection", "").toString()));
+    cmbObjective->setCurrentIndex(cmbObjective->findText(settings->getQSettings()->value(prefix+"objective", "").toString()));
+    cmbObjectiveProjection->setCurrentIndex(cmbObjectiveProjection->findText(settings->getQSettings()->value(prefix+"objective_projection", "").toString()));
+    cmbTubelens->setCurrentIndex(cmbTubelens->findText(settings->getQSettings()->value(prefix+"tubelens", "").toString()));
     cmbPreviewConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"preview_config", "default").toString());
     cmbAcquisitionConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"acquisition_config", "default").toString());
 }
@@ -136,8 +137,9 @@ void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString pr
 
     settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings->getQSettings()->setValue(prefix+"objective", cmbObjecive->currentText());
-    settings->getQSettings()->setValue(prefix+"objective_projection", cmbObjeciveProjection->currentText());
+    settings->getQSettings()->setValue(prefix+"objective", cmbObjective->currentText());
+    settings->getQSettings()->setValue(prefix+"objective_projection", cmbObjectiveProjection->currentText());
+    settings->getQSettings()->setValue(prefix+"tubelens", cmbTubelens->currentText());
     settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
     settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
 
@@ -186,12 +188,16 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ogl->setVerticalSpacing(1);
     ogl->addWidget(new QLabel("detection:"), 0,0);
     ogl->addWidget(new QLabel("lightsheet:"), 1,0);
-    cmbObjecive=new QComboBox(this);
-    connect(cmbObjecive, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbObjecive, 0,1);
-    cmbObjeciveProjection=new QComboBox(this);
-    connect(cmbObjeciveProjection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbObjeciveProjection, 1,1);
+    ogl->addWidget(new QLabel("tube lens:"), 2,0);
+    cmbObjective=new QComboBox(this);
+    connect(cmbObjective, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
+    ogl->addWidget(cmbObjective, 0,1);
+    cmbObjectiveProjection=new QComboBox(this);
+    connect(cmbObjectiveProjection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
+    ogl->addWidget(cmbObjectiveProjection, 2,1);
+    cmbTubelens=new QComboBox(this);
+    connect(cmbTubelens, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
+    ogl->addWidget(cmbTubelens, 1,1);
     btnAddObjective=new QToolButton(this);
     btnAddObjective->setToolTip(tr("add a new objective"));
     btnAddObjective->setIcon(QIcon(":/spimb040/objective_add.png"));
@@ -213,7 +219,9 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     labDetectObjectiveDescription=new QLabel(this);
     ogl->addWidget(labDetectObjectiveDescription, 0,5);
     labProjectObjectiveDescription=new QLabel(this);
-    ogl->addWidget(labProjectObjectiveDescription, 1,5);
+    ogl->addWidget(labProjectObjectiveDescription, 2,5);
+    labTubelensDescription=new QLabel(this);
+    ogl->addWidget(labTubelensDescription, 1,5);
     ogl->setColumnStretch(5, 1);
 
     camlayout->addRow(tr("<b>Objectives:</b>"), ogl);
@@ -644,10 +652,11 @@ void QFESPIMB040CameraConfig::loadObjectives() {
     QSettings inifile(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
     QStringList groups=inifile.childGroups();
     objectives.clear();
-    QString currentO=cmbObjecive->currentText();
-    QString currentP=cmbObjeciveProjection->currentText();
-    cmbObjecive->clear();
-    cmbObjeciveProjection->clear();
+    QString currentO=cmbObjective->currentText();
+    QString currentP=cmbObjectiveProjection->currentText();
+    QString currentT=cmbTubelens->currentText();
+    cmbObjective->clear();
+    cmbObjectiveProjection->clear();
     for (int i=0; i<groups.size(); i++) {
         QString g=groups[i];
         ObjectiveDescription o;
@@ -656,15 +665,18 @@ void QFESPIMB040CameraConfig::loadObjectives() {
         o.magnification=inifile.value(g+"/magnification", 1).toDouble();
         o.NA=inifile.value(g+"/na", 1).toDouble();
         objectives.append(o);
-        cmbObjecive->addItem(o.name);
-        cmbObjeciveProjection->addItem(o.name);
+        cmbObjective->addItem(o.name);
+        cmbObjectiveProjection->addItem(o.name);
     }
-    int i=cmbObjecive->findText(currentO);
+    int i=cmbObjective->findText(currentO);
     if (i<0) i=0;
-    cmbObjecive->setCurrentIndex(i);
-    i=cmbObjeciveProjection->findText(currentP);
+    cmbObjective->setCurrentIndex(i);
+    i=cmbObjectiveProjection->findText(currentP);
     if (i<0) i=0;
-    cmbObjeciveProjection->setCurrentIndex(i);
+    cmbObjectiveProjection->setCurrentIndex(i);
+    i=cmbTubelens->findText(currentP);
+    if (i<0) i=0;
+    cmbTubelens->setCurrentIndex(i);
 }
 
 void QFESPIMB040CameraConfig::storeObjectives() {
@@ -685,7 +697,7 @@ void QFESPIMB040CameraConfig::storeObjectives() {
 }
 
 void QFESPIMB040CameraConfig::deleteObjective() {
-    int i=cmbObjecive->currentIndex();
+    int i=cmbObjective->currentIndex();
     if (i>=0 && i<objectives.size()) {
         objectives.removeAt(i);
     }
@@ -695,7 +707,7 @@ void QFESPIMB040CameraConfig::deleteObjective() {
 
 
 void QFESPIMB040CameraConfig::editObjective() {
-    int i=cmbObjecive->currentIndex();
+    int i=cmbObjective->currentIndex();
     if (i>=0 && i<objectives.size()) {
         ObjectiveDescription d=objectives[i];
 
@@ -733,14 +745,20 @@ ObjectiveDescription QFESPIMB040CameraConfig::getObjectiveDescription(int i) {
 
 ObjectiveDescription QFESPIMB040CameraConfig::objective() {
     ObjectiveDescription d;
-    int i=cmbObjecive->currentIndex();
+    int i=cmbObjective->currentIndex();
     if (i>=0 && i<objectives.size()) return objectives[i];
     return d;
 }
 
+ObjectiveDescription QFESPIMB040CameraConfig::tubelens() {
+    ObjectiveDescription d;
+    int i=cmbTubelens->currentIndex();
+    if (i>=0 && i<objectives.size()) return objectives[i];
+    return d;
+}
 ObjectiveDescription QFESPIMB040CameraConfig::objectiveProjection() {
     ObjectiveDescription d;
-    int i=cmbObjeciveProjection->currentIndex();
+    int i=cmbObjectiveProjection->currentIndex();
     if (i>=0 && i<objectives.size()) return objectives[i];
     return d;
 }
@@ -754,12 +772,15 @@ bool QFESPIMB040CameraConfig::objectiveExists(QString name) {
 }
 
 void QFESPIMB040CameraConfig::currentObjectiveChanged(int idx) {
-    int iD=cmbObjecive->currentIndex();
+    int iD=cmbObjective->currentIndex();
     if (iD>=0 && iD<objectives.size()) labDetectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iD].magnification).arg(objectives[iD].NA));
     else labDetectObjectiveDescription->setText("");
-    int iP=cmbObjeciveProjection->currentIndex();
+    int iP=cmbObjectiveProjection->currentIndex();
     if (iP>=0 && iP<objectives.size()) labProjectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
     else labProjectObjectiveDescription->setText("");
+    int iT=cmbTubelens->currentIndex();
+    if (iT>=0 && iT<objectives.size()) labTubelensDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
+    else labTubelensDescription->setText("");
 }
 
 void QFESPIMB040CameraConfig::stop() {

@@ -102,6 +102,9 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         /** \brief return the current magnification */
         double magnification();
 
+        /** \brief return the current tubelens */
+        ObjectiveDescription tubelens();
+
         /** \brief return the current objective */
         ObjectiveDescription objective();
 
@@ -197,9 +200,11 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         /** \brief spinbox to select delay between two subsequent frames */
         QDoubleSpinBox* spinAcquisitionDelay;
         /** \brief select an objective */
-        QComboBox* cmbObjecive;
+        QComboBox* cmbObjective;
         /** \brief select an objective */
-        QComboBox* cmbObjeciveProjection;
+        QComboBox* cmbObjectiveProjection;
+        /** \brief select a tubelens */
+        QComboBox* cmbTubelens;
         /** \brief view for images from camera */
         QFESPIMB040CameraView* camView;
         /** \brief combobox for the selected camera preview configuration */
@@ -220,6 +225,7 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         QToolButton* btnDeleteObjective;
         QLabel* labDetectObjectiveDescription;
         QLabel* labProjectObjectiveDescription;
+        QLabel* labTubelensDescription;
 
         /** \brief action to connect/disconnect to acquisition device */
         QAction* actDisConnect;

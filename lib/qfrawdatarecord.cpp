@@ -84,9 +84,11 @@ void QFRawDataRecord::readXML(QDomElement& e) {
         while (!te.isNull()) {
             QString en=te.attribute("name");
             QString group=te.attribute("group");
+            int groupIndex=te.attribute("groupindex", "0").toInt();
             QString description=te.attribute("description");
             QDomElement re=te.firstChildElement("result");
             results[en].group=group;
+            results[en].groupIndex=groupIndex;
             results[en].description=description;
             while (!re.isNull()) {
                 QString n=re.attribute("name", "");
@@ -196,6 +198,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
         QString n=i.key();
         w.writeAttribute("name", n);
         w.writeAttribute("group", i.value().group);
+        w.writeAttribute("groupindex", QString::number(i.value().groupIndex));
         w.writeAttribute("description", i.value().description);
         QMapIterator<QString, evaluationResult> j(i.value().results);
         //for (int j=0; j<i.value().size(); j++) {
@@ -400,6 +403,17 @@ void QFRawDataRecord::resultsSetGroup(QString evaluationName, QString resultName
     r.group=group;
     results[evaluationName].results[resultName]=r;
     if (doEmitResultsChanged) emit resultsChanged();
+}
+
+void QFRawDataRecord::resultsSetEvaluationGroupIndex(QString evaluationName, int64_t groupIndex) {
+    results[evaluationName].groupIndex=groupIndex;
+}
+
+int64_t QFRawDataRecord::resultsGetEvaluationGroupIndex(QString evaluationName) const {
+    if (results.contains(evaluationName)) {
+        return results[evaluationName].groupIndex;
+    }
+    return -1;
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroup(QString evaluationName, QString group) {

@@ -55,7 +55,7 @@
       - sum of squared resdiuals (sometimes also called the residual sum of squares, RSS): \f[ \chi^2 = \sum\limits_{k=k_0}^{k_1}\tilde{E}_k^2 \f]
       - residual average: \f[ \langle E\rangle= \frac{1}{K}\cdot\sum\limits_{k=k_0}^{k_1}\tilde{E}_{k} \f]
       - residual standard deviation: \f[ \sqrt{\langle E^2\rangle}= \sqrt{ \frac{1}{K}\cdot\sum\limits_{k=k_0}^{k_1}\tilde{E}_{k}^2 -  \frac{1}{K^2}\cdot\left[\sum\limits_{k=k_0}^{k_1}\tilde{E}_{k}\right]^2 }=\sqrt{ \left\langle\left[\tilde{E}_{k}-\langle E\rangle\right]^2\right\rangle} \f]
-      - total sum of squares (TSS): \f[ TSS = \langle g^2\rangle= K\cdot\sum\limits_{k=k_0}^{k_1}\tilde{g}_{k}^2 -  \frac{1}{K}\cdot\left[\sum\limits_{k=k_0}^{k_1}\tilde{g}_{k}\right]^2 \f]
+      - total sum of squares (TSS): \f[ TSS = \langle g^2\rangle= \sum\limits_{k=k_0}^{k_1}\tilde{g}_{k}^2 -  \frac{1}{K}\cdot\left[\sum\limits_{k=k_0}^{k_1}\tilde{g}_{k}\right]^2 \f]
       - number of fit parameters <i>NP</i>: number of free parameters in the parameter vector \f$ \vec{p}\f$ of the model \f$ g(\tilde{\tau}_k, \vec{p}) \f$
       - number of datapoints <i>NR = K</i>
       - degrees of freedom \f$ \mbox{DF}= \mbox{NR}-\mbox{NP}-1\f$

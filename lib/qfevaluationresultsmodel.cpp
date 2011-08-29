@@ -101,8 +101,13 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
     if (!evaluation) return QVariant();
     if (role==Qt::DisplayRole) {
         if (orientation==Qt::Vertical) {
-            if (section<lastResults.size()) return QVariant(lastResults[section].first->getName()+": "+lastResults[section].second);
-            else return tr("Average +/- StdDev");
+            if (section<lastResults.size()) {
+                if (lastResults[section].first) {
+                    return QVariant(lastResults[section].first->getName()+": "+lastResults[section].second);
+                } else {
+                    return QVariant();
+                }
+            } else return tr("Average +/- StdDev");
         } else {
             if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
 

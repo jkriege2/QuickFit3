@@ -1,6 +1,7 @@
 #include "qfrawdatapropertyeditor.h"
 #include "dlgnewproperty.h"
 #include "qfrawdatarecordfactory.h"
+#include "../version.h"
 
 
 // TODO: add some more options to the fit results display: store column under different name
@@ -30,6 +31,31 @@ QFRawDataPropertyEditor::~QFRawDataPropertyEditor()
     writeSettings();
 }
 
+#define ADDTOGRID(layout, counter, label, widget) {\
+    QWidget* lparent=NULL; \
+    QWidget* bwidget=NULL; \
+      lparent=widget; \
+      bwidget=widget; \
+      layout->addWidget(widget, counter, 1); \
+    QLabel* l=new QLabel(label, lparent); \
+    l->setBuddy(bwidget); \
+    layout->addWidget(l, counter, 0); \
+    counter++; \
+}
+
+#define ADDTOGRIDLAY(layout, counter, label, widget) {\
+    QWidget* lparent=NULL; \
+    QWidget* bwidget=NULL; \
+    bwidget=new QWidget(widget->parentWidget()); \
+    bwidget->setLayout(widget); \
+    lparent=bwidget; \
+    layout->addWidget(bwidget, counter, 1); \
+    QLabel* l=new QLabel(label, lparent); \
+    l->setBuddy(bwidget); \
+    layout->addWidget(l, counter, 0); \
+    counter++; \
+}
+
 void QFRawDataPropertyEditor::createWidgets() {
     QVBoxLayout* ml=new QVBoxLayout(this);
     setLayout(ml);
@@ -38,10 +64,12 @@ void QFRawDataPropertyEditor::createWidgets() {
     ml->addLayout(vl);
     btnPrevious=new QPushButton(QIcon(":/lib/prop_previous.png"), tr("&previous"), this);
     btnPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnPrevious->setToolTip(tr("move to previous record"));
     vl->addWidget(btnPrevious);
     connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previousPressed()));
     btnNext=new QPushButton(QIcon(":/lib/prop_next.png"), tr("&next"), this);
     btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnNext->setToolTip(tr("move to next record"));
     vl->addWidget(btnNext);
     labTopIcon=new QLabel(this);
     vl->addWidget(labTopIcon);
@@ -49,14 +77,24 @@ void QFRawDataPropertyEditor::createWidgets() {
     vl->addWidget(labTop);
     vl->addStretch();
     connect(btnNext, SIGNAL(clicked()), this, SLOT(nextPressed()));
+
+    btnDeleteReord=new QPushButton(QIcon(":/lib/item_delete.png"), tr("&Remove Record"), this);
+    btnDeleteReord->setToolTip(tr("removes the currently displayed record from the project"));
+    btnDeleteReord->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    vl->addWidget(btnDeleteReord);
+    connect(btnDeleteReord, SIGNAL(clicked()), this, SLOT(deleteRecord()));
+
     tabMain=new QTabWidget(this);
     ml->addWidget(tabMain);
 
     QWidget* w=new QWidget(tabMain);
     QFormLayout* fl=new QFormLayout(w);
+    //int flcounter=0;
+    fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     w->setLayout(fl);
     tabMain->addTab(w, tr("&Properties"));
     labID=new QLabel(w);
+    labID->setSizePolicy(labID->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
     fl->addRow(tr("ID:"), labID);
     labType=new QLabel(w);
     labTypeIcon=new QLabel(w);
@@ -69,15 +107,24 @@ void QFRawDataPropertyEditor::createWidgets() {
     edtName=new QLineEdit(w);
     fl->addRow(tr("&Name:"), edtName);
     pteDescription=new QPlainTextEdit(w);
+    pteDescription->setSizePolicy( pteDescription->sizePolicy().horizontalPolicy(),QSizePolicy::Preferred);
+
     fl->addRow(tr("&Description:"), pteDescription);
+    //fl->setRowStretch(flcounter-1, 2);
     lstFiles=new QListWidget(w);
+    lstFiles->setSizePolicy(lstFiles->sizePolicy().verticalPolicy(), QSizePolicy::Preferred);
     fl->addRow(tr("&Files:"), lstFiles);
+    //fl->setRowStretch(flcounter-1, 1);
     tvProperties=new QTableView(w);
     QFontMetrics fm(font());
     tvProperties->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.1));
     tvProperties->horizontalHeader()->setStretchLastSection(true);
+    //tvProperties->setSizePolicy(tvProperties->sizePolicy().horizontalPolicy(), QSizePolicy::Expanding);
+    tvProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    QWidget* widProperties=new QWidget(this);
     QHBoxLayout* pl1=new QHBoxLayout(this);
+    widProperties->setLayout(pl1);
     pl1->setContentsMargins(0,0,0,0);
     pl1->addWidget(tvProperties);
     QVBoxLayout* pl2=new QVBoxLayout(this);
@@ -89,7 +136,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     connect(btnDeleteProperty, SIGNAL(clicked()), this, SLOT(deletePropClicked()));
     pl2->addWidget(btnDeleteProperty);
     pl2->addStretch();
-    fl->addRow(tr("Properties:"), pl1);
+    fl->addRow(tr("Properties:"), widProperties);
+    //fl->setRowStretch(flcounter-1, 5);
 
     widResults=new QWidget(this);
     QVBoxLayout* rwvlayout=new QVBoxLayout(this);
@@ -304,6 +352,23 @@ void QFRawDataPropertyEditor::previousPressed() {
     if (current) {
         QFRawDataRecord* n=current->getPreviousOfSameType();
         setCurrent(n);
+    }
+}
+
+void QFRawDataPropertyEditor::deleteRecord() {
+    if (current) {
+        int ret = QMessageBox::question(this, tr("QuickFit %1").arg(VERSION_FULL),
+                                tr("Do you really want to delete the current record?\n   '%1'").arg(current->getName()),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No);
+        if (ret==QMessageBox::Yes) {
+            QPointer<QFRawDataRecord> m=current;
+            previousPressed();
+            current->getProject()->deleteRawData(m->getID());
+            if (current==m) {
+                close();
+            }
+        }
     }
 }
 

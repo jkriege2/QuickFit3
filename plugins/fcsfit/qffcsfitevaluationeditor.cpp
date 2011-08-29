@@ -1577,6 +1577,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 QString group="fit properties";
 
                 record->resultsSetEvaluationGroup(evalID, QString("%1 %2 %3"));
+                record->resultsSetEvaluationGroupIndex(evalID, run);
                 record->resultsSetEvaluationDescription(evalID, QString(""));
 
                 record->resultsSetInteger(evalID, param="fit_used_run", run);
@@ -1762,7 +1763,7 @@ void QFFCSFitEvaluationEditor::fitAll() {
     dlgFitProgress->display();
 
 
-    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
     // count the records and runs to work on (for proper superProgress
     int items=recs.size();
@@ -1815,7 +1816,7 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
     dlgFitProgress->display();
 
 
-    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
     // count the records and runs to work on (for proper superProgress
     int items=0;
@@ -1902,7 +1903,7 @@ void QFFCSFitEvaluationEditor::copyToAll() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double* params=eval->allocFillParameters();
 
-    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
     for (int i=0; i<ffunc->paramCount(); i++) {
         QString id=ffunc->getParameterID(i);
@@ -1944,7 +1945,7 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double* params=eval->allocFillParameters();
 
-    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
     for (int i=0; i<ffunc->paramCount(); i++) {
         QString id=ffunc->getParameterID(i);

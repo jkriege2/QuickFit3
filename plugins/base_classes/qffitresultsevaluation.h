@@ -740,6 +740,8 @@ protected:
     /** \brief map with all available fit algorithms */
     QMap<QString, QFFitAlgorithm*> m_fitAlgorithms;
 
+    /** \brief settings object to access global fit parameters */
+    QSettings* fitParamGlobalSettings;
     /** \brief settings object to access fit parameters */
     QSettings* fitParamSettings;
 

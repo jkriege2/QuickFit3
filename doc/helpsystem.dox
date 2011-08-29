@@ -61,6 +61,10 @@
          - \c $$tutorials_contents$$ will be replaced by a list of plugin tutorials (complete with links as unordered list!)
          - \c $$help_contents$$ will be replaced by a list of plugin main help files (complete with links as unordered list!)
         .
+      - insert file's contents
+         - \verbatim $$insert:FILENAME$$ \endverbatim insert the contents (complete !!!) of the given file \c FILENAME (path relative to current directory)
+         - \verbatim $$insertglobal:FILENAME$$ \endverbatim insert the contents (complete !!!) of the given file \c FILENAME in the global help directory
+		. 
       - go back to top bar:    
          - \c $$qf_commondoc_backtop$$ displays a blue bar with an upward arrow that allows to jump back to the top of the page
         .

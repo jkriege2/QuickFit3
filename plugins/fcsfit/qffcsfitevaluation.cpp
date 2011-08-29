@@ -8,12 +8,21 @@ QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
     QFFitResultsEvaluation("fcs_", parent)
     //QFEvaluationItem(parent, true, false)
 {
-    QFileInfo inif(parent->getServices()->getOptions()->getIniFilename());
-    QString inifn=inif.absolutePath()+"/fitparams.ini";
-    fitParamSettings=new QSettings(inifn, QSettings::IniFormat);
 
     m_weighting=EqualWeighting;
     m_currentRun=-1;
+
+    if (m_fitFunctions.contains("fcs_diff")) {
+        m_fitFunction="fcs_diff";
+    } else if (m_fitFunctions.contains("fcs_diff1")) {
+        m_fitFunction="fcs_diff1";
+    } else if (m_fitFunctions.contains("fcs_multidiff")) {
+        m_fitFunction="fcs_multidiff";
+    }
+
+    if (m_fitAlgorithms.contains("fit_levmar")) {
+        m_fitAlgorithm="fit_levmar";
+    }
 
 }
 
@@ -262,7 +271,7 @@ void QFFCSFitEvaluation::resetAllFitResultsCurrentFileAllRuns() {
 void QFFCSFitEvaluation::resetAllFitResultsAllFilesAllRuns() {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRDRFCSDataInterface* rec=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
@@ -278,7 +287,7 @@ void QFFCSFitEvaluation::resetAllFitResultsAllFilesAllRuns() {
 void QFFCSFitEvaluation::resetAllFitValue()  {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRDRFCSDataInterface* rec=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
@@ -301,7 +310,7 @@ void QFFCSFitEvaluation::resetAllFitValue()  {
 
 /*! \brief reset all fit results to the initial/global/default value in all files and all runs */
 void QFFCSFitEvaluation::resetAllFitResults() {
-    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRDRFCSDataInterface* rec=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
@@ -317,7 +326,7 @@ void QFFCSFitEvaluation::resetAllFitResults() {
 void QFFCSFitEvaluation::resetAllFitFix() {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRDRFCSDataInterface* rec=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
         QString en=getEvaluationResultID(-1);
@@ -341,7 +350,7 @@ void QFFCSFitEvaluation::resetAllFitFix() {
 void QFFCSFitEvaluation::setAllFitValues(const QString& id, double value, double error) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     QString en=getEvaluationResultID();
     int pid=f->getParameterNum(id);
     QString unit="";
@@ -362,7 +371,7 @@ void QFFCSFitEvaluation::setAllFitValues(const QString& id, double value, double
 void QFFCSFitEvaluation::setAllFitFixes(const QString& id, bool fix) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QFRawDataRecord*> recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     QString en=getEvaluationResultID();
     int pid=f->getParameterNum(id);
     QString unit="";

@@ -31,5 +31,6 @@
     <qresource prefix="/lib">
         <file alias="fitalg_icon.png">icons/fitalg_icon.png</file>
         <file alias="fitfunc_icon.png">icons/fitfunc_icon.png</file>
+        <file alias="item_delete.png">icons/item_delete.png</file>
     </qresource>
 </RCC>

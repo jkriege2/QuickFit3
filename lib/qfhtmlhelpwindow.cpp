@@ -429,6 +429,9 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 if (result.contains(QString("$$")+fromHTML_replaces[i].first+QString("$$"))) replaced=true;
                 result=result.replace(QString("$$")+fromHTML_replaces[i].first+QString("$$"), fromHTML_replaces[i].second);
             }
+
+
+            // interpret $$list:<list_name>:<filter>$$ items
             QRegExp rxList("\\$\\$list\\:([a-z]+)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
             rxList.setMinimal(true);
             int count = 0;
@@ -522,8 +525,44 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
 
+            // interpret $$list:<list_name>:<filter>$$ items
+            QRegExp rxInsert("\\$\\$(insert|insertglobal)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            rxInsert.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxInsert.indexIn(result, pos)) != -1) {
+                QString command=rxInsert.cap(1).toLower().trimmed();
+                QString file=rxInsert.cap(2).trimmed();
+                //qDebug()<<pos<<list<<filter;
+
+                if (command=="insert") {
+                    qDebug()<<QFileInfo(filename).absoluteDir().absoluteFilePath(file);
+                    QFile f(QFileInfo(filename).absoluteDir().absoluteFilePath(file));
+                    QString rep="";
+                    if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        rep=f.readAll();
+                    }
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="insertglobal")) {
+                    qDebug()<<QDir(m_pluginServices->getAssetsDirectory()+"/help/").absoluteFilePath(file);
+                    QFile f(QDir(m_pluginServices->getAssetsDirectory()+"/help/").absoluteFilePath(file));
+                    QString rep="";
+                    if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        rep=f.readAll();
+                    }
+                    result=result.replace(rxInsert.cap(0), rep);
+                }
+
+                ++count;
+                pos += rxInsert.matchedLength();
+            }
+
+
+
             cnt++;
         }
+
+
 
         // remove all unreplaces $$name$$ sequences
         QRegExp rxSpecials("\\$\\$.+\\$\\$");

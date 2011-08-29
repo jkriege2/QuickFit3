@@ -608,7 +608,7 @@ void MainWindow::createActions() {
 
 
 
-    delItemAct = new QAction(QIcon(":/item_delete.png"), tr("&Delete Current Item"), this);
+    delItemAct = new QAction(QIcon(":/lib/item_delete.png"), tr("&Delete Current Item"), this);
     delItemAct->setStatusTip(tr("delete the currently selected item (if deletable) ..."));
     connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteItem()));
 

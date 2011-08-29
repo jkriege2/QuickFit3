@@ -10,7 +10,11 @@ $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$
 <p>
 This page describes the basic features any raw data record screen implements. 
       <center><img src="./pic/qf3_rdr.png"></center>
-The screen shows at least four tabs at the top. The last tab <b><img src=":/help.png"> Online-Help</b> may be used to display this online help message. The first tab <b>Properties</b> (see image above) may be used to enter these:
+The screen shows at least four tabs at the top. The last tab <b><img src=":/help.png"> Online-Help</b> may be used to display this online help message. </p>
+<p>In the head-line of this dialog you will find two buttons <img src="./pic/btn_rdr_next.png"> and <img src="./pic/btn_rdr_prev.png"> that allow to move to the next and previous record of the same type. The button <img src="./pic/btn_rdr_removerec.png"> allows to delete the current record from the project. Between the buttons QuickFit displays an icon representing the type of the current record and also its name.</p>
+
+<a name="#properties"><h2>Properties</h2>
+<p>The first tab <b>Properties</b> (see image above) may be used to enter these:
 <ul>
 <li>the internal unique ID (an integer number) of the raw data record</li>
 <li>a desciption of the evaluation type </li>
@@ -20,7 +24,10 @@ The screen shows at least four tabs at the top. The last tab <b><img src=":/help
 <li>a list of properties. A property is key/name (string) together with an arbitrary value (string, integer,floating-point number, boolean) that may e.g. be used to describe some additional information about the record, or the ambient conditions of the experiment, or any metadata, you like. These values are readable by evaluations. You may add a new property using the <img src=":/lib/prop_add.png"> button to add a new property and <img src=":/lib/prop_delete.png"> to remove the selected proeprty. You may edit the property value directly in the table, but note that some properties may be system-properties and are not editable. Any property you added by hand is editable in any case. </li>
 </ul>
 </p> 
-<p> The second last tab <b>Evaluation Results</b> may be used to view the results of all evaluation objects that were used together with the current raw data record. These results (but only for one evaluation item) are also visible on the <a href="qf3_evalscreen.html">evaluation screen</a>.
+<p> </p>
+
+<a name="#properties"><h2>Evaluation Results</h2>
+<p>The second last tab <b>Evaluation Results</b> may be used to view the results of all evaluation objects that were used together with the current raw data record. These results (but only for one evaluation item) are also visible on the <a href="qf3_evalscreen.html">evaluation screen</a>.
       <center><img src="./pic/qf3_rdr_results.png"></center>
 Features of the <b>evaluation screen</b> tab:
 <ul>

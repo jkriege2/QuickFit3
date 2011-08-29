@@ -2,6 +2,7 @@
 #define QFEVALUATIONEDITOR_H
 
 #include <QWidget>
+#include <QPointer>
 #include "programoptions.h"
 #include "qfpluginservices.h"
 
@@ -40,7 +41,7 @@ class QFEvaluationEditor : public QWidget {
     protected:
         void closeEvent( QCloseEvent * event );
         /** \brief points to the record currently displayed */
-        QFEvaluationItem* current;
+        QPointer<QFEvaluationItem> current;
         /** \brief settinsg object used to store application settings */
         ProgramOptions* settings;
         /** \brief ID of the owning QFEvaluationPropertyEditor */

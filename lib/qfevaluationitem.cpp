@@ -14,6 +14,7 @@ QFEvaluationItem::QFEvaluationItem(QFProject* parent, bool showRDRList, bool use
     errorDesc="";
     name="";
     description="";
+    if (project) connect(project, SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
 }
 
 void QFEvaluationItem::init(QString name) {
@@ -60,7 +61,7 @@ void QFEvaluationItem::readXML(QDomElement& e) {
 
     // read list of selected items
     if (useSelection) {
-        QList<QFRawDataRecord*> selectedRecords;
+        QList<QPointer<QFRawDataRecord> > selectedRecords;
         te=e.firstChildElement("selection");
         te=te.firstChildElement("item");
         while (!te.isNull()) {
@@ -121,7 +122,7 @@ void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {
     }
 }
 
-void QFEvaluationItem::setSelectedRecords(QList<QFRawDataRecord*> records) {
+void QFEvaluationItem::setSelectedRecords(QList<QPointer<QFRawDataRecord> > records) {
     for (int i=records.size()-1; i>=0; i--) {
         if (!isApplicable(records[i])) records.removeAt(i);
         //disconnect(selectedRecords[i], NULL, this, NULL);
@@ -157,7 +158,7 @@ void QFEvaluationItem::deselectRecord(int i) {
     }
 }
 
-QFRawDataRecord* QFEvaluationItem::getSelectedRecord(int i) {
+QPointer<QFRawDataRecord> QFEvaluationItem::getSelectedRecord(int i) {
     if ((i>=0) && (i<selectedRecords.size())) {
         return selectedRecords[i];
     }
@@ -189,10 +190,10 @@ void QFEvaluationItem::selectAllAplicableRecords() {
     }
 }
 
-QList<QFRawDataRecord*> QFEvaluationItem::getApplicableRecords() {
-    QList<QFRawDataRecord*> recs;
+ QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getApplicableRecords() {
+     QList<QPointer<QFRawDataRecord> > recs;
     for (int i=0; i<project->getRawDataCount(); i++) {
-        QFRawDataRecord* rec=project->getRawDataByNum(i);
+        QPointer<QFRawDataRecord> rec=project->getRawDataByNum(i);
         recs.append(rec);
     }
     return recs;
@@ -200,4 +201,20 @@ QList<QFRawDataRecord*> QFEvaluationItem::getApplicableRecords() {
 
 QString QFEvaluationItem::getResultsDisplayFilter() const {
     return getType()+"_"+QString::number(getID())+"*";
+}
+
+void QFEvaluationItem::recordAboutToBeDeleted(QFRawDataRecord* r) {
+    bool wasCurrent=false;
+    if (highlightedRecord==r) {
+        highlightedRecord=r->getNextOfSameType();
+        wasCurrent=true;
+    }
+
+    if (selectedRecords.contains(r)) {
+        selectedRecords.removeAll(r);
+    }
+    selectedRecords.removeAll(NULL);
+    emit selectionChanged(selectedRecords);
+    if (wasCurrent) emit highlightingChanged(r, highlightedRecord);
+    project->setDataChanged();
 }

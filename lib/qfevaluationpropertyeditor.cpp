@@ -1,6 +1,18 @@
 #include "qfevaluationpropertyeditor.h"
 #include "qfprojectrawdatamodel.h"
 #include "qfevaluationitemfactory.h"
+#include "../version.h"
+#include "qfproject.h"
+
+
+QFEvaluationRawDataModelProxy::QFEvaluationRawDataModelProxy(QObject *parent):
+    QSortFilterProxyModel(parent)
+{
+    setDynamicSortFilter(true);
+    eval=NULL;
+    editor=NULL;
+};
+
 
 bool QFEvaluationRawDataModelProxy::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
@@ -53,16 +65,22 @@ Qt::ItemFlags QFEvaluationRawDataModelProxy::flags(const QModelIndex &index) con
 
 void QFEvaluationRawDataModelProxy::setEvaluation(QFEvaluationItem* eval) {
     if (eval!=NULL) {
-        disconnect(eval, SIGNAL(selectionChanged(QList<QFRawDataRecord*>)), this, SLOT(selectionChanged(QList<QFRawDataRecord*>)));
+        disconnect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
     }
     this->eval=eval;
-    connect(eval, SIGNAL(selectionChanged(QList<QFRawDataRecord*>)), this, SLOT(selectionChanged(QList<QFRawDataRecord*>)));
+    connect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
     invalidateFilter();
 }
 
-void QFEvaluationRawDataModelProxy::selectionChanged(QList<QFRawDataRecord*> selectedRecords) {
+void QFEvaluationRawDataModelProxy::setEditor(QFEvaluationPropertyEditor* editor) {
+    this->editor=editor;
+}
+
+void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords) {
     //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
     invalidateFilter();
+    qDebug()<<rowCount()<<editor;
+    if ((rowCount()<=0)&& editor) editor->close();
 }
 
 
@@ -105,6 +123,7 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* service
     setCurrent(current);
     //std::cout<<"creating QFEvaluationPropertyEditor ... DONE!\n";
     readSettings();
+
 }
 
 QFEvaluationPropertyEditor::~QFEvaluationPropertyEditor() {
@@ -127,10 +146,12 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         //std::cout<<"disconnecting old ...\n";
         lstRawData->setModel(NULL);
         rdrProxy->setEvaluation(NULL);
+        rdrProxy->setEditor(NULL);
         rdrModel->setProject(NULL);
         resultsModel->init(NULL, "*");
         oldType=current->getType();
         //oldEditorCount=current->getEditorCount();
+        disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         disconnect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
         disconnect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
@@ -163,6 +184,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         //std::cout<<"connecting new ...\n";
         rdrModel->setProject(current->getProject());
         rdrProxy->setEvaluation(current);
+        rdrProxy->setEditor(this);
         resultsModel->init(current, current->getResultsDisplayFilter());
         if (current->getType()!=oldType) {
             //editorList.clear();
@@ -199,6 +221,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
+        connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
@@ -224,6 +247,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         labTypeIcon->setText("");
         lstRawData->setModel(NULL);
         rdrProxy->setEvaluation(NULL);
+        rdrProxy->setEditor(NULL);
         rdrModel->setProject(NULL);
 
     }
@@ -309,7 +333,17 @@ void QFEvaluationPropertyEditor::createWidgets() {
     wl->setLayout(layWidgets);
     //splitMain->addWidget(tabEditors);
     splitMain->addWidget(wl);
-    splitMain->addWidget(lstRawData);
+    //splitMain->addWidget(lstRawData);
+    QVBoxLayout* lstvbl=new QVBoxLayout(splitMain);
+    QWidget* lstvblw=new QWidget(splitMain);
+    lstvblw->setLayout(lstvbl);
+    lstvbl->addWidget(lstRawData, 10);
+    btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove record"), lstvblw);
+    btnRemoveRawData->setToolTip(tr("remove the current raw data record from the project"));
+    connect(btnRemoveRawData, SIGNAL(clicked()), this, SLOT(removeRawData()));
+    lstvbl->addWidget(btnRemoveRawData);
+
+    splitMain->addWidget(lstvblw);
 
     splitMain->setCollapsible(0, false);
     splitMain->setCollapsible(1, false);
@@ -402,6 +436,30 @@ void QFEvaluationPropertyEditor::writeSettings() {
     settings->getQSettings()->setValue("evalpropeditor/lastSaveDir", currentSaveDir);
 }
 
+void QFEvaluationPropertyEditor::deselectCurrent() {
+    if (lstRawData && lstRawData->model()) {
+        QModelIndex current=lstRawData->selectionModel()->currentIndex();
+        int rows=lstRawData->model()->rowCount();
+
+        QModelIndex next;
+
+        qDebug()<<current<<current.row()<<rows;
+
+        if (current.row()>0) {
+            next=lstRawData->model()->index(current.row()-1, current.column());
+
+        } else {
+            if (rows>1) next=lstRawData->model()->index(rows-1, current.column());
+        }
+        qDebug()<<next;
+        //lstRawData->selectionModel()->select(next, QItemSelectionModel::SelectCurrent);
+        if (next.isValid()) {
+            lstRawData->selectionModel()->setCurrentIndex(next, QItemSelectionModel::SelectCurrent);
+        } else {
+            close();
+        }
+    }
+}
 
 void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {
     if (rdrProxy!=NULL) {
@@ -411,6 +469,8 @@ void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, cons
         } else {
             //std::cout<<"!!!   QFEvaluationPropertyEditor::selectionChanged() with NULL new record\n";
         }
+
+        if (lstRawData->model()->rowCount()<=0) close();
     }
 }
 
@@ -522,3 +582,46 @@ void QFEvaluationPropertyEditor::saveResults() {
 void QFEvaluationPropertyEditor::resizeEvent(QResizeEvent* event) {
     labAveragedresults->setMaximumWidth(event->size().width());
 }
+
+void QFEvaluationPropertyEditor::removeRawData() {
+    if (current) {
+        QFRawDataRecord* r=current->getHighlightedRecord();
+        if (r) {
+            int ret = QMessageBox::question(this, tr("QuickFit %1").arg(VERSION_FULL),
+                                    tr("Do you really want to delete the current record?\n   '%1'").arg(r->getName()),
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No);
+            if (ret==QMessageBox::Yes) {
+                deselectCurrent();
+                current->getProject()->deleteRawData(r->getID());
+            }
+        }
+    }
+}
+
+void QFEvaluationPropertyEditor::recordAboutToBeDeleted(QFRawDataRecord* record) {
+    if (current) {
+        if (current->isApplicable(record)) {
+            int cnt=0;
+            QList<QFRawDataRecord*> list=current->getProject()->getRawDataList();
+            for (int i=0; i<list.size(); i++) {
+                if ((record!=list[i])&&(current->isApplicable(list[i]))) {
+                    cnt++;
+                }
+            }
+            if (cnt<=0) close();
+        }
+    }
+}
+
+/*
+void QFEvaluationPropertyEditor::selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords) {
+    if (current) {
+
+    }
+}
+
+void QFEvaluationPropertyEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
+
+}*/
+

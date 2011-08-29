@@ -891,6 +891,11 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
     settings.setValue("objectives_projection/magnification", cam->objectiveProjection().magnification);
     settings.setValue("objectives_projection/numerical_aperature", cam->objectiveProjection().NA);
 
+    settings.setValue("tubelens/name", cam->tubelens().name);
+    settings.setValue("tubelens/manufacturer", cam->tubelens().manufacturer);
+    settings.setValue("tubelens/magnification", cam->tubelens().magnification);
+    settings.setValue("tubelens/numerical_aperature", cam->tubelens().NA);
+
     // WRITE FILES LIST
     settings.setValue("files/count", files.size()+moreFiles.size());
     for (int i=0; i<moreFiles.size(); i++) {
@@ -945,6 +950,11 @@ QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QF
     settings.setValue("objectives_projection/manufacturer", cam->objectiveProjection().manufacturer);
     settings.setValue("objectives_projection/magnification", cam->objectiveProjection().magnification);
     settings.setValue("objectives_projection/numerical_aperature", cam->objectiveProjection().NA);
+
+    settings.setValue("tubelens/name", cam->tubelens().name);
+    settings.setValue("tubelens/manufacturer", cam->tubelens().manufacturer);
+    settings.setValue("tubelens/magnification", cam->tubelens().magnification);
+    settings.setValue("tubelens/numerical_aperature", cam->tubelens().NA);
 
     // WRITE FILES LIST
     settings.setValue("files/count", files.size());

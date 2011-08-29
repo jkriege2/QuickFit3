@@ -8,6 +8,7 @@
 #include <QtXml>
 #include <QStringList>
 #include <QMap>
+#include <QPointer>
 #include <QIcon>
 #include <QAbstractTableModel>
 #include "qfproject.h"
@@ -135,7 +136,7 @@ class QFEvaluationItem : public QObject, public QFProperties {
         bool getShowRDRList() const { return showRDRList; };
 
         /** \brief returns a list of currently selected items */
-        QList<QFRawDataRecord*> getSelectedRecords() const { return selectedRecords; };
+        QList<QPointer<QFRawDataRecord> > getSelectedRecords() const { return selectedRecords; };
 
         /** \brief add a record to the set of selected records */
         void selectRecord(QFRawDataRecord* record);
@@ -153,7 +154,7 @@ class QFEvaluationItem : public QObject, public QFProperties {
         inline int getSelectedRecordCount() { return selectedRecords.size(); }
 
         /** \brief return the i-th selected record */
-        QFRawDataRecord* getSelectedRecord(int i);
+        QPointer<QFRawDataRecord> getSelectedRecord(int i);
 
         /** \brief empty list of selected records */
         void clearSelectedRecords();
@@ -185,7 +186,7 @@ class QFEvaluationItem : public QObject, public QFProperties {
         virtual void writeXML(QXmlStreamWriter& w);
 
         /** \brief list of the raw data records this evaluation is applicable to */
-        QList<QFRawDataRecord*> getApplicableRecords();
+        QList<QPointer<QFRawDataRecord> > getApplicableRecords();
 
         /*! \brief the filter returned by this function is used to filter the evaluation reeults to display in the
                    "results" pane of the QFEvaluationPropertyEditor dialog.
@@ -218,7 +219,11 @@ class QFEvaluationItem : public QObject, public QFProperties {
         /** \brief signal emitted when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
         /** \brief signal emitted when the selection changed */
-        void selectionChanged(QList<QFRawDataRecord*> selectedRecords);
+        void selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords);
+
+    protected slots:
+        /** \brief called when a record is going to be deleted in the project, so we can savely hide it in an editor or so! */
+        void recordAboutToBeDeleted(QFRawDataRecord* r);
 
     protected:
         /** \brief ID of the raw data record */
@@ -256,7 +261,7 @@ class QFEvaluationItem : public QObject, public QFProperties {
         void setError(QString description) { errorOcc=true; errorDesc=description; }
 
         /** \brief set the list of currently selected items */
-        void setSelectedRecords(QList<QFRawDataRecord*> records);
+        void setSelectedRecords(QList<QPointer<QFRawDataRecord> > records);
 
         /** \brief determines whether the user may select a set of records (\c true ) or whether the user may only
          *         highlight a single record  (\c false , default).
@@ -271,10 +276,10 @@ class QFEvaluationItem : public QObject, public QFProperties {
         bool showRDRList;
 
         /** \brief list of the currently selected records */
-        QList<QFRawDataRecord*> selectedRecords;
+        QList<QPointer<QFRawDataRecord> > selectedRecords;
 
         /** \brief points to the currently highlighted record */
-        QFRawDataRecord* highlightedRecord;
+        QPointer<QFRawDataRecord> highlightedRecord;
 
 };
 

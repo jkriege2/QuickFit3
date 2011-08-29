@@ -13,6 +13,8 @@
 #include "qenhancedtableview.h"
 #include "qvisiblehandlesplitter.h"
 
+class QFEvaluationPropertyEditor; // forward
+
 
 /*! \brief This QSortFilterProxyModel implements a filter proxy model which  to filter out records
           that are not usable together with a given QFMultiListEvaluation.
@@ -29,13 +31,13 @@ class QFEvaluationRawDataModelProxy : public QSortFilterProxyModel {
         Q_OBJECT
 
     public:
-        QFEvaluationRawDataModelProxy(QObject *parent = 0): QSortFilterProxyModel(parent) {
-            setDynamicSortFilter(true);
-        };
+        QFEvaluationRawDataModelProxy(QObject *parent = 0);
+
         virtual ~QFEvaluationRawDataModelProxy() {};
 
         /** \brief set the evaluation against which the records shall be checked */
         void setEvaluation(QFEvaluationItem* eval);
+        void setEditor(QFEvaluationPropertyEditor* editor);
 
         virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
@@ -43,11 +45,12 @@ class QFEvaluationRawDataModelProxy : public QSortFilterProxyModel {
 
     protected slots:
         /** \brief called when the selection in the currently set evaluation changed */
-        void selectionChanged(QList<QFRawDataRecord*> selectedRecords);
+        void selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords);
     protected:
         virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
         /** \brief QFMultiListEvaluation used to check whether a raw data record is applicable */
-        QFEvaluationItem* eval;
+        QPointer<QFEvaluationItem> eval;
+        QPointer<QFEvaluationPropertyEditor> editor;
 
 };
 
@@ -83,6 +86,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         void setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
             helpWidget->setHtmlReplacementList(list);
         }
+        /** \brief deselect the currently highlighted record and choose another one from the available records! */
+        void deselectCurrent();
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);
@@ -91,7 +96,7 @@ class QFEvaluationPropertyEditor : public QWidget {
         /** \brief emitted when the raw data record data changes (i.e. ID, name, description, ...) */
         void propsChanged();
         /** \brief this will be connected to the project to indicate when  the currently
-         *         displayed record should be deleted */
+         *         displayed evaluation item should be deleted */
         void evaluationAboutToBeDeleted(QFEvaluationItem* r);
         /** \brief activated when the selection in lstRawData changes
          *  \see rdrModelReset()
@@ -110,9 +115,16 @@ class QFEvaluationPropertyEditor : public QWidget {
 
         /** \brief save results to a file */
         void saveResults();
+
+        /** \brief remove the currently selected QFRawDataRecord */
+        void removeRawData();
+
+        /** \brief if this was the last record this applies to, we close it */
+        void recordAboutToBeDeleted(QFRawDataRecord* record);
+
     protected:
         /** \brief points to the record currently displayed */
-        QFEvaluationItem* current;
+        QPointer<QFEvaluationItem> current;
         /** \brief model showing all available raw data records */
         QFProjectRawDataModel* rdrModel;
         /** \brief proxy model to filter rdrModel */
@@ -148,6 +160,8 @@ class QFEvaluationPropertyEditor : public QWidget {
         QVisibleHandleSplitter* splitMain;
         /** \brief Layout widget for the evaluation editor widget */
         QHBoxLayout* layWidgets;
+        /** \brief remove the currently selected QFRawDataRecord */
+        QPushButton* btnRemoveRawData;
 
         /** \brief tabel display the evaluation results associated with this file  */
         QEnhancedTableView* tvResults;
