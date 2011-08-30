@@ -10,6 +10,8 @@ rm ${ZIPFILE}
 mkdir -p deploy
 
 cd ..
+rm compiledate.h
+rm svnversion.h
 qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
 make
 make install
