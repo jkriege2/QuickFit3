@@ -12,6 +12,9 @@ mkdir -p deploy
 cd ..
 rm compiledate.h
 rm svnversion.h
+rm ./application/Makefile
+rm ./application/Makefile.Release
+rm ./application/Makefile.Debug
 qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
 make
 make install
