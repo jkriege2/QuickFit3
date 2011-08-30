@@ -28,8 +28,9 @@ do
 done
 
 if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
-mv ./globalconfig/* ./globalconfig_templates
+rm ./globalconfig/*
 rmdir ./globalconfig
+rm Qt*d4.dll
 find -name ".svn" -type d -exec rm -rf {} \;
 find -name "*.log" -exec rm -rf {} \;
 find -name "*.autosave" -exec rm -rf {} \;
@@ -44,7 +45,7 @@ do
 	find -name "${f}.*" -exec rm -rf {} \;
 done
 
-rm deploy.sh
+rm *.sh
 rm *.ini
 
 zip -rv9 ../${ZIPFILE} *

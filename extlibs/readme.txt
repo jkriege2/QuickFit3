@@ -1,4 +1,8 @@
 This directory contains external dependencies that may not be available on your system.
+
+If there is a .pri file in this directory for your library that one should solve all your problems.
+So simply include it and you should not need to add other options to your .pro file!
+
 If so, you may use these, according to the information given below:
 
 

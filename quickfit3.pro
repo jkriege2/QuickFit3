@@ -1,13 +1,16 @@
+
 release {
-    message("building in RELEASE mode")
+    message("building QuickFit in RELEASE mode, output is in $$QFOUTPUT")
 } else {
-    message("building in DEBUG mode")
+    message("building QuickFit in DEBUG mode, output is in $$QFOUTPUT")
 }
+
+
+include(autoversioning.pri)
 
 
 TEMPLATE = subdirs
 
-include(autoversioning.pri)
 
 SUBDIRS += lib libqf3widgets application
 application.depends = lib libqf3widgets
@@ -40,29 +43,33 @@ SUBDIRS += plg_fitalgorithm_simanneal
 plg_fitalgorithm_simanneal.subdir=./plugins/fitalgorithm_simanneal
 plg_fitalgorithm_simanneal.depends = lib libqf3widgets
 
-SUBDIRS += plg_spimb040
-plg_spimb040.subdir=./plugins/spimb040
-plg_spimb040.depends = lib libqf3widgets
 
-SUBDIRS += plg_cam_testcamera
-plg_cam_testcamera.subdir=./plugins/cam_testcamera
-plg_cam_testcamera.depends = lib libqf3widgets
+!macx {
 
-SUBDIRS += plg_cam_radhard2
-plg_cam_radhard2.subdir=./plugins/cam_radhard2
-plg_cam_radhard2.depends = lib libqf3widgets
+    SUBDIRS += plg_spimb040
+    plg_spimb040.subdir=./plugins/spimb040
+    plg_spimb040.depends = lib libqf3widgets
 
-SUBDIRS += plg_cam_andor
-plg_cam_andor.subdir=./plugins/cam_andor
-plg_cam_andor.depends = lib libqf3widgets
+    SUBDIRS += plg_cam_testcamera
+    plg_cam_testcamera.subdir=./plugins/cam_testcamera
+    plg_cam_testcamera.depends = lib libqf3widgets
 
-unix {
-    SUBDIRS += plg_cam_rh2v2
-    plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
-    plg_cam_rh2v2.depends = lib libqf3widgets
+    SUBDIRS += plg_cam_radhard2
+    plg_cam_radhard2.subdir=./plugins/cam_radhard2
+    plg_cam_radhard2.depends = lib libqf3widgets
+
+    SUBDIRS += plg_cam_andor
+    plg_cam_andor.subdir=./plugins/cam_andor
+    plg_cam_andor.depends = lib libqf3widgets
+
+    unix {
+        SUBDIRS += plg_cam_rh2v2
+        plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
+        plg_cam_rh2v2.depends = lib libqf3widgets
+    }
+
+    SUBDIRS += plg_stage_pi
+    plg_stage_pi.subdir=./plugins/stage_pi
+    plg_stage_pi.depends = lib libqf3widgets
+
 }
-
-SUBDIRS += plg_stage_pi
-plg_stage_pi.subdir=./plugins/stage_pi
-plg_stage_pi.depends = lib libqf3widgets
-

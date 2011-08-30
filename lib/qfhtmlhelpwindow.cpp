@@ -23,7 +23,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
     QWidget(parent)
 {
     m_pluginServices=NULL;
-    searchPath=QApplication::applicationDirPath();
+    searchPath="";
     replaces=NULL;
     m_baseFont=font();
     m_titleFont=font();
@@ -113,8 +113,6 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
     history.append(HistoryEntry(filename, title));
     updateButtons();
     //history.clear();
-    //QStringList(QApplication::applicationDirPath()+"/models/help/"+QFileInfo(model->getFilename()).completeBaseName()+"/")
-    //std::cout<<QString(QApplication::applicationDirPath()+"/models/help/"+QFileInfo(model->getFilename()).completeBaseName()+"/").toStdString()<<std::endl;
     descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
     if (!fragment.isEmpty()) {
         descriptionBrowser->scrollToAnchor(fragment);

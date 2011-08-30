@@ -12,9 +12,18 @@ INCLUDEPATH += . \
 include(../quickfit3.pri)
 
 release {
-    message("building in RELEASE mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT")
 } else {
-    message("building in DEBUG mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in DEBUG mode, output is in $$QFOUTPUT")
+}
+macx {
+    message("build system is macx")
+}
+win32 {
+    message("build system is win32")
+}
+unix {
+    message("build system is unix")
 }
 
 
@@ -26,9 +35,7 @@ LIBS += -L$$DESTDIR -lquickfit3lib -lquickfit3widgets
 # Input
 HEADERS += mainwindow.h \
            optionsdialog.h \
-    ../version.h \
-    ../svnversion.h \
-    ../compiledate.h
+    ../version.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -45,13 +52,17 @@ TRANSLATIONS= ./translations/de.ts
 
 INCLUDEPATH += ../../../../LIB/trunk/
 
-RC_FILE = quickfit3.rc
+win32 {
+    RC_FILE = quickfit3.rc
+}
 
 QT += gui xml
-CONFIG += console exceptions rtti stl
+CONFIG += console exceptions rtti stl link_prl
 
 
-
+exists(qf3icon.icns) {
+    ICON = myapp.icns
+}
 
 
 

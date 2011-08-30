@@ -4,9 +4,9 @@ TARGET = quickfit3widgets
 include(../quickfit3.pri)
 
 release {
-    message("building in RELEASE mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT")
 } else {
-    message("building in DEBUG mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in DEBUG mode, output is in $$QFOUTPUT")
 }
 
 DEPENDPATH += .
@@ -113,4 +113,4 @@ TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
-CONFIG += exceptions rtti stl
+CONFIG += lib_bundle exceptions rtti stl create_prl

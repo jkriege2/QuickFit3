@@ -290,8 +290,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         */
 
         helpWidget->clear();
-        QString dll=current->getProject()->getRawDataRecordFactory()->getPluginFilename(current->getType());
-        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/"))+current->getType()+".html");
+        QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
+        helpWidget->updateHelp(dll);
 
     } else {
         edtName->setText("");

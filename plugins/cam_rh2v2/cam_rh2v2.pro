@@ -10,14 +10,14 @@ DEPENDPATH += ./
 
 
 include(../plugins.pri)
+include(../../extlibs/usb.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS += -lusb -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
-win32:LIBS += -lgdi32
+LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += cam_rh2v2.h \

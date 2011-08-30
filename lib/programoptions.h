@@ -109,6 +109,9 @@ class ProgramOptions: public QObject {
         QString languageID;
         /** \brief last dir to load a raw data from */
         QString currentRawDataDir;
+        /** \brief directory of the QuickFit executable (as this circumvents problems with MacOS bundles ... use this instead of QApplication::applicationDirPath() )*/
+        QString appDir;
+
         /** \brief maximum number of threads */
         int maxThreads;
         /** \brief autosave interval in minutes (0=off) */

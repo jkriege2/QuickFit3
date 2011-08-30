@@ -5,7 +5,7 @@ TARGET = imaging_fcs
 DEPENDPATH += ./
 
 include(../plugins.pri)
-
+include(../../extlibs/tiff.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 

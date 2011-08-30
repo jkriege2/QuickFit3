@@ -7,12 +7,13 @@ TARGET = cam_testcamera
 DEFINES += TARGETNAME=$$TARGET
 
 include(../plugins.pri)
+include(../../extlibs/tiff.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
 DEPENDPATH += ./
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets -L../../extlibs/libtiff/ -ltiff
+LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += cam_testcamera.h \
@@ -31,8 +32,7 @@ TRANSLATIONS= ./translations/de.cam_testcamera.ts
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/ \
-               ../../extlibs/libtiff/
+               ../../../../../LIB/trunk/qt/
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl

@@ -135,9 +135,9 @@ double QFFCSFitEvaluation::getFitError(QFRawDataRecord* r, int run, const QStrin
 }
 
 bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) {
-    int run=getRunFromEvaluationResultID(paramid);
+    int run=getRunFromEvaluationResultID(id);
     QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
-    if (crintf && (id=="count_rate")) {
+    if (crintf && (paramid=="count_rate")) {
         error=crintf->getRateStdDev(run)*1000;
         value=crintf->getRateMean(run)*1000;
         return true;

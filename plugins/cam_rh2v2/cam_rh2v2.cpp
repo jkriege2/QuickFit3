@@ -45,7 +45,6 @@ void QFExtensionCameraRh2v2::loadSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -56,7 +55,6 @@ void QFExtensionCameraRh2v2::storeSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 	}
 

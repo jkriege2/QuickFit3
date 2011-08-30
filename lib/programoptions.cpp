@@ -1,5 +1,7 @@
 #include "programoptions.h"
 #include <iostream>
+#include <QtCore>
+#include <QDir>
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
@@ -23,23 +25,33 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     QObject(parent)
 {
     QFileInfo fi(QApplication::applicationFilePath());
-
-    globalConfigDir=QApplication::applicationDirPath()+"/globalconfig/";
+    appDir=QApplication::applicationDirPath();
+    #if defined(Q_OS_MAC)
+        // get out of /MyApp.app/Contents/MacOS in MacOSX App-Bundle
+        QDir aappDir(appDir);
+        if (aappDir.dirName() == "MacOS") {
+            aappDir.cdUp();
+            aappDir.cdUp();
+            aappDir.cdUp();
+        }
+        appDir=	aappDir.absolutePath()
+    #endif
+    globalConfigDir=appDir+"/globalconfig/";
     configDir=QDir::homePath()+"/."+fi.completeBaseName()+"/";
-    assetsDir=QApplication::applicationDirPath()+"/assets/";
-    pluginsDir=QApplication::applicationDirPath()+"/plugins/";
+    assetsDir=appDir+"/assets/";
+    pluginsDir=appDir+"/plugins/";
 
     #ifdef __WINDOWS__
-    //configDir=QApplication::applicationDirPath();
     #endif
 
-    #ifdef __LINUX__
-    //configDir=QApplication::applicationDirPath();
+    #if defined(__LINUX__) || defined(Q_OS_MAC)
     globalConfigDir="/usr/share/quickfit3/";
     #endif
 
 
-    QDir d(QApplication::applicationDirPath());
+
+
+    QDir d(appDir);
     d.mkpath(configDir);
     d.mkpath(globalConfigDir);
 
@@ -123,7 +135,7 @@ void ProgramOptions::readSettings() {
     emit styleChanged(style);
     stylesheet=settings->value("quickfit/stylesheet", stylesheet).toString();
     if (app) {
-        QString fn=QString(QCoreApplication::applicationDirPath()+"/stylesheets/%1.qss").arg(stylesheet);
+        QString fn=QString(appDir+"/stylesheets/%1.qss").arg(stylesheet);
         //std::cout<<"loading stylesheet '"<<fn.toStdString()<<"' ... ";
         QFile f(fn);
         f.open(QFile::ReadOnly);

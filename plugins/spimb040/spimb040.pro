@@ -7,9 +7,11 @@ DEPENDPATH += ./
 
 
 include(../plugins.pri)
+include(../../extlibs/lmfit.pri)
+include(../../extlibs/tiff.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
-LIBS += -L../../extlibs/lmfit/ -llmmin -L../../extlibs/libtiff/ -ltiff -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+LIBS +=  -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += spimb040.h \
@@ -52,8 +54,7 @@ INCLUDEPATH += . \
                ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
-               ../../../../../LIB/trunk/qt/ \
-               ../../extlibs/libtiff/
+               ../../../../../LIB/trunk/qt/
 
 QT += gui xml svg opengl
 

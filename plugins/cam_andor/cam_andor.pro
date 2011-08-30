@@ -5,18 +5,15 @@ TARGET = cam_andor
 DEPENDPATH += ./
 
 include(../plugins.pri)
+include(../../extlibs/andor.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
 
 DEFINES += TARGETNAME=$$TARGET
 
-win32 {
-  LIBS+= -L../../extlibs/andor_win32
-  INCLUDEPATH += ../../extlibs/andor_win32
-}
 
-LIBS += -landor -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += cam_andor.h \

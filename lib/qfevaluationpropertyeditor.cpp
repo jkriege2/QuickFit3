@@ -232,8 +232,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
 
 
         helpWidget->clear();
-        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginFilename(current->getType());
-        helpWidget->updateHelp(QString(services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/"))+current->getType()+".html");
+        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
+        helpWidget->updateHelp(dll);
 
     } else {
         edtName->setText("");

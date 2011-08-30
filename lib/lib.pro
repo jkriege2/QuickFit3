@@ -4,11 +4,13 @@ DEPENDPATH += .
 
 include(../quickfit3.pri)
 
+
 release {
-    message("building in RELEASE mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT")
 } else {
-    message("building in DEBUG mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in DEBUG mode, output is in $$QFOUTPUT")
 }
+
 
 INCLUDEPATH += .
 
@@ -56,9 +58,7 @@ HEADERS += dlgnewproperty.h \
            csvtools.h \
     qtriple.h \
     qvisiblehandlesplitter.h \
-    ../version.h \
-    ../svnversion.h \
-    ../compiledate.h
+    ../version.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -98,4 +98,5 @@ TRANSLATIONS= ./translations/de.lib.ts
 
 INCLUDEPATH +=
 
-CONFIG += exceptions rtti stl
+CONFIG += lib_bundle exceptions rtti stl create_prl
+

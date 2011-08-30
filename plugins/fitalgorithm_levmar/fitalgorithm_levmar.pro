@@ -4,11 +4,10 @@ TARGET = fitalgorithm_levmar
 DEPENDPATH += ./
 
 include(../plugins.pri)
+include(../../extlibs/levmar.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
-win32:LIBS += -L../../extlibs/levmar/ -llevmar -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
-unix:LIBS += -llapack -lblas -llevmar -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += fitalgorithm_levmar.h \
@@ -27,7 +26,6 @@ INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/ \
-               ../../extlibs/ \
                .
 
 QT += core

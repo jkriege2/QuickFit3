@@ -10,21 +10,10 @@ release {
             SVNVERSION = $$system(git svn info -r HEAD ../ | grep 'evision' | cut -d: -f2)
         }
     }
-    message("RELEASE MODE: svnversion is: $$SVNVERSION")
+    isEmpty(SVNVERSION) {
+        SVNVERSION = ---
+    }
 
-    #win32:isEmpty(QMAKE_SH) {
-        !isEmpty(SVNVERSION) {
-            system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
-        } else {
-            system(echo $$LITERAL_HASH define SVNVERSION \"---\"  > svnversion.h )
-        }
-    #} else {
-    #    !isEmpty(SVNVERSION) {
-    #        system(echo \" $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\" \" > svnversion.h )
-    #    } else {
-    #        system(echo \" $$LITERAL_HASH define SVNVERSION \"---\" \" > svnversion.h )
-    #    }
-    #}
 
     win32 {
 	    # first we have to check whether a MS Windows style date command is called. If you call this without the /T option, it will
@@ -44,28 +33,28 @@ release {
 	    # on UNIX we just call the date command!
         DATESTR = $$system(date +%Y/%M/%d)
     }
-
-    message("RELEASE MODE: svnversion is: $$DATESTR")
-
-    #win32:isEmpty(QMAKE_SH) {
-        !isEmpty(SVNVERSION) {
-            system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
-        } else {
-            system(echo $$LITERAL_HASH define COMPILEDATE \"---\"  > compiledate.h )
-        }
-    #} else {
-    #    !isEmpty(SVNVERSION) {
-    #        system(echo \" $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\" \" > compiledate.h )
-    #    } else {
-    #        system(echo \" $$LITERAL_HASH define COMPILEDATE \"---\" \" > compiledate.h )
-    #    }
-    #}
-
-
+    isEmpty(DATESTR) {
+        DATESTR = ---
+    }
+    message("RELEASE MODE: svnversion is: $$SVNVERSION")
+    message("RELEASE MODE: build date is: $$DATESTR")
 
 } else {
     message("DEBUG MODE: here we do not read the new svn version, but only make sure that the autoversioning files do exist")
     message("DEBUG MODE: compile in RELEASE mode in order to update autoversion!!!")
-    !exists(compiledate.h):system(echo ' $$LITERAL_HASH define COMPILEDATE \"---\" ' > compiledate.h )
-    !exists(svnversion.h):system(echo ' $$LITERAL_HASH define SVNVERSION \"---\" ' > svnversion.h )
+    DATESTR = ---
+    SVNVERSION = ---
 }
+
+
+
+
+win32 {
+    system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
+    system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
+} else {
+    system(echo '$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"'  > svnversion.h )
+    system(echo '$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"'  > compiledate.h )
+}
+
+

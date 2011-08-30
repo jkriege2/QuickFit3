@@ -512,6 +512,9 @@ void MainWindow::createWidgets() {
     fl->addRow(tr("Project &Name:"), edtName);
     connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(projectNameChanged(const QString&)));
     labFile=new QLabel(w);
+    labFile->setWordWrap(true);
+    labFile->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    labFile->setSizePolicy(QSizePolicy::Ignored, labFile->sizePolicy().verticalPolicy());
     fl->addRow(tr("Project File:"), labFile);
     edtCreator=new QLineEdit(w);
     fl->addRow(tr("Project &Creator:"), edtCreator);

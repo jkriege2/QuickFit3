@@ -2378,7 +2378,7 @@ void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
     QFFitFunction* function=data->getFitFunction(pid);
     QString help=services->getFitFunctionManager()->getPluginHelp(ppid, pid);
     if (QFile::exists(help) && function) {
-        hlpFunction->updateHelp(function->name(), help);
+        hlpFunction->updateHelp(help);
         hlpFunction->show();
     } else {
         QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit function available."));
@@ -2404,7 +2404,7 @@ void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
     QString help=services->getFitAlgorithmManager()->getPluginHelp(ppid, pid);
     if (QFile::exists(help) && algorithm) {
-        hlpAlgorithm->updateHelp(algorithm->name(), help);
+        hlpAlgorithm->updateHelp(help);
         hlpAlgorithm->show();
     } else {
         QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit algorithm available."));
