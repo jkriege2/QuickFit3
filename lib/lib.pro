@@ -55,7 +55,10 @@ HEADERS += dlgnewproperty.h \
            qflib_version.h \
            csvtools.h \
     qtriple.h \
-    qvisiblehandlesplitter.h
+    qvisiblehandlesplitter.h \
+    ../version.h \
+    ../svnversion.h \
+    ../compiledate.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

@@ -10,11 +10,11 @@ rm ${ZIPFILE}
 mkdir -p deploy
 
 cd ..
-rm compiledate.h
-rm svnversion.h
-rm ./application/Makefile
-rm ./application/Makefile.Release
-rm ./application/Makefile.Debug
+#rm compiledate.h
+#rm svnversion.h
+#rm ./application/Makefile
+#rm ./application/Makefile.Release
+#rm ./application/Makefile.Debug
 qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
 make
 make install
@@ -27,8 +27,9 @@ do
 	fi
 done
 
-if ! (cd deploy); then echo "could not create ./deploy/"; exit 1; fi
-mv ./globalconfig ./globalconfig_templates
+if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
+mv ./globalconfig/* ./globalconfig_templates
+rmdir ./globalconfig
 find -name ".svn" -type d -exec rm -rf {} \;
 find -name "*.log" -exec rm -rf {} \;
 find -name "*.autosave" -exec rm -rf {} \;
