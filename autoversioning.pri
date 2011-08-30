@@ -1,7 +1,7 @@
 # only write new version files in release mode
 # in debug mode: only make sure that the files exist, but do not update them
 
-release {
+#release {
     # try to read the SVN version
     SVNVERSION = $$system(svnversion)
     isEmpty(SVNVERSION){
@@ -39,12 +39,12 @@ release {
     message("RELEASE MODE: svnversion is: $$SVNVERSION")
     message("RELEASE MODE: build date is: $$DATESTR")
 
-} else {
-    message("DEBUG MODE: here we do not read the new svn version, but only make sure that the autoversioning files do exist")
-    message("DEBUG MODE: compile in RELEASE mode in order to update autoversion!!!")
-    DATESTR = ---
-    SVNVERSION = ---
-}
+#} else {
+#    message("DEBUG MODE: here we do not read the new svn version, but only make sure that the autoversioning files do exist")
+#    message("DEBUG MODE: compile in RELEASE mode in order to update autoversion!!!")
+#    DATESTR = ---
+#    SVNVERSION = ---
+#}
 
 
 

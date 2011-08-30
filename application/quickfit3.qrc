@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file alias="splash.png">../images/splash.png</file>
-        <file alias="icon.png">../images/qf3icon.png</file>
+        <file alias="icon.png">../images/icon_128.png</file>
         <file alias="help.png">../images/16x16/help.png</file>
         <file alias="help_next.png">../images/16x16/help_next.png</file>
         <file alias="help_previous.png">../images/16x16/help_previous.png</file>

@@ -194,10 +194,10 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ogl->addWidget(cmbObjective, 0,1);
     cmbObjectiveProjection=new QComboBox(this);
     connect(cmbObjectiveProjection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbObjectiveProjection, 2,1);
+    ogl->addWidget(cmbObjectiveProjection, 1,1);
     cmbTubelens=new QComboBox(this);
     connect(cmbTubelens, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbTubelens, 1,1);
+    ogl->addWidget(cmbTubelens, 2,1);
     btnAddObjective=new QToolButton(this);
     btnAddObjective->setToolTip(tr("add a new objective"));
     btnAddObjective->setIcon(QIcon(":/spimb040/objective_add.png"));
@@ -219,9 +219,9 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     labDetectObjectiveDescription=new QLabel(this);
     ogl->addWidget(labDetectObjectiveDescription, 0,5);
     labProjectObjectiveDescription=new QLabel(this);
-    ogl->addWidget(labProjectObjectiveDescription, 2,5);
+    ogl->addWidget(labProjectObjectiveDescription, 1,5);
     labTubelensDescription=new QLabel(this);
-    ogl->addWidget(labTubelensDescription, 1,5);
+    ogl->addWidget(labTubelensDescription, 2,5);
     ogl->setColumnStretch(5, 1);
 
     camlayout->addRow(tr("<b>Objectives:</b>"), ogl);
@@ -666,6 +666,7 @@ void QFESPIMB040CameraConfig::loadObjectives() {
         o.NA=inifile.value(g+"/na", 1).toDouble();
         objectives.append(o);
         cmbObjective->addItem(o.name);
+        cmbTubelens->addItem(o.name);
         cmbObjectiveProjection->addItem(o.name);
     }
     int i=cmbObjective->findText(currentO);
@@ -779,7 +780,7 @@ void QFESPIMB040CameraConfig::currentObjectiveChanged(int idx) {
     if (iP>=0 && iP<objectives.size()) labProjectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
     else labProjectObjectiveDescription->setText("");
     int iT=cmbTubelens->currentIndex();
-    if (iT>=0 && iT<objectives.size()) labTubelensDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
+    if (iT>=0 && iT<objectives.size()) labTubelensDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iT].magnification).arg(objectives[iT].NA));
     else labTubelensDescription->setText("");
 }
 
