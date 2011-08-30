@@ -23,6 +23,7 @@ do
 done
 
 if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
+mv ./globalconfig ./globalconfig_templates
 find -name ".svn" -type d -exec rm -rf {} \;
 find -name "*.log" -exec rm -rf {} \;
 find -name "*.autosave" -exec rm -rf {} \;
