@@ -13,7 +13,7 @@ cd ..
 qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
 make
 make install
-cd output_release
+cd output
 
 for f in *
 do
@@ -22,7 +22,7 @@ do
 	fi
 done
 
-if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
+if ! (cd deploy); then echo "could not create ./deploy/"; exit 1; fi
 mv ./globalconfig ./globalconfig_templates
 find -name ".svn" -type d -exec rm -rf {} \;
 find -name "*.log" -exec rm -rf {} \;
