@@ -20,4 +20,4 @@ BLAS_INCLUDE =
 
 exists(quickfit.inc):include(quickfit.inc)
 
-DEFINES += "GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\""
+DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
