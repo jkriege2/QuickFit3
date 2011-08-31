@@ -184,6 +184,7 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     ui->chkBaselineClamp->setChecked(settings.value(prefix+"baseline_clamp", true).toBool());
     ui->spinBaselineOffset->setValue(settings.value(prefix+"baseline_offset", 0).toInt());
     ui->spinEMGain->setValue(settings.value(prefix+"emgain", 1).toInt());
+    ui->chkEMGain->setChecked(settings.value(prefix+"emgain_enabled", true).toBool());
     ui->cmbPreampGain->setCurrentIndex(settings.value(prefix+"preamp_gain", 0).toInt());
     ui->cmbVerticalShiftSpeed->setCurrentIndex(settings.value(prefix+"vertical_shift_speed", 0).toInt());
     ui->cmbVerticalShiftAmplitude->setCurrentIndex(settings.value(prefix+"vertical_shift_amplitude", 0).toInt());
@@ -225,6 +226,7 @@ void AndorSettingsDialog::writeSettings(QSettings& settings) const {
     settings.setValue(prefix+"baseline_offset", ui->spinBaselineOffset->value());
     settings.setValue(prefix+"advanced_emgain", false); // no advanced EM gain
     settings.setValue(prefix+"emgain", ui->spinEMGain->value());
+    settings.setValue(prefix+"emgain_enabled", ui->chkEMGain->isChecked());
     settings.setValue(prefix+"preamp_gain", ui->cmbPreampGain->currentIndex());
     settings.setValue(prefix+"vertical_shift_speed", ui->cmbVerticalShiftSpeed->currentIndex());
     settings.setValue(prefix+"vertical_shift_amplitude", ui->cmbVerticalShiftAmplitude->currentIndex());
@@ -654,4 +656,6 @@ void AndorSettingsDialog::on_chkBaselineClamp_toggled(bool value) {
     ui->spinBaselineOffset->setEnabled(!value);
 }
 
-
+void AndorSettingsDialog::on_chkEMGain_toggled(bool value) {
+    ui->spinEMGain->setEnabled(!value);
+}

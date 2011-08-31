@@ -349,6 +349,7 @@ void QFExtensionCameraAndor::setSettingsFromQSettings(QFExtensionCameraAndor::Ca
     info.baselineClamp=settings.value(prefix+"baseline_clamp", info.baselineClamp).toBool();
     info.baselineOffset=settings.value(prefix+"baseline_offset", info.baselineOffset).toInt();
     info.emgain=settings.value(prefix+"emgain", info.emgain).toInt();
+    info.emgain_enabled=settings.value(prefix+"emgain_enabled", info.emgain_enabled).toInt();
     info.preamp_gain=settings.value(prefix+"preamp_gain", info.preamp_gain).toInt();
     info.vsSpeed=settings.value(prefix+"vertical_shift_speed", info.vsSpeed).toInt();
     info.vsAmplitude=settings.value(prefix+"vertical_shift_amplitude", info.vsAmplitude).toInt();
@@ -814,6 +815,7 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
         case 2:  (*parameters)["fan_mode"]=QString("off"); break;
     }
 
+    (*parameters)["camera_manufacturer"]="Andor";
     (*parameters)["camera_sdk_version"]=SDKVersion;
     (*parameters)["camera_driver_version"]=deviceDriverVersion;
     (*parameters)["pixel_units"]=QString("arbitrary");
@@ -840,6 +842,7 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
     (*parameters)["crop_mode"]=info.cropMode;
     (*parameters)["vertical_shift_amplitude"]=info.vsAmplitude;
     (*parameters)["emgain"]=info.emgain;
+    (*parameters)["emgain_enabled"]=info.emgain_enabled;
     (*parameters)["emgain_advanced"]=info.advancedEMGain;
     (*parameters)["spooling_mode"]=info.spool;
     (*parameters)["binning_vertical"]=info.vbin;
@@ -993,7 +996,11 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
-        CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
+        if (info.emgain_enabled) {
+            CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
+        } else {
+            CHECK(SetEMCCDGain(0), tr("error while setting EM gain"));
+        }
         CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
         CHECK(SetBaselineClamp((info.baselineClamp)?1:0), tr("error while setting baseline clamp mode"));
 

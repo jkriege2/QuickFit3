@@ -251,6 +251,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             bool advancedEMGain;
             /** \brief EM-GAIN factor */
             int emgain;
+            /** \brief EM-GAIN en-/disable */
+            bool emgain_enabled;
             /** \brief output amplifier mode: 0: EMCCD (default) 1: CCD (switch EM gain off) */
             int outputAmplifier;
 

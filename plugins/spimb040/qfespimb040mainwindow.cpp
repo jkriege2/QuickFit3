@@ -852,10 +852,13 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
     ecamera->getAcquisitionDescription(camera, &files, &parameters);
 
     // WRITE ACQUISITION SETTINGS
-    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera));
-    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera));
+    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)*cam->objective().magnification*cam->tubelens().magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)*cam->objective().magnification*cam->tubelens().magnification);
+    settings.setValue("acquisition/camera_pixel_width", ecamera->getPixelWidth(camera));
+    settings.setValue("acquisition/camera_pixel_height", ecamera->getPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
     settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
+    settings.setValue("acquisition/magnification", cam->objective().magnification*cam->tubelens().magnification);
 
     {
         QMapIterator <QString, QVariant> it1(acquisitionDescription);
@@ -923,13 +926,16 @@ QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QF
     QMap<QString, QVariant> parameters;
 
     // WRITE ACQUISITION SETTINGS
-    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera));
-    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera));
+    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)*cam->objective().magnification*cam->tubelens().magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)*cam->objective().magnification*cam->tubelens().magnification);
+    settings.setValue("acquisition/camera_pixel_width", ecamera->getPixelWidth(camera));
+    settings.setValue("acquisition/camera_pixel_height", ecamera->getPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
     settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
     settings.setValue("acquisition/exposure", ecamera->getExposureTime(camera));
     settings.setValue("acquisition/image_width", ecamera->getImageWidth(camera));
     settings.setValue("acquisition/image_height", ecamera->getImageHeight(camera));
+    settings.setValue("acquisition/magnification", cam->objective().magnification*cam->tubelens().magnification);
     QMapIterator <QString, QVariant> it1(acquisitionDescription);
     while (it1.hasNext()) {
         it1.next();

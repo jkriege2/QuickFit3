@@ -115,6 +115,7 @@ private slots:
 
     void on_chkFrameTransfer_toggled(bool value);
     void on_chkBaselineClamp_toggled(bool value);
+    void on_chkEMGain_toggled(bool value);
     void on_spinKineticCycles_valueChanged(int value);
     void on_spinAccumulates_valueChanged(int value);
     void on_spinExposure_valueChanged(double value);

@@ -668,14 +668,20 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="1" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0">
             <property name="spacing">
              <number>0</number>
             </property>
             <item>
              <widget class="QCheckBox" name="chkBaselineClamp">
               <property name="text">
-               <string>enabled</string>
+               <string>enabled, value:</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -695,9 +701,48 @@ p, li { white-space: pre-wrap; }
               </property>
              </widget>
             </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </item>
-          <item row="7" column="0">
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>&amp;ADC Channel:</string>
+            </property>
+            <property name="buddy">
+             <cstring>cmbADChannel</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="cmbADChannel"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>&amp;Amplifier:</string>
+            </property>
+            <property name="buddy">
+             <cstring>cmbAmplifier</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="cmbAmplifier"/>
+          </item>
+          <item row="8" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>&amp;Horizontal  Shift Speed:</string>
@@ -707,7 +752,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="8" column="1">
            <widget class="QComboBox" name="cmbHorizontalShiftSpeed">
             <property name="maximumSize">
              <size>
@@ -717,7 +762,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="9" column="0">
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>&amp;Preamplifier Gain:</string>
@@ -727,7 +772,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="9" column="1">
            <widget class="QComboBox" name="cmbPreampGain">
             <property name="minimumSize">
              <size>
@@ -743,7 +788,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="10" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>Vertical Shift &amp;Speed:</string>
@@ -753,7 +798,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="10" column="1">
            <widget class="QComboBox" name="cmbVerticalShiftSpeed">
             <property name="maximumSize">
              <size>
@@ -763,7 +808,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="11" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>&amp;Vertical Shift Amplitude:</string>
@@ -773,7 +818,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="11" column="1">
            <widget class="QComboBox" name="cmbVerticalShiftAmplitude">
             <property name="maximumSize">
              <size>
@@ -808,31 +853,48 @@ p, li { white-space: pre-wrap; }
             </item>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QComboBox" name="cmbADChannel"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>&amp;ADC Channel:</string>
-            </property>
-            <property name="buddy">
-             <cstring>cmbADChannel</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_27">
-            <property name="text">
-             <string>&amp;Amplifier:</string>
-            </property>
-            <property name="buddy">
-             <cstring>cmbAmplifier</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="cmbAmplifier"/>
+          <item row="6" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
+            <item>
+             <widget class="QCheckBox" name="chkEMGain">
+              <property name="text">
+               <string>enabled, value:</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinEMGain">
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="maximum">
+               <number>300</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item row="6" column="0">
            <widget class="QLabel" name="label_10">
@@ -840,20 +902,7 @@ p, li { white-space: pre-wrap; }
              <string>&amp;EM-Gain:</string>
             </property>
             <property name="buddy">
-             <cstring>spinEMGain</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QSpinBox" name="spinEMGain">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="maximum">
-             <number>300</number>
+             <cstring>chkEMGain</cstring>
             </property>
            </widget>
           </item>
@@ -1057,15 +1106,31 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinKineticCycleTime</tabstop>
   <tabstop>spinAccumulates</tabstop>
   <tabstop>spinAccCycleTime</tabstop>
+  <tabstop>cmbFileFormat</tabstop>
   <tabstop>chkFrameTransfer</tabstop>
   <tabstop>chkBaselineClamp</tabstop>
   <tabstop>spinBaselineOffset</tabstop>
+  <tabstop>cmbADChannel</tabstop>
+  <tabstop>cmbAmplifier</tabstop>
+  <tabstop>chkEMGain</tabstop>
+  <tabstop>spinEMGain</tabstop>
+  <tabstop>cmbHorizontalShiftSpeed</tabstop>
+  <tabstop>cmbPreampGain</tabstop>
+  <tabstop>cmbVerticalShiftSpeed</tabstop>
+  <tabstop>cmbVerticalShiftAmplitude</tabstop>
   <tabstop>spinWidth</tabstop>
   <tabstop>spinHeight</tabstop>
   <tabstop>spinLeft</tabstop>
   <tabstop>spinTop</tabstop>
+  <tabstop>btnFull</tabstop>
+  <tabstop>btn32</tabstop>
+  <tabstop>btn16</tabstop>
+  <tabstop>btn8</tabstop>
+  <tabstop>btnCenter</tabstop>
   <tabstop>spinHorizontalBinning</tabstop>
   <tabstop>spinVerticalBinning</tabstop>
+  <tabstop>cmbTriggerMode</tabstop>
+  <tabstop>chkTriggerInvert</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
@@ -1079,8 +1144,8 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
-     <y>686</y>
+     <x>275</x>
+     <y>727</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -1095,8 +1160,8 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>334</x>
-     <y>686</y>
+     <x>343</x>
+     <y>727</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

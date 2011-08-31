@@ -641,7 +641,7 @@ void QFESPIMB040CameraConfig::previewContinuous() {
 }
 
 double QFESPIMB040CameraConfig::magnification() {
-    return objective().magnification;
+    return objective().magnification*tubelens().magnification;
 }
 
 bool QFESPIMB040CameraConfig::objectivesWritable() const {
