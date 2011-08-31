@@ -22,16 +22,12 @@ class QFFitAlgorithmInstPlugin : public QObject, public QFPluginFitAlgorithm {
         Q_INTERFACES(QFPluginFitAlgorithm)
     public:
 		QF_PLUGIN
-	
+
         /** Default constructor */
         QFFitAlgorithmInstPlugin(QObject* parent=NULL) {}
         /** Default destructor */
         virtual ~QFFitAlgorithmInstPlugin() {}
 
-        /** \brief unique id for the plugin */
-        virtual QString getID() const {
-            return QString("target_id");
-        };
 
 
         /** \brief name for the plugin */
@@ -58,7 +54,7 @@ class QFFitAlgorithmInstPlugin : public QObject, public QFPluginFitAlgorithm {
         virtual QString getWeblink() const {
             return tr(/* plugin weblink */);
         };
-		
+
 
         /** \brief plugin ID  */
         virtual QString getID() const {
@@ -67,7 +63,8 @@ class QFFitAlgorithmInstPlugin : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief plugin icon  */
         virtual QString getIconFilename() const {
-            return ":/plugin_fitfunc_incon.png";
+            // replace with your icon if you have one ... or use this default icon
+            return ":/lib/fitalg_icon.png";
         };
 
         /** \brief plugin version  */

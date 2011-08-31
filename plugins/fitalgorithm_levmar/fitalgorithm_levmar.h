@@ -70,7 +70,7 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
     protected:
 
         /** \copydoc QFFitAlgorithm::intFit() */
-        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax);
+        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, Functor* model, const double* paramsMin, const double* paramsMax);
 
 
     public:
@@ -136,7 +136,7 @@ class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief plugin icon  */
         virtual QString getIconFilename() const {
-            return ":/plugin_fitfunc_incon.png";
+            return ":/lib/fitalg_icon.png";
         };
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {

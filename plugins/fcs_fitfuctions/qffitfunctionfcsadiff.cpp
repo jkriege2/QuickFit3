@@ -272,7 +272,7 @@ void QFFitFunctionFCSADiff::calcParameter(double* data, double* error) const {
 
 }
 
-bool QFFitFunctionFCSADiff::isParameterVisible(int parameter, double* data) const {
+bool QFFitFunctionFCSADiff::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSADiff_n_components];
     int nonfl_comp=data[FCSADiff_n_nonfluorescent];
     switch(parameter) {
@@ -295,7 +295,7 @@ unsigned int QFFitFunctionFCSADiff::getAdditionalPlotCount(const double* params)
     return 1;
 }
 
-QString QFFitFunctionFCSADiff::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSADiff::transformParametersForAdditionalPlot(int plot,  double* params) {
     params[FCSADiff_n_nonfluorescent]=0;
     return "without non-fluorescent";
 }

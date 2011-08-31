@@ -32,3 +32,5 @@ ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
 
 OTHER_FILES +=
+
+include(quickfit_config.pri)

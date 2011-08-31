@@ -623,11 +623,11 @@ bool QFFitResultsEvaluation::getFitFix(QFRawDataRecord* r, const QString& result
 
 void QFFitResultsEvaluation::setFitResultGroup(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& group) {
     if (r!=NULL) {
-        QFFitFunction* f=getFitFunction();
+        //QFFitFunction* f=getFitFunction();
         QString unit="";
-        if (f) {
+        /*if (f) {
             int pid=f->getParameterNum(parameterID);
-        }
+        }*/
         r->resultsSetGroup(resultID, getFitParamID(parameterID), group);
         emit resultsChanged();
     }
@@ -635,11 +635,11 @@ void QFFitResultsEvaluation::setFitResultGroup(QFRawDataRecord* r, const QString
 
 void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, const QString& label, const QString& label_richtext) {
     if (r!=NULL) {
-        QFFitFunction* f=getFitFunction();
+        //QFFitFunction* f=getFitFunction();
         QString unit="";
-        if (f) {
+        /*if (f) {
             int pid=f->getParameterNum(parameterID);
-        }
+        }*/
         r->resultsSetLabel(resultID, getFitParamID(parameterID), label, label_richtext);
         emit resultsChanged();
     }

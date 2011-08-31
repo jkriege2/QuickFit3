@@ -19,13 +19,13 @@ QFFitAlgorithmInst_F1::QFFitAlgorithmInst_F1() {
 double QFFitAlgorithmInst_F1::evaluate(double t, const double* data) const {
     const double p1=data[PARAM1];
     return p1*sqr(t);
-	
+
 	// this dummy function is   f(x)=p1*x^2
 }
 
 void QFFitAlgorithmInst_F1::evaluateDerivatives(double* derivatives, double t, const double* data) const {
     for (register int i=0; i<paramCount(); i++) derivatives[i]=0;
-	
+
     const double p1=data[PARAM1];
 
     derivatives[PARAM1]=2*p1*t;
@@ -44,7 +44,7 @@ void QFFitAlgorithmInst_F1::calcParameter(double* data, double* error) const {
 	// here a second parameter is 2*p1 (also it's error is calculated as 2*error_p1
 }
 
-bool QFFitAlgorithmInst_F1::isParameterVisible(int parameter, double* data) const {
+bool QFFitAlgorithmInst_F1::isParameterVisible(int parameter, const double* data) const {
     return true;
 	// all parameters are visible at all times
 }

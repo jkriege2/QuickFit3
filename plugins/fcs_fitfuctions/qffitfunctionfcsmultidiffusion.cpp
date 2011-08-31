@@ -308,7 +308,7 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
 
 }
 
-bool QFFitFunctionFCSMultiDiffusion::isParameterVisible(int parameter, double* data) const {
+bool QFFitFunctionFCSMultiDiffusion::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSMULTI_n_components];
     const int nonfl_comp=data[FCSMULTI_n_nonfluorescent];
     switch(parameter) {

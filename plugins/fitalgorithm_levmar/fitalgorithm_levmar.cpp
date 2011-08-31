@@ -26,13 +26,18 @@ void levmarfitjac(double *p, double *j, int m, int n, void *data) {
     adata->evaluateJacobian(j, p);
 }
 
-QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, QFFitAlgorithm::Functor* model, double* paramsMin, double* paramsMax) {
+QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
     int paramCount=model->get_paramcount();
 
     double opts[LM_OPTS_SZ];
     double info[LM_INFO_SZ];
+
+    double* pparamsMin=(double*)malloc(paramCount*sizeof(double));
+    double* pparamsMax=(double*)malloc(paramCount*sizeof(double));
+    memcpy(pparamsMin, paramsMin, paramCount*sizeof(double));
+    memcpy(pparamsMax, paramsMax, paramCount*sizeof(double));
 
     /* optimization control parameters; passing to levmar NULL instead of opts reverts to defaults */
     opts[0]=getParameter("mu").toDouble();
@@ -62,13 +67,15 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     bool numGrad=false;
     if ((!model->get_implementsJacobian())||(always_num_grad)) {
             std::cout<<"levmar: numerical gradients\n";
-        ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+        ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
         numGrad=true;
     } else {
             std::cout<<"levmar: analytical gradients\n";
-        ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), paramsMin, paramsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+        ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
     }
 
+    free(pparamsMin);
+    free(pparamsMax);
 
     result.addNumber("initial_error_sum", info[0]);
     result.addNumber("error_sum", info[1]);

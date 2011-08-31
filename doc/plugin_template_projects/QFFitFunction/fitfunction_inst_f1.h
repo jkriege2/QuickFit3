@@ -27,7 +27,7 @@ class QFFitAlgorithmInst_F1: public QFFitFunction {
         virtual void calcParameter(double* parameterValues, double* error=NULL) const;
 
         /*! \copydoc QFFitFunction::isParameterVisible()   */
-        virtual bool isParameterVisible(int parameter, double* parameterValues) const;
+        virtual bool isParameterVisible(int parameter, const double* parameterValues) const;
         /*! \copydoc QFFitFunction::getAdditionalPlotCount()   */
         virtual unsigned int getAdditionalPlotCount(const double* params);
 

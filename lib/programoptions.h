@@ -68,6 +68,8 @@ class ProgramOptions: public QObject {
         QString getPluginDirectory() const;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString getAssetsDirectory() const;
+        /** \brief returns the directory of the QuickFit main application */
+        QString getApplicationDirectory() const;
     public slots:
 
 

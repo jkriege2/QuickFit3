@@ -1,0 +1,11 @@
+# this is an example configuration file for the QuickFit build scripts ... edit according
+# to your system and save it as quickfit.inc
+
+HAS_LAPACK = true
+LAPACK_LINK = -llapack -lblas
+LAPACK_INCLUDE =
+
+
+HAS_BLAS = true
+BLAS_LIB = -lblas -lf2c -lm
+BLAS_INCLUDE =

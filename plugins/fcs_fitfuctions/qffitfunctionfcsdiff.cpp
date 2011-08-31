@@ -284,7 +284,7 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     error[FCSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
 }
 
-bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, double* data) const {
+bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSDiff_n_components];
     int nonfl_comp=data[FCSDiff_n_nonfluorescent];
     switch(parameter) {

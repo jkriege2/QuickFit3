@@ -39,7 +39,7 @@ double QFFitAlgorithmSimAnneal::chi2(QFFitAlgorithm::Functor* model, double* p) 
 }
 
 
-QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, QFFitAlgorithm::Functor* model, double* paramsMin, double* paramsMax) {
+QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
     // parameter count

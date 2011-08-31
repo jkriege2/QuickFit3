@@ -45,7 +45,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     #endif
 
     #if defined(__LINUX__) || defined(Q_OS_MAC)
-    globalConfigDir="/usr/share/quickfit3/";
+    globalConfigDir=QString("%1/quickfit3/").arg(GLOBALCONFIGDIR);
     #endif
 
 
@@ -163,6 +163,10 @@ QString ProgramOptions::getPluginDirectory() const {
 
 QString ProgramOptions::getAssetsDirectory() const {
     return assetsDir;
+}
+
+QString ProgramOptions::getApplicationDirectory() const {
+    return appDir;
 }
 
 void ProgramOptions::setLanguageID(QString id) {

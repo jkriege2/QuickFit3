@@ -7,7 +7,7 @@
 #include <iostream>
 #include "qfrawdatarecord.h"
 
-void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, double* params) {
+void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* params) {
 }
 
 
@@ -147,7 +147,7 @@ QString  QFFitAlgorithm::FitResult::getAsString(QString resultName) {
 
 
 
-QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* model, double* currentParams, bool* fixParams, double* dataX, double* dataY, double* dataWeight, uint64_t M):
+QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M):
     QFFitAlgorithm::Functor(M)
 {
     m_model=model;
@@ -196,7 +196,7 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::~FitQFFitFunctionFunctor() {
     free(m_modelParams);
 }
 
-double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(double* modelData) {
+double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(const double* modelData) {
     double* result=(double*)calloc(m_paramCount, sizeof(double));
 
     for (register int i=0; i<m_paramCount; i++) {
@@ -206,20 +206,20 @@ double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(dou
     return result;
 }
 
-void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromModelToFunctor(double* functorData, double* modelData) {
+void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromModelToFunctor(double* functorData, const double* modelData) {
     for (register int i=0; i<m_paramCount; i++) {
         functorData[i]=modelData[modelFromFunctor[i]];
     }
 }
 
-void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, double* functorData) {
+void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, const double* functorData) {
     for (register int i=0; i<m_paramCount; i++) {
         modelData[modelFromFunctor[i]]=functorData[i];
     }
 }
 
 
-void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, double* params) {
+void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, const double* params) {
     mapArrayFromFunctorToModel(m_modelParams, params);
     /*std::cout<<"N="<<m_N<<" Q="<<m_paramCount<<" M="<<get_evalout()<<"  P = ( ";
     for (register int i=0; i<m_N; i++) {
@@ -242,10 +242,10 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, double* 
         }
         evalout[i]=v;
     }
-    mapArrayFromModelToFunctor(params, m_modelParams);
+    //mapArrayFromModelToFunctor(params, m_modelParams);
 }
 
-void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, double* params) {
+void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, const double* params) {
     mapArrayFromFunctorToModel(m_modelParams, params);
     register int pcount=get_paramcount();
     register int ecount=get_evalout();
@@ -266,35 +266,43 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
 
 
 
-QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams, double* paramsMin, double* paramsMax) {
+QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
-    double* pparamsMin=paramsMin;
-    double* pparamsMax=paramsMax;
-    double* ddataWeight=dataWeight;
-    bool* pparamsFix=fixParams;
+    const double* pparamsMin=paramsMin;
+    double* ppparamsMin=NULL;
+    const double* pparamsMax=paramsMax;
+    double* ppparamsMax=NULL;
+    const double* ddataWeight=dataWeight;
+    double* dddataWeight=NULL;
+    const bool* pparamsFix=fixParams;
+    bool* ppparamsFix=NULL;
     if (paramsMin==NULL) {
-        pparamsMin=(double*)calloc(model->paramCount(), sizeof(double));
+        ppparamsMin=(double*)calloc(model->paramCount(), sizeof(double));
         for (int i=0; i<model->paramCount(); i++) {
-            pparamsMin[i]=-DBL_MAX;
+            ppparamsMin[i]=-DBL_MAX;
         }
+        pparamsMin=ppparamsMin;
     }
     if (paramsMax==NULL) {
-        pparamsMax=(double*)calloc(model->paramCount(), sizeof(double));
+        ppparamsMax=(double*)calloc(model->paramCount(), sizeof(double));
         for (int i=0; i<model->paramCount(); i++) {
-            pparamsMax[i]=DBL_MAX;
+            ppparamsMax[i]=DBL_MAX;
         }
+        pparamsMax=ppparamsMax;
     }
     if (dataWeight==NULL) {
-        ddataWeight=(double*)calloc(N, sizeof(double));
+        dddataWeight=(double*)calloc(N, sizeof(double));
         for (uint64_t i=0; i<N; i++) {
-            ddataWeight[i]=1.0;
+            dddataWeight[i]=1.0;
         }
+        ddataWeight=dddataWeight;
     }
     if (fixParams==NULL) {
-        pparamsFix=(bool*)calloc(model->paramCount(), sizeof(bool));
+        ppparamsFix=(bool*)calloc(model->paramCount(), sizeof(bool));
         for (int i=0; i<model->paramCount(); i++) {
-            pparamsFix[i]=false;
+            ppparamsFix[i]=false;
         }
+        pparamsFix=ppparamsFix;
     }
 
     QFFitAlgorithm::FitQFFitFunctionFunctor fm(model, initialParams, pparamsFix, dataX, dataY, ddataWeight, N);
@@ -307,8 +315,8 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, &fm, tparamsMin, tparamsMax);
 
     for (int i=0; i<model->paramCount(); i++) {
-        paramsMax[i]=initialParams[i];
-        //paramErrorsOut[i]=0;
+        paramsOut[i]=initialParams[i];
+        paramErrorsOut[i]=0;
     }
     fm.mapArrayFromFunctorToModel(paramsOut, tparamsOut);
     fm.mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);
@@ -319,10 +327,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     free(tparamsOut);
     free(tinitialParams);
 
-    if (paramsMin==NULL) free(pparamsMin);
-    if (paramsMax==NULL) free(pparamsMax);
-    if (fixParams==NULL) free(pparamsFix);
-    if (dataWeight==NULL) free(ddataWeight);
+    if (ppparamsMin==NULL) free(ppparamsMin);
+    if (ppparamsMax==NULL) free(ppparamsMax);
+    if (ppparamsFix==NULL) free(ppparamsFix);
+    if (dddataWeight==NULL) free(dddataWeight);
     return result;
 }
 

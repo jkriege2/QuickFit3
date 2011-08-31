@@ -164,7 +164,7 @@ void QFFitFunctionFCSSimpleDiff::calcParameter(double* data, double* error) cons
     }
 }
 
-bool QFFitFunctionFCSSimpleDiff::isParameterVisible(int parameter, double* data) const {
+bool QFFitFunctionFCSSimpleDiff::isParameterVisible(int parameter, const double* data) const {
     return true;
 }
 

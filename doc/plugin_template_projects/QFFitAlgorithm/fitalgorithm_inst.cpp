@@ -6,13 +6,13 @@
 #include "fitalgorithm_inst_a1.h"
 
 
-QStringList QFFitAlgorithmInst::getIDs() const {
+QStringList QFFitAlgorithmInstPlugin::getIDs() const {
 	QStringList sl;
 	sl<<"fa_id";
 	return sl;
 }
 
-QFFitAlgorithm* QFFitAlgorithmInst::get(QString id, QObject* parent) const {
+QFFitAlgorithm* QFFitAlgorithmInstPlugin::get(QString id, QObject* parent) const {
 	if (id=="fa_id") return new QFFitAlgorithmInst_A1();
 	return NULL;
 }

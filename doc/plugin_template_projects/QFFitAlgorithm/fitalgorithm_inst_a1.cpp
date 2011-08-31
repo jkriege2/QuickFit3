@@ -8,7 +8,7 @@ QFFitAlgorithmInst_A1::QFFitAlgorithmInst_A1() {
 	//setParameter("param_name", 0.0);
 }
 
-QFFitAlgorithm::FitResult QFFitAlgorithmInst_A1::intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, QFFitAlgorithm::Functor* model, double* paramsMin, double* paramsMax) {
+QFFitAlgorithm::FitResult QFFitAlgorithmInst_A1::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
     int paramCount=model->get_paramcount();
@@ -29,7 +29,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmInst_A1::intFit(double* paramsOut, doubl
 
 bool QFFitAlgorithmInst_A1::displayConfig() {
     QFFitAlgorithmInst_A1ConfigDialog* dlg=new QFFitAlgorithmInst_A1ConfigDialog(0);
-	
+
 	// init widget here:
     //dlg->setParam(getParameter("param_name").toDouble());
 

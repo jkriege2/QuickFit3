@@ -57,7 +57,8 @@ class QFFitAlgorithmInst : public QObject, public QFPluginFitFunction {
 
         /** \copydoc QFPlugin::getIconFilename()  */
         virtual QString getIconFilename() const {
-            return ":/plugin_fitfunc_incon.png";
+            // replace with your icon if you have one ... or use this default icon
+            return ":/lib/fitfunc_icon.png";
         };
 
         /** \brief plugin version  */

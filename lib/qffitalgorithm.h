@@ -100,7 +100,7 @@ class QFFitAlgorithm {
                     \param[out] evalout with size get_evalout()
                     \param params parameter vector with size get_paramcount()
                  */
-                virtual void evaluate(double* evalout, double* params)=0;
+                virtual void evaluate(double* evalout, const double* params)=0;
 
                 /*! \brief function that evaluates the arbitrary function
 
@@ -110,7 +110,7 @@ class QFFitAlgorithm {
 
                     \note This is only implemented if get_implementsJacobian() returns true
                  */
-                virtual void evaluateJacobian(double* evalout, double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params);
 
                 /** \brief return the number of parameters \f$ N \f$ */
                 virtual int get_paramcount() const=0;
@@ -153,30 +153,30 @@ class QFFitAlgorithm {
                     \param dataWeights the weight vector \f$ \sigma_m \f$
                     \param M number of datapoints
                 */
-                FitQFFitFunctionFunctor(QFFitFunction* model, double* currentParams, bool* fixParams, double* dataX, double* dataY, double* dataWeight, uint64_t M) ;
+                FitQFFitFunctionFunctor(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
 
                 ~FitQFFitFunctionFunctor();
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            The result is a NEW array created by calling \c calloc()
                 */
-                double* createMappedArrayForFunctor(double* modelData);
+                double* createMappedArrayForFunctor(const double* modelData);
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
-                void mapArrayFromModelToFunctor(double* functorData, double* modelData);
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
-                void mapArrayFromFunctorToModel(double* modelData, double* functorData);
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
 
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
-                virtual void evaluate(double* evalout, double* params);
+                virtual void evaluate(double* evalout, const double* params);
 
                 /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
-                virtual void evaluateJacobian(double* evalout, double* params);
+                virtual void evaluateJacobian(double* evalout, const double* params);
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
                 virtual bool get_implementsJacobian() const { return m_model->get_implementsDerivatives(); };
@@ -189,11 +189,11 @@ class QFFitAlgorithm {
                 /** \brief  QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$ */
                 QFFitFunction* m_model;
                 /** \brief the x-values data vector \f$ x_m \f$ */
-                double* m_dataX;
+                const double* m_dataX;
                 /** \brief the y-values data vector \f$ y_m \f$ */
-                double* m_dataY;
+                const double* m_dataY;
                 /** \brief the weight vector \f$ \sigma_m \f$ */
-                double* m_dataWeight;
+                const double* m_dataWeight;
                 /** \brief number of datapoints      */
                 uint64_t m_M;
                 /** \brief number of parameters in m_model */
@@ -287,7 +287,7 @@ class QFFitAlgorithm {
             \param paramsMax upper parameter bound
             \return a FitResult object describing the fit result
         */
-        FitResult fit(double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams=NULL, double* paramsMin=NULL, double* paramsMax=NULL);
+        FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
 
 
 
@@ -345,7 +345,7 @@ class QFFitAlgorithm {
             implementation of Functor which evaluates to \f$ f_m=\frac{y_m-f_m(x_m, \vec{p})}{\sigma_m} \f$ where
             \f$ (x_m, y_m, \sigma_m) \f$ is a measurement vector with weights \f$ \sigma_m \f$ .
         */
-        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, double* initialParams, Functor* model, double* paramsMin, double* paramsMax)=0;
+        virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, Functor* model, const double* paramsMin, const double* paramsMax)=0;
     public:
         /** \brief return a name for the algorithm */
         virtual QString name() const=0;

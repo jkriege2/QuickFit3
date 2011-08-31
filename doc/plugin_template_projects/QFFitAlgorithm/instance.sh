@@ -2,7 +2,7 @@
 
 function replace_in_all {
 	echo "replace: " $1 
-	for i in ./$FNAME/*.cpp ./$FNAME/*.h ./$FNAME/*.pro ./$FNAME/*.qrc ./$FNAME/help/*.html; do 
+	for i in ./$DIRNAME/*.cpp ./$DIRNAME/*.h ./$DIRNAME/*.pro ./$DIRNAME/*.qrc ./$DIRNAME/help/*.html; do 
 	  echo "  -> " $i
 	  sed $1 $i > $i.temp | mv $i.temp $i
 	done
@@ -62,22 +62,26 @@ echo -n "file name for QFFitAlgorithm plugin implementation: " $FNAME ".*
 FNAMEFF=`echo $FITALGCCLASSNAME | tr A-Z a-z`
 echo -n "file name for QFFitAlgorithm implementation: " $FNAMEFF ".*
 "
-mkdir -p $FNAME
+
+DIRNAME=fitalgorithm_${TARGETNAME}
+mkdir -p $DIRNAME
 
 for i in ${BASENAME}.*; do 
-  cp -v "$i" "./$FNAME/${FNAME}${i/$BASENAME}"; 
+  cp -v "$i" "./$DIRNAME/${FNAME}${i/$BASENAME}"; 
 done
 
 for i in ${BASENAME}_a1*.*; do 
-  cp -v "$i" "./$FNAME/${FNAMEFF}${i/${BASENAME}_a1}"; 
+  cp -v "$i" "./$DIRNAME/${FNAMEFF}${i/${BASENAME}_a1}"; 
 done
 
-mkdir -p $FNAME/translations
-mkdir -p $FNAME/help
-mkdir -p $FNAME/help/pic
-cp ftarget.html $FNAME/help/${TARGETNAME}.html
-cp f1.html $FNAME/help/${FITALGCNAME}.html
-cp tutorial.html $FNAME/help/tutorial.html
+mkdir -p $DIRNAME/translations
+mkdir -p $DIRNAME/help
+mkdir -p $DIRNAME/help/pic
+cp ftarget.html $DIRNAME/help/${TARGETNAME}.html
+cp f1.html $DIRNAME/help/${FITALGCNAME}.html
+cp tutorial.html $DIRNAME/help/tutorial.html
+
+
 
 
 replace_in_all 's/QFFitAlgorithmInst_A1/'$FITALGCCLASSNAME'/g'
@@ -101,3 +105,7 @@ replace_in_all 's/HEADER_H/'$CLASSNAME_UC'_H/g'
 
 replace_in_all 's/doxygen_GROUPNAME/qf3fitfunp_'$TARGETNAME'/g'
 replace_in_all 's/a1.html/'$FITALGCNAME'.html/g'
+
+for i in ${DIRNAME}/*.pro; do 
+  mv -v "$i" "${DIRNAME}/${DIRNAME}.pro"; 
+done

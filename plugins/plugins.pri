@@ -68,3 +68,4 @@ release {
 
 CONFIG += link_prl
 
+include(../quickfit_config.pri)

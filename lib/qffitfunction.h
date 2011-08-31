@@ -183,7 +183,7 @@ class QFFitFunction {
             \param parameterValues the parameter values on which to base the decission
             \return \c true if parameter is visibled (based on the parameter values in \a parameterValues )
         */
-        virtual bool isParameterVisible(int parameter, double* parameterValues) const { return true; };
+        virtual bool isParameterVisible(int parameter, const double* parameterValues) const { return true; };
 
         /*! \brief return the number of graphs that should be plotted additional to the function grph itself
             \param params The decision may be based on this parameter set.
