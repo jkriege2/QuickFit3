@@ -34,7 +34,7 @@ int main(int argc, char * argv[])
     app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(VERSION_FULL).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
     //app.setOrganizationDomain("http://www.dkfz.de/Macromol");
     app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
-    app.setWindowIcon(QIcon(":/icon.png"));
+    app.setWindowIcon(QIcon(":/icon_large.png"));
 
     QPixmap pixmap(":/splash.png");
     QPainter* painter=new QPainter(&pixmap);

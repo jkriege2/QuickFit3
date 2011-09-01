@@ -55,7 +55,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
-    QFile f(settings->getAssetsDirectory()+"/help/plugin_list_autocreate.html");
+    /*QFile f(settings->getAssetsDirectory()+"/help/plugin_list_autocreate.html");
     if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&f);
         out<<QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><title>%1</title></head><body><h2>%1</h2>").arg(tr("Available Plugins"));
@@ -78,7 +78,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
         out<<createPluginDocHelp();
         out<<"</body></html>";
         f2.close();
-    }
+    }*/
     logFileMainWidget->dec_indent();
 
     splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()));
@@ -92,6 +92,9 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
     htmlReplaceList.append(qMakePair(QString("author"), QString(QF_AUTHOR)));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(QF_WEBLINK)));
+    htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
+    htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
+    htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getAssetsDirectory()+QString("/help/")));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
