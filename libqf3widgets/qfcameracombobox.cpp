@@ -32,7 +32,9 @@ void QFCameraComboBox::findExtensions() {
         for (unsigned int j=0; j<cam->getCameraCount(); j++) {
             QPoint sl(i, j);
             QString name=extension->getName();
-            if (cam->getCameraCount()>0) name=name+QString(" #%1").arg(j);
+            QString cname=cam->getCameraName(j);
+            if (!cam->getCameraSensorName(j).isEmpty()) cname+=QString(" (%1)").arg(cam->getCameraSensorName(j));
+            if (cam->getCameraCount()>0) name=name+QString(" #%1: %2").arg(j).arg(cname);
             addItem(QIcon(extension->getIconFilename()), name, sl);
         }
     }
