@@ -10,13 +10,33 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
-	settings_pc = new QSettings(QString(":/cam_rh2v2.pc.ini"), QSettings::IniFormat );/** read ini file */
+  cameraSetting=(QFExtensionCameraRh2v2::cameraSettings*)calloc(2,sizeof(struct cameraSettings));
+
+  cameraSetting[0].prefix=new QString("Radhard2");
+  cameraSetting[0].settings_pc = new QSettings(QString(":/cam_rh2v2.pc.ini"), QSettings::IniFormat );/** read ini file */
+  cameraSetting[0].pc=new processing_chain(cameraSetting[0].settings_pc,*cameraSetting[0].prefix+QString("_preview"));
+  cameraSetting[0].xRes=32;
+  cameraSetting[0].yRes=32;
+  cameraSetting[0].pixelWidth=30;
+  cameraSetting[0].pixelHeight=30;
+  cameraSetting[0].exposureTime=0.000010;
+
+  QObject::connect(cameraSetting[0].pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
+  QObject::connect(cameraSetting[0].pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
+  QObject::connect(cameraSetting[0].pc, SIGNAL(log_err(QString)), this, SLOT(logger_err(QString)));
+
+  cameraSetting[1].prefix=new QString("Multisensor");
+  cameraSetting[1].settings_pc = new QSettings(QString(":/cam_rh2v2.pc.ini"), QSettings::IniFormat );/** read ini file */
+  cameraSetting[1].pc=new processing_chain(cameraSetting[1].settings_pc,*cameraSetting[1].prefix+QString("_preview"));
+  cameraSetting[1].xRes=128;
+  cameraSetting[1].yRes=128;
+  cameraSetting[0].pixelWidth=1;
+  cameraSetting[0].pixelHeight=1;
+  cameraSetting[1].exposureTime=1;
 	
-	pc=new processing_chain(settings_pc,0);
-	
-	QObject::connect(pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
-	QObject::connect(pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
-	QObject::connect(pc, SIGNAL(log_err(QString)), this, SLOT(logger_err(QString)));
+  QObject::connect(cameraSetting[1].pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
+  QObject::connect(cameraSetting[1].pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
+  QObject::connect(cameraSetting[1].pc, SIGNAL(log_err(QString)), this, SLOT(logger_err(QString)));
 }
 
 QFExtensionCameraRh2v2::~QFExtensionCameraRh2v2() {
@@ -45,6 +65,7 @@ void QFExtensionCameraRh2v2::loadSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -55,23 +76,24 @@ void QFExtensionCameraRh2v2::storeSettings(ProgramOptions* settingspo) {
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 	}
 
-QString& QFExtensionCameraRh2v2::findGroupByType(const QString &t){
-	QStringList groups = settings_pc->childGroups();
+QString& QFExtensionCameraRh2v2::findGroupByType(const QString &t, const unsigned int camera){
+  QStringList groups = cameraSetting[camera].settings_pc->childGroups();
 	QStringList::const_iterator constIterator;
 	
 	bool found=false;
 	QString result;
 	for (constIterator = groups.constBegin(); (constIterator != groups.constEnd()); ++constIterator){
-		settings_pc->beginGroup(*constIterator);
-		if(settings_pc->value("type").toString()==t)
+    cameraSetting[camera].settings_pc->beginGroup(*constIterator);
+    if(cameraSetting[camera].settings_pc->value("type").toString()==t)
 		{
 			found=true;
 			result.append(*constIterator);
 		}
-		settings_pc->endGroup();
+    cameraSetting[camera].settings_pc->endGroup();
 		if(found)break;
 	}
 	return result;
@@ -79,22 +101,38 @@ QString& QFExtensionCameraRh2v2::findGroupByType(const QString &t){
 
 
 unsigned int QFExtensionCameraRh2v2::getCameraCount() {
-    return 1;
+    return 2;
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }
 
-void QFExtensionCameraRh2v2::reconfigure(unsigned int camera, const QSettings& settings, unsigned int set){
-	settings_pc->setValue(findGroupByType("we_accumulator")+"/config/count",settings.value(QString("rh2v2/acccnt")));
-	settings_pc->setValue(findGroupByType("we_writer")+"/config/duration",settings.value(QString("rh2v2/duration")));
-	pc->reconfigure(settings_pc,set);
+bool QFExtensionCameraRh2v2::reconfigure(unsigned int camera, const QSettings& settings, const QString& setName){
+  cameraSetting[camera].settings_pc->setValue(findGroupByType("we_accumulator",camera)+"/config/count",settings.value(QString("rh2v2/acccnt")));
+  cameraSetting[camera].settings_pc->setValue(findGroupByType("we_writer",camera)+"/config/duration",settings.value(QString("rh2v2/duration")));
+  return cameraSetting[camera].pc->reconfigure(cameraSetting[camera].settings_pc,setName);
+}
+
+
+bool QFExtensionCameraRh2v2::reconfigure(unsigned int camera, const QSettings& settings, unsigned int set){
+  cameraSetting[camera].settings_pc->setValue(findGroupByType("we_accumulator",camera)+"/config/count",settings.value(QString("rh2v2/acccnt")));
+  cameraSetting[camera].settings_pc->setValue(findGroupByType("we_writer",camera)+"/config/duration",settings.value(QString("rh2v2/duration")));
+  cameraSetting[camera].pc->reconfigure(cameraSetting[camera].settings_pc,set);
+	return true;
 }	
 
+void QFExtensionCameraRh2v2::reconfigure2(unsigned int camera, const QSettings& settings, const QString& postfix){
+  if(!reconfigure(camera,settings,*cameraSetting[camera].prefix+QString("_")+postfix)){
+		QMessageBox msgBox;
+    msgBox.setText("Unable to rebuilt chain! ("+*cameraSetting[camera].prefix+"_"+postfix+")");
+    msgBox.setDetailedText("Perhaps the name does not exist?!?\nNo changes to the chain are applied.");
+		msgBox.setIcon(QMessageBox::Critical);
+		msgBox.exec();
+	}
+}
+
 void QFExtensionCameraRh2v2::useCameraSettings(unsigned int camera, const QSettings& settings) {
-	std::cerr << __FUNCTION__ << __FILE__ << __LINE__ << std::endl;
-	const unsigned int set=0;
-	pc->stop();
-	reconfigure(camera,settings,set);
-	pc->run();
+  cameraSetting[camera].pc->stop();
+	reconfigure2(camera,settings,"preview");
+  cameraSetting[camera].pc->run();
 }
 
 void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
@@ -152,11 +190,26 @@ void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSett
 }
 
 int QFExtensionCameraRh2v2::getImageWidth(unsigned int camera) {
-    return 32;
+  return cameraSetting[camera].xRes;
 }
 
 int QFExtensionCameraRh2v2::getImageHeight(unsigned int camera) {
-    return 32;
+  return cameraSetting[camera].yRes;
+}
+
+double QFExtensionCameraRh2v2::getPixelWidth(unsigned int camera) {
+  return cameraSetting[camera].pixelWidth;
+}
+
+double QFExtensionCameraRh2v2::getPixelHeight(unsigned int camera) {
+  return cameraSetting[camera].pixelHeight;
+}
+QString QFExtensionCameraRh2v2::getCameraName(unsigned int camera){
+  return *cameraSetting[camera].prefix;
+}
+
+QString QFExtensionCameraRh2v2::getCameraSensorName(unsigned int camera){
+  return QString("");
 }
 
 bool QFExtensionCameraRh2v2::isConnected(unsigned int camera) {
@@ -168,8 +221,8 @@ bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64
         *timestamp=(uint64_t) 0;
     }
 	//TODO: the following should be checked prior to execution...
-	if(pc->isRunning()){
-		we_endpoint *we_ep = pc->find_first<we_endpoint>();
+  if(cameraSetting[camera].pc->isRunning()){
+    we_endpoint *we_ep = cameraSetting[camera].pc->find_first<we_endpoint>();
 		if(we_ep!=NULL){
 			return we_ep->get_frame(data);
 		}
@@ -183,15 +236,15 @@ bool QFExtensionCameraRh2v2::connectDevice(unsigned int camera) {
 
 void QFExtensionCameraRh2v2::disconnectDevice(unsigned int camera) {
     /* disconnect from the given camera */
-	pc->stop();
+  cameraSetting[camera].pc->stop();
 }
 
 double QFExtensionCameraRh2v2::getExposureTime(unsigned int camera) {
-    return 0.000010;
+    return cameraSetting[camera].exposureTime;
 }
 
 bool QFExtensionCameraRh2v2::startAcquisition(unsigned int camera) {
-    pc->run();
+    cameraSetting[camera].pc->run();
 }
 
 void QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
@@ -199,16 +252,15 @@ void QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
 }
 
 bool QFExtensionCameraRh2v2::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
-	const unsigned int set=1;
-	pc->stop();
-	reconfigure(camera,settings,set);
-	settings_pc->setValue(findGroupByType("we_writer")+"/config/filename",filenamePrefix+".dat");
-	pc->reconfigure(settings_pc,set);
+  cameraSetting[camera].pc->stop();
+  reconfigure(camera,settings,*cameraSetting[camera].prefix+QString("_acquisition"));
+  cameraSetting[camera].settings_pc->setValue(findGroupByType("we_writer",camera)+"/config/filename",filenamePrefix+".dat");
+  cameraSetting[camera].pc->reconfigure(cameraSetting[camera].settings_pc,*cameraSetting[camera].prefix+QString("_acquisition"));
 	return true;
 }
 
 bool QFExtensionCameraRh2v2::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
-    return pc->isRunning();
+    return cameraSetting[camera].pc->isRunning();
 }
 
 void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
@@ -221,13 +273,7 @@ bool QFExtensionCameraRh2v2::getAcquisitionPreview(unsigned int camera, uint32_t
 int QFExtensionCameraRh2v2::getAcquisitionProgress(unsigned int camera) {
     return 0;
 }
-QString QFExtensionCameraRh2v2::getCameraName(unsigned int camera) {
-    return QString("RadHard2");
-}
 
-QString QFExtensionCameraRh2v2::getCameraSensorName(unsigned int camera) {
-	return QString("Radhard2");
-}
 void QFExtensionCameraRh2v2::log_text(QString message) {
 	if (logService) logService->log_text(message);
 	else if (services) services->log_text(message);
@@ -241,15 +287,6 @@ void QFExtensionCameraRh2v2::log_warning(QString message) {
 void QFExtensionCameraRh2v2::log_error(QString message) {
 	if (logService) logService->log_error(message);
 	else if (services) services->log_error(message);
-}
-
-
-double QFExtensionCameraRh2v2::getPixelWidth(unsigned int camera) {
-	return 30;
-}
-
-double QFExtensionCameraRh2v2::getPixelHeight(unsigned int camera) {
-	return 30;
 }
 
 

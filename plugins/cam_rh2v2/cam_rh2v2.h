@@ -12,6 +12,7 @@
 
 #define LOG_PREFIX "[RH2v2]: "
 
+
 /*!
     \defgroup qf3ext_rh2v2 QFExtensionCamera implementation
     \ingroup qf3extensionplugins
@@ -29,6 +30,15 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** Default destructor */
         virtual ~QFExtensionCameraRh2v2();
 
+        struct cameraSettings{
+          QSettings *settings_pc;
+          processing_chain *pc;
+          QString *prefix;
+          unsigned int xRes,yRes;
+          float pixelWidth,pixelHeight;
+          float exposureTime;
+        };
+
 
     /////////////////////////////////////////////////////////////////////////////
     // QFExtension routines
@@ -36,9 +46,9 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtension::getID() */
         virtual QString getID() const  { return QString("cam_rh2v2"); };
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("Radhard 2 SPAD array with custom firmware"); };
+        virtual QString getName() const  { return tr("HW YAID USB driver"); };
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return tr("Interface to Radhard2 SPAD array with custom firmware"); };
+        virtual QString getDescription() const  { return tr("Interface to sensors featuring streaming YAID format"); };
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan Buchholz"); };
         /** \copydoc QFExtension::getCopyright() */
@@ -80,6 +90,10 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         virtual int getImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
         virtual int getImageHeight(unsigned int camera);
+				/** \copydoc QFExtensionCamera::getCameraNme() */
+				virtual QString getCameraName(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getCameraSensorName() */
+        virtual QString getCameraSensorName(unsigned int camera);
         /** \copydoc QFExtensionCamera::isConnected() */
         virtual bool isConnected(unsigned int camera);
         /** \copydoc QFExtensionCamera::acquire() */
@@ -92,14 +106,6 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         virtual double getExposureTime(unsigned int camera);
         /** \copydoc QFExtensionCamera::setLogging() */
         virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
-        /** \copydoc QFExtensionCamera::getPixelWidth() */
-        virtual double getPixelWidth(unsigned int camera);
-        /** \copydoc QFExtensionCamera::getPixelHeight() */
-        virtual double getPixelHeight(unsigned int camera);
-        /** \copydoc QFExtensionCamera::getCameraName() */
-        virtual QString getCameraName(unsigned int camera);
-        /** \copydoc QFExtensionCamera::getCameraSensorName() */
-        virtual QString getCameraSensorName(unsigned int camera);
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
         virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
@@ -115,6 +121,10 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
         /** \copydoc QFExtensionCamera::getAcquisitionProgress() */
         virtual int getAcquisitionProgress(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getPixelWidth() */
+        virtual double getPixelWidth(unsigned int camera);
+        /** \copydoc QFExtensionCamera::getPixelHeight() */
+        virtual double getPixelHeight(unsigned int camera);
 
 
         /** \brief log project text message
@@ -132,13 +142,14 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
 
 	protected:
         QFPluginLogService* logService;
-				QSettings *settings_pc;
-				QString& findGroupByType(const QString&);
-				processing_chain *pc;
+        QString& findGroupByType(const QString &t, const unsigned int camera);
+        struct cameraSettings* cameraSetting;
 				
 	public:
-		void reconfigure(unsigned int camera, const QSettings& settings, unsigned int set);
-				
+        bool reconfigure(unsigned int camera, const QSettings& settings, unsigned int set);
+        bool reconfigure(unsigned int camera, const QSettings& settings, const QString& setName);
+        void reconfigure2(unsigned int camera, const QSettings& settings, const QString& postfix);
+
 	protected slots:
 		void logger_txt(QString message){log_text(LOG_PREFIX+message);}
 		void logger_wrn(QString message){log_warning(LOG_PREFIX+message);}
