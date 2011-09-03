@@ -30,9 +30,9 @@ int main(int argc, char * argv[])
     Q_INIT_RESOURCE(quickfit3);
     QApplication app(argc, argv);
 
-    app.setOrganizationName("");
+    app.setOrganizationName("German Cancer Research Center: B040 (Biophysics of Macromolecules)");
     app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(VERSION_FULL).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
-    //app.setOrganizationDomain("http://www.dkfz.de/Macromol");
+    app.setOrganizationDomain("http://www.dkfz.de/Macromol");
     app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
     app.setWindowIcon(QIcon(":/icon_large.png"));
 

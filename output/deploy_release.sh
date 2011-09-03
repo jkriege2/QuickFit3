@@ -47,6 +47,7 @@ done
 
 rm *.sh
 rm *.ini
+rm ATMCD32D.DLL
 
 zip -rv9 ../${ZIPFILE} *
 cd ..
