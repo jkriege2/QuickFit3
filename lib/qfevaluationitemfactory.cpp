@@ -147,3 +147,14 @@ QString QFEvaluationItemFactory::getPluginTutorial(QString ID) {
     return "";
 }
 
+QString QFEvaluationItemFactory::getPluginCopyrightFile(QString ID) {
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/copyright.html").arg(basename);
+    }
+    return "";
+}
+

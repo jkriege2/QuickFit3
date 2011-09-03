@@ -77,6 +77,8 @@ class QFExtensionManager : public QObject {
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFExtension ID. */
         QString getPluginTutorial(QString ID);
+        /** \brief returns the plugins copyright file (html) for a specified QFExtension ID. */
+        QString getPluginCopyrightFile(QString ID);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

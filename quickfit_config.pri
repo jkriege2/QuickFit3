@@ -20,4 +20,14 @@ BLAS_INCLUDE =
 
 exists(quickfit.inc):include(quickfit.inc)
 
-DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
+!win32 {
+    DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
+}
+
+contains( HAS_LAPACK, true ) {
+DEFINES += QF_HAS_LAPACK
+}
+
+contains( HAS_CBLAS, true ) {
+DEFINES += QF_HAS_CBLAS
+}

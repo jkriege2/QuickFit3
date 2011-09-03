@@ -95,6 +95,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
+    htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getAssetsDirectory()+QString("/help/")));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
@@ -147,7 +148,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     autoWriteSettings();
     timerAutosave->start();
 
-    setWindowIcon(QIcon(":/icon.png"));
+    setWindowIcon(QIcon(":/icon_large.png"));
 }
 
 
@@ -378,6 +379,56 @@ QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, 
     }
     return text;
 }
+
+QString MainWindow::createPluginDocCopyrights(QString mainitem_before, QString mainitem_after) {
+    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+    QString text=mainitem_before.arg(tr("Raw Data Record"));
+    // gather information about plugins
+    for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
+        QString id=getRawDataRecordFactory()->getIDList().at(i);
+        QString dir=getRawDataRecordFactory()->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("Data Evaluation"));
+    // gather information about plugins
+    for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
+        QString id=getEvaluationItemFactory()->getIDList().at(i);
+        QString dir=getEvaluationItemFactory()->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">Fit Algorithm</a>"));
+    // gather information about plugins
+    for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=fitAlgorithmManager->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function</a>"));
+    // gather information about plugins
+    for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=fitFunctionManager->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
+    // gather information about plugins
+    for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
+        QString id=getExtensionManager()->getIDList().at(i);
+        QString dir=getExtensionManager()->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    return text;
+}
+
 
 
 QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString mainitem_after) {

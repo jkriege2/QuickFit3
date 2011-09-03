@@ -158,6 +158,17 @@ QString QFFitFunctionManager::getPluginTutorial(int ID) {
     return "";
 }
 
+QString QFFitFunctionManager::getPluginCopyrightFile(int ID) {
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/copyright.html").arg(basename).arg(getID(ID));
+    }
+    return "";
+}
+
 
 
 

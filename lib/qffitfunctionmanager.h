@@ -60,6 +60,8 @@ class QFFitFunctionManager : public QObject {
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
         QString getPluginTutorial(int ID);
+        /** \brief returns the plugins copyright file (html) for a specified  ID. */
+        QString getPluginCopyrightFile(int ID);
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID);
         /** \brief search for raw data record plugins in the given directory */

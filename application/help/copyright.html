@@ -9,6 +9,7 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 <h2>QuickFit</h2>
 <p><i>Version:</i> <b>QuickFit $$version$$</b> (status: $$version.status$$, compiled: $$version.date$$, SVN: $$version.svnrevision$$)</p>
 <p><i>Copyright:</i> $$copyright$$</p>
+<p><i>Webpage:</i> <a href="$$weblink$$">$$weblink$$</a></p>
 <p>QuickFit $$version$$ was developed in the <a href="http://www.dkfz.de/Macromol/">department B040 'Biophysics of Macromolecules' (Prof. J&ouml;rg Langowski)</a> of the <a href="http://www.dkfz.de/">german cancer research center (DKFZ)</a>. The main developers are:
 <ul>
   <li>Jan W. Krieger (<a href="mailto:j.krieger@dkfz.de">j.krieger@dkfz.de</a>)</li>
@@ -26,7 +27,7 @@ Special thanks (for testing, ideas, ...) to:
 </p>
 <center><img src=":/splash.png"></center>
 <h2>Other Libraries used by QuickFit</h2>
-<p>QuickFit uses a set of libraries to implements its functionality. The listing given below does <u>not</u> cover libraries used by QuickFit plugins. These are mentioned separately in the respective plugin documentations!
+<p>QuickFit uses a set of libraries to implements its functionality. The listing given below does <u>not</u> cover libraries used by QuickFit plugins. These are mentioned separately in the <a href="plugin_help.html">respective plugin documentations</a> or <a href="plugin_copyrights.html">plugin copyright notes</a>!
 <ul>
 	<li>For the GUI we use <b><a href="http://qt.nokia.com/">Qt Cross-platform application and UI framework</a></b> by Nokia, under the LGPL license<br>
 	<blockquote>Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).  All rights reserved. Contact: Nokia Corporation (qt-info@nokia.com)<br><br>
@@ -56,7 +57,22 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.</blockquot
 </li>
 </ul>
 </p>
+<h2>Citing QuickFit</h2>
+<p>If you used QuickFit $$version$$ for your data evaluation, please cite it in your publication. You can use:
+<blockquote>
+J. Krieger (2011): <b>QuickFit $$version$$ (status: $$version.status$$, compiled: $$version.date$$, SVN: $$version.svnrevision$$): A data evaluation application for biophysics</b>, <i>[web page] <a href="$$weblink$$">$$weblink$$ [Accessed on $$version.date$$]</a></i>
+<br><br>
 
+<code><pre>
+@misc{quickfit3,
+    author={Jan Krieger},
+    title={QuickFit $$version$$ (status: $$version.status$$, compiled: $$version.date$$, SVN: $$version.svnrevision$$): A data evaluation application for biophysics},
+    howpublished={[web page] \verb+$$weblink$$+},
+    year={$$version.date$$},
+    note={[Accessed on $$version.date$$]},
+}</pre></code>
+</blockquote>
+</p>
 
 </body>
 </html>

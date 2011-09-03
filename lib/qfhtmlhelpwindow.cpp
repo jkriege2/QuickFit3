@@ -367,7 +367,12 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), pluginList->at(i).plugin->getIconFilename()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), pluginList->at(i).plugin->getAuthor()));
-                fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), pluginList->at(i).plugin->getCopyright()));
+                if (basedir.exists("copyright.html")) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">%1</a>").arg(pluginList->at(i).plugin->getCopyright())));
+                } else {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), pluginList->at(i).plugin->getCopyright()));
+                }
+
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), pluginList->at(i).plugin->getWeblink()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), tr("<a href=\"%1\">Plugin Webpage</a>").arg(pluginList->at(i).plugin->getWeblink())));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pluginList->at(i).plugin->getID()));
@@ -398,7 +403,11 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString(":/icon.png")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), tr("QuickFit $$version$$: Online-Help")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), QString("$$author$$")));
-        fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("$$copyright$$")));
+        if (basedir.exists("copyright.html")) {
+            fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">$$copyright$$</a>")));
+        } else {
+            fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("$$copyright$$")));
+        }
         fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), QString("$$weblink$$")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), tr("<a href=\"$$weblink$$\">QuickFit Webpage</a>")));
     }

@@ -79,6 +79,8 @@ class QFEvaluationItemFactory : public QObject {
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFEvaluationItem ID. */
         QString getPluginTutorial(QString ID);
+        /** \brief returns the plugins copyright file (html) for a specified QFEvaluationItem ID. */
+        QString getPluginCopyrightFile(QString ID);
 
         /** \brief register menu items for specified ID. */
         void registerMenu(QString ID, QMenu* menu);
