@@ -1,6 +1,7 @@
 #ifndef QFFITFUNCTIONFCSADIFF_H
 #define QFFITFUNCTIONFCSADIFF_H
 #include "qfpluginfitfunction.h"
+#include "qffitfunction.h"
 
 
 

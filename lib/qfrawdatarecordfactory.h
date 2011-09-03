@@ -13,6 +13,7 @@
 #include "programoptions.h"
 #include "qfpluginrawdata.h"
 #include "qfpluginservices.h"
+#include "lib_imexport.h"
 
 class QFRawDataRecord;
 
@@ -22,7 +23,7 @@ class QFRawDataRecord;
     \ingroup qf3lib_project
 
 */
-class QFRawDataRecordFactory : public QObject {
+class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         Q_OBJECT
     public:
 

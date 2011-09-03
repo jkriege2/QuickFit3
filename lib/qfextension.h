@@ -1,6 +1,7 @@
 #ifndef QFEXTENSION_H
 #define QFEXTENSION_H
 
+#include "lib_imexport.h"
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include <QWidget>
@@ -50,7 +51,7 @@ class QFExtension: public QFPlugin {
     overload projectChanged().
 
 */
-class QFExtensionBase: public QFExtension {
+class QFLIB_EXPORT QFExtensionBase: public QFExtension {
     public:
         QF_PLUGIN
 

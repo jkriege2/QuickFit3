@@ -2,6 +2,7 @@
 #define QFPLUGINFITALGORITHM_H
 
 #include <QtPlugin>
+#include "lib_imexport.h"
 #include <QString>
 #include <QStringList>
 #include <QObject>
@@ -14,7 +15,7 @@
     These plugins may contain several fitting functions. The function getIDs() returns a QStringList
     with all implemented plugin IDs.
 */
-class QFPluginFitAlgorithm: public QFPlugin {
+class QFLIB_EXPORT QFPluginFitAlgorithm: public QFPlugin {
     public:
         /** Default destructor */
         virtual ~QFPluginFitAlgorithm() {}

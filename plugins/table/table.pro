@@ -8,7 +8,7 @@ DEPENDPATH += ./
 include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+LIBS += -L$$QFOUTPUT -lquickfit3lib -L$$QFOUTPUT -lquickfit3widgets
 
 # Input
 HEADERS += dlgcsvparameters.h \

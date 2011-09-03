@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <cfloat>
 #include <cmath>
+#include "lib_imexport.h"
 
 /*! \brief describes a virtual base class fitting functions that are used together with QFFitAlgorithm objects.
     \ingroup qf3lib_fitting
@@ -52,7 +53,7 @@
 
 
 */
-class QFFitFunction {
+class QFLIB_EXPORT QFFitFunction {
     public:
         /** \brief different types of input widgets for parameters */
         enum ParameterType {

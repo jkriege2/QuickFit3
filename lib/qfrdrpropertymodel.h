@@ -2,6 +2,7 @@
 #define QFRDRPROPERTYMODEL_H
 
 #include <QAbstractTableModel>
+#include "lib_imexport.h"
 
 
 // forward declaration
@@ -12,7 +13,7 @@ class QFRawDataRecord;
            QFRawDataRecord.
     \ingroup qf3lib_project
 */
-class QFRDRPropertyModel : public QAbstractTableModel {
+class QFLIB_EXPORT QFRDRPropertyModel : public QAbstractTableModel {
         Q_OBJECT
     public:
         /** Default constructor */

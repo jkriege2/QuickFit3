@@ -1,6 +1,7 @@
 #ifndef QEVALUATIONITEM_H
 #define QEVALUATIONITEM_H
 
+#include "lib_imexport.h"
 #include <QObject>
 #include <QString>
 #include <QVector>
@@ -78,7 +79,7 @@ class QFEvaluationPropertyEditor;
     The user may supply an Online-Help for the QFEvaluationRecord and QFEvaluationEditor. The Help has to be written
     as HTML page (or a set of these) and has to be stored as \verbatim plugins/help/<plugin_id>/<plugin_id>.html \endverbatim.
  */
-class QFEvaluationItem : public QObject, public QFProperties {
+class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         Q_OBJECT
     public:
 

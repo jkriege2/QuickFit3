@@ -175,7 +175,11 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="edtStartswith"/>
+      <widget class="QLineEdit" name="edtStartswith">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

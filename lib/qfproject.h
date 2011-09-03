@@ -1,6 +1,7 @@
 #ifndef QFPROJECT_H
 #define QFPROJECT_H
 
+#include "lib_imexport.h"
 #include <map>
 #include <QObject>
 #include <QMap>
@@ -46,7 +47,7 @@ typedef QMap<QString, QVariant> qfp_param_type;
     NOT user editable!
 
 */
-class QFProject : public QObject, public QFProperties {
+class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         Q_OBJECT
     protected:
         /** \brief contains the currently highest ID */

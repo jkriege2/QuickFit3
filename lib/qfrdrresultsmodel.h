@@ -1,6 +1,7 @@
 #ifndef QFRDRRESULTSMODEL_H
 #define QFRDRRESULTSMODEL_H
 
+#include "lib_imexport.h"
 #include <QAbstractTableModel>
 #include <QStringList>
 
@@ -11,7 +12,7 @@ class QFRawDataRecord;
     \ingroup qf3lib_project
 
 */
-class QFRDRResultsModel : public QAbstractTableModel {
+class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         Q_OBJECT
     public:
         /** Default constructor */

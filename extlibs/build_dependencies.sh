@@ -194,8 +194,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 			mkdir ../../lib
 			mkdir ../../include
+			mkdir ../../include/levmar
 			cp *.a ../../lib/
 			cp levmar.h ../../include/
+			cp levmar.h ../../include/levmar/
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
 				libOK=-4

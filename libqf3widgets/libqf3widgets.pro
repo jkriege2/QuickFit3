@@ -63,7 +63,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../plugins/interfaces/qfrdrcountratesinterface.h \
     ../plugins/interfaces/qfextensionparameterdevice.h \
     ../plugins/interfaces/qfextensionlinearstage.h \
-    ../plugins/interfaces/qfextensioncamera.h
+    ../plugins/interfaces/qfextensioncamera.h \
+    libwid_imexport.h \
+    ../../../../LIB/trunk/lib_imexport.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -114,3 +116,7 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
 CONFIG += lib_bundle exceptions rtti stl create_prl
+
+DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
+
+

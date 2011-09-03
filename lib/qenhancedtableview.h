@@ -1,6 +1,7 @@
 #ifndef QENHANCEDTABLEVIEW_H
 #define QENHANCEDTABLEVIEW_H
 
+#include "lib_imexport.h"
 #include <QTableView>
 
 /*! \brief this class extends the QTableView
@@ -8,7 +9,7 @@
 
 */
 
-class QEnhancedTableView : public QTableView {
+class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         Q_OBJECT
     public:
         QEnhancedTableView(QWidget* parent=NULL);

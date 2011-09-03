@@ -2,7 +2,6 @@
 #define QFPFITALGORITHMLMFIT_H
 
 #include "qfpluginfitalgorithm.h"
-#include <levmar/levmar.h>
 
 /*!
     \defgroup qf3fitfunp_fit_lmfit LMFit Fitting Algorithm Plugin

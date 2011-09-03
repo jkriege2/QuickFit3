@@ -11,6 +11,7 @@
 #include "qftools.h"
 #include "qenhancedtableview.h"
 #include "qfhtmlhelpwindow.h"
+#include "lib_imexport.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -19,7 +20,7 @@
  As there were problems when changing the displayed editor for different types of raw data items. One editor window
  is only useable for one type of  raw data!
 */
-class QFRawDataPropertyEditor : public QWidget {
+class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */

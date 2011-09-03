@@ -4,5 +4,5 @@ contains( HAS_LAPACK, true ) {
                   ../../extlibs/include/
 } else {
    LIBS += -L../../extlibs/levmar/lib/ -llevmar -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
-   INCLUDEPATH += ../../extlibs/include/
+   INCLUDEPATH += ../../extlibs/levmar/include/
 }

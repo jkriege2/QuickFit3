@@ -22,6 +22,5 @@
         <file alias="project_saveas.png">../images/22x22/project_saveas.png</file>
         <file alias="rawdata_insert.png">../images/22x22/rdr_add.png</file>
         <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>
-        <file alias="table_insert.png">../images/22x22/table_insert.png</file>
     </qresource>
 </RCC>

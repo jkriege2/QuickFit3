@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "qffitalgorithm.h"
+#include "lib_imexport.h"
 
 
 namespace Ui {
@@ -38,7 +39,7 @@ namespace Ui {
 
 
 */
-class dlgQFFitAlgorithmProgressDialog : public QDialog
+class QFLIB_EXPORT dlgQFFitAlgorithmProgressDialog : public QDialog
 {
         Q_OBJECT
     public:
@@ -98,7 +99,7 @@ class dlgQFFitAlgorithmProgressDialog : public QDialog
 /*! \brief this class translates QFFitAlgorithmReporter calls over thread borders to a dlgQFFitAlgorithmProgressDialog
     \ingroup qf3lib_fitting
 */
-class dlgQFFitAlgorithmProgressDialogReporter : public QObject, public QFFitAlgorithmReporter
+class QFLIB_EXPORT dlgQFFitAlgorithmProgressDialogReporter : public QObject, public QFFitAlgorithmReporter
 {
         Q_OBJECT
     public:

@@ -5,6 +5,7 @@
 #include "qfextensionmanager.h"
 #include "../interfaces/qfextensioncamera.h"
 #include "qfextension.h"
+#include "libwid_imexport.h"
 
 /*! \brief QComboBox which is filled with all available cameras
     \ingroup qf3lib_widgets
@@ -12,7 +13,7 @@
     If this QComboBox is initialized with a valid QFExtensionManager object, it will be automatically
     filled with all available cameras.
  */
-class QFCameraComboBox : public QComboBox {
+class QFWIDLIB_EXPORT QFCameraComboBox : public QComboBox {
         Q_OBJECT
     public:
         QFCameraComboBox(QFExtensionManager* extManager, QWidget* parent=NULL);

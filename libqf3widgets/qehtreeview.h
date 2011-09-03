@@ -2,6 +2,7 @@
 #define QEHTREEVIEW_H
 
 #include <QTreeView>
+#include "libwid_imexport.h"
 
 /*! \brief this class extends the QTreeView by including signals that will be
            emitted by several internal events (key events ...).
@@ -10,7 +11,7 @@
   This is usefull, if you want to trigger actions by a keypress ...
 */
 
-class QEHTreeView : public QTreeView {
+class QFWIDLIB_EXPORT QEHTreeView : public QTreeView {
         Q_OBJECT
     public:
         /** \brief Default constructor */

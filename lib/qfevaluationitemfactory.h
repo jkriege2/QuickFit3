@@ -1,6 +1,7 @@
 #ifndef QFEVALUATIONITEMFACTORY_H
 #define QFEVALUATIONITEMFACTORY_H
 
+#include "lib_imexport.h"
 #include <QObject>
 #include <QMap>
 #include <QProgressBar>
@@ -24,7 +25,7 @@ class QFEvaluationItem;
     \ingroup qf3lib_project
 
 */
-class QFEvaluationItemFactory : public QObject {
+class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         Q_OBJECT
     protected:
         /** \brief this map is used to internally manage the available QFEvaluationItem s.

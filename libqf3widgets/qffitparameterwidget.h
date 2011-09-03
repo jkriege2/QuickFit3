@@ -1,6 +1,7 @@
 #ifndef QFFitParameterWidgetWrapper_H
 #define QFFitParameterWidgetWrapper_H
 
+#include "libwid_imexport.h"
 #include <QWidget>
 #include <QCheckBox>
 #include <QSpinBox>
@@ -34,7 +35,7 @@
     .
 
 */
-class QFFitParameterWidgetWrapper : public QObject {
+class QFWIDLIB_EXPORT QFFitParameterWidgetWrapper : public QObject {
         Q_OBJECT
     public:
         /** \brief used to specify the widget to display */

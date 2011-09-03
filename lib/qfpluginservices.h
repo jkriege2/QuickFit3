@@ -1,6 +1,7 @@
 #ifndef QFPLUGINSERVICES_H
 #define QFPLUGINSERVICES_H
 
+#include "lib_imexport.h"
 #include <QString>
 #include <QSettings>
 #include <QToolBar>

@@ -2,13 +2,14 @@
 #define QFFITPARAMETERBASICINTERFACE_H
 
 #include <QString>
+#include "libwid_imexport.h"
 
 /*! \brief generic interface that allows to access values, ranges and fix settinsg for fitting parameters
     \ingroup qf3lib_widgets
 
     This interface is provided for convenience, so special widgets that display fitting parameters may be re-used later on.
  */
-class QFFitParameterBasicInterface {
+class QFWIDLIB_EXPORT QFFitParameterBasicInterface {
     public:
         virtual ~QFFitParameterBasicInterface() {};
 

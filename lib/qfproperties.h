@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QVariant>
 #include <QStringList>
+#include "lib_imexport.h"
 
 class QDomElement; // forward
 class QXmlStreamWriter;
@@ -14,7 +15,7 @@ class QXmlStreamWriter;
     \ingroup qf3lib_project
 
 */
-class QFProperties {
+class QFLIB_EXPORT QFProperties {
     public:
         /** Default constructor */
         QFProperties();

@@ -3,13 +3,14 @@
 
 #include <QSplitter>
 #include <QSplitterHandle>
+#include "lib_imexport.h"
 
 /*! \brief a QSplitter that has a really visible Splitter handle
     \ingroup tools_qt
 
 
  */
-class QVisibleHandleSplitter : public QSplitter {
+class QFLIB_EXPORT QVisibleHandleSplitter : public QSplitter {
         Q_OBJECT
     public:
         explicit QVisibleHandleSplitter(Qt::Orientation orientation, QWidget *parent = 0);
@@ -33,7 +34,7 @@ class QVisibleHandleSplitter : public QSplitter {
 
 
  */
-class QVisibleGripSplitterHandle: public QSplitterHandle {
+class QFLIB_EXPORT QVisibleGripSplitterHandle: public QSplitterHandle {
         Q_OBJECT
     public:
         QVisibleGripSplitterHandle(Qt::Orientation orientation, QSplitter * parent=NULL);

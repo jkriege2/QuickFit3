@@ -6,6 +6,7 @@
 #include <iostream>
 #include "qfpluginservices.h"
 #include "qftools.h"
+#include "lib_imexport.h"
 
 
 // forward declaration
@@ -15,7 +16,7 @@ class QFRawDataRecord;
     \ingroup qf3lib_project
 
  */
-class QFRawDataEditor : public QWidget {
+class QFLIB_EXPORT QFRawDataEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */

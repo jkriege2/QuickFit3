@@ -1,6 +1,5 @@
 #include "qffitfunctionfcsadiff.h"
 
-
 #define sqr(x) ((x)*(x))
 #define cube(x) ((x)*(x)*(x))
 #define pow4(x) ((x)*(x)*(x)*(x))

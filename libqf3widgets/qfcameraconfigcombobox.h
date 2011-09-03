@@ -6,6 +6,7 @@
 #include "../interfaces/qfextensioncamera.h"
 #include "qfextension.h"
 #include "qfcameracombobox.h"
+#include "libwid_imexport.h"
 
 /*! \brief Interface that allows to stop/resume an acquisition
     \ingroup qf3lib_widgets
@@ -24,7 +25,7 @@ public:
     \ingroup qf3lib_widgets
 
  */
-class QFCameraConfigComboBoxNotifier: public QObject {
+class QFWIDLIB_EXPORT QFCameraConfigComboBoxNotifier: public QObject {
         Q_OBJECT
     public:
         QFCameraConfigComboBoxNotifier(QObject* parent);
@@ -47,7 +48,7 @@ class QFCameraConfigComboBoxNotifier: public QObject {
     box changes.
 
  */
-class QFCameraConfigComboBox : public QComboBox {
+class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QComboBox {
         Q_OBJECT
     public:
         QFCameraConfigComboBox(QString configDirectory, QWidget* parent=NULL);
@@ -108,7 +109,7 @@ class QFCameraConfigComboBox : public QComboBox {
     \ingroup qf3lib_widgets
 
  */
-class QFCameraConfigEditorWidget : public QWidget {
+class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         Q_OBJECT
     public:
         QFCameraConfigEditorWidget(QString configDirectory, QWidget* parent=NULL);

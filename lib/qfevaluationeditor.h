@@ -1,6 +1,7 @@
 #ifndef QFEVALUATIONEDITOR_H
 #define QFEVALUATIONEDITOR_H
 
+#include "lib_imexport.h"
 #include <QWidget>
 #include <QPointer>
 #include "programoptions.h"
@@ -12,7 +13,7 @@ class QFEvaluationItem;
 /*! \brief base class for all evaluation widgets
     \ingroup qf3lib_project
 */
-class QFEvaluationEditor : public QWidget {
+class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */

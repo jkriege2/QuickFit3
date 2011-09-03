@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QWidget>
 #include <QSplitter>
+#include "lib_imexport.h"
 
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
     \ingroup qf3lib_mathtools
@@ -22,13 +23,13 @@
     So with \a addSignifcant = 2 The value 1.23456789&pm;0.001
     will be rounded to 1.23456&pm;0.001
 */
-double roundWithError(double value, double error, int addSignifcant=1) ;
+QFLIB_EXPORT double roundWithError(double value, double error, int addSignifcant=1) ;
 
 /*! \brief round a value to its first 1+\a addSignifcant significant digits
     \ingroup qf3lib_mathtools
 
 */
-double roundError(double error, int addSignifcant=1) ;
+QFLIB_EXPORT double roundError(double error, int addSignifcant=1) ;
 
 /*! \brief store the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
@@ -39,7 +40,7 @@ double roundError(double error, int addSignifcant=1) ;
     \param widget the widget to store
     \param prefix this prefix is prepended to the QSettings keys
 */
-void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
+QFLIB_EXPORT void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
 
 /*! \brief load the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
@@ -50,7 +51,7 @@ void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QSt
     \param[out] widget the widget to change
     \param prefix this prefix is prepended to the QSettings keys
 */
-void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
+QFLIB_EXPORT void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
 
 
 /*! \brief load the geometry of a given widget to a QSettings
@@ -64,7 +65,7 @@ void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QSt
     \param defaultSize default size of the widget
     \param prefix this prefix is prepended to the QSettings keys
 */
-void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix=QString(""));
+QFLIB_EXPORT void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix=QString(""));
 
 /*! \brief store the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
@@ -75,7 +76,7 @@ void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosi
     \param widget the widget to store
     \param prefix this prefix is prepended to the QSettings keys
 */
-void saveSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
+QFLIB_EXPORT void saveSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
 
 /*! \brief load the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
@@ -86,7 +87,7 @@ void saveSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QStri
     \param[out] plitter the plitter to change
     \param prefix this prefix is prepended to the QSettings keys
 */
-void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
+QFLIB_EXPORT void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QString(""));
 
 /*! \brief outputs a string designating the type of a QVariant
     \ingroup qf3lib_tools
@@ -94,7 +95,7 @@ void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix=QStri
     \param variant input QVariant
     \return a string describing the type of \a variant
 */
-QString getQVariantType(const QVariant& variant);
+QFLIB_EXPORT QString getQVariantType(const QVariant& variant);
 
 /*! \brief outputs a string encoding the contents of a QVariant
     \ingroup qf3lib_tools
@@ -102,7 +103,7 @@ QString getQVariantType(const QVariant& variant);
     \param variant input QVariant
     \return a string encoding the contents of \a variant
 */
-QString getQVariantData(const QVariant& variant);
+QFLIB_EXPORT QString getQVariantData(const QVariant& variant);
 
 /*! \brief outputs a Variant, from a type and data, as encoded by getQVariantType() and getQVariantData()
     \ingroup qf3lib_tools
@@ -111,17 +112,17 @@ QString getQVariantData(const QVariant& variant);
     \param data contents of the new QVariant, encoded as string
     \return a QVariant, based on \a type and \a data. If the data is invalid for some reason, the function returns an invalid QVariant
 */
-QVariant getQVariantFromString(const QString& type, const QString& data);
+QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& data);
 
 /*! \brief convert a number to a QString with a given decimalSeparator
     \ingroup qf3lib_tools
 
 */
-QString doubleToQString(double value, int prec = 6, char f = 'g', QChar decimalSeparator=',' );
+QFLIB_EXPORT QString doubleToQString(double value, int prec = 6, char f = 'g', QChar decimalSeparator=',' );
 
 /*! \brief convert a string \a data to a boolean
     \ingroup qf3lib_tools
 
 */
-bool QStringToBool(QString& data);
+QFLIB_EXPORT bool QStringToBool(QString& data);
 #endif // QFTOOLS_H

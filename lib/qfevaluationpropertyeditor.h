@@ -1,6 +1,7 @@
 #ifndef QFEVALUATIONPROPERTYEDITOR_H
 #define QFEVALUATIONPROPERTYEDITOR_H
 
+#include "lib_imexport.h"
 #include <QtGui>
 #include <QSortFilterProxyModel>
 #include "qfproject.h"
@@ -27,7 +28,7 @@ class QFEvaluationPropertyEditor; // forward
 
 
  */
-class QFEvaluationRawDataModelProxy : public QSortFilterProxyModel {
+class QFLIB_EXPORT QFEvaluationRawDataModelProxy : public QSortFilterProxyModel {
         Q_OBJECT
 
     public:
@@ -65,7 +66,7 @@ class QFEvaluationRawDataModelProxy : public QSortFilterProxyModel {
           method of you evaluation item.
 
  */
-class QFEvaluationPropertyEditor : public QWidget {
+class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         Q_OBJECT
     protected:
 

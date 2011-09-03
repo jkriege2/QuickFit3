@@ -1,5 +1,5 @@
 
-
+DEFINES += QTLIB_IN_DLL
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

@@ -1,13 +1,14 @@
 #ifndef QFPLUGINEVALUATIONITEMBASE_H
 #define QFPLUGINEVALUATIONITEMBASE_H
 
+#include "lib_imexport.h"
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include "qfproject.h"
 #include "qfevaluationitem.h"
 #include <QWidget>
 #include "qfplugin.h"
-
+#include "lib_imexport.h"
 
 /** \brief base class for all QuickFit 3 raw data record plugins
     \ingroup qf3evaluationplugins
@@ -42,7 +43,7 @@ class QFPluginEvaluationItem: public QFPlugin {
 };
 
 
-class QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
+class QFLIB_EXPORT QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
     public:
         QF_PLUGIN
 

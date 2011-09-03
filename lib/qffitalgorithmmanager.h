@@ -1,6 +1,7 @@
 #ifndef QFFITALGORITHMMANAGER_H
 #define QFFITALGORITHMMANAGER_H
 
+#include "lib_imexport.h"
 #include <QObject>
 #include <QtPlugin>
 #include <QString>
@@ -17,7 +18,7 @@ class QFFitAlgorithm;
 
 
 */
-class QFFitAlgorithmManager : public QObject {
+class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         Q_OBJECT
     public:
         /** Default constructor */

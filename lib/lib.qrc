@@ -16,8 +16,6 @@
         <file alias="lib/projecttree_folder.png">../images/16x16/project_folder.png</file>
         <file alias="lib/projecttree_folderopen.png">../images/16x16/project_folderopen.png</file>
         <file alias="lib/projecttree_emptyrdr.png">../images/16x16/empty.png</file>
-        <file alias="lib/projecttree_tablefile.png">../images/16x16/table.png</file>
-        <file alias="lib/projecttree_emptyevaluatione.png">../images/16x16/datashowchart.png</file>
     </qresource>
     <qresource prefix="/lib/help">
         <file alias="help_down.png">icons/help_down.png</file>

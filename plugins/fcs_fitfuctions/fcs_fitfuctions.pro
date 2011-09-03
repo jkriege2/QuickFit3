@@ -8,7 +8,9 @@ include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 #DLLDESTDIR = $$DESTDIR
-LIBS +=
+
+LIBS += -L$$QFOUTPUT -lquickfit3lib
+
 
 # Input
 HEADERS += fcs_fitfuctions.h \
@@ -23,11 +25,11 @@ SOURCES += fcs_fitfuctions.cpp\
            qffitfunctionfcsdiff.cpp \
            qffitfunctionfcssimplediff.cpp
 
-FORMS =
+FORMS +=
 
 RESOURCES +=
 
-TRANSLATIONS= ./translations/de.qffcsfitfuncs.ts
+TRANSLATIONS += ./translations/de.qffcsfitfuncs.ts
 
 
 INCLUDEPATH += ../../lib/

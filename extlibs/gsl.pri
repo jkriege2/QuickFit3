@@ -1,2 +1,2 @@
-INCLUDEPATH += ../../extlibs/gsl/
-LIBS += -L../../extlibs/gsl/ -lgslcblas -lgsl
+INCLUDEPATH += ../../extlibs/gsl/include/
+LIBS += -L../../extlibs/gsl/lib/ -lgslcblas -lgsl

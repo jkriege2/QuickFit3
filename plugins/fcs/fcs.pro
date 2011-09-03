@@ -6,7 +6,7 @@ DEPENDPATH += ./
 
 include(../plugins.pri)
 
-DESTDIR = $$QFOUTPUT/plugins
+DEFINES += TARGETNAME=$$TARGET
 
 LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 

@@ -25,9 +25,9 @@ exists(quickfit.inc):include(quickfit.inc)
 }
 
 contains( HAS_LAPACK, true ) {
-DEFINES += QF_HAS_LAPACK
+    DEFINES += QF_HAS_LAPACK
 }
 
 contains( HAS_CBLAS, true ) {
-DEFINES += QF_HAS_CBLAS
+    DEFINES += QF_HAS_CBLAS
 }

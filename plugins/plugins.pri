@@ -10,6 +10,9 @@ UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
 QFOUTPUT = ../../output
+DESTDIR = $$QFOUTPUT/plugins
+
+DEFINES += QTLIB_IN_DLL
 
 #release {
 #    QFOUTPUT = ../../output_release
@@ -65,6 +68,7 @@ release {
     message("building $$TARGET $$TEMPLATE (plugin) in DEBUG mode, output is in $$QFOUTPUT")
 }
 
+LIBS += -L$$QFOUTPUT -lquickfit3lib
 
 CONFIG += link_prl
 

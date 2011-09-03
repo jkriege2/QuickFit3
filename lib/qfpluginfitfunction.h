@@ -1,6 +1,7 @@
 #ifndef QFPLUGINFITFUNCTION_H
 #define QFPLUGINFITFUNCTION_H
 
+#include "lib_imexport.h"
 #include <QtPlugin>
 #include <QString>
 #include <QStringList>

@@ -1,12 +1,14 @@
 #ifndef QFPLUGINRAWDATARECORDBASE_H
 #define QFPLUGINRAWDATARECORDBASE_H
 
+#include "lib_imexport.h"
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include "qfproject.h"
 #include <QWidget>
 #include "qfrawdatarecord.h"
 #include "qfplugin.h"
+#include "lib_imexport.h"
 
 /** \brief virtual interface class for all QuickFit 3 raw data record plugins
     \ingroup qf3rawdataplugins
@@ -45,21 +47,25 @@ class QFPluginRawDataRecord: public QFPlugin {
     the methods from QFPluginRawDataRecord, as they are generic to all plugins!
 
 */
-class QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
+class QFLIB_EXPORT QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
     public:
-        QF_PLUGIN
+        /** \brief class constructor */
+        QFPluginRawDataRecordBase();
 
         /** \brief class destructor */
-        virtual ~QFPluginRawDataRecordBase() {};
+        virtual ~QFPluginRawDataRecordBase();
+
+        //QF_PLUGIN
+        virtual void getQFLibVersion(int& major, int& minor) const;
 
         /** \brief set current project */
-        virtual void setProject(QFProject* project) { this->project=project; };
+        virtual void setProject(QFProject* project);
         /** \brief set services class to use for reporting/status output */
-        virtual void setServices(QFPluginServices* services) { this->services=services; };
+        virtual void setServices(QFPluginServices* services);
         /** \brief set program options object used by the application */
-        virtual void setSettings(ProgramOptions* settings) { this->settings=settings; };
+        virtual void setSettings(ProgramOptions* settings);
         /** \brief set parent widget (e.g. for message dialogs) */
-        virtual void setParentWidget(QWidget* parentWidget) { this->parentWidget=parentWidget; };
+        virtual void setParentWidget(QWidget* parentWidget);
 
     protected:
         QFPluginServices* services;

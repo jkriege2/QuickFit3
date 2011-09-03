@@ -1,6 +1,7 @@
 #ifndef QFPROJECTRAWDATAMODEL_H
 #define QFPROJECTRAWDATAMODEL_H
 
+#include "lib_imexport.h"
 #include <QAbstractListModel>
 #include "qfproject.h"
 
@@ -23,7 +24,7 @@
     \note You can use QFMultiListEvaluationPropertyEditor::QFProjectRawDataModelMultiListEvaluationProxy
           to filter out records that are not usable together with a given QFMultiListEvaluation.
  */
-class QFProjectRawDataModel : public QAbstractListModel {
+class QFLIB_EXPORT QFProjectRawDataModel : public QAbstractListModel {
         Q_OBJECT
     public:
         /** Default constructor */

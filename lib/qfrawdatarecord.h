@@ -13,6 +13,7 @@
 #include "qfrdrresultsmodel.h"
 #include "qfrdrpropertymodel.h"
 #include "qfproperties.h"
+#include "lib_imexport.h"
 
 
 class QDomElement; // forward
@@ -35,7 +36,7 @@ class QDomElement; // forward
     as HTML page (or a set of these) and has to be stored as \verbatim plugins/help/<plugin_id>/<plugin_id>.html \endverbatim.
 
  */
-class QFRawDataRecord : public QObject, public QFProperties {
+class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         Q_OBJECT
     public:
         /** \brief class constructor, reads from QDomElement */

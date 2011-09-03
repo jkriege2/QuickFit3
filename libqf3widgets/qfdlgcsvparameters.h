@@ -3,8 +3,11 @@
 
 #include <QDialog>
 #include <QMessageBox>
-#include "ui_qfdlg_csvparameters.h"
+#include "libwid_imexport.h"
 
+namespace Ui {
+    class QFDlgCSVParameters; // forward
+}
 
 /*! \brief Dialog which allows to enter the parameters needed to import a CSV file (separators)
     \ingroup qf3lib_widgets
@@ -17,7 +20,7 @@
     If you set any of the parameter in the constructor to an empty char or string, the according widget will be disabled.
 
  */
-class QFDlgCSVParameters : public QDialog, private Ui::QFDlgCSVParameters
+class QFWIDLIB_EXPORT QFDlgCSVParameters : public QDialog
 {
         Q_OBJECT
     public:
@@ -39,6 +42,7 @@ class QFDlgCSVParameters : public QDialog, private Ui::QFDlgCSVParameters
         char decimal_separator;
         char comment_start;
         QString header_start;
+        Ui::QFDlgCSVParameters* ui;
 };
 
 #endif // QFQFDlgCSVParameters_H

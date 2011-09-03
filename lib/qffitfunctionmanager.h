@@ -1,6 +1,7 @@
 #ifndef QFFITFUNCTIONMANAGER_H
 #define QFFITFUNCTIONMANAGER_H
 
+#include "lib_imexport.h"
 #include <QObject>
 #include <QList>
 #include <QString>
@@ -18,7 +19,7 @@
     means to sleect only a sub-group of parameters. They are selected by the start of their
     ID string, so getModels("fcs_") will return all models that start with "fcs_".
 */
-class QFFitFunctionManager : public QObject {
+class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         Q_OBJECT
     public:
         /** Default constructor */

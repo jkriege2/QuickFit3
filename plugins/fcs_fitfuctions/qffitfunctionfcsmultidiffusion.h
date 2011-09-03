@@ -2,6 +2,7 @@
 #define QFFITFUNCTIONFCSMULTIDIFFUSION_H
 
 #include "qfpluginfitfunction.h"
+#include "qffitfunction.h"
 
 
 /*! \brief plugin class for FCS Normal Diffusion Fit Functions

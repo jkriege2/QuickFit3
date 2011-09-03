@@ -2,13 +2,14 @@
 #define DLGNEWPROPERTY_H
 
 #include <QDialog>
+#include "lib_imexport.h"
 
 
 namespace Ui {
     class dlgNewProperty; // forward
 }
 
-class dlgNewProperty : public QDialog
+class QFLIB_EXPORT dlgNewProperty : public QDialog
 {
         Q_OBJECT
     public:

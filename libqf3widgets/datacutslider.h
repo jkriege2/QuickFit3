@@ -1,7 +1,7 @@
 #include <QtGui>
 #include "tools.h"
 #include <iostream>
-
+#include "libwid_imexport.h"
 
 #ifndef DATACUTSLIDER_H
 #define DATACUTSLIDER_H
@@ -16,7 +16,7 @@
  * value=min and the right one at value=max. It is always asserted that leftValue<rightValue.
  *
  */
-class DataCutSliders : public QWidget
+class QFWIDLIB_EXPORT DataCutSliders : public QWidget
 {
     Q_OBJECT
 

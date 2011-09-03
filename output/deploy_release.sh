@@ -30,7 +30,8 @@ done
 if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
 rm ./globalconfig/*
 rmdir ./globalconfig
-rm Qt*d4.dll
+rm ./qtplugins/qt*d4.dll
+
 find -name ".svn" -type d -exec rm -rf {} \;
 find -name "*.log" -exec rm -rf {} \;
 find -name "*.autosave" -exec rm -rf {} \;

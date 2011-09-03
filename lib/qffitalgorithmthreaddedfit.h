@@ -1,6 +1,7 @@
 #ifndef QFFITALGORITHMTHREADDEDFIT_H
 #define QFFITALGORITHMTHREADDEDFIT_H
 
+#include "lib_imexport.h"
 #include <QThread>
 #include <QObject>
 #include "qffitalgorithm.h"
@@ -14,7 +15,7 @@
     getDeltaTime().
 
 */
-class QFFitAlgorithmThreadedFit: public QThread {
+class QFLIB_EXPORT QFFitAlgorithmThreadedFit: public QThread {
         Q_OBJECT
     public:
         /** \brief class cosntructor */

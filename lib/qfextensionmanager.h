@@ -1,6 +1,7 @@
 #ifndef QFEXTENSIONMANAGER_H
 #define QFEXTENSIONMANAGER_H
 
+#include "lib_imexport.h"
 #include <QObject>
 #include <QMap>
 #include <QWidget>
@@ -15,7 +16,7 @@ class QFExtension; // forward
 /*! \brief manager class for QFExtension plugins
     \ingroup qf3extensionplugins
 */
-class QFExtensionManager : public QObject {
+class QFLIB_EXPORT QFExtensionManager : public QObject {
         Q_OBJECT
     public:
         /** \brief class constructor */

@@ -4,6 +4,7 @@
 #include <QAbstractItemModel>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
+#include "lib_imexport.h"
 
 // forward declaration
 class QFProject;
@@ -11,7 +12,7 @@ class QFProject;
 /*! \brief model that allows Model/View access to the QuickFit project tree
     \ingroup qf3lib_project
 */
-class QFProjectTreeModel : public QAbstractItemModel {
+class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         Q_OBJECT
     public:
         /** Default constructor */

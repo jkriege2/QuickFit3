@@ -5,13 +5,14 @@
 #include "qfextensionmanager.h"
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
+#include "libwid_imexport.h"
 
 /*! \brief QComboBox which is filled with all available stages
     \ingroup qf3lib_widgets
 
 
  */
-class QFStageComboBox : public QComboBox {
+class QFWIDLIB_EXPORT QFStageComboBox : public QComboBox {
         Q_OBJECT
     public:
         /** \briefclass cosntructor which does NOT initialize the contents (call init() separately!!!) */

@@ -1,12 +1,14 @@
 #ifndef PROGRAMOPTIONS_H
 #define PROGRAMOPTIONS_H
 
+#include "lib_imexport.h"
 #include <QtGui>
+#include "lib_imexport.h"
 
 /*! \brief this class manages the overall program options (and may also display an options Dialog
     \ingroup qf3lib_settings
  */
-class ProgramOptions: public QObject {
+class QFLIB_EXPORT ProgramOptions: public QObject {
         Q_OBJECT
     public:
         /** \brief Default constructor

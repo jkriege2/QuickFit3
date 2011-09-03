@@ -1,6 +1,7 @@
 #ifndef QFPLUGIN_H
 #define QFPLUGIN_H
 
+#include "lib_imexport.h"
 #include "qflib_version.h"
 
 /** \brief virtual interface class for all QuickFit 3 plugins

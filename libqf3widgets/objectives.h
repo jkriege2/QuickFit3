@@ -4,13 +4,14 @@
 #include <QDialog>
 #include <QString>
 #include <QWidget>
+#include "libwid_imexport.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): description of an objective
     \ingroup qf3ext_spimb040
 
 
  */
-struct ObjectiveDescription {
+struct QFWIDLIB_EXPORT ObjectiveDescription {
     QString name;
     QString manufacturer;
     double magnification;
@@ -29,7 +30,7 @@ namespace Ui {
 
 
  */
-class QF3ObjectiveEditor : public QDialog
+class QFWIDLIB_EXPORT QF3ObjectiveEditor : public QDialog
 {
     Q_OBJECT
 

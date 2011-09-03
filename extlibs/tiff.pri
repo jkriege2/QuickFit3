@@ -1,3 +1,3 @@
-INCLUDEPATH += ../../extlibs/libtiff/
-LIBS += -L../../extlibs/libtiff/ -ltiff
+INCLUDEPATH += ../../extlibs/libtiff/include/
+LIBS += -L../../extlibs/libtiff/lib/ -ltiff
 DEFINES += QF_HAS_LIBTIFF

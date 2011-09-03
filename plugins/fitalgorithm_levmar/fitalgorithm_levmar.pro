@@ -28,6 +28,8 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/qt/ \
                .
 
+LIBS += -L$$QFOUTPUT -lquickfit3lib
+
 QT += core
 CONFIG += exceptions rtti stl
 

@@ -1,6 +1,7 @@
 #ifndef QFFITALGORITHM_H
 #define QFFITALGORITHM_H
 
+#include "lib_imexport.h"
 #include "qffitfunction.h"
 #include <QString>
 #include <QMap>
@@ -20,7 +21,7 @@
     An Implementation of a QFFitAlgorithmReporter is dlgQFFitAlgorithmProgressDialog.
 
 */
-class QFFitAlgorithmReporter {
+class QFLIB_EXPORT QFFitAlgorithmReporter {
     public:
         virtual ~QFFitAlgorithmReporter() {};
         /** \brief report a status message */
@@ -78,7 +79,7 @@ class QFFitAlgorithmReporter {
     so you are guaranteed to finish the function.
 
 */
-class QFFitAlgorithm {
+class QFLIB_EXPORT QFFitAlgorithm {
     public:
         /*! \brief functor base class that may be used to optimize arbitrary functions
 
@@ -91,7 +92,7 @@ class QFFitAlgorithm {
             whether the jacobian was implemented or not.
 
          */
-        class Functor {
+        class QFLIB_EXPORT Functor {
             public:
                 Functor(int Mevalout) { m_evalout=Mevalout; }
 
@@ -142,7 +143,7 @@ class QFFitAlgorithm {
                 \f[ g_m(\vec{q})=\frac{y_m-f(x_m; m(\vec{q}))}{\sigma_m} \f]
             The data, the weights and the fix-vector is given to this functor in the constructor. Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
         */
-        class FitQFFitFunctionFunctor: public Functor {
+        class QFLIB_EXPORT FitQFFitFunctionFunctor: public Functor {
             public:
                 /*! \brief constructor, initializes the functor
                     \param model QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$
@@ -214,7 +215,7 @@ class QFFitAlgorithm {
 
 
         /** \brief this struct is used to return the fit result */
-        struct FitResult {
+        struct QFLIB_EXPORT FitResult {
             /** \brief \c true on success */
             bool fitOK;
             /** \brief additional result parameters of the fit (maxIterations, ...).

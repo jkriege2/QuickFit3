@@ -1,6 +1,7 @@
 #ifndef QFEVALUATIONRESULTSMODEL_H
 #define QFEVALUATIONRESULTSMODEL_H
 
+#include "lib_imexport.h"
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QPointer>
@@ -14,7 +15,7 @@ class QFProject;
     \ingroup qf3lib_project
 
 */
-class QFEvaluationResultsModel : public QAbstractTableModel {
+class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         Q_OBJECT
     public:
         /** Default constructor */
