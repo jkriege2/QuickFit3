@@ -1,3 +1,3 @@
-LIBS += -L../../extlibs/lmfit/ -llmmin 
-INCLUDEPATH += ../../extlibs/lmfit/
+LIBS += -L../../extlibs/lmfit/lib/ -llmmin 
+INCLUDEPATH += ../../extlibs/lmfit/include/
 

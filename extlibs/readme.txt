@@ -1,15 +1,29 @@
 This directory contains external dependencies that may not be available on your system.
 
 If there is a .pri file in this directory for your library that one should solve all your problems.
-So simply include it and you should not need to add other options to your .pro file!
+So simply include it into your project and you should not need to add other options to your .pro file!
 
-If so, you may use these, according to the information given below:
+There is a script build_dependencies.sh that tries to build all necessary libraries that are NEEDED to
+compile QuickFit and B040's plugins. The libraries will be built (as far as possible) without any
+external dependencies and in static versions, so compiling QuickFit with these libs should leed to an
+application that is fully statically linked.
+
+A note on LAPACK: Some of the external libs may use lapack/blas. Currently no dependency and no plugins
+absolutely NEED any of the two, so they are not part of the dependencies here. If you have them on your 
+system, you may use them though by telling the build_dependencies.sh (it asks for them) and setting
+the quickfit.inc file in the main directory.
+
+At the end of the file you'll find some additional information on some of the libraries.
 
 
 
 Andor driver:
 ~~~~~~~~~~~~~
   some tool scripts and headers for the Andor Camera SDK (commercial software !!!)
+  If you need to build the andor plugin on win32/MinGW you can use the link library in
+  the directory andor_win32 and also the header file ATMCD32D.H there. If you want to 
+  build the andor plugin on Linux you need to install the Andor-SDK before, so the libraries 
+  are available system-wide
 
 
 
@@ -18,60 +32,48 @@ CImg:
   This image processing library is lightweight, i.e. it consists of a single header only. All needed files
   are stored in ./cimg/. you may include the file cimg.h into your sourcecode and cimg.pri into you project
   file, which will include everything and set all pathes as needed!
-
-    in your project file, use this:  
-        # DEFINITION FOR CImg Library
-        include( ../extlibs/cimg.pri )
-        PRECOMPILED_HEADER += ../extlibs/cimg.h
-
-  As set in these files, cimg links against libpng and libz which should be available on your system! If not,
-  you may change this accordingly.
-
     * http://cimg.sourceforge.net/
 
+  in your project file, use this:  
+	# DEFINITION FOR CImg Library
+	include( ../extlibs/cimg.pri )
+	
+  in your C++-files include the file cimg.h from the ./extlibs/ library directly, as this also cares for 
+  eventually available additional libraries (libtiff, lapack, libpng, ...) that can be used by CImg!
+	
 
-
+	
 levmar:
 ~~~~~~~
-  A library for Levenberg-Marquardt fits, used by a plugin. If this is not installed globally on your system,
-  unpack it here in ./levmar/ and build it there. The files levmar.h as well as the link library liblevmar.a
-  should reside in ./levmar/ afterwards, as this directory may be supplied as additional search directory for
-  plugins that need this library and levmar.h is included as #include <levmar/levmar.h>. Add this to you
-  project file (modified as appropriate!):
-
-       INCLUDEPATH += ../../extlibs/
-       LIBS += -L../../extlibs/ -llevmar
-
-  Now compiling should either use your system-wide version, or the one in extlibs, if a system-wide is not found
-  (system-precedence given by #include <...>  instead of #include "..." ).
-
+  A library for Levenberg-Marquardt fits, used by a plugin. 
     * http://www.ics.forth.gr/~lourakis/levmar/
 
+
+lmfit:
+~~~~~~
+  A small Levenberg-Marquardt library, which is very fast, but does not support boundary constraints.
+    * http://joachimwuttke.de/lmfit/
 
 
 libtiff:
 ~~~~~~~~
-  A library for TIFF file access. If this is not installed globally on your system,
-  unpack it here in ./libtiff/ and build it there. The files tiff*.h as well as the link library libtiff.a
-  should reside in ./libtiff/ afterwards, as this directory may be supplied as additional search directory for
-  plugins that need this library and tiff*.h is included as #include <tiff*.h>.
-  Add this to you project file (modified as appropriate!):
-
-       INCLUDEPATH += ../../extlibs/libtiff/
-       LIBS += -L../../extlibs/libtiff/ -ltiff
-
-  Now compiling should either use your system-wide version, or the one in extlibs, if a system-wide is not found
-  (system-precedence given by #include <...>  instead of #include "..." ).
-  
-  A windows-binary for MinGW >=4.4 is also provided in a separate ZIP-file which you may unpack into your MinGW
-  directory. Then you have a global version for windows.
-
+  A library for TIFF file access. 
     * http://www.libtiff.org/
 
+
+libpng:
+~~~~~~~
+  A library for PNG file access. 
+    * http://www.libpng.org/pub/png/libpng.html
+
+
+GSL:
+~~~~
+  The GNU Scientific library, including many tools for math and computations, also a CBLAS implementation.
+    * http://www.gnu.org/s/gsl/
 
 
 MersenneTwister.h:
 ~~~~~~~~~~~~~~~~~~
   An implementation of the mersenne twister random number generator, lightweight in a single header file
-
     * http://www-personal.umich.edu/~wagnerr/MersenneTwister.h
