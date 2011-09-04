@@ -3,6 +3,7 @@
 #include "statistics_tools.h"
 #include "lmcurve.h"
 #include "qmoretextobject.h"
+#include "datatable2.h"
 
 #include <QtGui>
 #include <QtCore>
@@ -396,6 +397,8 @@ void QFESPIMB040CameraView::createActions() {
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     actSaveReport = new QAction(QIcon(":/spimb040/report_save.png"), tr("&Save a report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+    actSaveData = new QAction(QIcon(":/spimb040/preview_savedata.png"), tr("&Save marginal and histogram data"), this);
+    connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
 
 
     QActionGroup* actgMouse=new QActionGroup(this);
@@ -411,6 +414,7 @@ void QFESPIMB040CameraView::createActions() {
     actCursor->setChecked(true);
 
     toolbar->addAction(actSaveRaw);
+    toolbar->addAction(actSaveData);
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
@@ -727,16 +731,11 @@ void QFESPIMB040CameraView::redrawFrame() {
 
 }
 
-void QFESPIMB040CameraView::redrawFrameRecalc() {
+void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     if (currentlyRedrawing) return;
     currentlyRedrawing=true;
     prepareImage();
-    if (chkImageStatisticsHistogram->isChecked()) {
-        displayImageStatistics(true);
-    } else {
-        // possibly we still need the min/max value of the image for color scaling!
-        displayImageStatistics(false);
-    }
+    displayImageStatistics(chkImageStatisticsHistogram->isChecked(), forceHisto);
     redrawFrame();
     currentlyRedrawing=false;
 }
@@ -970,11 +969,8 @@ void QFESPIMB040CameraView::prepareImage() {
     }
 }
 
-void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
+void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forceHistogram) {
     if (!histogram_x || !histogram_y) return;
-
-    // DISABLE UPDATING OF GRAPHS (we only want to do this once per function call!!!)
-    pltCountsHistogram->set_doDrawing(false);
 
     // CALCULATE STATISTICS OF TRANSFORMED IMAGE
     double histogram_min=0;
@@ -1006,7 +1002,11 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
     if (chkCountsRangeAutoHigh->isChecked()) spinCountsUpper->setValue(cmax);
 
 
-    if (withHistogram && (histogramUpdateTime.elapsed()>HISTOGRAM_UPDATE_INTERVAL_MS)) {
+    if (withHistogram && ((histogramUpdateTime.elapsed()>HISTOGRAM_UPDATE_INTERVAL_MS) || forceHistogram )) {
+
+        // DISABLE UPDATING OF GRAPHS (we only want to do this once per function call!!!)
+        pltCountsHistogram->set_doDrawing(false);
+
         histogramUpdateTime.start();
         spinHistogramBins->setValue(histogram_n);
         plteHistogram->set_data(histogram_x, histogram_y, histogram_n);
@@ -1052,7 +1052,7 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram) {
     }
 
 
-    if (labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) {
+    if ((labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) || forceHistogram ) {
         QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
                         .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str())
@@ -1191,14 +1191,22 @@ void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& image, double timein
     imageTimeindex=timeindex;
     imageExposureTime=exposuretime;
     imageStatisticsCalculated=false;
-    redrawFrameRecalc();
+    redrawFrameRecalc(false);
+}
+
+void QFESPIMB040CameraView::displayImageComplete(JKImage<uint32_t>& image, double timeindex, double exposuretime) {
+    rawImage.assign(image);
+    imageTimeindex=timeindex;
+    imageExposureTime=exposuretime;
+    imageStatisticsCalculated=false;
+    redrawFrameRecalc(true);
 }
 
 void QFESPIMB040CameraView::clearImage() {
     rawImage.assign(100, 100, 0);
     imageTimeindex=0;
     imageExposureTime=1;
-    redrawFrameRecalc();
+    redrawFrameRecalc(true);
 }
 
 void QFESPIMB040CameraView::displayCameraConfig(QString camera, double framerate) {
@@ -1425,4 +1433,71 @@ void QFESPIMB040CameraView::printReport() {
     delete doc;
     QApplication::restoreOverrideCursor();
     if (m_stopresume) m_stopresume->resume();
+}
+
+void QFESPIMB040CameraView::saveData() {
+
+    QStringList filters;
+    filters<< tr("Comma-Separated value (*.dat *.csv)");
+    filters<< tr("Semicolon-Separated value [German Excel] (*.txt)");
+    filters<< tr("SYLK (*.slk)");
+
+    QString selFilter=filters[0];
+
+    if (m_stopresume) m_stopresume->stop();
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Data"),
+                            lastImagepath,
+                            filters.join(";;"), &selFilter);
+    if (fileName.isEmpty()) return;
+    lastImagepath=QFileInfo(fileName).absolutePath();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    datatable2 datat;
+    uint32_t col=0;
+    uint32_t rows=0;
+    if (cmbMarginalPlots->currentIndex()>0) {
+        col+=4;
+        rows=qMax(rows, qMax(pltDataMarginalLeftN, pltDataMarginalBottomN));
+        datat.resize(col, rows);
+        datat.set_title(col-4, "marginal_left_x");
+        datat.set_title(col-3, "marginal_left_data");
+        for (int i=0; i<pltDataMarginalLeftN; i++) {
+            datat.set(col-4, i, pltDataMarginalLeftX[i]);
+            datat.set(col-3, i, pltDataMarginalLeftY[i]);
+        }
+        datat.set_title(col-2, "marginal_bottom_x");
+        datat.set_title(col-1, "marginal_bottom_data");
+        for (int i=0; i<pltDataMarginalBottomN; i++) {
+            datat.set(col-2, i, pltDataMarginalBottomX[i]);
+            datat.set(col-1, i, pltDataMarginalBottomY[i]);
+        }
+    }
+    if (chkImageStatisticsHistogram->isChecked()) {
+        col+=2;
+        rows=qMax(rows, histogram_n);
+        datat.resize(col, rows);
+        datat.set_title(col-2, "histogram_x");
+        datat.set_title(col-1, "histogram_data");
+        for (int i=0; i<histogram_n; i++) {
+            datat.set(col-2, i, histogram_x[i]);
+            datat.set(col-1, i, histogram_y[i]);
+        }
+    }
+
+    if (selFilter==filters[0]) {
+        datat.set_csv_options(false, ", ", '.');
+        datat.save_csv(fileName.toStdString());
+    } else if (selFilter==filters[1]) {
+        datat.set_csv_options(false, "; ", ',');
+        datat.save_csv(fileName.toStdString());
+    } else if (selFilter==filters[2]) {
+         datat.save_sylk(fileName.toStdString());
+    }
+
+
+    QApplication::restoreOverrideCursor();
+    if (m_stopresume) m_stopresume->resume();
+
+
+
 }

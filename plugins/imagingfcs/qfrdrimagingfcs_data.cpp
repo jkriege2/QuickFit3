@@ -103,12 +103,22 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
                 //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
             }
             if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {
+                // this cuts all lines from current_set which are equal to the lastval (if this is 0.0 or 1.0)
+                // this cuts away channels where the correlations have not bee calculated!
+                double lastval=0.0;
+                if (current_set.size()>0) {
+                    lastval=current_set[current_set.size()-1].second;
+                    if (lastval==0.0 || lastval==1.0) {
+                        while ((current_set.size()>10)&& (current_set[current_set.size()-1].second==lastval)) current_set.pop_back();
+                    }
+                }
+
                 data_matrix.append(current_set);
                 if (NN<current_set.size()) NN=current_set.size();
-                //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size();
+                //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size()<<"    all0="<<all0<<"    all1="<<all1;
                 current_set.clear();
                 runs++;
-                QApplication::processEvents();
+                if (runs%50==0) QApplication::processEvents();
             }
             //if (stream.atEnd()) qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
@@ -298,4 +308,8 @@ int QFRDRImagingFCSData::runToY(int run) const {
 
 int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
     return (y*width+x)*N;
+}
+
+uint16_t* QFRDRImagingFCSData::getDataImagePreview() const {
+    return NULL;
 }

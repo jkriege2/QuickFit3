@@ -39,5 +39,6 @@
     <qresource prefix="/spimb040">
         <file alias="report_print.png">icons/report_print.png</file>
         <file alias="report_save.png">icons/report_save.png</file>
+        <file alias="preview_savedata.png">icons/preview_savedata.png</file>
     </qresource>
 </RCC>

@@ -146,18 +146,20 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
     public:
-        /** \brief return width of the image */
+        /** \copydoc QFEvaluationImageToRunInterface::getDataImageWidth() */
         virtual int getDataImageWidth() const;
-        /** \brief return height of the image */
+        /** \copydoc QFEvaluationImageToRunInterface::getDataImageHeight() */
         virtual int getDataImageHeight() const;
-        /** \brief convert a pixel coordinate to a rund index */
+        /** \copydoc QFEvaluationImageToRunInterface::xyToRun() */
         virtual int xyToRun(int x, int y) const;
-        /** \brief convert a run to a pixel x-coordinate */
+        /** \copydoc QFEvaluationImageToRunInterface::runToX() */
         virtual int runToX(int run) const;
-        /** \brief convert a run to a pixel y-coordinate */
+        /** \copydoc QFEvaluationImageToRunInterface::runToY() */
         virtual int runToY(int run) const;
-        /** \brief convert a pixel coordinate to an array index (in correlations and sigmas) */
+        /** \copydoc QFEvaluationImageToRunInterface::xyToIndex() */
         virtual int xyToIndex(int x, int y) const;
+        /** \copydoc QFEvaluationImageToRunInterface::getDataImagePreview() */
+        virtual uint16_t* getDataImagePreview() const;
 
 };
 

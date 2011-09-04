@@ -12,7 +12,7 @@ OBJECTS_DIR = ./.objs/
 QFOUTPUT = ../../output
 DESTDIR = $$QFOUTPUT/plugins
 
-DEFINES += QTLIB_IN_DLL
+
 
 #release {
 #    QFOUTPUT = ../../output_release
@@ -69,6 +69,7 @@ release {
 }
 
 LIBS += -L$$QFOUTPUT -lquickfit3lib
+DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 
 CONFIG += link_prl
 

@@ -514,7 +514,7 @@ void QFESPIMB040CameraConfig::previewSingle() {
             if (acquireSingle()) {
                 camView->show();
                 camView->setPixelSize(cam->getPixelWidth(camIdx)/magnification(), cam->getPixelHeight(camIdx)/magnification());
-                camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
+                camView->displayImageComplete(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             } else {
                 m_parent->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
             }

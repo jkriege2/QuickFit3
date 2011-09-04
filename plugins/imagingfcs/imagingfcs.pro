@@ -34,7 +34,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg
+QT += gui xml svg opengl
 CONFIG += exceptions rtti stl
 
 

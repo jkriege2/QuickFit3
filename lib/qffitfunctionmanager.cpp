@@ -153,7 +153,7 @@ QString QFFitFunctionManager::getPluginTutorial(int ID) {
     #ifndef Q_OS_WIN32
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
-        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename).arg(getID(ID));
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
     }
     return "";
 }
@@ -164,7 +164,7 @@ QString QFFitFunctionManager::getPluginCopyrightFile(int ID) {
     #ifndef Q_OS_WIN32
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
-        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/copyright.html").arg(basename).arg(getID(ID));
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/copyright.html").arg(basename);
     }
     return "";
 }

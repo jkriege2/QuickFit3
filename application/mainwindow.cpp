@@ -55,30 +55,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
-    /*QFile f(settings->getAssetsDirectory()+"/help/plugin_list_autocreate.html");
-    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&f);
-        out<<QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><title>%1</title></head><body><h2>%1</h2>").arg(tr("Available Plugins"));
-        out<<createPluginDoc(true);
-        out<<"</body></html>";
-        f.close();
-    }
-    QFile f1(settings->getAssetsDirectory()+"/help/plugin_tutorials_autocreate.html");
-    if (f1.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&f1);
-        out<<QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><title>%1</title></head><body><h2>%1</h2>").arg(tr("Plugin Tutorials"));
-        out<<createPluginDocTutorials();
-        out<<"</body></html>";
-        f1.close();
-    }
-    QFile f2(settings->getAssetsDirectory()+"/help/plugin_help_autocreate.html");
-    if (f2.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&f2);
-        out<<QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"><html><head><title>%1</title></head><body><h2>%1</h2>").arg(tr("Plugin Tutorials"));
-        out<<createPluginDocHelp();
-        out<<"</body></html>";
-        f2.close();
-    }*/
+
     logFileMainWidget->dec_indent();
 
     splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()));
@@ -913,7 +890,7 @@ void MainWindow::loadProject(const QString &fileName) {
     connect(project, SIGNAL(propertiesChanged()), this, SLOT(readProjectProperties()));
     readProjectProperties();
     connect(project, SIGNAL(wasChanged(bool)), this, SLOT(setWindowModified(bool)));
-    connect(project, SIGNAL(modelReset()), this, SLOT(modelReset()));
+    connect(project, SIGNAL(structureChanged()), this, SLOT(modelReset()));
     if (project->error()) {
         QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL), project->errorDescription());
         logFileProjectWidget->log_error(project->errorDescription()+"\n");

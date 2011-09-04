@@ -60,7 +60,19 @@ class QFESPIMB040CameraView : public QWidget {
         void setPixelSize(double pixelWidth, double pixelHeight);
 
     public slots:
-        /** \brief display a new image in the widget
+        /** \brief display a new image in the widget, this does not gurantee an update of the statistics
+
+            \param image points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
+            \param width width of \a image
+            \param height height of \a image
+            \param timeindex time index of image \a image in seconds
+            \param exposuretime exposure time of the image in seconds (used to calculate count rates in units of kHz).
+
+            \note This does NOT guarantee that the statistics are calculated for every frame (to increase frame rate!). If you need
+                  the statistics, call displayImageComplete() instead.
+        */
+        void displayImage(JKImage<uint32_t>& image, double timeindex, double exposuretime);
+        /** \brief display a new image in the widget, in comparison to displayImage() this guarantees an update of the statistics!
 
             \param image points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
             \param width width of \a image
@@ -68,7 +80,7 @@ class QFESPIMB040CameraView : public QWidget {
             \param timeindex time index of image \a image in seconds
             \param exposuretime exposure time of the image in seconds (used to calculate count rates in units of kHz).
         */
-        void displayImage(JKImage<uint32_t>& image, double timeindex, double exposuretime);
+        void displayImageComplete(JKImage<uint32_t>& image, double timeindex, double exposuretime);
         /** \brief clear the display */
         void clearImage();
         /*! \brief display the current camera data/config
@@ -84,6 +96,8 @@ class QFESPIMB040CameraView : public QWidget {
     protected slots:
         /** \brief save a report of the evaluation results */
         void saveReport();
+        /** \brief save the marginals and histogram data */
+        void saveData();
         /** \brief print a report of the evaluation results */
         void printReport();
     protected:
@@ -237,6 +251,8 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief action to save a report */
         QAction* actSaveReport;
+        /** \brief action to save marginal+histogram data */
+        QAction* actSaveData;
 
         bool measureFirst;
 
@@ -342,9 +358,9 @@ class QFESPIMB040CameraView : public QWidget {
          */
         void prepareImage();
         /** \brief redraws the frame with the current settings for color scale ... and recalculate statistics and transforms */
-        void redrawFrameRecalc();
+        void redrawFrameRecalc(bool forceHisto=false);
         /** \brief calculate image statistics */
-        void displayImageStatistics(bool withHistogram=true);
+        void displayImageStatistics(bool withHistogram=true, bool forceHistogram=false);
         /** \brief clear mask */
         void clearMask();
         /** \brief save mask */
