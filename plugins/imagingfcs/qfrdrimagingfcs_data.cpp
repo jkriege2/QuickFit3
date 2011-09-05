@@ -19,6 +19,32 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateContents(0,0,0);
 }
 
+QString QFRDRImagingFCSData::getEditorName(int i) {
+    if (i==0) return tr("Correlation Curves");
+    if (i==1) return tr("Parameter Image");
+    return QString("");
+};
+
+QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services, int i, QWidget* parent) {
+    if (i==0) return new QFRDRImagingFCSDataEditor(services, parent);
+    if (i==1) return new QFRDRImagingFCSImageEditor(services, parent);
+    return NULL;
+};
+
+
+QStringList QFRDRImagingFCSData::getExportFiletypes() {
+    QStringList sl;
+    return sl;
+};
+
+QString QFRDRImagingFCSData::getExportDialogTitle() {
+    return tr("");
+}
+
+QString QFRDRImagingFCSData::getExportDialogFiletypes() {
+    return tr("");
+}
+
 void QFRDRImagingFCSData::exportData(const QString& format, const QString& filename)const  {
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
 	// THIS IS OPTIONAL

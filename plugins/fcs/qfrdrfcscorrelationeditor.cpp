@@ -401,7 +401,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
     //std::cout<<"repainting ... 5\n";
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
     //std::cout<<"repainting ... 6\n";
-        plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [{\\mu}s]"));
+        plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
         plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
     //std::cout<<"repainting ... 7\n";
         plotter->zoomToFit(true, true, false,false);

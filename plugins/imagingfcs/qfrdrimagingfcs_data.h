@@ -13,6 +13,7 @@
 #include <QAction>
 #include "qfrawdatarecord.h"
 #include "qfrdrimagingfcs_dataeditor.h"
+#include "qfrdrimagingfcs_dataeditor_image.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "../interfaces/qfevaluationimagetoruninterface.h"
@@ -34,38 +35,29 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual ~QFRDRImagingFCSData();
 
         /** \brief return type (short type string) */
-        virtual QString getType() const { return "imaging_fcs"; };
+        virtual QString getType() const { return "imaging_fcs"; }
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr("Imaging FCS Data"); };
+        virtual QString getTypeName() const { return tr("Imaging FCS Data"); }
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/imaging_fcs/qfrdrimagingfcs_small.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/imaging_fcs/qfrdrimagingfcs_small.png"); }
         /** \brief return type description */
-        virtual QString getTypeDescription() const { return tr("manages FCS correlation curves from an imaging FCS experiment (SPIM-FCS, TIR-FCS ...)"); };
+        virtual QString getTypeDescription() const { return tr("manages FCS correlation curves from an imaging FCS experiment (SPIM-FCS, TIR-FCS ...)"); }
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/imaging_fcs/qfrdrimagingfcs.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/imaging_fcs/qfrdrimagingfcs.png"); }
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 1; };
+        virtual int getEditorCount() { return 2; }
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName(int i) {
-            if (i==0) return tr("Correlation Curves");
-            return QString("");
-        };
+        virtual QString getEditorName(int i);
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) {
-            if (i==0) return new QFRDRImagingFCSDataEditor(services, parent);
-            return NULL;
-        };
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL);
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
-        QStringList getExportFiletypes() {
-            QStringList sl;
-            return sl;
-        };
+        QStringList getExportFiletypes();
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr(""); };
+        QString getExportDialogTitle();
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr(""); };
+        QString getExportDialogFiletypes();
 
 
 
@@ -98,7 +90,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \brief returns whether to leave out a run */
-        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); };
+        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); }
         /** \brief add a run to the leaveouts */
         inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
         /** \brief remove a run from the leaveouts */

@@ -39,13 +39,42 @@
                 <property name="fcs_fit1_r8_datacut_min" type="int" data="0" usereditable="false" visible="false"/>
                 <property name="fcs_fit1_ravg_datacut_max" type="int" data="205" usereditable="false" visible="false"/>
                 <property name="fcs_fit1_ravg_datacut_min" type="int" data="0" usereditable="false" visible="false"/>
+                <property name="fcsimimeditor_datacut_max" type="int" data="203" usereditable="false" visible="false"/>
+                <property name="fcsimimeditor_datacut_min" type="int" data="0" usereditable="false" visible="false"/>
                 <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
             </properties>
             <results/>
             <files>
                 <file>imfcs_testdata/beads_10nM_4545.5Hz_EM250.autocorrelation.dat</file>
             </files>
-            <data/>
+            <data>
+                <leaveout list="2,5"/>
+            </data>
+        </rawdataelement>
+        <rawdataelement type="imaging_fcs" name="hela4xp_em300_0.0005s_1785.7Hz_2.autocorrelation.dat - ACF" id="2">
+            <description><![CDATA[]]></description>
+            <properties>
+                <property name="BASELINE" type="double" data="76" usereditable="false" visible="true"/>
+                <property name="CORRELATION_COLUMN" type="int" data="1" usereditable="true" visible="true"/>
+                <property name="CORR_M" type="int" data="2" usereditable="false" visible="true"/>
+                <property name="CORR_P" type="int" data="16" usereditable="false" visible="true"/>
+                <property name="CORR_S" type="int" data="18" usereditable="false" visible="true"/>
+                <property name="FILETYPE" type="string" data="VIDEO_CORRELATOR" usereditable="false" visible="true"/>
+                <property name="FIRST_FRAME" type="int" data="0" usereditable="false" visible="true"/>
+                <property name="FRAME_COUNT" type="int" data="200000" usereditable="false" visible="true"/>
+                <property name="HEIGHT" type="int" data="16" usereditable="false" visible="true"/>
+                <property name="LAST_FRAME" type="int" data="199999" usereditable="false" visible="true"/>
+                <property name="SUMMED_FRAMES" type="int" data="1" usereditable="false" visible="true"/>
+                <property name="TAU_COLUMN" type="int" data="0" usereditable="true" visible="true"/>
+                <property name="WIDTH" type="int" data="16" usereditable="false" visible="true"/>
+            </properties>
+            <results/>
+            <files>
+                <file>../../../output/assets/plugins/imaging_fcs/imfcs_testdata/hela4xp_em300_0.0005s_1785.7Hz_2.autocorrelation.dat</file>
+            </files>
+            <data>
+                <leaveout list="0,4,6,5,252,248,115,104,139,167,211,69,33,27"/>
+            </data>
         </rawdataelement>
     </rawdata>
     <evaluations>

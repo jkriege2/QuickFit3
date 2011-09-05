@@ -1,5 +1,5 @@
-#ifndef QFRDRIMAGINGFCSEDITOR_H
-#define QFRDRIMAGINGFCSEDITOR_H
+#ifndef QFRDRIMAGINGFCSEDITORIMAGE_H
+#define QFRDRIMAGINGFCSEDITORIMAGE_H
 
 #include "qfrawdataeditor.h"
 #include <QLabel>
@@ -16,20 +16,19 @@
 #include "datacutslider.h"
 #include "qt/jkqtfastplotter.h"
 #include "qfrdrimagingfcsrunsmodel.h"
+#include <QSet>
 
 
-/*! \brief editor for ACFs in QFRDRImagingFCSData
+/*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
 */
-class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
+class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         Q_OBJECT
-    protected:
-        QFRDRImagingFCSRunsModel runs;
     public:
         /** Default constructor */
-        QFRDRImagingFCSDataEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent);
         /** Default destructor */
-        virtual ~QFRDRImagingFCSDataEditor();
+        virtual ~QFRDRImagingFCSImageEditor();
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
@@ -53,28 +52,30 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         void replotData(int dummy=0);
 
         /** \brief draw overview plot */
+        void replotImage();
+
+        /** \brief draw overview plot */
         void replotOverview();
         /** \brief excludes the currently selected items from the evaluation and recalculates the average */
         void excludeRuns();
         /** \brief includes the currently selected items from the evaluation and recalculates the average */
         void includeRuns();
-        void selectionChanged(const QModelIndex & current, const QModelIndex & previous );
-        void selectionChanged(const QItemSelection & current, const QItemSelection & previous );
-        void runsModeChanged(int c);
         void slidersChanged(int userMin, int userMax, int min, int max);
         void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers);
     protected:
 
         /** \brief plotter widget for the correlation curve */
         JKQtPlotter* plotter;
+        /** \brief plotter widget for the correlation curve residuals */
+        JKQtPlotter* plotterResid;
         /** \brief sliders to set the cut of the correlation curve */
         DataCutSliders* sliders;
         /** \brief splitter between plot and rhs widgets */
         QVisibleHandleSplitter* splitter;
-        /** \brief splitter between plot and bottom widgets */
-        QVisibleHandleSplitter* splitterBot;
-        /** \brief a listwidget to display only a subset of runs */
-        QListView* lstRunsSelect;
+        /** \brief splitter between top plots */
+        QVisibleHandleSplitter* splitterTop;
+        /** \brief splitter between top plots and bottom plots */
+        QVisibleHandleSplitter* splitterTopBot;
         /** \brief checkbox to select whether to display errors or not */
         QCheckBox* chkDisplayAverage;
         /** \brief a combobox to select how the average run are displayed */
@@ -86,22 +87,17 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         QComboBox* cmbRunStyle;
         /** \brief a combobox to select how the error of the runs are displayed */
         QComboBox* cmbRunErrorStyle;
-        /** \brief a combobox to select how runs are displayed */
-        QComboBox* cmbRunDisplay;
         /** \brief a button which excludes the selected runs from the evaluation */
         QPushButton* btnDontUse;
         /** \brief a button which includes the selected runs to the evaluation */
         QPushButton* btnUse;
         /** \brief checkbox to select log tau-axis */
         QCheckBox* chkLogTauAxis;
-        /** \brief group box for data about the correlation functions */
-        QGroupBox* grpInfo;
-        /** \brief label for the number of runs in the file */
-        QLabel* labRuns;
-        /** \brief label for the number of points in the correlation function */
-        QLabel* labCorrelationPoints;
         /** \brief label for the run options */
         QLabel* labRunOptions;
+
+        /** \brief label over the parameter image plot */
+        QLabel* labParamImage;
 
         /** \brief fast plotter for overview image */
         JKQTFastPlotter* pltOverview;
@@ -116,7 +112,26 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         /** \brief data in plteOverviewExcluded */
         bool* plteOverviewExcludedData;
         /** \brief size of plteOverviewSelectedData */
-        int plteOverviewSelectedSize;
+        int plteOverviewSize;
+
+
+        /** \brief fast plotter for overview image */
+        JKQTFastPlotter* pltImage;
+        /** \brief plot for the overview image in pltOverview */
+        JKQTFPimagePlot* plteImage;
+        /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
+        JKQTFPimageOverlayPlot* plteImageSelected;
+        /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
+        JKQTFPimageOverlayPlot* plteImageExcluded;
+        double* plteImageData;
+        int plteImageSize;
+
+        /** \brief combobox for the color bar of plteImage */
+        QComboBox* cmbColorbar;
+
+        /** \brief set which contains all currently selected runs */
+        QSet<int32_t> selected;
+
 };
 
-#endif // QFRDRIMAGINGFCSEDITOR_H
+#endif // QFRDRIMAGINGFCSEDITORIMAGE_H

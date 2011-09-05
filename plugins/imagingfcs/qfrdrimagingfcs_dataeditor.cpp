@@ -1,36 +1,9 @@
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qfrdrimagingfcs_data.h"
-
-QFRDRImagingFCSDataEditor::runsModel::runsModel(QObject* parent):
-    QAbstractTableModel(parent)
-{
-    current=NULL;
-}
-
-void QFRDRImagingFCSDataEditor::runsModel::setCurrent(QFRawDataRecord* current) {
-    this->current=current;
-    reset();
-};
+#include <QDebug>
 
 
-QVariant QFRDRImagingFCSDataEditor::runsModel::data(const QModelIndex &index, int role) const {
-    if (!current || !index.isValid()) return QVariant();
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (role==Qt::BackgroundColorRole) {
-        QPalette pal;
-        if (index.row()>0) {
-            if (m->leaveoutRun(index.row()-1)) return pal.color(QPalette::Window).darker(130);
-            return pal.color(QPalette::Base);
-        }
-        return pal.color(QPalette::Base);
-    } else if (role==Qt::DisplayRole) {
-        if (index.row()==0) return tr("none");
-        return m->getCorrelationRunName(index.row()-1);//tr("Run %1").arg(index.row()-1);
-    }
-    return QVariant();
-}
-
-/*void QFRDRImagingFCSDataEditor::excludeRuns() {
+void QFRDRImagingFCSDataEditor::excludeRuns() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
@@ -41,6 +14,7 @@ QVariant QFRDRImagingFCSDataEditor::runsModel::data(const QModelIndex &index, in
         }
         m->recalcCorrelations();
     }
+    replotData();
 }
 
 void QFRDRImagingFCSDataEditor::includeRuns() {
@@ -54,26 +28,8 @@ void QFRDRImagingFCSDataEditor::includeRuns() {
         }
         m->recalcCorrelations();
     }
-}*/
+    replotData();
 
-
-Qt::ItemFlags QFRDRImagingFCSDataEditor::runsModel::flags(const QModelIndex &index) const {
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-}
-
-QVariant QFRDRImagingFCSDataEditor::runsModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    return QVariant();
-}
-
-int QFRDRImagingFCSDataEditor::runsModel::rowCount(const QModelIndex &parent) const {
-    if (!current) return 0;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (m) return 1+m->getCorrelationRuns();
-    return 1;
-}
-
-int QFRDRImagingFCSDataEditor::runsModel::columnCount(const QModelIndex &parent) const {
-    return 1;
 }
 
 
@@ -90,6 +46,8 @@ QFRDRImagingFCSDataEditor::~QFRDRImagingFCSDataEditor()
 {
     if (plteOverviewSelectedData) free(plteOverviewSelectedData);
     plteOverviewSelectedData=NULL;
+    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+    plteOverviewExcludedData=NULL;
 }
 
 void QFRDRImagingFCSDataEditor::createWidgets() {
@@ -114,7 +72,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     cmbAverageStyle=new QComboBox(w);
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
-    cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_linespoints.png"), tr("lines+points"));
+    cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageStyle, SLOT(setEnabled(bool)));
 
     cmbAverageErrorStyle=new QComboBox(w);
@@ -148,7 +106,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     cmbRunStyle=new QComboBox(w);
     cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
     cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
-    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_linespoints.png"), tr("lines+points"));
+    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
 
     cmbRunErrorStyle=new QComboBox(w);
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_enone.png"), tr("none"));
@@ -170,7 +128,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     lstRunsSelect->setModel(&runs);
     lstRunsSelect->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(lstRunsSelect->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
-    connect(lstRunsSelect->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(selectionChanged(const QModelIndex &, const QModelIndex &)));
+    //connect(lstRunsSelect->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(selectionChanged(const QModelIndex &, const QModelIndex &)));
 
 
     gl->addWidget(new QLabel(tr("select runs to display:")), row, 0, 1, 3);
@@ -209,19 +167,28 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     plteOverviewSelected=new JKQTFPimageOverlayPlot(pltOverview, NULL, 1, 1, 0, 1, 0, 1, col);
     pltOverview->addPlot(plteOverviewSelected);
 
+    col=QColor("blue");
+    col.setAlphaF(0.5);
+    plteOverviewExcluded=new JKQTFPimageOverlayPlot(pltOverview, NULL, 1, 1, 0, 1, 0, 1, col);
+    pltOverview->addPlot(plteOverviewExcluded);
+
+
     plteOverviewSelectedData=NULL;
+    plteOverviewExcludedData=NULL;
     plteOverviewSelectedSize=0;
 
 
-    //btnDontUse=new QPushButton(tr("exclude selected"), w);
-    //connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
-    //gl->addWidget(btnDontUse, 7, 0, 1, 2);
-    //btnUse=new QPushButton(tr("include selected"), w);
-    //connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
-    //gl->addWidget(btnUse, 8, 0, 1, 2);
+    btnDontUse=new QPushButton(tr("exclude sel."), w);
+    connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
+    gl->addWidget(btnDontUse, row, 1);
+    btnUse=new QPushButton(tr("include sel."), w);
+    connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
+    gl->addWidget(btnUse, row, 2);
+    row++;
 
     chkLogTauAxis=new QCheckBox("", w);
-    gl->addWidget(new QLabel(tr("log-scale on<br>lag time axis:")), row, 0);
+    gl->addWidget((l=new QLabel(tr("log &tau;-axis:"))), row, 0);
+    l->setTextFormat(Qt::RichText);
     gl->addWidget(chkLogTauAxis, row, 1);
     connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
     row++;
@@ -241,6 +208,10 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     QVBoxLayout* lp=new QVBoxLayout(this);
     wp->setLayout(lp);
     plotter = new JKQtPlotter(true, this);
+    plotter->get_plotter()->set_showKey(false);
+    plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+    plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
+
     lp->addWidget(plotter);
     sliders=new DataCutSliders(this);
     connect(sliders, SIGNAL(slidersChanged(int , int , int, int)), this, SLOT(slidersChanged(int, int, int, int)));
@@ -276,7 +247,7 @@ void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
 };
 
 void QFRDRImagingFCSDataEditor::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
-    replotData();
+    if (cmbRunDisplay->currentIndex()>1) replotData();
 }
 
 void QFRDRImagingFCSDataEditor::selectionChanged(const QItemSelection & current, const QItemSelection & previous ) {
@@ -334,11 +305,11 @@ void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     plotter->get_plotter()->setGraphsDataRange(sliders->get_userMin(), sliders->get_userMax());
-
-    QApplication::restoreOverrideCursor();
     plotter->set_doDrawing(true);
     plotter->set_emitSignals(true);
     plotter->update_plot();
+
+    QApplication::restoreOverrideCursor();
 
 }
 
@@ -368,11 +339,15 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         if (plteOverviewSelectedSize<w*h) {
             plteOverviewSelectedSize=w*h;
             plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
         }
 
         plteOverviewSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
         plteOverviewSelected->set_xmax(w);
         plteOverviewSelected->set_ymax(h);
+        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteOverviewExcluded->set_xmax(w);
+        plteOverviewExcluded->set_ymax(h);
         plteOverview->set_image(ov, JKQTFP_uint16, m->getDataImageWidth(), m->getDataImageHeight());
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
@@ -383,6 +358,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
                     int y=m->runToY(i);
                     int idx=y*m->getDataImageWidth()+x;
                     plteOverviewSelectedData[idx]=false;
+                    plteOverviewExcludedData[idx]=m->leaveoutRun(i);
                 }
             } else {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
@@ -390,6 +366,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
                     int y=m->runToY(i);
                     int idx=y*m->getDataImageWidth()+x;
                     plteOverviewSelectedData[idx]=lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0));
+                    plteOverviewExcludedData[idx]=m->leaveoutRun(i);
                 }
             }
         }
@@ -401,6 +378,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
 }
 
 void QFRDRImagingFCSDataEditor::replotData(int dummy) {
+    //qDebug()<<"replot";
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) {
@@ -408,11 +386,12 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
         ds->clear();
         return;
     }
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     plotter->set_doDrawing(false);
+    plotter->set_emitSignals(false);
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
-    plotter->set_emitSignals(false);
     plotter->clearGraphs();
     ds->clear();
 
@@ -447,6 +426,9 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
 
         size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
 
+
+        //QTime t;
+        //t.start();
 
 
        //////////////////////////////////////////////////////////////////////////////////
@@ -540,7 +522,7 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
             }
         }
 
-
+       //qDebug()<<"plots: "<<t.elapsed()<<" ms";
 
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -568,18 +550,19 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
             plotter->addGraph(g);
             }
 
-        plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(), false);
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
-        plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [{\\mu}s]"));
-        plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
         plotter->zoomToFit(true, true, false,false);
 
         QApplication::restoreOverrideCursor();
     }
     plotter->set_doDrawing(true);
     plotter->set_emitSignals(true);
+    //QTime t;
+    //t.start();
     plotter->update_plot();
+    //qDebug()<<"plotting in "<<t.elapsed()<<" ms";
     replotOverview();
+    QApplication::restoreOverrideCursor();
 };
 
 
@@ -588,11 +571,11 @@ void QFRDRImagingFCSDataEditor::readSettings() {
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsdataeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/log_tau_axis"), true).toBool());
     chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/display_avg"), true).toBool());
-    cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_style"), 1).toInt());
-    cmbAverageErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_error_style"), 1).toInt());
-    cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_display"), 2).toInt());
-    cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_style"), 1).toInt());
-    cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_error_style"), 1).toInt());
+    cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_style"), 0).toInt());
+    cmbAverageErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_error_style"), 2).toInt());
+    cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_display"), 3).toInt());
+    cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_style"), 0).toInt());
+    cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_error_style"), 0).toInt());
     loadSplitter(*(settings->getQSettings()), splitter, "imfcsdataeditor/corrsplitterSizes");
 };
 
