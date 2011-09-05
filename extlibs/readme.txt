@@ -26,6 +26,13 @@ Andor driver:
   are available system-wide
 
 
+libusb:
+~~~~~~~
+  The build script currently does NOT build libusb. But you will need it only for some of the
+  device drivers, not for the core fitting components. But on win32 the build script can uncompress
+  and locally install the supplied binary, taken from:
+    * http://sourceforge.net/apps/trac/libusb-win32/wiki
+
 
 CImg:
 ~~~~~

@@ -13,6 +13,9 @@ function print_result {
 	if [ $2 == -4 ]; then
 		echo -e "building '$1': \033[0;31m ERROR IN INSTALL STEP \033[0m" 
 	fi
+	if [ $2 == -5 ]; then
+		echo -e "building '$1': \033[0;33m INSTALL SCRIPT DOES NOT SUPPORT THIS ON YOUR PLATFORM \033[0m" 
+	fi
 	if [ $2 == 0 ]; then
 		echo -e "building '$1': \033[1;32m OK \033[0m" 
 	fi
@@ -354,6 +357,57 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 fi
 
+
+
+libusbOK=-5
+ISMSYS=`uname -o`
+echo $ISMSYS
+if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+	libusbOK=-1
+	read -p "Do you want to build 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- BUILDING: libusb (win32)                                           --\n"\
+		"------------------------------------------------------------------------\n\n"\
+
+		cd libusb
+		mkdir build
+		mkdir lib
+		mkdir bin
+		mkdir include
+		tar xvf ./win32_binary/libusb-win32-bin-1.2.5.0.tar.gz -C ./build/
+		cd build/libusb-win32-bin-1.2.5.0/
+		cp ./include/* ../../include
+		cp ./include/lusb0_usb.h ../../include/usb.h
+		libOK=$?
+		if [ $libOK -ne 0 ] ; then		
+			libOK=-4
+		else 
+			cp ./lib/gcc/* ../../lib
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			else
+				cp -r ./bin/* ../../bin
+				libOK=$?
+				if [ $libOK -ne 0 ] ; then		
+					libOK=-4
+				fi
+			fi
+		fi
+
+		cd ../../
+		if [ $KEEP_BUILD_DIR == "n" ] ; then
+			rm -rf build
+		fi
+		cd ${CURRENTDIR}
+		
+		libusbOK=$libOK
+
+	fi
+fi
+
 echo -e  "\n------------------------------------------------------------------------\n"\
 "-- BUILD RESULTS                                                       --\n"\
 "------------------------------------------------------------------------\n\n"\
@@ -364,3 +418,4 @@ print_result "levmar" $levmarOK
 print_result "libpng" $libpngOK
 print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
+print_result "libusb" $libusbOK
