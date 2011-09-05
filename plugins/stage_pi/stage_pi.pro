@@ -11,16 +11,14 @@ include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib
+LIBS +=  -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += stage_pi.h \
            ../interfaces/qfextensionlinearstage.h \
-           ../../../../../LIB/trunk/tools.h \
            ../../../../../LIB/trunk/jkserialconnection.h
 
 SOURCES += stage_pi.cpp \
-           ../../../../../LIB/trunk/tools.cpp \
            ../../../../../LIB/trunk/jkserialconnection.cpp
 
 FORMS =
@@ -35,5 +33,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/qt/
 
 QT += gui xml svg
+
+
 
 
