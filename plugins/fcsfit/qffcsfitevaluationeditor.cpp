@@ -1576,7 +1576,7 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 QString param;
                 QString group="fit properties";
 
-                record->resultsSetEvaluationGroup(evalID, QString("%1 %2 %3"));
+                record->resultsSetEvaluationGroup(evalID, QString("%1%2: %3, %4").arg(eval->getType()).arg(eval->getID()).arg(falg->shortName()).arg(ffunc->shortName()));
                 record->resultsSetEvaluationGroupIndex(evalID, run);
                 record->resultsSetEvaluationDescription(evalID, QString(""));
 

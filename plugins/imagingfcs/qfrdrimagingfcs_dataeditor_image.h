@@ -21,6 +21,13 @@
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
+
+
+    This class uses the evalGroups of QFRawDataRecord to let the user select a set of parameters
+    from which to generatethe plot. It assumes that the evaluation writes the run as evalGroup Index,
+    so this index is used to get the parameters for each run.
+
+    Only fit results from the result group <code>"fit results"</code> can be used for plotting.
 */
 class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         Q_OBJECT
@@ -62,7 +69,19 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void includeRuns();
         void slidersChanged(int userMin, int userMax, int min, int max);
         void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers);
+
+        /** \brief activated when the suer selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
+        void parameterSetChanged();
+        /** \brief activated when the suer selects a new parameter*/
+        void parameterChanged();
+        /** \brief clear the parameter image */
+        void clearImage();
+        /** \brief fills cmbResultGroup with all available result groups */
+        void fillParameterSet();
+        /** \brief connect/disconnect cmbResultGroups, cmbParameters, ... to their slots */
+        void connectParameterWidgets(bool connectTo=true);
     protected:
+
 
         /** \brief plotter widget for the correlation curve */
         JKQtPlotter* plotter;
@@ -70,14 +89,14 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         JKQtPlotter* plotterResid;
         /** \brief sliders to set the cut of the correlation curve */
         DataCutSliders* sliders;
-        /** \brief splitter between plot and rhs widgets */
-        QVisibleHandleSplitter* splitter;
         /** \brief splitter between top plots */
         QVisibleHandleSplitter* splitterTop;
         /** \brief splitter between top plots and bottom plots */
         QVisibleHandleSplitter* splitterTopBot;
         /** \brief checkbox to select whether to display errors or not */
         QCheckBox* chkDisplayAverage;
+        /** \brief checkbox to select whether to display residulas or not */
+        QCheckBox* chkDisplayResiduals;
         /** \brief a combobox to select how the average run are displayed */
         QComboBox* cmbAverageStyle;
         /** \brief a combobox to select how the error of the average run are displayed */
@@ -116,18 +135,28 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
 
         /** \brief fast plotter for overview image */
-        JKQTFastPlotter* pltImage;
+        JKQtPlotter* pltImage;
         /** \brief plot for the overview image in pltOverview */
-        JKQTFPimagePlot* plteImage;
-        /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
-        JKQTFPimageOverlayPlot* plteImageSelected;
-        /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
-        JKQTFPimageOverlayPlot* plteImageExcluded;
+        JKQTPMathImage* plteImage;
         double* plteImageData;
         int plteImageSize;
 
+        /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
+        JKQTPImage* plteImageSelected;
+        /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
+        JKQTPImage* plteImageExcluded;
+        QImage imgOverlay;
+
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
+
+        /** \brief combobox to select a result group */
+        QComboBox* cmbResultGroup;
+
+        /** \brief combobox to select a parameter from the result group */
+        QComboBox* cmbParameter;
+        QLabel* labParameter;
+
 
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;

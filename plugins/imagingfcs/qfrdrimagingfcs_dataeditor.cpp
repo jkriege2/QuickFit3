@@ -237,8 +237,8 @@ void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
         sliders->disableSliderSignals();
         sliders->set_min(0);
         sliders->set_max(m->getCorrelationN());
-        sliders->set_userMin(current->getProperty("fcsimcorreditor_datacut_min", 0).toInt());
-        sliders->set_userMax(current->getProperty("fcsimcorreditor_datacut_max", m->getCorrelationN()).toInt());
+        sliders->set_userMin(current->getProperty("imfcs_correditor_datacut_min", 0).toInt());
+        sliders->set_userMax(current->getProperty("imfcs_correditor_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
     } else {
 //        runs.setCurrent(current);
@@ -288,8 +288,8 @@ void QFRDRImagingFCSDataEditor::rawDataChanged() {
 
 void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!current) return;
-    current->setQFProperty("fcsimcorreditor_datacut_min", userMin, false, false);
-    current->setQFProperty("fcsimcorreditor_datacut_max", userMax, false, false);
+    current->setQFProperty("imfcs_correditor_datacut_min", userMin, false, false);
+    current->setQFProperty("imfcs_correditor_datacut_max", userMax, false, false);
     //replotData();
 
     JKQTPdatastore* ds=plotter->getDatastore();

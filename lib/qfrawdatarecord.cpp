@@ -868,12 +868,13 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
 
 
 
-QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const QString& group) const {
+QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const QString& group, const QString& evalgroup) const {
     QStringList l;
     int evalCount=resultsGetEvaluationCount();
     for (int i=0; i<evalCount; i++) {
         QString en=resultsGetEvaluationName(i);
-        if (evalName.isEmpty() || (en==evalName)) {
+        QString egrp=resultsGetEvaluationGroup(en);
+        if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
                 QString rn=resultsGetResultName(en, j);
@@ -909,13 +910,14 @@ QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const
 }
 
 
-QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const QString& evalName, const QString& group) const {
+QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const QString& evalName, const QString& group, const QString& evalgroup) const {
     QStringList l;
     QList<QPair<QString, QString> > list;
     int evalCount=resultsGetEvaluationCount();
     for (int i=0; i<evalCount; i++) {
         QString en=resultsGetEvaluationName(i);
-        if (evalName.isEmpty() || (en==evalName)) {
+        QString egrp=resultsGetEvaluationGroup(en);
+        if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
                 QString rn=resultsGetResultName(en, j);
@@ -935,7 +937,7 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const
 }
 
 
-QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichtext(const QString& evalName, const QString& group) const {
+QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichtext(const QString& evalName, const QString& group, const QString& evalgroup) const {
     QStringList l;
     /*
        This function first creates a list of the triple <label, richtext_label, result_id> that matches the given filters. Then this list
@@ -947,7 +949,8 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
     int evalCount=resultsGetEvaluationCount();
     for (int i=0; i<evalCount; i++) {
         QString en=resultsGetEvaluationName(i);
-        if (evalName.isEmpty() || (en==evalName)) {
+        QString egrp=resultsGetEvaluationGroup(en);
+        if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
                 QString rn=resultsGetResultName(en, j);
@@ -984,6 +987,24 @@ QList<QString> QFRawDataRecord::resultsCalcEvaluationsInGroup(const QString& eva
 }
 
 
+QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup) const {
+    QStringList l;
 
+    int evalCount=resultsGetEvaluationCount();
+    for (int i=0; i<evalCount; i++) {
+        QString en=resultsGetEvaluationName(i);
+        QString grp=resultsGetEvaluationGroup(en);
+        if (!l.contains(grp)) {
+            if (paramgroup.isEmpty()) {
+                l.append(grp);
+            } else {
+                QList<QString> gl=resultsCalcGroups(en);
+                if (gl.contains(paramgroup)) l.append(grp);
+            }
+        }
+    }
+
+    return l;
+}
 
 

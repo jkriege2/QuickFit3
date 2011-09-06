@@ -43,7 +43,309 @@
                 <property name="fcsimimeditor_datacut_min" type="int" data="0" usereditable="false" visible="false"/>
                 <property name="weights" type="int" data="0" usereditable="false" visible="false"/>
             </properties>
-            <results/>
+            <results>
+                <evaluation name="fcs_fit_1_fcs_diff1_run0" group="%1 %2 %3" groupindex="0" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="0" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000136156" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.000136157" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000136156  [old_SES = 0.000136157]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000136156  [old_SES = 0.000136157]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="220" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0165958" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="65.4279" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="3.8101" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="27,722.4" error="0" unit="usec"/>
+                    <result name="fitparam_fitstat_chisquared" label="chi squared" group="fit statistics" labelrich="&lt;font size=&quot;+2&quot;&gt;&amp;chi;&lt;sup&gt;2&lt;/sup&gt;&lt;/font&gt;" type="number" value="0.000136156" unit=""/>
+                    <result name="fitparam_fitstat_chisquared_weighted" label="weighted chi squared" group="fit statistics" labelrich="&lt;font size=&quot;+2&quot;&gt;&amp;chi;&lt;sup&gt;2&lt;/sup&gt;&lt;/font&gt; (weighted)" type="number" value="0.000136156" unit=""/>
+                    <result name="fitparam_fitstat_datapoints" label="datapoints" group="fit statistics" type="number" value="205" unit=""/>
+                    <result name="fitparam_fitstat_dof" label="degrees of freedom" group="fit statistics" type="number" value="201" unit=""/>
+                    <result name="fitparam_fitstat_fitparams" label="fit params" group="fit statistics" type="number" value="3" unit=""/>
+                    <result name="fitparam_fitstat_r2" label="R squared" group="fit statistics" labelrich="R&lt;sup&gt;2&lt;/sup&gt;" type="number" value="0.973572" unit=""/>
+                    <result name="fitparam_fitstat_residavg" label="residual average" group="fit statistics" labelrich="&amp;lang;E&amp;rang;" type="number" value="1.75733e-05" unit=""/>
+                    <result name="fitparam_fitstat_residavg_weighted" label="weighted residual average" group="fit statistics" labelrich="&amp;lang;E&amp;rang; (weighted)" type="number" value="1.75733e-05" unit=""/>
+                    <result name="fitparam_fitstat_residstddev" label="residual stddev" group="fit statistics" labelrich="&amp;radic;&amp;lang;E&lt;sup&gt;&lt;font size=&quot;+1&quot;&gt;2&lt;/font&gt;&lt;/sup&gt;&amp;rang; " type="number" value="0.000814781" unit=""/>
+                    <result name="fitparam_fitstat_residstddev_weighted" label="weighted residual stddev" group="fit statistics" labelrich="&amp;radic;&amp;lang;E&lt;sup&gt;&lt;font size=&quot;+1&quot;&gt;2&lt;/font&gt;&lt;/sup&gt;&amp;rang;  (weighted)" type="number" value="0.000814781" unit=""/>
+                    <result name="fitparam_fitstat_tss" label="total sum of squares" group="fit statistics" type="number" value="0.00515191" unit=""/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="1.00005" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="1.52928" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="60.2562" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run1" group="%1 %2 %3" groupindex="1" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="1" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000243333" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.000274493" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000243333  [old_SES = 0.000274493]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000243333  [old_SES = 0.000274493]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="219" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0169885" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="6.39209" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="6.68758" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="15,794.2" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="9.99971" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="15.2916" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="58.8635" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run2" group="%1 %2 %3" groupindex="2" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="2" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000191558" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.00154457" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000191558  [old_SES = 0.00154457]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000191558  [old_SES = 0.00154457]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="218" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0108567" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="10.0959" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="10.0681" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="10,491.1" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="9.90694" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="15.1497" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="92.1091" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run3" group="%1 %2 %3" groupindex="3" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="3" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000120648" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.000814652" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000120648  [old_SES = 0.000814652]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000120648  [old_SES = 0.000814652]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="219" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0134276" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="374.715" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="1.12787" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="93,649.9" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="0.215816" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="0.330027" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="74.4735" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run4" group="%1 %2 %3" groupindex="4" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="4" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000320374" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.000329262" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000320374  [old_SES = 0.000329262]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000320374  [old_SES = 0.000329262]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="219" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0169893" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="15.8541" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="7.06834" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="14,943.4" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="4.03151" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="6.16499" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="58.8606" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run5" group="%1 %2 %3" groupindex="5" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="5" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000346584" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.000493119" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000346584  [old_SES = 0.000493119]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000346584  [old_SES = 0.000493119]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="218" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0149578" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="89.9441" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="3.83582" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="27,536.5" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="0.807129" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="1.23426" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="66.8546" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run6" group="%1 %2 %3" groupindex="6" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="6" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000169327" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.00160711" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000169327  [old_SES = 0.00160711]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000169327  [old_SES = 0.00160711]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="218" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0111936" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="101.705" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="6.60626" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="15,988.6" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="0.953833" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="1.4586" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="89.337" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run7" group="%1 %2 %3" groupindex="7" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="7" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000648646" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.00181863" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000648646  [old_SES = 0.00181863]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000648646  [old_SES = 0.00181863]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="219" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0127273" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="83.3609" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="7.83238" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="13,485.7" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="1.02349" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="1.56513" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="78.5711" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_run8" group="%1 %2 %3" groupindex="8" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="8" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="0.000246786" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.00119208" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 0.000246786  [old_SES = 0.00119208]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 0.000246786  [old_SES = 0.00119208]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="218" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0129389" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="86.6735" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="6.64503" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="15,895.3" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="0.968278" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="1.48069" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="77.2863" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+                <evaluation name="fcs_fit_1_fcs_diff1_runavg" group="%1 %2 %3" groupindex="-1" description="">
+                    <result name="fit_cut_low" type="integer" value="0" unit=""/>
+                    <result name="fit_cut_up" type="integer" value="205" unit=""/>
+                    <result name="fit_datapoints" type="integer" value="205" unit=""/>
+                    <result name="fit_model_name" type="string" value="fcs_diff1"/>
+                    <result name="fit_used_run" label="fit: last point" group="fit properties" type="integer" value="-1" unit=""/>
+                    <result name="fitalg_error_sum" group="fit properties" type="number" value="2.65821e-05" unit=""/>
+                    <result name="fitalg_fit_paramcount" group="fit properties" type="number" value="3" unit=""/>
+                    <result name="fitalg_function_evals" group="fit properties" type="number" value="3,001" unit=""/>
+                    <result name="fitalg_initial_error_sum" group="fit properties" type="number" value="0.00042086" unit=""/>
+                    <result name="fitalg_iterations" group="fit properties" type="number" value="1,000" unit=""/>
+                    <result name="fitalg_message" type="string" value="SimAneal returned after 1000 iterations and 3001 chi2-function evaluations. reason:  stopped by abortion criterion f_max., SES = 2.65821e-05  [old_SES = 0.00042086]"/>
+                    <result name="fitalg_messageHTML" type="string" value="&lt;b&gt;SimAneal&lt;/b&gt; returned after 1000 iterations and 3001 &amp;chi;&lt;sup&gt;2&lt;/sup&gt;-function evaluations.&lt;br&gt;reason:  stopped by abortion criterion f&lt;sub&gt;max&lt;/sub&gt;.&#10;SES = 2.65821e-05  [old_SES = 0.00042086]"/>
+                    <result name="fitalg_name" type="string" value="fit_simanneal"/>
+                    <result name="fitalg_runtime" type="number" value="222" unit="msecs"/>
+                    <result name="fitalg_stop_reason" group="fit properties" type="string" value=" stopped by abortion criterion f_max."/>
+                    <result name="fitalg_success" type="boolean" value="true"/>
+                    <result name="fitparam_1n_particle" label="1/Particle number N" group="fit results" labelrich="1/N" type="numbererror" value="0.0144015" error="0" unit=""/>
+                    <result name="fitparam_concentration" label="particle concentration in focus" group="fit results" labelrich="C&lt;sub&gt;all&lt;/sub&gt;" type="numbererror" value="232.941" error="0" unit="nM"/>
+                    <result name="fitparam_diff_coeff1" label="diffusion coefficient of species 1" group="fit results" labelrich="D&lt;sub&gt;1&lt;/sub&gt;" type="numbererror" value="1.82162" error="0" unit="micron^2/s"/>
+                    <result name="fitparam_diff_tau1" label="diffusion time of first component" group="fit results" labelrich="&amp;tau;&lt;sub&gt;D,1&lt;/sub&gt;" type="numbererror" value="57,984.1" error="0" unit="usec"/>
+                    <result name="fitparam_focus_struct_fac" label="focus: axial ratio" group="fit results" labelrich="&amp;gamma;" type="numbererror" value="0.323691" error="0" unit=""/>
+                    <result name="fitparam_focus_volume" label="focus: effective colume" group="fit results" labelrich="V&lt;sub&gt;eff&lt;/sub&gt;" type="numbererror" value="0.494989" error="0" unit="fl"/>
+                    <result name="fitparam_focus_width" label="focus: lateral radius" group="fit results" labelrich="w&lt;sub&gt;x,y&lt;/sub&gt;" type="numbererror" value="650" error="0" unit="nm"/>
+                    <result name="fitparam_n_particle" label="Particle number N" group="fit results" labelrich="N" type="numbererror" value="69.4371" error="0" unit=""/>
+                    <result name="fitparam_nonfl_tau1" label="triplet decay time" group="fit results" labelrich="&amp;tau;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="3" error="0" unit="usec"/>
+                    <result name="fitparam_nonfl_theta1" label="triplet fraction" group="fit results" labelrich="&amp;theta;&lt;sub&gt;trip&lt;/sub&gt;" type="numbererror" value="0" error="0" unit=""/>
+                    <result name="fitparam_offset" label="correlation offset" group="fit results" labelrich="G&lt;sub&gt;&amp;infin;&lt;/sub&gt;" type="numbererror" value="1" error="0" unit=""/>
+                </evaluation>
+            </results>
             <files>
                 <file>imfcs_testdata/beads_10nM_4545.5Hz_EM250.autocorrelation.dat</file>
             </files>

@@ -375,22 +375,25 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
             If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
             If \a group is non-empty the resultant list is filtered by result groups.
+            If \a evalgroup is non-empty the list is restricted to evaluations from the given evalGroup
          */
-        QList<QString> resultsCalcNames(const QString& evalName=QString(""), const QString& group=QString("")) const;
+        QList<QString> resultsCalcNames(const QString& evalName=QString(""), const QString& group=QString(""), const QString& evalgroup=QString("")) const;
 
         /*! \brief return a list of all result labels (first field) for this raw data record, together ith the parameter IDs (second field)
 
             If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
             If \a group is non-empty the resultant list is filtered by result groups.
+            If \a evalgroup is non-empty the list is restricted to evaluations from the given evalGroup
          */
-        QList<QPair<QString, QString> > resultsCalcNamesAndLabels(const QString& evalName=QString(""), const QString& group=QString("")) const;
+        QList<QPair<QString, QString> > resultsCalcNamesAndLabels(const QString& evalName=QString(""), const QString& group=QString(""), const QString& evalgroup=QString("")) const;
 
         /*! \brief return a list of all richtexted result labels (first field) for this raw data record, together ith the parameter IDs (second field)
 
             If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
             If \a group is non-empty the resultant list is filtered by result groups.
+            If \a evalgroup is non-empty the list is restricted to evaluations from the given evalGroup
          */
-        QList<QPair<QString, QString> > resultsCalcNamesAndLabelsRichtext(const QString& evalName=QString(""), const QString& group=QString("")) const;
+        QList<QPair<QString, QString> > resultsCalcNamesAndLabelsRichtext(const QString& evalName=QString(""), const QString& group=QString(""), const QString& evalgroup=QString("")) const;
 
         /*! \brief return a list of all result Groups, restricted to a given evaluation
 
@@ -401,6 +404,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
         /*! \brief returns a list of evaluationIDs in a given evaluation group */
         QList<QString> resultsCalcEvaluationsInGroup(const QString& evalGroup) const;
+
+        /*! \brief return a list of all evaluation groups in this object
+
+            If \a paramgroup is non-empty the resultant list contains only thos groups that have parameters in the given paramgroup
+         */
+        QList<QString> resultsCalcEvalGroups(const QString& paramgroup=QString("")) const;
 
     public:
         /** \brief return type (short type string) */
