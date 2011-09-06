@@ -43,12 +43,12 @@ SUBDIRS += plg_fitalgorithm_simanneal
 plg_fitalgorithm_simanneal.subdir=./plugins/fitalgorithm_simanneal
 plg_fitalgorithm_simanneal.depends = lib libqf3widgets
 
+SUBDIRS += plg_fitalgorithm_fit_lmfit
+plg_fitalgorithm_fit_lmfit.subdir=./plugins/fitalgorithm_fit_lmfit
+plg_fitalgorithm_fit_lmfit.depends = lib libqf3widgets
+
 
 !macx {
-
-    SUBDIRS += plg_fitalgorithm_fit_lmfit
-    plg_fitalgorithm_fit_lmfit.subdir=./plugins/fitalgorithm_fit_lmfit
-    plg_fitalgorithm_fit_lmfit.depends = lib libqf3widgets
 
     SUBDIRS += plg_spimb040
     plg_spimb040.subdir=./plugins/spimb040

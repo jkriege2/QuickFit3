@@ -314,8 +314,11 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         sliders->set_userMin(current->getProperty("fcsimimeditor_datacut_min", 0).toInt());
         sliders->set_userMax(current->getProperty("fcsimimeditor_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
+        selected.clear();
+        selected.insert(0);
     } else {
 //        runs.setCurrent(current);
+        selected.clear();
     }
 
     //readSettings();
@@ -579,7 +582,9 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbColorbar->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), 0).toInt());
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_style"), 1).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), 1).toInt());
-    loadSplitter(*(settings->getQSettings()), splitter, "imfcsimageeditor/corrsplitterSizes");
+    loadSplitter(*(settings->getQSettings()), splitter, "imfcsimageeditor/splitterizes");
+    loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
+    loadSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
 };
 
 
@@ -592,7 +597,9 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_error_style"), cmbAverageErrorStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_style"), cmbRunStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_error_style"), cmbRunErrorStyle->currentIndex());
-    saveSplitter(*(settings->getQSettings()), splitter, "imfcsimageeditor/corrsplitterSizes");
+    saveSplitter(*(settings->getQSettings()), splitter, "imfcsimageeditor/splitterizes");
+    saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
+    saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
 };
 
 

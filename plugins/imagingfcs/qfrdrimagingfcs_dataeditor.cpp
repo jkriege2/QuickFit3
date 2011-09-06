@@ -211,6 +211,8 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     plotter->get_plotter()->set_showKey(false);
     plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
     plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
+    plotter->get_plotter()->set_useAntiAliasingForGraphs(false);
+    plotter->get_plotter()->set_useAntiAliasingForSystem(true);
 
     lp->addWidget(plotter);
     sliders=new DataCutSliders(this);
@@ -430,6 +432,8 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
         //QTime t;
         //t.start();
 
+        QVector<JKQTPgraph*> topGraphs;
+
 
        //////////////////////////////////////////////////////////////////////////////////
        // Plot ALL RUNS
@@ -478,9 +482,13 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
                 g->set_symbolSize(5);
                 g->set_errorWidth(1);
 
-                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0)))
+                bool isTop=false;
+
+                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                         g->set_color(QColor("red"));
-                else {
+                        topGraphs.append(g);
+                        isTop=true;
+                } else {
                     if (!m->leaveoutRun(i)) {
                         g->set_color(QColor("black"));
                     } else {
@@ -488,7 +496,7 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
                     }
                 }
                 g->set_errorColor(g->get_color().lighter());
-                plotter->addGraph(g);
+                if (!isTop) plotter->addGraph(g);
             }
 
         } else if (cmbRunDisplay->currentIndex()==3) {
@@ -548,7 +556,9 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
             g->set_symbolSize(5);
             g->set_symbol(avgSymbol);
             plotter->addGraph(g);
-            }
+        }
+
+        plotter->addGraphs(topGraphs);
 
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotter->zoomToFit(true, true, false,false);

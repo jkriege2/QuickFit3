@@ -257,6 +257,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
         size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
     //std::cout<<"repainting ... 2\n";
 
+        QVector<JKQTPgraph*> topGraphs;
 
         //////////////////////////////////////////////////////////////////////////////////
         // Plot average + error markers
@@ -331,9 +332,13 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                 g->set_xErrorStyle(JKQTPnoError);
                 g->set_errorWidth(1);
 
-                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0)))
-                        g->set_color(QColor("red"));
-                else {
+                bool isTop=false;
+
+                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
+                    g->set_color(QColor("red"));
+                    isTop=true;
+                    topGraphs.append(g);;
+                } else {
                     if (!m->leaveoutRun(i)) {
                         g->set_color(QColor("black"));
                     } else {
@@ -341,7 +346,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                     }
                 }
                 g->set_errorColor(g->get_errorColor().lighter());
-                plotter->addGraph(g);
+                if (!isTop) plotter->addGraph(g);
             }
         } else if (cmbRunDisplay->currentIndex()==3) {
            //////////////////////////////////////////////////////////////////////////////////
@@ -395,9 +400,11 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                 }
             }
         }
+
+       plotter->addGraphs(topGraphs);
     //std::cout<<"repainting ... 4\n";
 
-        plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(), false);
+        //plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(), false);
     //std::cout<<"repainting ... 5\n";
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
     //std::cout<<"repainting ... 6\n";

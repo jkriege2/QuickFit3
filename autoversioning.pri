@@ -24,9 +24,11 @@ win32 {
     HAS_WINDOWS_DATE=TRUE
     DATE_OUTPUT=$$system(date /T)
     contains(DATE_OUTPUT, "invalid"):HAS_WINDOWS_DATE=FALSE
-
+    message($$DATE_OUTPUT)
     contains(HAS_WINDOWS_DATE, FALSE) {
-        DATESTR = $$system(date +%Y/%M/%d)
+        !isEmpty(QMAKE_SH) {
+            DATESTR = $$system(date +%Y/%M/%d)
+        }
     } else {
         DATESTR = $$system(date /T)
     }
