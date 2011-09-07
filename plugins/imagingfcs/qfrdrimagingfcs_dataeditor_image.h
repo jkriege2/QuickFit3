@@ -17,7 +17,12 @@
 #include "qt/jkqtfastplotter.h"
 #include "qfrdrimagingfcsrunsmodel.h"
 #include <QSet>
-
+#include "jkdoubleedit.h"
+#include "qtriple.h"
+#include "htmldelegate.h"
+#include <QTableView>
+#include "qffitfunction.h"
+#include "qenhancedtableview.h"
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -60,7 +65,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
          * the parameter dummy has no function it is only there so this function may be used
          * as a slot for a signal with an integer parameter.
          */
-        void replotData(int dummy=0);
+        void replotData();
 
         /** \brief draw overview plot */
         void replotImage();
@@ -106,6 +111,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         void debugInfo();
     protected:
+        /** \brief map with all available fit functions */
+        QMap<QString, QFFitFunction*> m_fitFunctions;
 
 
         /** \brief plotter widget for the correlation curve */
@@ -116,6 +123,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         DataCutSliders* sliders;
         /** \brief splitter between top plots */
         QVisibleHandleSplitter* splitterTop;
+        /** \brief splitter between bottom plot and parameter table */
+        QVisibleHandleSplitter* splitterBot;
+        /** \brief splitter between bottom plot and parameter table */
+        QVisibleHandleSplitter* splitterBotPlots;
         /** \brief splitter between top plots and bottom plots */
         QVisibleHandleSplitter* splitterTopBot;
         /** \brief checkbox to select whether to display errors or not */
@@ -176,6 +187,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
 
+        /** \brief checkbox to en-/disable automatic color bar scaling */
+        QCheckBox* chkImageAutoScale;
+
+        JKDoubleEdit* edtColMin;
+        JKDoubleEdit* edtColMax;
+
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;
 
@@ -184,6 +201,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QComboBox* cmbParameter;
         QLabel* labParameter;
 
+        /** \brief table for the fit params */
+        QEnhancedTableView* tvParams;
+
 
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;
@@ -191,6 +211,24 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
         void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam);
+
+
+        /*! \brief evaluate the fit function (with parameters) as defined by the pair evalGroup and evaluation
+
+            \param tau lag times where to evaluate the fit function
+            \param[out] fit the evaluated wit function is written here, this is only filled if both \a tau and \a fit are non-NULL
+            \param N size of tau and fit
+            \param names is filled with the names of the parameters
+            \param values is filled with the values of the parameters
+            \param errors is filled with the errors of the parameters
+            \param fix is filled with the fix-states of the parameters
+            \param units is filled with the units of the parameters
+            \param evaluation specifies the parameters to use
+            \return If not all fit needed parameters are available, this function retuns \c false and does
+                    not output data in fit. If the function is well defined it is evaluated for every given
+                    tau. The result is saved in fit.
+         */
+        bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QString evaluation);
 
 };
 

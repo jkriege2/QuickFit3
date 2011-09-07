@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <math.h>
 #include "jkqttools.h"
+#include "qffitfunction.h"
+#include "qffitfunctionmanager.h"
 
 
 
@@ -12,6 +14,7 @@
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent):
     QFRawDataEditor(services, parent)
 {
+    m_fitFunctions=services->getFitFunctionManager()->getModels("", this);
     plteOverviewSelectedData=NULL;
     plteOverviewExcludedData=NULL;
     plteOverviewSize=0;
@@ -55,7 +58,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     labParameter->setBuddy(cmbParameter);
     topgrid->addWidget(cmbParameter, row, 4);
 
-    connectParameterWidgets();
 
 
     topgrid->addWidget(new QWidget(), 0, 2);
@@ -82,11 +84,29 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
         cmbColorbar->addItem(JKQTFPimagePlot_getPaletteIcon(i), sl[i]);
     }
     gli->addRow(tr("color &palette:"), cmbColorbar);
-    connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
+
+    chkImageAutoScale=new QCheckBox("auto", wimg);
+    gli->addRow(tr("color &range:"), chkImageAutoScale);
+
+    edtColMin=new JKDoubleEdit(wimg);
+    edtColMin->setCheckBounds(false, false);
+    edtColMax=new JKDoubleEdit(wimg);
+    edtColMax->setCheckBounds(false, false);
+    QHBoxLayout* coll=new QHBoxLayout();
+    coll->addWidget(edtColMin,1);
+    coll->addWidget(new QLabel(" ... "));
+    coll->addWidget(edtColMax,1);
+    coll->setContentsMargins(0,0,0,0);
+    gli->addRow(QString(""), coll);
 
     chkDisplayImageOverlay=new QCheckBox(wimg);
     gli->addRow(tr("show &overlays:"), chkDisplayImageOverlay);
-    connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
+
+
+
+
+
+    connectParameterWidgets();
 
     QGroupBox* wcp=new QGroupBox(tr(" correlation plot styles "), this);
     vbl->addWidget(wcp);
@@ -96,10 +116,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkDisplayAverage->setChecked(true);
     gl->addRow(tr("display &average:"), chkDisplayAverage);
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), this, SLOT(replotData()));
-    chkDisplayResiduals=new QCheckBox(w);
-    chkDisplayResiduals->setChecked(true);
-    gl->addRow(tr("display &residuals:"), chkDisplayResiduals);
-    connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
     cmbAverageStyle=new QComboBox(w);
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
@@ -119,7 +135,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(cmbAverageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
     gl->addRow("", cmbAverageErrorStyle);
     connect(cmbAverageErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
-
 
     cmbRunStyle=new QComboBox(w);
     cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
@@ -142,6 +157,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gl->addRow((l=new QLabel(tr("log &tau;-axis:"))), chkLogTauAxis);
     l->setTextFormat(Qt::RichText);
     connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+
+    chkDisplayResiduals=new QCheckBox(w);
+    chkDisplayResiduals->setChecked(true);
+    gl->addRow(tr("display &residuals:"), chkDisplayResiduals);
+    connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
 
 
@@ -237,11 +257,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     plteImageSelected=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, ovlSelCol, pltImage->get_plotter());
-    pltImage->addGraph(plteImageSelected);
+    //pltImage->addGraph(plteImageSelected);
 
 
     plteImageExcluded=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, ovlExCol, pltImage->get_plotter());
-    pltImage->addGraph(plteImageExcluded);
+    //pltImage->addGraph(plteImageExcluded);
 
     plteImageData=NULL;
 
@@ -304,14 +324,22 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     lp->addWidget(sliders);
 
 
+    tvParams=new QEnhancedTableView();
+    tvParams->setItemDelegate(new HTMLDelegate(tvParams));
+
+
     splitterTopBot=new QVisibleHandleSplitter(Qt::Vertical, this);
     splitterTop=new QVisibleHandleSplitter(Qt::Horizontal, this);
     splitterTop->addWidget(wpltImage);
     splitterTop->addWidget(wpltOverview);
     splitterTopBot->addWidget(splitterTop);
-    splitterTopBot->addWidget(plotter);
-    splitterTopBot->addWidget(wp);
-
+    splitterBotPlots=new QVisibleHandleSplitter(Qt::Vertical, this);
+    splitterBotPlots->addWidget(plotter);
+    splitterBotPlots->addWidget(wp);
+    splitterBot=new QVisibleHandleSplitter(Qt::Horizontal, this);
+    splitterBot->addWidget(splitterBotPlots);
+    splitterBot->addWidget(tvParams);
+    splitterTopBot->addWidget(splitterBot);
 
     vbl->addWidget(new QWidget(this), 1);
 
@@ -331,6 +359,9 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
         } else {
             current->setQFProperty(QString("imfcs_imeditor_colorbar_%1_%2").arg(egroup).arg(param), cmbColorbar->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imeditor_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imeditor_autorange_%1_%2").arg(egroup).arg(param), chkImageAutoScale->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imeditor_colmin_%1_%2").arg(egroup).arg(param), edtColMin->value(), false, false);
+            current->setQFProperty(QString("imfcs_imeditor_colmax_%1_%2").arg(egroup).arg(param), edtColMax->value(), false, false);
         }
 
     }
@@ -343,19 +374,23 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
         if (egroup.isEmpty() || param.isEmpty()) {
             writeSettings();
         } else if (settings) {
+            double mi=0, ma=1;
+            plteImage->getDataMinMax(mi, ma);
             int d=current->getProperty(QString("imfcs_imeditor_colorbar_%1_%2").arg(egroup).arg(param),
                                        settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex())).toInt();
             if (d>=0) cmbColorbar->setCurrentIndex(d);
             else if (cmbColorbar->count()>0) cmbColorbar->setCurrentIndex(0);
-            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imeditor_overlay_%1_%2").arg(egroup).arg(param),
-                                               settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), chkDisplayImageOverlay->isChecked())).toBool());
+            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imeditor_overlay_%1_%2").arg(egroup).arg(param), false).toBool());
+            chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imeditor_autorange_%1_%2").arg(egroup).arg(param), true).toBool());
+            edtColMin->setValue(current->getProperty(QString("imfcs_imeditor_colmin_%1_%2").arg(egroup).arg(param), mi).toDouble());
+            edtColMax->setValue(current->getProperty(QString("imfcs_imeditor_colmax_%1_%2").arg(egroup).arg(param), ma).toDouble());
         }
 
     }
 }
 
 void QFRDRImagingFCSImageEditor::displayOverlayChanged() {
-    if (chkDisplayImageOverlay->isChecked()) {
+    if (!chkDisplayImageOverlay->isChecked()) {
         pltImage->deleteGraph(plteImageSelected, false);
         pltImage->deleteGraph(plteImageExcluded, false);
     } else {
@@ -368,6 +403,18 @@ void QFRDRImagingFCSImageEditor::displayOverlayChanged() {
 
 void QFRDRImagingFCSImageEditor::paletteChanged() {
     plteImage->set_palette(cmbColorbar->currentIndex());
+    plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
+    edtColMin->setEnabled(!chkImageAutoScale->isChecked());
+    edtColMax->setEnabled(!chkImageAutoScale->isChecked());
+    if (!chkImageAutoScale->isChecked()) {
+        plteImage->set_imageMin(edtColMin->value());
+        plteImage->set_imageMax(edtColMax->value());
+    } else {
+        double mi=0, ma=0;
+        plteImage->getDataMinMax(mi, ma);
+        edtColMin->setValue(mi);
+        edtColMax->setValue(ma);
+    }
     saveImageSettings();
     pltImage->update_plot();
 }
@@ -493,6 +540,11 @@ void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int mi
 
     plotter->get_plotter()->setGraphsDataRange(sliders->get_userMin(), sliders->get_userMax());
     plotterResid->get_plotter()->setGraphsDataRange(sliders->get_userMin(), sliders->get_userMax());
+    plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
+    plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(),false);
+    plotterResid->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
+    plotterResid->setX(plotter->getXMin(), plotter->getXMax());
+    plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
 
     QApplication::restoreOverrideCursor();
     plotter->set_doDrawing(true);
@@ -510,7 +562,13 @@ void QFRDRImagingFCSImageEditor::replotImage() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     pltImage->set_doDrawing(false);
 
-    displayOverlayChanged();
+    if (!chkDisplayImageOverlay->isChecked()) {
+        pltImage->deleteGraph(plteImageSelected, false);
+        pltImage->deleteGraph(plteImageExcluded, false);
+    } else {
+        pltImage->addGraph(plteImageSelected);
+        pltImage->addGraph(plteImageExcluded);
+    }
 
     if (!m) {
         plteImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
@@ -523,7 +581,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         if ((w==0) || (h==0)) {
             w=h=1;
         }
-        qDebug()<<w<<h;
+        //qDebug()<<w<<h;
         double dx=1;
         if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
         double dy=1;
@@ -534,7 +592,14 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         pltImage->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
         pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
         pltImage->get_plotter()->set_axisAspectRatio(1*w/h);
-        plteImage->get_colorBarAxis()->set_minTicks(5);
+
+        if (w>3*h) {
+            pltImage->get_plotter()->getXAxis()->set_minTicks(3);
+            plteImage->get_colorBarAxis()->set_minTicks(3);
+        } else {
+            pltImage->get_plotter()->getXAxis()->set_minTicks(7);
+            plteImage->get_colorBarAxis()->set_minTicks(5);
+        }
         pltImage->setXY(0, w, 0, h);
 
         if (plteImageSize<m->getDataImageWidth()*m->getDataImageHeight()) {
@@ -624,7 +689,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
     //qDebug()<<"replotOverview ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
 
-void QFRDRImagingFCSImageEditor::replotData(int dummy) {
+void QFRDRImagingFCSImageEditor::replotData() {
     //qDebug()<<"replotData";
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -645,6 +710,7 @@ void QFRDRImagingFCSImageEditor::replotData(int dummy) {
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
     plotter->clearGraphs();
+    plotterResid->clearGraphs();
     ds->clear();
 
 
@@ -682,13 +748,14 @@ void QFRDRImagingFCSImageEditor::replotData(int dummy) {
 
 
        //////////////////////////////////////////////////////////////////////////////////
-       // Plot ALL RUNS (left out runs in gray, standard runs in black, highlighted run in red)
+       // Plot ALL RUNS (left out runs in gray)
+       // also evaluates and plots the fit function (if possible) + the residuals
        //////////////////////////////////////////////////////////////////////////////////
         for (int i=0; i<m->getCorrelationRuns(); i++) {
             if (selected.contains(i)) {
                 size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
                 size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_run);
@@ -702,14 +769,70 @@ void QFRDRImagingFCSImageEditor::replotData(int dummy) {
                 g->set_xErrorStyle(JKQTPnoError);
                 g->set_symbolSize(5);
                 g->set_errorWidth(1);
-
                 if (!m->leaveoutRun(i)) {
-                    g->set_color(QColor("darkgreen"));
+                    //g->set_color(QColor("darkgreen"));
                 } else {
                     g->set_color(QColor("grey"));
                 }
                 g->set_errorColor(g->get_color().lighter());
                 plotter->addGraph(g);
+
+
+                double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+                double* resid=(double*)calloc(m->getCorrelationN(), sizeof(double));
+                QStringList names, units;
+                QList<double> values, errors;
+                QList<bool> fix;
+
+                // search for the evaluationID that matches the current group(has to be in evals)  and run (i)
+                QStringList evals=current->resultsCalcEvaluationsInGroup(currentEvalGroup());
+                QString en="";
+                for (register int ev=0; ev<evals.size(); ev++) {
+                    //en=evals[i];
+                    if (current->resultsGetEvaluationGroupIndex(evals[ev])==i) {
+                        en=evals[ev];
+                        break;
+                    }
+                }
+
+                // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
+                if (evaluateFitFunction(m->getCorrelationT(), corr, m->getCorrelationN(), names, values, errors, fix, units, en)) {
+                    double* acf=m->getCorrelationRun(i);
+                    for (int nn=0; nn< m->getCorrelationN(); nn++) {
+                        resid[nn]=corr[nn]-acf[nn];
+                    }
+                    size_t c_fit=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("fit to run %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                    size_t c_resid=ds->addCopiedColumn(resid, m->getCorrelationN(), QString("residuals for run %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                    JKQTPxyLineGraph* gfit=new JKQTPxyLineGraph();
+                    gfit->set_lineWidth(1.5);
+                    gfit->set_xColumn(c_tau);
+                    gfit->set_yColumn(c_fit);
+                    gfit->set_drawLine(true);
+                    gfit->set_style(Qt::DotLine);
+                    gfit->set_symbol(JKQTPnoSymbol);
+                    gfit->set_title(tr("fit to run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+                    gfit->set_datarange_start(sliders->get_userMin());
+                    gfit->set_datarange_end(sliders->get_userMax());
+                    gfit->set_symbolSize(5);
+                    gfit->set_color(g->get_color());
+                    plotter->addGraph(gfit);
+                    JKQTPxyLineGraph* gr=new JKQTPxyLineGraph();
+                    gr->set_lineWidth(1.5);
+                    gr->set_xColumn(c_tau);
+                    gr->set_yColumn(c_resid);
+                    gr->set_drawLine(true);
+                    gr->set_style(Qt::DotLine);
+                    gr->set_symbol(JKQTPnoSymbol);
+                    gr->set_title(tr("residuals for run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+                    gr->set_datarange_start(sliders->get_userMin());
+                    gr->set_datarange_end(sliders->get_userMax());
+                    gr->set_symbolSize(5);
+                    gr->set_color(g->get_color());
+                    plotterResid->addGraph(gr);
+                }
+
+                free(corr);
+                free(resid);
             }
         }
 
@@ -742,6 +865,9 @@ void QFRDRImagingFCSImageEditor::replotData(int dummy) {
 
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(),false);
+        plotterResid->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
+        plotterResid->setX(plotter->getXMin(), plotter->getXMax());
+        plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
 
         QApplication::restoreOverrideCursor();
     }
@@ -771,11 +897,16 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), 1).toInt());
     loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     loadSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
+    loadSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
+    loadSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
 };
 
 
 void QFRDRImagingFCSImageEditor::writeSettings() {
     if (!settings) return;
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/autoscale"), chkImageAutoScale->isChecked());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/colmin"), edtColMin->value());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/colmax"), edtColMax->value());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/log_tau_axis"), chkLogTauAxis->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlays"), chkDisplayImageOverlay->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_resid"), chkDisplayResiduals->isChecked());
@@ -786,6 +917,8 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_style"), cmbRunStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_error_style"), cmbRunErrorStyle->currentIndex());
     saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
+    saveSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
+    saveSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
     saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
 };
 
@@ -817,7 +950,8 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
 
     }
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
-    replotImage();
+    parameterChanged();
+    displayOverlayChanged();
     replotData();
     replotOverview();
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
@@ -825,11 +959,14 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
 
 void QFRDRImagingFCSImageEditor::parameterChanged() {
     if (!current) return;
-    //cmbResultGroup->setEnabled(true);
     QString egroup=currentEvalGroup();
     current->setQFProperty(QString("imfcs_imeditor_param_%1").arg(filenameize(egroup)), cmbParameter->itemData(cmbParameter->currentIndex()).toString(), false, false);
+    connectParameterWidgets(false);
     replotImage();
-    //qDebug()<<"parameterChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
+    loadImageSettings();
+    paletteChanged();
+    displayOverlayChanged();
+    connectParameterWidgets(true);
 }
 
 void QFRDRImagingFCSImageEditor::clearImage() {
@@ -878,9 +1015,19 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
     if (connectTo) {
         connect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         connect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
+        connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
+        connect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
+        connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
+        connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
+        connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
     } else {
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         disconnect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
+        disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
+        disconnect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
+        disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
+        disconnect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
+        disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
     }
 
     //qDebug()<<"connectParameterWidgets ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
@@ -895,8 +1042,31 @@ void QFRDRImagingFCSImageEditor::imageZoomChangedLocally(double newxmin, double 
 void QFRDRImagingFCSImageEditor::acfZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
     if (sender==plotter) {
         plotterResid->setX(newxmin, newxmax);
+        //qDebug()<<newxmin << newxmax;
     }
 }
+
+
+
+
+QString QFRDRImagingFCSImageEditor::currentEvalGroup() const {
+    int grp=cmbResultGroup->currentIndex();
+    if (grp<0) return "";
+    return cmbResultGroup->itemData(grp).toString();
+
+}
+
+QString QFRDRImagingFCSImageEditor::currentFitParameter() const {
+    if (cmbParameter->currentIndex()<0) return "";
+    return cmbParameter->itemData(cmbParameter->currentIndex()).toString();
+}
+
+
+
+
+
+
+
 
 void QFRDRImagingFCSImageEditor::readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam) {
     uint16_t arraysize=width*height;
@@ -919,17 +1089,45 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, uint16_t widt
 
 }
 
+bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QString evaluation) {
+    QString fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
+    QFFitFunction* ff=m_fitFunctions.value(fitfunc, NULL);
+    //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size()<<ff;
+    if (!ff) return false;
+    double* params=(double*)calloc(ff->paramCount(),sizeof(double));
+    double* errs=(double*)calloc(ff->paramCount(),sizeof(double));
+    bool* fixs=(bool*)calloc(ff->paramCount(),sizeof(bool));
+    QStringList pids;
+    for (int i=0; i<ff->paramCount(); i++) {
+        QString id=ff->getParameterID(i);
+        pids.append(id);
+        errs[i]=0;
+        fixs[i]=false;
+        params[i]=ff->getDescription(id).initialValue;
+        if (current->resultsExists(evaluation, "fitparam_"+id)) {
+            params[i]=current->resultsGetAsDouble(evaluation, "fitparam_"+id);
+            errs[i]=current->resultsGetErrorAsDouble(evaluation, "fitparam_"+id);
+        }
+    }
+    for (int i=0; i<ff->paramCount(); i++) {
+        QString id=ff->getParameterID(i);
+        if (ff->isParameterVisible(i, params)) {
+            names.append(ff->getDescription(id).label);
+            units.append(ff->getDescription(id).unitLabel);
+            values.append(params[i]);
+            errors.append(params[i]);
+        }
+    }
 
+    if (tau && fit) {
+        for (int i=0; i<N; i++) {
+            fit[i]=ff->evaluate(tau[i], params);
+        }
+    }
 
-QString QFRDRImagingFCSImageEditor::currentEvalGroup() const {
-    int grp=cmbResultGroup->currentIndex();
-    if (grp<0) return "";
-    return cmbResultGroup->itemData(grp).toString();
-
-}
-
-QString QFRDRImagingFCSImageEditor::currentFitParameter() const {
-    if (cmbParameter->currentIndex()<0) return "";
-    return cmbParameter->itemData(cmbParameter->currentIndex()).toString();
+    free(params);
+    free(errs);
+    free(fixs);
+    return true;
 }
 
