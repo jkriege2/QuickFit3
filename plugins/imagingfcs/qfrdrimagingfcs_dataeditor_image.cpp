@@ -211,10 +211,13 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
     lpltImage->addWidget(pltImage, 1);
 
-
-    pltImage->get_plotter()->getXAxis()->set_linkedAxis(pltImage->get_plotter()->getYAxis());
-    pltImage->get_plotter()->getXAxis()->set_changeWidthToAspectRatio(true);
-    pltImage->get_plotter()->getXAxis()->set_aspectRatio(1.0);
+    pltImage->set_zoomByDoubleAndRightMouseClick(false);
+    pltImage->set_displayMousePosition(false);
+    pltImage->set_displayToolbar(false);
+    pltImage->get_plotter()->set_maintainAspectRatio(true);
+    pltImage->get_plotter()->set_aspectRatio(1);
+    pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
+    pltImage->get_plotter()->set_axisAspectRatio(1);
     pltImage->setXY(0,0,1,1);
     pltImage->setAbsoluteXY(0,1,0,1);
 
@@ -517,30 +520,22 @@ void QFRDRImagingFCSImageEditor::replotImage() {
     } else {
         double w=m->getDataImageWidth();
         double h=m->getDataImageHeight();
+        if ((w==0) || (h==0)) {
+            w=h=1;
+        }
+        qDebug()<<w<<h;
         double dx=1;
         if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
         double dy=1;
         if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));
 
-        pltImage->setXY(0, w, 0, h);
         pltImage->setAbsoluteXY(0, w, 0, h);
-        if (h>w) {
-            pltImage->get_plotter()->getXAxis()->set_linkedAxis(pltImage->get_plotter()->getYAxis());
-            pltImage->get_plotter()->getXAxis()->set_changeWidthToAspectRatio(true);
-            pltImage->get_plotter()->getXAxis()->set_aspectRatio(1.0);
-
-            pltImage->get_plotter()->getYAxis()->set_linkedAxis(NULL);
-            pltImage->get_plotter()->getYAxis()->set_changeWidthToAspectRatio(false);
-            pltImage->get_plotter()->getYAxis()->set_aspectRatio(1.0);
-        } else {
-            pltImage->get_plotter()->getXAxis()->set_linkedAxis(NULL);
-            pltImage->get_plotter()->getXAxis()->set_changeWidthToAspectRatio(false);
-            pltImage->get_plotter()->getXAxis()->set_aspectRatio(1.0);
-
-            pltImage->get_plotter()->getYAxis()->set_linkedAxis(pltImage->get_plotter()->getXAxis());
-            pltImage->get_plotter()->getYAxis()->set_changeWidthToAspectRatio(true);
-            pltImage->get_plotter()->getYAxis()->set_aspectRatio(1.0);
-        }
+        pltImage->get_plotter()->set_maintainAspectRatio(true);
+        pltImage->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
+        pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
+        pltImage->get_plotter()->set_axisAspectRatio(1*w/h);
+        plteImage->get_colorBarAxis()->set_minTicks(5);
+        pltImage->setXY(0, w, 0, h);
 
         if (plteImageSize<m->getDataImageWidth()*m->getDataImageHeight()) {
             plteImageSize=m->getDataImageWidth()*m->getDataImageHeight();
@@ -585,7 +580,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         pltOverview->setYRange(0,h);
         pltOverview->set_xTickDistance(dx);
         pltOverview->set_yTickDistance(dy);
-        pltOverview->set_aspectRatio(w/h);
+        pltOverview->set_aspectRatio(qMax(0.01, qMin(100.0, w/h)));
 
         if (plteOverviewSize<m->getDataImageWidth()*m->getDataImageHeight()) {
             plteOverviewSize=m->getDataImageWidth()*m->getDataImageHeight();
