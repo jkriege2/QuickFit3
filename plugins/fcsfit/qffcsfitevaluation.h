@@ -179,7 +179,7 @@ class QFFCSFitEvaluation : public QFFitResultsEvaluation {
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int run, double* values, double* errors, const QString& group);
+        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int run, double* values, double* errors, const QString& group, bool* fix=NULL);
 
         /*! \brief return the value of a given parameter
             \param r the record to adress

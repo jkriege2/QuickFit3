@@ -18,14 +18,16 @@ HEADERS += qfrdrimagingfcs.h \
            ../interfaces/qfrdrfcsdatainterface.h \
     ../interfaces/qfevaluationimagetoruninterface.h \
     qfrdrimagingfcs_dataeditor_image.h \
-    qfrdrimagingfcsrunsmodel.h
+    qfrdrimagingfcsrunsmodel.h \
+    ../base_classes/qftablemodel.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
            qfrdrimagingfcs_data.cpp \
 		   qfrdrimagingfcs_dataeditor.cpp \
     qfrdrimagingfcs_dataeditor_image.cpp \
-    qfrdrimagingfcsrunsmodel.cpp
+    qfrdrimagingfcsrunsmodel.cpp \
+    ../base_classes/qftablemodel.cpp
 
 FORMS =
 
@@ -46,6 +48,8 @@ ASSETS_TESTDATA.files = ./assets/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/imfcs_testdata/
 
 INSTALLS += ASSETS_TESTDATA
+
+
 
 
 

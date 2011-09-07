@@ -112,8 +112,8 @@ void QFFCSFitEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int run, 
     setFitResultValuesVisible(r, getEvaluationResultID(run),  values, errors);
 }
 
-void QFFCSFitEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int run, double* values, double* errors, const QString& group) {
-    setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(run),  values, errors, group);
+void QFFCSFitEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int run, double* values, double* errors, const QString& group, bool* fix) {
+    setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(run),  values, errors, group, fix);
 }
 
 double QFFCSFitEvaluation::getFitValue(QFRawDataRecord* r, int run, const QString& id) {

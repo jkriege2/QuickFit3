@@ -27,8 +27,15 @@ QVariant QFTableModel::data(const QModelIndex &index, int role) const {
     if (index.isValid()) {
         quint32 a=xyAdressToUInt32(index.row(), index.column());
         //std::cout<<"QFTableModel::data("<<a<<")"<<std::endl;
-        if (role == Qt::DisplayRole || role == Qt::EditRole) {
+        if (role == Qt::DisplayRole) {
             if (dataMap.contains(a)) return dataMap[a];
+        } else if (role == Qt::EditRole) {
+            if (dataEditMap.contains(a)) return dataEditMap[a];
+            else return dataMap[a];
+        } else if (role == Qt::CheckStateRole) {
+            if (dataCheckedMap.contains(a)) return dataCheckedMap[a];
+        } else if (role == Qt::BackgroundRole) {
+            if (dataBackgroundMap.contains(a)) return dataBackgroundMap[a];
         }
     }
     return QVariant();
@@ -95,6 +102,7 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
     //std::cout<<"  resize("<<rows<<", "<<columns<<"): 4\n";
     if (didx.size()>0) for (int i = didx.size()-1; i>=0; i--) {
         dataMap.remove(didx[i]);
+        if (dataEditMap.contains(didx[i])) dataEditMap.remove(didx[i]);
     }
     //std::cout<<"  resize("<<rows<<", "<<columns<<"): 5\n";
     reset();
@@ -159,6 +167,7 @@ void QFTableModel::clear() {
     rows=0;
     columns=0;
     dataMap.clear();
+    dataEditMap.clear();
     columnNames.clear();
     reset();
 }
@@ -169,6 +178,7 @@ bool QFTableModel::changeDatatype(quint16 row, quint16 column, QVariant::Type ne
     if (dataMap.contains(a)) {
         if (dataMap[a].canConvert(newType)) {
             dataMap[a].convert(newType);
+            //if (dataEditMap.contains(a)) dataEditMap[a].convert(newType);
             return true;
         } else {
             dataMap[a]=QVariant(newType);
@@ -188,6 +198,41 @@ void QFTableModel::setCell(quint16 row, quint16 column, QVariant value) {
     dataMap[a]=value;
 }
 
+void QFTableModel::setCellEditRole(quint16 row, quint16 column, QVariant value) {
+    //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
+    if (readonly || (row>=rows) || (column>=columns)) return;
+    quint32 a=xyAdressToUInt32(row, column);
+    dataEditMap[a]=value;
+}
+
+void QFTableModel::setCellBackgroundRole(quint16 row, quint16 column, QVariant value) {
+    if (readonly || (row>=rows) || (column>=columns)) return;
+    quint32 a=xyAdressToUInt32(row, column);
+    dataBackgroundMap[a]=value;}
+
+void QFTableModel::setCellCheckedRole(quint16 row, quint16 column, QVariant value) {
+    if (readonly || (row>=rows) || (column>=columns)) return;
+    quint32 a=xyAdressToUInt32(row, column);
+    dataCheckedMap[a]=value;
+}
+
+
+quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
+    if (readonly || (column>=columns)) return 0;
+    if (rows<=0) {
+        appendRow();
+        setCell(0, column, data);
+        return 0;
+    }
+    //quint16 row=0;
+    for (quint16 r=0; r<rows; r++) {
+        if (cell(r, column)==data) return r;
+    }
+    appendRow();
+    setCell(rows-1, column, data);
+    return rows-1;
+}
+
 QVariant QFTableModel::cell(quint16 row, quint16 column) const {
     if ((row>=rows) || (column>=columns)) return QVariant();
     quint32 a=xyAdressToUInt32(row, column);
@@ -195,6 +240,12 @@ QVariant QFTableModel::cell(quint16 row, quint16 column) const {
     return QVariant();
 }
 
+QVariant QFTableModel::cellEditRole(quint16 row, quint16 column) const {
+    if ((row>=rows) || (column>=columns)) return QVariant();
+    quint32 a=xyAdressToUInt32(row, column);
+    if (dataEditMap.contains(a)) return dataEditMap[a];
+    return QVariant();
+}
 void QFTableModel::setColumnTitle(quint16 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly || (column>=columns)) return;

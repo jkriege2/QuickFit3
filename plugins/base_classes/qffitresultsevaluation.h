@@ -275,8 +275,10 @@ public:
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param values values to be stored
      *  \param errors errors to be stored
+     *  \param group the fit parameter group to assign
+     *  \param fix indicates whether a parameter was fixed
      */
-    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group);
+    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix=NULL);
 
 
 

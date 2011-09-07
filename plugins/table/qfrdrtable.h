@@ -1,7 +1,7 @@
 #ifndef QFRDRTABLE_H
 #define QFRDRTABLE_H
 
-#include "qftablemodel.h"
+#include "../base_classes/qftablemodel.h"
 #include "qfrdrtableeditor.h"
 #include "qfrawdatarecord.h"
 #include "qfrawdatarecordfactory.h"

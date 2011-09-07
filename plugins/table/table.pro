@@ -14,13 +14,13 @@ LIBS += -L$$QFOUTPUT -lquickfit3lib -L$$QFOUTPUT -lquickfit3widgets
 HEADERS += dlgcsvparameters.h \
            qfrdrtable.h \
            qfrdrtableeditor.h \
-           qftablemodel.h \
+           ../base_classes/qftablemodel.h \
            qfprdrtable.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
            qfrdrtableeditor.cpp \
-           qftablemodel.cpp \
+           ../base_classes/qftablemodel.cpp \
            qfprdrtable.cpp
 
 FORMS = dlg_csvparameters.ui

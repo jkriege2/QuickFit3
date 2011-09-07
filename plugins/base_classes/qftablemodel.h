@@ -2,7 +2,7 @@
 #define QFTABLEMODEL_H
 
 #include <QAbstractTableModel>
-#include <QMap>
+#include <QHash>
 #include <QVariant>
 #include <QStringList>
 #include <QString>
@@ -29,8 +29,8 @@
     data is internally stored as a 2D array of QVariant objects. The 2D array is implemented as follows:
      - The row and column number are given as quint16, i.e. as 16-bit unsigned integers
      - row and columns are combined to a quint32 by calculating: (row<<16) | column
-     - This quint32 is used as a QMap index. If a cell is empty either an invalid QVariant is stored, or
-       the QMap simply does not contain a QVariant for this cell.
+     - This quint32 is used as a QHash index. If a cell is empty either an invalid QVariant is stored, or
+       the QHash simply does not contain a QVariant for this cell.
      - row and column count are stored externally.
      - data is stored in a QFTableModel object which is also externally accessible for data access.
     .
@@ -38,7 +38,7 @@
 class QFTableModel : public QAbstractTableModel {
         Q_OBJECT
     protected:
-        /** \brief converts a (row, column) adress into a QMap index: (row<<16) | column */
+        /** \brief converts a (row, column) adress into a QHash index: (row<<16) | column */
         inline quint32 xyAdressToUInt32(quint16 row, quint16 column) const {
             quint32 r=row;
             quint32 c=column;
@@ -61,7 +61,13 @@ class QFTableModel : public QAbstractTableModel {
         /** \brief the number of columns */
         quint16 columns;
         /** \brief this map is used to store tha data */
-        QMap<quint32, QVariant> dataMap;
+        QHash<quint32, QVariant> dataMap;
+        /** \brief this map is used to store tha data for the edit role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
+        QHash<quint32, QVariant> dataEditMap;
+        /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
+        QHash<quint32, QVariant> dataBackgroundMap;
+        /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
+        QHash<quint32, QVariant> dataCheckedMap;
         /** \brief string list that contains the column names */
         QStringList columnNames;
         /** \brief indicates whether the model is readonly (via the QAbstractTableModel interface!!!) or not */
@@ -98,10 +104,20 @@ class QFTableModel : public QAbstractTableModel {
         void setCell(quint16 row, quint16 column, QVariant value);
         /** \brief returns the value in the supplied cell */
         QVariant cell(quint16 row, quint16 column) const;
+        /** \brief set the given cell to the supplied value in EditRole */
+        void setCellEditRole(quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value in Background */
+        void setCellBackgroundRole(quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value in Checked */
+        void setCellCheckedRole(quint16 row, quint16 column, QVariant value);
+        /** \brief returns the value in the supplied cell in EditRole */
+        QVariant cellEditRole(quint16 row, quint16 column) const;
         /** \brief set the column title */
         void setColumnTitle(quint16 column, QString name);
         /** \brief return the column title */
         QString columnTitle(quint16 column) const;
+        /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
+        quint16 getAddRow(quint16 column, QVariant data);
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>
          *

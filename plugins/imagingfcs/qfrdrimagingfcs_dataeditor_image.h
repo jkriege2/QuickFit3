@@ -23,6 +23,7 @@
 #include <QTableView>
 #include "qffitfunction.h"
 #include "qenhancedtableview.h"
+#include "../base_classes/qftablemodel.h"
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -37,11 +38,20 @@
 class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         Q_OBJECT
     public:
+
         /** Default constructor */
         QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSImageEditor();
     protected:
+        enum ImageTransforms {
+            itNone=0,
+            itAbs=1,
+            itLog=2,
+            itReciprocal=3,
+            itSqrt=4
+        };
+
         /** \brief create widgets on object creation */
         void createWidgets();
         /** \brief read the settings */
@@ -53,6 +63,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QString currentEvalGroup() const;
         /** \brief return the currently selected fit parameter (or an empty string, if none selected, or no evalGroup selected) */
         QString currentFitParameter() const;
+        /** \brief return the currently selected goodnes of fit parameter (or an empty string, if none selected, or no evalGroup selected) */
+        QString currentGofParameter() const;
+        /** \brief return the currently selected fit parameter transformation */
+        ImageTransforms currentFitParameterTransfrom() const;
+        /** \brief return the currently selected goodnes of fit parameter transformation */
+        ImageTransforms currentGofParameterTransfrom() const;
 
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
@@ -152,6 +168,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QCheckBox* chkLogTauAxis;
         /** \brief label for the run options */
         QLabel* labRunOptions;
+        /** \brief checkbox to select whether to display key in the graphs */
+        QCheckBox* chkKeys;
 
         /** \brief label over the parameter image plot */
         QLabel* labParamImage;
@@ -174,7 +192,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief fast plotter for overview image */
         JKQtPlotter* pltImage;
-        /** \brief plot for the overview image in pltOverview */
+        /** \brief plot for the overview image in pltImage */
         JKQTPMathImage* plteImage;
         double* plteImageData;
         int plteImageSize;
@@ -183,6 +201,20 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         JKQTPOverlayImage* plteImageSelected;
         /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
         JKQTPOverlayImage* plteImageExcluded;
+
+
+        /** \brief fast plotter for goodnes of fit image */
+        JKQtPlotter* pltGofImage;
+        /** \brief plot for the  goodnes of fit image in pltOverview */
+        JKQTPMathImage* plteGofImage;
+        double* plteGofImageData;
+
+
+        /** \brief plot for the selected runs in pltGofImage, plot plteImageSelectedData */
+        JKQTPOverlayImage* plteGofImageSelected;
+        /** \brief plot for the excluded runs in pltGofImage, plot plteImageSelectedData */
+        JKQTPOverlayImage* plteGofImageExcluded;
+
 
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
@@ -200,17 +232,28 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief combobox to select a parameter from the result group */
         QComboBox* cmbParameter;
         QLabel* labParameter;
+        QLabel* labParameterTransform;
+        QComboBox* cmbParameterTransform;
+        /** \brief combobox to select a goodnes of fit parameter from the result group */
+        QComboBox* cmbGofParameter;
+        QLabel* labGofParameter;
+        QLabel* labGofParameterTransform;
+        QComboBox* cmbGofParameterTransform;
 
         /** \brief table for the fit params */
         QEnhancedTableView* tvParams;
+
+        QFTableModel* tabFitvals;
 
 
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;
 
 
+
+
         /** \brief create a parameter image with the given evalGroup and fitParam */
-        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam);
+        void readParameterImage(double* image, double* gof_image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, QString gofParam, ImageTransforms tranGofParam);
 
 
         /*! \brief evaluate the fit function (with parameters) as defined by the pair evalGroup and evaluation
@@ -218,17 +261,19 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
             \param tau lag times where to evaluate the fit function
             \param[out] fit the evaluated wit function is written here, this is only filled if both \a tau and \a fit are non-NULL
             \param N size of tau and fit
-            \param names is filled with the names of the parameters
-            \param values is filled with the values of the parameters
-            \param errors is filled with the errors of the parameters
-            \param fix is filled with the fix-states of the parameters
-            \param units is filled with the units of the parameters
+            \param[out] names is filled with the names of the parameters
+            \param[out] namelabels is filled with the name labels of the parameters
+            \param[out] values is filled with the values of the parameters
+            \param[out] errors is filled with the errors of the parameters
+            \param[out] fix is filled with the fix-states of the parameters
+            \param[out] units is filled with the units of the parameters
+            \param[out] unitlabels is filled with the unit labels of the parameters
             \param evaluation specifies the parameters to use
             \return If not all fit needed parameters are available, this function retuns \c false and does
                     not output data in fit. If the function is well defined it is evaluated for every given
                     tau. The result is saved in fit.
          */
-        bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QString evaluation);
+        bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation);
 
 };
 
