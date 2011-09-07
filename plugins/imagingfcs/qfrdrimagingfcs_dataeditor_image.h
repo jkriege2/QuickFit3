@@ -103,6 +103,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
             This function updates the contents of the image setting comboboxes, but tries to preserve the current selection!
          */
         void resultsChanged();
+
+        void debugInfo();
     protected:
 
 
@@ -176,6 +178,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;
+
 
         /** \brief combobox to select a parameter from the result group */
         QComboBox* cmbParameter;

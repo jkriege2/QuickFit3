@@ -20,14 +20,14 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
 }
 
 QString QFRDRImagingFCSData::getEditorName(int i) {
-    if (i==0) return tr("Correlation Curves");
-    if (i==1) return tr("Parameter Image");
+    if (i==0) return tr("Parameter Image");
+    if (i==1) return tr("Correlation Curves");
     return QString("");
 };
 
 QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services, int i, QWidget* parent) {
-    if (i==0) return new QFRDRImagingFCSDataEditor(services, parent);
-    if (i==1) return new QFRDRImagingFCSImageEditor(services, parent);
+    if (i==0) return new QFRDRImagingFCSImageEditor(services, parent);
+    if (i==1) return new QFRDRImagingFCSDataEditor(services, parent);
     return NULL;
 };
 

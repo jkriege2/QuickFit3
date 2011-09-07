@@ -69,6 +69,25 @@ class QFEvaluationPropertyEditor;
     Evaluation items also contain properties, but they are not visible for the user and only used as a simple
     interface to load and store them.
 
+    \section QFEvaluationRecord_Signals Signals & Slots
+    This class has some signals that can be emitted when fit properties or fit results change. When setting a whole
+    bunch of properties/results where each set() operation could emit a signal it may be wise to surround this portion
+    of code by function calls that stop the emitting of these signals:
+\code
+    eval->set_doEmitPropertiesChanged(false); // disable emitting the signals
+    eval->set_doEmitResultsChanged(false);
+
+    // ... YOUR CODE HERE ...
+
+    eval->set_doEmitPropertiesChanged(true); // enable emitting the signals again
+    eval->set_doEmitResultsChanged(true);
+    eval->emitPropertiesChanged(); // explicitly call the signals
+    eval->emitResultsChanged();
+\endcode
+    Of course you also have to make sure to use the methods emitResultsChanged() and emitParametersChanged() functions,
+    instead of emiting the signals directly.
+
+
     \section QFEvaluationRecord_Error Error Reporting
     Errors are reported by the methods error() which returns \c true if an error has occured and the method
     errorDescription() which returns a textual description of the error. The protected method setError() may be
@@ -195,23 +214,48 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
             The default implementation returns: \code getType()+"_"+QString::number(getID())+"*"; \endcode
 
             If you want to refilter the results pane, you should make sure that this function returns the new filter
-            and then \code emit resultsChanged() \endcode which will result in a redisplay of the evaluation results.
+            and then \code emitResultsChanged() \endcode which will result in a redisplay of the evaluation results.
          */
         virtual QString getResultsDisplayFilter() const;
 
+        /** \brief return whether resultsChanged() signals are enabled */
+        inline bool get_doEmitResultsChanged() {
+            return doEmitResultsChanged;
+        }
+        /** \brief set whether resultsChanged() signals are enabled */
+        inline void set_doEmitResultsChanged(bool enable) {
+            doEmitResultsChanged=enable;
+        }
+
+        /** \brief return whether propertiesChanged() signals are enabled */
+        inline bool get_doEmitPropertiesChanged() {
+            return doEmitPropertiesChanged;
+        }
+        /** \brief set whether propertiesChanged() signals are enabled */
+        inline void set_doEmitPropertiesChanged(bool enable) {
+            doEmitPropertiesChanged=enable;
+        }
     public slots:
         /** \brief set the name */
         inline void setName(const QString n) {
             name=n;
-            emit propertiesChanged();
+            emitPropertiesChanged();
         }
         /** \brief set the description  */
         inline void setDescription(const QString& d) {
             description=d;
-            emit propertiesChanged();
+            emitPropertiesChanged();
         };
 
+        /** \brief emits resultsChanged(), only if doEmitResultsChanged is \c true */
+        inline void emitResultsChanged() {
+            if (doEmitResultsChanged) emit resultsChanged();
+        }
 
+        /** \brief emits propertiesChanged(), only if doEmitPropertiesChanged is \c true */
+        inline void emitPropertiesChanged() {
+            if (doEmitPropertiesChanged) emit propertiesChanged();
+        }
     signals:
         /** \brief emitted whenever at least one of the properties changes */
         void propertiesChanged();
@@ -239,6 +283,10 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         QString errorDesc;
         /** \brief pointer to the parent project object */
         QFProject* project;
+        /** \brief en-/disable emiting of resultsChanged() signal */
+        bool doEmitResultsChanged;
+        /** \brief en-/disable emiting of propertiesChanged() signal */
+        bool doEmitPropertiesChanged;
 
         /** \brief read object contents from QDomElement */
         void readXML(QDomElement& e);

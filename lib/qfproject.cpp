@@ -6,6 +6,7 @@
 #include "qfevaluationitemfactory.h"
 #include "qfrawdatarecordfactory.h"
 #include "qfpluginservices.h"
+#include "../version.h"
 
 #include <QTemporaryFile>
 
@@ -231,10 +232,10 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
     f.open();
     QXmlStreamWriter w(&f);
-    w.setAutoFormatting(true);
+    w.setAutoFormatting(false);
     w.writeStartDocument();
     w.writeStartElement("quickfitproject");
-    w.writeAttribute("quickfit_version", "3.0");
+    w.writeAttribute("quickfit_version", VERSION_FULL);
     w.writeAttribute("name", name);
     w.writeAttribute("creator", creator);
     w.writeStartElement("description");

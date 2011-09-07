@@ -1,6 +1,7 @@
 #ifndef QFFITRESULTSEVALUATION_H
 #define QFFITRESULTSEVALUATION_H
 
+#include <QHash>
 #include <QMap>
 #include <QSettings>
 
@@ -721,14 +722,14 @@ protected:
         Internally a uniquie key for every fit parameter is used to adress the contents. The key is calculated
         from the \code fit_fuction_id+"___"+parameter_id \endcode
      */
-    QMap<QString, FitParameter> parameterStore;
+    QHash<QString, FitParameter> parameterStore;
 
     /*! \brief parameter store for fit algorithm parameters
 
     This map effectively has two strings as key. the first is the fit algorithm ID and the second the parameter name
     The value stored for each key is a QVariant.
     */
-    QMap<QString, QMap<QString, QVariant> > algorithm_parameterstore;
+    QHash<QString, QHash<QString, QVariant> > algorithm_parameterstore;
 
 
     /** \brief the current fitting function */

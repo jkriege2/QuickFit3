@@ -24,6 +24,19 @@ class QDomElement; // forward
 
     This class manages the basic properties of every raw data item in QuickFit 3.0.
 
+    \section QFRawDataRecor_Signals Signals & Slots
+    This class has some signals that can be emitted when fit properties or fit results change. When setting a whole
+    bunch of results where each set() operation could emit a signal it may be wise to surround this portion
+    of code by function calls that stop the emitting of these signals:
+\code
+    rdr->disableEmitResultsChanged();
+
+    // ... YOUR CODE HERE ...
+
+    rdr->enableEmitResultsChanged();
+\endcode
+    Of course you also have to make sure to use the methods emitResultsChanged() functions,
+    instead of emiting the signals directly.
 
     \section QFRawDataRecord_Error Error Reporting
     Errors are reported by the methods error() which returns \c true if an error has occured and the method
@@ -130,7 +143,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief pointer to the parent project object */
         QFProject* project;
 
-        /** \brief read object contents from QDomElement */
+        /** \brief read object contents from QDomElement
+         *  \see
+         */
         void readXML(QDomElement& e);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
         virtual void intWriteData(QXmlStreamWriter& w) {}
@@ -189,7 +204,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
     protected:
         /*! \brief this struct holds the metadata and also the data about an evaluationID */
         struct evaluationIDMetadata {
-            QString group; /**< group this evaluationID belongs to \b (optional) */
+            QString group; /**< group this evaluationID belongs to \b (optional), translated to a human-readable version, using evalGroupLabels */
             int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
             QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
             QHash<QString, evaluationResult> results; /**< the real results */
@@ -197,35 +212,23 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
         /** \brief evaluation results are stored in this QHash which maps an evaluation name to
          *         to a list of evaluation results (which is indexed by result names! */
-        QHash<QString, evaluationIDMetadata > results;
+        QHash<QString, evaluationIDMetadata* > results;
         /** \brief table used to display the results */
         QFRDRResultsModel* resultsmodel;
 
+        /** \brief maps evaluationIDMetadata.group to a human-readable version */
+        QHash<QString, QString> evalGroupLabels;
         /** \brief is this is \c false, the signal resultsChanged() is NOT emited */
         bool doEmitResultsChanged;
     public:
         /** \brief clear all evaluation results */
-        inline void resultsClearAll() {
-            results.clear();
-            if (doEmitResultsChanged) emit resultsChanged();
-        };
+        void resultsClearAll();
         /** \brief clear all evaluation results of a specific evaluation name */
-        inline void resultsClear(QString name) {
-            if (results.contains(name)) {
-                results[name].results.clear();
-                results.remove(name);
-                if (doEmitResultsChanged) emit resultsChanged();
-            }
-        };
+        void resultsClear(QString name);
         /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */
-        virtual void resultsClear(QString name, QString postfix);
+        void resultsClear(QString name, QString postfix);
         /** \brief check whether a result exists */
-        inline bool resultsExists(QString evalName, QString resultName) const {
-            if (results.contains(evalName)) {
-                return results[evalName].results.contains(resultName);
-            }
-            return false;
-        };
+        bool resultsExists(QString evalName, QString resultName) const;
         /** \brief check whether there are any results from a given evauation */
         inline bool resultsExistsFromEvaluation(QString evalName) const {
             return results.contains(evalName);
@@ -256,11 +259,17 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline evaluationResult resultsGet(QString evalName, QString resultName) const {
             evaluationResult r;
             if (resultsExists(evalName, resultName)) {
-                r=results[evalName].results.value(resultName);
+                return results[evalName]->results.value(resultName);
             }
             return r;
         };
-        /** \brief return a specified result as string */
+        /** \brief return the type of a specified result, or qfrdreInvalid if an error occured (eval does not exist ...) */
+        inline evaluationResultType resultsGetType(QString evalName, QString resultName) const {
+            if (resultsExists(evalName, resultName)) {
+                return results[evalName]->results.value(resultName).type;
+            }
+            return qfrdreInvalid;
+        };        /** \brief return a specified result as string */
         QString  resultsGetAsString(QString evalName, QString resultName) const;
         /** \brief remove the value stored in the given position
          *
@@ -301,10 +310,22 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return the group of a result  */
         QString resultsGetGroup(QString evaluationName, QString resultName) const;
 
-        /** \brief set the group of an evaluation ID */
-        void resultsSetEvaluationGroup(QString evaluationName, QString group);
+        /** \brief set the human-readable label for a group name used as evalGroup  */
+        void resultsSetEvaluationGroupLabel(QString evalGroup, QString label);
+        /** \brief return the human-readable label of an evaluation group
+         *
+         *  This function returns the argument \a evalGroup if a label is not saved!
+         */
+        QString resultsGetLabelForEvaluationGroup(QString evalGroup) const;
         /** \brief return the group of an evaluation ID, returns an empty string, if the evaluationName does not exist  */
         QString resultsGetEvaluationGroup(QString evaluationName) const;
+        /** \brief return the group of an evaluation ID as human-readable label
+         *
+         *   returns an empty string, if the evaluationName does not exist and the group itself, if no label exists.
+         */
+        QString resultsGetEvaluationGroupLabel(QString evaluationName) const;
+        /** \brief set the group of an evaluation ID */
+        void resultsSetEvaluationGroup(QString evaluationName, QString group);
         /** \brief set the group index of an evaluation ID */
         void resultsSetEvaluationGroupIndex(QString evaluationName, int64_t groupIndex);
         /** \brief return the group index of an evaluation ID, returns \c -1, if the evaluationName does not exist  */
@@ -316,19 +337,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
 
         /** \brief get number of results for a specified evaluation */
-        inline int resultsGetCount(QString evalName) const {
-            if (results.contains(evalName)) return results[evalName].results.size();
-            return 0;
-        };
+        int resultsGetCount(QString evalName) const;
         /** \brief get number of evaluations in this object */
-        inline int resultsGetEvaluationCount() const {
-            return results.size();
-        };
+        int resultsGetEvaluationCount() const;
         /** \brief get the i-th evaluation name */
-        inline QString resultsGetEvaluationName(int i) const {
-            if ((long)i<results.size()) return results.keys().at(i);
-            return QString("");
-        };
+        QString resultsGetEvaluationName(int i) const;
         /** \brief get the i-th result name */
         QString resultsGetResultName(QString evaluationName, int i) const;
 

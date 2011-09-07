@@ -110,7 +110,7 @@ QString getQVariantData(const QVariant& variant) {
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     switch(variant.type()) {
-        case QVariant::Double: t=loc.toString(variant.toDouble()); break;
+        case QVariant::Double: t=loc.toString(variant.toDouble(), 'g', 10); break;
         default: t=variant.toString(); break;
     }
     return t;
@@ -155,7 +155,21 @@ QString doubleToQString(double value, int prec, char f, QChar decimalSeparator) 
     return res;
 }
 
-bool QStringToBool(QString& data){
+QString CDoubleToQString(double value) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    return loc.toString(value, 'g', 10);
+}
+
+
+double CQStringToDouble(QString value) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    return loc.toDouble(value) ;
+}
+
+
+bool QStringToBool(const QString& data){
     QString d=data.toLower();
     if (d=="true") return true;
     if (d=="t") return true;

@@ -8,6 +8,8 @@ QFEvaluationItem::QFEvaluationItem(QFProject* parent, bool showRDRList, bool use
 {
     this->useSelection=useSelection;
     this->showRDRList=showRDRList;
+    doEmitPropertiesChanged=true;
+    doEmitResultsChanged=true;
     highlightedRecord=NULL;
     project=parent;
     errorOcc=false;
@@ -78,8 +80,8 @@ void QFEvaluationItem::readXML(QDomElement& e) {
     intReadData(&te);
     //std::cout<<"reading XML: done!\n";
     if (!errorOcc) {
-        emit propertiesChanged();
-        emit resultsChanged();
+        emitPropertiesChanged();
+        emitResultsChanged();
     }
 }
 

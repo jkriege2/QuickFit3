@@ -1,0 +1,86 @@
+
+/*! \page qf3fileformats QuickFit File formats
+    \ingroup quickfit3
+    
+    \subpage qf3fileformats_project QuickFit project file format (*.qfp)
+    QuickFit saves it's projectin a XML file with the default extension \c .qfp . This section
+    describes the XML tags used to encode a project.
+    
+    Here is an example project file with comments, or values (all uppercase!) explaining the tags:
+\verbatim
+<?xml version="1.0" encoding="UTF-8"?>
+<quickfitproject quickfit_version="3.0" name="PROJECT NAME" creator="PROJECT CREATOR">
+  <description>PROJECT DESCRIPTION</description>
+  <properties/> <!-- there are no project  properties ... if there are, they are saved as 
+                     properties in <rawdataelement> -->
+  <rawdata> <!-- all raw data records in the project:
+                 every record's data is enclosed in one  <rawdataelement> tag -->
+    <rawdataelement type="RDR TYPE" 
+                    name="RDR NAME" 
+                    id="INTERNAL ID (INT)">
+      <description>RDR DESCRIPTION</description>
+      <properties> <!-- the RDR properties -->
+        <property name="PROPERTY NAME" 
+                  type="PROPERTY TYPE (string|double|bool|date|int|...)" 
+                  data="PROPERTY DATA (CONVERTED TO STRING)" 
+                  usereditable="IS PROPERTY USER EDITABLE (true|false)" 
+                  visible="IS PROPERTY VISIBLE (true|false)"/>
+        <!-- ... -->
+      </properties>
+      <results> <!-- the RDR evaluation results -->
+        <evaluation name="EVALUATION RESULT SET NAME" 
+                    group="GROUP THIS EVALUATION RESULT SET BELONGS TO" 
+                    groupindex="INDEX INSIDE GROUP (int)" 
+                    description="EVALUATION RESULT SET DESCRIPTION">
+          <result name="RESULT NAME" 
+                  type="RESULT TYPE (number|numbererror|string|...)" 
+                  value="RESULT VALUE (converted to string)"
+                  error="RESULT ERROR (converted to string)"
+                  unit="RESULT UNIT" 
+                  group="RESULT GROUP"
+                  label="HUMAN-READABLE VERSION OF NAME"
+                  labelrich="HUMAN-READABLE, RICHTEXTED VERSION OF NAME" />
+          <!-- ... -->          
+        </evaluation>
+        <!-- ... -->
+      </results>
+      <evalgrouplabels> <!-- translates <evaluation group"..."> to a human-readable version -->
+        <group id="EVALUATION GROUP" 
+               label="EVALUATION GROUP LABEL/DESCRIPTION"/>
+        <!-- ... -->
+      </evalgrouplabels>
+      <files> <!-- lists all files this RDR reads from -->
+        <file>FILENAME (IF POSSIBLE RELATIVE TO PROJECT), WITH '/' AS DIRECTORY SEPARATOR (UNIX STYLE!!!)</file>
+        <!-- ... -->
+      </files>
+      <data> <!-- may be written freely by the raw data record (not part of this fileformat description, as it is plugin-dependent) -->
+        <!-- ... -->
+      </data>    
+    </rawdataelement>
+  </rawdata>
+  
+  
+  <evaluations><!-- all evaluation items in the project:
+                    every evaluation's data is enclosed in one  <evaluationelement> tag -->
+    <evaluationelement type="EVALUATION TYPE" 
+                       name="EVALUATION NAME" 
+                       id="INTERNAL ID (INT)">
+      <description>EVALUATION DESCRIPTION</description>
+      <properties> <!-- the EVALUATION properties -->
+        <property name="PROPERTY NAME" 
+                  type="PROPERTY TYPE (string|double|bool|date|int|...)" 
+                  data="PROPERTY DATA (CONVERTED TO STRING)" 
+                  usereditable="IS PROPERTY USER EDITABLE (true|false)" 
+                  visible="IS PROPERTY VISIBLE (true|false)"/>
+        <!-- ... -->
+      </properties>
+      <data> <!-- may be written freely by the evaluation items (not part of this fileformat description, as it is plugin-dependent) -->
+        <!-- ... -->
+      </data>
+    </evaluationelement>
+  </evaluations>
+</quickfitproject>
+
+\endverbatim
+
+*/

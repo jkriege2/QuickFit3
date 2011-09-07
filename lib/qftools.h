@@ -118,11 +118,23 @@ QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& 
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT QString doubleToQString(double value, int prec = 6, char f = 'g', QChar decimalSeparator=',' );
+QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator=',' );
+
+/*! \brief convert a number to a QString with the c-locale (and without group separator)
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString CDoubleToQString(double value);
+
+/*! \brief convert a number to a QString with the c-locale (and without group separator)
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT double CQStringToDouble(QString value);
 
 /*! \brief convert a string \a data to a boolean
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT bool QStringToBool(QString& data);
+QFLIB_EXPORT bool QStringToBool(const QString& data);
 #endif // QFTOOLS_H
