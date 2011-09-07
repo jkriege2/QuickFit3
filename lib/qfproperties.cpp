@@ -18,7 +18,7 @@ unsigned int QFProperties::getVisiblePropertyCount() {
     unsigned int c=0;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
-    QMapIterator<QString, propertyItem> i(props);
+    QHashIterator<QString, propertyItem> i(props);
     while (i.hasNext()) {
         i.next();
         if (i.value().visible) c++;
@@ -30,7 +30,7 @@ QString QFProperties::getVisibleProperty(unsigned int j) {
     unsigned int c=0;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
-    QMapIterator<QString, propertyItem> i(props);
+    QHashIterator<QString, propertyItem> i(props);
     while (i.hasNext()) {
         i.next();
         if (i.value().visible) {
@@ -42,7 +42,7 @@ QString QFProperties::getVisibleProperty(unsigned int j) {
 }
 
 void QFProperties::storeProperties(QXmlStreamWriter& w) {
-    QMapIterator<QString, propertyItem> i(props);
+    QHashIterator<QString, propertyItem> i(props);
     while (i.hasNext()) {
         i.next();
         w.writeStartElement("property");

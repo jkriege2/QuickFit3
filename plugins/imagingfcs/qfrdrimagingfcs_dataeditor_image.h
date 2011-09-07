@@ -36,11 +36,6 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSImageEditor();
-    protected slots:
-        /** \brief connected to the rawDataChanged() signal of the current record */
-        virtual void rawDataChanged();
-        /** \brief connect widgets to current data record */
-        virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old);
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -49,8 +44,17 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
+        /** \brief return the currently selected evalGroup (or an empty string, if none selected) */
+        QString currentEvalGroup() const;
+        /** \brief return the currently selected fit parameter (or an empty string, if none selected, or no evalGroup selected) */
+        QString currentFitParameter() const;
 
     protected slots:
+        /** \brief connected to the rawDataChanged() signal of the current record */
+        virtual void rawDataChanged();
+        /** \brief connect widgets to current data record */
+        virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old);
+
         /** \brief displays the data from the current data element in the plotter widget
          *
          * the parameter dummy has no function it is only there so this function may be used
@@ -80,6 +84,25 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void fillParameterSet();
         /** \brief connect/disconnect cmbResultGroups, cmbParameters, ... to their slots */
         void connectParameterWidgets(bool connectTo=true);
+        /** \brief called when the user selects a new palette */
+        void paletteChanged();
+        /** \brief called when the user selects to display overlays or not */
+        void displayOverlayChanged();
+
+        /** \brief save the image plot settings to the raw data record properties */
+        void saveImageSettings();
+        /** \brief load the image plot settings from the raw data record properties */
+        void loadImageSettings();
+
+        void imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender);
+
+        void acfZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender);
+
+        /*! \brief called when the current's record's fit results change
+
+            This function updates the contents of the image setting comboboxes, but tries to preserve the current selection!
+         */
+        void resultsChanged();
     protected:
 
 
@@ -97,6 +120,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QCheckBox* chkDisplayAverage;
         /** \brief checkbox to select whether to display residulas or not */
         QCheckBox* chkDisplayResiduals;
+        /** \brief checkbox to select whether to display selected/excluded pixels overlay on image plot */
+        QCheckBox* chkDisplayImageOverlay;
         /** \brief a combobox to select how the average run are displayed */
         QComboBox* cmbAverageStyle;
         /** \brief a combobox to select how the error of the average run are displayed */
@@ -142,10 +167,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         int plteImageSize;
 
         /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
-        JKQTPImage* plteImageSelected;
+        JKQTPOverlayImage* plteImageSelected;
         /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
-        JKQTPImage* plteImageExcluded;
-        QImage imgOverlay;
+        JKQTPOverlayImage* plteImageExcluded;
 
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
@@ -160,6 +184,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;
+
+
+        /** \brief create a parameter image with the given evalGroup and fitParam */
+        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam);
 
 };
 

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QMap>
+#include <QHash>
 #include <QVariant>
 #include <QStringList>
 #include "lib_imexport.h"
@@ -90,7 +90,7 @@ class QFLIB_EXPORT QFProperties {
             bool visible;
         };
         /** \brief internal store for the objectproperties */
-        QMap<QString, propertyItem> props;
+        QHash<QString, propertyItem> props;
 
         /** \brief called when the project properties (name, description, ...) changed
          *
@@ -101,7 +101,7 @@ class QFLIB_EXPORT QFProperties {
          *  class.
          */
         virtual void emitPropertiesChanged() {};
-        /**\brief issue an error report/set object into error state
+        /** \brief issue an error report/set object into error state
          *
          * This should be reimplemented by the inheriting object, to comply woth its error
          * reporting system!

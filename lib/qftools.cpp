@@ -106,18 +106,27 @@ QString getQVariantType(const QVariant& variant) {
 }
 
 QString getQVariantData(const QVariant& variant) {
-    return variant.toString();
+    QString t="";
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    switch(variant.type()) {
+        case QVariant::Double: t=loc.toString(variant.toDouble()); break;
+        default: t=variant.toString(); break;
+    }
+    return t;
 }
 
 QVariant getQVariantFromString(const QString& type, const QString& data) {
     QVariant d=data;
     //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     bool c=false;
     if (type=="bool") { c=d.convert(QVariant::Bool); }
     else if (type=="char") { c=d.convert(QVariant::Char); }
     else if (type=="date") { c=d.convert(QVariant::Date); }
     else if (type=="datetime") { c=d.convert(QVariant::DateTime); }
-    else if (type=="double") { c=d.convert(QVariant::Double); }
+    else if (type=="double") { d=loc.toDouble(data, &c); }
     else if (type=="int") { c=d.convert(QVariant::Int); }
     else if (type=="longlong") { c=d.convert(QVariant::LongLong); }
     else if (type=="string") { c=d.convert(QVariant::String); }
@@ -138,6 +147,7 @@ QVariant getQVariantFromString(const QString& type, const QString& data) {
 
 QString doubleToQString(double value, int prec, char f, QChar decimalSeparator) {
     QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     QString res=loc.toString(value, f, prec);
     if (loc.decimalPoint()!=decimalSeparator) {
         res=res.replace(loc.decimalPoint(), decimalSeparator);

@@ -914,7 +914,7 @@ void QFFCSFitEvaluationEditor::replotData() {
         } else {
             if (eval->getCurrentRun()<(int)data->getCorrelationRuns()) {
                 c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentRun()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentRun())).toStdString());
-                graphName=tr("\\verb{%2} %3").arg(eval->getCurrentRun()).arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentRun()));
+                graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentRun()));
                 if (eval->getFitDataWeighting()==QFFCSFitEvaluation::RunErrorWeighting) {
                     c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentRun()), data->getCorrelationN(), "cperrunerror");
                     errorName=tr("per run");

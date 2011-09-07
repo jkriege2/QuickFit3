@@ -5,7 +5,7 @@
 #include <QString>
 #include <QVariant>
 #include <QStringList>
-#include <QMap>
+#include <QHash>
 #include <QIcon>
 #include <QAbstractTableModel>
 #include "qfproject.h"
@@ -51,20 +51,20 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
 
         /** \brief return the next sibling rawdata record in the project */
-        inline QFRawDataRecord* getNext() { return project->getNextRawData(this); };
+        inline QFRawDataRecord* getNext() { return project->getNextRawData(this); }
         /** \brief return the next sibling rawdata record in the project */
-        inline QFRawDataRecord* getPrevious() { return project->getPreviousRawData(this); };
+        inline QFRawDataRecord* getPrevious() { return project->getPreviousRawData(this); }
         /** \brief return the next sibling rawdata record in the project, which has the same type as this record */
-        inline QFRawDataRecord* getNextOfSameType() { return project->getNextRawDataOfSameType(this); };
+        inline QFRawDataRecord* getNextOfSameType() { return project->getNextRawDataOfSameType(this); }
         /** \brief return the next sibling rawdata record in the project, which has the same type as this record */
-        inline QFRawDataRecord* getPreviousOfSameType() { return project->getPreviousRawDataOfSameType(this); };
+        inline QFRawDataRecord* getPreviousOfSameType() { return project->getPreviousRawDataOfSameType(this); }
 
         /** \brief return the ID */
-        inline int getID() { return ID; };
+        inline int getID() { return ID; }
         /** \brief return the name */
         inline QString getName() { return name; }
         /** \brief return the description  */
-        inline QString getDescription() { return description; };
+        inline QString getDescription() { return description; }
         /** \brief return the list of linked files */
         inline QStringList getFiles() { return files; }
         /** \brief return a pointer to the project that contains this QRawDatarecord */
@@ -82,13 +82,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief set the name */
         inline void setName(const QString n) {
             name=n;
-            //emit dataChanged(propModel->index(project->getRawDataIndex(this), 0), index(project->getRawDataIndex(this), 2));
             emitPropertiesChanged();
         }
         /** \brief set the description  */
         inline void setDescription(const QString& d) {
             description=d;
-            //emit dataChanged(index(project->getRawDataIndex(this), 0), index(project->getRawDataIndex(this), 2));
             emitPropertiesChanged();
         };
         /** \brief returns a model which may be used to access and edit the properties in this object  */
@@ -102,18 +100,18 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void rawDataChanged();
     public:
         /** \copydoc QFProperties::emitPropertiesChanged() */
-        virtual void emitPropertiesChanged() { emit propertiesChanged(); };
+        virtual void emitPropertiesChanged() { emit propertiesChanged(); }
         /** \brief this function emits a resultsChanged() signal. */
-        virtual void emitResultsChanged() { if (doEmitResultsChanged) emit resultsChanged(); };
+        virtual void emitResultsChanged() { if (doEmitResultsChanged) emit resultsChanged(); }
         /** \brief this function emits a rawDataChanged() signal. */
-        virtual void emitRawDataChanged() { emit rawDataChanged(); };
+        virtual void emitRawDataChanged() { emit rawDataChanged(); }
         /** \brief disable emitting of rawDataChanged() signal*/
         void disableEmitResultsChanged() { doEmitResultsChanged=false; }
         /** \brief enable emitting of rawDataChanged() signal and emit one signal */
         void enableEmitResultsChanged() { doEmitResultsChanged=true; emit resultsChanged(); }
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
-        virtual void setPropertiesError(QString message) { setError(message); };
+        virtual void setPropertiesError(QString message) { setError(message); }
 
         /** \brief a model used to access the properties */
         QFRDRPropertyModel* propModel;
@@ -135,12 +133,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief read object contents from QDomElement */
         void readXML(QDomElement& e);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
-        virtual void intWriteData(QXmlStreamWriter& w) {};
+        virtual void intWriteData(QXmlStreamWriter& w) {}
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
          */
-        virtual void intReadData(QDomElement* e=NULL) {};
+        virtual void intReadData(QDomElement* e=NULL) {}
         /** \brief set the internal error flag and description */
         void setError(QString description) { errorOcc=true; errorDesc=description; }
 
@@ -194,12 +192,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             QString group; /**< group this evaluationID belongs to \b (optional) */
             int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
             QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
-            QMap<QString, evaluationResult> results; /**< the real results */
+            QHash<QString, evaluationResult> results; /**< the real results */
         };
 
-        /** \brief evaluation results are stored in this QMap which maps an evaluation name to
+        /** \brief evaluation results are stored in this QHash which maps an evaluation name to
          *         to a list of evaluation results (which is indexed by result names! */
-        QMap<QString, evaluationIDMetadata > results;
+        QHash<QString, evaluationIDMetadata > results;
         /** \brief table used to display the results */
         QFRDRResultsModel* resultsmodel;
 

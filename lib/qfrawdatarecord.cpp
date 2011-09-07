@@ -90,6 +90,8 @@ void QFRawDataRecord::readXML(QDomElement& e) {
             results[en].group=group;
             results[en].groupIndex=groupIndex;
             results[en].description=description;
+            QLocale loc=QLocale::c();
+            loc.setNumberOptions(QLocale::OmitGroupSeparator);
             while (!re.isNull()) {
                 QString n=re.attribute("name", "");
                 QString t=re.attribute("type", "invalid");
@@ -104,14 +106,14 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     r.bvalue=QVariant(re.attribute("value", "false")).toBool();
                 } else if (t=="integer") {
                     r.type=qfrdreInteger;
-                    r.ivalue=re.attribute("value", "0").toInt();
+                    r.ivalue=loc.toInt(re.attribute("value", "0"));
                     r.unit=re.attribute("unit", "");
                 } else if (t=="string") {
                     r.type=qfrdreString;
                     r.svalue=re.attribute("value", "");
                 } else if (t=="number") {
                     r.type=qfrdreNumber;
-                    r.dvalue=re.attribute("value", "0.0").toDouble();
+                    r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
                     r.unit=re.attribute("unit", "");
                 } else if (t=="numberlist") {
                     r.type=qfrdreNumberVector;
@@ -119,7 +121,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     QStringList s=re.attribute("value", "0.0").split(";");
                     for (int i=0; i<s.size(); i++) {
                         bool ok=false;
-                        double d=s[i].toDouble(&ok);
+                        double d=loc.toDouble(s[i], &ok);
                         if (ok) { r.dvec.append(d); }
                         else { r.dvec.append(0); }
                     }
@@ -130,16 +132,16 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     QStringList s=re.attribute("value", "0.0").split(";");
                     for (int i=0; i<s.size(); i++) {
                         bool ok=false;
-                        double d=s[i].toDouble(&ok);
+                        double d=loc.toDouble(s[i], &ok);
                         if (ok) { r.dvec.append(d); }
                         else { r.dvec.append(0); }
                     }
                     r.unit=re.attribute("unit", "");
-                    r.columns=re.attribute("columns", "").toInt();
+                    r.columns=loc.toInt(re.attribute("columns", "0"));
                 } else if (t=="numbererror") {
                     r.type=qfrdreNumberError;
-                    r.dvalue=re.attribute("value", "0.0").toDouble();
-                    r.derror=re.attribute("error", "0.0").toDouble();
+                    r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
+                    r.derror=loc.toDouble(re.attribute("error", "0.0"));
                     r.unit=re.attribute("unit", "");
                 }
                 if (!n.isEmpty() && !en.isEmpty()) results[en].results.insert(n, r);
@@ -190,7 +192,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
     storeProperties(w);
     w.writeEndElement();
     w.writeStartElement("results");
-    QMapIterator<QString, evaluationIDMetadata > i(results);
+    QHashIterator<QString, evaluationIDMetadata > i(results);
     while (i.hasNext()) {
     //for (int i=0; i<results.keys().size(); i++) {
         i.next();
@@ -200,7 +202,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
         w.writeAttribute("group", i.value().group);
         w.writeAttribute("groupindex", QString::number(i.value().groupIndex));
         w.writeAttribute("description", i.value().description);
-        QMapIterator<QString, evaluationResult> j(i.value().results);
+        QHashIterator<QString, evaluationResult> j(i.value().results);
         //for (int j=0; j<i.value().size(); j++) {
         while (j.hasNext()) {
             j.next();
@@ -211,6 +213,8 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
             if (!r.label.isEmpty()) w.writeAttribute("label", r.label);
             if (!r.group.isEmpty()) w.writeAttribute("group", r.group);
             if (!r.label_rich.isEmpty()) w.writeAttribute("labelrich", r.label_rich);
+            QLocale loc=QLocale::c();
+            loc.setNumberOptions(QLocale::OmitGroupSeparator);
             switch(r.type) {
                 case qfrdreInvalid:
                     w.writeAttribute("type", "invalid");
@@ -222,9 +226,9 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                 case qfrdreInteger:
                     w.writeAttribute("type", "integer");
                   #ifdef Q_OS_WIN32
-                    w.writeAttribute("value", QLocale::c().toString(r.ivalue));
+                    w.writeAttribute("value", loc.toString(r.ivalue));
                   #else
-                    w.writeAttribute("value", QLocale::c().toString(r.ivalue));
+                    w.writeAttribute("value", loc.toString(r.ivalue));
                   #endif
                     w.writeAttribute("unit", r.unit);
                     break;
@@ -234,7 +238,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     break;
                 case qfrdreNumber:
                     w.writeAttribute("type", "number");
-                    w.writeAttribute("value", QLocale::c().toString(r.dvalue));
+                    w.writeAttribute("value", loc.toString(r.dvalue, 'e', 20));
                     w.writeAttribute("unit", r.unit);
                     break;
                 case qfrdreNumberVector: {
@@ -242,7 +246,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     QString s="";
                     for (int i=0; i<r.dvec.size(); i++) {
                         if (i>0) s=s+";";
-                        s=s+QLocale::c().toString(r.dvec[i]);
+                        s=s+QLocale::c().toString(r.dvec[i], 'e', 20);
                     }
                     w.writeAttribute("value", s);
                     w.writeAttribute("unit", r.unit);
@@ -252,16 +256,16 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     QString s="";
                     for (int i=0; i<r.dvec.size(); i++) {
                         if (i>0) s=s+";";
-                        s=s+QLocale::c().toString(r.dvec[i]);
+                        s=s+QLocale::c().toString(r.dvec[i], 'e', 20);
                     }
                     w.writeAttribute("value", s);
                     w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("columns", QLocale::c().toString(r.columns));
+                    w.writeAttribute("columns", loc.toString(r.columns));
                     } break;
                 case qfrdreNumberError:
                     w.writeAttribute("type", "numbererror");
-                    w.writeAttribute("value", QLocale::c().toString(r.dvalue));
-                    w.writeAttribute("error", QLocale::c().toString(r.derror));
+                    w.writeAttribute("value", loc.toString(r.dvalue, 'e', 20));
+                    w.writeAttribute("error", loc.toString(r.derror, 'e', 20));
                     w.writeAttribute("unit", r.unit);
                     break;
 
@@ -314,7 +318,7 @@ void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool e
 
 void QFRawDataRecord::resultsClear(QString name, QString postfix) {
     if (results.contains(name)) {
-        QMapIterator<QString, evaluationResult> i(results[name].results);
+        QHashIterator<QString, evaluationResult> i(results[name].results);
         while (i.hasNext()) {
             i.next();
             //cout << i.key() << ": " << i.value() << endl;
@@ -614,7 +618,7 @@ QString QFRawDataRecord::resultsGetResultName(QString evaluationName, int i) con
 
 void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
     if (resultsExistsFromEvaluation(oldEvalName)) {
-        QMapIterator<QString, evaluationResult> i(results[oldEvalName].results);
+        QHashIterator<QString, evaluationResult> i(results[oldEvalName].results);
         while (i.hasNext()) {
             i.next();
             results[newEvalName].results.insert(i.key(), i.value());
