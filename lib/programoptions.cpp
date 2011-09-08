@@ -34,7 +34,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
             aappDir.cdUp();
             aappDir.cdUp();
         }
-        appDir=	aappDir.absolutePath()
+        appDir=	aappDir.absolutePath();
     #endif
     globalConfigDir=appDir+"/globalconfig/";
     configDir=QDir::homePath()+"/."+fi.completeBaseName()+"/";
