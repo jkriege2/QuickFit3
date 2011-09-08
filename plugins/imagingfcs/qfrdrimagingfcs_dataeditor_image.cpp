@@ -146,26 +146,23 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkDisplayAverage=new QCheckBox(w);
     chkDisplayAverage->setChecked(true);
     gl->addRow(tr("display &average:"), chkDisplayAverage);
-    connect(chkDisplayAverage, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
     cmbAverageStyle=new QComboBox(w);
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
-    connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageStyle, SLOT(setEnabled(bool)));
 
     cmbAverageErrorStyle=new QComboBox(w);
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_enone.png"), tr("none"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
-    connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageErrorStyle, SLOT(setEnabled(bool)));
 
     gl->addRow((l=new QLabel(tr("average &options:"))), cmbAverageStyle);
-    connect(chkDisplayAverage, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
-    connect(cmbAverageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
     gl->addRow("", cmbAverageErrorStyle);
-    connect(cmbAverageErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+    connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageStyle, SLOT(setEnabled(bool)));
+    connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageErrorStyle, SLOT(setEnabled(bool)));
+    connect(chkDisplayAverage, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
 
     cmbRunStyle=new QComboBox(w);
     cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
@@ -180,25 +177,21 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     gl->addRow((labRunOptions=new QLabel(tr("run &options:"), w)), cmbRunStyle);
     labRunOptions->setBuddy(cmbRunStyle);
-    connect(cmbRunStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
     gl->addRow("", cmbRunErrorStyle);
-    connect(cmbRunErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
 
     chkLogTauAxis=new QCheckBox("", w);
     gl->addRow((l=new QLabel(tr("log &tau;-axis:"))), chkLogTauAxis);
     l->setTextFormat(Qt::RichText);
-    connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
 
     chkDisplayResiduals=new QCheckBox(w);
     chkDisplayResiduals->setChecked(true);
     gl->addRow(tr("display &residuals:"), chkDisplayResiduals);
-    connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
     chkKeys=new QCheckBox(w);
     chkKeys->setChecked(true);
     gl->addRow(tr("display &keys:"), chkKeys);
-    connect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
+    connectImageWidgets(true);
 
 
 
@@ -451,11 +444,11 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
         if (egroup.isEmpty() || param.isEmpty()) {
             writeSettings();
         } else {
-            current->setQFProperty(QString("imfcs_imeditor_colorbar_%1_%2").arg(egroup).arg(param), cmbColorbar->currentIndex(), false, false);
-            current->setQFProperty(QString("imfcs_imeditor_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imeditor_autorange_%1_%2").arg(egroup).arg(param), chkImageAutoScale->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imeditor_colmin_%1_%2").arg(egroup).arg(param), edtColMin->value(), false, false);
-            current->setQFProperty(QString("imfcs_imeditor_colmax_%1_%2").arg(egroup).arg(param), edtColMax->value(), false, false);
+            current->setQFProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param), cmbColorbar->currentIndex(), false, false);
+            current->setQFProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), chkImageAutoScale->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), edtColMin->value(), false, false);
+            current->setQFProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), edtColMax->value(), false, false);
         }
 
     }
@@ -469,15 +462,18 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             writeSettings();
         } else if (settings) {
             double mi=0, ma=1;
+            connectParameterWidgets(false);
             plteImage->getDataMinMax(mi, ma);
-            int d=current->getProperty(QString("imfcs_imeditor_colorbar_%1_%2").arg(egroup).arg(param),
+            int d=current->getProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param),
                                        settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex())).toInt();
             if (d>=0) cmbColorbar->setCurrentIndex(d);
             else if (cmbColorbar->count()>0) cmbColorbar->setCurrentIndex(0);
-            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imeditor_overlay_%1_%2").arg(egroup).arg(param), false).toBool());
-            chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imeditor_autorange_%1_%2").arg(egroup).arg(param), true).toBool());
-            edtColMin->setValue(current->getProperty(QString("imfcs_imeditor_colmin_%1_%2").arg(egroup).arg(param), mi).toDouble());
-            edtColMax->setValue(current->getProperty(QString("imfcs_imeditor_colmax_%1_%2").arg(egroup).arg(param), ma).toDouble());
+            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), false).toBool());
+            chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true).toBool());
+            edtColMin->setValue(current->getProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), mi).toDouble());
+            edtColMax->setValue(current->getProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), ma).toDouble());
+            connectParameterWidgets(true);
+            pltImage->update_plot();
         }
 
     }
@@ -554,8 +550,8 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         sliders->disableSliderSignals();
         sliders->set_min(0);
         sliders->set_max(m->getCorrelationN());
-        sliders->set_userMin(current->getProperty("imfcs_imeditor_datacut_min", 0).toInt());
-        sliders->set_userMax(current->getProperty("imfcs_imeditor_datacut_max", m->getCorrelationN()).toInt());
+        sliders->set_userMin(current->getProperty("imfcs_imed_datacut_min", 0).toInt());
+        sliders->set_userMax(current->getProperty("imfcs_imed_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
         selected.clear();
         selected.insert(0);
@@ -623,8 +619,8 @@ void QFRDRImagingFCSImageEditor::resultsChanged() {
 
 void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!current) return;
-    current->setQFProperty("imfcs_imeditor_datacut_min", userMin, false, false);
-    current->setQFProperty("imfcs_imeditor_datacut_max", userMax, false, false);
+    current->setQFProperty("imfcs_imed_datacut_min", userMin, false, false);
+    current->setQFProperty("imfcs_imed_datacut_max", userMax, false, false);
     //replotData();
 
     JKQTPdatastore* ds=plotter->getDatastore();
@@ -849,7 +845,6 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
     if (m->getCorrelationN()>0) {
 
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
         JKQTPerrorPlotstyle runerrorstyle=JKQTPnoError;
         switch (cmbRunErrorStyle->currentIndex()) {
@@ -1033,7 +1028,6 @@ void QFRDRImagingFCSImageEditor::replotData() {
         plotterResid->setX(plotter->getXMin(), plotter->getXMax());
         plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
 
-        QApplication::restoreOverrideCursor();
     }
     plotter->set_doDrawing(true);
     plotter->set_emitSignals(true);
@@ -1041,7 +1035,6 @@ void QFRDRImagingFCSImageEditor::replotData() {
     //t.start();
     plotter->update_plot();
     //qDebug()<<"plotting in "<<t.elapsed()<<" ms";
-    replotOverview();
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotData ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 };
@@ -1106,7 +1099,8 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbGofParameter->clear();
         //cmbParameter->setCurrentIndex(-1);
     } else {
-        m->setQFProperty("imfcs_imeditor_evalgroup", grp, false, false);
+        connectParameterWidgets(false);
+        m->setQFProperty("imfcs_imed_evalgroup", grp, false, false);
         labParameter->setEnabled(true);
         cmbParameter->setEnabled(true);
         labParameterTransform->setEnabled(true);
@@ -1115,7 +1109,6 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbGofParameter->setEnabled(true);
         labGofParameterTransform->setEnabled(true);
         cmbGofParameterTransform->setEnabled(true);
-        connectParameterWidgets(false);
         //QStringList egroup=m->resultsCalcEvalGroups();
         QString egroup=currentEvalGroup();
         QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
@@ -1130,30 +1123,40 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
             cmbParameter->addItem(tr("fit prop.: %1").arg(params[i].first), params[i].second);
             cmbGofParameter->insertItem(0, tr("fit prop.: %1").arg(params[i].first), params[i].second);
         }
-        int d=cmbParameter->findData(current->getProperty(QString("imfcs_imeditor_param_%1").arg(filenameize(egroup)), ""));
+        int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), ""));
         if (d>=0) cmbParameter->setCurrentIndex(d);
-        d=cmbGofParameter->findData(current->getProperty(QString("imfcs_imeditor_gofparam_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
+        d=cmbGofParameter->findData(current->getProperty(QString("imfcs_imed_gofparam_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
         if (d>=0) cmbGofParameter->setCurrentIndex(d);
-        cmbGofParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imeditor_gofparamtrans_%1").arg(filenameize(egroup)), 0).toInt());
-        cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imeditor_paramtrans_%1").arg(filenameize(egroup)), 0).toInt());
+        cmbGofParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), 0).toInt());
+        cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), 0).toInt());
         connectParameterWidgets(true);
 
     }
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
     parameterChanged();
-    displayOverlayChanged();
     replotData();
-    replotOverview();
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
 
 void QFRDRImagingFCSImageEditor::parameterChanged() {
     if (!current) return;
     QString egroup=currentEvalGroup();
-    current->setQFProperty(QString("imfcs_imeditor_param_%1").arg(filenameize(egroup)), cmbParameter->itemData(cmbParameter->currentIndex()).toString(), false, false);
-    current->setQFProperty(QString("imfcs_imeditor_gofparam_%1").arg(filenameize(egroup)), cmbGofParameter->itemData(cmbGofParameter->currentIndex()).toString(), false, false);
-    current->setQFProperty(QString("imfcs_imeditor_gofparamtrans_%1").arg(filenameize(egroup)), cmbGofParameterTransform->currentIndex(), false, false);
-    current->setQFProperty(QString("imfcs_imeditor_paramtrans_%1").arg(filenameize(egroup)), cmbParameterTransform->currentIndex(), false, false);
+
+    connectParameterWidgets(false);
+    cmbGofParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), 0).toInt());
+    cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), 0).toInt());
+
+    current->setQFProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), cmbParameter->itemData(cmbParameter->currentIndex()).toString(), false, false);
+    current->setQFProperty(QString("imfcs_imed_gofparam_%1").arg(filenameize(egroup)), cmbGofParameter->itemData(cmbGofParameter->currentIndex()).toString(), false, false);
+    connectParameterWidgets(true);
+
+    transformChanged();
+}
+
+void QFRDRImagingFCSImageEditor::transformChanged() {
+    QString egroup=currentEvalGroup();
+    current->setQFProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), cmbGofParameterTransform->currentIndex(), false, false);
+    current->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
     connectParameterWidgets(false);
     replotImage();
     loadImageSettings();
@@ -1161,6 +1164,7 @@ void QFRDRImagingFCSImageEditor::parameterChanged() {
     displayOverlayChanged();
     connectParameterWidgets(true);
 }
+
 
 void QFRDRImagingFCSImageEditor::clearImage() {
     if (plteImageData) free(plteImageData);
@@ -1189,7 +1193,7 @@ void QFRDRImagingFCSImageEditor::fillParameterSet() {
             cmbResultGroup->addItem(QString("%1").arg(current->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
             //qDebug()<<"egroup["<<i<<"/"<<cmbResultGroup->count()<<"]: "<<egroups[i];
         }
-        int d=cmbResultGroup->findData(current->getProperty("imfcs_imeditor_evalgroup", "").toString());
+        int d=cmbResultGroup->findData(current->getProperty("imfcs_imed_evalgroup", "").toString());
         if (d>=0) cmbResultGroup->setCurrentIndex(d);
         else if (cmbResultGroup->count()>0) cmbResultGroup->setCurrentIndex(0);
         connectParameterWidgets(true);
@@ -1206,13 +1210,35 @@ void QFRDRImagingFCSImageEditor::debugInfo() {
     QTimer::singleShot(500, this, SLOT(debugInfo()));
 }
 
+void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
+    if (connectTo) {
+        connect(chkDisplayAverage, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+        connect(cmbAverageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        connect(cmbAverageErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        connect(cmbRunStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        connect(cmbRunErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+        connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+        connect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+    } else {
+        disconnect(chkDisplayAverage, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+        disconnect(cmbAverageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(cmbAverageErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(cmbRunStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(cmbRunErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+        disconnect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+        disconnect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+    }
+}
+
 void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
     if (connectTo) {
         connect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         connect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
         connect(cmbGofParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
-        connect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
-        connect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
+        connect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
+        connect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
         connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
         connect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
         connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
@@ -1222,8 +1248,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         disconnect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
         disconnect(cmbGofParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
-        disconnect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
-        disconnect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
+        disconnect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
+        disconnect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
         disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
         disconnect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
         disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));

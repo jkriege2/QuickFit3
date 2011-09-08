@@ -95,16 +95,20 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void slidersChanged(int userMin, int userMax, int min, int max);
         void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers);
 
-        /** \brief activated when the suer selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
+        /** \brief activated when the user selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
         void parameterSetChanged();
-        /** \brief activated when the suer selects a new parameter*/
+        /** \brief activated when the user selects a new parameter*/
         void parameterChanged();
+        /** \brief called when the user selects a new transformation */
+        void transformChanged();
         /** \brief clear the parameter image */
         void clearImage();
         /** \brief fills cmbResultGroup with all available result groups */
         void fillParameterSet();
         /** \brief connect/disconnect cmbResultGroups, cmbParameters, ... to their slots */
         void connectParameterWidgets(bool connectTo=true);
+        /** \brief connect/disconnect widgets for image settings to their slots */
+        void connectImageWidgets(bool connectTo=true);
         /** \brief called when the user selects a new palette */
         void paletteChanged();
         /** \brief called when the user selects to display overlays or not */
