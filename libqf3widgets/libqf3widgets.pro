@@ -120,7 +120,7 @@ TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 INCLUDEPATH += ../../../../LIB/trunk/ \
                ../../../../LIB/trunk/qt/
 
-CONFIG += lib_bundle exceptions rtti stl create_prl
+CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
 
