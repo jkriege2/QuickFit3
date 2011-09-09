@@ -61,7 +61,7 @@ CONFIG += console exceptions rtti stl link_prl
 
 macx{
   exists(qf3icon.icns) {
-    ICON = myapp.icns
+    ICON = qf3icon.icns
   }
 }
 

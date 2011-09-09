@@ -68,7 +68,6 @@ release {
     message("building $$TARGET $$TEMPLATE (plugin) in DEBUG mode, output is in $$QFOUTPUT")
 }
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib
 DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 
 CONFIG += link_prl
