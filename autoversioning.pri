@@ -5,10 +5,11 @@
 
 # try to read the SVN version
 SVNVERSION = $$system(svnversion)
+contains(SVNVERSION,exported):SVNVERSION=
 isEmpty(SVNVERSION){
     # if SVN does not work, try git svn
     unix {
-        SVNVERSION = $$system(git svn info -r HEAD ../ | grep 'evision' | cut -d: -f2)
+        SVNVERSION = $$system(git svn info | grep -i 'revision' | cut -d: -f2)
     }
 }
 isEmpty(SVNVERSION) {
@@ -27,14 +28,14 @@ win32 {
     message($$DATE_OUTPUT)
     contains(HAS_WINDOWS_DATE, FALSE) {
         !isEmpty(QMAKE_SH) {
-            DATESTR = $$system(date +%Y/%M/%d)
+            DATESTR = $$system(date +%Y/%m/%d)
         }
     } else {
         DATESTR = $$system(date /T)
     }
 } else {
     # on UNIX we just call the date command!
-    DATESTR = $$system(date +%Y/%M/%d)
+    DATESTR = $$system(date +%Y/%m/%d)
 }
 isEmpty(DATESTR) {
     DATESTR = ---

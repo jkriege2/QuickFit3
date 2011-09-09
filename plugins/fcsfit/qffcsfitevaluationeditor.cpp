@@ -1604,6 +1604,10 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                 doFitThread->start(QThread::HighestPriority);
                 while (!doFitThread->isFinished()) {
                     QApplication::processEvents();
+                    if (dlgFitProgress->isCanceled()) {
+                      doFitThread->terminate();
+                      break;
+                    }
                 }
                 dlgFitProgress->setProgressFull();
                 dlgFitProgress->reportStatus(tr("calculating parameters, errors and storing data ..."));

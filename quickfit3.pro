@@ -1,14 +1,14 @@
 
-release {
-    message("building QuickFit in RELEASE mode, output is in $$QFOUTPUT")
-} else {
-    message("building QuickFit in DEBUG mode, output is in $$QFOUTPUT")
-}
 
 
 include(autoversioning.pri)
 include(quickfit_config.pri)
 
+release {
+    message("building QuickFit in RELEASE mode")
+} else {
+    message("building QuickFit in DEBUG mode")
+}
 TEMPLATE = subdirs
 
 
