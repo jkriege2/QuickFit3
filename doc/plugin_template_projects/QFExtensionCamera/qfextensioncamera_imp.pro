@@ -9,7 +9,6 @@ include(../plugins.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
-LIBS += -L$${QFOUTPUT} -lquickfit3lib
 
 # Input
 HEADERS += qfextensioncamera_imp.h \

@@ -9,7 +9,7 @@ include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += fitalgorithm_simanneal.h \

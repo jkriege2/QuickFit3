@@ -10,8 +10,6 @@ include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
-
 # Input
 HEADERS += qfrdr.h \
            qfrdr_data.h \

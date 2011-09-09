@@ -8,8 +8,7 @@ include(../plugins.pri)
 include(../../extlibs/lmfit.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
-
-LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += qfpfitalgorithmlmfit.h \

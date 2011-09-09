@@ -10,11 +10,12 @@ INCLUDEPATH += . \
                ../../../../LIB/trunk/qt
 
 include(../quickfit3.pri)
+include(../libquickfitwidgets.pri)
 
 release {
-    message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT ")
 } else {
-    message("building $$TARGET $$TEMPLATE in DEBUG mode, output is in $$QFOUTPUT")
+    message("building $$TARGET $$TEMPLATE in DEBUG mode, output is in $$QFOUTPUT ")
 }
 macx {
     message("build system is macx")
@@ -30,8 +31,6 @@ unix {
 DESTDIR = $$QFOUTPUT
 
 QMAKE_RPATHDIR += $$DESTDIR
-
-LIBS += -L$$DESTDIR -lquickfit3lib -lquickfit3widgets
 # Input
 HEADERS += mainwindow.h \
            optionsdialog.h \
@@ -60,8 +59,10 @@ QT += gui xml
 CONFIG += console exceptions rtti stl link_prl
 
 
-exists(qf3icon.icns) {
+macx{
+  exists(qf3icon.icns) {
     ICON = myapp.icns
+  }
 }
 
 

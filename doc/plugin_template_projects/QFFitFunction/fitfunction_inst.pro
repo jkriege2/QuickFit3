@@ -6,7 +6,6 @@ DEPENDPATH += ./
 
 include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
-LIBS +=
 
 # Input
 HEADERS += fitfunction_inst.h \

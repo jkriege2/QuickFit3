@@ -74,3 +74,4 @@ DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 CONFIG += link_prl
 
 include(../quickfit_config.pri)
+include(../libquickfit.pri)

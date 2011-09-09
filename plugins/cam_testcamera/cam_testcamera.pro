@@ -13,7 +13,7 @@ DESTDIR = $$QFOUTPUT/plugins
 
 DEPENDPATH += ./
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += cam_testcamera.h \

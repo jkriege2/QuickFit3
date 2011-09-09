@@ -11,7 +11,7 @@ include(../../extlibs/lmfit.pri)
 include(../../extlibs/tiff.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
-LIBS +=  -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += spimb040.h \

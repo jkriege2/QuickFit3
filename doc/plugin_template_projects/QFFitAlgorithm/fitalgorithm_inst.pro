@@ -8,7 +8,6 @@ include(../plugins.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
-LIBS += -L../../output/ -lquickfit3lib -lquickfit3widgets
 
 # Input
 HEADERS += fitalgorithm_inst.h \

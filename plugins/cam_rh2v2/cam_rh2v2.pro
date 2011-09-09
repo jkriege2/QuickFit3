@@ -17,7 +17,7 @@ DESTDIR = $$QFOUTPUT/plugins
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += cam_rh2v2.h \

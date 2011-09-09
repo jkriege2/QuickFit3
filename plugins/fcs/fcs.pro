@@ -8,7 +8,7 @@ include(../plugins.pri)
 
 DEFINES += TARGETNAME=$$TARGET
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += dlgcsvparameters.h \

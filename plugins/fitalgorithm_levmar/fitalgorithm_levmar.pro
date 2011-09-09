@@ -8,6 +8,7 @@ include(../../extlibs/levmar.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
+include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += fitalgorithm_levmar.h \
@@ -27,8 +28,6 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/ \
                .
-
-LIBS += -L$$QFOUTPUT -lquickfit3lib
 
 QT += core
 CONFIG += exceptions rtti stl

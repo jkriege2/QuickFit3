@@ -16,7 +16,7 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
                ../lib/ \
                ../plugins/interfaces/
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib
+include(../libquickfit.pri)
 
 QT += gui xml svg opengl
 

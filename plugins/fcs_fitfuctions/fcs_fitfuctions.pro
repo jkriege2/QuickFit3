@@ -9,7 +9,6 @@ include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 #DLLDESTDIR = $$DESTDIR
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib
 
 
 # Input

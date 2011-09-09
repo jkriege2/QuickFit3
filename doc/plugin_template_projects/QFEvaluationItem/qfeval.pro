@@ -9,8 +9,6 @@ include(../plugins.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
-LIBS += -L$$QFOUTPUT -lquickfit3lib -lquickfit3widgets
-
 # Input
 HEADERS += qfeval.h \
            qfeval_item.h \
