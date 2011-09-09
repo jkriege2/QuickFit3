@@ -100,7 +100,7 @@ TRANSLATIONS= ./translations/de.lib.ts
 
 INCLUDEPATH +=
 
-CONFIG += lib_bundle exceptions rtti stl create_prl
+CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFLIB_LIBRARY
 
