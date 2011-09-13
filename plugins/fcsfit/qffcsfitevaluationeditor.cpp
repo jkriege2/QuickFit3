@@ -631,14 +631,14 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         datacut->set_min(0);
         datacut->set_max(data->getCorrelationN());
         QString run="avg";
-        if (eval->getCurrentRun()>-1) run=QString::number(eval->getCurrentRun());
+        if (eval->getCurrentIndex()>-1) run=QString::number(eval->getCurrentIndex());
         datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+run+"_datacut_min", 0).toInt());
         datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+run+"_datacut_max", data->getCorrelationN()).toInt());
         datacut->enableSliderSignals();
         dataEventsEnabled=false;
         spinRun->setMaximum(data->getCorrelationRuns()-1);
         if (data->getCorrelationRuns()==1) spinRun->setMaximum(-1);
-        spinRun->setValue(eval->getCurrentRun());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
+        spinRun->setValue(eval->getCurrentIndex());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
         if (data->getCorrelationRuns()>1) spinRun->setSuffix(QString(" / 0..%1").arg(data->getCorrelationRuns()-1));
         int newidx=cmbModel->findData(eval->getFitFunction()->id());
         if (newidx!=cmbModel->currentIndex()) modelChanged=true;
@@ -777,7 +777,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
     }
 
-    if (eval->getCurrentRun()!=spinRun->value()) eval->setCurrentRun(eval->getCurrentRun());
+    if (eval->getCurrentIndex()!=spinRun->value()) eval->setCurrentIndex(eval->getCurrentIndex());
 
     if (eval->hasFit()) {
         labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
@@ -916,17 +916,17 @@ void QFFCSFitEvaluationEditor::replotData() {
         QString graphName="";
         size_t c_std=0;
         QString errorName="";
-        if (eval->getCurrentRun()<0) {
+        if (eval->getCurrentIndex()<0) {
             c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
             graphName=tr("\\verb{%1} average").arg(record->getName());
             c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
             errorName=tr("stddev");
         } else {
-            if (eval->getCurrentRun()<(int)data->getCorrelationRuns()) {
-                c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentRun()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentRun())).toStdString());
-                graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentRun()));
+            if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
+                c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentIndex()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentIndex())).toStdString());
+                graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentIndex()));
                 if (eval->getFitDataWeighting()==QFFCSFitEvaluation::RunErrorWeighting) {
-                    c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentRun()), data->getCorrelationN(), "cperrunerror");
+                    c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentIndex()), data->getCorrelationN(), "cperrunerror");
                     errorName=tr("per run");
                 } else {
                     c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
@@ -1022,7 +1022,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    int run=eval->getCurrentRun();
+    int run=eval->getCurrentIndex();
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -1074,17 +1074,17 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 double* residuals_runavg=(double*)calloc(runAvgMaxN, sizeof(double));
                 double* residuals_runavg_weighted=(double*)calloc(runAvgMaxN, sizeof(double));
 
-                if (eval->getCurrentRun()<0) {
+                if (eval->getCurrentIndex()<0) {
                     corrdata=data->getCorrelationMean();
                 } else {
-                    if (eval->getCurrentRun()<(int)data->getCorrelationRuns()) {
-                        corrdata=data->getCorrelationRun(eval->getCurrentRun());
+                    if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
+                        corrdata=data->getCorrelationRun(eval->getCurrentIndex());
                     } else {
                         corrdata=data->getCorrelationMean();
                     }
                 }
 
-                double* weights=allocWeights(NULL, record, eval->getCurrentRun(), datacut_min, datacut_max);
+                double* weights=allocWeights(NULL, record, eval->getCurrentIndex(), datacut_min, datacut_max);
                 //qDebug()<<"    b "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1094,7 +1094,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 double* fullParams=eval->allocFillParameters();
                 double* errors=eval->allocFillParameterErrors();
-                bool* paramsFix=eval->allocFillFix(record, eval->getCurrentRun());
+                bool* paramsFix=eval->allocFillFix(record, eval->getCurrentIndex());
                 ffunc->calcParameter(fullParams, errors);
                 int fitparamN=0;
                 for (int i=0; i<ffunc->paramCount(); i++) {
@@ -1761,7 +1761,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
     if (data->getCorrelationN()>0) {
         falg->setReporter(dlgFitProgressReporter);
         QString runname=tr("average");
-        if (eval->getCurrentRun()>=0) runname=QString::number(eval->getCurrentRun());
+        if (eval->getCurrentIndex()>=0) runname=QString::number(eval->getCurrentIndex());
         dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
         dlgFitProgress->reportStatus("");
         dlgFitProgress->setProgressMax(100);
@@ -1773,7 +1773,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
 
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-        doFit(record, eval->getCurrentRun());
+        doFit(record, eval->getCurrentIndex());
 
         displayModel(false);
         replotData();
@@ -1837,7 +1837,7 @@ void QFFCSFitEvaluationEditor::fitAll() {
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!falg)) return;
 
-    int run=eval->getCurrentRun();
+    int run=eval->getCurrentIndex();
     QString runname=tr("average");
     if (run>=0) runname=QString::number(run);
 
@@ -2049,7 +2049,7 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
                     int runmax=fcs->getCorrelationRuns();
                     if (runmax<=1) runmax=0;
 
-                    int run=eval->getCurrentRun();
+                    int run=eval->getCurrentIndex();
 
                     if (eval->hasFit(record, run)) {
                         eval->setFitResultValue(record, run, id, value, error);
@@ -2118,7 +2118,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* algorithm=eval->getFitAlgorithm();
-    //int run=eval->getCurrentRun();
+    //int run=eval->getCurrentIndex();
     double* params=eval->allocFillParameters();
 
     QTextCursor cursor(document);
@@ -2150,7 +2150,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(0, 0).firstCursorPosition().insertText(tr("file:"), fTextBold);
     table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
     table->cellAt(0, 2).firstCursorPosition().insertText(tr("run:"), fTextBold);
-    table->cellAt(0, 3).firstCursorPosition().insertText(QString("%1 [%2]").arg((eval->getCurrentRun()<0)?tr("average"):QString::number(eval->getCurrentRun())).arg(fcs->getCorrelationRunName(eval->getCurrentRun())), fText);
+    table->cellAt(0, 3).firstCursorPosition().insertText(QString("%1 [%2]").arg((eval->getCurrentIndex()<0)?tr("average"):QString::number(eval->getCurrentIndex())).arg(fcs->getCorrelationRunName(eval->getCurrentIndex())), fText);
     table->cellAt(1, 0).firstCursorPosition().insertText(tr("fit algorithm:"), fTextBold);
     table->cellAt(1, 1).firstCursorPosition().insertText(algorithm->name(), fText);
     table->cellAt(1, 2).firstCursorPosition().insertText(tr("data range:"), fTextBold);
@@ -2520,8 +2520,8 @@ void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min,
     if (!data) return;
     if (!current->getHighlightedRecord()) return;
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    QString run=QString::number(data->getCurrentRun());
-    if (data->getCurrentRun()<0) run="avg";
+    QString run=QString::number(data->getCurrentIndex());
+    if (data->getCurrentIndex()<0) run="avg";
     current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
     current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
     replotData();
@@ -2541,7 +2541,7 @@ void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
 
             for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
                 QString run=QString::number(r);
-                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentRun()))) {
+                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
                     recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
                     //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
                 }
@@ -2566,7 +2566,7 @@ void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
 
             for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
                 QString run=QString::number(r);
-                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentRun()))) {
+                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
                     //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
                     recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
                 }
@@ -2597,7 +2597,7 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     //qDebug()<<t.elapsed()<<" ms";
     t.start();
 
-    data->setCurrentRun(run);
+    data->setCurrentIndex(run);
     //qDebug()<<t.elapsed()<<" ms";
     t.start();
 
@@ -2609,7 +2609,7 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     datacut->set_min(0);
     datacut->set_max(fcs->getCorrelationN());
     QString runn="avg";
-    if (data->getCurrentRun()>-1) runn=QString::number(data->getCurrentRun());
+    if (data->getCurrentIndex()>-1) runn=QString::number(data->getCurrentIndex());
     datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_min", 0).toInt());
     datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_max", fcs->getCorrelationN()).toInt());
     datacut->enableSliderSignals();
@@ -2695,7 +2695,7 @@ double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord
     //JKQTPdatastore* dsres=pltResiduals->getDatastore();
     //QFFitFunction* ffunc=eval->getFitFunction();
     int run=run_in;
-    if (run<=-100) run=eval->getCurrentRun();
+    if (run<=-100) run=eval->getCurrentIndex();
 
     int N=data->getCorrelationN();
 

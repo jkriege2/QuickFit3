@@ -51,8 +51,6 @@ param_fix=<initial_fix>
     .
 
 */
-
-
 class QFFitResultsEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
     Q_OBJECT
 public:
