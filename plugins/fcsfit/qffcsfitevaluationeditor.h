@@ -66,7 +66,7 @@
     Finally also the <b>residual correlation function \f$\hat{\gamma}(k)\f$</b>, i.e. the autocorrelation function of the index-ordered residuals is calculated.
     This function gives hints on whether there are any non-random structures in the fit values, which might not be visible
     in the residuals plots:
-      \f[ \hat{\gamma}(k)=\frac{1}{K}\cdot\sum\limits_{i=k_0}^{k_1-k-1}(\tilde{E}_{i}-\langle E\rangle)\cdot(\tilde{E}_{i+k}-\langle E\rangle) \f]
+      \f[ \hat{\gamma}(k)=\frac{\frac{1}{K}\cdot\sum\limits_{i=k_0}^{k_1-k-1}(\tilde{E}_{i}-\langle E\rangle)\cdot(\tilde{E}_{i+k}-\langle E\rangle)}{\bigl(\langle E^2\rangle\bigr)^2} \f]
 
     The residuals are displayed together with their running average, where the average over the 10 surrounding values is calculated:
       \f[ \overline{E}^{(10)}(\tilde{\tau}_k)=\frac{1}{11}\sum\limits_{i=k-5}^{k+5}\tilde{E}_i \f]

@@ -1156,7 +1156,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                             if (resw<rminw) rminw=resw;
                         }
                         //std::cout<<"res="<<res<<" resw="<<resw<<"    :    rmin="<<rmin<<"  rmax="<<rmax<<"    rminw="<<rminw<<"  rmaxw="<<rmaxw<<std::endl;
-                        if ((i+runAvgStart>=datacut_min) && (i+runAvgStart+runAvgWidth<=datacut_max) && ((i-datacut_min)%runAvgWidth==0)) {
+                        if ((i+runAvgStart>=datacut_min) && (i+runAvgStart+runAvgWidth<=datacut_max) /*&& ((i-datacut_min)%runAvgWidth==0)*/) {
                             double s=0, sw=0;
                             double tau=0;
                             for (int j=0; j<runAvgWidth; j++) {
@@ -1226,6 +1226,10 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 double* resCorrelation=statisticsAllocAutocorrelate(&(residuals[datacut_min]), datacut_max-datacut_min);
                 double* resWCorrelation=statisticsAllocAutocorrelate(&(residuals_weighted[datacut_min]), datacut_max-datacut_min);
                 int resN=ceil((double)(datacut_max-datacut_min)/2.0);
+                for (register int i=0; i<resN; i++) {
+                    resCorrelation[i]/=(residStdDev*residStdDev);
+                    resWCorrelation[i]/=(residWeightStdDev*residWeightStdDev);
+                }
 
 
                 size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
