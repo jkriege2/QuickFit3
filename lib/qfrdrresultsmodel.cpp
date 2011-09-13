@@ -14,8 +14,16 @@ QFRDRResultsModel::~QFRDRResultsModel()
 }
 
 void QFRDRResultsModel::resultsChanged() {
-    if (record) lastResultNames=record->resultsCalcNames();
-    else lastResultNames.clear();
+    /*if (record) lastResultNames=record->resultsCalcNames();
+    else lastResultNames.clear();*/
+    QList<QPair<QString, QString> > l=record->resultsCalcNamesAndLabels();
+    lastResultNames.clear();
+    lastResultLabels.clear();
+    for (int i=0; i<l.size(); i++) {
+        lastResultNames.append(l[i].second);
+        if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
+        else lastResultLabels.append(l[i].first);
+    }
     reset();
 }
 
@@ -23,8 +31,16 @@ void QFRDRResultsModel::init(QFRawDataRecord* record) {
     disconnect();
     setParent(record);
     this->record=record;
-    if (record) lastResultNames=record->resultsCalcNames();
-    else lastResultNames.clear();
+    QList<QPair<QString, QString> > l=record->resultsCalcNamesAndLabels();
+    lastResultNames.clear();
+    lastResultLabels.clear();
+    for (int i=0; i<l.size(); i++) {
+        lastResultNames.append(l[i].second);
+        if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
+        else lastResultLabels.append(l[i].first);
+    }
+/*    if (record) lastResultNames=record->resultsCalcNames();
+    else lastResultNames.clear();*/
     connect(record, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
     reset();
 }
@@ -60,14 +76,14 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                 QString en=record->resultsGetEvaluationName(index.column());
                 if (record->resultsExists(en, lastResultNames[index.row()])) {
                     QFRawDataRecord::evaluationResult r=record->resultsGet(en, lastResultNames[index.row()]);
-                    return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]));
+                    return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
                 }
             } else if (index.column()==record->resultsGetEvaluationCount()) {
                 QString rname=lastResultNames[index.row()];
                 double average=0;
                 double stddev=0;
                 calcStatistics(rname, average, stddev);
-                return QVariant(QString("%1 +/ %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
+                return QVariant(QString("%1 &plusmn; %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
             }
         }
     } else if ((role==ValueRole)||(role==Qt::EditRole)) {
@@ -92,10 +108,10 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
     if (!record) return QVariant();
     if (role==Qt::DisplayRole) {
         if (orientation==Qt::Horizontal) {
-            if (section<record->resultsGetEvaluationCount()) return QVariant(record->resultsGetEvaluationName(section));
-            else return tr("Average +/- StdDev");
+            if (section<record->resultsGetEvaluationCount()) return QVariant(record->resultsGetEvaluationDescription(record->resultsGetEvaluationName(section)));
+            else return tr(/*"Avg +/- StdDev"*/); //tr("&lang;val&rang; &plusmn; &sigma<sub>val</sub>");
         } else {
-            if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
+            if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
         }
     }
     return QVariant();

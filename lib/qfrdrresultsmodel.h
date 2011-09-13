@@ -11,6 +11,8 @@ class QFRawDataRecord;
 /*! \brief class to display the results stored in QFRawDataRecord
     \ingroup qf3lib_project
 
+    This model is meant to be used together with QFHTMLDelegate
+
 */
 class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         Q_OBJECT
@@ -45,6 +47,8 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
 
         /** \brief current list of all shown result names (updated on model reset, using calcResultNames() */
         QStringList lastResultNames;
+        /** \brief current list of all shown result labels (updated on model reset, using calcResultNames() */
+        QStringList lastResultLabels;
 };
 
 #endif // QFRDRRESULTSMODEL_H

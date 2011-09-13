@@ -72,7 +72,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 double stddev=0;
                 QString rname=lastResultNames[resNameI];
                 calcStatistics(rname, average, stddev);
-                return QVariant(QString("%1 +/ %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
+                return QVariant(QString("%1 +/- %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
             }
         }
     } else if ((role==ValueRole)||(role==Qt::EditRole)) {

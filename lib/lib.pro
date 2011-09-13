@@ -59,7 +59,8 @@ HEADERS += dlgnewproperty.h \
     qtriple.h \
     qvisiblehandlesplitter.h \
     ../version.h \
-    lib_imexport.h
+    lib_imexport.h \
+    qfhtmldelegate.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -89,7 +90,8 @@ SOURCES += dlgnewproperty.cpp \
            qfevaluationresultsmodel.cpp \
            csvtools.cpp \
     qvisiblehandlesplitter.cpp \
-    qfpluginrawdata.cpp
+    qfpluginrawdata.cpp \
+    qfhtmldelegate.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui
@@ -103,4 +105,10 @@ INCLUDEPATH +=
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFLIB_LIBRARY
+
+
+
+
+
+
 

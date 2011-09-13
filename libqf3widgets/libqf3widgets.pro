@@ -67,8 +67,7 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     libwid_imexport.h \
     ../../../../LIB/trunk/lib_imexport.h \
     ../../../../LIB/trunk/qt/jkqtpimagetools.h \
-    ../../../../LIB/trunk/qt/jkqtpimageelements.h \
-    ../../../../LIB/trunk/qt/htmldelegate.h
+    ../../../../LIB/trunk/qt/jkqtpimageelements.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -103,8 +102,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfcameraconfigcombobox.cpp \
     qfcameracombobox.cpp \
     objectives.cpp \
-    ../../../../LIB/trunk/qt/jkqtpimageelements.cpp \
-    ../../../../LIB/trunk/qt/htmldelegate.cpp
+    ../../../../LIB/trunk/qt/jkqtpimageelements.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui

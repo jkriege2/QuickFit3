@@ -2,6 +2,7 @@
 #include "dlgnewproperty.h"
 #include "qfrawdatarecordfactory.h"
 #include "../version.h"
+#include "qfhtmldelegate.h"
 
 
 // TODO: add some more options to the fit results display: store column under different name
@@ -157,6 +158,9 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvResults=new QEnhancedTableView(widResults);
     tvResults->setAlternatingRowColors(true);
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
+    tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
+    tvResults->horizontalHeader()->setItemDelegate(new QFHTMLDelegate(tvResults));
+    tvResults->verticalHeader()->setItemDelegate(new QFHTMLDelegate(tvResults));
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -588,11 +592,13 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
             }
             //QAbstractItemModel* m=tvResults->model();
             //tvResults->setModel(NULL);
+            current->disableEmitResultsChanged();
             for (int i=0; i<qMin(row.size(), col.size()); i++) {
                 QString hh=col[i];
                 QString vh=row[i];
                 current->resultsRemove(hh, vh, false);
             }
+            current->enableEmitResultsChanged();
             current->emitResultsChanged();
             //tvResults->setModel(m);
         }
