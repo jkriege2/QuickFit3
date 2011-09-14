@@ -109,7 +109,7 @@ QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation,
     if (role==Qt::DisplayRole) {
         if (orientation==Qt::Horizontal) {
             if (section<record->resultsGetEvaluationCount()) return QVariant(record->resultsGetEvaluationDescription(record->resultsGetEvaluationName(section)));
-            else return tr(/*"Avg +/- StdDev"*/); //tr("&lang;val&rang; &plusmn; &sigma<sub>val</sub>");
+            else return tr("Avg +/- StdDev"); //tr("&lang;val&rang; &plusmn; &sigma<sub>val</sub>");
         } else {
             if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
         }

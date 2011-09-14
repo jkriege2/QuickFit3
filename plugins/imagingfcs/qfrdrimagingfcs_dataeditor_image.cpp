@@ -405,7 +405,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     tvParams=new QEnhancedTableView();
-    tvParams->setItemDelegate(new HTMLDelegate(tvParams));
+    tvParams->setItemDelegate(new QFHTMLDelegate(tvParams));
     tvParams->setAlternatingRowColors(true);
     QFontMetrics tvfm(font());
     tvParams->verticalHeader()->setDefaultSectionSize((int)round((double)tvfm.height()*1.5));

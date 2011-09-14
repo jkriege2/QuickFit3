@@ -19,7 +19,7 @@
 #include <QSet>
 #include "jkdoubleedit.h"
 #include "qtriple.h"
-#include "htmldelegate.h"
+#include "qfhtmldelegate.h"
 #include <QTableView>
 #include "qffitfunction.h"
 #include "qenhancedtableview.h"
