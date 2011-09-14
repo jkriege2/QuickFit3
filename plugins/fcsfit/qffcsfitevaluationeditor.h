@@ -34,6 +34,7 @@
 #include "dlgqffitalgorithmprogressdialog.h"
 #include "qffitalgorithmthreaddedfit.h"
 #include "qvisiblehandlesplitter.h"
+#include "../base_classes/qffitresultsevaluationeditorbase.h"
 
 
 /*! \brief editor class for FCS least-square fits
@@ -72,7 +73,7 @@
       \f[ \overline{E}^{(10)}(\tilde{\tau}_k)=\frac{1}{11}\sum\limits_{i=k-5}^{k+5}\tilde{E}_i \f]
 
 */
-class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
+class QFFCSFitEvaluationEditor : public QFFitResultsEvaluationEditorBase {
         Q_OBJECT
     public:
         /** Default constructor */
@@ -217,12 +218,8 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */
         bool dataEventsEnabled;
-        /** \brief current save directory */
-        QString currentSaveDirectory;
         /** \brief stores the last fit statistics report, created in updateFitFunction() */
         QString fitStatisticsReport;
-
-        QString currentFPSSaveDir;
 
         QFFitAlgorithmThreadedFit* doFitThread;
 
@@ -239,6 +236,11 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
             done in the calling function. Also the redisplay of the model ... won't be done by this method.
         */
         void doFit(QFRawDataRecord* record, int run);
+        /** \brief create a report in a given QTextDocument object
+         *
+         *  For correct sizing of the plots: set the textWidth of the document before calling this function!
+         */
+        virtual void createReportDoc(QTextDocument* document);
 
     protected slots:
         /** \brief calibrate the focal volume */
@@ -249,17 +251,17 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
 
         /** \brief display all data and parameters describing the current record */
-        void displayModel(bool newWidget);
+        virtual void displayModel(bool newWidget);
 
         /** \brief replot curves */
-        void replotData();
+        virtual void replotData();
 
         /*! \brief update the fit model function and the residuals in the graphs
 
             This function only adds the fit function plot objects and does NOT cause a replot of the graphs. It is called by
             replotData().
         */
-        void updateFitFunctions();
+        virtual void updateFitFunctions();
 
         /*! \brief fit model to current data
          */
@@ -284,15 +286,6 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
         void algorithmChanged(int model);
         /** \brief called when the weights changes */
         void weightsChanged(int weight);
-        /** \brief emitted when we should save a report */
-        void saveReport();
-        /** \brief emitted when we should print a report */
-        void printReport();
-        /** \brief create a report in a given QTextDocument object
-         *
-         *  For correct sizing of the plots: set the textWidth of the document before calling this function!
-         */
-        void createReportDoc(QTextDocument* document);
         /** \brief emitted when the x logscale checkbox changes its state */
         void chkXLogScaleToggled(bool checked);
         /** \brief emitted when the grid checkbox changes its state */
@@ -336,10 +329,6 @@ class QFFCSFitEvaluationEditor : public QFEvaluationEditor {
          *         it with the appropriate values, according to the current settings */
         double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
 
-        /** \brief save current fit function and fit results to an INI file */
-        void saveCurrentFitResults();
-        /** \brief set current fit function and fit results according to an INI file */
-        void loadCurrentFitResults();
 
     private:
         /** \brief create all widgets on the form */

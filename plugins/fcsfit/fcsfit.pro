@@ -19,7 +19,8 @@ HEADERS += ../base_classes/qffitresultsevaluation.h \
 		   ../interfaces/qfrdrcountratesinterface.h \
            ../../../../../LIB/trunk/statistics_tools.h \
            dlgestimatefocalvolume.h \
-    ../base_classes/qffitresultsbyindexevaluation.h
+    ../base_classes/qffitresultsbyindexevaluation.h \
+    ../base_classes/qffitresultsevaluationeditorbase.h
 
 
 SOURCES += ../base_classes/qffitresultsevaluation.cpp \
@@ -28,12 +29,14 @@ SOURCES += ../base_classes/qffitresultsevaluation.cpp \
            qffcsfitevaluationeditor.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
            dlgestimatefocalvolume.cpp \
-    ../base_classes/qffitresultsbyindexevaluation.cpp
+    ../base_classes/qffitresultsbyindexevaluation.cpp \
+    ../base_classes/qffitresultsevaluationeditorbase.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui
 
-RESOURCES += qfevalfcsfit.qrc
+RESOURCES += qfevalfcsfit.qrc \
+    ../base_classes/qffitresultsevaluationeditorbase.qrc
 
 TRANSLATIONS= ./translations/de.qfevalfcsfit.ts
 
@@ -44,5 +47,8 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg core
 CONFIG += exceptions rtti stl
+
+
+
 
 

@@ -24,14 +24,13 @@
 
 
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
-    QFEvaluationEditor(services, parent)
+    QFFitResultsEvaluationEditorBase("fcsfitevaleditor/", services, parent)
 {
     cmbModel=NULL;
     dataEventsEnabled=true;
     m_parameterWidgetWidth=75;
     m_parameterCheckboxWidth=32;
     fitStatisticsReport="";
-    currentSaveDirectory="";
 
     doFitThread=new QFFitAlgorithmThreadedFit(this);
 
@@ -587,8 +586,8 @@ void QFFCSFitEvaluationEditor::readSettings() {
         tbEditRanges->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", 0).toInt());
         spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
         tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
-        currentFPSSaveDir=settings->getQSettings()->value("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir).toString();
-        currentSaveDirectory=settings->getQSettings()->value("fcsfitevaleditor/lastSaveDirectory", currentSaveDirectory).toString();
+        QFFitResultsEvaluationEditorBase::readSettings();
+
     }
 }
 
@@ -611,8 +610,7 @@ void QFFCSFitEvaluationEditor::writeSettings() {
         settings->getQSettings()->setValue("fcsfitevaleditor/display_range_widgets", tbEditRanges->currentIndex());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
         settings->getQSettings()->setValue("fcsfitevaleditor/residual_toolbox_current", tabResidulas->currentIndex());
-        settings->getQSettings()->setValue("fcsfitevaleditor/lastFPSDirectory", currentFPSSaveDir);
-        settings->getQSettings()->setValue("fcsfitevaleditor/lastSaveDirectory", currentSaveDirectory);
+        QFFitResultsEvaluationEditorBase::writeSettings();
     }
 }
 
@@ -1512,6 +1510,551 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
 
 
+
+
+void QFFCSFitEvaluationEditor::resetCurrent() {
+    if (!current) return;
+    if (!cmbModel) return;
+    //QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    eval->resetAllFitResultsCurrent();
+    updateParameterValues();
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::resetAll() {
+    if (!current) return;
+    if (!cmbModel) return;
+    //QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    eval->resetAllFitResults();
+    updateParameterValues();
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::copyToAll() {
+
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    copyToInitial();
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            for (int i=0; i<recs.size(); i++) {
+                QFRawDataRecord* record=recs[i];
+                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+                if (fcs) {
+                    int runmax=fcs->getCorrelationRuns();
+                    if (runmax<=1) runmax=0;
+                    for (int run=-1; run<runmax; run++) {
+                        if (eval->hasFit(record, run)) {
+                            eval->setFitResultValue(record, run, id, value, error);
+                            eval->setFitResultFix(record, run, id, fix);
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
+
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    copyToInitial();
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            for (int i=0; i<recs.size(); i++) {
+                QFRawDataRecord* record=recs[i];
+                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+                if (fcs) {
+                    int runmax=fcs->getCorrelationRuns();
+                    if (runmax<=1) runmax=0;
+
+                    int run=eval->getCurrentIndex();
+
+                    if (eval->hasFit(record, run)) {
+                        eval->setFitResultValue(record, run, id, value, error);
+                        eval->setFitResultFix(record, run, id, fix);
+                    }
+
+                }
+            }
+        };
+    }
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::copyToInitial() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    if (!fcs) return;
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            eval->setInitFitFix(id, fix);
+            eval->setInitFitValue(id, value, error);
+        };
+    }
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("plot_grid", chkGrid->isChecked(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("plot_style", cmbPlotStyle->currentIndex(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("plot_errorstyle", cmbErrorStyle->currentIndex(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::residualStyleChanged(int style) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("plot_residualsstyle", cmbResidualStyle->currentIndex(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("weighted_residuals", chkWeightedResiduals->isChecked(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::residualHistogramBinsChanged(int bins) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    current->setQFProperty("plot_residualshistogrambins", spinResidualHistogramBins->value(), false, false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+
+
+void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
+    hlpFunction->clear();
+    if (!current) return;
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QStringList sl;
+    //sl<<":/";
+    QString pid=cmbModel->itemData(cmbModel->currentIndex()).toString();
+    int ppid=services->getFitFunctionManager()->getPluginForID(pid);
+    //QString dll=services->getFitFunctionManager()->getPluginFilename(pid);
+    //if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
+    //else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
+    //hlpFunction->show();
+    QFFitFunction* function=data->getFitFunction(pid);
+    QString help=services->getFitFunctionManager()->getPluginHelp(ppid, pid);
+    if (QFile::exists(help) && function) {
+        hlpFunction->updateHelp(help);
+        hlpFunction->show();
+    } else {
+        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit function available."));
+    }
+}
+
+void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
+    hlpAlgorithm->clear();
+    if (!current) return;
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    //QStringList sl;
+    //sl<<":/";
+    QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
+    int ppid=services->getFitAlgorithmManager()->getPluginForID(pid);
+    //std::cout<<pid.toStdString()<<"   "<<ppid<<std::endl;
+    //QString dll=services->getFitAlgorithmManager()->getPluginFilename(ppid);
+    //QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
+    //if (algorithm) {
+    //    if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->id()+".html");
+    //    else hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->helpFile());
+    //    hlpAlgorithm->show();
+    //}
+    QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
+    QString help=services->getFitAlgorithmManager()->getPluginHelp(ppid, pid);
+    if (QFile::exists(help) && algorithm) {
+        hlpAlgorithm->updateHelp(help);
+        hlpAlgorithm->show();
+    } else {
+        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit algorithm available."));
+    }
+}
+
+void QFFCSFitEvaluationEditor::configFitAlgorithm() {
+    if (!current) return;
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
+    QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
+    if (algorithm) {
+        data->restoreQFFitAlgorithmParameters(algorithm);
+        if (algorithm->displayConfig()) {
+            data->storeQFFitAlgorithmParameters(algorithm);
+        }
+    }
+}
+void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    if (!current->getHighlightedRecord()) return;
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    QString run=QString::number(data->getCurrentIndex());
+    if (data->getCurrentIndex()<0) run="avg";
+    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
+    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
+    replotData();
+}
+
+void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
+    if (!current) return;
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    for (int i=0; i<recs.size(); i++) {
+        if (current->isApplicable(recs[i])) {
+            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
+            recs[i]->setQFProperty(resultID+"_ravg_datacut_min", userMin, false, false);
+
+            for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
+                QString run=QString::number(r);
+                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
+                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
+                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
+                }
+            }
+
+        }
+    }
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
+    if (!current) return;
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!data) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    for (int i=0; i<recs.size(); i++) {
+        if (current->isApplicable(recs[i])) {
+            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
+            recs[i]->setQFProperty(resultID+"_ravg_datacut_max", userMax, false, false);
+
+            for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
+                QString run=QString::number(r);
+                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
+                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
+                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
+                }
+            }
+
+        }
+    }
+    QApplication::restoreOverrideCursor();
+}
+
+
+void QFFCSFitEvaluationEditor::runChanged(int run) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+
+    //qDebug()<<"runChanged";
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QTime t;
+
+    t.start();
+    QFRawDataRecord* currentRecord=current->getHighlightedRecord();
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+    labRun->setText(QString("  (%1)").arg(fcs->getCorrelationRunName(run)));
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+
+    data->setCurrentIndex(run);
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+
+    datacut->disableSliderSignals();
+    datacut->set_min(0);
+    datacut->set_max(fcs->getCorrelationN());
+    QString runn="avg";
+    if (data->getCurrentIndex()>-1) runn=QString::number(data->getCurrentIndex());
+    datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_min", 0).toInt());
+    datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_max", fcs->getCorrelationN()).toInt());
+    datacut->enableSliderSignals();
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+
+    displayModel(false);
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+    replotData();
+    //qDebug()<<t.elapsed()<<" ms";
+    t.start();
+    QApplication::restoreOverrideCursor();
+    //qDebug()<<"runChanged ... done";
+}
+
+void QFFCSFitEvaluationEditor::modelChanged(int model) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    QString ff=cmbModel->itemData(cmbModel->currentIndex()).toString();
+    data->setFitFunction(ff);
+    displayModel(true);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::weightsChanged(int model) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (data) {
+        if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
+        else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
+        else if (cmbWeights->currentIndex()==2) data->setFitDataWeighting(QFFCSFitEvaluation::RunErrorWeighting);
+        else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
+    }
+    displayModel(true);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    current->getHighlightedRecord()->setQFProperty("algorithm", cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString(), false, false);
+    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
+    QString alg=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
+    data->setFitAlgorithm(alg);
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
+    if (!dataEventsEnabled) return;
+    if (sender==pltData) {
+        pltResiduals->setX(newxmin, newxmax);
+    }
+}
+
+void QFFCSFitEvaluationEditor::plotMouseMove(double x, double y) {
+    labMousePosition->setTextFormat(Qt::RichText);
+    labMousePosition->setText(tr("cursor: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+// FITTING AND READING DATA FOR FIT, FIT STATISTICS
+/////////////////////////////////////////////////////////////////////
+
+double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) {
+    if (weightsOKK) *weightsOKK=false;
+    if (!current) return NULL;
+    if (!cmbModel) return NULL;
+    QFRawDataRecord* record=record_in;
+    if (!record_in) record=current->getHighlightedRecord();
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    //JKQTPdatastore* ds=pltData->getDatastore();
+    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
+    //QFFitFunction* ffunc=eval->getFitFunction();
+    int run=run_in;
+    if (run<=-100) run=eval->getCurrentIndex();
+
+    int N=data->getCorrelationN();
+
+    QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
+    double* weights=(double*)malloc(N*sizeof(double));
+    bool weightsOK=false;
+    if (weighting==QFFCSFitEvaluation::StdDevWeighting) {
+        double* std=data->getCorrelationStdDev();
+        weightsOK=true;
+        for (int i=0; i<N; i++) {
+            weights[i]=std[i];
+            if ((data_start>=0) && (data_end>=0)) {
+                if ((i>=data_start)&&(i<=data_end)) {
+                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                        weightsOK=false;
+                        break;
+                    }
+                };
+            } else {
+                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                    weightsOK=false;
+                    break;
+                };
+            }
+        }
+    }
+    if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
+        double* std=NULL;
+        if (run>=0) std=data->getCorrelationRunError(run);
+        else std=data->getCorrelationStdDev();
+        weightsOK=true;
+        for (int i=0; i<N; i++) {
+            weights[i]=std[i];
+            if ((data_start>=0) && (data_end>=0)) {
+                if ((i>=data_start)&&(i<=data_end)) {
+                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                        weightsOK=false;
+                        break;
+                    }
+                };
+            } else {
+                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                    weightsOK=false;
+                    break;
+                };
+            }
+        }
+    }
+    if (!weightsOK) {
+        for (int i=0; i<N; i++) weights[i]=1;
+        if (weighting==QFFCSFitEvaluation::EqualWeighting) weightsOK=true;
+    }
+    if (weightsOKK) *weightsOKK=weightsOK;
+    return weights;
+}
+
+
 void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
     QApplication::processEvents();
     QApplication::processEvents();
@@ -1957,147 +2500,125 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
 }
 
 
-void QFFCSFitEvaluationEditor::resetCurrent() {
-    if (!current) return;
-    if (!cmbModel) return;
-    //QFRawDataRecord* record=current->getHighlightedRecord();
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    eval->resetAllFitResultsCurrent();
-    updateParameterValues();
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
 
-void QFFCSFitEvaluationEditor::resetAll() {
-    if (!current) return;
-    if (!cmbModel) return;
-    //QFRawDataRecord* record=current->getHighlightedRecord();
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    eval->resetAllFitResults();
-    updateParameterValues();
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
 
-void QFFCSFitEvaluationEditor::copyToAll() {
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+// CALIBRATING FOCAL VOLUME
+/////////////////////////////////////////////////////////////////////
+
+void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
+    double particles=1;
+    double tauD=10;
+    double particles_error=0;
+    double tauD_error=0;
+    double wxy=0, wxy_error=0;
+    double gamma=6, gamma_error=1;
+    bool has_tauD=false;
+    bool has_nparticles=false;
+    bool has_gamma=false;
 
     if (!current) return;
     if (!cmbModel) return;
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    copyToInitial();
-
     QFFitFunction* ffunc=eval->getFitFunction();
+    if (!ffunc || !eval) return;
 
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
-
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-
+    //read input parameters
     for (int i=0; i<ffunc->paramCount(); i++) {
         QString id=ffunc->getParameterID(i);
-        double value=eval->getFitValue(id);
-        double error=eval->getFitError(id);
-        bool fix=eval->getFitFix(id);
-        if (ffunc->isParameterVisible(i, params)) {
-            for (int i=0; i<recs.size(); i++) {
-                QFRawDataRecord* record=recs[i];
-                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-                if (fcs) {
-                    int runmax=fcs->getCorrelationRuns();
-                    if (runmax<=1) runmax=0;
-                    for (int run=-1; run<runmax; run++) {
-                        if (eval->hasFit(record, run)) {
-                            eval->setFitResultValue(record, run, id, value, error);
-                            eval->setFitResultFix(record, run, id, fix);
-                        }
-                    }
-                }
+        QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+        if (id.toLower()=="n_particle") {
+            particles=eval->getFitValue(id);
+            particles_error=eval->getFitError(id);
+            has_nparticles=true;
+        }
+        if ((id.toLower()=="1n_particle") && (!has_nparticles)) {
+            particles=1.0/eval->getFitValue(id);
+            particles_error=fabs(eval->getFitError(id)/(eval->getFitValue(id)*eval->getFitValue(id)));
+            has_nparticles=true;
+        }
+        if ((id.toLower()=="focus_struct_fac") && (!has_gamma)) {
+            gamma=eval->getFitValue(id);
+            gamma_error=eval->getFitError(id);
+            has_gamma=true;
+        }
+        if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) {
+            double factor=1;
+            if (d.unit=="msec") { factor=1000; }
+            if (d.unit=="ms") { factor=1000; }
+            if (d.unit=="msecs") { factor=1000; }
+            if (d.unit=="milliseconds") { factor=1000; }
+            if (d.unit=="sec") { factor=1000000; }
+            if (d.unit=="s") { factor=1000000; }
+            if (d.unit=="secs") { factor=1000000; }
+            if (d.unit=="seconds") { factor=1000000; }
+            tauD=factor*eval->getFitValue(id);
+            tauD_error=factor*eval->getFitError(id);
+            has_tauD=true;
+        }
+    }
+
+    dlgEstimateFocalVolume* dlg=new dlgEstimateFocalVolume(settings, this);
+    dlg->init(particles,  particles_error, has_nparticles, tauD, tauD_error, has_tauD, gamma, gamma_error, has_gamma);
+
+    bool ok= ( dlg->exec() == QDialog::Accepted);
+    wxy=dlg->get_wxy();
+    wxy_error=dlg->get_wxyerror();
+
+    delete dlg;
+    //write back output parameters
+    if (ok) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+            if (id.toLower()=="focus_width") {
+
+                double factor=1;
+                if (d.unit=="micron") { factor=1000; }
+                if (d.unit=="µm") { factor=1000; }
+                if (d.unit=="um") { factor=1000; }
+                if (d.unit=="microns") { factor=1000; }
+                if (d.unit=="m") { factor=1000000; }
+                if (d.unit=="meter") { factor=1000000; }
+                if (d.unit=="meters") { factor=1000000; }
+                eval->setFitValue(id, wxy/factor);
+                eval->setFitError(id, wxy_error/factor);
             }
-        };
+        }
+        displayModel(true);
+        replotData();
+        QApplication::restoreOverrideCursor();
     }
-
-    free(params);
-    QApplication::restoreOverrideCursor();
 }
 
-void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
 
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    copyToInitial();
 
-    QFFitFunction* ffunc=eval->getFitFunction();
 
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
 
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        double value=eval->getFitValue(id);
-        double error=eval->getFitError(id);
-        bool fix=eval->getFitFix(id);
-        if (ffunc->isParameterVisible(i, params)) {
-            for (int i=0; i<recs.size(); i++) {
-                QFRawDataRecord* record=recs[i];
-                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-                if (fcs) {
-                    int runmax=fcs->getCorrelationRuns();
-                    if (runmax<=1) runmax=0;
 
-                    int run=eval->getCurrentIndex();
 
-                    if (eval->hasFit(record, run)) {
-                        eval->setFitResultValue(record, run, id, value, error);
-                        eval->setFitResultFix(record, run, id, fix);
-                    }
 
-                }
-            }
-        };
-    }
 
-    free(params);
-    QApplication::restoreOverrideCursor();
-}
 
-void QFFCSFitEvaluationEditor::copyToInitial() {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    if (!fcs) return;
 
-    QFFitFunction* ffunc=eval->getFitFunction();
 
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
 
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        double value=eval->getFitValue(id);
-        double error=eval->getFitError(id);
-        bool fix=eval->getFitFix(id);
-        if (ffunc->isParameterVisible(i, params)) {
-            eval->setInitFitFix(id, fix);
-            eval->setInitFitValue(id, value, error);
-        };
-    }
 
-    free(params);
-    QApplication::restoreOverrideCursor();
-}
 
+/////////////////////////////////////////////////////////////////////
+// REPORT GENERATION
+/////////////////////////////////////////////////////////////////////
 
 void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     // make sure all widgets ahave the right size
@@ -2329,620 +2850,3 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     cursor.insertFragment(QTextDocumentFragment::fromHtml(htmlBot));
 
 }
-
-void QFFCSFitEvaluationEditor::saveReport() {
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
-
-    if (!fn.isEmpty()) {
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        QModernProgressDialog progress(tr("Exporting ..."), "", NULL);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setHasCancel(false);
-        progress.setLabelText(tr("saving FCS Fit report <br> to '%1' ...").arg(fn));
-        progress.open();
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        //qDebug()<<doc->toHtml();
-        delete doc;
-        delete printer;
-        progress.accept();
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-void QFFCSFitEvaluationEditor::printReport() {
-    QPrinter* p=new QPrinter();//QPrinter::HighResolution);
-
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Portrait);
-    QPrintDialog *dialog = new QPrintDialog(p, this);
-    dialog->setWindowTitle(tr("Print Report"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QModernProgressDialog progress(tr("Printing ..."), "", NULL);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setHasCancel(false);
-    progress.setLabelText(tr("printing FCS Fit report ..."));
-    progress.open();
-    QTextDocument* doc=new QTextDocument();
-    doc->setTextWidth(p->pageRect().size().width());
-    createReportDoc(doc);
-    doc->print(p);
-    delete p;
-    progress.accept();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::chkXLogScaleToggled(bool checked) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("plot_taulog", chkXLogScale->isChecked(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::chkGridToggled(bool checked) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("plot_grid", chkGrid->isChecked(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::plotStyleChanged(int style) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("plot_style", cmbPlotStyle->currentIndex(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::errorStyleChanged(int style) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("plot_errorstyle", cmbErrorStyle->currentIndex(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::residualStyleChanged(int style) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("plot_residualsstyle", cmbResidualStyle->currentIndex(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::chkWeightedResidualsToggled(bool checked) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("weighted_residuals", chkWeightedResiduals->isChecked(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::residualHistogramBinsChanged(int bins) {
-    if (!current) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    current->setQFProperty("plot_residualshistogrambins", spinResidualHistogramBins->value(), false, false);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-
-
-void QFFCSFitEvaluationEditor::displayFitFunctionHelp() {
-    hlpFunction->clear();
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    //QStringList sl;
-    //sl<<":/";
-    QString pid=cmbModel->itemData(cmbModel->currentIndex()).toString();
-    int ppid=services->getFitFunctionManager()->getPluginForID(pid);
-    //QString dll=services->getFitFunctionManager()->getPluginFilename(pid);
-    //if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
-    //else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
-    //hlpFunction->show();
-    QFFitFunction* function=data->getFitFunction(pid);
-    QString help=services->getFitFunctionManager()->getPluginHelp(ppid, pid);
-    if (QFile::exists(help) && function) {
-        hlpFunction->updateHelp(help);
-        hlpFunction->show();
-    } else {
-        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit function available."));
-    }
-}
-
-void QFFCSFitEvaluationEditor::displayFitAlgorithmHelp() {
-    hlpAlgorithm->clear();
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    //QStringList sl;
-    //sl<<":/";
-    QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
-    int ppid=services->getFitAlgorithmManager()->getPluginForID(pid);
-    //std::cout<<pid.toStdString()<<"   "<<ppid<<std::endl;
-    //QString dll=services->getFitAlgorithmManager()->getPluginFilename(ppid);
-    //QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
-    //if (algorithm) {
-    //    if (algorithm->helpFile().isEmpty()) hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->id()+".html");
-    //    else hlpAlgorithm->updateHelp(algorithm->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+algorithm->helpFile());
-    //    hlpAlgorithm->show();
-    //}
-    QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
-    QString help=services->getFitAlgorithmManager()->getPluginHelp(ppid, pid);
-    if (QFile::exists(help) && algorithm) {
-        hlpAlgorithm->updateHelp(help);
-        hlpAlgorithm->show();
-    } else {
-        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit algorithm available."));
-    }
-}
-
-void QFFCSFitEvaluationEditor::configFitAlgorithm() {
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!data) return;
-    QString pid=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
-    QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
-    if (algorithm) {
-        data->restoreQFFitAlgorithmParameters(algorithm);
-        if (algorithm->displayConfig()) {
-            data->storeQFFitAlgorithmParameters(algorithm);
-        }
-    }
-}
-void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!data) return;
-    if (!current->getHighlightedRecord()) return;
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    QString run=QString::number(data->getCurrentIndex());
-    if (data->getCurrentIndex()<0) run="avg";
-    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
-    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
-    replotData();
-}
-
-void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!data) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
-            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
-            recs[i]->setQFProperty(resultID+"_ravg_datacut_min", userMin, false, false);
-
-            for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
-                QString run=QString::number(r);
-                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
-                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
-                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
-                }
-            }
-
-        }
-    }
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!data) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
-            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
-            recs[i]->setQFProperty(resultID+"_ravg_datacut_max", userMax, false, false);
-
-            for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
-                QString run=QString::number(r);
-                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
-                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
-                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
-                }
-            }
-
-        }
-    }
-    QApplication::restoreOverrideCursor();
-}
-
-
-void QFFCSFitEvaluationEditor::runChanged(int run) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-
-    //qDebug()<<"runChanged";
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QTime t;
-
-    t.start();
-    QFRawDataRecord* currentRecord=current->getHighlightedRecord();
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-    labRun->setText(QString("  (%1)").arg(fcs->getCorrelationRunName(run)));
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-
-    data->setCurrentIndex(run);
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-
-    datacut->disableSliderSignals();
-    datacut->set_min(0);
-    datacut->set_max(fcs->getCorrelationN());
-    QString runn="avg";
-    if (data->getCurrentIndex()>-1) runn=QString::number(data->getCurrentIndex());
-    datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_min", 0).toInt());
-    datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_max", fcs->getCorrelationN()).toInt());
-    datacut->enableSliderSignals();
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-
-    displayModel(false);
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-    replotData();
-    //qDebug()<<t.elapsed()<<" ms";
-    t.start();
-    QApplication::restoreOverrideCursor();
-    //qDebug()<<"runChanged ... done";
-}
-
-void QFFCSFitEvaluationEditor::modelChanged(int model) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    QString ff=cmbModel->itemData(cmbModel->currentIndex()).toString();
-    data->setFitFunction(ff);
-    displayModel(true);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::weightsChanged(int model) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (data) {
-        if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
-        else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
-        else if (cmbWeights->currentIndex()==2) data->setFitDataWeighting(QFFCSFitEvaluation::RunErrorWeighting);
-        else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
-    }
-    displayModel(true);
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::algorithmChanged(int model) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    current->getHighlightedRecord()->setQFProperty("algorithm", cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString(), false, false);
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    QString alg=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
-    data->setFitAlgorithm(alg);
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
-    if (!dataEventsEnabled) return;
-    if (sender==pltData) {
-        pltResiduals->setX(newxmin, newxmax);
-    }/* else {
-        plotter->setX(newxmin, newxmax);
-    }*/
-}
-
-void QFFCSFitEvaluationEditor::plotMouseMove(double x, double y) {
-    labMousePosition->setTextFormat(Qt::RichText);
-    labMousePosition->setText(tr("cursor: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
-}
-
-double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) {
-    if (weightsOKK) *weightsOKK=false;
-    if (!current) return NULL;
-    if (!cmbModel) return NULL;
-    QFRawDataRecord* record=record_in;
-    if (!record_in) record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    //JKQTPdatastore* ds=pltData->getDatastore();
-    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    //QFFitFunction* ffunc=eval->getFitFunction();
-    int run=run_in;
-    if (run<=-100) run=eval->getCurrentIndex();
-
-    int N=data->getCorrelationN();
-
-    QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
-    double* weights=(double*)malloc(N*sizeof(double));
-    bool weightsOK=false;
-    if (weighting==QFFCSFitEvaluation::StdDevWeighting) {
-        double* std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
-        double* std=NULL;
-        if (run>=0) std=data->getCorrelationRunError(run);
-        else std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (!weightsOK) {
-        for (int i=0; i<N; i++) weights[i]=1;
-        if (weighting==QFFCSFitEvaluation::EqualWeighting) weightsOK=true;
-    }
-    if (weightsOKK) *weightsOKK=weightsOK;
-    return weights;
-}
-
-void QFFCSFitEvaluationEditor::saveCurrentFitResults() {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
-    if (!ffunc || !eval) return;
-
-
-    QString filter= tr("FCS Fit Parameter Set (*.fps)");
-    QString selectedFilter=filter;
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save FCS Fit Parameter Set as ..."), currentFPSSaveDir, filter, &selectedFilter);
-    if ((!fileName.isEmpty())&&(!fileName.isNull())) {
-        currentFPSSaveDir=QFileInfo(fileName).absolutePath();
-        bool ok=true;
-        if (QFile::exists(fileName)) {
-            int ret = QMessageBox::question(this, tr("Save FCS Fit Parameter Set as  ..."),
-                            tr("A Configuration with the name '%1' already exists.\n"
-                               "Do you want to overwrite?").arg(fileName),
-                            QMessageBox::Yes | QMessageBox::No,  QMessageBox::No);
-            if (ret==QMessageBox::No) ok=false;
-        }
-        if (ok) {
-            QSettings settings(fileName, QSettings::IniFormat);
-            settings.setValue("fit_function/id", eval->getFitFunction()->id());
-
-            QStringList pids=ffunc->getParameterIDs();
-            double* fullParams=eval->allocFillParameters();
-            double* errors=eval->allocFillParameterErrors();
-            bool* paramsFix=eval->allocFillFix();
-            double* paramsMin=eval->allocFillParametersMin();
-            double* paramsMax=eval->allocFillParametersMax();
-            //ffunc->calcParameter(fullParams, errors);
-            for (int i=0; i<pids.size(); i++) {
-                QString id=pids[i];
-                int num=ffunc->getParameterNum(id);
-                if (!id.isEmpty()) {
-                    bool visible=ffunc->isParameterVisible(num, fullParams);
-                    QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
-                    if (!d.userEditable) visible=false;
-
-                    if (visible) {
-                        settings.setValue("fit_params/"+id+"/value", eval->getFitValue(id));
-                        if (d.displayError==QFFitFunction::EditError) settings.setValue("fit_params/"+id+"/error", eval->getFitError(id));
-                        if (d.fit) settings.setValue("fit_params/"+id+"/fix", eval->getFitFix(id));
-                        if (d.userRangeEditable) {
-                           settings.setValue("fit_params/"+id+"/min", eval->getFitMin(id));
-                           settings.setValue("fit_params/"+id+"/max", eval->getFitMax(id));
-                        }
-                    }
-                }
-            }
-            free(fullParams);
-            free(errors);
-            free(paramsFix);
-            free(paramsMin);
-            free(paramsMax);
-        }
-    }
-}
-
-void QFFCSFitEvaluationEditor::loadCurrentFitResults() {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
-    if (!ffunc || !eval) return;
-
-    QString filter= tr("FCS Fit Parameter Set (*.fps)");
-    QString selectedFilter=filter;
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load FCS Fit Parameter Set ..."), currentFPSSaveDir, filter, &selectedFilter);
-    if ((!fileName.isEmpty())&&(!fileName.isNull())) {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        currentFPSSaveDir=QFileInfo(fileName).absolutePath();
-        QSettings settings(fileName, QSettings::IniFormat);
-        QString ffuncname=settings.value("fit_function/id", eval->getFitFunction()->id()).toString();
-        eval->setFitFunction(ffuncname);
-        settings.beginGroup("fit_params");
-        QStringList keys = settings.allKeys();
-        for (int i=0; i<keys.size(); i++) {
-            if (keys[i].endsWith("/error")) {
-                QString paramname=keys[i].left(keys[i].length()-6);
-                eval->setFitError(paramname, settings.value(keys[i]).toDouble());
-            } else if (keys[i].endsWith("/value")) {
-                QString paramname=keys[i].left(keys[i].length()-6);
-                eval->setFitValue(paramname, settings.value(keys[i]).toDouble());
-            } else if (keys[i].endsWith("/fix")) {
-                QString paramname=keys[i].left(keys[i].length()-4);
-                eval->setFitFix(paramname, settings.value(keys[i]).toBool());
-            } else if (keys[i].endsWith("/min")) {
-                QString paramname=keys[i].left(keys[i].length()-4);
-                eval->setFitMin(paramname, settings.value(keys[i]).toDouble());
-            } else if (keys[i].endsWith("/max")) {
-                QString paramname=keys[i].left(keys[i].length()-4);
-                eval->setFitMax(paramname, settings.value(keys[i]).toDouble());
-            }
-        }
-        displayModel(true);
-        replotData();
-        QApplication::restoreOverrideCursor();
-
-    }
-}
-
-void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
-    double particles=1;
-    double tauD=10;
-    double particles_error=0;
-    double tauD_error=0;
-    double wxy=0, wxy_error=0;
-    double gamma=6, gamma_error=1;
-    bool has_tauD=false;
-    bool has_nparticles=false;
-    bool has_gamma=false;
-
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
-    if (!ffunc || !eval) return;
-
-    //read input parameters
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
-        if (id.toLower()=="n_particle") {
-            particles=eval->getFitValue(id);
-            particles_error=eval->getFitError(id);
-            has_nparticles=true;
-        }
-        if ((id.toLower()=="1n_particle") && (!has_nparticles)) {
-            particles=1.0/eval->getFitValue(id);
-            particles_error=fabs(eval->getFitError(id)/(eval->getFitValue(id)*eval->getFitValue(id)));
-            has_nparticles=true;
-        }
-        if ((id.toLower()=="focus_struct_fac") && (!has_gamma)) {
-            gamma=eval->getFitValue(id);
-            gamma_error=eval->getFitError(id);
-            has_gamma=true;
-        }
-        if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) {
-            double factor=1;
-            if (d.unit=="msec") { factor=1000; }
-            if (d.unit=="ms") { factor=1000; }
-            if (d.unit=="msecs") { factor=1000; }
-            if (d.unit=="milliseconds") { factor=1000; }
-            if (d.unit=="sec") { factor=1000000; }
-            if (d.unit=="s") { factor=1000000; }
-            if (d.unit=="secs") { factor=1000000; }
-            if (d.unit=="seconds") { factor=1000000; }
-            tauD=factor*eval->getFitValue(id);
-            tauD_error=factor*eval->getFitError(id);
-            has_tauD=true;
-        }
-    }
-
-    dlgEstimateFocalVolume* dlg=new dlgEstimateFocalVolume(settings, this);
-    dlg->init(particles,  particles_error, has_nparticles, tauD, tauD_error, has_tauD, gamma, gamma_error, has_gamma);
-
-    bool ok= ( dlg->exec() == QDialog::Accepted);
-    wxy=dlg->get_wxy();
-    wxy_error=dlg->get_wxyerror();
-
-    delete dlg;
-    //write back output parameters
-    if (ok) {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            QString id=ffunc->getParameterID(i);
-            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
-            if (id.toLower()=="focus_width") {
-
-                double factor=1;
-                if (d.unit=="micron") { factor=1000; }
-                if (d.unit=="µm") { factor=1000; }
-                if (d.unit=="um") { factor=1000; }
-                if (d.unit=="microns") { factor=1000; }
-                if (d.unit=="m") { factor=1000000; }
-                if (d.unit=="meter") { factor=1000000; }
-                if (d.unit=="meters") { factor=1000000; }
-                eval->setFitValue(id, wxy/factor);
-                eval->setFitError(id, wxy_error/factor);
-            }
-        }
-        displayModel(true);
-        replotData();
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-
