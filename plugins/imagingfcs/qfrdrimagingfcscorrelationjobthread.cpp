@@ -107,8 +107,12 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                 emit progressIncrement(10);
                 emit messageChanged(tr("counting frames ..."));
                 emit progressIncrement(10);
-                frames=reader->countFrames();
-
+                first_frame=0;
+                uint32_t frame_count=reader->countFrames();
+                if (job.range_min>0 && job.range_min<frame_count) first_frame=job.range_min;
+                frames=frame_count-first_frame;
+                if (job.range_max>first_frame && job.range_max<frame_count) frames=job.range_max-first_frame;
+                double input_length=frames*job.frameTime;
                 if (frames>0) {
                     frame_width=reader->frameWidth();
                     frame_height=reader->frameHeight();
@@ -232,7 +236,6 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<statistics_time[i]<<", "<<statistics_mean[i]-baseline<<", "<<statistics_std[i]<<", "<<statistics_min[i]-baseline<<", "<<statistics_max[i]-baseline<<"\n";
                                 }
                                 f.close();
-                                addFiles.append(localFilename);
                             } else {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create statistics file '%1'!").arg(localFilename));
@@ -246,7 +249,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                     if ((m_status==1) && !was_canceled && job.acf && acf && acf_tau && acf_N>0) {
                         QDir d(QFileInfo(job.filename).absoluteDir());
-                        QString localFilename=QFileInfo(d.absoluteFilePath(job.prefix+QFileInfo(job.filename).completeBaseName()+".acf.dat")).absoluteFilePath();
+                        QString localFilename=QFileInfo(d.absoluteFilePath(job.prefix+QFileInfo(job.filename).completeBaseName()+".autocorrelation.dat")).absoluteFilePath();
                         QString localFileDirectory=QFileInfo(d.absoluteFilePath(localFilename)).dir().absolutePath();
                         if (d.mkpath(localFileDirectory)) {
                             QFile f(localFilename);
@@ -255,10 +258,15 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text.setLocale(outLocale);
                                 emit messageChanged(tr("saving autocorrelation ..."));
 
-                                for (register uint32_t i=0; i<acf_N; i++) {
-                                    text<<acf_tau[i]<<", "<<acf[i];
-                                    if (acf_std) text<<", "<<acf_std[i];
-                                    text<<"\n";
+                                for (register uint32_t p=0; p<frame_width*frame_height; p++) {
+                                    for (register uint32_t i=0; i<acf_N; i++) {
+                                        if (acf_tau[i]<input_length)  {
+                                            text<<acf_tau[i]<<", "<<acf[p*acf_N+i];
+                                            if (acf_std) text<<", "<<acf_std[p*acf_N+i];
+                                            text<<"\n";
+                                        } else break;
+                                    }
+                                    text<<"\n\n";
                                 }
                                 addFiles.append(localFilename);
                                 f.close();
@@ -276,7 +284,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                     if ((m_status==1) && !was_canceled && job.ccf && ccf_tau && ccf1 && ccf2 && ccf3 && ccf4 && ccf_N>0) {
                         QDir d(QFileInfo(job.filename).absoluteDir());
-                        QString localFilename=QFileInfo(d.absoluteFilePath(job.prefix+QFileInfo(job.filename).completeBaseName()+".ccf.dat")).absoluteFilePath();
+                        QString localFilename=QFileInfo(d.absoluteFilePath(job.prefix+QFileInfo(job.filename).completeBaseName()+".crosscorrelation.dat")).absoluteFilePath();
                         QString localFileDirectory=QFileInfo(d.absoluteFilePath(localFilename)).dir().absolutePath();
                         if (d.mkpath(localFileDirectory)) {
                             QFile f(localFilename);
@@ -285,11 +293,17 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text.setLocale(outLocale);
                                 emit messageChanged(tr("saving crosscorrelation ..."));
 
-                                for (register uint32_t i=0; i<ccf_N; i++) {
-                                    text<<ccf_tau[i]<<", "<<ccf1[i]<<", "<<ccf2[i]<<", "<<ccf3[i]<<", "<<ccf4[i];
-                                    if (ccf1_std && ccf2_std && ccf3_std && ccf4_std) text<<", "<<ccf1_std[i]<<", "<<ccf2_std[i]<<", "<<ccf3_std[i]<<", "<<ccf4_std[i];
-                                    text<<"\n";
+                                for (register uint32_t p=0; p<frame_width*frame_height; p++) {
+                                    for (register uint32_t i=0; i<ccf_N; i++) {
+                                        if (ccf_tau[i]<input_length)  {
+                                            text<<ccf_tau[i]<<", "<<ccf1[p*acf_N+i]<<", "<<ccf2[p*acf_N+i]<<", "<<ccf3[p*acf_N+i]<<", "<<ccf4[p*acf_N+i];
+                                            if (ccf1_std && ccf2_std && ccf3_std && ccf4_std) text<<", "<<ccf1_std[p*acf_N+i]<<", "<<ccf2_std[p*acf_N+i]<<", "<<ccf3_std[p*acf_N+i]<<", "<<ccf4_std[p*acf_N+i];
+                                            text<<"\n";
+                                        } else break;
+                                    }
+                                    text<<"\n\n";
                                 }
+                                addFiles.append(localFilename);
                                 f.close();
                             } else {
                                 m_status=-1; emit statusChanged(m_status);
@@ -302,7 +316,49 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     }
                     emit progressIncrement(10);
 
+                    if ((m_status==1) && !was_canceled) {
+                        emit messageChanged(tr("saving settings ..."));
+                        QDir d=QFileInfo(job.filename).dir();
+                        QString localFilename=QFileInfo(d.absoluteFilePath(job.prefix+QFileInfo(job.filename).completeBaseName()+".evalsettings.txt")).absoluteFilePath();
+                        QString localFileDirectory=QFileInfo(d.absoluteFilePath(localFilename)).dir().absolutePath();
+                        if (d.mkpath(localFileDirectory)) {
+                            QFile f(localFilename);
+                            if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&f);
+                                text.setLocale(outLocale);
 
+                                text<<"date/time                   : "<<QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss") << "\n";
+                                text<<"width                       : "<<frame_width << "\n";
+                                text<<"height                      : "<<frame_height << "\n";
+                                text<<"frame count in file         : "<<frame_count << "\n";
+                                text<<"frame count                 : "<<frames << "\n";
+                                text<<"first frame                 : "<<first_frame << "\n";
+                                text<<"last frame                  : "<<first_frame+frames-1 << "\n";
+                                text<<"correlator S                : "<<job.S << "\n";
+                                text<<"correlator m                : "<<job.m << "\n";
+                                text<<"correlator P                : "<<job.P << "\n";
+                                text<<"correlator type             : "<<job.correlator << "\n";
+                                text<<"smallest tau [s]            : "<<job.frameTime << "\n";
+                                text<<"baseline                    : "<<baseline << "\n";
+                                if (video && job.video) {
+                                    text<<"video sum up                : "<<job.video_frames << "\n";
+                                    text<<"video frames                : "<<real_video_count << "\n";
+                                }
+                                if (job.statistics) {
+                                    text<<"statistics over             : "<<job.statistics_frames << "\n";
+                                }
+
+                                f.close();
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create settings file '%1'!").arg(localFilename));
+                            }
+                        } else {
+                            m_status=-1; emit statusChanged(m_status);
+                            emit messageChanged(tr("could not create settings subdirectory '%1' in '%2'!").arg(localFileDirectory).arg(d.absolutePath()));
+                        }
+                    }
+                    emit progressIncrement(10);
 
                     if (video) free(video);
                     if (average_frame) free(average_frame);
@@ -330,7 +386,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     }
                 } else {
                     m_status=-1; emit statusChanged(m_status);
-                    emit messageChanged(tr("no frames in file"));
+                    emit messageChanged(tr("no frames in file/selected"));
                 }
 
                 reader->close();
@@ -374,6 +430,17 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         uint16_t* frame_data=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
         float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
         uint16_t video_frame_num=0;
+        bool OK=true;
+        while (OK && (frame<first_frame)) {
+            OK=reader->nextFrame();
+            frame++;
+        }
+        frame=0;
+        statistics_mean.clear();
+        statistics_std.clear();
+        statistics_min.clear();
+        statistics_max.clear();
+        statistics_time.clear();
         do {
             if (!reader->readFrameUINT16(frame_data)) {
                 m_status=-1; emit statusChanged(m_status);
@@ -394,17 +461,20 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 if (frame==0) {
                     frames_min=frame_min;
                     frames_max=frame_max;
-                    statistics_mean.clear();
-                    statistics_std.clear();
-                    statistics_min.clear();
-                    statistics_max.clear();
-                    statistics_time.clear();
+                } else {
+                    frames_min=(frame_min<frames_min)?frame_min:frames_min;
+                    frames_max=(frame_max>frames_max)?frame_max:frames_max;
+                }
+                if (frame%job.statistics_frames==0) {
                     sframe_min=frame_min;
                     sframe_max=frame_max;
+                } else {
+                    sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
+                    sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
                 }
                 if (job.statistics && (frame%job.statistics_frames==0) && (frame>0)) {
-                    statistics_time.append((float)frame*job.frameTime);
                     float N=frame_width*frame_height*job.statistics_frames;
+                    statistics_time.append((float)frame*job.frameTime);
                     statistics_mean.append(sum/N);
                     statistics_min.append(sframe_min);
                     statistics_max.append(sframe_max);
@@ -431,7 +501,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             }
             frame++;
             if (was_canceled) break;
-        } while (reader->nextFrame() && (m_status==1));
+        } while (reader->nextFrame() && (m_status==1) && (frame<frames));
 
 
         free(frame_data);
@@ -442,8 +512,67 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     // NOW WE CORRECT THE IMAGE FOR IT'S BASELINE (ACCORDING TO THE USER SETTINGS)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!was_canceled) calcBackgroundCorrection();
+    emit messageChanged(tr("applying baseline correction..."));
+    for (uint32_t i=0; i<frame_width*frame_height*frames; i++) {
+        image_series[i]=image_series[i]-baseline;
+    }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CALCULATE THE ACFs
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (job.acf && job.correlator==0) {
+        emit messageChanged(tr("calculating autocorrelations ..."));
+        acf_N=job.S*job.P;
+        acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+        acf_tau=(double*)calloc(acf_N,sizeof(double));
+        long* acf_t=(long*)calloc(acf_N*frame_width*frame_height,sizeof(long));
+        statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
+        for (uint32_t p=0; p<frame_width*frame_height; p++) {
+            statisticsAutocorrelateMultiTauSymmetric(&(acf[p*acf_N]), &(image_series[p]), frames, acf_t, acf_N, frame_width*frame_height);
+            emit messageChanged(tr("calculating autocorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
+            if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
+            else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
+        }
+        for (int i=0; i<acf_N; i++) {
+            acf_tau[i]=(double)acf_t[i]*job.frameTime;
+        }
+        free(acf_t);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CALCULATE THE CCFs
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (job.ccf && job.correlator==0) {
+        emit messageChanged(tr("calculating crosscorrelations ..."));
+        ccf_N=job.S*job.P;
+        ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+        ccf2=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+        ccf3=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+        ccf4=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+        ccf_tau=(double*)calloc(ccf_N,sizeof(double));
+        long* ccf_t=(long*)calloc(ccf_N*frame_width*frame_height,sizeof(long));
+        statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
+        for (int32_t p=0; p<frame_width*frame_height; p++) {
+            if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf1[p*acf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+            if ((int32_t)p+1<(int32_t)frame_width*frame_height) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*acf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+            if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf3[p*acf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+            if ((int32_t)p+(int32_t)frame_width<(int32_t)frame_width*frame_height) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*acf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+
+            emit messageChanged(tr("calculating crosscorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
+            if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
+            else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
+        }
+        for (int i=0; i<acf_N; i++) {
+            ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
+        }
+        free(ccf_t);
+    }
+
+
+    if (image_series) free(image_series);
+    image_series=NULL;
 }
 
 void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {

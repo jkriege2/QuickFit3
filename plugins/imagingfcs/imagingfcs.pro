@@ -26,7 +26,11 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagereader.h \
     qfrdrimagereadertiff.h \
     ../../../../../LIB/trunk/tinytiffwriter.h \
-    ../../../../../LIB/trunk/libtiff_tools.h
+    ../../../../../LIB/trunk/libtiff_tools.h \
+    ../../../../../LIB/trunk/statistics_tools.h \
+    ../../../../../LIB/trunk/shiftregister.h \
+    ../../../../../LIB/trunk/multitau-correlator.h \
+    ../../../../../LIB/trunk/correlator_multitau.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -40,7 +44,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcscorrelationjobthread.cpp \
     qfrdrimagereadertiff.cpp \
     ../../../../../LIB/trunk/tinytiffwriter.cpp \
-    ../../../../../LIB/trunk/libtiff_tools.cpp
+    ../../../../../LIB/trunk/libtiff_tools.cpp \
+    ../../../../../LIB/trunk/statistics_tools.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -63,6 +68,9 @@ ASSETS_TESTDATA.files = ./assets/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/imfcs_testdata/
 
 INSTALLS += ASSETS_TESTDATA
+
+
+
 
 
 

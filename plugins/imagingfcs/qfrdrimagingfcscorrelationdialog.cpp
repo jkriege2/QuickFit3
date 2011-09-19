@@ -150,6 +150,15 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int 
     updateCorrelator();
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
+    ui->spinFirstFrame->setEnabled(!checked);
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_chkLastFrame_clicked(bool checked) {
+    ui->spinLastFrame->setEnabled(!checked);
+}
+
+
 
 void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFile_clicked() {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
@@ -267,11 +276,18 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.S=ui->spinS->value();
     job.P=ui->spinP->value();
     job.m=ui->spinM->value();
-    job.frameTime=ui->edtFrameTime->value();
+    job.frameTime=ui->edtFrameTime->value()*1e-6;
     job.addToProject=ui->chkAddToProject->isChecked();
     job.prefix=ui->edtPrefix->text();
     job.backgroundOffset=ui->edtOffset->value();
-    job.range_min=job.range_max=-1;
+    job.range_min=-1;
+    if (!ui->chkFirstFrame->isChecked()) {
+        job.range_min=ui->spinFirstFrame->value();
+    }
+    job.range_max=-1;
+    if (!ui->chkLastFrame->isChecked()) {
+        job.range_max=ui->spinLastFrame->value();
+    }
     job.acf=true;
     job.ccf=true;
     job.video=true;

@@ -38,6 +38,7 @@ protected:
 
     QFRDRImageReader* reader;
     uint32_t frames;
+    uint32_t first_frame;
     uint32_t frame_width;
     uint32_t frame_height;
     float* average_frame;

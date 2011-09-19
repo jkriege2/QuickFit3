@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>878</width>
-    <height>467</height>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -164,7 +164,7 @@
            </item>
           </layout>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>frame &amp;timing:</string>
@@ -174,7 +174,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="QLabel" name="label_15">
@@ -261,7 +261,7 @@
            </item>
           </layout>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -271,7 +271,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -401,7 +401,7 @@
            </item>
           </layout>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="label_12">
            <property name="text">
             <string>&amp;background correction:</string>
@@ -411,7 +411,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
             <widget class="QComboBox" name="cmbBackground">
@@ -486,7 +486,7 @@
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string>&amp;add to project:</string>
@@ -496,7 +496,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <widget class="QCheckBox" name="chkAddToProject">
@@ -527,6 +527,102 @@
                <normaloff>:/imaging_fcs/add_job.png</normaloff>:/imaging_fcs/add_job.png</iconset>
              </property>
             </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>frame &amp;range:</string>
+           </property>
+           <property name="buddy">
+            <cstring>chkFirstFrame</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>from         </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="chkFirstFrame">
+             <property name="text">
+              <string>first</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinFirstFrame">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximum">
+              <number>10000000</number>
+             </property>
+             <property name="singleStep">
+              <number>1000</number>
+             </property>
+             <property name="value">
+              <number>10000</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>   &amp;to         </string>
+             </property>
+             <property name="buddy">
+              <cstring>chkLastFrame</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="chkLastFrame">
+             <property name="text">
+              <string>last</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinLastFrame">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximum">
+              <number>10000000</number>
+             </property>
+             <property name="singleStep">
+              <number>1000</number>
+             </property>
+             <property name="value">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_10">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>
@@ -734,12 +830,12 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>787</x>
-     <y>577</y>
+     <x>867</x>
+     <y>484</y>
     </hint>
     <hint type="destinationlabel">
      <x>719</x>
-     <y>560</y>
+     <y>494</y>
     </hint>
    </hints>
   </connection>

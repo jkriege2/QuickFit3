@@ -95,6 +95,8 @@ protected slots:
     void addJobToProject(Job job);
     void updateCorrelator();
     void startNextWaitingThread();
+    void on_chkFirstFrame_clicked(bool checked);
+    void on_chkLastFrame_clicked(bool checked);
 protected:
     void closeEvent(QCloseEvent * event);
     bool allThreadsDone() const;
