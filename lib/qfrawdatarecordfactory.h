@@ -50,6 +50,9 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);
 
+        /** \brief deinitialize all plugins */
+        void deinit();
+
 
         /** \brief returns a list of the IDs of all available QFRawDataRecords. */
         QStringList getIDList();

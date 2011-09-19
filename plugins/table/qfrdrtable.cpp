@@ -82,7 +82,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
 void QFRDRTable::intReadData(QDomElement* e) {
     if (!datamodel) {
         datamodel=new QFTableModel(this);
-        connect(datamodel, SIGNAL(modelReset()), this, SLOT(rawDataChanged()));
+        connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
     datamodel->clear();

@@ -173,10 +173,12 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         writeSettings();
         closeProject();
         rawDataFactory->distribute(NULL, settings, this, this);
+        rawDataFactory->deinit();
         evaluationFactory->distribute(NULL, settings, this, this);
+        evaluationFactory->deinit();
         extensionManager->distribute(NULL);
         extensionManager->deinit();
-				newProjectTimer.stop();
+        newProjectTimer.stop();
         event->accept();
     } else {
         event->ignore();

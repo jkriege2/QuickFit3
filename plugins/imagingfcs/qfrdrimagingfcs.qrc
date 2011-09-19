@@ -16,5 +16,15 @@
         <file alias="reci.png">icons/reci.png</file>
         <file alias="sqrt.png">icons/sqrt.png</file>
         <file alias="none.png">icons/none.png</file>
+        <file alias="qfrdrimagingfcs_correlate.png">icons/qfrdrimagingfcs_correlate.png</file>
+        <file alias="add_job.png">icons/add_job.png</file>
+        <file alias="fileopen.png">icons/fileopen.png</file>
+        <file alias="use_file.png">icons/use_file.png</file>
+        <file alias="job_cancel.png">icons/job_cancel.png</file>
+        <file alias="job_done.png">icons/job_done.png</file>
+        <file alias="thread_error.png">icons/thread_error.png</file>
+        <file alias="thread_ok.png">icons/thread_ok.png</file>
+        <file alias="thread_run.png">icons/thread_run.png</file>
+        <file alias="thread_wait.png">icons/thread_wait.png</file>
     </qresource>
 </RCC>

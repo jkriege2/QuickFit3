@@ -51,6 +51,11 @@ void QFRawDataRecordFactory::distribute(QFProject* project, ProgramOptions* sett
     }
 }
 
+void QFRawDataRecordFactory::deinit() {
+    for (int i=0; i<getIDList().size(); i++) {
+        items[getIDList().at(i)]->deinit();
+    }
+}
 
 int QFRawDataRecordFactory::getMajorVersion(QString id) {
     int ma, mi;

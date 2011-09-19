@@ -2,6 +2,8 @@
 #define QFRDRIMAGINGFCS_H
 
 #include "qfpluginrawdata.h"
+#include "qfrdrimagingfcscorrelationdialog.h"
+#include <QPointer>
 /*!
     \defgroup qf3rdrdp_imaging_fcs Raw Data Record Plugin
     \ingroup qf3rawdataplugins
@@ -22,12 +24,17 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief Create a new QFRawDataRecord in the given project \a parent. Also adds the record to the project. */
         virtual QFRawDataRecord* createRecord(QFProject* parent);
+        /** \brief set current project */
+        virtual void setProject(QFProject* project);
 
         /*! \brief create menu items in \a menu that start insert of record
 
             The menu items should be connected to slots in the plugin.
         */
         virtual void registerToMenu(QMenu* menu);
+
+        /** \copydoc QFPluginRawDataRecord::deinit() */
+        virtual void deinit();
 
         /** \brief short ID for the plugin */
         virtual QString getID() const  { return tr("imaging_fcs"); };
@@ -57,6 +64,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
     protected slots:
         /** \brief insertdata from file*/
         void insertRecord();
+        /** \brief correlate image data and insert the result */
+        void correlateAndInsert();
     protected:
         /*! \brief add a video_correlator file to the current project
 
@@ -66,6 +75,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);
+
 };
 
 #endif // QFRDRIMAGINGFCS_H

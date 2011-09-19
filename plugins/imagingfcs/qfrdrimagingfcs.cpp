@@ -4,46 +4,71 @@
 #include "qmodernprogresswidget.h"
 
 QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
-    QObject(parent)
+    QObject(parent), QFPluginRawDataRecordBase()
 {
     //constructor
 }
 
 QFRDRImagingFCSPlugin::~QFRDRImagingFCSPlugin()
 {
-    //destructor
+}
+
+void QFRDRImagingFCSPlugin::deinit() {
 }
 
 QFRawDataRecord* QFRDRImagingFCSPlugin::createRecord(QFProject* parent) {
-	// factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRImagingFCSData)
+    // factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRImagingFCSData)
     return new QFRDRImagingFCSData(parent);
+}
+
+void QFRDRImagingFCSPlugin::setProject(QFProject* project) {
+    QFPluginRawDataRecordBase::setProject(project);
 }
 
 
 void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
-	// create menu entries to insert data with this type
-    QAction* action=new QAction(QIcon(getIconFilename()), tr("Insert Imaging FCS dataset (image of ACFs/CCFs)"), parentWidget);
-    action->setStatusTip(tr("Insert a newimaging FCS record"));
+    QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&imFCS: Imaging FCS"));
+
+    // create menu entries to insert data with this type
+    QAction* action=new QAction(QIcon(getIconFilename()), tr("&load imFCS dataset"), parentWidget);
+    action->setStatusTip(tr("Insert a new imaging FCS record"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
-    menu->addAction(action);
+    m->addAction(action);
+
+
+    QAction* actCorrelate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
+    actCorrelate->setStatusTip(tr("Correlate an image series and insert the result into the current project"));
+    connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
+    m->addAction(actCorrelate);
 }
 
+void QFRDRImagingFCSPlugin::correlateAndInsert() {
+    if (project && settings) {
+        QFRDRImagingFCSCorrelationDialog* dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(settings, NULL);
+        dlgCorrelate->setProject(project);
+        dlgCorrelate->show();
+        while (dlgCorrelate->isVisible()) {
+            QApplication::processEvents();
+        }
+        delete dlgCorrelate;
+    }
+}
 
 void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
         // file format to import
-		QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat; *.crosscorrelation.dat)");
+        QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat; *.crosscorrelation.dat)");
         // look into INI which was the last used format
-		QString current_format_name=settings->getQSettings()->value("imaging_fcs/current_format_filter", format_videoCorrelator).toString();
+        QString current_format_name=settings->getQSettings()->value("imaging_fcs/current_format_filter", format_videoCorrelator).toString();
         // let the user select some files to import
-		QStringList files = QFileDialog::getOpenFileNames(parentWidget,
+        QStringList files = QFileDialog::getOpenFileNames(parentWidget,
                               tr("Select Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
                               format_videoCorrelator, &current_format_name);
         // store the format we just used
-		settings->getQSettings()->setValue("imaging_fcs/current_format_filter", current_format_name);
+        settings->getQSettings()->setValue("imaging_fcs/current_format_filter", current_format_name);
 
-		// now we iterate over all files and use QuickFit's progress bar interface (see plugin services)
+        // now we iterate over all files and use QuickFit's progress bar interface (see plugin services)
         QStringList list = files;
         QStringList::Iterator it = list.begin();
         services->setProgressRange(0, list.size());

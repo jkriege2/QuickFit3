@@ -31,6 +31,9 @@ class QFPluginEvaluationItem: public QFPlugin {
         /** \brief short ID for the plugin */
         virtual QString getID() const =0;
 
+        /** \brief deinit plugin, this function is guaranteed to be called once, before  */
+        virtual void deinit()=0;
+
 
         /** \brief set current project */
         virtual void setProject(QFProject* project)=0;
@@ -58,6 +61,9 @@ class QFLIB_EXPORT QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
         virtual void setSettings(ProgramOptions* settings) {this->settings=settings; };
         /** \brief set parent widget (e.g. for message dialogs) */
         virtual void setParentWidget(QWidget* parentWidget) {this->parentWidget=parentWidget; };
+
+        /** \brief deinit plugin, this function is guaranteed to be called once, before  */
+        virtual void deinit() {};
 
     protected:
         QFPluginServices* services;

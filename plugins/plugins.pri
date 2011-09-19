@@ -74,3 +74,11 @@ CONFIG += link_prl
 
 include(../quickfit_config.pri)
 include(../libquickfit.pri)
+
+HEADERS +=
+
+SOURCES +=
+
+
+
+

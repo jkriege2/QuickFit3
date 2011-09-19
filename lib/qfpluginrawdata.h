@@ -27,6 +27,8 @@ class QFPluginRawDataRecord: public QFPlugin {
             The menu items should be connected to slots in the plugin.
         */
         virtual void registerToMenu(QMenu* menu)=0;
+        /** \brief deinit plugin, this function is guaranteed to be called once, before  */
+        virtual void deinit()=0;
 
 
         /** \brief set current project */
@@ -66,6 +68,8 @@ class QFLIB_EXPORT QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
         virtual void setSettings(ProgramOptions* settings);
         /** \brief set parent widget (e.g. for message dialogs) */
         virtual void setParentWidget(QWidget* parentWidget);
+        /** \brief deinit plugin, this function is guaranteed to be called once, before  */
+        virtual void deinit() {};
 
     protected:
         QFPluginServices* services;
