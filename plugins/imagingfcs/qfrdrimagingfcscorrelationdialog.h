@@ -58,6 +58,7 @@ struct Job {
     /** \brief average over this number of frames, if creating a video */
     uint32_t video_frames;
 
+
 };
 
 
@@ -79,6 +80,7 @@ public:
     void writeSettings();
     void readSettings();
 
+    QStringList getFilesToAdd() const;
 
 protected slots:
     void on_btnSelectImageFile_clicked();
@@ -92,7 +94,6 @@ protected slots:
     void frameRateChanged(double value);
     void updateProgress();
     void updateFromFile();
-    void addJobToProject(Job job);
     void updateCorrelator();
     void startNextWaitingThread();
     void on_chkFirstFrame_clicked(bool checked);
@@ -111,7 +112,8 @@ private:
     QStringList imageFilters;
     QStringList imageFormatNames;
     QList<Job> jobs;
-    QList<Job> jobsToAdd;
+    //QList<Job> jobsToAdd;
+    QStringList filesToAdd;
     bool closing;
 
     int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;

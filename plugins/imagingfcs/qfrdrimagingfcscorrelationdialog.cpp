@@ -37,7 +37,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(ProgramOption
     connect(ui->edtFrameRate, SIGNAL(valueChanged(double)), this, SLOT(frameRateChanged(double)));
     connect(ui->edtFrameTime, SIGNAL(valueChanged(double)), this, SLOT(frameTimeChanged(double)));
     if (opt) readSettings();
-    jobsToAdd.clear();
+    filesToAdd.clear();
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 }
 
@@ -118,9 +118,14 @@ void QFRDRImagingFCSCorrelationDialog::closeEvent(QCloseEvent * event)  {
         prg.setLabelText(tr("add job results to project ..."));
         prg.open();
         for (int i=0; i<jobs.size(); i++) {
-            if (jobs[i].thread->status()==2) {
-                addJobToProject(jobs[i]);
+            if (jobs[i].addToProject && (jobs[i].thread->status()==2)) {
+                for (int j=0; j<jobs[i].thread->getAddFiles().size(); j++) {
+                    filesToAdd.append(jobs[i].thread->getAddFiles().at(j));
+                }
             }
+            jobs[i].progress->close();
+            delete jobs[i].progress;
+            delete jobs[i].thread;
         }
         prg.close();
     } else {
@@ -393,6 +398,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile() {
     ui->edtOffset->setValue(baseline_offset);
 }
 
-void QFRDRImagingFCSCorrelationDialog::addJobToProject(Job job) {
-    jobsToAdd.append(job);
+
+QStringList QFRDRImagingFCSCorrelationDialog::getFilesToAdd() const {
+    return filesToAdd;
 }

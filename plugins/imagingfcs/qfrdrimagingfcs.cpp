@@ -50,6 +50,32 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
         while (dlgCorrelate->isVisible()) {
             QApplication::processEvents();
         }
+
+
+        QStringList list=dlgCorrelate->getFilesToAdd();
+
+        QStringList::Iterator it = list.begin();
+        services->setProgressRange(0, list.size());
+        services->setProgress(0);
+        int i=0;
+        QModernProgressDialog progress(tr("Loading imFCS Data ..."), "", NULL);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setHasCancel(false);
+        progress.open();
+        while(it != list.end()) {
+            i++;
+            services->log_text(tr("loading '%1' ...\n").arg(*it));
+            progress.setLabelText(tr("loading '%1' ...\n").arg(*it));
+            QApplication::processEvents();
+            insertVideoCorrelatorFile(*it);
+            settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+            services->setProgress(i);
+            QApplication::processEvents();
+            ++it;
+        }
+        progress.accept();
+        services->setProgress(0);
+
         delete dlgCorrelate;
     }
 }

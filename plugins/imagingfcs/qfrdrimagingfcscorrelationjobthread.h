@@ -17,7 +17,8 @@ public:
     void init(Job job);
     static QStringList getImageFilterList();
     static QStringList getImageFormatNameList();
-    QStringList getAddFiles();
+    QStringList getAddFiles() const;
+    Job getJob() const;
 signals:
     void messageChanged(QString message);
     void progressChanged(int progress);

@@ -16,8 +16,11 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QObject
     was_canceled=false;
 }
 
-QStringList QFRDRImagingFCSCorrelationJobThread::getAddFiles() {
+QStringList QFRDRImagingFCSCorrelationJobThread::getAddFiles() const {
     return addFiles;
+}
+Job QFRDRImagingFCSCorrelationJobThread::getJob() const {
+    return job;
 }
 
 QStringList QFRDRImagingFCSCorrelationJobThread::getImageFilterList()  {
@@ -108,10 +111,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                 emit messageChanged(tr("counting frames ..."));
                 emit progressIncrement(10);
                 first_frame=0;
-                uint32_t frame_count=reader->countFrames();
+                int32_t frame_count=reader->countFrames();
                 if (job.range_min>0 && job.range_min<frame_count) first_frame=job.range_min;
                 frames=frame_count-first_frame;
-                if (job.range_max>first_frame && job.range_max<frame_count) frames=job.range_max-first_frame;
+                if (job.range_max>(int64_t)first_frame && job.range_max<frame_count) frames=job.range_max-first_frame;
                 double input_length=frames*job.frameTime;
                 if (frames>0) {
                     frame_width=reader->frameWidth();
@@ -159,12 +162,12 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             if (tif) {
                                 float avgMin=average_frame[0];
                                 float avgMax=average_frame[0];
-                                for (int i=0; i<frame_width*frame_height; i++) {
+                                for (uint32_t i=0; i<frame_width*frame_height; i++) {
                                     avgMin=(average_frame[i]<avgMin)?average_frame[i]:avgMin;
                                     avgMax=(average_frame[i]>avgMax)?average_frame[i]:avgMax;
                                 }
                                 uint8_t* img=(uint8_t*)malloc(frame_width*frame_height*sizeof(uint8_t));
-                                for (int i=0; i<frame_width*frame_height; i++) {
+                                for (uint32_t i=0; i<frame_width*frame_height; i++) {
                                     img[i]=(uint8_t)round((average_frame[i]-avgMin)*255.0/fabs(avgMax-avgMin));
                                 }
                                 TIFFTWriteUint8(tif, img, frame_width, frame_height);
@@ -191,13 +194,13 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             if (tif) {
                                 float avgMin=video[0];
                                 float avgMax=video[0];
-                                for (register int i=0; i<frame_width*frame_height*video_count; i++) {
+                                for (register uint32_t i=0; i<frame_width*frame_height*video_count; i++) {
                                     avgMin=(video[i]<avgMin)?video[i]:avgMin;
                                     avgMax=(video[i]>avgMax)?video[i]:avgMax;
                                 }
                                 uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
-                                for (register int c=0; c<real_video_count; c++) {
-                                    for (register int i=0; i<frame_width*frame_height; i++) {
+                                for (register uint32_t c=0; c<real_video_count; c++) {
+                                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                                         img[i]=(uint16_t)round((float)(video[c*frame_width*frame_height+i]-avgMin)*(float)0xFFFF/fabs(avgMax-avgMin));
                                     }
                                     TIFFTWriteUint16(tif, img, frame_width, frame_height);
@@ -396,6 +399,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
             emit messageChanged(tr("could not create image reader object"));
         }
     }
+
+    /*if (m_status==2) {
+        job.processingOK=true;
+        job.filesToAdd=addFiles;
+    } else {
+        job.processingOK=false;
+        job.filesToAdd.clear();
+    }*/
 }
 
 
@@ -534,7 +545,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
             else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
         }
-        for (int i=0; i<acf_N; i++) {
+        for (uint32_t i=0; i<acf_N; i++) {
             acf_tau[i]=(double)acf_t[i]*job.frameTime;
         }
         free(acf_t);
@@ -554,17 +565,17 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ccf_tau=(double*)calloc(ccf_N,sizeof(double));
         long* ccf_t=(long*)calloc(ccf_N*frame_width*frame_height,sizeof(long));
         statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
-        for (int32_t p=0; p<frame_width*frame_height; p++) {
+        for (uint32_t p=0; p<frame_width*frame_height; p++) {
             if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf1[p*acf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-            if ((int32_t)p+1<(int32_t)frame_width*frame_height) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*acf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+            if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*acf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
             if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf3[p*acf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-            if ((int32_t)p+(int32_t)frame_width<(int32_t)frame_width*frame_height) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*acf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*acf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
 
             emit messageChanged(tr("calculating crosscorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
             if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
             else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
         }
-        for (int i=0; i<acf_N; i++) {
+        for (uint32_t i=0; i<acf_N; i++) {
             ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
         }
         free(ccf_t);
