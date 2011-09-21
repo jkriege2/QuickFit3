@@ -194,7 +194,7 @@ bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
     return true;
 }
 
-bool QFRDRImageReaderTIFF::readFrame(float* data) {
+bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
     if (!tif) return false;
 
     uint16 samplesperpixel, bitspersample;

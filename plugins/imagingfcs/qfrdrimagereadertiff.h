@@ -4,7 +4,6 @@
 #include "qfrdrimagereader.h"
 #include <tiffio.h>
 
-
 /*! \brief image reader class for TIFF images (implements QFRDRImageReader)
     \ingroup qf3rdrdp_imaging_fcs
 
@@ -33,7 +32,7 @@ class QFRDRImageReaderTIFF : public QFRDRImageReader {
         /** \brief return the height of the frames (valid after open() returned \c true */
         virtual uint16_t frameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool readFrame(float* data);
+        virtual bool readFrameFloat(float* data);
         /** \brief read a new frame into the given array of integers */
         virtual bool readFrameUINT16(uint16_t* data);
         /** \brief return a filter string for the file format */

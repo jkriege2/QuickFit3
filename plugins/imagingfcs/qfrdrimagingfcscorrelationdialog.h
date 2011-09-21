@@ -5,6 +5,7 @@
 #include "qfproject.h"
 #include "programoptions.h"
 #include "qfrdrimagingfcsthreadprogress.h"
+#include <stdint.h>
 
 class QFRDRImagingFCSCorrelationJobThread; // forward
 namespace Ui {

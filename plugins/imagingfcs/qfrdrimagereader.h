@@ -44,7 +44,7 @@ class QFRDRImageReader {
         /** \brief return the height of the frames (valid after open() returned \c true */
         virtual uint16_t frameHeight()=0;
         /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool readFrame(float* data)=0;
+        virtual bool readFrameFloat(float* data)=0;
         /** \brief read a new frame into the given array of integers */
         virtual bool readFrameUINT16(uint16_t* data)=0;
         /** \brief return a description of the last error that occured */
