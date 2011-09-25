@@ -20,6 +20,8 @@ class QFRDRImageReaderTIFF : public QFRDRImageReader {
         virtual bool open(QString filename);
         /** \brief close the currently opened image file */
         virtual void close();
+        /** \brief move the reading pointer back to the first frame */
+        virtual void reset();
         /** \brief return the number of frames in the files.
          *
          *  This does not change the state of the class. This method may have a long runtime, if it has to really count the frames!

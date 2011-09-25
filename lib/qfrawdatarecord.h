@@ -58,7 +58,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual ~QFRawDataRecord();
 
         /** \brief initialize the object with the given data */
-        void init(QString name=QString(""), QStringList inputFiles=QStringList());
+        void init(QString name=QString(""), QStringList inputFiles=QStringList(), QStringList inputFilesTypes=QStringList());
         /** \brief initialize from QDomElement */
         void init(QDomElement& e);
 
@@ -80,6 +80,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline QString getDescription() { return description; }
         /** \brief return the list of linked files */
         inline QStringList getFiles() { return files; }
+        /** \brief return the list of linked files */
+        inline QStringList getFilesTypes() { return files_types; }
         /** \brief return a pointer to the project that contains this QRawDatarecord */
         inline QFProject* getProject() { return project; }
 
@@ -136,6 +138,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QString description;
         /** \brief list of files connected with this record */
         QStringList files;
+        /** \brief list of the types of the files connected with this record (see files) */
+        QStringList files_types;
         /** \brief indicates whether an error has occured */
         bool errorOcc;
         /** \brief contains the description of the last error */

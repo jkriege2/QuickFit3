@@ -70,8 +70,9 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         /*! \brief add a video_correlator file to the current project
 
             \param filename filename of the input file
+            \param filename_overview filename of a file containing an overview image
         */
-        void insertVideoCorrelatorFile(const QString& filename);
+        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""));
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);

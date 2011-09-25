@@ -115,35 +115,18 @@ class QFPluginServices {
         /** \brief a list of the online help directories of all plugins with metadata.
          */
         virtual QList<HelpDirectoryInfo>* getPluginHelpList()=0;
-};
 
+        /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
+        virtual void displayHelpWindow(const QString& helpfile=QString(""))=0;
 
+        /** \brief return the directory of the online help for the given plugin ID */
+        virtual QString getPluginHelpDirectory(const QString& pluginID)=0;
 
-/*! \brief wrapper class that allows plugins to access basic \& advanced services of the QuickFit application, extends QFPluginServices
-    \ingroup qf3plugintools
-*/
-class QFExtensionServices: public QFPluginServices {
-    public:
-        /** \brief class destructor */
-        ~QFExtensionServices() {};
+        /** \brief return the main help file for the given plugin ID */
+        virtual QString getPluginHelp(const QString& pluginID)=0;
 
-        /** \brief indent all following lines in the global logging pane */
-        virtual void log_global_indent()=0;
-        /** \brief undo former log_global_indent() */
-        virtual void log_global_unindent()=0;
-
-        /** \brief log global text message
-         *  \param message the message to log
-         */
-        virtual void log_global_text(QString message)=0;
-        /** \brief log global warning message
-         *  \param message the warning message to log
-         */
-        virtual void log_global_warning(QString message)=0;
-        /** \brief log global error message
-         *  \param message the error message to log
-         */
-        virtual void log_global_error(QString message)=0;
+        /** \brief return the tutorial for the given plugin ID */
+        virtual QString getPluginTutorial(const QString& pluginID)=0;
 
         /*! \brief return a pointer to a given menu, or NULL
 
@@ -177,7 +160,27 @@ class QFExtensionServices: public QFPluginServices {
          */
         virtual void insertToolBar(QString toolbarname, QToolBar* newToolbar)=0;
 
+        /** \brief indent all following lines in the global logging pane */
+        virtual void log_global_indent()=0;
+        /** \brief undo former log_global_indent() */
+        virtual void log_global_unindent()=0;
+
+        /** \brief log global text message
+         *  \param message the message to log
+         */
+        virtual void log_global_text(QString message)=0;
+        /** \brief log global warning message
+         *  \param message the warning message to log
+         */
+        virtual void log_global_warning(QString message)=0;
+        /** \brief log global error message
+         *  \param message the error message to log
+         */
+        virtual void log_global_error(QString message)=0;
 };
+
+
+
 
 
 

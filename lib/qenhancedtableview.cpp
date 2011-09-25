@@ -1,5 +1,5 @@
 #include "qenhancedtableview.h"
-
+#include <QDebug>
 #include <QSet>
 #include <QApplication>
 #include <QClipboard>
@@ -109,3 +109,49 @@ void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
 }
 
 
+QString QEnhancedTableView::toHtml() const {
+    if (!model()) return "";
+    QString html="<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">";
+    for (int row=-1; row<model()->rowCount(); row++) {
+        html+="<tr>";
+        if (row==-1) {
+            for (int col=-1; col<model()->columnCount(); col++) {
+                html+="<th>";
+                if (col>=0) {
+                    html+=model()->headerData(col, Qt::Horizontal).toString();
+                }
+                html+="</th>";
+            }
+        } else {
+            for (int col=-1; col<model()->columnCount(); col++) {
+                if (col==-1) {
+                    html+="<th>";
+                    html+=model()->headerData(row, Qt::Vertical).toString();
+                    html+="</th>";
+                } else {
+                    QModelIndex index=model()->index(row, col);
+                    QVariant check=index.data(Qt::CheckStateRole);
+                    QBrush back=index.data(Qt::BackgroundRole).value<QBrush>();
+                    QString style="";
+                    //qDebug()<<"r="<<row<<"\tc="<<col<<"\tcolor="<<back.color().name();
+                    if (back.color()!=QColor(0,0,0) && index.data(Qt::BackgroundRole).isValid()) style=QString("background: %1;").arg(back.color().name());
+                    if (style.isEmpty()) html+=QString("<td>");
+                    else html+=QString("<td style=\"%1\">").arg(style);
+                    if (check.isValid()) {
+                        if (check.toInt()!=0) {
+                            html+= QString("|&times;|&nbsp;&nbsp;");
+                        } else {
+                            html+= QString("|&nbsp;|&nbsp;&nbsp;");
+                        }
+                    }
+                    html+=index.data().toString();
+                    html+="</td>";
+                }
+            }
+        }
+        html+="</tr>";
+
+    }
+    html+="</table>";
+    return html;
+}

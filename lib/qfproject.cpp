@@ -389,35 +389,15 @@ void QFProject::readXML(const QString& file) {
 
 }
 
-QFRawDataRecord* QFProject::addRawData(QString type, QString name, QStringList inputFiles, QMap<QString, QVariant> initParams, QStringList initParamsReadonly) {
+QFRawDataRecord* QFProject::addRawData(QString type, QString name, QStringList inputFiles, QMap<QString, QVariant> initParams, QStringList initParamsReadonly, QStringList inputFilesTypes) {
     QString t=type.toLower();
     QFRawDataRecord* rde=NULL;
-/*    if (t=="table") {
-        QFRDRTable* e=new QFRDRTable(this);
-        for (int i=0; i<initParams.keys().size(); i++) {
-            e->setProperty(initParams.keys().at(i), initParams[initParams.keys().at(i)], !initParamsReadonly.contains(initParams.keys().at(i)));
-        }
-        e->init(name, inputFiles);
-        rde=e;
-    } else if (t=="fcs") {
-        QFRDRFCSData* e=new QFRDRFCSData(this);
-        for (int i=0; i<initParams.keys().size(); i++) {
-            e->setProperty(initParams.keys().at(i), initParams[initParams.keys().at(i)], !initParamsReadonly.contains(initParams.keys().at(i)));
-        }
-        e->init(name, inputFiles);
-        rde=e;
-    } else if (t=="unknown") {
-        //new QFRawDataRecord(this, name, inputFiles);
-        QFRawDataRecord* e=new QFRawDataRecord(this);
-        e->init(name, inputFiles);
-        rde=e;
-    }*/
     rde=getRawDataRecordFactory()->createRecord(type, this);
     if (rde) {
         for (int i=0; i<initParams.keys().size(); i++) {
             rde->setQFProperty(initParams.keys().at(i), initParams[initParams.keys().at(i)], !initParamsReadonly.contains(initParams.keys().at(i)));
         }
-        rde->init(name, inputFiles);
+        rde->init(name, inputFiles, inputFilesTypes);
     } else {
         setError(tr("error while trying to initialize an object for datatype '%1' in the QuickFit Project '%2'").arg(type).arg(getName()));
         return NULL;
@@ -431,19 +411,6 @@ QFRawDataRecord* QFProject::addRawData(QString type, QString name, QStringList i
 QFEvaluationItem* QFProject::addEvaluation(QString type, QString name) {
     QString t=type.toLower();
     QFEvaluationItem* rde=NULL;
-    /*if (t=="plot") {
-        QFRDRTable* e=new QFRDRTable(this);
-        for (int i=0; i<initParams.keys().size(); i++) {
-            e->setProperty(initParams.keys().at(i), initParams[initParams.keys().at(i)]);
-        }
-        e->init(name, inputFiles);
-        rde=e;
-    } else if (t=="unknown") {
-        //new QFRawDataRecord(this, name, inputFiles);
-        QFEvaluationItem* e=new QFEvaluationItem(this);
-        e->init(name);
-        rde=e;
-    }*/
     rde=getEvaluationItemFactory()->createRecord(type, services, this);
     if (rde) {
         rde->init(name);

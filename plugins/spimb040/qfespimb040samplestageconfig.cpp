@@ -3,7 +3,7 @@
 #include <QtGui>
 #include <iostream>
 
-QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices):
+QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices):
         QGroupBox(parent)
 {
     setTitle(tr(" Sample Translation Stages: "));

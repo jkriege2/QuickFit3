@@ -276,7 +276,7 @@ void QFHTMLHelpWindow::print() {
 
     // select a printer
 
-    QPrintDialog *dialog = new QPrintDialog(p, NULL);
+    QPrintDialog *dialog = new QPrintDialog(p, this);
     dialog->setWindowTitle(tr("Print Help Page"));
     if (dialog->exec() != QDialog::Accepted) {
         delete p;

@@ -32,7 +32,7 @@ double fSlit( double t, const double *p )
 #define HISTOGRAM_UPDATE_INTERVAL_MS 50
 #define MARGINAL_FIT_SIZE_FACTOR 3
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, QFExtensionServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent):
+QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, QFPluginServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent):
     QWidget(parent)
 {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));

@@ -3,6 +3,9 @@
  <author>Jan Krieger</author>
  <class>AndorSettingsDialog</class>
  <widget class="QDialog" name="AndorSettingsDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>

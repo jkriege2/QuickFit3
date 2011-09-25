@@ -85,6 +85,9 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** \brief returns the plugins copyright file (html) for a specified QFEvaluationItem ID. */
         QString getPluginCopyrightFile(QString ID);
 
+        /** \brief return \c true if a plugin with the given ID is registered */
+        bool contains(QString ID);
+
         /** \brief register menu items for specified ID. */
         void registerMenu(QString ID, QMenu* menu);
 

@@ -73,6 +73,9 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
 
         /** \brief save results to a file */
         void saveResults();
+
+        /** \brief display help dialog */
+        void displayHelp();
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -124,6 +127,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QWidget* widResults;
         /** \brief help widget for evaluation */
         QFHTMLHelpWindow* helpWidget;
+        /** \brief button to display help */
+        QPushButton* btnHelp;
 
         QList<QPointer<QFRawDataEditor> > editorList;
         int id;

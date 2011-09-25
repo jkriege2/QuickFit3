@@ -58,6 +58,7 @@ QFRawDataPropertyEditor::~QFRawDataPropertyEditor()
 }
 
 void QFRawDataPropertyEditor::createWidgets() {
+    QLabel* l;
     QVBoxLayout* ml=new QVBoxLayout(this);
     setLayout(ml);
     ml->setContentsMargins(2,2,2,2);
@@ -77,44 +78,74 @@ void QFRawDataPropertyEditor::createWidgets() {
     labTop=new QLabel(this);
     vl->addWidget(labTop);
     vl->addStretch();
-    connect(btnNext, SIGNAL(clicked()), this, SLOT(nextPressed()));
 
     btnDeleteReord=new QPushButton(QIcon(":/lib/item_delete.png"), tr("&Remove Record"), this);
     btnDeleteReord->setToolTip(tr("removes the currently displayed record from the project"));
     btnDeleteReord->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     vl->addWidget(btnDeleteReord);
     connect(btnDeleteReord, SIGNAL(clicked()), this, SLOT(deleteRecord()));
+    btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("&Help"), this);
+    btnHelp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnHelp->setToolTip(tr("display online-help"));
+    vl->addWidget(btnHelp);
+    connect(btnHelp, SIGNAL(clicked()), this, SLOT(displayHelp()));
 
     tabMain=new QTabWidget(this);
     ml->addWidget(tabMain);
 
     QWidget* w=new QWidget(tabMain);
-    QFormLayout* fl=new QFormLayout(w);
+    QGridLayout* fl=new QGridLayout(w);
     //int flcounter=0;
-    fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    //fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     w->setLayout(fl);
     tabMain->addTab(w, tr("&Properties"));
     labID=new QLabel(w);
     labID->setSizePolicy(labID->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
-    fl->addRow(tr("ID:"), labID);
+    //fl->addRow(tr("ID:"), labID);
+    fl->addWidget((l=new QLabel(tr("ID:"), w)), 0, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    fl->addWidget(labID, 0, 1);
+    fl->setRowStretch(0,1);
     labType=new QLabel(w);
     labTypeIcon=new QLabel(w);
+    labType->setSizePolicy(labType->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
+    labTypeIcon->setSizePolicy(labTypeIcon->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
     QHBoxLayout* ptl=new QHBoxLayout(this);
     ptl->setContentsMargins(0,0,0,0);
     ptl->addWidget(labTypeIcon);
     ptl->addWidget(labType);
     ptl->addStretch();
-    fl->addRow(tr("Type:"), ptl);
+    //fl->addRow(tr("Type:"), ptl);
+    fl->addWidget((l=new QLabel(tr("Type:"), w)), 1, 0);
+    fl->setRowStretch(1,1);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    fl->addLayout(ptl, 1, 1);
     edtName=new QLineEdit(w);
-    fl->addRow(tr("&Name:"), edtName);
+    //fl->addRow(tr("&Name:"), edtName);
+    fl->addWidget((l=new QLabel(tr("&Name:"), w)), 2, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setBuddy(edtName);
+    fl->addWidget(edtName, 2, 1);
+    fl->setRowStretch(2,1);
+
     pteDescription=new QPlainTextEdit(w);
     pteDescription->setSizePolicy( pteDescription->sizePolicy().horizontalPolicy(),QSizePolicy::Preferred);
 
-    fl->addRow(tr("&Description:"), pteDescription);
+    //fl->addRow(tr("&Description:"), pteDescription);
+    fl->addWidget((l=new QLabel(tr("&Description:"), w)), 3, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setBuddy(pteDescription);
+    fl->addWidget(pteDescription, 3, 1);
+    fl->setRowStretch(3,1);
     //fl->setRowStretch(flcounter-1, 2);
     lstFiles=new QListWidget(w);
     lstFiles->setSizePolicy(lstFiles->sizePolicy().verticalPolicy(), QSizePolicy::Preferred);
-    fl->addRow(tr("&Files:"), lstFiles);
+    //fl->addRow(tr("&Files:"), lstFiles);
+    fl->addWidget((l=new QLabel(tr("&Files:"), w)), 4, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setBuddy(lstFiles);
+    fl->addWidget(lstFiles, 4, 1);
+    fl->setRowStretch(4,1);
     //fl->setRowStretch(flcounter-1, 1);
     tvProperties=new QTableView(w);
     QFontMetrics fm(font());
@@ -126,6 +157,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     QWidget* widProperties=new QWidget(this);
     QHBoxLayout* pl1=new QHBoxLayout(this);
     widProperties->setLayout(pl1);
+    widProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pl1->setContentsMargins(0,0,0,0);
     pl1->addWidget(tvProperties);
     QVBoxLayout* pl2=new QVBoxLayout(this);
@@ -137,7 +169,11 @@ void QFRawDataPropertyEditor::createWidgets() {
     connect(btnDeleteProperty, SIGNAL(clicked()), this, SLOT(deletePropClicked()));
     pl2->addWidget(btnDeleteProperty);
     pl2->addStretch();
-    fl->addRow(tr("Properties:"), widProperties);
+    //fl->addRow(tr("Properties:"), widProperties);
+    fl->addWidget((l=new QLabel(tr("Properties:"), w)), 5, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    fl->addWidget(widProperties, 5, 1);
+    fl->setRowStretch(5,3);
     //fl->setRowStretch(flcounter-1, 5);
 
     widResults=new QWidget(this);
@@ -176,9 +212,9 @@ void QFRawDataPropertyEditor::createWidgets() {
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
 
-    helpWidget=new QFHTMLHelpWindow(this);
+    /*helpWidget=new QFHTMLHelpWindow(this);
     helpWidget->initFromPluginServices(services);
-    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));
+    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));*/
 
 }
 
@@ -228,7 +264,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
                 }
                 editorList.clear();
                 tabMain->removeTab(tabMain->indexOf(widResults));
-                tabMain->removeTab(tabMain->indexOf(helpWidget));
+                //tabMain->removeTab(tabMain->indexOf(helpWidget));
             }
         }
     }
@@ -251,7 +287,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
                 }
             }
             tabMain->addTab(widResults, tr("Evaluation &Results"));
-            tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("Online-&Help"));
+            //tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("Online-&Help"));
         } else {
             for (int i=0; i<editorList.size(); i++) {
                 editorList[i]->setCurrent(current, id);
@@ -267,7 +303,14 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         labType->setText(current->getTypeDescription());
         labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         lstFiles->clear();
-        lstFiles->addItems(current->getFiles());
+        QStringList f=current->getFiles();
+        QStringList t=current->getFilesTypes();
+        for (int i=0; i<f.size(); i++) {
+            if (i<t.size()) {
+                if (!t[i].isEmpty()) f[i]=f[i]+QString(" [%1]").arg(t[i]);
+            }
+        }
+        lstFiles->addItems(f);
         lstFiles->setEnabled(true);
         tvProperties->setModel(current->getPropertyModel());
         tvProperties->setEnabled(true);
@@ -293,9 +336,9 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         move(pos);
         */
 
-        helpWidget->clear();
+        /*helpWidget->clear();
         QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
-        helpWidget->updateHelp(dll);
+        helpWidget->updateHelp(dll);*/
 
     } else {
         edtName->setText("");
@@ -313,6 +356,11 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         tvProperties->setEnabled(false);
     }
     //std::cout<<"creating new editors ... DONE!\n";
+}
+
+void QFRawDataPropertyEditor::displayHelp() {
+    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
+    services->displayHelpWindow(dll);
 }
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
@@ -390,7 +438,14 @@ void QFRawDataPropertyEditor::propsChanged() {
         labType->setText(current->getTypeDescription());
         labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         lstFiles->clear();
-        lstFiles->addItems(current->getFiles());
+        QStringList f=current->getFiles();
+        QStringList t=current->getFilesTypes();
+        for (int i=0; i<f.size(); i++) {
+            if (i<t.size()) {
+                if (!t[i].isEmpty()) f[i]=f[i]+QString(" [%1]").arg(t[i]);
+            }
+        }
+        lstFiles->addItems(f);
     }
 }
 

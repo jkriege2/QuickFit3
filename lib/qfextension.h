@@ -23,7 +23,7 @@ class QFExtension: public QFPlugin {
         virtual ~QFExtension() {};
 
         /*! \brief initialize the plugin, when implementing plugins, do not overload this, but overload QFExtensionBase::initExtension() */
-        virtual void init(QFExtensionServices* services, QWidget* parentWidget)=0;
+        virtual void init(QFPluginServices* services, QWidget* parentWidget)=0;
 
         /*! \brief deinitialize the plugin */
         virtual void deinit()=0;
@@ -59,7 +59,7 @@ class QFLIB_EXPORT QFExtensionBase: public QFExtension {
         virtual ~QFExtensionBase() {};
 
         /*! \copydoc QFExtension::init() */
-        virtual void init(QFExtensionServices* services, QWidget* parentWidget) {
+        virtual void init(QFPluginServices* services, QWidget* parentWidget) {
             this->services=services;
             this->parentWidget=parentWidget;
             this->settings=services->getOptions();
@@ -87,7 +87,7 @@ class QFLIB_EXPORT QFExtensionBase: public QFExtension {
 
 
     protected:
-        QFExtensionServices* services;
+        QFPluginServices* services;
         QFProject* project;
         ProgramOptions* settings;
         QWidget* parentWidget;

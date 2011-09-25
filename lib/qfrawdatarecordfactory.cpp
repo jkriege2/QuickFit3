@@ -160,3 +160,9 @@ QString QFRawDataRecordFactory::getPluginCopyrightFile(QString ID) {
     }
     return "";
 }
+
+
+bool  QFRawDataRecordFactory::contains(QString ID) {
+    return items.contains(ID);
+}
+

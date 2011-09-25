@@ -58,7 +58,7 @@ void QFExtensionCameraRadhard2::initExtension() {
 }
 
 void QFExtensionCameraRadhard2::programFPGA() {
-    QDialog* dlg=new QDialog(NULL);
+    QDialog* dlg=new QDialog(parentWidget);
 
     QGridLayout* lay=new QGridLayout(dlg);
     dlg->setLayout(lay);

@@ -44,7 +44,7 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
 
 void QFRDRImagingFCSPlugin::correlateAndInsert() {
     if (project && settings) {
-        QFRDRImagingFCSCorrelationDialog* dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(settings, NULL);
+        QFRDRImagingFCSCorrelationDialog* dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
         dlgCorrelate->setProject(project);
         dlgCorrelate->show();
         while (dlgCorrelate->isVisible()) {
@@ -66,8 +66,10 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
             i++;
             services->log_text(tr("loading '%1' ...\n").arg(*it));
             progress.setLabelText(tr("loading '%1' ...\n").arg(*it));
+            QString filename=*it;
+            QString overview="";
             QApplication::processEvents();
-            insertVideoCorrelatorFile(*it);
+            insertVideoCorrelatorFile(filename, overview);
             settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
             services->setProgress(i);
             QApplication::processEvents();
@@ -110,7 +112,15 @@ void QFRDRImagingFCSPlugin::insertRecord() {
             progress.setLabelText(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name));
             QApplication::processEvents();
             if (current_format_name==format_videoCorrelator) {
-                    insertVideoCorrelatorFile(*it);
+                QString filename=*it;
+                QString overview=filename;
+                overview=overview.replace(".autocorrelation.dat", ".overview.tif");
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".crosscorrelation.dat", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) overview="";
+                insertVideoCorrelatorFile(filename, overview);
             }
             settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
             services->setProgress(i);
@@ -128,7 +138,7 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QTextStream stream(&file);
 		while ((!stream.atEnd()) && (result<=0)) {
-            QVector<double> data=csvReadline(stream, ',', '#');
+            QVector<double> data=csvReadline(stream, ',', '#', 0);
             result=data.size();
 		}
 		file.close();
@@ -136,9 +146,10 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     return result;
 }
 
-void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
+void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww) {
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
+    QString filename_overview=filename_overvieww;
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
@@ -180,6 +191,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
                     if (reg.indexIn(line)>-1) {
                         QString name=reg.cap(1).toLower().trimmed();
                         QString value=reg.cap(3);
+
                         if (name=="width") {
                             initParams["WIDTH"]=value.toInt();
                             width=value.toInt();
@@ -189,6 +201,9 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
                             height=value.toInt();
                             paramsReadonly<<"HEIGHT";
                         } else if (name=="reading frame count") {
+                            initParams["FRAME_COUNT"]=value.toInt();
+                            paramsReadonly<<"FRAME_COUNT";
+                        } else if (name=="frame count") {
                             initParams["FRAME_COUNT"]=value.toInt();
                             paramsReadonly<<"FRAME_COUNT";
                         } else if (name=="first frame") {
@@ -217,6 +232,18 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
                             paramsReadonly<<"";*/
                         }
                     }
+                    int colon_idx=line.indexOf(':');
+                    if (colon_idx>=0) {
+                        QString name=line.left(colon_idx).toLower().trimmed();
+                        QString value=line.mid(colon_idx+1).trimmed();
+                        //qDebug()<<name<<value;
+                        if (name=="overview image file") {
+                            filename_overview=QFileInfo(value).canonicalFilePath();
+                        } else if (name=="date/time") {
+                            initParams["CORRELATION_DATE"]=value;
+                            paramsReadonly<<"CORRELATION_DATE";
+                        }
+                    }
                 } while (!line.isNull());
             }
         }
@@ -230,28 +257,46 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename) {
         }
         if (ok && (height<=0)) {
             bool okk=true;
-            int wwidth=QInputDialog::getInt ( NULL, tr("Import Video Correlator Data"), tr("width = "), 0, 1, 2147483647, 1, &okk);
+            int wwidth=QInputDialog::getInt ( NULL, tr("Import Video Correlator Data"), tr("height = "), 0, 1, 2147483647, 1, &okk);
             if (okk) { height=wwidth; ok=false; }
         }
         if (ok) {
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;
             initParams["TAU_COLUMN"]=0;
+            int columns=checkColumns(filename);
             if (!isCross) {
                 initParams["CORRELATION_COLUMN"]=1;
+                QStringList files, files_types;
+                files<<filename;
+                files_types<<"acf";
+                //qDebug()<<"filename_overview: "<<filename_overview;
+                if (QFile::exists(filename_overview)) {
+                    files<<filename_overview;
+                    files_types<<"overview";
+                }
+                if (columns>2) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), QStringList(filename), initParams, paramsReadonly);
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files, initParams, paramsReadonly, files_types);
                 if (e->error()) { // when an error occured: remove record and output an error message
                     QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
                     project->deleteRawData(e->getID());
                 }
             } else {
-                int columns=checkColumns(filename);
-                for (int c=1; c<columns; c++) {
+
+                for (int c=1; c<=qMin(4,columns); c++) {
                     initParams["CORRELATION_COLUMN"]=c;
+                    QStringList files, files_types;
+                    files<<filename;
+                    files_types<<"ccf";
+                    if (QFile::exists(filename_overview)) {
+                        files<<filename_overview;
+                        files_types<<"overview";
+                    }
+                    if (columns>4) initParams["CORRELATION_ERROR_COLUMN"]=c+4;
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), QStringList(filename), initParams, paramsReadonly);
+                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types);
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));

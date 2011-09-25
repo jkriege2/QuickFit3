@@ -8,7 +8,7 @@
 #include "../interfaces/qfextensionlinearstage.h"
 
 class QFESPIMB040MainWindow; // forward
-class QFExtensionServices; // forward
+class QFPluginServices; // forward
 class QFExtension;
 
 namespace Ui {
@@ -23,7 +23,7 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040ImageStackConfigWidget(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices);
+        explicit QFESPIMB040ImageStackConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
         ~QFESPIMB040ImageStackConfigWidget();
 
     signals:
@@ -65,7 +65,7 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
     private:
         Ui::QFESPIMB040ImageStackConfigWidget *ui;
         QFESPIMB040MainWindow* m_parent;
-        QFExtensionServices* m_pluginServices;
+        QFPluginServices* m_pluginServices;
 
 };
 

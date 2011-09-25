@@ -122,6 +122,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         /** \brief if this was the last record this applies to, we close it */
         void recordAboutToBeDeleted(QFRawDataRecord* record);
+        /** \brief display the online help dialog for this plugin */
+        void displayHelp();
 
     protected:
         /** \brief points to the record currently displayed */
@@ -189,6 +191,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QFPluginServices* services;
         /** \brief help widget for evaluation */
         QFHTMLHelpWindow* helpWidget;
+        /** \brief button to diaply online-help */
+        QPushButton* btnHelp;
 
         QString currentSaveDir;
 

@@ -37,6 +37,8 @@ class QFRDRImageReader {
          *  This does not change the state of the class. This method may have a long runtime, if it has to really count the frames!
          */
         virtual uint32_t countFrames()=0;
+        /** \brief move the reading pointer back to the first frame */
+        virtual void reset()=0;
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         virtual bool nextFrame()=0;
         /** \brief return the width of the frames (valid after open() returned \c true */

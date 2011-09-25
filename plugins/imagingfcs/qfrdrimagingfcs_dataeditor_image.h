@@ -14,7 +14,6 @@
 #include <QGroupBox>
 #include <QAbstractTableModel>
 #include "datacutslider.h"
-#include "qt/jkqtfastplotter.h"
 #include "qfrdrimagingfcsrunsmodel.h"
 #include <QSet>
 #include "jkdoubleedit.h"
@@ -86,6 +85,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief draw overview plot */
         void replotImage();
 
+        /** \brief replot the selection displays only */
+        void replotSelection(bool replot);
+
+        /** \brief fill the selection/expluded arrays for the overlays, does not plot */
+        void updateSelectionArrays();
+
         /** \brief draw overview plot */
         void replotOverview();
         /** \brief excludes the currently selected items from the evaluation and recalculates the average */
@@ -130,6 +135,13 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void resultsChanged();
 
         void debugInfo();
+
+        /** \brief save a report of the evaluation results */
+        void saveReport();
+        /** \brief save the marginals and histogram data */
+        void saveData();
+        /** \brief print a report of the evaluation results */
+        void printReport();
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -178,14 +190,14 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief label over the parameter image plot */
         QLabel* labParamImage;
 
-        /** \brief fast plotter for overview image */
-        JKQTFastPlotter* pltOverview;
+        /** \brief  plotter for overview image */
+        JKQtPlotter* pltOverview;
         /** \brief plot for the overview image in pltOverview */
-        JKQTFPimagePlot* plteOverview;
+        JKQTPMathImage* plteOverview;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
-        JKQTFPimageOverlayPlot* plteOverviewSelected;
+        JKQTPOverlayImage* plteOverviewSelected;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
-        JKQTFPimageOverlayPlot* plteOverviewExcluded;
+        JKQTPOverlayImage* plteOverviewExcluded;
         /** \brief data in plteOverviewSelected */
         bool* plteOverviewSelectedData;
         /** \brief data in plteOverviewExcluded */
@@ -194,7 +206,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         int plteOverviewSize;
 
 
-        /** \brief fast plotter for overview image */
+        /** \brief  plotter for overview image */
         JKQtPlotter* pltImage;
         /** \brief plot for the overview image in pltImage */
         JKQTPMathImage* plteImage;
@@ -207,7 +219,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         JKQTPOverlayImage* plteImageExcluded;
 
 
-        /** \brief fast plotter for goodnes of fit image */
+        /** \brief  plotter for goodnes of fit image */
         JKQtPlotter* pltGofImage;
         /** \brief plot for the  goodnes of fit image in pltOverview */
         JKQTPMathImage* plteGofImage;
@@ -222,6 +234,11 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
+
+        ///** \brief combobox for the color bar of plteOverview */
+        //QComboBox* cmbOverviewColorbar;
+        ///** \brief combobox for the color bar of plteGofImage */
+        //QComboBox* cmbGofColorbar;
 
         /** \brief checkbox to en-/disable automatic color bar scaling */
         QCheckBox* chkImageAutoScale;
@@ -249,9 +266,19 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         QFTableModel* tabFitvals;
 
+        /** \brief action to print a report */
+        QPushButton* btnPrintReport;
+
+        /** \brief action to save a report */
+        QPushButton* btnSaveReport;
+        /** \brief action to save marginal+histogram data */
+        QPushButton* btnSaveData;
+
 
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;
+
+        QString lastSavePath;
 
 
 
@@ -279,6 +306,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
          */
         bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation);
 
+        void createReportDoc(QTextDocument* document);
 };
 
 #endif // QFRDRIMAGINGFCSEDITORIMAGE_H

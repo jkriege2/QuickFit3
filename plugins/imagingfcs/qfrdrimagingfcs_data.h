@@ -18,6 +18,7 @@
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "../interfaces/qfevaluationimagetoruninterface.h"
 #include "csvtools.h"
+#include "qtriple.h"
 
 
 
@@ -112,6 +113,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 		/** \brief load data file */
         bool loadVideoCorrelatorFile(QString filename);
 
+        /** \brief load overview image file */
+        bool loadOverview(QString filename);
+
     private:
         /** \brief width of the image */
         int width;
@@ -129,6 +133,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double* sigmas;
         /** \brief time axis [seconds] */
         double* tau;
+
+        /** \brief overview image */
+        uint16_t* overview;
 
 		/** \brief the leaveout list */
         QList<int> leaveout;

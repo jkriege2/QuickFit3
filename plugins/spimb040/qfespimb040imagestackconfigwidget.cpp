@@ -12,7 +12,7 @@
 
 #define STAGE_INTERVAL_MS 100
 
-QFESPIMB040ImageStackConfigWidget::QFESPIMB040ImageStackConfigWidget(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices) :
+QFESPIMB040ImageStackConfigWidget::QFESPIMB040ImageStackConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ImageStackConfigWidget)
 {

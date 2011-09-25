@@ -48,7 +48,7 @@
 class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         Q_OBJECT
     public:
-        QFESPIMB040MainWindow(QFExtensionServices* pluginServices, QWidget* parent=NULL);
+        QFESPIMB040MainWindow(QFPluginServices* pluginServices, QWidget* parent=NULL);
         virtual ~QFESPIMB040MainWindow();
 
         /** \brief load settings */
@@ -68,7 +68,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         QFESPIMB040CameraConfig* camConfig1;
         QFESPIMB040CameraConfig* camConfig2;
         QFESPIMB040SampleStageConfig* sampleStages;
-        QFExtensionServices* m_pluginServices;
+        QFPluginServices* m_pluginServices;
 
         QTabWidget* tabAcquisition;
         QFESPIMB040AcquisitionConfigWidget* widAcquisition;
@@ -76,6 +76,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
 
         QTabWidget* tabMain;
         QFHTMLHelpWindow* help;
+        QPushButton* btnHelp;
 
 
 
@@ -130,6 +131,8 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
             16-bit TIFF file for eachcamera separately.
           */
         void doImageStack();
+
+        void displayHelp();
 
     protected:
         /*! \brief save an image from the given camera as a 16-bit TIFF image into \a filename

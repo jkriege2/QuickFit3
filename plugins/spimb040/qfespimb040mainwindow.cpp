@@ -6,7 +6,7 @@
 
 
 
-QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFExtensionServices* pluginServices, QWidget* parent):
+QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFPluginServices* pluginServices, QWidget* parent):
     QWidget(parent, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint)
 {
     camConfig1=NULL;
@@ -71,6 +71,10 @@ void QFESPIMB040MainWindow::showEvent( QShowEvent * event )  {
     }
 }
 
+void QFESPIMB040MainWindow::displayHelp() {
+    m_pluginServices->displayHelpWindow(m_pluginServices->getExtensionManager()->getPluginHelp("ext_spimb040"));
+}
+
 void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main tab and help widget
@@ -82,12 +86,18 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     mainl->addWidget(tabMain);
     QWidget* mainWid=new QWidget(this);
     tabMain->addTab(mainWid, tr("Imaging"));
-    help=new QFHTMLHelpWindow(tabMain);
+
+
+    /*help=new QFHTMLHelpWindow(tabMain);
     help->initFromPluginServices(m_pluginServices);
     tabMain->addTab(help, QIcon(":/lib/help.png"), tr("Help"));
     help->initFromPluginServices(m_pluginServices);
     help->updateHelp( extManager->getPluginHelp("ext_spimb040") );
-    qDebug()<<extManager->getPluginHelp("ext_spimb040");
+    qDebug()<<extManager->getPluginHelp("ext_spimb040");*/
+    btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("Help"), this);
+    btnHelp->setToolTip(tr("display the online help window"));
+    connect(btnHelp, SIGNAL(clicked()), this,SLOT(displayHelp()));
+    tabMain->setCornerWidget(btnHelp, Qt::TopRightCorner);
     tabMain->setCurrentIndex(0);
 
 

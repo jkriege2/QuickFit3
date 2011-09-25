@@ -4,7 +4,7 @@
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
 	<title>Imaging FCS Plugin: Usage</title>
 	  <link rel="prev" href="imaging_fcs.html"> 
-	  <link rel="next" href="imfcs_dataformats.html"> 
+	  <link rel="next" href="imfcs_correlator.html"> 
 	  <link rel="contents" href="imaging_fcs.html">   
   </head>
   <body>
@@ -20,11 +20,30 @@
 	<p></p>
 
 	<a name="#rdreditor"><h2>Imaging FCS Data Editor</h2>
+	<h3>Correlation Curves</h3>
+	<p>In this editor you may look at the correlation curves (ACF/CCF) for each pixel. You can either select a pixel from the given list of pixel coordinates or from the image below this list. In addition to the selected pixels, also an average (and standard deviation) over all pixels that were not excluded (button below image) may be displayed. By excluding the ACF/CCF from a pixel you remove it from the average. This feature may be used if the sample is uniform and you want to fit to an averaged ACF/CCF.</p>
 	<p></p>
-	<p></p>
-	<p></p>
-	<p></p>
-
+	<h3>Parameter Image</h3>
+	<p>This editor is used to display the result of fits as an image. It collects the fit results from a given set for each pixel. these fit results are displayed as a color-coded image (top left). In addition a second parameter may be selected that serves as measure for the goodnes of fit (top center plot). In the top right plot the overview image of the measurement is displayed. By clicking on one of the images, you may select the corresponding ACF/CCF to be displayed below. If you keep Ctrl pressed, while clicking, multiple pixels may be selected. The currently selected pixels may optionally be shown as overlays in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fitparameters are shown in the table on the right of the correlation function plot. </p>
+	<p>On the right-hand side you may select different options that change the appearance of the plots (color scales, ranges, ...).</p>
+	<p>The parameters to display are selected above the plots. First you will have to select a fit parameter set. If you use the FCS Fit plugin for fitting, a new set will be created for every differing combination of evaluation item (if you have two, you can distinguish these), fit algorithm and fit function. Then as a second step you may selectthe parameters to display. The parameters can be transformed with some basic mathematical transformations (none reciprocal 1/x, square root, logarithm) before they are displayed. The display settings (transformation, color coding, ...) are stored for every fit parameter and result set separately in the project, so you can switch to and back between different parameters, without loosing the settings.</p>
+	<p>You can save the parameter and goodnes-of-fit images as data files for further processing, or as a report:
+		<ul>
+		  <li><b><img src=":/imaging_fcs/preview_savedata.png"> Save data:</b> Saves the parameter image and goodnes of fit image as a separate file. The selected parameter transformations are omitted. You can select different file formats:
+		    <ol>
+			  <li><i>Comma-Separated value:</i> saves the data as text file which contains a matrix of numbers, separated by commas (,) and with a dot (.) as decimal separator.</li>
+			  <li><i>Semicolon-Separated value [German Excel]:</i> saves the data as text file which contains a matrix of numbers, separated by semicolons (;) and with a comma (,) as decimal separator.</li>
+			  <li><i>SYLK:</i> saves the data as a SYLK file which can be imported by many spread sheet programs</li>
+			  <li><i>float-TIFF:</i> saves the data as a TIFF image with 32-bit floating point values in each pixel.</li>
+			  <li><i>16-bit-TIFF:</i> saves the data as a TIFF image with 16-bit unsigned integer values in each pixel.</li>
+			  <li><i>color-coded PNG image:</i> saves the data as PNG image with the color coding used in the dialog (note: this uses the same transformation as the dialog).</li>
+			</ol>
+			The two images are saved into separae files. They end with the suffix <tt>.param.ext</tt> for the parameter image or <tt>.gof.ext</tt> for the goodnes of fit image.
+		  </li>
+		  <li><b><img src=":/imaging_fcs/report_save.png"> Save report:</b> Save the contenst of the current window as a PDF or PostScript file.</li>
+		  <li><b><img src=":/imaging_fcs/report_print.png"> Print report:</b> Print the contents of the curret window.</li>
+		</ul>
+	</p>
 	</body>
 </html>
 

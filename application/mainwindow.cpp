@@ -179,7 +179,9 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         extensionManager->distribute(NULL);
         extensionManager->deinit();
         newProjectTimer.stop();
+        helpWindow->close();
         event->accept();
+        QApplication::exit();
     } else {
         event->ignore();
     }
@@ -1201,6 +1203,33 @@ void MainWindow::autosaveProject() {
     logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
     project->writeXML(autosaveFilename, false);
 
+}
+
+QString MainWindow::getPluginHelpDirectory(const QString& pluginID) {
+    QString hlp=getPluginHelp(pluginID);
+    if (hlp.isEmpty()) return settings->getAssetsDirectory()+QString("/help/");
+    else return QFileInfo(hlp).absolutePath()+"/";
+}
+
+QString MainWindow::getPluginHelp(const QString& pluginID) {
+    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginHelp(pluginID);
+    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginHelp(pluginID);
+    if (extensionManager->contains(pluginID)) return extensionManager->getPluginHelp(pluginID);
+    return "";
+}
+
+QString MainWindow::getPluginTutorial(const QString& pluginID) {
+    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginTutorial(pluginID);
+    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginTutorial(pluginID);
+    if (extensionManager->contains(pluginID)) return extensionManager->getPluginTutorial(pluginID);
+    return "";
+}
+
+void MainWindow::displayHelpWindow(const QString& helpfile) {
+    helpWindow->clear();
+    if (helpfile.isEmpty()) helpWindow->updateHelp(settings->getAssetsDirectory()+QString("/help/quickfit.html"));
+    else helpWindow->updateHelp(helpfile);
+    helpWindow->show();
 }
 
 void MainWindow::displayHelp() {

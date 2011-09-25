@@ -31,6 +31,10 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
+SRC_DISTRIBUTED.files = $$HEADERS \
+                        $$SOURCES \
+                        $$FORMS
+
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl

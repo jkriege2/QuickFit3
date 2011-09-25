@@ -26,5 +26,8 @@
         <file alias="thread_ok.png">icons/thread_ok.png</file>
         <file alias="thread_run.png">icons/thread_run.png</file>
         <file alias="thread_wait.png">icons/thread_wait.png</file>
+        <file alias="preview_savedata.png">icons/preview_savedata.png</file>
+        <file alias="report_print.png">icons/report_print.png</file>
+        <file alias="report_save.png">icons/report_save.png</file>
     </qresource>
 </RCC>

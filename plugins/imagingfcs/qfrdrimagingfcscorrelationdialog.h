@@ -5,67 +5,22 @@
 #include "qfproject.h"
 #include "programoptions.h"
 #include "qfrdrimagingfcsthreadprogress.h"
+#include "qfpluginservices.h"
 #include <stdint.h>
 
 class QFRDRImagingFCSCorrelationJobThread; // forward
+struct Job; // forward
 namespace Ui {
     class QFRDRImagingFCSCorrelationDialog; // forward
 }
 
-/*! \brief job description for correlation
-    \ingroup qf3rdrdp_imaging_fcs
-*/
-struct Job {
-    /** \brief progress widget for this job */
-    QPointer<QFRDRImagingFCSThreadProgress> progress;
-    /** \brief thread object for this job */
-    QPointer<QFRDRImagingFCSCorrelationJobThread> thread;
-    /** \brief name of the input file */
-    QString filename;
-    /** \brief fileformat of the input file */
-    int fileFormat;
-    /** \brief correlator to use */
-    int correlator;
-    /** \brief background correction mode */
-    int backgroundCorrection;
-    /** \brief offset to substract from frames */
-    float backgroundOffset;
-    /** \brief correlator: number of linear correlators */
-    int S;
-    /** \brief correlator: channels per lin. correlator */
-    int P;
-    /** \brief correlator: m factor */
-    int m;
-    /** \brief first frame to calculate */
-    int32_t range_min;
-    /** \brief last frame to calculate */
-    int32_t range_max;
-    /** \brief add job results to project */
-    bool addToProject;
-    /** \brief duration of a single frame */
-    double frameTime;
-    /** \brief output prefix */
-    QString prefix;
-    /** \brief calculate ACF of each pixel */
-    bool acf;
-    /** \brief calculate the CCF to the nearest neighbour pixels */
-    bool ccf;
-    /** \brief statistics over frames */
-    uint32_t statistics_frames;
-    /** \brief calculate statistics */
-    bool statistics;
-    /** \brief create video */
-    bool video;
-    /** \brief average over this number of frames, if creating a video */
-    uint32_t video_frames;
-
-
-};
-
-
-
 /*! \brief dialog used to correlate image sequences
     \ingroup qf3rdrdp_imaging_fcs
+
+    This dialog is called by QFRDRImagingFCSPlugin::correlateAndInsert(). It allows the user
+    to create several correlation jobs that run in parallel and to wait until they are done.
+    Finally getFilesToAdd() returns a list of file constaining ACFs and CCFs to be added to the
+    project, by calling QFRDRImagingFCSPlugin::insertVideoCorrelatorFile().
 */
 class QFRDRImagingFCSCorrelationDialog : public QWidget
 {
@@ -73,7 +28,7 @@ class QFRDRImagingFCSCorrelationDialog : public QWidget
 
 public:
 
-    QFRDRImagingFCSCorrelationDialog(ProgramOptions* opt, QWidget *parent = 0);
+    QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent = 0);
     ~QFRDRImagingFCSCorrelationDialog();
 
     void setProject(QFProject* project);
@@ -87,6 +42,7 @@ protected slots:
     void on_btnSelectImageFile_clicked();
     void on_btnAddJob_clicked();
     void on_btnLoad_clicked();
+    void on_btnHelp_clicked();
     void on_spinP_valueChanged(int val);
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
@@ -94,17 +50,20 @@ protected slots:
     void frameTimeChanged(double value);
     void frameRateChanged(double value);
     void updateProgress();
-    void updateFromFile();
+    void updateFromFile(bool readFrameCount=true);
     void updateCorrelator();
+    void updateFrameCount();
     void startNextWaitingThread();
     void on_chkFirstFrame_clicked(bool checked);
     void on_chkLastFrame_clicked(bool checked);
+    void setEditControlsEnabled(bool enabled);
 protected:
     void closeEvent(QCloseEvent * event);
     bool allThreadsDone() const;
     int runningThreads() const;
     int waitingThreads() const;
 private:
+    QFPluginServices* pluginServices;
     Ui::QFRDRImagingFCSCorrelationDialog *ui;
     QPointer<QFProject> project;
     ProgramOptions* options;
@@ -116,6 +75,8 @@ private:
     //QList<Job> jobsToAdd;
     QStringList filesToAdd;
     bool closing;
+    int32_t frame_count;
+    QString inputconfigfile;
 
     int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
     int getLayoutIDForProgress(const QWidget* w) const;

@@ -7,10 +7,11 @@
 
 #define UPDATE_TIMEOUT 50
 
-QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(ProgramOptions* opt, QWidget *parent) :
+QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent) :
     QWidget(parent, Qt::Dialog|Qt::WindowTitleHint|Qt::WindowMinMaxButtonsHint|Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint),
     ui(new Ui::QFRDRImagingFCSCorrelationDialog)
 {
+    this->pluginServices=pluginservices;
     closing=false;
     this->options=opt;
     lastImagefileDir="";
@@ -21,8 +22,6 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(ProgramOption
     ui->edtFrameRate->setValue(100);
     ui->edtOffset->setRange(-1e10,1e10);
     ui->edtOffset->setValue(0);
-    ui->widDetails->setVisible(false);
-    ui->labDetails->setVisible(false);
 
     imageFilters.clear();
     ui->cmbFileformat->clear();
@@ -36,13 +35,26 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(ProgramOption
     lastImagefileFilter=imageFilters[0];
     connect(ui->edtFrameRate, SIGNAL(valueChanged(double)), this, SLOT(frameRateChanged(double)));
     connect(ui->edtFrameTime, SIGNAL(valueChanged(double)), this, SLOT(frameTimeChanged(double)));
+    connect(ui->spinFirstFrame, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->spinLastFrame, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->spinSegments, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->spinStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->spinVideoFrames, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     if (opt) readSettings();
     filesToAdd.clear();
+    setEditControlsEnabled(false);
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 }
 
 QFRDRImagingFCSCorrelationDialog::~QFRDRImagingFCSCorrelationDialog() {
     delete ui;
+}
+
+void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
+    ui->widDetails->setEnabled(enabled);
+    ui->labDetails->setEnabled(enabled);
+    ui->spinFirstFrame->setEnabled(enabled && !ui->chkFirstFrame->isChecked());
+    ui->spinLastFrame->setEnabled(enabled && !ui->chkLastFrame->isChecked());
 }
 
 bool QFRDRImagingFCSCorrelationDialog::allThreadsDone() const  {
@@ -157,10 +169,12 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int 
 
 void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
     ui->spinFirstFrame->setEnabled(!checked);
+    updateFrameCount();
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_chkLastFrame_clicked(bool checked) {
     ui->spinLastFrame->setEnabled(!checked);
+    updateFrameCount();
 }
 
 
@@ -177,15 +191,17 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFile_clicked() {
     }
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_btnHelp_clicked() {
+    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("imaging_fcs")+"imfcs_correlator.html");
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
     QString filename=ui->edtImageFile->text();
     if (QFile::exists(filename)) {
         updateFromFile();
-        ui->widDetails->setVisible(true);
-        ui->labDetails->setVisible(true);
+        setEditControlsEnabled(true);
     } else {
-        ui->widDetails->setVisible(false);
-        ui->labDetails->setVisible(false);
+        setEditControlsEnabled(false);
         QMessageBox::critical(this, tr("imFCS Correlator"), tr("The file '%1' does not exist.\nPlease select an existing file!").arg(filename));
     }
     writeSettings();
@@ -196,12 +212,20 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/last_imagefile_dir", lastImagefileDir);
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/last_imagefile_filter", lastImagefileFilter);
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/correlator", ui->cmbCorrelator->currentIndex());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/prefix", ui->edtPrefix->text());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/postfix", ui->edtPostfix->text());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/background", ui->cmbBackground->currentIndex());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/S", ui->spinS->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/P", ui->spinP->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/m", ui->spinM->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/parallel_threads", ui->spinProcesses->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/add_to_project", ui->chkAddToProject->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/statistics", ui->spinStatistics->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/video", ui->chkVideo->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/video_frames", ui->spinVideoFrames->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -210,12 +234,20 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     lastImagefileFilter=options->getQSettings()->value("imaging_fcs/dlg_correlate/last_imagefile_filter", lastImagefileFilter).toString();
 
     ui->cmbCorrelator->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/correlator", ui->cmbCorrelator->currentIndex()).toInt());
-    ui->cmbCorrelator->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/background", ui->cmbBackground->currentIndex()).toInt());
+    ui->cmbBackground->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/background", ui->cmbBackground->currentIndex()).toInt());
     ui->spinS->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/S", ui->spinS->value()).toInt());
     ui->spinP->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/P", ui->spinP->value()).toInt());
     ui->spinM->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/m", ui->spinM->value()).toInt());
     ui->spinProcesses->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/parallel_threads", ui->spinProcesses->value()).toInt());
     ui->chkAddToProject->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/add_to_project", ui->chkAddToProject->isChecked()).toBool());
+    ui->edtPrefix->setText(options->getQSettings()->value("imaging_fcs/dlg_correlate/prefix", ui->edtPrefix->text()).toString());
+    ui->edtPostfix->setText(options->getQSettings()->value("imaging_fcs/dlg_correlate/postfix", ui->edtPostfix->text()).toString());
+    ui->chkVideo->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/video", ui->chkVideo->isChecked()).toBool());
+    ui->spinVideoFrames->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/video_frames", ui->spinVideoFrames->value()).toInt());
+    ui->spinStatistics->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/statistics", ui->spinStatistics->value()).toInt());
+    ui->chkACF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked()).toBool());
+    ui->chkCCF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked()).toBool());
+    ui->spinSegments->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value()).toInt());
 
 }
 
@@ -263,8 +295,7 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
-    updateFromFile();
-
+    updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
     Job job;
     job.progress=new QFRDRImagingFCSThreadProgress(this);
     job.thread=new QFRDRImagingFCSCorrelationJobThread(this);
@@ -275,6 +306,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
     connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
     job.filename=ui->edtImageFile->text();
+    job.descriptionFilename=inputconfigfile;
     job.correlator=ui->cmbCorrelator->currentIndex();
     job.fileFormat=ui->cmbFileformat->currentIndex();
     job.backgroundCorrection=ui->cmbBackground->currentIndex();
@@ -284,6 +316,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.frameTime=ui->edtFrameTime->value()*1e-6;
     job.addToProject=ui->chkAddToProject->isChecked();
     job.prefix=ui->edtPrefix->text();
+    job.postfix=ui->edtPostfix->text();
     job.backgroundOffset=ui->edtOffset->value();
     job.range_min=-1;
     if (!ui->chkFirstFrame->isChecked()) {
@@ -293,16 +326,16 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     if (!ui->chkLastFrame->isChecked()) {
         job.range_max=ui->spinLastFrame->value();
     }
-    job.acf=true;
-    job.ccf=true;
-    job.video=true;
-    job.video_frames=100;
+    job.acf=ui->chkACF->isChecked();
+    job.ccf=ui->chkCCF->isChecked();
+    job.video=ui->chkVideo->isChecked();
+    job.video_frames=qMax(2,ui->spinVideoFrames->value());
     job.statistics=true;
-    job.statistics_frames=100;
+    job.statistics_frames=qMax(2, ui->spinStatistics->value());
+    job.segments=ui->spinSegments->value();
     writeSettings();
 
-    ui->widDetails->setVisible(false);
-    ui->labDetails->setVisible(false);
+    setEditControlsEnabled(false);
     ui->layProgress->insertWidget(0, job.progress);
 
     job.progress->setName(tr("correlating '%1'").arg(job.filename));
@@ -317,6 +350,7 @@ void QFRDRImagingFCSCorrelationDialog::frameTimeChanged(double value) {
         connect(ui->edtFrameRate, SIGNAL(valueChanged(double)), this, SLOT(frameRateChanged(double)));
     }
     updateCorrelator();
+    updateFrameCount();
 }
 
 void QFRDRImagingFCSCorrelationDialog::frameRateChanged(double value) {
@@ -326,14 +360,47 @@ void QFRDRImagingFCSCorrelationDialog::frameRateChanged(double value) {
         connect(ui->edtFrameTime, SIGNAL(valueChanged(double)), this, SLOT(frameTimeChanged(double)));
     }
     updateCorrelator();
+    updateFrameCount();
+}
+
+void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
+    double taumin=ui->edtFrameTime->value()*1e-6;
+    double frames=frame_count;
+    int64_t first=0;
+    int64_t last=frame_count-1;
+    if (!ui->chkFirstFrame->isChecked()) first= ui->spinFirstFrame->value();
+    if (!ui->chkLastFrame->isChecked()) last= ui->spinLastFrame->value();
+    frames=last-first+1;
+
+    if (frame_count>0) {
+        ui->labInputLength->setText(tr("length: %1 = %2 s").arg((int64_t)round(frames)).arg(frames*taumin));
+        ui->labRange->setText(tr("= %1 frames").arg(round(frames)));
+        ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frame_count/ui->spinSegments->value()).arg(taumin*(double)(frame_count/ui->spinSegments->value())));
+        ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frame_count/ui->spinStatistics->value()));
+        ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(taumin*(double)ui->spinVideoFrames->value()).arg(frame_count/ui->spinVideoFrames->value()));
+    } else {
+        ui->labInputLength->setText(QString(""));
+        ui->labRange->setText(QString(""));
+        ui->labSegments->setText(QString(""));
+        ui->labStatistics->setText(QString(""));
+        ui->labVideo->setText(QString(""));
+    }
+
 }
 
 void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
+    int corrType=ui->cmbCorrelator->currentIndex();
+    if (corrType==2) {
+        ui->spinM->setEnabled(false);
+        ui->spinM->setValue(2);
+    } else {
+        ui->spinM->setEnabled(true);
+    }
+
     int S=ui->spinS->value();
     double P=ui->spinP->value();
     double m=ui->spinM->value();
     double taumin=ui->edtFrameTime->value();
-    int corrType=ui->cmbCorrelator->currentIndex();
     double taumax=taumin;
 
     if (corrType==1) {
@@ -351,10 +418,18 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
             taumax+=pow(m, s)*taumin*P;
         }
     }
-    ui->labCorrelator->setText(tr("<i>spanned correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...</i><sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
+    ui->labCorrelator->setText(tr("<i>spanned correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
-void QFRDRImagingFCSCorrelationDialog::updateFromFile() {
+void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
+    QModernProgressDialog prg(this);
+    prg.setWindowTitle(tr("imFCS: Correlator"));
+    prg.setLabelText(tr("Reading image series information ... reading config file ..."));
+    prg.open();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
     QString filename=QFileInfo(ui->edtImageFile->text()).absoluteFilePath();
     double frametime=ui->edtFrameTime->value();
     double baseline_offset=ui->edtOffset->value();
@@ -362,13 +437,14 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile() {
     //////////////////////////////////////////////////////////////////////////////////
     // now we search for a .configuration.ini file describing the selected file
     //////////////////////////////////////////////////////////////////////////////////
-    QSettings settings;
     QDir d=QFileInfo(filename).absoluteDir();
-    QFileInfo finfo(filename);
     QStringList nameFilters;
     nameFilters<<"*.ini";
+    inputconfigfile="";
     d.setNameFilters(nameFilters);
     foreach (QString iniFile, d.entryList(QDir::Files)) {
+        QApplication::processEvents();
+        inputconfigfile=d.absoluteFilePath(iniFile);
         QSettings set(d.absoluteFilePath(iniFile), QSettings::IniFormat);
         int fcnt=set.value("files/count", 0).toInt();
         if (fcnt>0) {
@@ -391,11 +467,54 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile() {
         }
     }
 
-
     // SET THE FRAMETIME/RATE
     ui->edtFrameTime->setValue(frametime);
     frameTimeChanged(frametime);
     ui->edtOffset->setValue(baseline_offset);
+
+
+
+    if (readFrameCount) {
+
+        //////////////////////////////////////////////////////////////////////////////////
+        // we also try to open the file with an appropriate reader and read th number of frames in it
+        //////////////////////////////////////////////////////////////////////////////////
+        prg.setLabelText(tr("Reading image series information ... counting frames ..."));
+        QApplication::processEvents();
+        QApplication::processEvents();
+        QFRDRImageReader* reader=NULL;
+        bool OK=false;
+        if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount()) {
+            reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex());
+        }
+        if (reader) {
+            OK=reader->open(filename);
+            if (OK)  {
+                QApplication::processEvents();
+                frame_count=reader->countFrames();
+                if (frame_count>0) {
+                    ui->spinLastFrame->setMaximum(frame_count-1);
+                    ui->spinFirstFrame->setMaximum(frame_count-1);
+                    ui->spinLastFrame->setValue(frame_count-1);
+                    ui->spinVideoFrames->setMaximum(frame_count-1);
+                    ui->spinVideoFrames->setValue(qMax(2,frame_count/1000));
+                    ui->spinStatistics->setMaximum(frame_count-1);
+                } else {
+                    ui->spinLastFrame->setMaximum(10000000);
+                    ui->spinFirstFrame->setMaximum(10000000);
+                    ui->spinLastFrame->setValue(10000000);
+                    ui->spinVideoFrames->setMaximum(10000000);
+                    ui->spinVideoFrames->setValue(100);
+                    ui->spinStatistics->setMaximum(10000000);
+                }
+            }
+            delete reader;
+        }
+    }
+
+    prg.close();
+    QApplication::restoreOverrideCursor();
+    updateFrameCount();
 }
 
 

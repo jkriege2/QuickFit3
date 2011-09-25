@@ -221,9 +221,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          * \param inputFiles files to import into the project
          * \param initParams parameters to add to the record parameters BEFORE importing the files
          * \param initParamsReadonly a list of the parameters that shall be readonly, i.e. not usereditable
+         * \param inputFilesTypes types of the files listed in \a inputFiles
          * \return a pointer to the newly created record
          */
-        QFRawDataRecord* addRawData(QString type, QString name=QString(""), QStringList inputFiles=QStringList(), qfp_param_type initParams=qfp_param_type(), QStringList initParamsReadonly=QStringList());
+        QFRawDataRecord* addRawData(QString type, QString name=QString(""), QStringList inputFiles=QStringList(), qfp_param_type initParams=qfp_param_type(), QStringList initParamsReadonly=QStringList(), QStringList inputFilesTypes=QStringList());
 
         /** \brief add new evaluation record
          *

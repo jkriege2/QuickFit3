@@ -1,5 +1,5 @@
 #include "qfrdrimagereadertiff.h"
-
+#include "libtiff_tools.h"
 #include <QObject>
 #include <QtGlobal>
 
@@ -24,6 +24,7 @@ QString QFRDRImageReaderTIFF::formatName() const {
 
 
 bool QFRDRImageReaderTIFF::open(QString filename) {
+    close();
     tif = TIFFOpen(filename.toAscii().data(),"r");
     if (tif) {
         uint32 nx,ny;
@@ -44,6 +45,7 @@ bool QFRDRImageReaderTIFF::open(QString filename) {
 
 void QFRDRImageReaderTIFF::close() {
     if (tif) TIFFClose(tif);
+    tif=NULL;
 }
 
 uint32_t QFRDRImageReaderTIFF::countFrames() {
@@ -56,6 +58,11 @@ uint32_t QFRDRImageReaderTIFF::countFrames() {
     } while (TIFFReadDirectory(tif));
     TIFFSetDirectory(tif,dir);
     return nb_images;
+}
+
+void QFRDRImageReaderTIFF::reset() {
+    if (!tif) return ;
+    TIFFSetDirectory(tif,0);
 }
 
 bool QFRDRImageReaderTIFF::nextFrame() {
@@ -72,60 +79,9 @@ uint16_t QFRDRImageReaderTIFF::frameHeight() {
 }
 
 
-template<typename t, typename tout>
-bool QFRDRImageReaderTIFF_load_nontiled(tout* data_out, TIFF *const tif, const uint32 width, const uint32 height) {
-    t *const buf = (t*)_TIFFmalloc(TIFFStripSize(tif));
-    if (buf) {
-        uint32 row, rowsperstrip = (uint32)-1;
-        TIFFGetField(tif,TIFFTAG_ROWSPERSTRIP,&rowsperstrip);
-        for (row = 0; row<height; row+= rowsperstrip) {
-            uint32 nrow = (row+rowsperstrip>height?height-row:rowsperstrip);
-            tstrip_t strip = TIFFComputeStrip(tif, row, 0);
-            if ((TIFFReadEncodedStrip(tif,strip,buf,-1))<0) {
-                _TIFFfree(buf);
-                return false;
-            }
-            const t *ptr = buf;
-            for (unsigned int rr = 0; rr<nrow; ++rr) {
-                for (unsigned int cc = 0; cc<width; ++cc) {
-                    data_out[cc+(row+rr)*width] = (tout)*(ptr++);
-                }
-            }
-        }
-        _TIFFfree(buf);
-    } else return false;
-    return true;
-}
-
-
-
-template<typename t, typename tout>
-bool QFRDRImageReaderTIFF_load_tiled(tout* data_out, TIFF *const tif, const uint32 width, const uint32 height, const uint32 tile_width, const uint32 tile_height) {
-    t *const buf = (t*)_TIFFmalloc(TIFFTileSize(tif));
-    if (buf) {
-        unsigned int sample=0;
-        for (unsigned int row = 0; row<height; row+=tile_height) {
-            for (unsigned int col = 0; col<width; col+=tile_width) {
-                if (TIFFReadTile(tif,buf,col,row,0,sample)<0) {
-                    _TIFFfree(buf);
-                    return false;
-                }
-                const t *ptr = buf;
-                for (unsigned int rr = row; rr<qMin((unsigned int)(row+tile_height),(unsigned int)height); ++rr) {
-                    for (unsigned int cc = col; cc<qMin((unsigned int)(col+tile_width),(unsigned int)width); ++cc) {
-                        data_out[cc+rr*width] = (tout)*(ptr++);
-                    }
-                }
-            }
-        }
-        _TIFFfree(buf);
-    } else return false;
-    return true;
-}
-
 bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
     if (!tif) return false;
-
+    bool ok=true;
     uint16 samplesperpixel, bitspersample;
     uint16 sampleformat = SAMPLEFORMAT_UINT;
     uint32 nx,ny;
@@ -148,14 +104,14 @@ bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
             TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
             switch (bitspersample) {
                 case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_tiled<uint8_t,  uint16_t>(data,  tif, nx, ny, tw, th);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  uint16_t>(data,  tif, nx, ny, tw, th);
                     else {
                         setLastError(QObject::tr("can not load 8-bit tiled image in format different from UINT   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_tiled<uint16_t,  uint16_t>(data,  tif, nx, ny, tw, th);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  uint16_t>(data,  tif, nx, ny, tw, th);
                     else {
                         setLastError(QObject::tr("can not load 16-bit tiled image in format different from UINT   (from file '%1')").arg(filename));
                         return false;
@@ -170,14 +126,14 @@ bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
         } else { // load a non-tiled frame
             switch (bitspersample) {
                 case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_nontiled<uint8_t,  uint16_t>(data,  tif, nx, ny);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  uint16_t>(data,  tif, nx, ny);
                     else {
                         setLastError(QObject::tr("can not load 8-bit image in format different from UINT   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_nontiled<uint16_t,  uint16_t>(data,  tif, nx, ny);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  uint16_t>(data,  tif, nx, ny);
                     else {
                         setLastError(QObject::tr("can not load 16-bit image in format different from UINT   (from file '%1')").arg(filename));
                         return false;
@@ -191,11 +147,16 @@ bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
             }
         }
     }
-    return true;
+    if (!ok) {
+        setLastError(QObject::tr("unknown error when reading frame from TIFF file   (from file '%1')").arg(filename));
+    }
+    return ok;
 }
 
 bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
     if (!tif) return false;
+
+    bool ok=true;
 
     uint16 samplesperpixel, bitspersample;
     uint16 sampleformat = SAMPLEFORMAT_UINT;
@@ -219,34 +180,34 @@ bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
             TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
             switch (bitspersample) {
                 case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_tiled<uint8_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_tiled<int8_t,  float>(data,  tif, nx, ny, tw, th);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  float>(data,  tif, nx, ny, tw, th);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int8_t,  float>(data,  tif, nx, ny, tw, th);
                     else {
                         setLastError(QObject::tr("can not load 8-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_tiled<uint16_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_tiled<int16_t,  float>(data,  tif, nx, ny, tw, th);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  float>(data,  tif, nx, ny, tw, th);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int16_t,  float>(data,  tif, nx, ny, tw, th);
                     else {
                         setLastError(QObject::tr("can not load 16-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 32 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_tiled<uint32_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_tiled<int32_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) QFRDRImageReaderTIFF_load_tiled<float,  float>(data,  tif, nx, ny, tw, th);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint32_t,  float>(data,  tif, nx, ny, tw, th);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int32_t,  float>(data,  tif, nx, ny, tw, th);
+                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<float,  float>(data,  tif, nx, ny, tw, th);
                     else {
                         setLastError(QObject::tr("can not load 32-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 64 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_tiled<uint64_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_tiled<int64_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) QFRDRImageReaderTIFF_load_tiled<double,  float>(data,  tif, nx, ny, tw, th);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint64_t,  float>(data,  tif, nx, ny, tw, th);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int64_t,  float>(data,  tif, nx, ny, tw, th);
+                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<double,  float>(data,  tif, nx, ny, tw, th);
                     else {
                         setLastError(QObject::tr("can not load 64-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
                         return false;
@@ -261,34 +222,34 @@ bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
         } else { // load a non-tiled frame
             switch (bitspersample) {
                 case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_nontiled<uint8_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_nontiled<int8_t,  float>(data,  tif, nx, ny);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  float>(data,  tif, nx, ny);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int8_t,  float>(data,  tif, nx, ny);
                     else {
                         setLastError(QObject::tr("can not load 8-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_nontiled<uint16_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_nontiled<int16_t,  float>(data,  tif, nx, ny);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  float>(data,  tif, nx, ny);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int16_t,  float>(data,  tif, nx, ny);
                     else {
                         setLastError(QObject::tr("can not load 16-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 32 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_nontiled<uint32_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_nontiled<int32_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) QFRDRImageReaderTIFF_load_nontiled<float,  float>(data,  tif, nx, ny);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint32_t,  float>(data,  tif, nx, ny);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int32_t,  float>(data,  tif, nx, ny);
+                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<float,  float>(data,  tif, nx, ny);
                     else {
                         setLastError(QObject::tr("can not load 32-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
                         return false;
                     }
                     break;
                 case 64 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) QFRDRImageReaderTIFF_load_nontiled<uint64_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) QFRDRImageReaderTIFF_load_nontiled<int64_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) QFRDRImageReaderTIFF_load_nontiled<double,  float>(data,  tif, nx, ny);
+                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint64_t,  float>(data,  tif, nx, ny);
+                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int64_t,  float>(data,  tif, nx, ny);
+                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<double,  float>(data,  tif, nx, ny);
                     else {
                         setLastError(QObject::tr("can not load 64-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
                         return false;
@@ -302,5 +263,8 @@ bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
             }
         }
     }
-    return true;
+    if (!ok) {
+        setLastError(QObject::tr("unknown error when reading frame from TIFF file   (from file '%1')").arg(filename));
+    }
+    return ok;
 }

@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Imaging FCS Plugin: Image Correlators</title>
+	  <link rel="prev" href="imfcs_usage.html"> 
+	  <link rel="next" href="imfcs_dataformats.html"> 
+	  <link rel="contents" href="imaging_fcs.html">     
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="#imagecorrelation"><h2>Image Correlation</h2>
+	<p>The imFCS plugin also provides a module that calculates auto- and crosscorrelation functions (ACFs, CCFs) from image series. The image series have to be available in one of these formats:
+	   <ul>
+	     <li>multi-frame <b>TIFF</b> file (with 8- or 16-bit greyscale frames that all have the same size)</li>
+		 <li><b>RadHard raw</b> format</li>
+	   </ul>
+	   The plugin will read in the image series <i>I(x,y,t)</i> (<i>t=0..T-1, x=0..width-1, y=0..height-1</i>) and then calculate the ACFs/CCFs:
+	   <ul>
+	     <li><b>autocorrelation function <i>g<sub>x,y</sub>(&tau;)</i> (ACF)</b> for every pixel <i>(x,y)</i>
+		     <blockquote>
+               <img src="./pic/acf_int.png">
+             </blockquote>
+			 The result is saved in a comma-separated values (CSV) file <tt>basename.<i>autocorrelation.dat</i></tt>, as described <a href="imfcs_dataformats.html#formats_acf">here</a>. The pixels are ordered row-major, i.e. the order is
+			   <i>(0,0), (1,0), ...,(width-1,0), (0,1), (1,1), ..., (width-1,1), ..., (width-1, height-1). </i>
+			   
+		 </li>
+	     <li><b>crosscorrelation function <i>g<sub>(x,y)-(x',y')</sub>(&tau;) </i>(CCF)</b> for every pixel <i>(x,y)</i> to its neighbor pixels <i>(x',y')</i>
+		     <blockquote>
+               <img src="./pic/ccf_int.png">
+             </blockquote>
+			 Here the neighbors are the four directly neighboring pixels, i.e. <i>(x',y') = (x-1,y); (x+1,y); (x,y-1); (x,y+1)</i> If a neighboring pixel does not exist, the CCF equals 0 for all values of &tau;. The result is saved in a comma-separated values (CSV) file <tt>basename.<i>crosscorrelation.dat</i></tt>, as described <a href="imfcs_dataformats.html#formats_ccf">here</a>. The pixels are ordered row-major, i.e. the order is
+			   <i>(0,0), (1,0), ...,(width-1,0), (0,1), (1,1), ..., (width-1,1), ..., (width-1, height-1). </i>
+		 </li>
+	   </ul>
+	   In both cases the averaging operation is defined as:
+		 <blockquote>
+		   <img src="./pic/avg.png">
+		 </blockquote>
+	   In addition these properties are also calculated:
+       <ul>
+	     <li><b>average/overview image:</b> This 16-bit greyscale TIFF image <tt>basename.<i>overview.tif</i></tt> contains a per-pixel average over all frames in the image series. The average values are calculated as floating point numbers and then mapped to the range 0..65535 (the smallest average pixel will be 0 and the largest 65535) before saving it to the file.</li>
+	     <li><b>video:</b> This 16-bit greyscale multi-frame TIFF file <tt>basename.<i>video.tif</i></tt> contains a series of images where each image is the average over a given number of frames (parameter <tt>video_frames</tt>) from the image series. The video greyscale range is expanded to 0..65535, by the same method as above, but for the  whole series.</li>
+	     <li><b>statistics:</b> The correlator may calculate a set of statistical parameters from the image series. They are saved as a comma-separated values file <tt>basename.<i>statistics.dat</i></tt> of the format:
+		    <blockquote><tt>time [seconds], average, stddev, min, max</tt></blockquote>
+			Each property is calculated over a range of <tt>statistics_frames</tt> frames and eachpixel therein. The average averages over all pixels in all of these <tt>statistics_frames</tt> frames. 
+		 </li>
+	     <li><b>evaluation settings:</b> Finally a human (and computer) readable text file <tt>basename.<i>evalsettigs.txt</i></tt> is created. It contains the major settings used for the calculation. It also lists all files created by the evalution. For a detailed description of the file format, see <a href="imfcs_dataformats.html#formats_evalsettings">here</a></li>
+	   </ul>	   
+	</p>
+    <p></p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	
+	<a name="#background"><h2>Background Correction</h2>
+    <p>This plugin offers several options for the background correction. This is needed, as CCD-camera already ass a certain offset in order to prevent negativ readings. These possibilities are implemented:
+	<ul>
+	  <li><b>remove fixed offset:</b> subtracts only the given offset value from each pixel grey value</li>
+	  <li><b>remove fixed offset and minimum:</b> subtracts the given offset and the minimum grey value over the whole image series from each pixel grey value</li>
+	</ul>
+	Subtracting this background, improves the visibility of the correlation, But care must be taken to <u>not</u> remove part of the signal itself, as this may change the measured ACF/CCF amplitude and therefore the estimate of particle number.
+	</p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	
+	<a name="#correlators"><h2>Correlators</h2>
+    <p>In the last section only the definition of the ACFs/CCFs was given (in terms of integrals, i.e. continuous imae series). But the image series <i>I(t)</i> (omitting the pixel-specifier) are not continuous, but discrete in time:
+	 <blockquote>
+	   <img src="./pic/discrete_timeseries.png">
+	 </blockquote>	
+	 This section will describe the different types of correlators, available in this plugin, that calculate an ACF/CCF from one/two given discrete timeseries <i>I<sub>n</sub></i> (and <i>J<sub>n</sub></i> ). The integration or frame time is specified by <i>&tau;<sub>min</sub></i>:
+	<ul>
+	  <li><b>Direct Estimation:</b><br>This correlator directly estimates the above given correlation function by replacing the integrals with sums (only the CCF of two signals <i>I<sub>n</sub></i> and <i>J<sub>n</sub></i> is shown, the ACF is given by the CCF of the signal with itself, i.e. <i><i>J<sub>n</sub></i>=<i>I<sub>n</sub></i></i>):
+	     <blockquote>
+		   <img src="./pic/acf_direct.png">
+		 </blockquote>
+	  This sum is evaluated for semi-logarithmically spaced lags <i>&tau;</i>. These are specified by three integer numbers <i>S, P</i> and <i>m</i> that result in <i>S&middot;P</i> different values of <i>&tau; = &tau;<sub>s,p</sub></i>:
+	     <blockquote><i>
+		   &tau;<sub>0,0</sub> = &tau;<sub>min</sub><br>
+		   &tau;<sub>s,p</sub> = &tau;<sub>s-1,P-1</sub> + p&middot;m<sup>s</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>with<i> s=0..S-1 </i>and</i> p=0..P-1
+		 </i></blockquote>
+	  This recursive formula leads to <i>S</i> blocks of <i>P</i> linearly spaces lags. The difference between two subsequent lags increases exponentially (<i>m<sup>s</sup></i>) from block to block.
+	  The normalization is explained in more detail below.
+	  </li>
+	  <li><b>Multi-&tau; Correlator:</b><br>
+	  This correlation scheme was introduced by K. Schätzel [1,2] for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
+	     <blockquote>
+		   <img src="./pic/multitau_signals.png">
+		 </blockquote>	  
+	  Using this scheme, the estimate of the CCF can be written as above:
+	     <blockquote>
+		   <img src="./pic/multitau_ccf.png">
+		 </blockquote>	  	  
+	  As can be seen only the averages intensities <i>I<sub>s,n</sub></i> appear in the formula. This scheme can also be drawn as a schematic, which shows the direct connection to a simple hardware implementation [3]:
+	     <blockquote>
+		   <img src="./pic/multi_tau_schaematic.png">
+		 </blockquote>
+      The &Delta;&tau; blocks delay the input signal by &Delta;&tau;, the &times;-blocks multiply the two input signals and the &Sigma;-blocks accumulate the input. The top row (a) shows a fully linear implementation (no logarithmic spacing) and (b)/(c) the multi-&tau; implementation. This plugin contains a software version of this scheme. Using this scheme introduces an additional (triangular) averaging into the ACF/CCF (as compared to the direct estimation), but allows to calculate it without the need to keep the whole image series in memory. Also this averaging depends on the linear block <i>s</i> and has only little impakt for small <i>s</i>. the systematic error introduced increases for the larger lags for which usually measured ACFs/CCFs already decayed to 0 [4]:
+	     <blockquote>
+		   <img src="./pic/multitau_avg.png">
+		 </blockquote>
+	  Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. 
+	  </li>
+	</ul>
+	Both types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in [2]. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
+	     <blockquote>
+		   <img src="./pic/symm_normalization.png">
+		 </blockquote>
+	The "delayed monitor" <i>M(&tau;<sub>k</sub>)</i> may be estimated in two ways. Either it is calculated for every lag <i>&tau;<sub>k</sub></i> separately, or it can bes estimated as:
+		 <blockquote>
+		   <img src="./pic/symm_normalization_estimate.png">
+		 </blockquote>
+	from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see [3] for a detailed discussion).
+	</p>
+    <p><b>References:</b><blockquote>
+	  [1]: K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.<br>
+	  [2]: K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305<br>
+	  [3]: J. Buchholz, J.W. Krieger, etal (2011): <b>FPGA implementation of a 32&times;32 autocorrelator array for analysis of fast image series</b>, <i>to be published</i><br>
+	  [4]: Z. Kojro, A. Riede, M. Schubert and W. Grill (1999): <b>Systematic and statistical errors in correlation estimators obtained from various digital correlators</b> <i>Review of Scientific Instruments</i> <b>70</b>, 4487-4496<br>
+	</blockquote></p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	
+	<a name="#usage"><h2>Importing correlated data into a QuickFit project</h2>
+    <p>This plugin supplied a simple dialog that allows to set all options, for the evaluation described above. It allows to define several "jobs" and to evaluate these one-by one (also some in parallel on a multi-core machine), as usually the correlation may take several minutes (which allows you to go and drink a short coffee ;-) Note however that correlation usually creates a high load on hard disk access, so you do not always improve the processing speed with more cores, as the bottle-neck is the harddisk access speed.</p>
+    <p>First you will have to select a file containing the image series (<b>Image Series</b>):<ul>
+	  <li><img src=":/imaging_fcs/fileopen.png"> displays a dialog that allows to selecta file from the hard disk.</li>
+	  <li><img src=":/imaging_fcs/use_file.png"> will load an image series entered in the input field by hand.</li>
+	<ul></p>
+	<p>Subsequently the plugin will read the image series properties and meta-data. Then you can set all the properties (<b>Details:</b>) defining the actions to be taken:
+	<ul>
+	    <li>All the output files start with the same <tt>basename</tt> in the filenames (see above). This <tt>basename</tt> is created from three parts (let's assume that the input filename is <tt><i>[path_to]/[inputfilename].[ext]</i></tt>):
+			<blockquote><tt><i>[path_to]/</i><b>[prefix]</b><i>[inputfilename]</i><b>[postfix]</b><i>[ending]</i></tt></blockquote>
+			Here <tt><i>[inputfilename]</i></tt> is the filename without extension of the input file (i.e. <tt>inputfilename</tt>), <tt></i>[ending]</i></tt> is the ending specifying the output file (see above, e.g. <tt>.evalsetting.txt</tt>, <tt>.autocorrelation.dat</tt>, ...). If <tt><i>[prefix]</i></tt> contains directory separators (<tt>/</tt>) the output files will be created in subdirectories. in addition you may use some special strings in <tt><i>[prefix]</i></tt> and <tt><i>[postfix]</i></tt> (case-insensitive):
+			<ul>
+			  <li><tt>%COUNTER%</tt> will first simply be deleted. If a set of output files with the given name already exist, the counter is increased until no output files with the given name exist.</li>
+			  <li><tt>%S%</tt> S parameter of the correlator</li>
+			  <li><tt>%P%</tt> P parameter of the correlator</li>
+			  <li><tt>%M%</tt> m parameter of the correlator</li>
+			  <li><tt>%framerate%</tt> framerate in Herz</li>
+			  <li><tt>%frametime%</tt> frametime in microseconds</li>
+			  <li><tt>%first%</tt> first used frame</li>
+			  <li><tt>%last%</tt> last used frame</li>
+			  <li><tt>%backoffset%</tt> offset of background correction</li>
+			  <li><tt>%backcorrection%</tt> background correction mode</li>
+			  <li><tt>%backcorrectionid%</tt> background correction mode as number</li>
+			  <li><tt>%segments%</tt> segments the image series is cut into</li>
+			  <li><tt>%correlator%</tt> correlator type used</li>
+			  <li><tt>%correlatorid%</tt> correlator type used as number</li>
+			</ul>
+			As an example if <tt><i>[prefix]</i>="./results/"</tt> and <tt><i>[postfix]</i>="%COUNTER%"</tt>, the these output files will be created:
+			<blockquote><tt>[path_to]/results/[inputfilename].autocorrelation.dat<br>[path_to]/results/[inputfilename].crosscorrelation.dat<br>...
+			</tt></blockquote>
+			If you start a job for the same input file and the same postfox/prefix again, these files will be created:
+			<blockquote><tt>[path_to]/results/[inputfilename]<b>1</b>.autocorrelation.dat<br>[path_to]/results/[inputfilename]<b>1</b>.crosscorrelation.dat<br>...
+			</tt></blockquote>
+		</li>
+	    <li>Sometimes one wants to exclude certain parts of the image series. This is possible by setting the <b>first</b> and <b>last frame</b>.</li>
+		<li>Sometimes model fitting is more reliable, if an estimate of the statistic error <i>&Delta;g(&tau;)</i> introduced when estimating the ACF/CCF is known. So this module allows to <b>cut the input image series into several segments</b> (taking into account the iven first and last frame) and to correlate each segment separately. Then the ACF/CCF may be calculated as the average and the error as the standard deviation over the ACF/CCF for the single segments.</li>
+		<li>It is especially important to set the correct <b>framerate</b> (in images/second) or <b>frame time</b> (=1/framerate in microseconds), as this is crucial for the correctlag time axis.</li> 
+		<li>If you want to immediately add the results to the current project, don't forget to check the corresponding box below the parameters.</li> 
+		<li>The rest of the settings were already described above.</li>
+	</ul></p>
+	<p>Finally a click on <b><img src=":/imaging_fcs/add_job.png"> add job</b> will add the job to the list of jobs to be processed (bottom of the window). </p>
+    <p>All the processing jobs (threads) are shown as a list in the bottom of the correlator dialog. The status of each job is displayed together with its progress and the overall progress. The current status of each job is shown as an icon:
+	<blockquote>
+	    <img src=":/imaging_fcs/thread_wait.png"> <b>waiting:</b> The job waits for an empty processing slot.<br>
+	    <img src=":/imaging_fcs/thread_run.png"> <b>running:</b> The job is currently processed.<br>
+	    <img src=":/imaging_fcs/thread_ok.png"> <b>done:</b> Processing of the job finished successfully.<br>
+	    <img src=":/imaging_fcs/thread_error.png"> <b>error: Processing of the job finished with an error. The error is displayed together with the job status.</b>
+	</blockquote>
+	</p>
+    <p>Click <b>Close</b> to close the window. If some jobs are still running, you may either wait until they are finished, or cancel them. All jobs that finished sucessfully and were marked to be added to the project will now be added. It is also possible to add a job later, by simply selecting the <tt>basename.autocorrelation.dat</tt> or <tt>basename.crosscorrelation.dat</tt> files as described <a href="imfcs_usage.html#import">here</a>.</p>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

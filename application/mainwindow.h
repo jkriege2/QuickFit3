@@ -28,7 +28,7 @@
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFExtensionServices {
+class MainWindow : public QMainWindow, public QFPluginServices {
         Q_OBJECT
 
     public:
@@ -51,15 +51,15 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         /** \copydoc QFPluginServices::log_unindent() */
         virtual void log_unindent();
 
-        /** \copydoc QFExtensionServices::log_global_text() */
+        /** \copydoc QFPluginServices::log_global_text() */
         virtual void log_global_text(QString message);
-        /** \copydoc QFExtensionServices::log_global_warning() */
+        /** \copydoc QFPluginServices::log_global_warning() */
         virtual void log_global_warning(QString message);
-        /** \copydoc QFExtensionServices::log_global_error() */
+        /** \copydoc QFPluginServices::log_global_error() */
         virtual void log_global_error(QString message);
-        /** \copydoc QFExtensionServices::log_global_indent() */
+        /** \copydoc QFPluginServices::log_global_indent() */
         virtual void log_global_indent();
-        /** \copydoc QFExtensionServices::log_global_unindent() */
+        /** \copydoc QFPluginServices::log_global_unindent() */
         virtual void log_global_unindent();
 
         /** \copydoc QFPluginServices::setStatusMessage()  */
@@ -92,20 +92,32 @@ class MainWindow : public QMainWindow, public QFExtensionServices {
         /** \copydoc QFPluginServices::getPluginsDirectory() */
         virtual QString getPluginsDirectory();
 
-        /** \copydoc QFExtensionServices::getMenu() */
+        /** \copydoc QFPluginServices::getMenu() */
         virtual QMenu* getMenu(QString menu);
 
-        /** \copydoc QFExtensionServices::getToolbar() */
+        /** \copydoc QFPluginServices::getToolbar() */
         virtual QToolBar* getToolbar(QString toolbar);
 
-        /** \copydoc QFExtensionServices::insertMenu() */
+        /** \copydoc QFPluginServices::insertMenu() */
         virtual void insertMenu(QString menuname, QMenu* newMenu, QMenu* before=NULL);
 
-        /** \copydoc QFExtensionServices::insertToolBar() */
+        /** \copydoc QFPluginServices::insertToolBar() */
         virtual void insertToolBar(QString toolbarname, QToolBar* newToolbar);
 
-        /** \copydoc QFExtensionServices::getExtensionManager() */
+        /** \copydoc QFPluginServices::getExtensionManager() */
         virtual QFExtensionManager* getExtensionManager();
+
+        /** \brief QFPluginServices::displayHelpWindow() */
+        virtual void displayHelpWindow(const QString& helpfile=QString(""));
+
+        /** \brief QFPluginServices::getPluginHelp() */
+        virtual QString getPluginHelp(const QString& pluginID);
+
+        /** \brief QFPluginServices::getPluginTutorial() */
+        virtual QString getPluginTutorial(const QString& pluginID);
+
+        /** \brief QFPluginServices::getPluginHelpDirectory() */
+        virtual QString getPluginHelpDirectory(const QString& pluginID);
     protected:
         void closeEvent(QCloseEvent *event);
 

@@ -9,7 +9,7 @@
 #include "../interfaces/qfextensionlinearstage.h"
 
 class QFESPIMB040MainWindow; // forward
-class QFExtensionServices; // forward
+class QFPluginServices; // forward
 
 namespace Ui {
     class QFESPIMB040AcquisitionConfigWidget;
@@ -20,7 +20,7 @@ class QFESPIMB040AcquisitionConfigWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit QFESPIMB040AcquisitionConfigWidget(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices);
+    explicit QFESPIMB040AcquisitionConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
     ~QFESPIMB040AcquisitionConfigWidget();
 signals:
     void doAcquisition();
@@ -46,7 +46,7 @@ protected slots:
     void on_chkUse2_clicked(bool enabled);
 private:
     QFESPIMB040MainWindow* m_parent;
-    QFExtensionServices* m_pluginServices;
+    QFPluginServices* m_pluginServices;
     Ui::QFESPIMB040AcquisitionConfigWidget *ui;
 };
 

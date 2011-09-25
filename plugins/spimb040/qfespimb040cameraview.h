@@ -45,11 +45,11 @@ class QFESPIMB040CameraView : public QWidget {
         /*! \brief class contructor
 
             \param cameraID ID of the camera to use
-            \param pluginServices  QFExtensionServices object used to access QuickFit basic services
+            \param pluginServices  QFPluginServices object used to access QuickFit basic services
             \param stopresume (if supplied) allows to stop/resume a preview in order to save an image
             \param parent the parent widget
          */
-        QFESPIMB040CameraView(int cameraID, QFExtensionServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent=NULL);
+        QFESPIMB040CameraView(int cameraID, QFPluginServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent=NULL);
         virtual ~QFESPIMB040CameraView();
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings, QString prefix);
@@ -116,7 +116,7 @@ class QFESPIMB040CameraView : public QWidget {
         QTabWidget* tabSettings;
         QTabWidget* tabResults;
 
-        QFExtensionServices* m_pluginServices;
+        QFPluginServices* m_pluginServices;
         QFCameraConfigComboBoxStartResume* m_stopresume;
 
 

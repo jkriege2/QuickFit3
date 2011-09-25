@@ -231,9 +231,9 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
 
 
-        helpWidget->clear();
+        /*helpWidget->clear();
         QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
-        helpWidget->updateHelp(dll);
+        helpWidget->updateHelp(dll);*/
 
     } else {
         edtName->setText("");
@@ -252,6 +252,13 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
 
     }
 }
+
+
+void QFEvaluationPropertyEditor::displayHelp() {
+    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
+    services->displayHelpWindow(dll);
+}
+
 
 void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
     if (current) {
@@ -395,9 +402,13 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
-    helpWidget=new QFHTMLHelpWindow(this);
+    /*helpWidget=new QFHTMLHelpWindow(this);
     helpWidget->initFromPluginServices(services);
-    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));
+    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));*/
+    btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("&Help"), this);
+    btnHelp->setToolTip(tr("display online help dialog"));
+    tabMain->setCornerWidget(btnHelp, Qt::TopRightCorner);
+    connect(btnHelp, SIGNAL(clicked()), this, SLOT(displayHelp()));
 }
 
 void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {

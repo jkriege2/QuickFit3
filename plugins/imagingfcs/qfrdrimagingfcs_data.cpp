@@ -1,5 +1,6 @@
 #include "qfrdrimagingfcs_data.h"
 #include <QtXml>
+#include "libtiff_tools.h"
 
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
@@ -13,6 +14,7 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     N=0;
     width=0;
     height=0;
+    overview=NULL;
 }
 
 QFRDRImagingFCSData::~QFRDRImagingFCSData() {
@@ -95,6 +97,39 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 	} else {
 	    setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[0]));
 	}
+    if (files.size()>1) {
+        for (int i=1; i<files.size(); i++) {
+            if (i<files_types.size()) {
+                if (files_types[i].toLower().trimmed()=="overview") {
+                    loadOverview(files[i]);
+                }
+            }
+        }
+    }
+}
+
+bool QFRDRImagingFCSData::loadOverview(QString filename) {
+    bool ok=false;
+    if (QFile::exists(filename)) {
+        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        if (tif) {
+            uint32 nx,ny;
+            TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
+            TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+            //qDebug()<<nx<<ny;
+            if (nx*ny>=width*height) {
+                ok=TIFFReadFrame<uint16_t>(tif, overview);
+            }
+            TIFFClose(tif);
+        }
+    }
+
+    if (!ok) {
+        for (int i=0; i<width*height; i++) {
+            overview[i]=0;
+        }
+    }
+    return ok;
 }
 
 bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
@@ -112,20 +147,23 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
         if (taucolumn<0) taucolumn=0;
         int corrcolumn=getProperty("CORRELATION_COLUMN", 1).toInt();
         if (corrcolumn<0) corrcolumn=1;
+        int correrrcolumn=getProperty("CORRELATION_ERROR_COLUMN", -1).toInt();
         //int maxCol=qMax(corrcolumn, taucolumn);
 
         QTextStream stream(&file);
         bool last_empty, empty=true;
-        QVector<QVector<QPair<double, double> > > data_matrix;
-        QVector<QPair<double, double> > current_set;
+        QVector<QVector<QTriple<double, double, double> > > data_matrix;
+        QVector<QTriple<double, double, double> > current_set;
         int NN=0;
         int runs=0;
         while ((!stream.atEnd()) && (runs<=width*height)) {
-            QVector<double> data=csvReadline(stream, ',', '#');
+            QVector<double> data=csvReadline(stream, ',', '#', 0);
             last_empty=empty;
             empty=data.isEmpty();
-            if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size())) {
-                current_set.append(qMakePair(data[taucolumn], data[corrcolumn]));
+            if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size()) && (correrrcolumn<data.size()) && (correrrcolumn>=0)) {
+                current_set.append(qMakeTriple(data[taucolumn], data[corrcolumn],  data[correrrcolumn]));
+            } else if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size())) {
+                current_set.append(qMakeTriple(data[taucolumn], data[corrcolumn], 0.0));
                 //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
             }
             if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {
@@ -135,7 +173,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
                 if (current_set.size()>0) {
                     lastval=current_set[current_set.size()-1].second;
                     if (lastval==0.0 || lastval==1.0) {
-                        while ((current_set.size()>10)&& (current_set[current_set.size()-1].second==lastval)) current_set.pop_back();
+                        while ((current_set.size()>10) && (current_set[current_set.size()-1].second==lastval)) current_set.pop_back();
                     }
                 }
 
@@ -158,7 +196,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
                 for (int i=0; i<width*height; i++) {
                     if (i>=data_matrix.size()) {
                         for (int j=0; j<NN; j++) {
-                            correlations[i*NN+j]=1;
+                            correlations[i*NN+j]=0;
                             sigmas[i*NN+j]=0;
                         }
                     } else {
@@ -167,9 +205,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
                             if (j<data_matrix[i].size()) {
                                 tau[j]=data_matrix[i].at(j).first;
                                 correlations[i*NN+j]=data_matrix[i].at(j).second;
-                                sigmas[i*NN+j]=0;
+                                sigmas[i*NN+j]=data_matrix[i].at(j).third;
                             } else {
-                                correlations[i*NN+j]=1;
+                                correlations[i*NN+j]=0;
                                 sigmas[i*NN+j]=0;
                             }
                         }
@@ -252,16 +290,19 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (correlationStdDev) free(correlationStdDev);
     if (sigmas) free(sigmas);
     if (tau) free(tau);
+    if (overview) free(overview);
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
+    overview=NULL;
     if ((x>0) && (y>0) && (N>0)) {
         correlations=(double*)calloc(x*y*N,sizeof(double));
         sigmas=(double*)calloc(x*y*N,sizeof(double));
         correlationMean=(double*)calloc(N,sizeof(double));
         correlationStdDev=(double*)calloc(N,sizeof(double));
+        overview=(uint16_t*)calloc(x*y,sizeof(uint16_t));
         tau=(double*)calloc(N,sizeof(double));
         width=x;
         height=y;
@@ -279,9 +320,11 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             double sum2=0;
             for (int j=0; j<width*height; j++) {
                 const double& v=correlations[j*N+i];
-                sum+=v;
-                sum2+=v*v;
-                norm++;
+                if (QFFloatIsOK(v) && !leaveout.contains(j)) {
+                    sum+=v;
+                    sum2+=v*v;
+                    norm++;
+                }
             }
             if (norm>0) {
                 correlationMean[i]=sum/norm;
@@ -337,5 +380,5 @@ int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
 }
 
 uint16_t* QFRDRImagingFCSData::getDataImagePreview() const {
-    return NULL;
+    return overview;
 }

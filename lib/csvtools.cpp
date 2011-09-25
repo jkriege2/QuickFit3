@@ -1,7 +1,8 @@
 #include "csvtools.h"
 #include <iostream>
+#include <math.h>
 
-QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char) {
+QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value) {
     QString line=f.readLine();
     //std::cout<<"line='"<<line.toStdString()<<"'\n";
     QVector<double> result;
@@ -32,19 +33,37 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
                 case '9':
                 case '.':
                 case '-':
+                case 'n': case 'N':
+                case 'a': case 'A':
+                case 'i': case 'I':
+                case 'f': case 'F':
                 case 'e': case 'E':
                     num=num+ch;
                     break;
                 default:
                     if (ch==separator_char) {
                         if (num.size()>0) {
-                            result.append(num.toDouble());
+                            bool ok=true;
+                            if (num.toLower().trimmed()=="nan") {
+                                result.append(NAN);
+                            } else{
+                                double d=num.toDouble(&ok);
+                                if (ok) result.append(d);
+                                else result.append(non_value);
+                            }
                         }
                         num="";
                     } else if (ch==comment_char) {
                         isComment=true;
                         if (num.size()>0) {
-                            result.append(num.toDouble());
+                            bool ok=true;
+                            if (num.toLower().trimmed()=="nan") {
+                                result.append(NAN);
+                            } else{
+                                double d=num.toDouble(&ok);
+                                if (ok) result.append(d);
+                                else result.append(non_value);
+                            }
                         }
                         num="";
                         done=true;

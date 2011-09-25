@@ -25,7 +25,7 @@ QFCameraConfigNotifier* QFESPIMB040CameraConfig::m_notifier=NULL;
 
 
 
-QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionServices* pluginServices):
+QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFPluginServices* pluginServices):
     QGroupBox(parent)
 {
     if (m_notifier==NULL) m_notifier=new QFCameraConfigNotifier(this);

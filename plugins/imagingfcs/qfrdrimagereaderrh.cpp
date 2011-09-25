@@ -19,7 +19,7 @@ QString QFRDRImageReaderRH::filter() const {
 }
 
 QString QFRDRImageReaderRH::formatName() const {
-    return QObject::tr("RRH");
+    return QObject::tr("RadHard raw Ddata");
 }
 
 
@@ -83,6 +83,10 @@ uint32_t QFRDRImageReaderRH::countFrames() {
 
 bool QFRDRImageReaderRH::nextFrame() {
     return not file->atEnd();
+}
+
+void QFRDRImageReaderRH::reset() {
+    file->seek(0);
 }
 
 uint16_t QFRDRImageReaderRH::frameWidth() {

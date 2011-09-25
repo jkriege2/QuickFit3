@@ -163,3 +163,7 @@ QString QFEvaluationItemFactory::getPluginCopyrightFile(QString ID) {
     return "";
 }
 
+bool QFEvaluationItemFactory::contains(QString ID) {
+    return items.contains(ID);
+}
+

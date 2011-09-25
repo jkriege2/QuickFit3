@@ -33,11 +33,12 @@ QFRDRResultsModel* QFRawDataRecord::resultsGetModel() {
     return resultsmodel;
 };
 
-void QFRawDataRecord::init(QString name, QStringList inputFiles) {
+void QFRawDataRecord::init(QString name, QStringList inputFiles, QStringList inputFilesTypes) {
     this->ID=project->getNewID();
     this->name=name;
     description="";
     files=inputFiles;
+    files_types=inputFilesTypes;
     intReadData();
     //std::cout<<"after intReadData() in init ...\n";
     project->registerRawDataRecord(this);
@@ -171,12 +172,14 @@ void QFRawDataRecord::readXML(QDomElement& e) {
         QDomElement fe=te.firstChildElement("file");
         while (!fe.isNull()) {
             QString filexml=fe.text();
+            QString typexml=fe.attribute("type", "");
             QFileInfo fi(project->getFile());
             //std::cout<<"file = "<<filexml.toStdString()<<"\n";
             //std::cout<<"  project-absolute path = "<<fi.absoluteDir().absolutePath().toStdString()<<"\n";
             //std::cout<<"  file-absolute path = "<<fi.absoluteDir().absoluteFilePath(filexml).toStdString()<<"\n";
 
             files.push_back(fi.absoluteDir().absoluteFilePath(filexml));
+            files_types.append(typexml);
             fe=fe.nextSiblingElement("file");
         }
     }
@@ -306,7 +309,14 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
             QString file=files[i];
             QFileInfo fi(project->getFile());
             file=fi.absoluteDir().relativeFilePath(files[i]);
-            w.writeTextElement("file", file);
+            w.writeStartElement("file");
+            if (i<files_types.size()) {
+                if (!files_types[i].isEmpty()) {
+                    w.writeAttribute("type", files_types[i]);
+                }
+            }
+            w.writeCharacters(file);
+            w.writeEndElement();
         }
         w.writeEndElement();
     }

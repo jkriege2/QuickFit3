@@ -69,7 +69,7 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
 
 
         /** Default constructor */
-        QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFExtensionServices* pluginServices);
+        QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFPluginServices* pluginServices);
         /** Default destructor */
         virtual ~QFESPIMB040CameraConfig();
 
@@ -130,7 +130,7 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         QFESPIMB040MainWindow* m_parent;
         int m_camViewID;
         QFExtensionManager* m_extManager;
-        QFExtensionServices* m_pluginServices;
+        QFPluginServices* m_pluginServices;
 
         QList<ObjectiveDescription> objectives;
         bool objectivesWritable() const;

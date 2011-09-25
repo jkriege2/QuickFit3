@@ -32,7 +32,7 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         void distribute(QFProject* project);
 
         /*! \brief initialize the plugins */
-        void init(QFExtensionServices* services, QWidget* parentWidget);
+        void init(QFPluginServices* services, QWidget* parentWidget);
 
         /*! \brief deinitialize the plugins */
         void deinit();
@@ -73,6 +73,8 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         QFExtension* getInstance(QString id);
         /** \brief return a pointer to the given Object instance */
         QObject* getQObjectInstance(QString id);
+        /** \brief return \c true if a plugin with the given ID is registered */
+        bool contains(QString ID);
 
         /** \brief returns the plugins main help file (html) for a specified QFExtension ID. */
         QString getPluginHelp(QString ID);

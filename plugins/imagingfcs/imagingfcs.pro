@@ -31,7 +31,10 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/shiftregister.h \
     ../../../../../LIB/trunk/multitau-correlator.h \
     ../../../../../LIB/trunk/correlator_multitau.h \
-    qfrdrimagereaderrh.h
+    qfrdrimagereaderrh.h \
+    ../../../../../LIB/trunk/frame.h \
+    ../../../../../LIB/trunk/crc_ccitt.h \
+    ../../../../../LIB/trunk/crc.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -70,3 +73,6 @@ ASSETS_TESTDATA.files = ./assets/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/imfcs_testdata/
 
 INSTALLS += ASSETS_TESTDATA
+
+
+

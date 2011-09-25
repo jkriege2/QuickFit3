@@ -3,7 +3,7 @@
  <class>OptionsDlg</class>
  <widget class="QDialog" name="OptionsDlg">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::WindowModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -223,9 +223,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>buttonBox</tabstop>
   <tabstop>cmbLanguage</tabstop>
  </tabstops>
- <resources>
-  <include location="quickfit3.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

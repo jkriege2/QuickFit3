@@ -5,7 +5,9 @@
 #include "jkqttools.h"
 #include "qffitfunction.h"
 #include "qffitfunctionmanager.h"
-
+#include "datatable2.h"
+#include "jkimage.h"
+#include "qmoretextobject.h"
 
 
 
@@ -21,6 +23,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     plteImageData=NULL;
     plteGofImageData=NULL;
     plteImageSize=0;
+    lastSavePath="";
     createWidgets();
     //QTimer::singleShot(500, this, SLOT(debugInfo()));
 }
@@ -105,7 +108,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* vbl=new QVBoxLayout();
     w->setLayout(vbl);
 
-    QGroupBox* wimg=new QGroupBox(tr(" image plot styles "), this);
+    QGroupBox* wimg=new QGroupBox(tr(" parameter image style "), this);
     vbl->addWidget(wimg);
     QFormLayout* gli=new QFormLayout(this);
     wimg->setLayout(gli);
@@ -175,7 +178,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
 
-    gl->addRow((labRunOptions=new QLabel(tr("run &options:"), w)), cmbRunStyle);
+    gl->addRow((labRunOptions=new QLabel(tr("pixel &options:"), w)), cmbRunStyle);
     labRunOptions->setBuddy(cmbRunStyle);
     gl->addRow("", cmbRunErrorStyle);
 
@@ -209,37 +212,44 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltOverview=new QWidget(this);
     QVBoxLayout* lpltOverview=new QVBoxLayout();
     wpltOverview->setLayout(lpltOverview);
-    pltOverview=new JKQTFastPlotter(wpltOverview);
+    pltOverview=new JKQtPlotter(wpltOverview);
     lpltOverview->addWidget(new QLabel(tr("Overview:")));
     lpltOverview->addWidget(pltOverview, 1);
-    pltOverview->set_aspectRatio(1);
-    pltOverview->set_maintainAspectRatio(true);
-    pltOverview->set_xAxisLabelVisible(false);
-    pltOverview->set_yAxisLabelVisible(false);
-    pltOverview->set_tickFontSize(6);
-    pltOverview->set_tickFontName(font().family());
-    QFont fo=font();
-    fo.setPointSizeF(pltOverview->get_tickFontSize());
-    QFontMetricsF fm(fo);
-    pltOverview->set_plotBorderBottom(2.0*fm.ascent());
-    pltOverview->set_plotBorderLeft(fm.width("00000"));
-    pltOverview->set_drawGrid(false);
-    connect(pltOverview, SIGNAL(clicked(double,double,Qt::KeyboardModifiers)), this,SLOT(previewClicked(double,double,Qt::KeyboardModifiers)));
+    pltOverview->set_zoomByDoubleAndRightMouseClick(false);
+    pltOverview->set_displayMousePosition(false);
+    pltOverview->set_displayToolbar(false);
+    pltOverview->get_plotter()->set_maintainAspectRatio(true);
+    pltOverview->get_plotter()->set_aspectRatio(1);
+    pltOverview->get_plotter()->set_maintainAxisAspectRatio(true);
+    pltOverview->get_plotter()->set_axisAspectRatio(1);
+    pltOverview->setXY(0,0,1,1);
+    pltOverview->setAbsoluteXY(0,1,0,1);
 
-    plteOverview=new JKQTFPimagePlot(pltOverview, NULL, JKQTFP_uint16, 1, 1, 0, 1, 0, 1, JKQTFP_GRAY);
-    pltOverview->addPlot(plteOverview);
+    pltOverview->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
+    pltOverview->get_plotter()->getYAxis()->set_tickLabelFontSize(8);
+    pltOverview->get_plotter()->getXAxis()->set_axisLabel("");
+    pltOverview->get_plotter()->getYAxis()->set_axisLabel("");
+    pltOverview->get_plotter()->setGrid(false);
+    pltOverview->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltOverview->get_plotter()->set_useAntiAliasingForGraphs(true);
+    connect(pltOverview, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+    connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(previewClicked(double,double,Qt::KeyboardModifiers)));
 
+    plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImage::GRAY, pltOverview->get_plotter());
+    pltOverview->addGraph(plteOverview);
 
-    QColor ovlSelCol=QColor("green");
+    QColor ovlSelCol=QColor("red");
     ovlSelCol.setAlphaF(0.5);
-    plteOverviewSelected=new JKQTFPimageOverlayPlot(pltOverview, NULL, 1, 1, 0, 1, 0, 1, ovlSelCol);
-    pltOverview->addPlot(plteOverviewSelected);
+    plteOverviewSelected=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, ovlSelCol, pltOverview->get_plotter());
+    pltOverview->addGraph(plteOverviewSelected);
 
-    QColor ovlExCol=QColor("darkgrey");
+
+    QColor ovlExCol=QColor("blue");
     ovlExCol.setAlphaF(0.5);
-    plteOverviewExcluded=new JKQTFPimageOverlayPlot(pltOverview, NULL, 1, 1, 0, 1, 0, 1, ovlExCol);
-    pltOverview->addPlot(plteOverviewExcluded);
+    plteOverviewExcluded=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, ovlExCol, pltOverview->get_plotter());
+    pltOverview->addGraph(plteOverviewExcluded);
 
+    plteImageData=NULL;
 
 
 
@@ -430,7 +440,39 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     vbl->addWidget(new QWidget(this), 1);
 
-    lb->addWidget(grpTop, 0, 0, 1, 2);
+
+
+
+
+
+
+
+
+    QGridLayout* grdTop=new QGridLayout(this);
+    btnPrintReport = new QPushButton(QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
+    connect(btnPrintReport, SIGNAL(clicked()), this, SLOT(printReport()));
+    btnSaveReport = new QPushButton(QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
+    connect(btnSaveReport, SIGNAL(clicked()), this, SLOT(saveReport()));
+    btnSaveData = new QPushButton(QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
+    connect(btnSaveData, SIGNAL(clicked()), this, SLOT(saveData()));
+    grdTop->addWidget(grpTop, 0, 1, 3, 1);
+    grdTop->addWidget(btnSaveData, 0, 0);
+    grdTop->addWidget(btnSaveReport, 1, 0);
+    grdTop->addWidget(btnPrintReport, 2, 0);
+    grdTop->setColumnStretch(1,0);
+
+
+
+
+
+
+
+
+
+
+
+    //lb->addWidget(grpTop, 1, 0, 1, 2);
+    lb->addLayout(grdTop, 0,0,1,2);
     lb->addWidget(splitterTopBot, 1, 0);
     lb->addWidget(w, 1, 1);
     lb->setColumnStretch(0,5);
@@ -584,9 +626,12 @@ void QFRDRImagingFCSImageEditor::previewClicked(double x, double y, Qt::Keyboard
         selected.insert(idx);
     }
     replotData();
+    replotSelection(true);
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
+    replotSelection(false);
+    replotOverview();
     replotImage();
     replotData();
 };
@@ -665,25 +710,11 @@ void QFRDRImagingFCSImageEditor::replotImage() {
     pltImage->set_doDrawing(false);
     pltGofImage->set_doDrawing(false);
 
-    if (!chkDisplayImageOverlay->isChecked()) {
-        pltImage->deleteGraph(plteImageSelected, false);
-        pltImage->deleteGraph(plteImageExcluded, false);
-        pltGofImage->deleteGraph(plteImageSelected, false);
-        pltGofImage->deleteGraph(plteImageExcluded, false);
-    } else {
-        pltImage->addGraph(plteImageSelected);
-        pltImage->addGraph(plteImageExcluded);
-        pltGofImage->addGraph(plteImageSelected);
-        pltGofImage->addGraph(plteImageExcluded);
-    }
+
 
     if (!m) {
         plteImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
-        plteImageSelected->set_data(NULL, 0, 0);
-        plteImageExcluded->set_data(NULL, 0, 0);
         plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
-        plteGofImageSelected->set_data(NULL, 0, 0);
-        plteGofImageExcluded->set_data(NULL, 0, 0);
         //qDebug()<<"replotImage !m";
     } else {
         double w=m->getDataImageWidth();
@@ -692,21 +723,21 @@ void QFRDRImagingFCSImageEditor::replotImage() {
             w=h=1;
         }
         //qDebug()<<w<<h;
-        double dx=1;
+        /*double dx=1;
         if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
         double dy=1;
-        if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));
+        if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));*/
 
         pltImage->setAbsoluteXY(0, w, 0, h);
         pltImage->get_plotter()->set_maintainAspectRatio(true);
         pltImage->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
         pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
-        pltImage->get_plotter()->set_axisAspectRatio(1*w/h);
+        pltImage->get_plotter()->set_axisAspectRatio(1.0*w/h);
         pltGofImage->setAbsoluteXY(0, w, 0, h);
         pltGofImage->get_plotter()->set_maintainAspectRatio(true);
         pltGofImage->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
         pltGofImage->get_plotter()->set_maintainAxisAspectRatio(true);
-        pltGofImage->get_plotter()->set_axisAspectRatio(1*w/h);
+        pltGofImage->get_plotter()->set_axisAspectRatio(1.0*w/h);
 
         if (w>3*h) {
             pltImage->get_plotter()->getXAxis()->set_minTicks(3);
@@ -749,6 +780,109 @@ void QFRDRImagingFCSImageEditor::replotImage() {
     //qDebug()<<"replotImage ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
 
+void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    pltOverview->set_doDrawing(false);
+
+    if (plteOverviewSize<m->getDataImageWidth()*m->getDataImageHeight()) {
+        plteOverviewSize=m->getDataImageWidth()*m->getDataImageHeight();
+        plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
+        plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
+    }
+
+    if (plteOverviewSelectedData) {
+        int siz=m->getDataImageWidth()*m->getDataImageHeight();
+        if (m) {
+            for (register int i=0; i<siz; i++) {
+                int x=m->runToX(i);
+                int y=m->runToY(i);
+                int idx=y*m->getDataImageWidth()+x;
+                plteOverviewSelectedData[idx]=selected.contains(i);
+                plteOverviewExcludedData[idx]=m->leaveoutRun(i);
+            }
+        } else {
+            for (register int i=0; i<siz; i++) {
+                plteOverviewSelectedData[i]=false;
+                plteOverviewExcludedData[i]=false;
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
+    //qDebug()<<"replotOverview";
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    pltOverview->set_doDrawing(false);
+    pltImage->set_doDrawing(false);
+    pltGofImage->set_doDrawing(false);
+    updateSelectionArrays();
+
+    if (!chkDisplayImageOverlay->isChecked()) {
+        pltImage->deleteGraph(plteImageSelected, false);
+        pltImage->deleteGraph(plteImageExcluded, false);
+        pltGofImage->deleteGraph(plteGofImageSelected, false);
+        pltGofImage->deleteGraph(plteGofImageExcluded, false);
+    } else {
+        pltImage->addGraph(plteImageSelected);
+        pltImage->addGraph(plteImageExcluded);
+        pltGofImage->addGraph(plteGofImageSelected);
+        pltGofImage->addGraph(plteGofImageExcluded);
+    }
+
+    if (!m) {
+        plteOverviewSelected->set_data(NULL, 1, 1);
+        plteOverviewExcluded->set_data(NULL, 1, 1);
+        plteImageSelected->set_data(NULL, 1, 1);
+        plteImageExcluded->set_data(NULL, 1, 1);
+        plteGofImageSelected->set_data(NULL, 1, 1);
+        plteGofImageExcluded->set_data(NULL, 1, 1);
+    } else {
+        //uint16_t* ov=m->getDataImagePreview();
+        double w=m->getDataImageWidth();
+        double h=m->getDataImageHeight();
+        if ((w==0) || (h==0)) {
+            w=h=1;
+        }
+
+        plteOverviewSelected->set_width(w);
+        plteOverviewSelected->set_height(h);
+        plteOverviewSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+        plteOverviewExcluded->set_width(w);
+        plteOverviewExcluded->set_height(h);
+        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+        plteImageSelected->set_width(w);
+        plteImageSelected->set_height(h);
+        plteImageSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+        plteImageExcluded->set_width(w);
+        plteImageExcluded->set_height(h);
+        plteImageExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+        plteGofImageSelected->set_width(w);
+        plteGofImageSelected->set_height(h);
+        plteGofImageSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+        plteGofImageExcluded->set_width(w);
+        plteGofImageExcluded->set_height(h);
+        plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+
+    }
+
+    pltOverview->set_doDrawing(true);
+    pltImage->set_doDrawing(true);
+    pltGofImage->set_doDrawing(true);
+    if (replot) {
+        pltOverview->update_plot();
+        pltImage->update_plot();
+        pltGofImage->update_plot();
+    }
+    QApplication::restoreOverrideCursor();
+}
+
 void QFRDRImagingFCSImageEditor::replotOverview() {
     //qDebug()<<"replotOverview";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -756,62 +890,42 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
     pltOverview->set_doDrawing(false);
 
     if (!m) {
-        plteOverview->set_image(NULL, JKQTFP_uint16, 1, 1);
+        plteOverview->set_data(NULL, 1, 1, JKQTPMathImageBase::UInt16Array);
         plteOverviewSelected->set_data(NULL, 1, 1);
         plteOverviewExcluded->set_data(NULL, 1, 1);
     } else {
-        uint16_t* ov=m->getDataImagePreview();
+        //uint16_t* ov=m->getDataImagePreview();
         double w=m->getDataImageWidth();
         double h=m->getDataImageHeight();
-        double dx=1;
-        if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
-        double dy=1;
-        if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));
-
-        pltOverview->setXRange(0,w);
-        pltOverview->setYRange(0,h);
-        pltOverview->set_xTickDistance(dx);
-        pltOverview->set_yTickDistance(dy);
-        pltOverview->set_aspectRatio(qMax(0.01, qMin(100.0, w/h)));
-
-        if (plteOverviewSize<m->getDataImageWidth()*m->getDataImageHeight()) {
-            plteOverviewSize=m->getDataImageWidth()*m->getDataImageHeight();
-            plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
-            plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
+        if ((w==0) || (h==0)) {
+            w=h=1;
         }
 
-        plteOverviewSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
-        plteOverviewSelected->set_xmax(w);
-        plteOverviewSelected->set_ymax(h);
+        //qDebug()<<"replotOverview()  w="<<w<<"   h="<<h;
+        pltOverview->setAbsoluteXY(0, w, 0, h);
+        pltOverview->get_plotter()->set_maintainAspectRatio(true);
+        pltOverview->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
+        pltOverview->get_plotter()->set_maintainAxisAspectRatio(true);
+        pltOverview->get_plotter()->set_axisAspectRatio(1.0*w/h);
 
-        plteImageSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
-        plteImageSelected->set_width(w);
-        plteImageSelected->set_height(h);
 
-        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
-        plteOverviewExcluded->set_xmax(w);
-        plteOverviewExcluded->set_ymax(h);
-
-        plteImageExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
-        plteImageExcluded->set_width(w);
-        plteImageExcluded->set_height(h);
-
-        plteOverview->set_image(ov, JKQTFP_uint16, m->getDataImageWidth(), m->getDataImageHeight());
-        plteOverview->set_xmax(w);
-        plteOverview->set_ymax(h);
-        if (plteOverviewSelectedData) {
-            for (int i=0; i<m->getCorrelationRuns(); i++) {
-                int x=m->runToX(i);
-                int y=m->runToY(i);
-                int idx=y*m->getDataImageWidth()+x;
-                plteOverviewSelectedData[idx]=selected.contains(i);
-                plteOverviewExcludedData[idx]=m->leaveoutRun(i);
-            }
+        if (w>3*h) {
+            pltOverview->get_plotter()->getXAxis()->set_minTicks(3);
+            plteOverview->get_colorBarAxis()->set_minTicks(3);
+        } else {
+            pltOverview->get_plotter()->getXAxis()->set_minTicks(7);
+            plteOverview->get_colorBarAxis()->set_minTicks(5);
         }
+        pltOverview->setXY(0, w, 0, h);
+
+        if (m->getDataImagePreview()) plteOverview->set_data(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::UInt16Array);
+        else plteOverview->set_data(NULL, m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::UInt16Array);
+        plteOverview->set_width(w);
+        plteOverview->set_height(h);
     }
 
     pltOverview->set_doDrawing(true);
-    pltOverview->update_data();
+    pltOverview->update_plot();
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotOverview ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
@@ -909,8 +1023,8 @@ void QFRDRImagingFCSImageEditor::replotData() {
         tabFitvals->setColumnTitle(0, tr("parameter"));
         for (int i=0; i<m->getCorrelationRuns(); i++) {
             if (selected.contains(i)) {
-                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
-                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
                 JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
@@ -957,8 +1071,8 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     for (int nn=0; nn< m->getCorrelationN(); nn++) {
                         resid[nn]=corr[nn]-acf[nn];
                     }
-                    size_t c_fit=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("fit to run %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
-                    size_t c_resid=ds->addCopiedColumn(resid, m->getCorrelationN(), QString("residuals for run %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                    size_t c_fit=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("fit to pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                    size_t c_resid=ds->addCopiedColumn(resid, m->getCorrelationN(), QString("residuals for pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
                     JKQTPxyLineGraph* gfit=new JKQTPxyLineGraph();
                     gfit->set_lineWidth(1.5);
                     gfit->set_xColumn(c_tau);
@@ -987,7 +1101,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     plotterResid->addGraph(gr);
 
                     tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("run %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
                     int col=tabFitvals->columnCount()-1;
                     tabFitvals->appendColumn();
                     tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("error"));
@@ -1042,6 +1156,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
 void QFRDRImagingFCSImageEditor::readSettings() {
     if (!settings) return;
+    lastSavePath=settings->getQSettings()->value(QString("imfcsimageeditor/last_save_path"), lastSavePath).toString();
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsimageeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_tau_axis"), true).toBool());
     chkKeys->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_keys"), false).toBool());
@@ -1062,6 +1177,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
 
 void QFRDRImagingFCSImageEditor::writeSettings() {
     if (!settings) return;
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/last_save_path"), lastSavePath);
     settings->getQSettings()->setValue(QString("imfcsimageeditor/autoscale"), chkImageAutoScale->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/colmin"), edtColMin->value());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/colmax"), edtColMax->value());
@@ -1158,6 +1274,7 @@ void QFRDRImagingFCSImageEditor::transformChanged() {
     current->setQFProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), cmbGofParameterTransform->currentIndex(), false, false);
     current->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
     connectParameterWidgets(false);
+    replotOverview();
     replotImage();
     loadImageSettings();
     paletteChanged();
@@ -1263,10 +1380,13 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
 
 void QFRDRImagingFCSImageEditor::imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
     if (sender==pltImage) {
-        pltOverview->setXYRange(newxmin, newxmax, newymin, newymax);
+        pltOverview->setXY(newxmin, newxmax, newymin, newymax);
         pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
     } else if (sender==pltGofImage) {
-            pltOverview->setXYRange(newxmin, newxmax, newymin, newymax);
+            pltOverview->setXY(newxmin, newxmax, newymin, newymax);
+            pltImage->setXY(newxmin, newxmax, newymin, newymax);
+    } else if (sender==pltOverview) {
+            pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
             pltImage->setXY(newxmin, newxmax, newymin, newymax);
     }
 }
@@ -1436,3 +1556,270 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* 
     return true;
 }
 
+void QFRDRImagingFCSImageEditor::saveReport() {
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+
+    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+                                lastSavePath,
+                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+
+    if (!fn.isEmpty()) {
+        lastSavePath=QFileInfo(fn).absolutePath();
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+        QFileInfo fi(fn);
+        QPrinter* printer=new QPrinter();
+        printer->setPaperSize(QPrinter::A4);
+        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+        printer->setOrientation(QPrinter::Landscape);
+        printer->setOutputFormat(QPrinter::PdfFormat);
+        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+        printer->setOutputFileName(fn);
+        QTextDocument* doc=new QTextDocument();
+        doc->setTextWidth(printer->pageRect().size().width());
+        createReportDoc(doc);
+        doc->print(printer);
+        delete doc;
+        delete printer;
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+
+void QFRDRImagingFCSImageEditor::printReport() {
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+    QPrinter* p=new QPrinter();
+
+    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+    p->setOrientation(QPrinter::Landscape);
+    QPrintDialog *dialog = new QPrintDialog(p, this);
+    dialog->setWindowTitle(tr("Print Report"));
+    if (dialog->exec() != QDialog::Accepted) {
+        delete p;
+        return;
+    }
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QTextDocument* doc=new QTextDocument();
+    doc->setTextWidth(p->pageRect().size().width());
+    createReportDoc(doc);
+    doc->print(p);
+    delete p;
+    delete doc;
+    QApplication::restoreOverrideCursor();
+}
+
+void QFRDRImagingFCSImageEditor::saveData() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        QStringList filters;
+        filters<< tr("Comma-Separated value (*.dat *.csv)");
+        filters<< tr("Semicolon-Separated value [German Excel] (*.txt)");
+        filters<< tr("SYLK (*.slk)");
+        filters<< tr("float-TIFF (*.tif)");
+        filters<< tr("16-bit-TIFF (*.tif *.tif16)");
+        filters<< tr("color-coded PNG image (*.png)");
+
+        QString selFilter=filters[0];
+
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Data"),
+                                lastSavePath,
+                                filters.join(";;"), &selFilter);
+        if (fileName.isEmpty()) return;
+        lastSavePath=QFileInfo(fileName).absolutePath();
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        QString ext=QFileInfo(fileName).suffix();
+        QString base=QFileInfo(fileName).completeBaseName();
+        QString path=QFileInfo(fileName).absolutePath();
+        if (path.right(1)!="/") path=path+"/";
+
+        QString fileNameParam=path+base+".param."+ext;
+        QString fileNameGof=path+base+".gof."+ext;
+
+        bool saveParam=true;
+        bool saveGof=true;
+        if (QFile::exists(fileNameParam)) {
+            saveParam=(QMessageBox::question(this, tr("imFCS: Save Parameter Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameParam), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+        }
+        if (QFile::exists(fileNameGof)) {
+            saveGof=(QMessageBox::question(this, tr("imFCS: Save Parameter Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameGof), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+        }
+
+        JKImage<double> image(m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<double> gof_image(m->getDataImageWidth(), m->getDataImageHeight());
+        readParameterImage(image.data(), gof_image.data(), m->getDataImageWidth(), m->getDataImageHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+
+        if (selFilter==filters[0]) {
+            if (saveParam) image.save_csv(fileNameParam.toStdString(), ", ", '.');
+            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), ", ", '.');
+        } else if (selFilter==filters[1]) {
+            if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", ',');
+            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", ',');
+        } else if (selFilter==filters[2]) {
+            if (saveParam)  image.save_sylk(fileNameParam.toStdString());
+            if (saveGof) gof_image.save_sylk(fileNameGof.toStdString());
+        } else if (selFilter==filters[3]) {
+            if (saveParam) image.save_tifffloat(fileNameParam.toStdString());
+            if (saveGof) gof_image.save_tifffloat(fileNameGof.toStdString());
+        } else if (selFilter==filters[4]) {
+            if (saveParam) image.save_tiffuint16(fileNameParam.toStdString());
+            if (saveGof) gof_image.save_tiffuint16(fileNameGof.toStdString());
+        } else {
+            if (saveParam) plteImage->drawImage().save(fileNameParam, "PNG");
+            if (saveGof) plteGofImage->drawImage().save(fileNameGof, "PNG");
+        }
+
+
+        QApplication::restoreOverrideCursor();
+
+    }
+}
+
+
+void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
+
+    // make sure all widgets ahave the right size
+    int PicTextFormat=QTextFormat::UserObject + 1;
+    QObject *picInterface = new QPictureTextObject;
+    document->documentLayout()->registerHandler(PicTextFormat, picInterface);
+
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+
+
+    QTextCursor cursor(document);
+    QTextCharFormat fText=cursor.charFormat();
+    fText.setFontPointSize(8);
+    QTextCharFormat fTextSmall=fText;
+    fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fTextBold=fText;
+    fTextBold.setFontWeight(QFont::Bold);
+    QTextCharFormat fTextBoldSmall=fTextBold;
+    fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fHeading1=fText;
+    QTextBlockFormat bfLeft;
+    bfLeft.setAlignment(Qt::AlignLeft);
+    QTextBlockFormat bfRight;
+    bfRight.setAlignment(Qt::AlignRight);
+    QTextBlockFormat bfCenter;
+    bfCenter.setAlignment(Qt::AlignHCenter);
+
+    fHeading1.setFontPointSize(2*fText.fontPointSize());
+    fHeading1.setFontWeight(QFont::Bold);
+    cursor.insertText(tr("imagingFCS Report: %1\n").arg(m->getName()), fHeading1);
+    cursor.movePosition(QTextCursor::End);
+
+    QTextTableFormat tableFormat;
+    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
+    QTextTableFormat tableFormat1=tableFormat;
+    tableFormat1.setWidth(QTextLength(QTextLength::VariableLength, 1));
+    QTextTable* table = cursor.insertTable(3, 3, tableFormat);
+    table->mergeCells(2,1,1,2);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>result set:</i> <b>%1</b></small>").arg(cmbResultGroup->currentText())));
+        tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter:</i> <b>%1</b></small>").arg(cmbParameter->currentText())));
+        tabCursor=table->cellAt(0, 2).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameterTransform->currentText())));
+        tabCursor=table->cellAt(1, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>goodnes of fit:</i> <b>%1</b></small>").arg(cmbGofParameter->currentText())));
+        tabCursor=table->cellAt(1, 2).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbGofParameterTransform->currentText())));
+        tabCursor=table->cellAt(2, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(cmbColorbar->currentText())));
+        tabCursor=table->cellAt(2, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(edtColMin->value()).arg(edtColMax->value())));
+    }
+    QApplication::processEvents();
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertBlock();
+    double w1=pltImage->width();
+    double w2=pltGofImage->width();
+    double w3=pltOverview->width();
+    double allwidth=w1+w2+w3;
+    table = cursor.insertTable(1, 3, tableFormat);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        pltImage->get_plotter()->draw(*painter, QRect(0,0,pltImage->width(),pltImage->width()));
+        delete painter;
+        double scale=document->textWidth()*w1/allwidth*0.9/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("parameter image:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    QApplication::processEvents();
+    {
+        QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        pltGofImage->get_plotter()->draw(*painter, QRect(0,0,pltGofImage->width(),pltGofImage->width()));
+        delete painter;
+        double scale=document->textWidth()*w2/allwidth*0.9/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("goodnes of fit image:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    QApplication::processEvents();
+    {
+        QTextCursor tabCursor=table->cellAt(0, 2).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        pltOverview->get_plotter()->draw(*painter, QRect(0,0,pltOverview->width(),pltOverview->width()));
+        delete painter;
+        double scale=document->textWidth()*w3/allwidth*0.9/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("parameter image:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
+
+    table = cursor.insertTable(1, 2, tableFormat1);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->width()));
+        delete painter;
+        double scale=document->textWidth()*(double)plotter->width()/allwidth/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+
+        tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<font size=\"-4\">%1</font>").arg(tvParams->toHtml())));
+    }
+    QApplication::processEvents();
+    cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
+
+
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertText(tr("files:\n"), fTextBoldSmall);
+    QStringList f=m->getFiles();
+    QStringList t=m->getFilesTypes();
+    for (int i=0; i<f.size(); i++) {
+        QString typ="";
+        if (i<t.size())
+            if (!t[i].isEmpty())
+                typ=QString("[%1]").arg(t[i]);
+        cursor.insertText(tr("%1 %2\n").arg(f[i]).arg(typ), fTextSmall);
+
+    }
+
+    if (!m->getDescription().isEmpty()) {
+        cursor.insertText(tr("description: "), fTextBoldSmall);
+        cursor.insertText(m->getDescription(), fTextSmall);
+    }
+    cursor.movePosition(QTextCursor::End);
+
+}

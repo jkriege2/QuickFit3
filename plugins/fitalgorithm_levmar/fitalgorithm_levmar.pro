@@ -21,6 +21,9 @@ FORMS +=
 
 RESOURCES +=
 
+SRC_DISTRIBUTED.files = $$HEADERS \
+                        $$SOURCES
+
 TRANSLATIONS= ./translations/de.fitalgorithm_levmar.ts
 
 INCLUDEPATH += ../../lib/ \

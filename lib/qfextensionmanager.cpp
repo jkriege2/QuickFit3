@@ -63,7 +63,7 @@ void QFExtensionManager::distribute(QFProject* project) {
 }
 
 
-void QFExtensionManager::init(QFExtensionServices* services, QWidget* parentWidget) {
+void QFExtensionManager::init(QFPluginServices* services, QWidget* parentWidget) {
     QMapIterator<QString, QFExtension*> i(items);
     while (i.hasNext()) {
         i.next();
@@ -197,3 +197,6 @@ QString QFExtensionManager::getPluginCopyrightFile(QString ID) {
     return "";
 }
 
+bool QFExtensionManager::contains(QString ID) {
+    return items.contains(ID);
+}

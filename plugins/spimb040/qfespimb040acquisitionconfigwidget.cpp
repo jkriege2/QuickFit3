@@ -10,7 +10,7 @@
 #include <QtCore>
 
 
-QFESPIMB040AcquisitionConfigWidget::QFESPIMB040AcquisitionConfigWidget(QFESPIMB040MainWindow* parent, QFExtensionServices* pluginServices) :
+QFESPIMB040AcquisitionConfigWidget::QFESPIMB040AcquisitionConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040AcquisitionConfigWidget)
 {

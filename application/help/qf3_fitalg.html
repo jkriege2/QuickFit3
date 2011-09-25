@@ -3,10 +3,35 @@
 <head>
 <meta name="qrichtext" content="1" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>QuickFit $$version$$ fit algorithm Plugins</title>
+<title>QuickFit $$version$$ Fit Algorithm Plugins</title>
 </head>
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-
+<h1>QuickFit $$version$$ Fit Algorithm Plugins</h1>
+<h2>Least Squares Fit Problems</h2>
+<p>
+Many data evaluation methods include fitting a model function <i>f(x, p)</i> to a set of measured data points <i>(x<sub>i</sub>, y<sub>i</sub>)</i>. Here the model function is specified by a vector of parameters <i>p</i>, so the problem is to find that <i>p</i> which best describes the data best. Therefore we first have to define what <i>best</i> means, i.e. how to measure how far the model <i>f(x<sub>i</sub>, p)</i> is off from the correspondign measurement <i>y<sub>i</sub></i>. Usually this is measured in terms of squared deviations and then called a <b>least-squares fit problem</i>:
+<blockquote>
+  <img src="./pic/qf3_least_squares_problem.png">
+</blockquote>
+In addition to the <i>N</i> measurements <i>(x<sub>i</sub>, y<sub>i</sub>)</i> we can also use measurement errors <i>&sigma;<sub>i</sub></i> to weight the measurements (the larger the error, the less the point influences the result). If no measurement errors are known, then we can use all <i>&sigma;<sub>i</sub>=1</i>.</p>
+<p>QuickFit also implements special <a href="qf3_fitfunc.html">plugins for fit functions</a> that implement different varieties of <i>f(x<sub>i</sub>, p)</i>.</p>
+<p></p>
+<p></p>
+<h2>Least Squares Fit Algorithms</h2>
+<p>As least squares problems appear in many data evaluation tasks, QuickFit incorporates them into its basic toolbox. They are realized as special plugins that solve a slightly broader problem than the one above:
+<blockquote>
+  <img src="./pic/qf3_least_squares_problem2.png">
+</blockquote>
+Here the L<sup>2</sup>-Norm of the vector-valued function <i>g(p)</i> equals exactly the above written data fit expression, if we set the components <i>i=1..N</i> of <i>g(p)</i>to :
+<blockquote>
+  <img src="./pic/qf3_least_squares_problem3.png">
+</blockquote>
+</p>
+<p>In your current QuickFit installation, these fit algorithms are available:
+   $$list:fitalg:$$ 
+</p>
+<p></p>
 </body>
 </html>
+
