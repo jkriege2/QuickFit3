@@ -8,10 +8,11 @@ QFRDRImageReaderRH::QFRDRImageReaderRH() {
     height=0;
     filename="";
     frameSize=0;
+    file=NULL;
 }
 
 QFRDRImageReaderRH::~QFRDRImageReaderRH() {
-    close();
+    if (file) close();
 }
 
 QString QFRDRImageReaderRH::filter() const {
@@ -49,6 +50,7 @@ unsigned int QFRDRImageReaderRH::calculateFrameSize() {
 
 
 bool QFRDRImageReaderRH::open(QString filename) {
+  close();
   bool result=true;
   file = new QFile(filename);
   if (!file->open(QIODevice::ReadOnly))
@@ -67,12 +69,15 @@ bool QFRDRImageReaderRH::open(QString filename) {
 }
 
 void QFRDRImageReaderRH::close() {
+  if (!file) return ;
   file->close();
+  delete file;
+  file=NULL;
 }
 
 uint32_t QFRDRImageReaderRH::countFrames() {
   uint32_t result=0;
-
+  if (!file) return 0;
   unsigned int size=file->size();
   if(frameSize!=0) {
     if((size % frameSize)==0)
@@ -82,10 +87,12 @@ uint32_t QFRDRImageReaderRH::countFrames() {
 }
 
 bool QFRDRImageReaderRH::nextFrame() {
+    if (!file) return false;
     return not file->atEnd();
 }
 
 void QFRDRImageReaderRH::reset() {
+    if (!file) return ;
     file->seek(0);
 }
 
@@ -98,9 +105,11 @@ uint16_t QFRDRImageReaderRH::frameHeight() {
 }
 
 bool QFRDRImageReaderRH::readFrameUINT16(uint16_t* data) {
+  if (!file) return false;
   return readFrame_<uint16_t>(data);
 }
 
 bool QFRDRImageReaderRH::readFrameFloat(float* data) {
+    if (!file) return false;
   return readFrame_<float>(data);
 }

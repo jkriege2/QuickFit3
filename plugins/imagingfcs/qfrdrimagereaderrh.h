@@ -59,6 +59,7 @@ class QFRDRImageReaderRH : public QFRDRImageReader {
 
         template < typename T >
         bool readFrame_(T* data) {
+          if (!file) return false;
           bool result=false;
           QDataStream in(file);
           frame<T> *f = new frame<T>(data,width,height);
