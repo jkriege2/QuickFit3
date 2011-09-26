@@ -1,7 +1,7 @@
 #include "qfrdrimagingfcscorrelationjobthread.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagereadertiff.h"
-//#include "qfrdrimagereaderrh.h"
+#include "qfrdrimagereaderrh.h"
 #include "multitau-correlator.h"
 #include "correlator_multitau.h"
 #include "libtiff_tools.h"
@@ -70,7 +70,7 @@ QFRDRImageReader* QFRDRImagingFCSCorrelationJobThread::getImageReader(int idx)  
     // INSERT ADDITIONAL IMAGE FILTERS HERE!
     //////////////////////////////////////////////////////////////////////////////////////////
     if (idx==0) r=new QFRDRImageReaderTIFF();
-    //if (idx==1) r=new QFRDRImageReaderRH();
+    if (idx==1) r=new QFRDRImageReaderRH();
 
     return r;
 }
