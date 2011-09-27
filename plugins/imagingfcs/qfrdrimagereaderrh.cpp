@@ -45,6 +45,7 @@ unsigned int QFRDRImageReaderRH::calculateFrameSize() {
     if(crc0==crc)frameSize=pos;
   }while((pos<len)||(frameSize!=0));
   file->seek(0);
+  delete[] buffer;
   return frameSize;
 }
 
@@ -53,8 +54,10 @@ bool QFRDRImageReaderRH::open(QString filename) {
   close();
   bool result=true;
   file = new QFile(filename);
-  if (!file->open(QIODevice::ReadOnly))
-    return false;
+  if (!file->open(QIODevice::ReadOnly)) {
+      setLastError(file->errorString());
+      return false;
+  }
   frameSize=calculateFrameSize();
   switch(frameSize) {
     case  134: width= 32; height= 32; break;
@@ -62,8 +65,9 @@ bool QFRDRImageReaderRH::open(QString filename) {
     default: frameSize=0; break;
   }
   if(width==0||height==0) {
-    close();
-    result=false;
+      setLastError(QObject::tr("could not determine frame size: framesize=%1  with=%2  height=%3").arg(frameSize).arg(width).arg(height));
+      close();
+      result=false;
   }
   return result;
 }

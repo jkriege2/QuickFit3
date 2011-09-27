@@ -171,7 +171,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
             OK=reader->open(job.filename);
             if (!OK) {
                 m_status=-1; emit statusChanged(m_status);
-                if (reader) emit messageChanged(reader->lastError());
+                if (reader) messageChanged(tr("error opening file '%1': %2").arg(job.filename).arg(reader->lastError()));
                 else emit messageChanged(tr("error opening file '%1'").arg(job.filename));
             } else {
                 emit progressIncrement(10);
