@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>SPIM-FCS fit model 1-component diffusion</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>SPIM-FCS fit model 1-component diffusion</h2>
+		<p>This function implements a 1-component pure-diffusion model for data acquired with a camera in SPIM illumination mode. The model was taken from:
+		<blockquote>
+		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.
+		</blockquote>
+		The fit function is defined as:
+		<blockquote><img src="./pic/form_387.png"></blockquote>
+		where <i>a</i> is the width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification), <i>&sigma;<sub>xy</sub></i> is the lateral radius of the point-spread function (PSF), <i>&sigma;<sub>z</sub></i> it's longitudinal radius, <i>N</i> the particle number in the observation volume, <i>D</i> the diffusion coefficient of the particles and <i>G<sub>&infin;</sub></i> is a constant offset.
+		</p>
+		<p>The focal volume is calculated as:
+		<blockquote><img src="./pic/form_388.png"><br><img src="./pic/form_389.png"></blockquote>
+		and the concentration therefore is:
+		<blockquote><img src="./pic/form_390.png"><br><img src="./pic/form_391.png"></blockquote>
+		</p>
+	</body>
+</html>
