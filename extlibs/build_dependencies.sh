@@ -53,7 +53,6 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	ISMSYS=`uname -o`
 	echo $ISMSYS
 	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
-		#cp ./win32/Makefile.gcc .
 		BINARY_PATH='../../bin'
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
@@ -172,20 +171,29 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 		#  #define HAVE_LAPACK is already set in the library header, so we don't need to change it there
 		# we only need to alter the Makefile!
+		#case $i in
+		#1) sed 's/LAPACKLIBS=/LAPACKLIBS=-llapack -lblas#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
+		#2) sed 's/LAPACKLIBS=/LAPACKLIBS=-llapack -lcblas#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
+		#3) sed 's/LAPACKLIBS=/LAPACKLIBS=-llapack -lblas -lf2c#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
+		#4) sed 's/LAPACKLIBS=/LAPACKLIBS=-L\/usr\/local\/atlas\/lib -llapack -lcblas -lf77blas -latlas -lf2c#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
+		#5) HAVE_LAPACK="n" ;;
+		#6) SKIP="1" ;;
+		#esac
 		case $i in
-		1) sed 's/LAPACKLIBS=/LAPACKLIBS=-llapack -lblas#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
-		2) sed 's/LAPACKLIBS=/LAPACKLIBS=-llapack -lcblas#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
-		3) sed 's/LAPACKLIBS=/LAPACKLIBS=-llapack -lblas -lf2c#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
-		4) sed 's/LAPACKLIBS=/LAPACKLIBS=-L\/usr\/local\/atlas\/lib -llapack -lcblas -lf77blas -latlas -lf2c#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile ;;
+		1) echo "LAPACKLIBS=-llapack -lblas" > Makefile; cat ../../buildscript_tools/Makefile >> Makefile; ;;
+		2) echo "LAPACKLIBS=-llapack -lcblas" > Makefile; cat ../../buildscript_tools/Makefile >> Makefile; ;;
+		3) echo "LAPACKLIBS=-llapack -lblas -lf2c" > Makefile; cat ../../buildscript_tools/Makefile >> Makefile; ;;
+		4) echo "LAPACKLIBS=-L\/usr\/local\/atlas\/lib -llapack -lcblas -lf77blas -latlas -lf2c" > Makefile; cat ../../buildscript_tools/Makefile >> Makefile; ;;
 		5) HAVE_LAPACK="n" ;;
 		6) SKIP="1" ;;
 		esac
 	fi	
 	if [ $HAVE_LAPACK == "n" ] ; then
-		# we have to undefine #define HAVE_LAPACK in the library header
-		sed 's/#define HAVE_LAPACK/\/*#define HAVE_LAPACK*\//g' levmar.h > levmar.h.temp | mv levmar.h.temp levmar.h
 		# and alter the Makefile
-		sed 's/LAPACKLIBS=/LAPACKLIBS=#/g' Makefile > Makefile.temp | mv Makefile.temp Makefile
+		cp ../../buildscript_tools/levmar.h .
+		echo "LAPACKLIBS=" > Makefile; cat ../../buildscript_tools/Makefile >> Makefile; 
+	else
+		echo "#define HAVE_LAPACK" > Makefile; cat ../../buildscript_tools/levmar.h >> levmar.h; 
 	fi 
 
 	if [ $SKIP == "0" ] ; then
