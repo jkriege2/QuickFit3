@@ -8,7 +8,7 @@
 #include <QDataStream>
 #include <stdint.h>
 
-#define MAX_FRAME_SIZE (2058)
+#define MAX_FRAME_SIZE (2100)
 
 /*! \brief image reader class for Radhard raw images (implements QFRDRImageReader)
     \ingroup qf3rdrdp_imaging_fcs
@@ -63,11 +63,13 @@ class QFRDRImageReaderRH : public QFRDRImageReader {
           bool result=false;
           QDataStream in(file);
           frame<T> *f = new frame<T>(data,width,height);
-          char *buffer = new char [frameSize];
-          unsigned int len = in.readRawData(buffer, frameSize);
+          unsigned char *buffer = new unsigned char [frameSize];
+          unsigned int len = in.readRawData((char*) buffer, frameSize);
           if(buffer[0]==0xFFU) {
             f->template load_packed<uint32_t>((uint32_t*)&(buffer[8]));
             result=true;
+          } else {
+            setLastError(QObject::tr("did not find 0xFF at start of frame, found %1").arg(buffer[0],0,16));
           }
           delete f;
           return result;
