@@ -309,6 +309,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.descriptionFilename=inputconfigfile;
     job.correlator=ui->cmbCorrelator->currentIndex();
     job.fileFormat=ui->cmbFileformat->currentIndex();
+    qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
     job.backgroundCorrection=ui->cmbBackground->currentIndex();
     job.S=ui->spinS->value();
     job.P=ui->spinP->value();
@@ -455,7 +456,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                     QString fnAbs=d.absoluteFilePath(fn);
                     if (fnAbs==filename) {
                         if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
-                        else ui->cmbFileformat->setCurrentIndex(-1);
+                        //else ui->cmbFileformat->setCurrentIndex(-1);
 
                         if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
                         else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;

@@ -1,7 +1,7 @@
 #include <QtGui>
 #include <QtPlugin>
 #include <iostream>
-
+#include <QDebug>
 #include "cam_rh2v2.h"
 
 
@@ -245,6 +245,7 @@ double QFExtensionCameraRh2v2::getExposureTime(unsigned int camera) {
 
 bool QFExtensionCameraRh2v2::startAcquisition(unsigned int camera) {
     cameraSetting[camera].pc->run();
+    return true;
 }
 
 void QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
@@ -253,8 +254,9 @@ void QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
 
 bool QFExtensionCameraRh2v2::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
   cameraSetting[camera].pc->stop();
-  reconfigure(camera,settings,*cameraSetting[camera].prefix+QString("_acquisition"));
   cameraSetting[camera].settings_pc->setValue(findGroupByType("we_writer",camera)+"/config/filename",filenamePrefix+".dat");
+  //qDebug()<<"********"<<findGroupByType("we_writer",camera)+"/config/filename";
+  reconfigure(camera,settings,*cameraSetting[camera].prefix+QString("_acquisition"));
   cameraSetting[camera].pc->reconfigure(cameraSetting[camera].settings_pc,*cameraSetting[camera].prefix+QString("_acquisition"));
 	return true;
 }
@@ -264,6 +266,17 @@ bool QFExtensionCameraRh2v2::isAcquisitionRunning(unsigned int camera, double* p
 }
 
 void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+    QFExtensionCamera::AcquititonFileDescription fd;
+    fd.name=cameraSetting[camera].settings_pc->value(findGroupByType("we_writer",camera)+"/config/filename", "").toString();
+    fd.type=QString("RADHARD2RAW");
+    fd.description=tr("raw data from Radhard2");
+    if (files) files->append(fd);
+
+
+    (*parameters)["sequence_length"]=cameraSetting[camera].settings_pc->value(findGroupByType("we_writer",camera)+"/config/duration", "").toInt();
+    (*parameters)["image_width"]=32;
+    (*parameters)["pixel_height"]=32;
+    (*parameters)["frame_time"]=1e-5;
 }
 
 bool QFExtensionCameraRh2v2::getAcquisitionPreview(unsigned int camera, uint32_t* data) {

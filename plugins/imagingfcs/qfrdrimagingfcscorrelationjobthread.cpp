@@ -142,10 +142,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
     ptime.start();
 
     emit messageChanged(tr("loading data ..."));
-    if ((job.fileFormat<0)||(job.fileFormat>1)) {
+    if ((job.fileFormat<0)||(job.fileFormat>=getImageReaderCount())) {
         m_status=-1;
         emit statusChanged(m_status);
-        emit messageChanged(tr("file format not supported or given ..."));
+        emit messageChanged(tr("file format not supported or given ... format given was: %1").arg(job.fileFormat));
         emit rangeChanged(0,100);
         emit progressChanged(0);
     } else if (!QFile::exists(job.filename)) {
