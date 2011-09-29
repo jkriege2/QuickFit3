@@ -38,12 +38,13 @@ unsigned int QFRDRImageReaderRH::calculateFrameSize() {
   file->seek(0);
   uint16_t crc=0xFFFFU;
   do {
-    crc=crc_ccitt(crc,bufferPos,4);
-    bufferPos+=4;
-    pos+=4;
+    crc=crc_ccitt(crc,bufferPos,1);
+    bufferPos+=1;
+    pos+=1;
     uint16_t crc0=*((uint16_t*)bufferPos);
-    if(crc0==crc)frameSize=pos;
-  }while((pos<len)||(frameSize!=0));
+    uint16_t crc1=crc16::reverse<uint16_t>(crc);
+    if(crc0==crc1)frameSize=pos+2;
+  }while((pos<len)&&(frameSize==0));
   file->seek(0);
   delete[] buffer;
   return frameSize;
@@ -59,6 +60,7 @@ bool QFRDRImageReaderRH::open(QString filename) {
       return false;
   }
   frameSize=calculateFrameSize();
+  fprintf(stderr,"FRAMESIZE: %i",frameSize);
   switch(frameSize) {
     case  134: width= 32; height= 32; break;
     case 2058: width=128; height=128; break;
