@@ -113,9 +113,10 @@ unsigned int check_bit_header(FILE * infile, char* message) {
 
 
 
-
+#define TEMPSIZE 1024
 int flash_bitfile(char * infilename, char* message, char fpga) {
-  char tmpMessage[1024];
+  char tmpMessage[TEMPSIZE];
+  for (int i=0; i<TEMPSIZE; i++) tmpMessage[i]=0;
 
   // usb related variables
   int                rv;
@@ -163,6 +164,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   }
   if (!device)
   {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nNo board detected!");
     strcat(message, tmpMessage);
     return 0;
@@ -172,6 +174,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   infile = fopen(infilename, "r");
   if (!infile)
   {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nError opening file \"%s\" for reading!", infilename);
     strcat(message, tmpMessage);
     return 0;
@@ -180,6 +183,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   flen = check_bit_header(infile, tmpMessage);
   strcat(message, tmpMessage);
   if (!flen) {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nError checking header of bitfile \"%s\".", infilename);
     strcat(message, tmpMessage);
     return 0;
@@ -187,6 +191,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   buffer = (char*)malloc(flen * sizeof(char));
   if (!buffer)
   {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nMemory allocation failed!");
     strcat(message, tmpMessage);
     return 0;
@@ -209,6 +214,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   if (usb_set_configuration(h_device,
 			    device->config->bConfigurationValue))
   {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nCould not set the USB configuration 0x%08X" , device->config->bConfigurationValue );
     strcat(message, tmpMessage);
     free(buffer);
@@ -227,11 +233,13 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   free(buffer);
   if (rv < 0)
   {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nFailed to send the bitstream!");
     strcat(message, tmpMessage);
     return 0;
   }
   else {
+    memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nSent: 0x%.8x Bytes", rv);
     strcat(message, tmpMessage);
   }

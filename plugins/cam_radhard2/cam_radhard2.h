@@ -177,7 +177,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
             \param retries number of retries when programming was not successfull
             \return \c true on successfull programming
         */
-        bool flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries=10);
+        bool flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries=2);
 
     protected:
         /** \brief are we connected? */
@@ -205,7 +205,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         bool autoflash;
 
         QEnhancedLineEdit* edtBitfile;
-        QLabel* labFlashSuccess;
+        QTextEdit* edtFlashSuccess;
         QSpinBox* spIterations;
         QSpinBox* spDivider;
 
