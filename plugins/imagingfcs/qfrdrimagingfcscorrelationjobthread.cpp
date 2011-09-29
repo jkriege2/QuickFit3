@@ -539,247 +539,271 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         statistics_min.clear();
         statistics_max.clear();
         statistics_time.clear();
-        do {
-            if (!reader->readFrameUINT16(frame_data)) {
-                m_status=-1; emit statusChanged(m_status);
-                emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
-            } else {
-                float frame_min=frame_data[0];
-                float frame_max=frame_data[0];
-                for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                    register uint16_t v=frame_data[i];
-                    image_series[frame*frame_width*frame_height+i] = v;
-                    frame_min=(v<frame_min)?v:frame_min;
-                    frame_max=(v>frame_max)?v:frame_max;
-                    average_frame[i]=average_frame[i]+(float)v/(float)frames;
-                    sum+=v;
-                    sum2+=(v*v);
-                    video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
-                }
-                if (frame==0) {
-                    frames_min=frame_min;
-                    frames_max=frame_max;
+        if (!OK) {
+            m_status=-1; emit statusChanged(m_status);
+            emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
+        } else {
+            do {
+                if (!reader->readFrameUINT16(frame_data)) {
+                    m_status=-1; emit statusChanged(m_status);
+                    emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
                 } else {
-                    frames_min=(frame_min<frames_min)?frame_min:frames_min;
-                    frames_max=(frame_max>frames_max)?frame_max:frames_max;
-                }
-                if (frame%job.statistics_frames==0) {
-                    sframe_min=frame_min;
-                    sframe_max=frame_max;
-                } else {
-                    sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
-                    sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
-                }
-                if (job.statistics && (frame%job.statistics_frames==0) && (frame>0)) {
-                    float N=frame_width*frame_height*job.statistics_frames;
-                    statistics_time.append((float)frame*job.frameTime);
-                    statistics_mean.append(sum/N);
-                    statistics_min.append(sframe_min);
-                    statistics_max.append(sframe_max);
-                    if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
-                    sum=0;
-                    sum2=0;
-                    sframe_min=0;
-                    sframe_max=0;
-                }
-                if (job.video && (frame%job.video_frames==0) && (frame>0) && video){
-                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                        video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
-                        video_frame[i]=0;
+                    float frame_min=frame_data[0];
+                    float frame_max=frame_data[0];
+                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        register uint16_t v=frame_data[i];
+                        image_series[frame*frame_width*frame_height+i] = v;
+                        frame_min=(v<frame_min)?v:frame_min;
+                        frame_max=(v>frame_max)?v:frame_max;
+                        average_frame[i]=average_frame[i]+(float)v/(float)frames;
+                        sum+=v;
+                        sum2+=(v*v);
+                        video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
                     }
-                    video_frame_num++;
-                    //qDebug()<<video_frame_num;
+                    if (frame==0) {
+                        frames_min=frame_min;
+                        frames_max=frame_max;
+                    } else {
+                        frames_min=(frame_min<frames_min)?frame_min:frames_min;
+                        frames_max=(frame_max>frames_max)?frame_max:frames_max;
+                    }
+                    if (frame%job.statistics_frames==0) {
+                        sframe_min=frame_min;
+                        sframe_max=frame_max;
+                    } else {
+                        sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
+                        sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
+                    }
+                    if (job.statistics && (frame%job.statistics_frames==0) && (frame>0)) {
+                        float N=frame_width*frame_height*job.statistics_frames;
+                        statistics_time.append((float)frame*job.frameTime);
+                        statistics_mean.append(sum/N);
+                        statistics_min.append(sframe_min);
+                        statistics_max.append(sframe_max);
+                        if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
+                        sum=0;
+                        sum2=0;
+                        sframe_min=0;
+                        sframe_max=0;
+                    }
+                    if (job.video && (frame%job.video_frames==0) && (frame>0) && video){
+                        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                            video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
+                            video_frame[i]=0;
+                        }
+                        video_frame_num++;
+                        //qDebug()<<video_frame_num;
+                    }
+                    if (frames<500) {
+                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
+                    } else if ((frames/500==0) || (frame%(frames/500)==0)) {
+                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(2);
+                    }
                 }
-            }
-            real_video_count=video_frame_num;
-
-            if (frame%(frames/1000)==0) {
-                emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames));
-                emit progressIncrement(1);
-            }
-            frame++;
-            if (was_canceled) break;
-        } while (reader->nextFrame() && (m_status==1) && (frame<frames));
+                real_video_count=video_frame_num;
 
 
+                frame++;
+                if (was_canceled) break;
+            } while (reader->nextFrame() && (m_status==1) && (frame<frames));
+
+        }
         free(frame_data);
         free(video_frame);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // NOW WE CORRECT THE IMAGE FOR IT'S BASELINE (ACCORDING TO THE USER SETTINGS)
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!was_canceled) calcBackgroundCorrection();
-    emit messageChanged(tr("applying baseline correction..."));
-    for (uint32_t i=0; i<frame_width*frame_height*frames; i++) {
-        image_series[i]=image_series[i]-baseline-backgroundImage[i%(frame_width*frame_height)];
+    if (m_status==1 && !was_canceled) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // NOW WE CORRECT THE IMAGE FOR IT'S BASELINE (ACCORDING TO THE USER SETTINGS)
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (!was_canceled) calcBackgroundCorrection();
+        emit messageChanged(tr("applying baseline correction..."));
+        for (uint32_t i=0; i<frame_width*frame_height*frames; i++) {
+            image_series[i]=image_series[i]-baseline-backgroundImage[i%(frame_width*frame_height)];
+        }
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CALCULATE THE ACFs
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (job.acf && job.correlator==0) {
-        emit messageChanged(tr("calculating autocorrelations ..."));
-        acf_N=job.S*job.P;
-        acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-        for (uint32_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
-            acf[nn]=1.0;
-        }
-        if (job.segments>1) {
-            acf_std=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-        }
-        acf_tau=(double*)calloc(acf_N,sizeof(double));
-        long* acf_t=(long*)calloc(acf_N*frame_width*frame_height,sizeof(long));
-        statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
-        for (uint32_t p=0; p<frame_width*frame_height; p++) {
-            if (job.segments<=1) {
-                statisticsAutocorrelateMultiTauSymmetric(&(acf[p*acf_N]), &(image_series[p]), frames, acf_t, acf_N, frame_width*frame_height);
-            } else {
-                uint32_t segment_frames=frames/job.segments;
-                double* cftemp=(double*)calloc(acf_N,sizeof(double));
-                double* sum=(double*)calloc(acf_N,sizeof(double));
-                double* sum2=(double*)calloc(acf_N,sizeof(double));
-                for (register uint32_t ct=0; ct<acf_N; ct++) {
-                    sum[ct]=0;
-                    sum2[ct]=0;
-                }
-                for (int32_t seg=0; seg<job.segments; seg++) {
-                    for (register uint32_t ct=0; ct<acf_N; ct++) cftemp[ct]=0;
-                    statisticsAutocorrelateMultiTauSymmetric(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, acf_t, acf_N, frame_width*frame_height);
+    if (m_status==1 && !was_canceled) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CALCULATE THE ACFs
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (job.acf && job.correlator==0) {
+            emit messageChanged(tr("calculating autocorrelations ..."));
+            acf_N=job.S*job.P;
+            acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+            for (uint32_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
+                acf[nn]=1.0;
+            }
+            if (job.segments>1) {
+                acf_std=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+            }
+            acf_tau=(double*)calloc(acf_N,sizeof(double));
+            long* acf_t=(long*)calloc(acf_N*frame_width*frame_height,sizeof(long));
+            statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
+            for (uint32_t p=0; p<frame_width*frame_height; p++) {
+                if (job.segments<=1) {
+                    statisticsAutocorrelateMultiTauSymmetric(&(acf[p*acf_N]), &(image_series[p]), frames, acf_t, acf_N, frame_width*frame_height);
+                } else {
+                    uint32_t segment_frames=frames/job.segments;
+                    double* cftemp=(double*)calloc(acf_N,sizeof(double));
+                    double* sum=(double*)calloc(acf_N,sizeof(double));
+                    double* sum2=(double*)calloc(acf_N,sizeof(double));
                     for (register uint32_t ct=0; ct<acf_N; ct++) {
-                        sum[ct]=sum[ct]+cftemp[ct];
-                        sum2[ct]=sum2[ct]+cftemp[ct]*cftemp[ct];
+                        sum[ct]=0;
+                        sum2[ct]=0;
                     }
+                    for (int32_t seg=0; seg<job.segments; seg++) {
+                        for (register uint32_t ct=0; ct<acf_N; ct++) cftemp[ct]=0;
+                        statisticsAutocorrelateMultiTauSymmetric(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, acf_t, acf_N, frame_width*frame_height);
+                        for (register uint32_t ct=0; ct<acf_N; ct++) {
+                            sum[ct]=sum[ct]+cftemp[ct];
+                            sum2[ct]=sum2[ct]+cftemp[ct]*cftemp[ct];
+                        }
+                    }
+                    free(cftemp);
+                    double segs=job.segments;
+                    for (register uint32_t ct=0; ct<acf_N; ct++) {
+                        acf[p*acf_N+ct]=sum[ct]/segs;
+                        acf_std[p*acf_N+ct]=sqrt((sum2[ct]-sum[ct]*sum[ct]/segs)/(segs-1.0));
+                    }
+                    free(sum);
+                    free(sum2);
                 }
-                free(cftemp);
-                double segs=job.segments;
-                for (register uint32_t ct=0; ct<acf_N; ct++) {
-                    acf[p*acf_N+ct]=sum[ct]/segs;
-                    acf_std[p*acf_N+ct]=sqrt((sum2[ct]-sum[ct]*sum[ct]/segs)/(segs-1.0));
+                if (m_status==1 && !was_canceled) {
+                    if (frame_width*frame_height<500) {
+                        emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(500/frame_width*frame_height);
+                    } else if (p%(frame_width*frame_height/500)==0) {
+                        emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1);
+                    }
+
+                } else {
+                    break;
                 }
-                free(sum);
-                free(sum2);
             }
-            emit messageChanged(tr("calculating autocorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
-            if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
-            else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
+            for (uint32_t i=0; i<acf_N; i++) {
+                acf_tau[i]=(double)acf_t[i]*job.frameTime;
+            }
+            free(acf_t);
         }
-        for (uint32_t i=0; i<acf_N; i++) {
-            acf_tau[i]=(double)acf_t[i]*job.frameTime;
-        }
-        free(acf_t);
+
     }
 
+    if (m_status==1 && !was_canceled) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CALCULATE THE CCFs
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (job.ccf && job.correlator==0) {
+            emit messageChanged(tr("calculating crosscorrelations ..."));
+            ccf_N=job.S*job.P;
+            ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+            ccf2=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+            ccf3=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+            ccf4=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+            for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
+                ccf1[nn]=1.0;
+                ccf2[nn]=1.0;
+                ccf3[nn]=1.0;
+                ccf4[nn]=1.0;
+            }
+            if (job.segments>1) {
+                ccf1_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+                ccf2_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+                ccf3_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+                ccf4_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+            }
+            ccf_tau=(double*)calloc(ccf_N,sizeof(double));
+            long* ccf_t=(long*)calloc(ccf_N*frame_width*frame_height,sizeof(long));
+            statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
+            for (uint32_t p=0; p<frame_width*frame_height; p++) {
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CALCULATE THE CCFs
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (job.ccf && job.correlator==0) {
-        emit messageChanged(tr("calculating crosscorrelations ..."));
-        ccf_N=job.S*job.P;
-        ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        ccf2=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        ccf3=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        ccf4=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
-            ccf1[nn]=1.0;
-            ccf2[nn]=1.0;
-            ccf3[nn]=1.0;
-            ccf4[nn]=1.0;
-        }
-        if (job.segments>1) {
-            ccf1_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf2_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf3_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf4_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        }
-        ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-        long* ccf_t=(long*)calloc(ccf_N*frame_width*frame_height,sizeof(long));
-        statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
-        for (uint32_t p=0; p<frame_width*frame_height; p++) {
 
-
-            if (job.segments<=1) {
-                if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-            } else {
-                uint32_t segment_frames=frames/job.segments;
-                double* cftemp=(double*)calloc(4*ccf_N,sizeof(double));
-                double* sum=(double*)calloc(4*ccf_N,sizeof(double));
-                double* sum2=(double*)calloc(4*ccf_N,sizeof(double));
-                for (register uint32_t ct=0; ct<4*ccf_N; ct++) {
-                    sum[ct]=0;
-                    sum2[ct]=0;
-                }
-                for (int32_t seg=0; seg<job.segments; seg++) {
-                    for (register uint32_t ct=0; ct<4*ccf_N; ct++) cftemp[ct]=0;
-                    if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                if (job.segments<=1) {
+                    if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                } else {
+                    uint32_t segment_frames=frames/job.segments;
+                    double* cftemp=(double*)calloc(4*ccf_N,sizeof(double));
+                    double* sum=(double*)calloc(4*ccf_N,sizeof(double));
+                    double* sum2=(double*)calloc(4*ccf_N,sizeof(double));
+                    for (register uint32_t ct=0; ct<4*ccf_N; ct++) {
+                        sum[ct]=0;
+                        sum2[ct]=0;
+                    }
+                    for (int32_t seg=0; seg<job.segments; seg++) {
+                        for (register uint32_t ct=0; ct<4*ccf_N; ct++) cftemp[ct]=0;
+                        if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        for (register uint32_t ct=0; ct<ccf_N; ct++) {
+                            if ((int32_t)p-1>=0) {
+                                sum[0*ccf_N+ct]  += cftemp[0*ccf_N+ct];
+                                sum2[0*ccf_N+ct] += cftemp[0*ccf_N+ct]*cftemp[0*ccf_N+ct];
+                            } else {
+                                sum[0*ccf_N+ct] += 1.0;
+                                sum2[0*ccf_N+ct] += 1.0*1.0;
+                            }
+                            if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) {
+                                sum[1*ccf_N+ct]  += cftemp[1*ccf_N+ct];
+                                sum2[1*ccf_N+ct] += cftemp[1*ccf_N+ct]*cftemp[1*ccf_N+ct];
+                            } else {
+                                sum[1*ccf_N+ct] += 1.0;
+                                sum2[1*ccf_N+ct] += 1.0*1.0;
+                            }
+                            if ((int32_t)p-(int32_t)frame_width>=0) {
+                                sum[2*ccf_N+ct]  += cftemp[2*ccf_N+ct];
+                                sum2[2*ccf_N+ct] += cftemp[2*ccf_N+ct]*cftemp[2*ccf_N+ct];
+                            } else {
+                                sum[2*ccf_N+ct] += 1.0;
+                                sum2[2*ccf_N+ct] += 1.0*1.0;
+                            }
+                            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) {
+                                sum[3*ccf_N+ct]  += cftemp[3*ccf_N+ct];
+                                sum2[3*ccf_N+ct] += cftemp[3*ccf_N+ct]*cftemp[3*ccf_N+ct];
+                            } else {
+                                sum[3*ccf_N+ct] += 1.0;
+                                sum2[3*ccf_N+ct] += 1.0*1.0;
+                            }
+                        }
+                    }
+                    free(cftemp);
+                    double segs=job.segments;
                     for (register uint32_t ct=0; ct<ccf_N; ct++) {
-                        if ((int32_t)p-1>=0) {
-                            sum[0*ccf_N+ct]  += cftemp[0*ccf_N+ct];
-                            sum2[0*ccf_N+ct] += cftemp[0*ccf_N+ct]*cftemp[0*ccf_N+ct];
-                        } else {
-                            sum[0*ccf_N+ct] += 1.0;
-                            sum2[0*ccf_N+ct] += 1.0*1.0;
-                        }
-                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) {
-                            sum[1*ccf_N+ct]  += cftemp[1*ccf_N+ct];
-                            sum2[1*ccf_N+ct] += cftemp[1*ccf_N+ct]*cftemp[1*ccf_N+ct];
-                        } else {
-                            sum[1*ccf_N+ct] += 1.0;
-                            sum2[1*ccf_N+ct] += 1.0*1.0;
-                        }
-                        if ((int32_t)p-(int32_t)frame_width>=0) {
-                            sum[2*ccf_N+ct]  += cftemp[2*ccf_N+ct];
-                            sum2[2*ccf_N+ct] += cftemp[2*ccf_N+ct]*cftemp[2*ccf_N+ct];
-                        } else {
-                            sum[2*ccf_N+ct] += 1.0;
-                            sum2[2*ccf_N+ct] += 1.0*1.0;
-                        }
-                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) {
-                            sum[3*ccf_N+ct]  += cftemp[3*ccf_N+ct];
-                            sum2[3*ccf_N+ct] += cftemp[3*ccf_N+ct]*cftemp[3*ccf_N+ct];
-                        } else {
-                            sum[3*ccf_N+ct] += 1.0;
-                            sum2[3*ccf_N+ct] += 1.0*1.0;
-                        }
+                        ccf1[p*ccf_N+ct]=sum[0*ccf_N+ct]/segs;
+                        ccf1_std[p*ccf_N+ct]=sqrt((sum2[0*ccf_N+ct]-sum[0*ccf_N+ct]*sum[0*ccf_N+ct]/segs)/(segs-1.0));
+
+                        ccf2[p*ccf_N+ct]=sum[1*ccf_N+ct]/segs;
+                        ccf2_std[p*ccf_N+ct]=sqrt((sum2[1*ccf_N+ct]-sum[1*ccf_N+ct]*sum[1*ccf_N+ct]/segs)/(segs-1.0));
+
+                        ccf3[p*ccf_N+ct]=sum[2*ccf_N+ct]/segs;
+                        ccf3_std[p*ccf_N+ct]=sqrt((sum2[2*ccf_N+ct]-sum[2*ccf_N+ct]*sum[2*ccf_N+ct]/segs)/(segs-1.0));
+
+                        ccf4[p*ccf_N+ct]=sum[3*ccf_N+ct]/segs;
+                        ccf4_std[p*ccf_N+ct]=sqrt((sum2[3*ccf_N+ct]-sum[3*ccf_N+ct]*sum[3*ccf_N+ct]/segs)/(segs-1.0));
                     }
+                    free(sum);
+                    free(sum2);
                 }
-                free(cftemp);
-                double segs=job.segments;
-                for (register uint32_t ct=0; ct<ccf_N; ct++) {
-                    ccf1[p*ccf_N+ct]=sum[0*ccf_N+ct]/segs;
-                    ccf1_std[p*ccf_N+ct]=sqrt((sum2[0*ccf_N+ct]-sum[0*ccf_N+ct]*sum[0*ccf_N+ct]/segs)/(segs-1.0));
 
-                    ccf2[p*ccf_N+ct]=sum[1*ccf_N+ct]/segs;
-                    ccf2_std[p*ccf_N+ct]=sqrt((sum2[1*ccf_N+ct]-sum[1*ccf_N+ct]*sum[1*ccf_N+ct]/segs)/(segs-1.0));
+                if (m_status==1 && !was_canceled) {
+                    if (frame_width*frame_height<500) {
+                        emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(500/frame_width*frame_height);
+                    } else if (p%(frame_width*frame_height/500)==0) {
+                        emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1);
+                    }
 
-                    ccf3[p*ccf_N+ct]=sum[2*ccf_N+ct]/segs;
-                    ccf3_std[p*ccf_N+ct]=sqrt((sum2[2*ccf_N+ct]-sum[2*ccf_N+ct]*sum[2*ccf_N+ct]/segs)/(segs-1.0));
-
-                    ccf4[p*ccf_N+ct]=sum[3*ccf_N+ct]/segs;
-                    ccf4_std[p*ccf_N+ct]=sqrt((sum2[3*ccf_N+ct]-sum[3*ccf_N+ct]*sum[3*ccf_N+ct]/segs)/(segs-1.0));
+                } else {
+                    break;
                 }
-                free(sum);
-                free(sum2);
             }
-
-            emit messageChanged(tr("calculating crosscorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
-            if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
-            else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
+            for (uint32_t i=0; i<acf_N; i++) {
+                ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
+            }
+            free(ccf_t);
         }
-        for (uint32_t i=0; i<acf_N; i++) {
-            ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
-        }
-        free(ccf_t);
     }
-
 
     if (image_series) free(image_series);
     image_series=NULL;
@@ -899,13 +923,14 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             }
             real_video_count=video_frame_num;
 
-            if (frame%(frames/1000)==0) {
-                emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames));
-                emit progressIncrement(1);
+            if (frames<1000) {
+                emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1000/frames);
+            } else if (frame%(frames/1000)==0) {
+                emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1);
             }
             frame++;
             if (was_canceled) break;
-        } while (reader->nextFrame() && (m_status==1) && (frame<frames));
+        } while (reader->nextFrame() && (m_status==1) && (frame<frames) && (!was_canceled));
 
 
         free(frame_data);
@@ -915,15 +940,15 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // NOW WE CALCULATE THE IMAGE BASELINE (ACCORDING TO THE USER SETTINGS). IT WILL BE APPLIED LATER!
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!was_canceled) calcBackgroundCorrection();
+    if (!was_canceled && m_status==1) calcBackgroundCorrection();
 
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CALCULATE THE ACFs AND CCFs
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!was_canceled) {
-        emit messageChanged(tr("calculating correlations ..."));
+    if (!was_canceled && m_status==1) {
+        emit messageChanged(tr("preparing correlations ..."));
 
         float* frame_data=(float*)malloc(frame_width*frame_height*sizeof(float));
 
@@ -1155,16 +1180,18 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 }
             }
 
-            if (frame%(frames/1000)==0) {
-                emit messageChanged(tr("calculating correlations ..."));
-                emit progressIncrement(1);
+            if (frames<1000) {
+                emit messageChanged(tr("calculating correlations (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1000/frames);
+            } else if (frame%(frames/1000)==0) {
+                emit messageChanged(tr("calculating correlations (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1);
             }
             frame++;
             if (was_canceled) break;
-        } while (reader->nextFrame() && (m_status==1) && (frame<frames));
+        } while (reader->nextFrame() && (m_status==1) && (frame<frames) && (!was_canceled));
 
         // calculate avg + stddev from sum and square-sum, as calculated above
-        if (job.acf && acf_N>0) {
+        if (job.acf && acf_N>0 && (m_status==1) && (!was_canceled) ) {
+            emit messageChanged(tr("averaging ACF segments ..."));
             for (register uint64_t tt=0; tt<acf_N*frame_width*frame_height; tt++) {
                 double sum=acf[tt];
                 double sum2=acf_std[tt];
@@ -1174,13 +1201,15 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 } else {
                     acf_std[tt]=0;
                 }
+                if (was_canceled) break;
             }
             if (job.segments<=1) {
                 free(acf_std);
                 acf_std=NULL;
             }
         }
-        if (job.ccf && ccf_N>0) {
+        if (job.ccf && ccf_N>0 && (m_status==1) && (!was_canceled)) {
+            emit messageChanged(tr("averaging CCF segments ..."));
             for (register uint64_t tt=0; tt<ccf_N*frame_width*frame_height; tt++) {
                 double sum=ccf1[tt];
                 double sum2=ccf1_std[tt];
@@ -1231,157 +1260,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         }
         free(frame_data);
     }
-
-/*
-        statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
-        for (uint32_t p=0; p<frame_width*frame_height; p++) {
-            if (job.segments<=1) {
-                statisticsAutocorrelateMultiTauSymmetric(&(acf[p*acf_N]), &(current_frame[p]), frames, acf_t, acf_N, frame_width*frame_height);
-            } else {
-                uint32_t segment_frames=frames/job.segments;
-                double* cftemp=(double*)calloc(acf_N,sizeof(double));
-                double* sum=(double*)calloc(acf_N,sizeof(double));
-                double* sum2=(double*)calloc(acf_N,sizeof(double));
-                for (register uint32_t ct=0; ct<acf_N; ct++) {
-                    sum[ct]=0;
-                    sum2[ct]=0;
-                }
-                for (int32_t seg=0; seg<job.segments; seg++) {
-                    for (register uint32_t ct=0; ct<acf_N; ct++) cftemp[ct]=0;
-                    statisticsAutocorrelateMultiTauSymmetric(cftemp, &(current_frame[seg*segment_frames*frame_width*frame_height+p]), segment_frames, acf_t, acf_N, frame_width*frame_height);
-                    for (register uint32_t ct=0; ct<acf_N; ct++) {
-                        sum[ct]=sum[ct]+cftemp[ct];
-                        sum2[ct]=sum2[ct]+cftemp[ct]*cftemp[ct];
-                    }
-                }
-                free(cftemp);
-                double segs=job.segments;
-                for (register uint32_t ct=0; ct<acf_N; ct++) {
-                    acf[p*acf_N+ct]=sum[ct]/segs;
-                    acf_std[p*acf_N+ct]=sqrt((sum2[ct]-sum[ct]*sum[ct]/segs)/(segs-1.0));
-                }
-                free(sum);
-                free(sum2);
-            }
-            emit messageChanged(tr("calculating autocorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
-            if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
-            else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
-        }
-        for (uint32_t i=0; i<acf_N; i++) {
-            acf_tau[i]=(double)acf_t[i]*job.frameTime;
-        }
-        free(acf_t);
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CALCULATE THE CCFs
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (job.ccf && job.correlator==0) {
-        emit messageChanged(tr("calculating crosscorrelations ..."));
-        ccf_N=job.S*job.P;
-        ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        ccf2=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        ccf3=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        ccf4=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
-            ccf1[nn]=1.0;
-            ccf2[nn]=1.0;
-            ccf3[nn]=1.0;
-            ccf4[nn]=1.0;
-        }
-        if (job.segments>1) {
-            ccf1_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf2_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf3_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf4_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-        }
-        ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-        long* ccf_t=(long*)calloc(ccf_N*frame_width*frame_height,sizeof(long));
-        statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
-        for (uint32_t p=0; p<frame_width*frame_height; p++) {
-
-
-            if (job.segments<=1) {
-                if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf1[p*ccf_N]), &(current_frame[p-1]), &(current_frame[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*ccf_N]), &(current_frame[p+1]), &(current_frame[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf3[p*ccf_N]), &(current_frame[p-frame_width]), &(current_frame[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*ccf_N]), &(current_frame[p+frame_width]), &(current_frame[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-            } else {
-                uint32_t segment_frames=frames/job.segments;
-                double* cftemp=(double*)calloc(4*ccf_N,sizeof(double));
-                double* sum=(double*)calloc(4*ccf_N,sizeof(double));
-                double* sum2=(double*)calloc(4*ccf_N,sizeof(double));
-                for (register uint32_t ct=0; ct<4*ccf_N; ct++) {
-                    sum[ct]=0;
-                    sum2[ct]=0;
-                }
-                for (int32_t seg=0; seg<job.segments; seg++) {
-                    for (register uint32_t ct=0; ct<4*ccf_N; ct++) cftemp[ct]=0;
-                    if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[0*ccf_N]), &(current_frame[seg*segment_frames*frame_width*frame_height+p-1]), &(current_frame[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[1*ccf_N]), &(current_frame[seg*segment_frames*frame_width*frame_height+p+1]), &(current_frame[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[2*ccf_N]), &(current_frame[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(current_frame[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[3*ccf_N]), &(current_frame[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(current_frame[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                    for (register uint32_t ct=0; ct<ccf_N; ct++) {
-                        if ((int32_t)p-1>=0) {
-                            sum[0*ccf_N+ct]  += cftemp[0*ccf_N+ct];
-                            sum2[0*ccf_N+ct] += cftemp[0*ccf_N+ct]*cftemp[0*ccf_N+ct];
-                        } else {
-                            sum[0*ccf_N+ct] += 1.0;
-                            sum2[0*ccf_N+ct] += 1.0*1.0;
-                        }
-                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) {
-                            sum[1*ccf_N+ct]  += cftemp[1*ccf_N+ct];
-                            sum2[1*ccf_N+ct] += cftemp[1*ccf_N+ct]*cftemp[1*ccf_N+ct];
-                        } else {
-                            sum[1*ccf_N+ct] += 1.0;
-                            sum2[1*ccf_N+ct] += 1.0*1.0;
-                        }
-                        if ((int32_t)p-(int32_t)frame_width>=0) {
-                            sum[2*ccf_N+ct]  += cftemp[2*ccf_N+ct];
-                            sum2[2*ccf_N+ct] += cftemp[2*ccf_N+ct]*cftemp[2*ccf_N+ct];
-                        } else {
-                            sum[2*ccf_N+ct] += 1.0;
-                            sum2[2*ccf_N+ct] += 1.0*1.0;
-                        }
-                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) {
-                            sum[3*ccf_N+ct]  += cftemp[3*ccf_N+ct];
-                            sum2[3*ccf_N+ct] += cftemp[3*ccf_N+ct]*cftemp[3*ccf_N+ct];
-                        } else {
-                            sum[3*ccf_N+ct] += 1.0;
-                            sum2[3*ccf_N+ct] += 1.0*1.0;
-                        }
-                    }
-                }
-                free(cftemp);
-                double segs=job.segments;
-                for (register uint32_t ct=0; ct<ccf_N; ct++) {
-                    ccf1[p*ccf_N+ct]=sum[0*ccf_N+ct]/segs;
-                    ccf1_std[p*ccf_N+ct]=sqrt((sum2[0*ccf_N+ct]-sum[0*ccf_N+ct]*sum[0*ccf_N+ct]/segs)/(segs-1.0));
-
-                    ccf2[p*ccf_N+ct]=sum[1*ccf_N+ct]/segs;
-                    ccf2_std[p*ccf_N+ct]=sqrt((sum2[1*ccf_N+ct]-sum[1*ccf_N+ct]*sum[1*ccf_N+ct]/segs)/(segs-1.0));
-
-                    ccf3[p*ccf_N+ct]=sum[2*ccf_N+ct]/segs;
-                    ccf3_std[p*ccf_N+ct]=sqrt((sum2[2*ccf_N+ct]-sum[2*ccf_N+ct]*sum[2*ccf_N+ct]/segs)/(segs-1.0));
-
-                    ccf4[p*ccf_N+ct]=sum[3*ccf_N+ct]/segs;
-                    ccf4_std[p*ccf_N+ct]=sqrt((sum2[3*ccf_N+ct]-sum[3*ccf_N+ct]*sum[3*ccf_N+ct]/segs)/(segs-1.0));
-                }
-                free(sum);
-                free(sum2);
-            }
-
-            emit messageChanged(tr("calculating crosscorrelations %1/%2 ...").arg(p+1).arg(frame_width*frame_height));
-            if (frame_width*frame_height<500) emit progressIncrement(ceil(500/(frame_width*frame_height)));
-            else if (p%(frame_width*frame_height/500)==0) emit progressIncrement(1);
-        }
-        for (uint32_t i=0; i<acf_N; i++) {
-            ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
-        }
-        free(ccf_t);
-    }
-*/
 
     for (register int i=0; i<acfjk.size(); i++) {
         if (acfjk[i]) delete acfjk[i];

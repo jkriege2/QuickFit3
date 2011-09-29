@@ -8,7 +8,7 @@
 #define UPDATE_TIMEOUT 50
 
 QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent) :
-    QWidget(parent, Qt::Dialog|Qt::WindowTitleHint|Qt::WindowMinMaxButtonsHint|Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint),
+    QDialog(parent),
     ui(new Ui::QFRDRImagingFCSCorrelationDialog)
 {
     this->pluginServices=pluginservices;
@@ -88,7 +88,7 @@ void QFRDRImagingFCSCorrelationDialog::startNextWaitingThread()   {
     }
 }
 
-void QFRDRImagingFCSCorrelationDialog::closeEvent(QCloseEvent * event)  {
+void QFRDRImagingFCSCorrelationDialog::done(int status)  {
     closing=true;
     bool allOK=allThreadsDone();
     bool someError=false;
@@ -97,9 +97,7 @@ void QFRDRImagingFCSCorrelationDialog::closeEvent(QCloseEvent * event)  {
     }
 
     if (allOK) {
-        event->accept();
     } else {
-        event->ignore();
         if (QMessageBox::warning(this, tr("imFCS Correlator"), tr("Some of the correlation jobs are not done yet.\nClose anyways (unfinished jobs will be canceled)!"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
             // cancel all unfinished threads
             for (int i=0; i<jobs.size(); i++) {
@@ -118,13 +116,13 @@ void QFRDRImagingFCSCorrelationDialog::closeEvent(QCloseEvent * event)  {
             }
             prg.close();
             allOK=true;
-            event->accept();
+
         } else {
             closing=false;
         }
     }
 
-    if (event->isAccepted()) {
+    if (closing) {
         // add jobs to project
         QModernProgressDialog prg(this);
         prg.setLabelText(tr("add job results to project ..."));
@@ -140,8 +138,8 @@ void QFRDRImagingFCSCorrelationDialog::closeEvent(QCloseEvent * event)  {
             delete jobs[i].thread;
         }
         prg.close();
-    } else {
-        closing=false;
+        QDialog::done(status);
+        close();
     }
 
     writeSettings();

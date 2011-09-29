@@ -46,10 +46,8 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
     if (project && settings) {
         QFRDRImagingFCSCorrelationDialog* dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
         dlgCorrelate->setProject(project);
-        dlgCorrelate->show();
-        while (dlgCorrelate->isVisible()) {
-            QApplication::processEvents();
-        }
+        dlgCorrelate->exec();
+
 
 
         QStringList list=dlgCorrelate->getFilesToAdd();

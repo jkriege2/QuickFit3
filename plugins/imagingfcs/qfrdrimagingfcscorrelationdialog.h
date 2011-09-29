@@ -22,7 +22,7 @@ namespace Ui {
     Finally getFilesToAdd() returns a list of file constaining ACFs and CCFs to be added to the
     project, by calling QFRDRImagingFCSPlugin::insertVideoCorrelatorFile().
 */
-class QFRDRImagingFCSCorrelationDialog : public QWidget
+class QFRDRImagingFCSCorrelationDialog : public QDialog
 {
     Q_OBJECT
 
@@ -58,7 +58,7 @@ protected slots:
     void on_chkLastFrame_clicked(bool checked);
     void setEditControlsEnabled(bool enabled);
 protected:
-    void closeEvent(QCloseEvent * event);
+    void done(int status);
     bool allThreadsDone() const;
     int runningThreads() const;
     int waitingThreads() const;
