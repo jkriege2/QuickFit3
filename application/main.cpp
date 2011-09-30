@@ -27,6 +27,10 @@
 
 int main(int argc, char * argv[])
 {
+    bool nosplash=false;
+    for (int i=0; i<argc; i++) {
+        if (QString(argv[i])=="--nosplash") nosplash=true;
+    }
     Q_INIT_RESOURCE(quickfit3);
     QApplication app(argc, argv);
 
@@ -42,9 +46,9 @@ int main(int argc, char * argv[])
     painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
     delete painter;
     painter=NULL;
-    QSplashScreen splash(pixmap,Qt::WindowStaysOnTopHint);
+    QSplashScreen splash(pixmap);//,Qt::WindowStaysOnTopHint);
     splash.showMessage("initializing ...");
-    splash.show();
+    if (!nosplash) splash.show();
     app.processEvents();
     app.processEvents();
     app.processEvents();

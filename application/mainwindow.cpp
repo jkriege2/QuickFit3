@@ -33,7 +33,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
     createMenus();
     createToolBars();
     createStatusBar();
-    setUnifiedTitleAndToolBarOnMac(true);
+    //setUnifiedTitleAndToolBarOnMac(true);
 
 
     // search for plugin
