@@ -1,6 +1,11 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="cam_radhard2_logo.png">cam_radhard2.png</file>
-    <file alias="cam_radhard2_flash.png">../../images/16x16/flash.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="cam_radhard2_logo.png">cam_radhard2.png</file>
+        <file alias="cam_radhard2_flash.png">images/flash.png</file>
+    </qresource>
+    <qresource prefix="/cam_radhard2">
+        <file alias="fileopen.png">images/fileopen.png</file>
+        <file alias="flash.png">images/flash.png</file>
+        <file alias="dialog_close.png">images/dialog_close.png</file>
+    </qresource>
 </RCC>

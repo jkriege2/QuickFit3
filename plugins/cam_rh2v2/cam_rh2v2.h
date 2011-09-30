@@ -8,6 +8,8 @@
 #include "processing_chain.h"
 #include "qenhancedlineedit.h"
 #include "jkstyledbutton.h"
+#include "../base_classes/radhard2flash.h"
+#include "qfradhard2flashtool.h"
 
 
 #define LOG_PREFIX "[RH2v2]: "
@@ -75,6 +77,8 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionBase::storeSettings() */
         virtual void storeSettings(ProgramOptions* settings); 
 
+        /** \brief QAction used to program the FPGA */
+        QAction* actProgramFPGA;
 
     /////////////////////////////////////////////////////////////////////////////
     // QFExtensionCamera routines
@@ -140,10 +144,28 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
          */
         virtual void log_error(QString message);
 
+
+
+        /*! \brief program the given \a bitfile into the FPGA (m for master or s for slave)
+
+            \param bitfile which file to flash
+            \param fpga \c 'm' to program master FPGA or \c 's' to program slave FPGA
+            \param[out] messageOut contains the messages output by the flashing procedure
+            \param retries number of retries when programming was not successfull
+            \return \c true on successfull programming
+        */
+        bool flashFPGA(QString autobitfile, char fpga, QString& messageOut, int retries=10);
+
 	protected:
         QFPluginLogService* logService;
         QString& findGroupByType(const QString &t, const unsigned int camera);
         struct cameraSettings* cameraSetting;
+        QString bitfileMaster;
+        QString bitfileSlave;
+        QString autoflashbitfileMaster;
+        QString autoflashbitfileSlave;
+        bool autoflash;
+        int retries;
 				
 	public:
         bool reconfigure(unsigned int camera, const QSettings& settings, unsigned int set);
@@ -154,6 +176,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
 		void logger_txt(QString message){log_text(LOG_PREFIX+message);}
 		void logger_wrn(QString message){log_warning(LOG_PREFIX+message);}
 		void logger_err(QString message){log_error(LOG_PREFIX+message);}
+        void programFPGA();
 
 };
 

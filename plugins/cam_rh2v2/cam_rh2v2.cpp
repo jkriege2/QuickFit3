@@ -10,6 +10,12 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
+    bitfileMaster="";
+    bitfileSlave="";
+    autoflashbitfileMaster="";
+    autoflashbitfileSlave="";
+    autoflash=false;
+    retries =10;
   cameraSetting=(QFExtensionCameraRh2v2::cameraSettings*)calloc(2,sizeof(struct cameraSettings));
 
   cameraSetting[0].prefix=new QString("Radhard2");
@@ -55,30 +61,85 @@ void QFExtensionCameraRh2v2::projectChanged(QFProject* oldProject, QFProject* pr
 }
 
 void QFExtensionCameraRh2v2::initExtension() {
-	services->log_global_text(tr("%1initializing extension '%2' ... [OK]\n").arg(LOG_PREFIX).arg(getName()));
+    services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
+    bitfileMaster=autoflashbitfileMaster=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_master.bit";
+    bitfileSlave=autoflashbitfileSlave=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_slave.bit";
+    actProgramFPGA=new QAction(QIcon(":/cam_radhard2/flash.png"), tr("Flash FPGAs"), this);
+    connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
+    QMenu* extm=services->getMenu("extensions");
+    if (extm) {
+        QMenu* subMenu=extm->addMenu(QIcon(":/cam_radhard2_logo.png"), tr("Radhard 2 V2 Tools"));
+        subMenu->addAction(actProgramFPGA);
+    }
+
+    loadSettings(NULL);
+
+    services->log_global_text(tr("%2initializing extension '%1' ... DONE\n").arg(getName()).arg(LOG_PREFIX));
+}
+
+
+
+void QFExtensionCameraRh2v2::programFPGA() {
+    QFRadhard2FlashtoolV2* dlg=new QFRadhard2FlashtoolV2(this, NULL);
+    loadSettings(NULL);
+
+    dlg->setBitfileMaster(bitfileMaster);
+    dlg->setBitfileSlave(bitfileSlave);
+    dlg->setAutoBitfileMaster(autoflashbitfileMaster);
+    dlg->setAutoBitfileSlave(autoflashbitfileSlave);
+    dlg->setAutoFlash(autoflash);
+    dlg->setRetries(retries);
+
+    dlg->exec();
+
+    bitfileMaster=dlg->bitfileMaster();
+    bitfileSlave=dlg->bitfileSlave();
+    autoflashbitfileMaster=dlg->autoBitfileMaster();
+    autoflashbitfileSlave=dlg->autoBitfileSlave();
+    retries=dlg->retries();
+    autoflash=dlg->autoflash();
+
+    storeSettings(NULL);
+    delete dlg;
+}
+
+
+bool QFExtensionCameraRh2v2::flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries) {
+    messageOut="";
+    int res=0;
+    int i=0;
+    QSTeing name="master";
+    if (fpga=='S' || fpga='s') name=slave;
+    while ((i<retries) && (res==0)) {
+        char message[8192];
+        res=flash_bitfile(bitfile.toAscii().data(), message, fpga);
+        if (i>0) messageOut+="\n\n";
+        messageOut += tr("try %4 %1/%2:\n%3").arg(i+1).arg(retries).arg(message).arg(name);
+        i++;
+    }
+    return res!=0;
 }
 
 void QFExtensionCameraRh2v2::loadSettings(ProgramOptions* settingspo) {
-	/* here you could read config information from the quickfit.ini file using settings object */
-    if (!settingspo) return;
-	if (settingspo->getQSettings()==NULL) return;
-    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
-
-	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    bitfileSlave=settings.value("radhard2/bitfileSlave", bitfileSlave).toString();
+    bitfileMaster=settings.value("radhard2/bitfileMaster", bitfileMaster).toString();
+    autoflashbitfileMaster=settings.value("radhard2/autoflashbitfileMaster", autoflashbitfileMaster).toString();
+    bitfileMaster=settings.value("radhard2/autoflashbitfileSlave", autoflashbitfileSlave).toString();
+    autoflash=settings.value("radhard2/autoflash", autoflash).toBool();
+    retries=settings.value("radhard2/retries", retries).toInt();
 
 }
 
 void QFExtensionCameraRh2v2::storeSettings(ProgramOptions* settingspo) {
-	/* here you could write config information to the quickfit.ini file using settings object */
-    if (!settingspo) return;
-	if (settingspo->getQSettings()==NULL) return;
-    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
-
-	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(QApplication::applicationDirPath()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
-
-	}
+    QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    settings.setValue("radhard2/bitfileSlave", bitfileSlave);
+    settings.setValue("radhard2/bitfileMaster", bitfileMaster);
+    settings.setValue("radhard2/autoflashbitfileMaster", autoflashbitfileMaster);
+    settings.setValue("radhard2/autoflashbitfileSlave", autoflashbitfileSlave);
+    settings.setValue("radhard2/autoflash", autoflash);
+    settings.setValue("radhard2/retries", retries);
+}
 
 QString& QFExtensionCameraRh2v2::findGroupByType(const QString &t, const unsigned int camera){
   QStringList groups = cameraSetting[camera].settings_pc->childGroups();
@@ -231,7 +292,22 @@ bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64
 }
 
 bool QFExtensionCameraRh2v2::connectDevice(unsigned int camera) {
-	return true;
+    /*if (autoflash && QFile(autoflashbitfileMaster).exists() && QFile(autoflashbitfileSlave).exists()) {
+        log_text(tr("flashing Radhard2 FPGAs (master: %1  slave:%2)\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave));
+        QString flashMessage;
+        bool ok=flashFPGA(autoflashbitfileMaster, 'm', flashMessage);
+        ok=ok&&flashFPGA(autoflashbitfileSlave, 's', flashMessage);
+        flashMessage.replace('\n', QString("\n%1  ").arg(LOG_PREFIX));
+        if (ok) {
+            log_text(tr("  %3\nflashing Radhard2 FPGAs (master: %1  slave:%2) ... DONE!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave).arg(flashMessage));
+        } else {
+            log_error(tr("  %3\nflashing Radhard2 FPGAs (master: %1  slave:%2) ... ERROR!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave).arg(flashMessage));
+            return false;
+        }
+    } else {
+        if (autoflash) log_warning(tr("could not flash Radhard2 FPGAs, as bit file '%1' or '%2' does not exist!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave));
+    }*/
+    return true;
 }
 
 void QFExtensionCameraRh2v2::disconnectDevice(unsigned int camera) {
@@ -274,8 +350,10 @@ void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QLis
 
 
     (*parameters)["sequence_length"]=cameraSetting[camera].settings_pc->value(findGroupByType("we_writer",camera)+"/config/duration", "").toInt();
-    (*parameters)["image_width"]=32;
-    (*parameters)["pixel_height"]=32;
+    (*parameters)["image_width"]=getImageWidth(camera);
+    (*parameters)["image_height"]=getImageHeight(camera);
+    (*parameters)["pixel_width"]=getPixelWidth(camera);
+    (*parameters)["pixel_height"]=getPixelHeight(camera);
     (*parameters)["frame_time"]=1e-5;
 }
 

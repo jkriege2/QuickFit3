@@ -21,8 +21,9 @@ QFExtensionCameraRadhard2::QFExtensionCameraRadhard2(QObject* parent):
     autoflashbitfile="";
     spIterations=NULL;
     spDivider=NULL;
-    autoflash=false;
+    autoflash=true;
     autoflashbitfile=bitfile="";
+    retries=10;
 
 }
 
@@ -43,12 +44,12 @@ void QFExtensionCameraRadhard2::projectChanged(QFProject* oldProject, QFProject*
 
 void QFExtensionCameraRadhard2::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
-    autoflashbitfile=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/extensions/"+getID()+"/radhard2_top_cell.bit";
+    bitfile=autoflashbitfile=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell.bit";
     actProgramFPGA=new QAction(QIcon(":/cam_radhard2_flash.png"), tr("Flash Radhard2 FPGA"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
     if (extm) {
-        QMenu* subMenu=extm->addMenu(tr("Radhard 2 Tools"));
+        QMenu* subMenu=extm->addMenu(QIcon(":/cam_radhard2_logo.png"), tr("Radhard 2 Tools"));
         subMenu->addAction(actProgramFPGA);
     }
 
@@ -58,68 +59,39 @@ void QFExtensionCameraRadhard2::initExtension() {
 }
 
 void QFExtensionCameraRadhard2::programFPGA() {
-    QDialog* dlg=new QDialog(parentWidget);
+    QFRadhard2Flashtool* dlg=new QFRadhard2Flashtool(this, NULL);
+    loadSettings(NULL);
 
-    QGridLayout* lay=new QGridLayout(dlg);
-    dlg->setLayout(lay);
+    dlg->setBitfile(bitfile);
+    dlg->setAutoBitfile(autoflashbitfile);
+    dlg->setAutoFlash(autoflash);
+    dlg->setRetries(retries);
 
-    edtBitfile=new QEnhancedLineEdit(dlg);
-    QLabel* l=new QLabel(tr("&Bitfile:"), dlg);
-    l->setBuddy(edtBitfile);
-    JKStyledButton* btnSelect=new JKStyledButton(JKStyledButton::SelectFile, edtBitfile, dlg);
-    edtBitfile->addButton(btnSelect);
-    edtBitfile->setText(bitfile);
-
-    QPushButton* btnFlash=new QPushButton(tr("&Flash"), dlg);
-    connect(btnFlash, SIGNAL(clicked()), this, SLOT(programFPGAClicked()));
-
-    edtFlashSuccess=new QTextEdit(dlg);
-    //labFlashSuccess->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
-
-    QPushButton* btnClose=new QPushButton(tr("&Close"), dlg);
-    connect(btnClose, SIGNAL(clicked()), dlg, SLOT(accept()));
-
-    lay->addWidget(l, 0, 0);
-    lay->addWidget(edtBitfile, 0, 1, 1, 3);
-    lay->addWidget(btnFlash, 1, 1, 1, 1);
-    lay->addWidget(edtFlashSuccess, 2, 1, 1, 3);
-    lay->addWidget(edtFlashSuccess, 2, 1, 1, 3);
-    lay->addWidget(btnClose, 3, 3);
-
-    dlg->resize(500,200);
     dlg->exec();
-    bitfile=edtBitfile->text();
+
+    bitfile=dlg->bitfile();
+    autoflashbitfile=dlg->autoBitfile();
+    retries=dlg->retries();
+    autoflash=dlg->autoflash();
+
     storeSettings(NULL);
     delete dlg;
     edtBitfile=NULL;
     edtFlashSuccess=NULL;
 }
 
-void QFExtensionCameraRadhard2::programFPGAClicked() {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    if (edtBitfile) {
-        QString message;
-        bool ok=flashFPGA(edtBitfile->text(), 'm', message, 2);
-        if (edtFlashSuccess) {
-            edtFlashSuccess->setText(message);
-            edtFlashSuccess->moveCursor(QTextCursor::End);
-        }
-        if (!ok) {
-            QMessageBox::critical(NULL, tr("Radhard2 driver"), tr("Could not program Radhard2 FPGA, see dialog for error message!"));
-        }
-    }
-    QApplication::restoreOverrideCursor();
-}
 
 bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries) {
     messageOut="";
     int res=0;
     int i=0;
+    QString name="master";
+    if (fpga=='S' || fpga=='s') name="slave";
     while ((i<retries) && (res==0)) {
         char message[8192];
         res=flash_bitfile(bitfile.toAscii().data(), message, fpga);
         if (i>0) messageOut+="\n\n";
-        messageOut += tr("try %1/%2:\n%3").arg(i+1).arg(retries).arg(message);
+        messageOut += tr("try %4 %1/%2:\n%3").arg(i+1).arg(retries).arg(message).arg(name);
         i++;
     }
     return res!=0;
@@ -127,25 +99,19 @@ bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& m
 
 
 void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
-    if (!settingspo) return;
-    if (settingspo->getQSettings()==NULL) return;
-    QSettings& settings=*(settingspo->getQSettings());
-    //QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
-    //iterations=settings.value("radhard2/iterations", iterations).toInt();
-    //divider=settings.value("radhard2/divider", divider).toInt();
-    //subtractOne=settings.value("radhard2/subtract_one", subtractOne).toBool();
+    QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    autoflashbitfile=settings.value("radhard2/autobitfile", autoflashbitfile).toString();
     bitfile=settings.value("radhard2/bitfile", bitfile).toString();
+    autoflash=settings.value("radhard2/autoflash", autoflash).toBool();
+    retries=settings.value("radhard2/retries", retries).toInt();
 }
 
 void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
-    if (!settingspo) return;
-    if (settingspo->getQSettings()==NULL) return;
-    QSettings& settings=*(settingspo->getQSettings());
-    //QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
-    //settings.setValue("radhard2/iterations", iterations);
-    //settings.setValue("radhard2/divider", divider);
-    //settings.setValue("radhard2/subtract_one", subtractOne);
+    QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    settings.setValue("radhard2/autobitfile", autoflashbitfile);
     settings.setValue("radhard2/bitfile", bitfile);
+    settings.setValue("radhard2/autoflash", autoflash);
+    settings.setValue("radhard2/retries", retries);
 }
 
 unsigned int QFExtensionCameraRadhard2::getCameraCount() {
@@ -156,8 +122,6 @@ void QFExtensionCameraRadhard2::useCameraSettings(unsigned int camera, const QSe
     iterations=settings.value("radhard2/iterations", 1000).toUInt();
     divider=settings.value("radhard2/divider", 1).toUInt();
     subtractOne=settings.value("radhard2/subtract1", true).toBool();
-    //autoflash=settings.value("radhard2/autoflash", false).toBool();
-    //autoflashbitfile=settings.value("radhard2/autoflash_bitfile", "").toString();
     if (isConnected(camera)) {
         sendIterations();
         sendDivider();
@@ -209,19 +173,6 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QS
     formlayout->addRow(tr("subtract offset 1:"), chkSubtract1);
 
 
-    /*QCheckBox* chkAutoFlash=new QCheckBox("", dlg);
-    chkAutoFlash->setChecked(settings.value("radhard2/autoflash", true).toBool());
-    formlayout->addRow(tr("autom. flash on connect:"), chkAutoFlash);
-
-    QEnhancedLineEdit* edtBitfile=new QEnhancedLineEdit(dlg);
-    formlayout->addRow(tr("bitfile for autoflash:"), edtBitfile);
-    JKStyledButton* btnSelect=new JKStyledButton(JKStyledButton::SelectFile, edtBitfile, dlg);
-    edtBitfile->addButton(btnSelect);
-    edtBitfile->setText(settings.value("radhard2/autoflash_bitfile", bitfile).toString());
-    connect(chkAutoFlash, SIGNAL(clicked(bool)), edtBitfile, SLOT(setEnabled(bool)));
-    chkAutoFlash->setChecked(settings.value("radhard2/autoflash", bitfile).toBool());*/
-
-
     lay->addLayout(formlayout);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
@@ -235,8 +186,7 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QS
          settings.setValue("radhard2/iterations", spIterations->value());
          settings.setValue("radhard2/divider", spDivider->value());
          settings.setValue("radhard2/subtract1", chkSubtract1->isChecked());
-         //settings.setValue("radhard2/autoflash", chkAutoFlash->isChecked());
-         //settings.setValue("radhard2/autoflash_bitfile", edtBitfile->text());
+
     }
     delete dlg;
     spIterations=NULL;

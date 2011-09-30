@@ -7,10 +7,11 @@
 #include "../interfaces/qfextensioncamera.h"
 #include "radhard2lib/radhard2.h"
 #include "radhard2lib/radhard2lib.h"
-#include "radhard2lib/radhard2flash.h"
+#include "../base_classes/radhard2flash.h"
 #include "highrestimer.h"
 #include "qenhancedlineedit.h"
 #include "jkstyledbutton.h"
+#include "qfradhard2flashtool.h"
 
 
 
@@ -148,7 +149,15 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
          *  \param message the error message to log
          */
         virtual void log_error(QString message);
+        /*! \brief program the given \a bitfile into the FPGA (m for master or s for slave)
 
+            \param bitfile which file to flash
+            \param fpga \c 'm' to program master FPGA or \c 's' to program slave FPGA
+            \param[out] messageOut contains the messages output by the flashing procedure
+            \param retries number of retries when programming was not successfull
+            \return \c true on successfull programming
+        */
+        bool flashFPGA(QString autobitfile, char fpga, QString& messageOut, int retries=10);
     signals:
         /** \brief signal that may be used to display the current exposure time as a string */
         void displayAcquisitionTime(const QString& time);
@@ -168,16 +177,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         void sendIterations();
         /** \brief program the FPGA */
         void programFPGA();
-        void programFPGAClicked();
-        /*! \brief program the given \a bitfile into the FPGA (m for master or s for slave)
 
-            \param bitfile which file to flash
-            \param fpga \c 'm' to program master FPGA or \c 's' to program slave FPGA
-            \param[out] messageOut contains the messages output by the flashing procedure
-            \param retries number of retries when programming was not successfull
-            \return \c true on successfull programming
-        */
-        bool flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries=2);
 
     protected:
         /** \brief are we connected? */
@@ -203,6 +203,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         QString autoflashbitfile;
         /** \brief indicates if the driver should try to download a bitfile to the FPGA on connecting */
         bool autoflash;
+        int retries;
 
         QEnhancedLineEdit* edtBitfile;
         QTextEdit* edtFlashSuccess;

@@ -18,16 +18,19 @@ include(../../libquickfitwidgets.pri)
 HEADERS += cam_radhard2.h \
            radhard2lib/radhard2.h \
            radhard2lib/radhard2lib.h \
-           radhard2lib/radhard2flash.h \
+           ../base_classes/radhard2flash.h \
            ../interfaces/qfextensioncamera.h \
-           ../../../../../LIB/trunk/highrestimer.h
+           ../../../../../LIB/trunk/highrestimer.h \
+    qfradhard2flashtool.h
 
 SOURCES += cam_radhard2.cpp \
            radhard2lib/radhard2.cpp \
-           radhard2lib/radhard2flash.cpp \
-           ../../../../../LIB/trunk/highrestimer.cpp
+           ../base_classes/radhard2flash.cpp \
+           ../../../../../LIB/trunk/highrestimer.cpp \
+    qfradhard2flashtool.cpp
 
-FORMS =
+FORMS = \
+    qfradhard2flashtool.ui
 
 RESOURCES += cam_radhard2.qrc
 
@@ -41,3 +44,6 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl
+
+
+
