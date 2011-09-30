@@ -33,7 +33,7 @@ void QFESPIMB040::initExtension() {
 
     QDir d(services->getConfigFileDirectory());
     // make sure the directory for the config files of this extension exists
-    d.mkpath(services->getConfigFileDirectory()+"/plugins/extensions/"+getID());
+    d.mkpath(services->getConfigFileDirectory()+"/plugins/"+getID());
 
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QToolBar* exttb=services->getToolbar("extensions");

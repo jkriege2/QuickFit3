@@ -16,6 +16,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
     autoflashbitfileSlave="";
     autoflash=false;
     retries =10;
+    retryDelay=1000;
   cameraSetting=(QFExtensionCameraRh2v2::cameraSettings*)calloc(2,sizeof(struct cameraSettings));
 
   cameraSetting[0].prefix=new QString("Radhard2");
@@ -62,8 +63,8 @@ void QFExtensionCameraRh2v2::projectChanged(QFProject* oldProject, QFProject* pr
 
 void QFExtensionCameraRh2v2::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
-    bitfileMaster=autoflashbitfileMaster=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_master.bit";
-    bitfileSlave=autoflashbitfileSlave=bitfile=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_slave.bit";
+    bitfileMaster=autoflashbitfileMaster=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_master.bit";
+    bitfileSlave=autoflashbitfileSlave=services->getOptions()->getAssetsDirectory()+"/plugins/"+getID()+"/radhard2_top_cell_slave.bit";
     actProgramFPGA=new QAction(QIcon(":/cam_radhard2/flash.png"), tr("Flash FPGAs"), this);
     connect(actProgramFPGA, SIGNAL(triggered()), this, SLOT(programFPGA()));
     QMenu* extm=services->getMenu("extensions");
@@ -89,6 +90,7 @@ void QFExtensionCameraRh2v2::programFPGA() {
     dlg->setAutoBitfileSlave(autoflashbitfileSlave);
     dlg->setAutoFlash(autoflash);
     dlg->setRetries(retries);
+    dlg->setRetryDelayMS(retryDelay);
 
     dlg->exec();
 
@@ -98,24 +100,30 @@ void QFExtensionCameraRh2v2::programFPGA() {
     autoflashbitfileSlave=dlg->autoBitfileSlave();
     retries=dlg->retries();
     autoflash=dlg->autoflash();
+    retryDelay=dlg->retryDelayMS();
 
     storeSettings(NULL);
     delete dlg;
 }
 
 
-bool QFExtensionCameraRh2v2::flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries) {
+bool QFExtensionCameraRh2v2::flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries, int retryDelayMS) {
     messageOut="";
     int res=0;
     int i=0;
-    QSTeing name="master";
-    if (fpga=='S' || fpga='s') name=slave;
+    QString name="master";
+    if (fpga=='S' || fpga=='s') name="slave";
     while ((i<retries) && (res==0)) {
         char message[8192];
         res=flash_bitfile(bitfile.toAscii().data(), message, fpga);
         if (i>0) messageOut+="\n\n";
         messageOut += tr("try %4 %1/%2:\n%3").arg(i+1).arg(retries).arg(message).arg(name);
         i++;
+        QTime time;
+        time.start();
+        while (time.elapsed()<retryDelayMS) {
+            QApplication::processEvents();
+        }
     }
     return res!=0;
 }
@@ -125,9 +133,10 @@ void QFExtensionCameraRh2v2::loadSettings(ProgramOptions* settingspo) {
     bitfileSlave=settings.value("radhard2/bitfileSlave", bitfileSlave).toString();
     bitfileMaster=settings.value("radhard2/bitfileMaster", bitfileMaster).toString();
     autoflashbitfileMaster=settings.value("radhard2/autoflashbitfileMaster", autoflashbitfileMaster).toString();
-    bitfileMaster=settings.value("radhard2/autoflashbitfileSlave", autoflashbitfileSlave).toString();
+    autoflashbitfileSlave=settings.value("radhard2/autoflashbitfileSlave", autoflashbitfileSlave).toString();
     autoflash=settings.value("radhard2/autoflash", autoflash).toBool();
     retries=settings.value("radhard2/retries", retries).toInt();
+    retryDelay=settings.value("radhard2/retryDelay", retryDelay).toInt();
 
 }
 
@@ -139,6 +148,7 @@ void QFExtensionCameraRh2v2::storeSettings(ProgramOptions* settingspo) {
     settings.setValue("radhard2/autoflashbitfileSlave", autoflashbitfileSlave);
     settings.setValue("radhard2/autoflash", autoflash);
     settings.setValue("radhard2/retries", retries);
+    settings.setValue("radhard2/retryDelay", retryDelay);
 }
 
 QString& QFExtensionCameraRh2v2::findGroupByType(const QString &t, const unsigned int camera){
@@ -292,21 +302,34 @@ bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64
 }
 
 bool QFExtensionCameraRh2v2::connectDevice(unsigned int camera) {
-    /*if (autoflash && QFile(autoflashbitfileMaster).exists() && QFile(autoflashbitfileSlave).exists()) {
-        log_text(tr("flashing Radhard2 FPGAs (master: %1  slave:%2)\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave));
+    if (autoflash && (QFile(autoflashbitfileMaster).exists() || QFile(autoflashbitfileSlave).exists())) {
         QString flashMessage;
-        bool ok=flashFPGA(autoflashbitfileMaster, 'm', flashMessage);
-        ok=ok&&flashFPGA(autoflashbitfileSlave, 's', flashMessage);
-        flashMessage.replace('\n', QString("\n%1  ").arg(LOG_PREFIX));
-        if (ok) {
-            log_text(tr("  %3\nflashing Radhard2 FPGAs (master: %1  slave:%2) ... DONE!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave).arg(flashMessage));
-        } else {
-            log_error(tr("  %3\nflashing Radhard2 FPGAs (master: %1  slave:%2) ... ERROR!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave).arg(flashMessage));
-            return false;
+        if (QFile(autoflashbitfileMaster).exists()) {
+            log_text(tr("flashing Radhard2 Master FPGA (%1)\n").arg(autoflashbitfileMaster));
+            bool ok=flashFPGA(autoflashbitfileMaster, 'm', flashMessage, retries, retryDelay);
+            flashMessage.replace('\n', QString("\n%1  ").arg(LOG_PREFIX));
+            if (ok) {
+                log_text(tr("  %3\nflashing Radhard2 Master FPGA (%1) ... DONE!\n").arg(autoflashbitfileMaster).arg(flashMessage));
+            } else {
+                log_error(tr("  %3\nflashing Radhard2 Master FPGA (%1) ... ERROR!\n").arg(autoflashbitfileMaster).arg(flashMessage));
+                return false;
+            }
+        }
+        if (QFile(autoflashbitfileSlave).exists()) {
+            log_text(tr("flashing Radhard2 Slave FPGA (%1)\n").arg(autoflashbitfileSlave));
+            bool ok=flashFPGA(autoflashbitfileSlave, 's', flashMessage, retries, retryDelay);
+            flashMessage.replace('\n', QString("\n%1  ").arg(LOG_PREFIX));
+            if (ok) {
+                log_text(tr("  %3\nflashing Radhard2 Slave FPGA (%1) ... DONE!\n").arg(autoflashbitfileSlave).arg(flashMessage));
+            } else {
+                log_error(tr("  %3\nflashing Radhard2 Slave FPGA (%1) ... ERROR!\n").arg(autoflashbitfileSlave).arg(flashMessage));
+                return false;
+            }
+
         }
     } else {
         if (autoflash) log_warning(tr("could not flash Radhard2 FPGAs, as bit file '%1' or '%2' does not exist!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave));
-    }*/
+    }
     return true;
 }
 

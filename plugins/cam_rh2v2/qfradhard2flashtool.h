@@ -4,13 +4,13 @@
 #include <QDialog>
 #include "../base_classes/radhard2flash.h"
 #include "programoptions.h"
-#include "cam_rh2v2.h"
+
 
 namespace Ui {
     class QFRadhard2FlashtoolV2; // forward
 }
 
-class QFExtensionCameraRadhard2; // forward
+class QFExtensionCameraRh2v2; // forward
 
 /*! \brief Flash tool dialog for Radhard2
     \ingroup qf3ext_rh2v2
@@ -28,8 +28,10 @@ class QFRadhard2FlashtoolV2 : public QDialog{
         void setAutoBitfileSlave(QString bitfile);
         void setAutoFlash(bool v);
         void setRetries(int v);
+        void setRetryDelayMS(int milliseconds);
 
         int retries() const;
+        int retryDelayMS() const;
         bool autoflash() const;
         QString bitfileMaster() const;
         QString bitfileSlave() const;

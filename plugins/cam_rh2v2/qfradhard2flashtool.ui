@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
+    <width>790</width>
     <height>482</height>
    </rect>
   </property>
@@ -135,6 +135,41 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>&amp;Delay between retries:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinRetryDelay</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="spinRetryDelay">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="suffix">
+         <string> ms</string>
+        </property>
+        <property name="minimum">
+         <number>100</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -189,7 +224,7 @@
            <string>&amp;Flash</string>
           </property>
           <property name="icon">
-           <iconset resource="/cam_rh2v2.qrc">
+           <iconset resource="cam_rh2v2.qrc">
             <normaloff>:/camrh2v2/flash.png</normaloff>:/camrh2v2/flash.png</iconset>
           </property>
          </widget>
@@ -294,9 +329,14 @@
   <tabstop>chkAutoload</tabstop>
   <tabstop>edtAutoBitfileMaster</tabstop>
   <tabstop>btnLoad1</tabstop>
+  <tabstop>edtAutoBitfileSlave</tabstop>
+  <tabstop>btnLoad2</tabstop>
   <tabstop>spinRetries</tabstop>
+  <tabstop>spinRetryDelay</tabstop>
   <tabstop>edtMasterBitfile</tabstop>
   <tabstop>btnLoad</tabstop>
+  <tabstop>edtSlaveBitfile</tabstop>
+  <tabstop>btnLoad3</tabstop>
   <tabstop>btnFlash</tabstop>
   <tabstop>edtSuccess</tabstop>
   <tabstop>pushButton_2</tabstop>

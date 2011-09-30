@@ -1,6 +1,6 @@
 #include "qfradhard2flashtool.h"
 #include "ui_qfradhard2flashtool.h"
-#include "cam_radhard2.h"
+#include "cam_rh2v2.h"
 
 QFRadhard2FlashtoolV2::QFRadhard2FlashtoolV2(QFExtensionCameraRh2v2 *ext, QWidget* parent) :
     QDialog(parent),
@@ -18,22 +18,29 @@ QFRadhard2FlashtoolV2::~QFRadhard2FlashtoolV2()
 
 void QFRadhard2FlashtoolV2::on_btnFlash_clicked(){
     if (!radhard2extension) return;
-    if (!QFile::exists(ui->edtFile->text())) {
-        QMessageBox::critical(this, tr("Radhard2 driver"), tr("Bitfile '%1' does not exist!").arg(ui->edtFile->text()));
+    if (!bitfileMaster().isEmpty() && !QFile::exists(bitfileMaster())) {
+        QMessageBox::critical(this, tr("Radhard2 driver"), tr("Master bitfile '%1' does not exist!").arg(bitfileMaster()));
         return;
     }
+    if (!bitfileSlave().isEmpty() && !QFile::exists(bitfileSlave())) {
+        QMessageBox::critical(this, tr("Radhard2 driver"), tr("Slave bitfile '%1' does not exist!").arg(bitfileSlave()));
+        return;
+    }
+
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QString message;
-    ui->edtSuccess->setText(tr("flashing master FPGA: '%1' ...\nflashing master FPGA: '%2' ...").arg(bitfileMaster()).arg(bitfileSlave()));
+    ui->edtSuccess->setText(tr("flashing master FPGA: '%1' ...\nflashing slave FPGA: '%2' ...").arg(bitfileMaster()).arg(bitfileSlave()));
     QApplication::processEvents();
-    bool ok = radhard2extension->flashFPGA(bitfileMaster(), 'm', message, ui->spinRetries->value());
-    ok = ok && radhard2extension->flashFPGA(bitfileSlave(), 's', message, ui->spinRetries->value());
+    bool ok = true;
+    if (!bitfileMaster().isEmpty()) ok = ok && radhard2extension->flashFPGA(bitfileMaster(), 'm', message, ui->spinRetries->value(), ui->spinRetryDelay->value());
+    if (!bitfileSlave().isEmpty()) ok = ok && radhard2extension->flashFPGA(bitfileSlave(), 's', message, ui->spinRetries->value(), ui->spinRetryDelay->value());
     ui->edtSuccess->setText(message);
     ui->edtSuccess->moveCursor(QTextCursor::End);
+    QApplication::restoreOverrideCursor();
     if (!ok) {
         QMessageBox::critical(this, tr("Radhard2 driver"), tr("Could not program Radhard2 FPGA, see dialog for error message!"));
+        return;
     }
-    QApplication::restoreOverrideCursor();
 }
 
 void QFRadhard2FlashtoolV2::on_btnLoad_clicked(){
@@ -44,7 +51,7 @@ void QFRadhard2FlashtoolV2::on_btnLoad_clicked(){
 }
 
 void QFRadhard2FlashtoolV2::on_btnLoad1_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfileMaster->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtAutoBitfileMaster->setText(fileName);
     }
@@ -111,4 +118,12 @@ QString QFRadhard2FlashtoolV2::bitfileSlave() const {
 
 QString QFRadhard2FlashtoolV2::autoBitfileSlave() const {
     return ui->edtAutoBitfileSlave->text();
+}
+
+void QFRadhard2FlashtoolV2::setRetryDelayMS(int milliseconds) {
+    ui->spinRetryDelay->setValue(milliseconds);
+}
+
+int QFRadhard2FlashtoolV2::retryDelayMS() const {
+    return ui->spinRetryDelay->value();
 }

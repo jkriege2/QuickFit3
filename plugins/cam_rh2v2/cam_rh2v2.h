@@ -152,9 +152,10 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
             \param fpga \c 'm' to program master FPGA or \c 's' to program slave FPGA
             \param[out] messageOut contains the messages output by the flashing procedure
             \param retries number of retries when programming was not successfull
+            \param retryDelayMS delay between two retries in milliseconds
             \return \c true on successfull programming
         */
-        bool flashFPGA(QString autobitfile, char fpga, QString& messageOut, int retries=10);
+        bool flashFPGA(QString autobitfile, char fpga, QString& messageOut, int retries=10, int retryDelayMS=500);
 
 	protected:
         QFPluginLogService* logService;
@@ -166,6 +167,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         QString autoflashbitfileSlave;
         bool autoflash;
         int retries;
+        int retryDelay;
 				
 	public:
         bool reconfigure(unsigned int camera, const QSettings& settings, unsigned int set);

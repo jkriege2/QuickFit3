@@ -152,11 +152,12 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   {
     for (device = bus->devices; device; device = device->next)
     {
+      //fprintf(stderr, "device: vender=%X  product=%X  (Radhrad2: %X / %X)\n", device->descriptor.idVendor, device->descriptor.idProduct, ID_VENDOR, id_product);
       if ((device->descriptor.idVendor  == ID_VENDOR) &&
 	       (device->descriptor.idProduct == id_product))
       {
-	flag = 1;
-	break;
+        flag = 1;
+        break;
       }
     }
     if (flag)

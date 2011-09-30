@@ -24,7 +24,7 @@ QFExtensionCameraRadhard2::QFExtensionCameraRadhard2(QObject* parent):
     autoflash=true;
     autoflashbitfile=bitfile="";
     retries=10;
-
+    retryDelay=1000;
 }
 
 QFExtensionCameraRadhard2::~QFExtensionCameraRadhard2() {
@@ -66,6 +66,7 @@ void QFExtensionCameraRadhard2::programFPGA() {
     dlg->setAutoBitfile(autoflashbitfile);
     dlg->setAutoFlash(autoflash);
     dlg->setRetries(retries);
+    dlg->setRetryDelayMS(retryDelay);
 
     dlg->exec();
 
@@ -73,6 +74,7 @@ void QFExtensionCameraRadhard2::programFPGA() {
     autoflashbitfile=dlg->autoBitfile();
     retries=dlg->retries();
     autoflash=dlg->autoflash();
+    retryDelay=dlg->retryDelayMS();
 
     storeSettings(NULL);
     delete dlg;
@@ -81,7 +83,7 @@ void QFExtensionCameraRadhard2::programFPGA() {
 }
 
 
-bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries) {
+bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& messageOut, int retries, int retryDelayMS) {
     messageOut="";
     int res=0;
     int i=0;
@@ -93,6 +95,11 @@ bool QFExtensionCameraRadhard2::flashFPGA(QString bitfile, char fpga, QString& m
         if (i>0) messageOut+="\n\n";
         messageOut += tr("try %4 %1/%2:\n%3").arg(i+1).arg(retries).arg(message).arg(name);
         i++;
+        QTime time;
+        time.start();
+        while (time.elapsed()<retryDelayMS) {
+            QApplication::processEvents();
+        }
     }
     return res!=0;
 }
@@ -104,6 +111,7 @@ void QFExtensionCameraRadhard2::loadSettings(ProgramOptions* settingspo) {
     bitfile=settings.value("radhard2/bitfile", bitfile).toString();
     autoflash=settings.value("radhard2/autoflash", autoflash).toBool();
     retries=settings.value("radhard2/retries", retries).toInt();
+    retryDelay=settings.value("radhard2/retryDelay", retryDelay).toInt();
 }
 
 void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
@@ -112,6 +120,7 @@ void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
     settings.setValue("radhard2/bitfile", bitfile);
     settings.setValue("radhard2/autoflash", autoflash);
     settings.setValue("radhard2/retries", retries);
+    settings.setValue("radhard2/retryDelay", retryDelay);
 }
 
 unsigned int QFExtensionCameraRadhard2::getCameraCount() {
@@ -250,7 +259,7 @@ bool QFExtensionCameraRadhard2::connectDevice(unsigned int camera) {
     if (autoflash && QFile(autoflashbitfile).exists()) {
         log_text(tr("flashing Radhard2 FPGAs (bit file: %1)\n").arg(autoflashbitfile));
         QString flashMessage;
-        bool ok=flashFPGA(autoflashbitfile, 'm', flashMessage);
+        bool ok=flashFPGA(autoflashbitfile, 'm', flashMessage, retries, retryDelay);
         flashMessage.replace('\n', QString("\n%1  ").arg(LOG_PREFIX));
         if (ok) {
             log_text(tr("  %2\nflashing Radhard2 FPGAs (bit file: %1) ... DONE!\n").arg(autoflashbitfile).arg(flashMessage));

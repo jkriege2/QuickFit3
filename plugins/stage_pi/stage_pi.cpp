@@ -96,8 +96,8 @@ void QFExtensionLinearStagePI::loadSettings(ProgramOptions* settingspo) {
 	if (settingspo->getQSettings()==NULL) return;
     //QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
-	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	// ALTERNATIVE: read/write Information to/from plugins/<ID>/<ID>.ini file
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -107,8 +107,8 @@ void QFExtensionLinearStagePI::storeSettings(ProgramOptions* settingspo) {
 	if (settingspo->getQSettings()==NULL) return;
     //QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
-	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+	// ALTERNATIVE: read/write Information to/from plugins/<ID>/<ID>.ini file
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 

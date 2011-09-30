@@ -26,7 +26,7 @@ void QFRadhard2Flashtool::on_btnFlash_clicked(){
     QString message;
     ui->edtSuccess->setText(tr("flashing master FPGA: '%1' ...").arg(ui->edtFile->text()));
     QApplication::processEvents();
-    bool ok=radhard2extension->flashFPGA(ui->edtFile->text(), 'm', message, ui->spinRetries->value());
+    bool ok=radhard2extension->flashFPGA(ui->edtFile->text(), 'm', message, ui->spinRetries->value(), ui->spinRetryDelay->value());
     ui->edtSuccess->setText(message);
     ui->edtSuccess->moveCursor(QTextCursor::End);
     if (!ok) {
@@ -79,4 +79,12 @@ QString QFRadhard2Flashtool::bitfile() const {
 
 QString QFRadhard2Flashtool::autoBitfile() const {
     return ui->edtAutoBitfile->text();
+}
+
+void QFRadhard2Flashtool::setRetryDelayMS(int milliseconds) {
+    ui->spinRetryDelay->setValue(milliseconds);
+}
+
+int QFRadhard2Flashtool::retryDelayMS() const {
+    return ui->spinRetryDelay->value();
 }

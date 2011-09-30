@@ -23,17 +23,18 @@ include(../../libquickfitwidgets.pri)
 HEADERS += cam_rh2v2.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/highrestimer.h \
-    qfradhard2flashtool.h
+    qfradhard2flashtool.h \
+    ../base_classes/radhard2flash.h
 
 SOURCES += cam_rh2v2.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
-    qfradhard2flashtool.cpp
+    qfradhard2flashtool.cpp \
+    ../base_classes/radhard2flash.cpp
 
 FORMS = \
     qfradhard2flashtool.ui
 
-RESOURCES += cam_rh2v2.qrc \
-    cam_radhard2.qrc
+RESOURCES += cam_rh2v2.qrc
 
 TRANSLATIONS= ./translations/de.cam_rh2v2.ts
 

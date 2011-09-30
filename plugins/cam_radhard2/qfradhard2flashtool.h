@@ -25,7 +25,9 @@ class QFRadhard2Flashtool : public QDialog{
         void setAutoBitfile(QString bitfile);
         void setAutoFlash(bool v);
         void setRetries(int v);
+        void setRetryDelayMS(int milliseconds);
 
+        int retryDelayMS() const;
         int retries() const;
         bool autoflash() const;
         QString bitfile() const;

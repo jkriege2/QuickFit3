@@ -71,8 +71,8 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
 
     // find applicable .ccf files
 
-    QString directory=m_configDirectory+"/plugins/extensions/"+extension->getID();
-    QDir(m_configDirectory).mkpath("plugins/extensions/"+extension->getID());
+    QString directory=m_configDirectory+"/plugins/"+extension->getID();
+    QDir(m_configDirectory).mkpath("plugins/"+extension->getID());
     //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
     directory+="/";
     QStringList filenames;
