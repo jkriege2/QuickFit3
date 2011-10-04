@@ -90,5 +90,5 @@ void QFESPIMB040AcquisitionConfigWidget::on_chkUse1_clicked(bool enabled) {
 void QFESPIMB040AcquisitionConfigWidget::on_chkUse2_clicked(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkOverview->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
-    ui->edtPrefix2->setEnabled(ui->chkUse1->isChecked());
+    ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());
 }

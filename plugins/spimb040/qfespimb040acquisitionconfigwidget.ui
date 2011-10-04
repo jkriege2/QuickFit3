@@ -200,38 +200,5 @@ p, li { white-space: pre-wrap; }
  <resources>
   <include location="spimb040.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>chkUse1</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>edtPrefix1</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>82</x>
-     <y>63</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>160</x>
-     <y>63</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkUse2</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>edtPrefix2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>183</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

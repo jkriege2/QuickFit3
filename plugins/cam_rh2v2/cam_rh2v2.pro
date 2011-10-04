@@ -46,8 +46,5 @@ INCLUDEPATH += ../../lib/ \
 QT += gui xml svg
 CONFIG += exceptions rtti stl
 
-
-
-
-
-
+OTHER_FILES += \
+    cam_rh2v2.pc.ini

@@ -847,7 +847,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 image.copyLineAverage(pltDataMarginalLeftY, pltDataMarginalLeftX);
             }
             pltDataMarginalXPixelF=image.height()-1-pltDataMarginalYPixel+0.5;
-            pltDataMarginalYPixelF=pltDataMarginalXPixel;
+            pltDataMarginalYPixelF=pltDataMarginalXPixel+0.5;
         }
         statisticsMinMax(pltDataMarginalBottomY, pltDataMarginalBottomN, pltDataMarginalBottomYMin, pltDataMarginalBottomYMax);
         statisticsMinMax(pltDataMarginalLeftY, pltDataMarginalLeftN, pltDataMarginalLeftYMin, pltDataMarginalLeftYMax);

@@ -507,6 +507,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                     ui->spinStatistics->setMaximum(10000000);
                 }
             }
+            reader->close();
             delete reader;
         }
     }

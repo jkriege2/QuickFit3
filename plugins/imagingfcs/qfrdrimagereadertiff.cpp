@@ -2,6 +2,7 @@
 #include "libtiff_tools.h"
 #include <QObject>
 #include <QtGlobal>
+#include <QDebug>
 
 QFRDRImageReaderTIFF::QFRDRImageReaderTIFF() {
     width=0;
@@ -11,7 +12,8 @@ QFRDRImageReaderTIFF::QFRDRImageReaderTIFF() {
 }
 
 QFRDRImageReaderTIFF::~QFRDRImageReaderTIFF() {
-    close();
+    if (tif!=NULL) TIFFClose(tif);
+    tif=NULL;
 }
 
 QString QFRDRImageReaderTIFF::filter() const {
@@ -44,7 +46,9 @@ bool QFRDRImageReaderTIFF::open(QString filename) {
 }
 
 void QFRDRImageReaderTIFF::close() {
-    if (tif) TIFFClose(tif);
+    if (!tif) return;
+    qDebug()<<"QFRDRImageReaderTIFF::close()   tif="<<tif;
+    TIFFClose(tif);
     tif=NULL;
 }
 
@@ -52,11 +56,13 @@ uint32_t QFRDRImageReaderTIFF::countFrames() {
     if (!tif) return 0;
 
     uint32_t nb_images = 0;
-    tdir_t dir=TIFFCurrentDirectory(tif);
+    //tdir_t dir=TIFFCurrentDirectory(tif);
+    TIFFSetDirectory(tif,0);
     do {
         ++nb_images;
-    } while (TIFFReadDirectory(tif));
-    TIFFSetDirectory(tif,dir);
+    } while (TIFFReadDirectory(tif) && (nb_images<65536)); // LIBTIFF can only read up to 2¹6 frames!!!
+    //TIFFSetDirectory(tif,dir);
+    TIFFSetDirectory(tif,0);
     return nb_images;
 }
 

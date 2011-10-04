@@ -37,9 +37,9 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
   cameraSetting[1].pc=new processing_chain(cameraSetting[1].settings_pc,*cameraSetting[1].prefix+QString("_preview"));
   cameraSetting[1].xRes=128;
   cameraSetting[1].yRes=128;
-  cameraSetting[0].pixelWidth=1;
-  cameraSetting[0].pixelHeight=1;
-  cameraSetting[1].exposureTime=1;
+  cameraSetting[1].pixelWidth=30;
+  cameraSetting[1].pixelHeight=30;
+  cameraSetting[1].exposureTime=0.0001;
 	
   QObject::connect(cameraSetting[1].pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
   QObject::connect(cameraSetting[1].pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
