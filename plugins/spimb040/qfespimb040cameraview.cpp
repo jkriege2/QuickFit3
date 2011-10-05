@@ -10,27 +10,29 @@
 
 double fGauss( double t, const double *p )
 {
-    double offset=p[0];
-    double A=p[1];
-    double avg=p[2];
-    double var=p[3];
+    const double offset=p[0];
+    const double A=p[1];
+    const double avg=p[2];
+    const double var=p[3];
     return offset+A*exp(-2.0*(t-avg)*(t-avg)/var);
 }
 
 double fSlit( double t, const double *p )
 {
-    double offset=p[0];
-    double A=p[1];
-    double avg=p[2];
-    double d=p[3];
-    double x=M_PI*(t-avg)/d;
-    double s=sin(x)/x;
+    const double offset=p[0];
+    const double A=p[1];
+    const double avg=p[2];
+    const double d=p[3];
+    const double x=M_PI*(t-avg)/d;
+    const double s=sin(x)/x;
     return offset+A*s*s;
 }
 
-#define LABEL_UPDATE_INTERVAL_MS 50
-#define HISTOGRAM_UPDATE_INTERVAL_MS 50
+#define LABEL_UPDATE_INTERVAL_MS 250
+#define HISTOGRAM_UPDATE_INTERVAL_MS 250
+
 #define MARGINAL_FIT_SIZE_FACTOR 3
+#define MARGINAL_FIT_MINVALUES 100
 
 QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, QFPluginServices* pluginServices, QFCameraConfigComboBoxStartResume* stopresume, QWidget* parent):
     QWidget(parent)
@@ -81,10 +83,12 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(int cameraID, QFPluginServices* plu
     pltDataMarginalBottomY=(double*)calloc(pltDataMarginalBottomN,sizeof(double));
     pltDataMarginalLeftX=(double*)calloc(pltDataMarginalLeftN,sizeof(double));
     pltDataMarginalLeftY=(double*)calloc(pltDataMarginalLeftN,sizeof(double));
-    pltDataMarginalFitBottomY=(double*)calloc(pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
-    pltDataMarginalFitLeftY=(double*)calloc(pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
-    pltDataMarginalFitBottomX=(double*)calloc(pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
-    pltDataMarginalFitLeftX=(double*)calloc(pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR,sizeof(double));
+    pltDataMarginalBottomFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR);
+    pltDataMarginalLeftFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR);
+    pltDataMarginalFitBottomY=(double*)calloc(pltDataMarginalBottomFitN,sizeof(double));
+    pltDataMarginalFitLeftY=(double*)calloc(pltDataMarginalLeftFitN,sizeof(double));
+    pltDataMarginalFitBottomX=(double*)calloc(pltDataMarginalBottomFitN,sizeof(double));
+    pltDataMarginalFitLeftX=(double*)calloc(pltDataMarginalLeftFitN,sizeof(double));
     pltDataMarginalXPixelF=pltDataMarginalXPixel=0;
     pltDataMarginalYPixelF=pltDataMarginalYPixel=0;
     pltDataMarginalLeftYMin=0;
@@ -713,8 +717,8 @@ void QFESPIMB040CameraView::redrawFrame() {
         pltMarginalLeft->deletePlot(plteMarginalFitLeft);
         pltMarginalBottom->deletePlot(plteMarginalFitBottom);
         if (cmbMarginalFitFunction->currentIndex()>0) {
-            plteMarginalFitBottom->set_data(pltDataMarginalFitBottomX, pltDataMarginalFitBottomY, pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR);
-            plteMarginalFitLeft->set_data(pltDataMarginalFitLeftY, pltDataMarginalFitLeftX, pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR);
+            plteMarginalFitBottom->set_data(pltDataMarginalFitBottomX, pltDataMarginalFitBottomY, pltDataMarginalBottomFitN);
+            plteMarginalFitLeft->set_data(pltDataMarginalFitLeftY, pltDataMarginalFitLeftX, pltDataMarginalLeftFitN);
             pltMarginalLeft->addPlot(plteMarginalFitLeft);
             pltMarginalBottom->addPlot(plteMarginalFitBottom);
         }
@@ -734,9 +738,16 @@ void QFESPIMB040CameraView::redrawFrame() {
 void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     if (currentlyRedrawing) return;
     currentlyRedrawing=true;
+    QTime tim;
+    tim.start();
     prepareImage();
+    qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   prepareImage = "<<tim.elapsed()<<" ms";
+    tim.start();
     displayImageStatistics(chkImageStatisticsHistogram->isChecked(), forceHisto);
+    qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
+    tim.start();
     redrawFrame();
+    qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
     currentlyRedrawing=false;
 }
 
@@ -783,10 +794,13 @@ void QFESPIMB040CameraView::prepareImage() {
             pltDataMarginalBottomY=(double*)realloc((void*)pltDataMarginalBottomY, pltDataMarginalBottomN*sizeof(double));
             pltDataMarginalLeftX=(double*)realloc((void*)pltDataMarginalLeftX, pltDataMarginalLeftN*sizeof(double));
             pltDataMarginalLeftY=(double*)realloc((void*)pltDataMarginalLeftY, pltDataMarginalLeftN*sizeof(double));
-            pltDataMarginalFitBottomY=(double*)realloc((void*)pltDataMarginalFitBottomY, pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
-            pltDataMarginalFitLeftY=(double*)realloc((void*)pltDataMarginalFitLeftY, pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
-            pltDataMarginalFitBottomX=(double*)realloc((void*)pltDataMarginalFitBottomX, pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
-            pltDataMarginalFitLeftX=(double*)realloc((void*)pltDataMarginalFitLeftX, pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR*sizeof(double));
+
+            pltDataMarginalBottomFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR);
+            pltDataMarginalLeftFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR);
+            pltDataMarginalFitBottomY=(double*)realloc((void*)pltDataMarginalFitBottomY, pltDataMarginalBottomFitN*sizeof(double));
+            pltDataMarginalFitLeftY=(double*)realloc((void*)pltDataMarginalFitLeftY, pltDataMarginalLeftFitN*sizeof(double));
+            pltDataMarginalFitBottomX=(double*)realloc((void*)pltDataMarginalFitBottomX, pltDataMarginalBottomFitN*sizeof(double));
+            pltDataMarginalFitLeftX=(double*)realloc((void*)pltDataMarginalFitLeftX, pltDataMarginalLeftFitN*sizeof(double));
         }
         if (cmbRotation->currentIndex()==0) {
             // +x-
@@ -858,8 +872,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double var=0;
                 double avg=statisticsAverageVariance(var, pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
-                for (uint32_t i=0; i<pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR; i++) {
-                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                for (uint32_t i=0; i<pltDataMarginalLeftFitN; i++) {
+                    double x=(double)i*(double)pltDataMarginalLeftN/(double)pltDataMarginalLeftFitN;
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=pltDataMarginalLeftYMin+(pltDataMarginalLeftYMax-pltDataMarginalLeftYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
@@ -867,8 +881,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2));
                 var=0;
                 avg=statisticsAverageVariance(var, pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
-                for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
-                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
+                    double x=(double)i*(double)pltDataMarginalBottomN/(double)pltDataMarginalBottomFitN;
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=pltDataMarginalBottomYMin+(pltDataMarginalBottomYMax-pltDataMarginalBottomYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
@@ -888,8 +902,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 lm_control_struct control = lm_control_double;
                 control.printflags = 0; // monitor status (+1) and parameters (+2)
                 lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fGauss, &control, &status );
-                for (uint32_t i=0; i<pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR; i++) {
-                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                for (uint32_t i=0; i<pltDataMarginalLeftFitN; i++) {
+                    double x=(double)i*(double)pltDataMarginalLeftN/(double)pltDataMarginalLeftFitN;
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=fGauss(x, pout);
                 }
@@ -907,8 +921,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 control = lm_control_double;
                 control.printflags = 0; // monitor status (+1) and parameters (+2)
                 lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fGauss, &control, &status );
-                for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
-                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
+                    double x=(double)i*(double)pltDataMarginalBottomN/(double)pltDataMarginalBottomFitN;
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=fGauss(x, pout);
                 }
@@ -932,8 +946,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 lm_control_struct control = lm_control_double;
                 control.printflags = 0; // monitor status (+1) and parameters (+2)
                 lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fSlit, &control, &status );
-                for (uint32_t i=0; i<pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR; i++) {
-                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                for (uint32_t i=0; i<pltDataMarginalLeftFitN; i++) {
+                    double x=(double)i*(double)pltDataMarginalLeftN/(double)pltDataMarginalLeftFitN;
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=fSlit(x, pout);
                 }
@@ -952,8 +966,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 control = lm_control_double;
                 control.printflags = 0; // monitor status (+1) and parameters (+2)
                 lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fSlit, &control, &status );
-                for (uint32_t i=0; i<pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR; i++) {
-                    double x=(double)i/(double)MARGINAL_FIT_SIZE_FACTOR;
+                for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
+                    double x=(double)i*(double)pltDataMarginalBottomN/(double)pltDataMarginalBottomFitN;
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=fSlit(x, pout);
                 }
@@ -1055,7 +1069,7 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
     if ((labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) || forceHistogram ) {
         QString s=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
-                        .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0).c_str())
+                        .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0, 3).c_str())
                         .arg(roundWithError(imageMean, imageStddev, 2)).arg(roundError(imageStddev, 2))
                         .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 2)).arg(roundError(imageStddev/imageExposureTime/1000.0, 2))
                         .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight);

@@ -167,6 +167,10 @@ class QFESPIMB040CameraView : public QWidget {
         double pltDataMarginalYPixelF;
         /** \brief combobox to select the type of marginal plot */
         QComboBox* cmbMarginalPlots;
+        /** \brief bottom marginal fit number of points */
+        uint32_t pltDataMarginalBottomFitN;
+        /** \brief bottom marginal fit number of points */
+        uint32_t pltDataMarginalLeftFitN;
 
         double pltDataMarginalLeftYMin;
         double pltDataMarginalLeftYMax;

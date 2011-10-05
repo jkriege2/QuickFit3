@@ -35,6 +35,7 @@ bool QFRDRImageReaderTIFF::open(QString filename) {
         width=nx;
         height=ny;
         this->filename=filename;
+        TIFFSetWarningHandler(NULL);
         return true;
     } else {
         width=0;
