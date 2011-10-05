@@ -115,7 +115,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void rawDataChanged();
     public:
         /** \copydoc QFProperties::emitPropertiesChanged() */
-        virtual void emitPropertiesChanged() { emit propertiesChanged(); }
+        virtual void emitPropertiesChanged() { if (doEmitPropertiesChanged) emit propertiesChanged(); }
         /** \brief this function emits a resultsChanged() signal. */
         virtual void emitResultsChanged() { if (doEmitResultsChanged) emit resultsChanged(); }
         /** \brief this function emits a rawDataChanged() signal. */
@@ -123,7 +123,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief disable emitting of rawDataChanged() signal*/
         void disableEmitResultsChanged() { doEmitResultsChanged=false; }
         /** \brief enable emitting of rawDataChanged() signal and emit one signal */
-        void enableEmitResultsChanged() { doEmitResultsChanged=true; emit resultsChanged(); }
+        void enableEmitResultsChanged(bool emitnow=true) { doEmitResultsChanged=true; if (emitnow) emit resultsChanged(); }
+        /** \brief disable emitting of propertiesChanged() signal*/
+        void disableEmitPropertiesChanged() { doEmitPropertiesChanged=false; }
+        /** \brief enable emitting of propertiesChanged() signal and emit one signal */
+        void enableEmitPropertiesChanged(bool emitnow=true) { doEmitPropertiesChanged=true; if (emitnow) emit propertiesChanged(); }
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message) { setError(message); }
@@ -224,6 +228,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QHash<QString, QString> evalGroupLabels;
         /** \brief is this is \c false, the signal resultsChanged() is NOT emited */
         bool doEmitResultsChanged;
+        bool doEmitPropertiesChanged;
     public:
         /** \brief clear all evaluation results */
         void resultsClearAll();

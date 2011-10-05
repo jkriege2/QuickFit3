@@ -80,3 +80,5 @@ plg_fitalgorithm_fit_lmfit.depends = lib libqf3widgets
     plg_stage_pi.depends = lib libqf3widgets
 
 }
+
+

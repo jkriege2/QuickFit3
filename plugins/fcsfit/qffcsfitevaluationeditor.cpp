@@ -1815,6 +1815,7 @@ void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
     for (int i=0; i<recs.size(); i++) {
         if (current->isApplicable(recs[i])) {
             QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
+            recs[i]->disableEmitPropertiesChanged();
             recs[i]->setQFProperty(resultID+"_ravg_datacut_min", userMin, false, false);
 
             for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
@@ -1824,7 +1825,7 @@ void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
                     //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
                 }
             }
-
+            recs[i]->enableEmitPropertiesChanged(true);
         }
     }
     QApplication::restoreOverrideCursor();
@@ -1840,6 +1841,7 @@ void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
     for (int i=0; i<recs.size(); i++) {
         if (current->isApplicable(recs[i])) {
             QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
+            recs[i]->disableEmitPropertiesChanged();
             recs[i]->setQFProperty(resultID+"_ravg_datacut_max", userMax, false, false);
 
             for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
@@ -1849,6 +1851,7 @@ void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
                     recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
                 }
             }
+            recs[i]->enableEmitPropertiesChanged(true);
 
         }
     }
