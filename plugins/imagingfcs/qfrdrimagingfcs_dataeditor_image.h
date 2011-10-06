@@ -12,7 +12,9 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QGroupBox>
+#include <QSpinBox>
 #include <QAbstractTableModel>
+#include <QTabWidget>
 #include "datacutslider.h"
 #include "qfrdrimagingfcsrunsmodel.h"
 #include <QSet>
@@ -75,6 +77,17 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old);
 
+
+        /** \brief replot histogram */
+        void replotHistogram();
+
+        /** \brief recalculate histogram over all pixels */
+        void updateHistogram();
+
+        /** \brief recalculate histogram over selected pixels */
+        void updateSelectionHistogram(bool replot=true);
+
+
         /** \brief displays the data from the current data element in the plotter widget
          *
          * the parameter dummy has no function it is only there so this function may be used
@@ -98,7 +111,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief includes the currently selected items from the evaluation and recalculates the average */
         void includeRuns();
         void slidersChanged(int userMin, int userMax, int min, int max);
-        void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers);
+        void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
 
         /** \brief activated when the user selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
         void parameterSetChanged();
@@ -116,6 +129,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void connectImageWidgets(bool connectTo=true);
         /** \brief called when the user selects a new palette */
         void paletteChanged();
+        void histogramSettingsChanged();
         /** \brief called when the user selects to display overlays or not */
         void displayOverlayChanged();
 
@@ -145,6 +159,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
+
+
 
 
         /** \brief plotter widget for the correlation curve */
@@ -275,6 +291,23 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QPushButton* btnSaveData;
 
 
+        /** \brief plotter widget for the parameter histogram */
+        JKQtPlotter* pltParamHistogram;
+        QCheckBox* chkLogHistogram;
+        QSpinBox* spinHistogramBins;
+        QGroupBox* grpHistogramSettings;
+        QEnhancedTableView* tvHistogramParameters;
+        QFTableModel* tabHistogramParameters;
+        QVisibleHandleSplitter* splitterHistogram;
+
+
+
+
+        /** \nrief tab widget to select whether to display ACF, histogram, ... */
+        QTabWidget* tabDisplay;
+
+
+
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;
 
@@ -310,3 +343,4 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 };
 
 #endif // QFRDRIMAGINGFCSEDITORIMAGE_H
+

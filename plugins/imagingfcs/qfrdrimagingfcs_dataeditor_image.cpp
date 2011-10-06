@@ -1,4 +1,4 @@
-#include "qfrdrimagingfcs_dataeditor.h"
+#include "qfrdrimagingfcs_dataeditor_image.h"
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
 #include <math.h>
@@ -8,6 +8,8 @@
 #include "datatable2.h"
 #include "jkimage.h"
 #include "qmoretextobject.h"
+#include "statistics_tools.h"
+#include "jkqtpelements.h"
 
 
 
@@ -140,7 +142,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-    connectParameterWidgets();
 
     QGroupBox* wcp=new QGroupBox(tr(" correlation plot styles "), this);
     vbl->addWidget(wcp);
@@ -233,19 +234,19 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltOverview->get_plotter()->set_useAntiAliasingForSystem(true);
     pltOverview->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltOverview, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-    connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(previewClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
 
     plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImage::GRAY, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverview);
 
     QColor ovlSelCol=QColor("red");
-    ovlSelCol.setAlphaF(0.5);
+    //ovlSelCol.setAlphaF(0.5);
     plteOverviewSelected=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, ovlSelCol, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverviewSelected);
 
 
     QColor ovlExCol=QColor("blue");
-    ovlExCol.setAlphaF(0.5);
+    //ovlExCol.setAlphaF(0.5);
     plteOverviewExcluded=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, ovlExCol, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverviewExcluded);
 
@@ -289,7 +290,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
 
-    connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(previewClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
 
     plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltImage->get_plotter());
     pltImage->addGraph(plteImage);
@@ -343,7 +344,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
 
-    connect(pltGofImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(previewClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
 
     plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
     pltGofImage->addGraph(plteGofImage);
@@ -465,18 +466,99 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // ACF TAB
+    //////////////////////////////////////////////////////////////////////////////////////////
+    QWidget* widACFs=new QWidget(this);
+    QGridLayout* layACFs=new QGridLayout();
+    widACFs->setLayout(layACFs);
+    layACFs->addWidget(splitterTopBot, 0, 0);
+    layACFs->addWidget(w, 0, 1);
+    layACFs->setColumnStretch(0,5);
+    layACFs->setContentsMargins(0,0,0,0);
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // HISTOGRAM TAB
+    //////////////////////////////////////////////////////////////////////////////////////////
+    QWidget* widHist=new QWidget(this);
+    QGridLayout* layHist=new QGridLayout();
+    widHist->setLayout(layHist);
+
+    // HISTOGRAM SETTINGS/////////////////////////////////////////////////////////////////////
+    grpHistogramSettings=new QGroupBox(tr("histogram style"), this);
+    QFormLayout* flHistSet=new QFormLayout(grpHistogramSettings);
+    grpHistogramSettings->setLayout(flHistSet);
+    spinHistogramBins=new QSpinBox(this);
+    spinHistogramBins->setRange(5,300);
+    spinHistogramBins->setValue(25);
+    flHistSet->addRow(tr("histogram bins:"), spinHistogramBins);
+    chkLogHistogram=new QCheckBox("", grpHistogramSettings);
+    flHistSet->addRow(tr("log-scale:"), chkLogHistogram);
+
+    // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
+    splitterHistogram=new QVisibleHandleSplitter(this);
+    pltParamHistogram=new JKQtPlotter(this);
+    tvHistogramParameters=new QEnhancedTableView(this);
+    tabHistogramParameters=new QFTableModel(this);
+    tabHistogramParameters->setReadonly(false);
+    tabHistogramParameters->clear();
+    tabHistogramParameters->appendColumn();
+    tabHistogramParameters->setColumnTitle(0, tr("parameter"));
+    tabHistogramParameters->appendColumn();
+    tabHistogramParameters->setColumnTitle(1, tr("complete histogram"));
+    tabHistogramParameters->appendColumn();
+    tabHistogramParameters->setColumnTitle(2, tr("selection histogram"));
+    for (int r=0; r<8; r++) tabHistogramParameters->appendRow();
+    tabHistogramParameters->setCell(0, 0, tr("data points N"));
+    tabHistogramParameters->setCell(1, 0, tr("average"));
+    tabHistogramParameters->setCell(2, 0, tr("median"));
+    tabHistogramParameters->setCell(3, 0, tr("std. dev. &sigma;"));
+    tabHistogramParameters->setCell(4, 0, tr("min"));
+    tabHistogramParameters->setCell(5, 0, tr("25% quantile"));
+    tabHistogramParameters->setCell(6, 0, tr("75% quantile"));
+    tabHistogramParameters->setCell(7, 0, tr("max"));
+    tabHistogramParameters->setReadonly(true);
+
+    tvHistogramParameters->setModel(tabHistogramParameters);
+    tvHistogramParameters->setItemDelegate(new QFHTMLDelegate(tvParams));
+    tvHistogramParameters->setAlternatingRowColors(true);
+    tvHistogramParameters->verticalHeader()->setDefaultSectionSize((int)round((double)tvfm.height()*1.5));
+
+
+
+    splitterHistogram->addWidget(pltParamHistogram);
+    splitterHistogram->addWidget(tvHistogramParameters);
+    layHist->addWidget(splitterHistogram, 0, 0);
+    layHist->addWidget(grpHistogramSettings, 0, 1);
+    layHist->setColumnStretch(0,5);
+    layHist->setContentsMargins(0,0,0,0);
 
 
 
 
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // PUT EVERYTHING TOGETHER
+    //////////////////////////////////////////////////////////////////////////////////////////
+    tabDisplay=new QTabWidget(this);
+    tabDisplay->addTab(widACFs, tr("&Correlations"));
+    tabDisplay->addTab(widHist, tr("&Histogram"));
 
 
     //lb->addWidget(grpTop, 1, 0, 1, 2);
-    lb->addLayout(grdTop, 0,0,1,2);
-    lb->addWidget(splitterTopBot, 1, 0);
-    lb->addWidget(w, 1, 1);
-    lb->setColumnStretch(0,5);
+    lb->addLayout(grdTop, 0,0);
+    lb->addWidget(tabDisplay, 1,0);
 
+
+
+
+
+    connectParameterWidgets();
 };
 
 void QFRDRImagingFCSImageEditor::saveImageSettings() {
@@ -491,6 +573,7 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             current->setQFProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), chkImageAutoScale->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), edtColMin->value(), false, false);
             current->setQFProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), edtColMax->value(), false, false);
+            current->setQFProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), spinHistogramBins->value(), false, false);
         }
 
     }
@@ -514,6 +597,8 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true).toBool());
             edtColMin->setValue(current->getProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), mi).toDouble());
             edtColMax->setValue(current->getProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), ma).toDouble());
+            spinHistogramBins->setValue(current->getProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), spinHistogramBins->value()).toInt());
+
             connectParameterWidgets(true);
             pltImage->update_plot();
         }
@@ -555,6 +640,11 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
     pltImage->update_plot();
 }
 
+void QFRDRImagingFCSImageEditor::histogramSettingsChanged() {
+    saveImageSettings();
+    updateHistogram();
+}
+
 void QFRDRImagingFCSImageEditor::excludeRuns() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -567,6 +657,7 @@ void QFRDRImagingFCSImageEditor::excludeRuns() {
         m->recalcCorrelations();
     }
     replotData();
+    updateHistogram();
 }
 
 void QFRDRImagingFCSImageEditor::includeRuns() {
@@ -581,6 +672,7 @@ void QFRDRImagingFCSImageEditor::includeRuns() {
         m->recalcCorrelations();
     }
     replotData();
+    updateHistogram();
 }
 
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -609,7 +701,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
 };
 
 
-void QFRDRImagingFCSImageEditor::previewClicked(double x, double y, Qt::KeyboardModifiers modifiers) {
+void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardModifiers modifiers) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
 
@@ -627,6 +719,7 @@ void QFRDRImagingFCSImageEditor::previewClicked(double x, double y, Qt::Keyboard
     }
     replotData();
     replotSelection(true);
+    updateSelectionHistogram(true);
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
@@ -634,6 +727,7 @@ void QFRDRImagingFCSImageEditor::rawDataChanged() {
     replotOverview();
     replotImage();
     replotData();
+    updateHistogram();
 };
 
 void QFRDRImagingFCSImageEditor::resultsChanged() {
@@ -1168,10 +1262,12 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     chkDisplayImageOverlay->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), false).toBool());
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_style"), 1).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), 1).toInt());
+    chkLogHistogram->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_histogram"), false).toBool());
     loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     loadSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     loadSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
     loadSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
+    loadSplitter(*(settings->getQSettings()), splitterHistogram, "imfcsimageeditor/splitterhistogramSizes");
 };
 
 
@@ -1191,10 +1287,12 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_error_style"), cmbAverageErrorStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_style"), cmbRunStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_error_style"), cmbRunErrorStyle->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/log_histogram"), chkLogHistogram->isChecked());
     saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     saveSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
     saveSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
     saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
+    saveSplitter(*(settings->getQSettings()), splitterHistogram, "imfcsimageeditor/splitterhistogramSizes");
 };
 
 
@@ -1251,6 +1349,7 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
     parameterChanged();
     replotData();
+    updateHistogram();
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
 
@@ -1280,6 +1379,7 @@ void QFRDRImagingFCSImageEditor::transformChanged() {
     paletteChanged();
     displayOverlayChanged();
     connectParameterWidgets(true);
+    updateHistogram();
 }
 
 
@@ -1361,6 +1461,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
+        connect(chkLogHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        connect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
     } else {
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         disconnect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
@@ -1372,6 +1474,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         disconnect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
+        disconnect(chkLogHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
     }
 
     //qDebug()<<"connectParameterWidgets ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
@@ -1572,7 +1676,7 @@ void QFRDRImagingFCSImageEditor::saveReport() {
         QPrinter* printer=new QPrinter();
         printer->setPaperSize(QPrinter::A4);
         printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Landscape);
+        printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
         if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
         printer->setOutputFileName(fn);
@@ -1593,7 +1697,7 @@ void QFRDRImagingFCSImageEditor::printReport() {
     QPrinter* p=new QPrinter();
 
     p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Landscape);
+    p->setOrientation(QPrinter::Portrait);
     QPrintDialog *dialog = new QPrintDialog(p, this);
     dialog->setWindowTitle(tr("Print Report"));
     if (dialog->exec() != QDialog::Accepted) {
@@ -1702,6 +1806,11 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     QTextCharFormat fTextBoldSmall=fTextBold;
     fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
     QTextCharFormat fHeading1=fText;
+    fHeading1.setFontPointSize(1.4*fText.fontPointSize());
+    fHeading1.setFontWeight(QFont::Bold);
+    QTextCharFormat fHeading2=fText;
+    fHeading2.setFontPointSize(1.2*fText.fontPointSize());
+    fHeading2.setFontWeight(QFont::Bold);
     QTextBlockFormat bfLeft;
     bfLeft.setAlignment(Qt::AlignLeft);
     QTextBlockFormat bfRight;
@@ -1709,8 +1818,6 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     QTextBlockFormat bfCenter;
     bfCenter.setAlignment(Qt::AlignHCenter);
 
-    fHeading1.setFontPointSize(2*fText.fontPointSize());
-    fHeading1.setFontWeight(QFont::Bold);
     cursor.insertText(tr("imagingFCS Report: %1\n").arg(m->getName()), fHeading1);
     cursor.movePosition(QTextCursor::End);
 
@@ -1719,27 +1826,28 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     QTextTableFormat tableFormat1=tableFormat;
     tableFormat1.setWidth(QTextLength(QTextLength::VariableLength, 1));
-    QTextTable* table = cursor.insertTable(3, 3, tableFormat);
-    table->mergeCells(2,1,1,2);
+    QTextTable* table = cursor.insertTable(4, 2, tableFormat);
+    table->mergeCells(0,0,1,2);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>result set:</i> <b>%1</b></small>").arg(cmbResultGroup->currentText())));
-        tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        tabCursor=table->cellAt(1, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter:</i> <b>%1</b></small>").arg(cmbParameter->currentText())));
-        tabCursor=table->cellAt(0, 2).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameterTransform->currentText())));
         tabCursor=table->cellAt(1, 1).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>goodnes of fit:</i> <b>%1</b></small>").arg(cmbGofParameter->currentText())));
-        tabCursor=table->cellAt(1, 2).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbGofParameterTransform->currentText())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameterTransform->currentText())));
         tabCursor=table->cellAt(2, 0).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(cmbColorbar->currentText())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>goodnes of fit:</i> <b>%1</b></small>").arg(cmbGofParameter->currentText())));
         tabCursor=table->cellAt(2, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbGofParameterTransform->currentText())));
+        tabCursor=table->cellAt(3, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(cmbColorbar->currentText())));
+        tabCursor=table->cellAt(3, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(edtColMin->value()).arg(edtColMax->value())));
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);
     cursor.insertBlock();
+    cursor.insertText(tr("Parameter Images:\n").arg(m->getName()), fHeading2);
     double w1=pltImage->width();
     double w2=pltGofImage->width();
     double w3=pltOverview->width();
@@ -1749,7 +1857,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
-        pltImage->get_plotter()->draw(*painter, QRect(0,0,pltImage->width(),pltImage->width()));
+        pltImage->get_plotter()->draw(*painter, QRect(0,0,pltImage->width(),pltImage->height()));
         delete painter;
         double scale=document->textWidth()*w1/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
@@ -1761,7 +1869,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
-        pltGofImage->get_plotter()->draw(*painter, QRect(0,0,pltGofImage->width(),pltGofImage->width()));
+        pltGofImage->get_plotter()->draw(*painter, QRect(0,0,pltGofImage->width(),pltGofImage->height()));
         delete painter;
         double scale=document->textWidth()*w2/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
@@ -1773,7 +1881,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         QTextCursor tabCursor=table->cellAt(0, 2).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
-        pltOverview->get_plotter()->draw(*painter, QRect(0,0,pltOverview->width(),pltOverview->width()));
+        pltOverview->get_plotter()->draw(*painter, QRect(0,0,pltOverview->width(),pltOverview->height()));
         delete painter;
         double scale=document->textWidth()*w3/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
@@ -1788,7 +1896,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
-        plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->width()));
+        plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->height()+plotterResid->height()));
         delete painter;
         double scale=document->textWidth()*(double)plotter->width()/allwidth/pic.boundingRect().width();
         if (scale<=0) scale=1;
@@ -1796,22 +1904,53 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 
         tabCursor=table->cellAt(0, 1).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<font size=\"-4\">%1</font>").arg(tvParams->toHtml())));
+        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-4\">%1</font></center>").arg(tvParams->toHtml())));
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
 
 
+
+    w1=qMax(1,pltParamHistogram->width());
+    w2=qMax(1,tvHistogramParameters->width());
+    allwidth=qMax(1.0,w1+w2);
+    cursor.insertBlock();
+    cursor.insertText(tr("Parameter Histograms:\n").arg(m->getName()), fHeading2);
+    table = cursor.insertTable(1, 2, tableFormat1);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        pltParamHistogram->get_plotter()->draw(*painter, QRect(0,0,pltParamHistogram->width(),pltParamHistogram->height()));
+        delete painter;
+        double scale=document->textWidth()*w1/allwidth/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+
+        tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-4\">%1</font></center>").arg(tvHistogramParameters->toHtml())));
+    }
+    QApplication::processEvents();
+    cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
+
+
+    cursor.insertBlock();
+    cursor.insertText(tr("Data Source:\n").arg(m->getName()), fHeading2);
     cursor.movePosition(QTextCursor::End);
     cursor.insertText(tr("files:\n"), fTextBoldSmall);
     QStringList f=m->getFiles();
     QStringList t=m->getFilesTypes();
     for (int i=0; i<f.size(); i++) {
         QString typ="";
-        if (i<t.size())
-            if (!t[i].isEmpty())
+        if (i<t.size()) {
+            if (!t[i].isEmpty()) {
                 typ=QString("[%1]").arg(t[i]);
+            }
+        }
         cursor.insertText(tr("%1 %2\n").arg(f[i]).arg(typ), fTextSmall);
 
     }
@@ -1822,4 +1961,127 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     }
     cursor.movePosition(QTextCursor::End);
 
+}
+
+
+void QFRDRImagingFCSImageEditor::replotHistogram() {
+    pltParamHistogram->set_doDrawing(false);
+    pltParamHistogram->getYAxis()->set_logAxis(chkLogHistogram->isChecked());
+    pltParamHistogram->zoomToFit(true, true, false, !chkLogHistogram->isChecked());
+    pltParamHistogram->set_doDrawing(true);
+    pltParamHistogram->update_plot();
+}
+
+void QFRDRImagingFCSImageEditor::updateHistogram() {
+    pltParamHistogram->set_doDrawing(false);
+    tvHistogramParameters->setModel(NULL);
+    tabHistogramParameters->setReadonly(false);
+
+    pltParamHistogram->clearGraphs(true);
+    JKQTPdatastore* ds=pltParamHistogram->getDatastore();
+    ds->clear();
+
+    for (int r=0; r<tabHistogramParameters->rowCount(); r++) {
+        tabHistogramParameters->setCell(r, 1, QVariant());
+    }
+
+    //qDebug()<<"***** updateHistogram()   "<<plteImageData<<plteImageSize;
+
+    if (plteImageData && (plteImageSize>0)) {
+        double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+        statisticsSort(plteImageData, plteImageSize, datahist);
+        double dmean, dstd, dmin, dmax, dmedian, dq25, dq75;
+        dmean=statisticsAverageVariance(dstd, datahist, plteImageSize);
+        dstd=sqrt(dstd);
+        dmin=statisticsSortedMin(datahist, plteImageSize);
+        dmax=statisticsSortedMax(datahist, plteImageSize);
+        dmedian=statisticsSortedMedian(datahist, plteImageSize);
+        dq25=statisticsSortedQuantile(datahist, plteImageSize, 0.25);
+        dq75=statisticsSortedQuantile(datahist, plteImageSize, 0.75);
+        tabHistogramParameters->setCell(0, 1, plteImageSize);
+        tabHistogramParameters->setCell(1, 1, dmean);
+        tabHistogramParameters->setCell(2, 1, dmedian);
+        tabHistogramParameters->setCell(3, 1, dstd);
+        tabHistogramParameters->setCell(4, 1, dmin);
+        tabHistogramParameters->setCell(5, 1, dq25);
+        tabHistogramParameters->setCell(6, 1, dq75);
+        tabHistogramParameters->setCell(7, 1, dmax);
+
+
+
+        long histBins=spinHistogramBins->value();
+        double* histX=(double*)malloc(histBins*sizeof(double));
+        double* histY=(double*)malloc(histBins*sizeof(double));
+
+        statisticsHistogram<double, double>(datahist, plteImageSize, histX, histY, histBins);
+
+        double hmax=statisticsMax(histY, histBins);
+        double barY=hmax*1.2;
+
+        size_t pltcPHHistogramX=ds->addCopiedColumn(histX, histBins, "histX");;
+        size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, "histY");;
+        size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, "barY");
+        size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, "mean");;
+        size_t pltcPHBarStd=ds->addCopiedColumn(&dstd, 1, "stddev");;
+        size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, "median");;
+        size_t pltcPHBarMin=ds->addCopiedColumn(&dmin, 1, "min");;
+        size_t pltcPHBarMax=ds->addCopiedColumn(&dmax, 1, "max");;
+        size_t pltcPHBarQ25=ds->addCopiedColumn(&dq25, 1, "quant25");;
+        size_t pltcPHBarQ75=ds->addCopiedColumn(&dq75, 1, "quant75");;
+
+        JKQTPboxplotHorizontalGraph* plteParamHistogramBoxplot=new JKQTPboxplotHorizontalGraph(pltParamHistogram->get_plotter());
+        plteParamHistogramBoxplot->set_boxWidth(hmax*0.15);
+        plteParamHistogramBoxplot->set_maxColumn(pltcPHBarMax);
+        plteParamHistogramBoxplot->set_minColumn(pltcPHBarMin);
+        plteParamHistogramBoxplot->set_medianColumn(pltcPHBarMedian);
+        plteParamHistogramBoxplot->set_meanColumn(pltcPHBarMean);
+        plteParamHistogramBoxplot->set_percentile25Column(pltcPHBarQ25);
+        plteParamHistogramBoxplot->set_percentile75Column(pltcPHBarQ75);
+        plteParamHistogramBoxplot->set_posColumn(pltcPHBarY);
+        plteParamHistogramBoxplot->set_color(QColor("blue"));
+        plteParamHistogramBoxplot->set_title(tr("boxplot (complete)"));
+        pltParamHistogram->addGraph(plteParamHistogramBoxplot);
+
+        JKQTPbarHorizontalGraph* plteParamHistogram=new JKQTPbarHorizontalGraph(pltParamHistogram->get_plotter());
+        plteParamHistogram->set_fillColor(QColor("blue"));
+        plteParamHistogram->set_width(0.5);
+        plteParamHistogram->set_xColumn(pltcPHHistogramX);
+        plteParamHistogram->set_yColumn(pltcPHHistogramY);
+        plteParamHistogram->set_title(tr("histogram (complete)"));
+        pltParamHistogram->addGraph(plteParamHistogram);
+
+        free(histX);
+        free(histY);
+        free(datahist);
+    }
+
+
+    updateSelectionHistogram(false);
+
+
+    tabHistogramParameters->setReadonly(true);
+    tvHistogramParameters->setModel(tabHistogramParameters);
+    tvHistogramParameters->resizeColumnsToContents();
+    replotHistogram();
+}
+
+void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
+    if (replot) {
+        tvHistogramParameters->setModel(NULL);
+        tabHistogramParameters->setReadonly(false);
+        pltParamHistogram->set_doDrawing(false);
+    }
+
+
+    for (int r=0; r<tabHistogramParameters->rowCount(); r++) {
+        tabHistogramParameters->setCell(r, 2, QVariant());
+    }
+
+
+    if (replot) {
+        tabHistogramParameters->setReadonly(true);
+        tvHistogramParameters->setModel(tabHistogramParameters);
+        tvHistogramParameters->resizeColumnsToContents();
+        replotHistogram();
+    }
 }

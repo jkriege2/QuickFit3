@@ -72,6 +72,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     btnNext=new QPushButton(QIcon(":/lib/prop_next.png"), tr("&next"), this);
     btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     btnNext->setToolTip(tr("move to next record"));
+    connect(btnNext, SIGNAL(clicked()), this, SLOT(nextPressed()));
     vl->addWidget(btnNext);
     labTopIcon=new QLabel(this);
     vl->addWidget(labTopIcon);
