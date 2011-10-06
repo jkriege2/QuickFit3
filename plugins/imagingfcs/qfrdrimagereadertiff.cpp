@@ -27,6 +27,7 @@ QString QFRDRImageReaderTIFF::formatName() const {
 
 bool QFRDRImageReaderTIFF::open(QString filename) {
     close();
+    TIFFSetWarningHandler(0);
     tif = TIFFOpen(filename.toAscii().data(),"r");
     if (tif) {
         uint32 nx,ny;
