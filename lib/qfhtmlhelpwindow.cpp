@@ -19,8 +19,8 @@ QString removeHTMLComments(const QString& data) {
      return data1;
 }
 
-QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
-    QWidget(parent)
+QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
+    QWidget(parent, flags)
 {
     m_pluginServices=NULL;
     searchPath="";
@@ -69,7 +69,6 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent):
     layout->setStretchFactor(descriptionBrowser, 6);
     setLayout(layout);
 
-    Qt::WindowFlags flags = Qt::Tool | Qt::WindowStaysOnTopHint;
     setWindowFlags(flags);
     setWindowTitle(tr("QuickFit Online-Help"));
     setWindowIcon(QIcon(":/lib/help.png"));

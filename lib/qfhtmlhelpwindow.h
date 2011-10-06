@@ -34,7 +34,7 @@ class QFLIB_EXPORT QFHTMLHelpWindow : public QWidget {
 
 
         /** \brief class constructor */
-        QFHTMLHelpWindow(QWidget* parent=0);
+        QFHTMLHelpWindow(QWidget* parent=0, Qt::WindowFlags flags= 0);
 
         /** \brief read widget size and position from a QSettings object where prefix is prepended to all keys */
         void readSettings(QSettings& settings, QString prefix=QString(""));

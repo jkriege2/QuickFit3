@@ -579,7 +579,7 @@ void MainWindow::createWidgets() {
     prgMainProgress=new QProgressBar(this);
     statusBar()->addPermanentWidget(prgMainProgress);
 
-    helpWindow=new QFHTMLHelpWindow(0);
+    helpWindow=new QFHTMLHelpWindow(0, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
     //helpWindow->setHtmlReplacementList(&htmlReplaceList);
     helpWindow->initFromPluginServices(this);
     helpWindow->close();

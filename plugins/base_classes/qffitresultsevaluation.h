@@ -678,7 +678,7 @@ public:
 
 
 
-    /*! \brief return an resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlo9ghted record and all current settings */
+    /*! \brief return an resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlighted record and all current settings */
     virtual QString getEvaluationResultID()=0;
 signals:
 

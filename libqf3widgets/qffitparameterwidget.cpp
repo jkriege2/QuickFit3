@@ -74,6 +74,16 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     connect(actCopyFix, SIGNAL(triggered()), this, SLOT(s_actCopyFix()));
     actCopyValueFix = new QAction(tr("copy value && fix to all files"), this);
     connect(actCopyValueFix, SIGNAL(triggered()), this, SLOT(s_actCopyValueFix()));
+
+
+    actCopyValueRuns = new QAction(tr("copy &value to all runs"), this);
+    connect(actCopyValueRuns, SIGNAL(triggered()), this, SLOT(s_actCopyValueRuns()));
+    actCopyFixRuns = new QAction(tr("copy &fix to all runs"), this);
+    connect(actCopyFixRuns, SIGNAL(triggered()), this, SLOT(s_actCopyFixRuns()));
+    actCopyValueFixRuns = new QAction(tr("copy value && fix to all runs"), this);
+    connect(actCopyValueFixRuns, SIGNAL(triggered()), this, SLOT(s_actCopyValueFixRuns()));
+
+
     actCopyValueInit = new QAction(tr("copy &value to initial"), this);
     connect(actCopyValueInit, SIGNAL(triggered()), this, SLOT(s_actCopyValueInit()));
     actCopyFixInit = new QAction(tr("copy &fix to initial"), this);
@@ -88,6 +98,16 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     connect(actResetFix, SIGNAL(triggered()), this, SLOT(s_actResetFix()));
     actResetValueFix = new QAction(tr("reset this value && fix"), this);
     connect(actResetValueFix, SIGNAL(triggered()), this, SLOT(s_actResetValueFix()));
+
+
+    sep1=new QAction(this);
+    sep1->setSeparator(true);
+    sep2=new QAction(this);
+    sep2->setSeparator(true);
+    sep3=new QAction(this);
+    sep3->setSeparator(true);
+    sep4=new QAction(this);
+    sep4->setSeparator(true);
 
 
     int height=5;
@@ -131,15 +151,22 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
         neditValue->setShowUpDown(false);
         connect(neditValue, SIGNAL(valueChanged(double)), this, SLOT(doubleValueChanged(double)));
         height=qMax(height, neditValue->minimumSizeHint().height());
+        neditValue->addContextmenuAction(sep1);
         neditValue->addContextmenuAction(actCopyValue);
         neditValue->addContextmenuAction(actCopyFix);
         neditValue->addContextmenuAction(actCopyValueFix);
-        neditValue->addContextmenuAction(actCopyValueInit);
-        neditValue->addContextmenuAction(actCopyFixInit);
-        neditValue->addContextmenuAction(actCopyValueFixInit);
+        neditValue->addContextmenuAction(sep2);
+        neditValue->addContextmenuAction(actCopyValueRuns);
+        neditValue->addContextmenuAction(actCopyFixRuns);
+        neditValue->addContextmenuAction(actCopyValueFixRuns);
+        neditValue->addContextmenuAction(sep3);
         neditValue->addContextmenuAction(actResetValue);
         neditValue->addContextmenuAction(actResetFix);
         neditValue->addContextmenuAction(actResetValueFix);
+        neditValue->addContextmenuAction(sep4);
+        neditValue->addContextmenuAction(actCopyValueInit);
+        neditValue->addContextmenuAction(actCopyFixInit);
+        neditValue->addContextmenuAction(actCopyValueFixInit);
 
         connect(neditValue, SIGNAL(keyEventMatches(int, Qt::KeyboardModifiers)), this, SLOT(keyEventMatches(int, Qt::KeyboardModifiers)));
         neditValue->addKeyEvent(Qt::Key_Space, Qt::NoModifier);
@@ -695,17 +722,58 @@ void QFFitParameterWidgetWrapper::pEnterPressed() {
 
 void QFFitParameterWidgetWrapper::s_actCopyValue() {
     m_datastore->setAllFitValues(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
-    m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+
+    if (QMessageBox::question(NULL, tr("Copy values to all files"), tr("Do you want to also copy the current value to the initial settings?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+    }
 }
 
 void QFFitParameterWidgetWrapper::s_actCopyFix() {
     m_datastore->setAllFitFixes(m_parameterID, m_datastore->getFitFix(m_parameterID));
-    m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+    if (QMessageBox::question(NULL, tr("Copy fix to all files"), tr("Do you want to also copy the current fix to the initial settings?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+    }
 }
 
 void QFFitParameterWidgetWrapper::s_actCopyValueFix() {
-    s_actCopyValue();
-    s_actCopyFix();
+    m_datastore->setAllFitValues(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
+    m_datastore->setAllFitFixes(m_parameterID, m_datastore->getFitFix(m_parameterID));
+
+    if (QMessageBox::question(NULL, tr("Copy values & fix to all files"), tr("Do you want to also copy the current value and fix to the initial settings?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+        m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+    }
+}
+
+void QFFitParameterWidgetWrapper::s_actCopyValueRuns() {
+    m_datastore->setAllFitValues(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID), true);
+
+    if (QMessageBox::question(NULL, tr("Copy values to all runs"), tr("Do you want to also copy the current value to the initial settings?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+    }
+}
+
+void QFFitParameterWidgetWrapper::s_actCopyFixRuns() {
+    m_datastore->setAllFitFixes(m_parameterID, m_datastore->getFitFix(m_parameterID), true);
+    if (QMessageBox::question(NULL, tr("Copy fix to all runs"), tr("Do you want to also copy the current fix to the initial settings?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+    }
+}
+
+void QFFitParameterWidgetWrapper::s_actCopyValueFixRuns() {
+    m_datastore->setAllFitValues(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID), true);
+    m_datastore->setAllFitFixes(m_parameterID, m_datastore->getFitFix(m_parameterID), true);
+
+    if (QMessageBox::question(NULL, tr("Copy values & fix to all runs"), tr("Do you want to also copy the current value and fix to the initial settings?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID));
+        m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
+    }
 }
 
 void QFFitParameterWidgetWrapper::s_actCopyValueInit() {
@@ -717,8 +785,8 @@ void QFFitParameterWidgetWrapper::s_actCopyFixInit() {
 }
 
 void QFFitParameterWidgetWrapper::s_actCopyValueFixInit() {
-    s_actCopyValueInit();
-    s_actCopyFixInit();
+    m_datastore->setInitFitValue(m_parameterID, m_datastore->getFitValue(m_parameterID), m_datastore->getFitError(m_parameterID));
+    m_datastore->setInitFitFix(m_parameterID, m_datastore->getFitFix(m_parameterID));
 }
 
 void QFFitParameterWidgetWrapper::s_actResetValue() {
@@ -732,8 +800,9 @@ void QFFitParameterWidgetWrapper::s_actResetFix() {
 }
 
 void QFFitParameterWidgetWrapper::s_actResetValueFix() {
-    s_actResetValue();
-    s_actResetFix();
+    m_datastore->resetDefaultFitValue(m_parameterID);
+    m_datastore->resetDefaultFitFix(m_parameterID);
+    reloadValues();
 }
 
 void QFFitParameterWidgetWrapper::keyEventMatches(int key, Qt::KeyboardModifiers modifiers) {

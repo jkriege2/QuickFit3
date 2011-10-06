@@ -20,7 +20,8 @@ HEADERS += ../base_classes/qffitresultsevaluation.h \
            ../../../../../LIB/trunk/statistics_tools.h \
            dlgestimatefocalvolume.h \
     ../base_classes/qffitresultsbyindexevaluation.h \
-    ../base_classes/qffitresultsevaluationeditorbase.h
+    ../base_classes/qffitresultsevaluationeditorbase.h \
+    ../base_classes/qffitresultsbyindexevaluationeditorbase.h
 
 
 SOURCES += ../base_classes/qffitresultsevaluation.cpp \
@@ -30,7 +31,8 @@ SOURCES += ../base_classes/qffitresultsevaluation.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
            dlgestimatefocalvolume.cpp \
     ../base_classes/qffitresultsbyindexevaluation.cpp \
-    ../base_classes/qffitresultsevaluationeditorbase.cpp
+    ../base_classes/qffitresultsevaluationeditorbase.cpp\
+    ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui

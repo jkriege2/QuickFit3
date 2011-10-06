@@ -85,9 +85,9 @@ class QFWIDLIB_EXPORT QFFitParameterBasicInterface {
         virtual void setInitFitFix(const QString& id, bool fix)=0;
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files */
-        virtual void setAllFitValues(const QString& id, double value, double error=0.0)=0;
+        virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false)=0;
         /*! \brief set the given parameter \a id to the given fix value */
-        virtual void setAllFitFixes(const QString& id, bool fix)=0;
+        virtual void setAllFitFixes(const QString& id, bool fix, bool currentFileOnly=false)=0;
         /*! \brief reset the given parameter \a id to the initial/global/default value */
         virtual void resetDefaultFitValue(const QString& id)=0;
         /*! \brief reset the given parameter \a id to the initial/global/default fix */

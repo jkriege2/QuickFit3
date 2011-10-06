@@ -42,10 +42,6 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         /** \brief return the largest available index */
         virtual int getIndexMax(QFRawDataRecord* r)=0;
 
-    public:
-
-
-
         /** \brief set the current index to use */
         int getCurrentIndex();
 
@@ -303,9 +299,9 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual bool hasFit(QFRawDataRecord* r, int index);
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files and all indexes */
-        virtual void setAllFitValues(const QString& id, double value, double error=0.0);
+        virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false);
         /*! \brief set the given parameter \a id to the given fix value and all indexes */
-        virtual void setAllFitFixes(const QString& id, bool fix);
+        virtual void setAllFitFixes(const QString& id, bool fix, bool currentFileOnly=false);
         /*! \brief reset all parameters to the initial/global/default value in all files and all indexes */
         virtual void resetAllFitValue();
         /*! \brief reset all fit results to the initial/global/default value in all files and all indexes */

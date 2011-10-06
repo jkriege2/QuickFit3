@@ -13,6 +13,7 @@
 #include <QShortcut>
 #include <cfloat>
 #include <limits.h>
+#include <QMessageBox>
 #include "qffitparameterbasicinterface.h"
 #include "jkdoubleedit.h"
 #include "qffitfunction.h"
@@ -129,6 +130,9 @@ class QFWIDLIB_EXPORT QFFitParameterWidgetWrapper : public QObject {
         void intMaxChanged(int value);
         void sfixChanged(bool fix);
         void pEnterPressed();
+        void s_actCopyValueRuns();
+        void s_actCopyFixRuns();
+        void s_actCopyValueFixRuns();
         void s_actCopyValue();
         void s_actCopyFix();
         void s_actCopyValueFix();
@@ -198,12 +202,19 @@ class QFWIDLIB_EXPORT QFFitParameterWidgetWrapper : public QObject {
         QAction* actCopyValue;
         QAction* actCopyFix;
         QAction* actCopyValueFix;
+        QAction* actCopyValueRuns;
+        QAction* actCopyFixRuns;
+        QAction* actCopyValueFixRuns;
         QAction* actCopyValueInit;
         QAction* actCopyFixInit;
         QAction* actCopyValueFixInit;
         QAction* actResetValue;
         QAction* actResetFix;
         QAction* actResetValueFix;
+        QAction* sep1;
+        QAction* sep2;
+        QAction* sep3;
+        QAction* sep4;
 
         QPointer<QGridLayout> m_layout;
 

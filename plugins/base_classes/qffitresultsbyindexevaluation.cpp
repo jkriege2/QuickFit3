@@ -270,40 +270,56 @@ void QFFitResultsByIndexEvaluation::resetAllFitFix() {
 }
 
 /*! \brief set the given parameter \a id to the given value (and error) in all files, hasFit for the file is \c true */
-void QFFitResultsByIndexEvaluation::setAllFitValues(const QString& id, double value, double error) {
+void QFFitResultsByIndexEvaluation::setAllFitValues(const QString& id, double value, double error, bool currentFileOnly) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs;
+    recs.clear();
+    if (currentFileOnly) {
+        recs.append(getHighlightedRecord());
+    } else {
+        recs=getApplicableRecords();
+    }
     QString en=getEvaluationResultID();
     int pid=f->getParameterNum(id);
     QString unit="";
     if (pid>-1) unit=f->getDescription(pid).unit;
     for (int i=0; i<recs.size(); i++) {
         if (recs[i]) {
+            recs[i]->disableEmitResultsChanged();
             for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
                 QString en=getEvaluationResultID(idx);
                 if (hasFit(recs[i], idx)) recs[i]->resultsSetNumberError(en, getFitParamID(id), value, error, unit);
             }
+            recs[i]->enableEmitResultsChanged();
         }
     }
     emit resultsChanged();
 }
 
 /*! \brief set the given parameter \a id to the given fix value */
-void QFFitResultsByIndexEvaluation::setAllFitFixes(const QString& id, bool fix) {
+void QFFitResultsByIndexEvaluation::setAllFitFixes(const QString& id, bool fix, bool currentFileOnly) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
-    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs;
+    recs.clear();
+    if (currentFileOnly) {
+        recs.append(getHighlightedRecord());
+    } else {
+        recs=getApplicableRecords();
+    }
     QString en=getEvaluationResultID();
     int pid=f->getParameterNum(id);
     QString unit="";
     if (pid>-1) unit=f->getDescription(pid).unit;
     for (int i=0; i<recs.size(); i++) {
         if (recs[i]) {
+            recs[i]->disableEmitResultsChanged();
             for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
                 QString en=getEvaluationResultID(idx);
                 if (hasFit(recs[i], idx)) recs[i]->resultsSetBoolean(en, getFitParamFixID(id), fix);
             }
+            recs[i]->enableEmitResultsChanged();
         }
     }
     emit resultsChanged();

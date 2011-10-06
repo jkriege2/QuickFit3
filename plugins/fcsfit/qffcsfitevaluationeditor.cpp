@@ -24,7 +24,7 @@
 
 
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
-    QFFitResultsEvaluationEditorBase("fcsfitevaleditor/", services, parent)
+    QFFitResultsByIndexEvaluationEditorBase("fcsfitevaleditor/", services, parent)
 {
     cmbModel=NULL;
     dataEventsEnabled=true;
@@ -479,6 +479,10 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     connect(datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
     connect(datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
+    connect(datacut, SIGNAL(copyUserMinMaxToAll(int,int)), this, SLOT(copyUserMinMaxToAll(int,int)));
+    connect(datacut, SIGNAL(copyUserMinToAllRuns(int)), this, SLOT(copyUserMinToAllRuns(int)));
+    connect(datacut, SIGNAL(copyUserMaxToAllRuns(int)), this, SLOT(copyUserMaxToAllRuns(int)));
+    connect(datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));
 
 }
 
@@ -630,8 +634,8 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         datacut->set_max(data->getCorrelationN());
         QString run="avg";
         if (eval->getCurrentIndex()>-1) run=QString::number(eval->getCurrentIndex());
-        datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+run+"_datacut_min", 0).toInt());
-        datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+run+"_datacut_max", data->getCorrelationN()).toInt());
+        datacut->set_userMin(getUserMin(0));
+        datacut->set_userMax(getUserMax(data->getCorrelationN()));
         datacut->enableSliderSignals();
         dataEventsEnabled=false;
         spinRun->setMaximum(data->getCorrelationRuns()-1);
@@ -857,8 +861,9 @@ void QFFCSFitEvaluationEditor::replotData() {
     }
 
     //qDebug()<<"  replotData";
-    QTime t;
+    QTime t, t1;
     t.start();
+    t1.start();
 
     pltResiduals->set_doDrawing(false);
     pltResiduals->set_emitSignals(false);
@@ -877,7 +882,7 @@ void QFFCSFitEvaluationEditor::replotData() {
     dsresh->clear();
     dsresc->clear();
 
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   a "<<t.elapsed()<<" ms";
     t.start();
 
     pltResiduals->getXAxis()->set_logAxis(chkXLogScale->isChecked());
@@ -896,7 +901,7 @@ void QFFCSFitEvaluationEditor::replotData() {
     pltData->getYAxis()->set_minTicks(5);
     pltResiduals->getYAxis()->set_minTicks(5);
 
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   b "<<t.elapsed()<<" ms";
     t.start();
 
     int errorStyle=cmbErrorStyle->currentIndex();
@@ -943,7 +948,7 @@ void QFFCSFitEvaluationEditor::replotData() {
             case 2: styl=JKQTPerrorBars; break;
             case 3: styl=JKQTPerrorBarsLines; break;
         }
-        //qDebug()<<"   "<<t.elapsed()<<" ms";
+        //qDebug()<<"   c "<<t.elapsed()<<" ms";
         t.start();
 
         JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(pltData->get_plotter());
@@ -969,11 +974,11 @@ void QFFCSFitEvaluationEditor::replotData() {
             g->set_symbol(JKQTPcross);
         }
         pltData->addGraph(g);
-        //qDebug()<<"   "<<t.elapsed()<<" ms";
+        //qDebug()<<"   d "<<t.elapsed()<<" ms";
         t.start();
 
         updateFitFunctions();
-        //qDebug()<<"   "<<t.elapsed()<<" ms";
+        //qDebug()<<"   e "<<t.elapsed()<<" ms";
         t.start();
 
         pltData->zoomToFit(true, true);
@@ -983,7 +988,7 @@ void QFFCSFitEvaluationEditor::replotData() {
 
         pltResidualHistogram->zoomToFit(true, true);
         pltResidualCorrelation->zoomToFit(true, true);
-        //qDebug()<<"   "<<t.elapsed()<<" ms";
+        //qDebug()<<"   f "<<t.elapsed()<<" ms";
         t.start();
     }
 
@@ -996,22 +1001,22 @@ void QFFCSFitEvaluationEditor::replotData() {
     pltResidualHistogram->set_emitSignals(true);
     pltResidualCorrelation->set_doDrawing(true);
     pltResidualCorrelation->set_emitSignals(true);
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   g "<<t.elapsed()<<" ms";
     t.start();
 
     pltResiduals->update_plot();
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   h "<<t.elapsed()<<" ms";
     t.start();
     pltData->update_plot();
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   i "<<t.elapsed()<<" ms";
     t.start();
     pltResidualHistogram->update_plot();
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   j "<<t.elapsed()<<" ms";
     t.start();
     pltResidualCorrelation->update_plot();
-    //qDebug()<<"   "<<t.elapsed()<<" ms";
+    //qDebug()<<"   k "<<t.elapsed()<<" ms";
     t.start();
-    //qDebug()<<"  replotData";
+    //qDebug()<<"  replotData end  runtime = "<<t1.elapsed()<<" ms";
 }
 
 void QFFCSFitEvaluationEditor::updateFitFunctions() {
@@ -1036,8 +1041,9 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
 
     //qDebug()<<"    updateFitFunctions";
-    QTime t;
+    QTime t, t1;
     t.start();
+    t1.start();
 
     int residualStyle=cmbResidualStyle->currentIndex();
     int residualHistogramBins=spinResidualHistogramBins->value();
@@ -1429,53 +1435,65 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     eval->setFitResultValue(record, eid, param="fitstat_chisquared", residSqrSum);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_chisquared_weighted", residWeightSqrSum);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_residavg", residAverage);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("residual average"), QString("&lang;E&rang;"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_residavg_weighted", residWeightAverage);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_residstddev", residStdDev);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_residstddev_weighted", residWeightStdDev);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_fitparams", fitparamN);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("fit params"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_datapoints", dataSize);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("datapoints"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_dof", degFreedom);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("degrees of freedom"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_r2", Rsquared);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("R squared"), tr("R<sup>2</sup>"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
 
                     eval->setFitResultValue(record, eid, param="fitstat_tss", TSS);
                     eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
                     eval->setFitResultLabel(record, eid, param, tr("total sum of squares"));
+                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
                     record->enableEmitResultsChanged();
                 }
+
+                //qDebug()<<"    m_presignals "<<t.elapsed()<<" ms";
                 eval->set_doEmitPropertiesChanged(true);
                 eval->set_doEmitResultsChanged(true);
-                record->enableEmitResultsChanged();
-                eval->emitPropertiesChanged();
-                eval->emitResultsChanged();
+                //record->enableEmitResultsChanged();
+
                 //qDebug()<<"    m "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1504,7 +1522,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     } catch(std::exception& E) {
         services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
     }
-    //qDebug()<<"    updateFitFunctions";
+    //qDebug()<<"    updateFitFunctions end   runtime = "<<t1.elapsed()<<"ms";
 
 }
 
@@ -1793,70 +1811,13 @@ void QFFCSFitEvaluationEditor::configFitAlgorithm() {
 }
 void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!dataEventsEnabled) return;
-    if (!current) return;
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!data) return;
     if (!current->getHighlightedRecord()) return;
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    QString run=QString::number(data->getCurrentIndex());
-    if (data->getCurrentIndex()<0) run="avg";
-    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
-    current->getHighlightedRecord()->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
+    setUserMinMax(userMin, userMax);
     replotData();
 }
 
-void QFFCSFitEvaluationEditor::copyUserMinToAll(int userMin) {
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!data) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
-            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
-            recs[i]->disableEmitPropertiesChanged();
-            recs[i]->setQFProperty(resultID+"_ravg_datacut_min", userMin, false, false);
-
-            for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
-                QString run=QString::number(r);
-                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
-                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
-                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
-                }
-            }
-            recs[i]->enableEmitPropertiesChanged(true);
-        }
-    }
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::copyUserMaxToAll(int userMax) {
-    if (!current) return;
-    QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!data) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
-            QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(recs[i]);
-            recs[i]->disableEmitPropertiesChanged();
-            recs[i]->setQFProperty(resultID+"_ravg_datacut_max", userMax, false, false);
-
-            for (int r=0; r<(int)fcs->getCorrelationRuns(); r++) {
-                QString run=QString::number(r);
-                if (!((recs[i]==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
-                    //recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_min", userMin, false, false);
-                    recs[i]->setQFProperty(resultID+"_r"+run+"_datacut_max", userMax, false, false);
-                }
-            }
-            recs[i]->enableEmitPropertiesChanged(true);
-
-        }
-    }
-    QApplication::restoreOverrideCursor();
-}
 
 
 void QFFCSFitEvaluationEditor::runChanged(int run) {
@@ -1864,7 +1825,7 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
 
-    //qDebug()<<"runChanged";
+    ////qDebug()<<"runChanged";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QTime t;
 
@@ -1872,18 +1833,18 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     QFRawDataRecord* currentRecord=current->getHighlightedRecord();
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
     labRun->setText(QString("  (%1)").arg(fcs->getCorrelationRunName(run)));
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
 
     data->setCurrentIndex(run);
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
 
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
 
     datacut->disableSliderSignals();
@@ -1891,20 +1852,20 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     datacut->set_max(fcs->getCorrelationN());
     QString runn="avg";
     if (data->getCurrentIndex()>-1) runn=QString::number(data->getCurrentIndex());
-    datacut->set_userMin(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_min", 0).toInt());
-    datacut->set_userMax(currentRecord->getProperty(resultID+"_r"+runn+"_datacut_max", fcs->getCorrelationN()).toInt());
+    datacut->set_userMin(getUserMin(0));
+    datacut->set_userMax(getUserMax(fcs->getCorrelationN()));
     datacut->enableSliderSignals();
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
 
     displayModel(false);
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
     replotData();
-    //qDebug()<<t.elapsed()<<" ms";
+    ////qDebug()<<t.elapsed()<<" ms";
     t.start();
     QApplication::restoreOverrideCursor();
-    //qDebug()<<"runChanged ... done";
+    ////qDebug()<<"runChanged ... done";
 }
 
 void QFFCSFitEvaluationEditor::modelChanged(int model) {
@@ -2097,8 +2058,8 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
             }
         }
         // we also have to care for the data cutting
-        int cut_low=datacut->get_userMin();
-        int cut_up=datacut->get_userMax();
+        int cut_low=getUserMin(record, run);
+        int cut_up=getUserMax(record, run);
         int cut_N=N-cut_low-(N-cut_up);
         if (cut_N<0) {
             cut_low=0;

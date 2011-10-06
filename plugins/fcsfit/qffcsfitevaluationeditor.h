@@ -35,6 +35,7 @@
 #include "qffitalgorithmthreaddedfit.h"
 #include "qvisiblehandlesplitter.h"
 #include "../base_classes/qffitresultsevaluationeditorbase.h"
+#include "../base_classes/qffitresultsbyindexevaluationeditorbase.h"
 
 
 /*! \brief editor class for FCS least-square fits
@@ -73,7 +74,7 @@
       \f[ \overline{E}^{(10)}(\tilde{\tau}_k)=\frac{1}{11}\sum\limits_{i=k-5}^{k+5}\tilde{E}_i \f]
 
 */
-class QFFCSFitEvaluationEditor : public QFFitResultsEvaluationEditorBase {
+class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase {
         Q_OBJECT
     public:
         /** Default constructor */
@@ -92,11 +93,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsEvaluationEditorBase {
         /** \brief used to reread all parameter widget values from the datastore */
         void updateParameterValues();
 
-        /** \brief copy min cut to all files */
-        void copyUserMinToAll(int userMin);
 
-        /** \brief copy max cut to all files */
-        void copyUserMaxToAll(int userMax);
     protected:
         /** \brief label displaying the current record */
         QLabel* labRecord;

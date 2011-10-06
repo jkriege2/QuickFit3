@@ -6,6 +6,11 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     //setMaximumHeight(60);
     //setMinimumHeight(60);
 
+    runsName=tr("runs");
+    filesName=tr("files");
+    copyToRunsEnabled=true;
+    copyToFilesEnabled=true;
+
     sliderSignals=true;
     allowCopyToAll=true;
     min=0;
@@ -20,17 +25,25 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     editLow->setContextMenuPolicy(Qt::NoContextMenu);
     editHigh->setContextMenuPolicy(Qt::NoContextMenu);
 
-    QLabel* lab1=new QLabel(tr("<b>lower cut-off</b>"), this);
-    QLabel* lab2=new QLabel(tr("<b>upper cut-off</b>"), this);
-    lab2->setAlignment(Qt::AlignRight);
 
     QGridLayout* layout=new QGridLayout(this);
     layout->setContentsMargins(0,0,0,0);
+
+    /*QLabel* lab1=new QLabel(tr("<b>lower cut-off</b>"), this);
+    QLabel* lab2=new QLabel(tr("<b>upper cut-off</b>"), this);
+    lab2->setAlignment(Qt::AlignRight);
     layout->addWidget(lab1, 0, 0, Qt::AlignLeft|Qt::AlignBottom);
     layout->addWidget(lab2, 0, 3, Qt::AlignRight|Qt::AlignBottom);
     layout->addWidget(editLow,  1, 0, Qt::AlignLeft|Qt::AlignTop);
-    layout->addWidget(editHigh, 1, 3, Qt::AlignRight|Qt::AlignTop);
+    layout->addWidget(editHigh, 1, 3, Qt::AlignRight|Qt::AlignTop);*/
 
+    QLabel* lab1=new QLabel(tr("<b>lower & upper cut-off</b>"), this);
+    lab1->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(editLow,  0, 0, Qt::AlignLeft|Qt::AlignTop);
+    layout->addWidget(lab1, 0, 1, Qt::AlignRight|Qt::AlignBottom);
+    layout->addWidget(editHigh, 0, 2, Qt::AlignRight|Qt::AlignTop);
+    layout->setColumnStretch(0,1);
+    layout->setColumnStretch(2,1);
     contextMenu=NULL;
     setLayout(layout);
 
@@ -43,14 +56,24 @@ DataCutSliders::DataCutSliders(QWidget* parent):
 void DataCutSliders::contextMenuEvent(QContextMenuEvent *event) {
     QMenu *menu = new QMenu(this);
     if (allowCopyToAll) {
-        menu->addSeparator();
-        actCopyMin=menu->addAction(tr("copy m&in to all files"));
-        connect(actCopyMin, SIGNAL(triggered()), this, SLOT(copyUserMinClicked()));
-        actCopyMax=menu->addAction(tr("copy m&ax to all files"));
-        connect(actCopyMax, SIGNAL(triggered()), this, SLOT(copyUserMaxClicked()));
-        actCopyBoth=menu->addAction(tr("copy min&+max to all files"));
-        connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMinClicked()));
-        connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMaxClicked()));
+        if (copyToFilesEnabled) {
+            menu->addSeparator();
+            QAction* actCopyMin=menu->addAction(tr("copy m&in to all %1").arg(filesName));
+            connect(actCopyMin, SIGNAL(triggered()), this, SLOT(copyUserMinClicked()));
+            QAction* actCopyMax=menu->addAction(tr("copy m&ax to all %1").arg(filesName));
+            connect(actCopyMax, SIGNAL(triggered()), this, SLOT(copyUserMaxClicked()));
+            QAction* actCopyBoth=menu->addAction(tr("copy min&+max to all %1").arg(filesName));
+            connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMinMaxClicked()));
+        }
+        if (copyToRunsEnabled) {
+            menu->addSeparator();
+            QAction* actCopyMin=menu->addAction(tr("copy mi&n to all %1").arg(runsName));
+            connect(actCopyMin, SIGNAL(triggered()), this, SLOT(copyUserMinRunsClicked()));
+            QAction* actCopyMax=menu->addAction(tr("copy ma&x to all %1").arg(runsName));
+            connect(actCopyMax, SIGNAL(triggered()), this, SLOT(copyUserMaxRunsClicked()));
+            QAction* actCopyBoth=menu->addAction(tr("copy min+max to all &%1").arg(runsName));
+            connect(actCopyBoth, SIGNAL(triggered()), this, SLOT(copyUserMinMaxRunsClicked()));
+        }
     }
     menu->exec(event->globalPos());
     delete menu;

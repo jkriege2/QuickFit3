@@ -24,21 +24,25 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         /** \brief class constructor */
         DataCutSliders(QWidget* parent=0);
 
-        GetSetMacroI(int, min, update());
-        GetSetMacroI(int, max, update());
-        GetSetMacroI(int, userMin, update());
-        GetSetMacroI(int, userMax, update());
-        GetSetMacro(bool, allowCopyToAll);
-        GetMacro(bool, sliderSignals);
+        GetSetMacroI(int, min, update())
+        GetSetMacroI(int, max, update())
+        GetSetMacroI(int, userMin, update())
+        GetSetMacroI(int, userMax, update())
+        GetSetMacro(bool, allowCopyToAll)
+        GetSetMacro(QString, runsName)
+        GetSetMacro(QString, filesName)
+        GetSetMacro(bool, copyToRunsEnabled)
+        GetSetMacro(bool, copyToFilesEnabled)
+        GetMacro(bool, sliderSignals)
 
         /** \brief switches off the slidersChanged() signal. */
         void disableSliderSignals() {
             sliderSignals=false;
-        };
+        }
         /** \brief switches on the slidersChanged() signal. */
         void enableSliderSignals() {
             sliderSignals=true;
-        };
+        }
 
     protected:
 
@@ -52,11 +56,22 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         void sliderHighValueChanged(int value);
 
         /** \brief this emity copyUserMinToAll() */
-        void copyUserMinClicked() { emit copyUserMinToAll(userMin); };
+        void copyUserMinClicked() { emit copyUserMinToAll(userMin); }
 
         /** \brief this emity copyUserMaxToAll() */
-        void copyUserMaxClicked() { emit copyUserMaxToAll(userMax); };
+        void copyUserMaxClicked() { emit copyUserMaxToAll(userMax); }
 
+        /** \brief this emity copyUserMaxToAll() */
+        void copyUserMinMaxClicked() { emit copyUserMinMaxToAll(userMin, userMax); }
+
+        /** \brief this emity copyUserMinToAll() */
+        void copyUserMinRunsClicked() { emit copyUserMinToAllRuns(userMin); }
+
+        /** \brief this emity copyUserMaxToAll() */
+        void copyUserMaxRunsClicked() { emit copyUserMaxToAllRuns(userMax); }
+
+        /** \brief this emity copyUserMaxToAll() */
+        void copyUserMinMaxRunsClicked() { emit copyUserMinMaxToAllRuns(userMin, userMax); }
 
     signals:
         /** \brief this signal is emitted by the DataCutSlider widget, whenever the user moved the sliders or set new values by
@@ -71,6 +86,17 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         /** \brief this signal is emited when the user clicks the "copy to all" context menu of the max widget item. */
         void copyUserMaxToAll(int userMax);
 
+        /** \brief this signal is emited when the user clicks the "copy to all runs" context menu of the min widget item. */
+        void copyUserMinToAllRuns(int userMin);
+
+        /** \brief this signal is emited when the user clicks the "copy to all runs" context menu of the max widget item. */
+        void copyUserMaxToAllRuns(int userMax);
+
+        /** \brief this signal is emited when the user clicks the "copy to all" context menu of the min/max widget item. */
+        void copyUserMinMaxToAllRuns(int userMin, int userMax);
+
+        /** \brief this signal is emited when the user clicks the "copy to all runs" context menu of the max widget item. */
+        void copyUserMinMaxToAll(int userMin, int userMax);
 
     public slots:
         /** \brief sets all the data and constraints of the widget at once */
@@ -91,14 +117,8 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         /** \brief QLineEdit which displays and edits the current upper cut-off */
         QSpinBox* editHigh;
 
-        /** \brief this signal is emited when the user clicks the "copy min to all" context menu item. */
-        QAction* actCopyMin;
-        /** \brief this signal is emited when the user clicks the "copy max to all" context menu item. */
-        QAction* actCopyMax;
-        /** \brief this signal is emited when the user clicks the "copymin+maxto all" context menu item. */
-        QAction* actCopyBoth;
 
-        /** \brief if set \c true this widget may emit a copyToAll() signal */
+        /** \brief if set \c true this widget may emit a copy...() signals */
         bool allowCopyToAll;
 
         /** \brief context menu for the widget */
@@ -112,6 +132,15 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         int userMin;
         /** \brief user set maximum value */
         int userMax;
+
+        /** \brief name used for "runs" */
+        QString runsName;
+        /** \brief name used for "files" */
+        QString filesName;
+        /** \brief enable copy to runs */
+        bool copyToRunsEnabled;
+        /** \brief enable copy to all files */
+        bool copyToFilesEnabled;
 };
 
 
