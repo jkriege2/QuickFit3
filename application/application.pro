@@ -56,7 +56,11 @@ win32 {
 }
 
 QT += gui xml
-CONFIG += console exceptions rtti stl link_prl
+CONFIG +=  exceptions rtti stl link_prl
+
+!release {
+    CONFIG += console
+}
 
 
 macx{
