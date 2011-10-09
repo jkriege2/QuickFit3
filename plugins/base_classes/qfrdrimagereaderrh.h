@@ -64,7 +64,7 @@ class QFRDRImageReaderRH : public QFRDRImageReader {
           QDataStream in(file);
           frame<T> *f = new frame<T>(data,width,height);
           unsigned char *buffer = new unsigned char [frameSize];
-          //unsigned int len = in.readRawData((char*) buffer, frameSize);
+          unsigned int len = in.readRawData((char*) buffer, frameSize);
           if(buffer[0]==0xFFU) {
             f->template load_packed<uint32_t>((uint32_t*)&(buffer[8]));
             result=true;
