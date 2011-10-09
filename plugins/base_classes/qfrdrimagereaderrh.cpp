@@ -9,6 +9,7 @@ QFRDRImageReaderRH::QFRDRImageReaderRH() {
     filename="";
     frameSize=0;
     file=NULL;
+    buffer=NULL;
 }
 
 QFRDRImageReaderRH::~QFRDRImageReaderRH() {
@@ -59,6 +60,7 @@ bool QFRDRImageReaderRH::open(QString filename) {
       setLastError(file->errorString());
       return false;
   }
+  this->filename=filename;
   frameSize=calculateFrameSize();
   fprintf(stderr,"FRAMESIZE: %i",frameSize);
   switch(frameSize) {
@@ -71,14 +73,20 @@ bool QFRDRImageReaderRH::open(QString filename) {
       close();
       result=false;
   }
+  if (result) {
+      buffer = (unsigned char*)malloc(frameSize*sizeof(unsigned char)); //new unsigned char [frameSize];
+  }
   return result;
 }
 
 void QFRDRImageReaderRH::close() {
   if (!file) return ;
+  if (buffer) free(buffer);
+  buffer=NULL;
   file->close();
   delete file;
   file=NULL;
+  filename="";
 }
 
 uint32_t QFRDRImageReaderRH::countFrames() {
@@ -94,12 +102,15 @@ uint32_t QFRDRImageReaderRH::countFrames() {
 
 bool QFRDRImageReaderRH::nextFrame() {
     if (!file) return false;
-    return not file->atEnd();
+    QDataStream in(file);
+    in.readRawData((char*)buffer, frameSize);
+    return !file->atEnd();
 }
 
 void QFRDRImageReaderRH::reset() {
-    if (!file) return ;
-    file->seek(0);
+    QString fn=filename;
+    close();
+    open(fn);
 }
 
 uint16_t QFRDRImageReaderRH::frameWidth() {

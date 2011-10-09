@@ -51,6 +51,7 @@ void QFRDRImageReaderTIFF::close() {
     if (!tif) return;
     qDebug()<<"QFRDRImageReaderTIFF::close()   tif="<<tif;
     TIFFClose(tif);
+    filename="";
     tif=NULL;
 }
 
@@ -69,8 +70,11 @@ uint32_t QFRDRImageReaderTIFF::countFrames() {
 }
 
 void QFRDRImageReaderTIFF::reset() {
-    if (!tif) return ;
-    TIFFSetDirectory(tif,0);
+    //if (!tif) return ;
+    //TIFFSetDirectory(tif,0);
+    QString fn=filename;
+    close();
+    open(fn);
 }
 
 bool QFRDRImageReaderTIFF::nextFrame() {

@@ -54,6 +54,7 @@ class QFRDRImageReaderRH : public QFRDRImageReader {
         QString filename;
         unsigned int frameSize;
         QFile *file;
+        unsigned char* buffer;
 
         unsigned int calculateFrameSize();
 
@@ -61,12 +62,9 @@ class QFRDRImageReaderRH : public QFRDRImageReader {
         bool readFrame_(T* data) {
           if (!file) return false;
           bool result=false;
-          QDataStream in(file);
           frame<T> *f = new frame<T>(data,width,height);
-          unsigned char *buffer = new unsigned char [frameSize];
-          unsigned int len = in.readRawData((char*) buffer, frameSize);
           if(buffer[0]==0xFFU) {
-            f->template load_packed<uint32_t>((uint32_t*)&(buffer[8]));
+            f->template load_packed<uint32_t>((uint32_t*)&(buffer[4]));
             result=true;
           } else {
             setLastError(QObject::tr("did not find 0xFF at start of frame, found %1").arg(buffer[0],0,16));

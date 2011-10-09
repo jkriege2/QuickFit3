@@ -376,7 +376,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
         ui->labRange->setText(tr("= %1 frames").arg(round(frames)));
         ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frame_count/ui->spinSegments->value()).arg(taumin*(double)(frame_count/ui->spinSegments->value())));
         ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frame_count/ui->spinStatistics->value()));
-        ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(taumin*(double)ui->spinVideoFrames->value()).arg(frame_count/ui->spinVideoFrames->value()));
+        ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(1e6*taumin*(double)ui->spinVideoFrames->value()).arg(frame_count/ui->spinVideoFrames->value()));
     } else {
         ui->labInputLength->setText(QString(""));
         ui->labRange->setText(QString(""));
@@ -441,6 +441,14 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     nameFilters<<"*.ini";
     inputconfigfile="";
     d.setNameFilters(nameFilters);
+    // could be that the absolute pathes are wrong. In this case we try to get a second guess by finding a file which
+    // equals in the name, but not the directory ... the user can correct the data anyways. This second guess is stored
+    // in these variables:
+    double sframetime=0;
+    double sbaseline_offset=0;
+    bool hasSecond=false;
+    bool hasFirst=false;
+    bool sIsTiff=false;
     foreach (QString iniFile, d.entryList(QDir::Files)) {
         QApplication::processEvents();
         inputconfigfile=d.absoluteFilePath(iniFile);
@@ -452,7 +460,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                 QString ft=set.value("files/type"+QString::number(f), "").toString();
                 if (!fn.isEmpty()) {
                     QString fnAbs=d.absoluteFilePath(fn);
+                    qDebug()<<"ini:  "<<fnAbs;
+                    qDebug()<<"file: "<<filename;
                     if (fnAbs==filename) {
+                        hasFirst=true;
                         if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
                         //else ui->cmbFileformat->setCurrentIndex(-1);
 
@@ -460,10 +471,25 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                         else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
 
                         baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
+                    } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filename).fileName()) {
+                        hasSecond=true;
+                        if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
+                        //else ui->cmbFileformat->setCurrentIndex(-1);
+
+                        if (set.contains("acquisition/frame_time")) sframetime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
+                        else if (set.contains("acquisition/frame_rate")) sframetime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
+
+                        sbaseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
                     }
                 }
             }
         }
+    }
+    // if there is no direct match, we take the second best, if there is one
+    if (!hasFirst && hasSecond)  {
+        frametime=sframetime;
+        baseline_offset=sbaseline_offset;
+        if (sIsTiff) ui->cmbFileformat->setCurrentIndex(0);
     }
 
     // SET THE FRAMETIME/RATE
@@ -494,14 +520,14 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                 if (frame_count>0) {
                     ui->spinLastFrame->setMaximum(frame_count-1);
                     ui->spinFirstFrame->setMaximum(frame_count-1);
-                    ui->spinLastFrame->setValue(frame_count-1);
+                    if (ui->chkLastFrame->isChecked()) ui->spinLastFrame->setValue(frame_count-1);
                     ui->spinVideoFrames->setMaximum(frame_count-1);
                     ui->spinVideoFrames->setValue(qMax(2,frame_count/1000));
                     ui->spinStatistics->setMaximum(frame_count-1);
                 } else {
                     ui->spinLastFrame->setMaximum(10000000);
                     ui->spinFirstFrame->setMaximum(10000000);
-                    ui->spinLastFrame->setValue(10000000);
+                    if (ui->chkLastFrame->isChecked()) ui->spinLastFrame->setValue(10000000);
                     ui->spinVideoFrames->setMaximum(10000000);
                     ui->spinVideoFrames->setValue(100);
                     ui->spinStatistics->setMaximum(10000000);
@@ -521,3 +547,4 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
 QStringList QFRDRImagingFCSCorrelationDialog::getFilesToAdd() const {
     return filesToAdd;
 }
+

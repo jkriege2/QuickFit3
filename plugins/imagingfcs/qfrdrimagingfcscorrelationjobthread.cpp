@@ -514,6 +514,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         }
         msleep(50);
     }
+    for (register uint64_t i=0; i<(frames+2)*frame_width*frame_height; i++) {
+        image_series[i]=0;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // NOW WE READ ALL FRAMES IN THE TIFF FILE INTO THE flot* ARRAY ALLOCATED BEFORE
@@ -525,8 +529,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         float sum2=0;
         float sframe_min=0;
         float sframe_max=0;
-        uint16_t* frame_data=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+        uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
         float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (register uint16 i=0; i<frame_width*frame_height; i++) {
+            video_frame[i]=0;
+            frame_data[i]=0;
+        }
         uint16_t video_frame_num=0;
         bool OK=true;
         while (OK && (frame<first_frame)) {
@@ -543,6 +551,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             m_status=-1; emit statusChanged(m_status);
             emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
         } else {
+            bool statFirst=true;
+            bool videoFirst=true;
             do {
                 if (!reader->readFrameUINT16(frame_data)) {
                     m_status=-1; emit statusChanged(m_status);
@@ -550,6 +560,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 } else {
                     float frame_min=frame_data[0];
                     float frame_max=frame_data[0];
+
                     for (register uint16 i=0; i<frame_width*frame_height; i++) {
                         register uint16_t v=frame_data[i];
                         image_series[frame*frame_width*frame_height+i] = v;
@@ -560,6 +571,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         sum2+=(v*v);
                         video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
                     }
+                    if (frame<100) {
+                        qDebug()<<frame<<sum<<sum2<<video_frame[0];
+                    }
                     if (frame==0) {
                         frames_min=frame_min;
                         frames_max=frame_max;
@@ -567,15 +581,17 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         frames_min=(frame_min<frames_min)?frame_min:frames_min;
                         frames_max=(frame_max>frames_max)?frame_max:frames_max;
                     }
-                    if (frame%job.statistics_frames==0) {
+                    if (statFirst) {
                         sframe_min=frame_min;
                         sframe_max=frame_max;
+                        statFirst=false;
                     } else {
                         sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
                         sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
                     }
-                    if (job.statistics && (frame%job.statistics_frames==0) && (frame>0)) {
+                    if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
                         float N=frame_width*frame_height*job.statistics_frames;
+                        qDebug()<<"stat "<<frame<<sum<<sum2<<N;
                         statistics_time.append((float)frame*job.frameTime);
                         statistics_mean.append(sum/N);
                         statistics_min.append(sframe_min);
@@ -585,8 +601,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         sum2=0;
                         sframe_min=0;
                         sframe_max=0;
+                        statFirst=true;
                     }
-                    if (job.video && (frame%job.video_frames==0) && (frame>0) && video){
+                    if (job.video && video && ((frame+1)%job.video_frames==0)){
                         for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                             video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
                             video_frame[i]=0;
@@ -856,8 +873,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         float sum2=0;
         float sframe_min=0;
         float sframe_max=0;
-        uint16_t* frame_data=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+        uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
         float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (int64_t i=0; i<frame_width*frame_height; i++)  {
+            frame_data[i]=0;
+            video_frame[i]=0;
+        }
         uint16_t video_frame_num=0;
         bool OK=true;
         while (OK && (frame<first_frame)) {
@@ -870,6 +891,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         statistics_min.clear();
         statistics_max.clear();
         statistics_time.clear();
+        bool statFirst=true;
+        bool videoFirst=true;
         do {
             if (!reader->readFrameUINT16(frame_data)) {
                 m_status=-1; emit statusChanged(m_status);
@@ -893,14 +916,15 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     frames_min=(frame_min<frames_min)?frame_min:frames_min;
                     frames_max=(frame_max>frames_max)?frame_max:frames_max;
                 }
-                if (frame%job.statistics_frames==0) {
+                if (statFirst) {
                     sframe_min=frame_min;
                     sframe_max=frame_max;
+                    statFirst=false;
                 } else {
                     sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
                     sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
                 }
-                if (job.statistics && (frame%job.statistics_frames==0) && (frame>0)) {
+                if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
                     float N=frame_width*frame_height*job.statistics_frames;
                     statistics_time.append((float)frame*job.frameTime);
                     statistics_mean.append(sum/N);
@@ -911,8 +935,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     sum2=0;
                     sframe_min=0;
                     sframe_max=0;
+                    statFirst=true;
                 }
-                if (job.video && (frame%job.video_frames==0) && (frame>0) && video){
+                if (job.video && ((frame+1)%job.video_frames==0) && video){
                     for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
                         video_frame[i]=0;
@@ -962,22 +987,22 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
             if (acf_N>0) {
                 acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-                for (uint32_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
+                for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
                     acf[nn]=0.0;
                 }
                 acf_std=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-                for (uint32_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
+                for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
                     acf_std[nn]=0.0;
                 }
                 acf_tau=(double*)calloc(acf_N,sizeof(double));
                 if (job.correlator==1) {
                     double* tau=acfjk[0]->getCorTau();
-                    for (uint32_t tt=0; tt<acf_N; tt++) {
+                    for (uint64_t tt=0; tt<acf_N; tt++) {
                         acf_tau[tt]=tau[tt];
                     }
                 } else {
                     double** corr1=acfjb[0]->get_array_G();
-                    for (uint32_t tt=0; tt<acf_N; tt++) {
+                    for (uint64_t tt=0; tt<acf_N; tt++) {
                         acf_tau[tt]=job.frameTime*corr1[0][tt];
                     }
                     free(corr1[0]);
@@ -1056,8 +1081,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                         for (register uint16 i=0; i<frame_width*frame_height; i++) {
                             register double v=frame_data[i];
                             acfjk[i]->correlate_step(v);
-
-                            if ((frame%segment_frames)==(segment_frames-1)) {
+                        }
+                        if ((frame%segment_frames)==(segment_frames-1)) {
+                            for (register uint16 i=0; i<frame_width*frame_height; i++) {
                                 acfjk[i]->normalize();
                                 double* corr=acfjk[i]->getCor();
                                 for (register uint32_t tt=0; tt<acf_N; tt++) {
@@ -1073,8 +1099,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                         for (register uint16 i=0; i<frame_width*frame_height; i++) {
                             register double v=frame_data[i];
                             acfjb[i]->run(v, v);
-
-                            if ((frame%segment_frames)==(segment_frames-1)) {
+                        }
+                        if ((frame%segment_frames)==(segment_frames-1)) {
+                            for (register uint16 i=0; i<frame_width*frame_height; i++) {
                                 double** corr=acfjb[i]->get_array_G();
                                 for (register uint32_t tt=0; tt<acf_N; tt++) {
                                     register double v=corr[1][tt];
@@ -1306,7 +1333,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
         frames_max=frames_max-baseline;
         frames_min=frames_min-baseline;
     } else if (job.backgroundCorrection==2) {
-        baseline=baseline+frames_min;
+        baseline=job.backgroundOffset+frames_min;
         frames_max=frames_max-baseline;
         frames_min=frames_min-baseline;
     }
