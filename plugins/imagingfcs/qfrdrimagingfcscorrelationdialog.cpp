@@ -460,8 +460,8 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                 QString ft=set.value("files/type"+QString::number(f), "").toString();
                 if (!fn.isEmpty()) {
                     QString fnAbs=d.absoluteFilePath(fn);
-                    qDebug()<<"ini:  "<<fnAbs;
-                    qDebug()<<"file: "<<filename;
+                    //qDebug()<<"ini:  "<<fnAbs;
+                    //qDebug()<<"file: "<<filename;
                     if (fnAbs==filename) {
                         hasFirst=true;
                         if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
