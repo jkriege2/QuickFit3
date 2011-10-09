@@ -267,7 +267,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
 
         if (cmbRunDisplay->currentIndex()==0) { // plot all runs
             for (unsigned int i=0; i<rateRuns; i++) {
-                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3: %2run %1").arg(i).arg(binned).arg(name).toStdString());
+                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3: %2run %1").arg(i).arg(binned).arg(name));
 
                 JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                 g->set_lineWidth(1);
@@ -301,7 +301,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
             }
         } else if (cmbRunDisplay->currentIndex()==1) { // plot all runs with the current one selected
             for (unsigned int i=0; i<rateRuns; i++) {
-                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned).toStdString());
+                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
                 if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                     JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                     g->set_lineWidth(1);
@@ -343,7 +343,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
         } else if (cmbRunDisplay->currentIndex()==2) { // plot only selected runs
             for (unsigned int i=0; i<rateRuns; i++) {
                 if (!m->leaveoutRun(i)) {
-                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned).toStdString());
+                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
 
                     JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                     g->set_lineWidth(1);

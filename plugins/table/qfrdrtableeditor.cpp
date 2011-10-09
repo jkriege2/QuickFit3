@@ -161,7 +161,7 @@ void QFRDRTableEditor::slSaveTable() {
             QString fileName = QFileDialog::getSaveFileName(this, m->getExportDialogTitle(), currentTableDir, filter, &selectedFilter);
             if ((!fileName.isEmpty())&&(!fileName.isNull())) {
                 int f=filter.split(";;").indexOf(selectedFilter);
-                std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<"   "<<m->getExportFiletypes().at(f).toStdString()<<std::endl;
+                //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<"   "<<m->getExportFiletypes().at(f).toStdString()<<std::endl;
                 m->exportData(m->getExportFiletypes().at(f), fileName);
             }
         }

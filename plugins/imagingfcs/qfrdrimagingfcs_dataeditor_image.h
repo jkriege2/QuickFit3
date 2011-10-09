@@ -85,7 +85,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void updateHistogram();
 
         /** \brief recalculate histogram over selected pixels */
-        void updateSelectionHistogram(bool replot=true);
+        void updateSelectionHistogram(bool replot=false);
 
 
         /** \brief displays the data from the current data element in the plotter widget
@@ -160,7 +160,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
 
-
+        int connectParameterWidgetsCounter;
+        int connectImageWidgetsCounter;
 
 
         /** \brief plotter widget for the correlation curve */
@@ -211,9 +212,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief plot for the overview image in pltOverview */
         JKQTPMathImage* plteOverview;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
-        JKQTPOverlayImage* plteOverviewSelected;
+        JKQTPOverlayImageEnhanced* plteOverviewSelected;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
-        JKQTPOverlayImage* plteOverviewExcluded;
+        JKQTPOverlayImageEnhanced* plteOverviewExcluded;
         /** \brief data in plteOverviewSelected */
         bool* plteOverviewSelectedData;
         /** \brief data in plteOverviewExcluded */
@@ -227,12 +228,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief plot for the overview image in pltImage */
         JKQTPMathImage* plteImage;
         double* plteImageData;
-        int plteImageSize;
+        int32_t plteImageSize;
 
         /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
-        JKQTPOverlayImage* plteImageSelected;
+        JKQTPOverlayImageEnhanced* plteImageSelected;
         /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
-        JKQTPOverlayImage* plteImageExcluded;
+        JKQTPOverlayImageEnhanced* plteImageExcluded;
 
 
         /** \brief  plotter for goodnes of fit image */
@@ -243,9 +244,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
 
         /** \brief plot for the selected runs in pltGofImage, plot plteImageSelectedData */
-        JKQTPOverlayImage* plteGofImageSelected;
+        JKQTPOverlayImageEnhanced* plteGofImageSelected;
         /** \brief plot for the excluded runs in pltGofImage, plot plteImageSelectedData */
-        JKQTPOverlayImage* plteGofImageExcluded;
+        JKQTPOverlayImageEnhanced* plteGofImageExcluded;
 
 
         /** \brief combobox for the color bar of plteImage */
@@ -299,6 +300,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QEnhancedTableView* tvHistogramParameters;
         QFTableModel* tabHistogramParameters;
         QVisibleHandleSplitter* splitterHistogram;
+        QCheckBox* chkNormalizedHistograms;
+        double mainHistogramMax;
+        QCheckBox* chkExcludeExcludedRunsFromHistogram;
+        QCheckBox* chkHistogramRangeAuto;
+        JKDoubleEdit* edtHistogramMin;
+        JKDoubleEdit* edtHistogramMax;
 
 
 

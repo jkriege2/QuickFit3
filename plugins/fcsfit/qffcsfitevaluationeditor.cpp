@@ -926,7 +926,7 @@ void QFFCSFitEvaluationEditor::replotData() {
             errorName=tr("stddev");
         } else {
             if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
-                c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentIndex()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentIndex())).toStdString());
+                c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentIndex()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentIndex())));
                 graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentIndex()));
                 if (eval->getFitDataWeighting()==QFFCSFitEvaluation::RunErrorWeighting) {
                     c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentIndex()), data->getCorrelationN(), "cperrunerror");
@@ -1257,7 +1257,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     for (int j=0; j<N; j++) {
                         afitfunc[j]=ffunc->evaluate(tauvals[j], params);
                     }
-                    size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i).toStdString());
+                    size_t c_afit=ds->addCopiedColumn(afitfunc, N, QString("add_fit_model_%1").arg(i));
                     JKQTPxyLineGraph* g_afit=new JKQTPxyLineGraph(pltData->get_plotter());
                     g_afit->set_drawLine(true);
                     g_afit->set_title(name);

@@ -440,8 +440,8 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
        //////////////////////////////////////////////////////////////////////////////////
        if (cmbRunDisplay->currentIndex()==1) {
             for (int i=0; i<m->getCorrelationRuns(); i++) {
-                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(m->getCorrelationRunName(i)).arg(i).toStdString());
-                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(m->getCorrelationRunName(i)).arg(i).toStdString());
+                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(m->getCorrelationRunName(i)).arg(i));
+                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(m->getCorrelationRunName(i)).arg(i));
                 JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
@@ -465,8 +465,8 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
            // Plot ALL RUNS (left out runs in gray, standard runs in black, highlighted run in red)
            //////////////////////////////////////////////////////////////////////////////////
             for (int i=0; i<m->getCorrelationRuns(); i++) {
-                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
-                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
                 JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
@@ -505,8 +505,8 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
            //////////////////////////////////////////////////////////////////////////////////
             for (int i=0; i<m->getCorrelationRuns(); i++) {
                 if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
-                    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)).toStdString());
+                    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+                    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
                     JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
                     g->set_lineWidth(1);
                     g->set_xColumn(c_tau);
