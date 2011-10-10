@@ -15,6 +15,8 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     width=0;
     height=0;
     overview=NULL;
+    setResultsInitSize(1000);
+    setEvaluationIDMetadataInitSize(1000);
 }
 
 QFRDRImagingFCSData::~QFRDRImagingFCSData() {

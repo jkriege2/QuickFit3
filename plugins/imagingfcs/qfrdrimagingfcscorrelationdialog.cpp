@@ -374,9 +374,12 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
     if (frame_count>0) {
         ui->labInputLength->setText(tr("length: %1 = %2 s").arg((int64_t)round(frames)).arg(frames*taumin));
         ui->labRange->setText(tr("= %1 frames").arg(round(frames)));
-        ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frame_count/ui->spinSegments->value()).arg(taumin*(double)(frame_count/ui->spinSegments->value())));
-        ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frame_count/ui->spinStatistics->value()));
-        ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(1e6*taumin*(double)ui->spinVideoFrames->value()).arg(frame_count/ui->spinVideoFrames->value()));
+        if (ui->spinSegments->value()!=0) ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frame_count/ui->spinSegments->value()).arg(taumin*(double)(frame_count/ui->spinSegments->value())));
+        else ui->labSegments->setText("");
+        if (ui->spinStatistics->value()!=0) ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frame_count/ui->spinStatistics->value()));
+        else ui->labStatistics->setText("");
+        if (ui->spinVideoFrames->value()!=0) ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(1e6*taumin*(double)ui->spinVideoFrames->value()).arg(frame_count/ui->spinVideoFrames->value()));
+        else ui->labVideo->setText(QString(""));
     } else {
         ui->labInputLength->setText(QString(""));
         ui->labRange->setText(QString(""));

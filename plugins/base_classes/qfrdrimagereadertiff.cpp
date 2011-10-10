@@ -27,7 +27,8 @@ QString QFRDRImageReaderTIFF::formatName() const {
 
 bool QFRDRImageReaderTIFF::open(QString filename) {
     close();
-    TIFFSetWarningHandler(0);
+    //TIFFSetWarningHandler(0);
+    qDebug()<<"QFRDRImageReaderTIFF::open("<<filename<<")     tif="<<tif;
     tif = TIFFOpen(filename.toAscii().data(),"r");
     if (tif) {
         uint32 nx,ny;
@@ -36,23 +37,26 @@ bool QFRDRImageReaderTIFF::open(QString filename) {
         width=nx;
         height=ny;
         this->filename=filename;
-        TIFFSetWarningHandler(NULL);
+        //TIFFSetWarningHandler(NULL);
+        qDebug()<<"  QFRDRImageReaderTIFF::open("<<filename<<")   tif="<<tif<<"  result=false";
         return true;
     } else {
         width=0;
         height=0;
         setLastError(QObject::tr("libtiff: error opening file '%1'").arg(filename));
         this->filename="";
+        qDebug()<<"  QFRDRImageReaderTIFF::open("<<filename<<")   tif="<<tif<<"  result=false";
         return false;
     }
 }
 
 void QFRDRImageReaderTIFF::close() {
     if (!tif) return;
-    qDebug()<<"QFRDRImageReaderTIFF::close()   tif="<<tif;
+    qDebug()<<"QFRDRImageReaderTIFF::close()     tif="<<tif;
     TIFFClose(tif);
     filename="";
     tif=NULL;
+    qDebug()<<"  QFRDRImageReaderTIFF::close()   tif="<<tif;
 }
 
 uint32_t QFRDRImageReaderTIFF::countFrames() {
@@ -61,20 +65,22 @@ uint32_t QFRDRImageReaderTIFF::countFrames() {
     uint32_t nb_images = 0;
     //tdir_t dir=TIFFCurrentDirectory(tif);
     TIFFSetDirectory(tif,0);
+    //reset();
     do {
         ++nb_images;
-    } while (TIFFReadDirectory(tif) && (nb_images<65536)); // LIBTIFF can only read up to 2¹6 frames!!!
+    } while (TIFFReadDirectory(tif) && (nb_images<65000)); // LIBTIFF can only read up to 2^{16} frames!!!
     //TIFFSetDirectory(tif,dir);
     TIFFSetDirectory(tif,0);
+    //reset();
     return nb_images;
 }
 
 void QFRDRImageReaderTIFF::reset() {
-    //if (!tif) return ;
-    //TIFFSetDirectory(tif,0);
-    QString fn=filename;
-    close();
-    open(fn);
+    if (!tif) return ;
+    TIFFSetDirectory(tif,0);
+    //QString fn=filename;
+    //close();
+    //open(fn);
 }
 
 bool QFRDRImageReaderTIFF::nextFrame() {

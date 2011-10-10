@@ -2230,9 +2230,9 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
             }
             eval->set_doEmitPropertiesChanged(true);
             eval->set_doEmitResultsChanged(true);
-            record->enableEmitResultsChanged();
-            eval->emitPropertiesChanged();
-            eval->emitResultsChanged();
+            record->enableEmitResultsChanged(false);
+            //eval->emitPropertiesChanged();
+            //eval->emitResultsChanged();
         } catch(std::exception& E) {
             services->log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
         }
@@ -2285,7 +2285,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
         doFit(record, eval->getCurrentIndex());
-
+        record->enableEmitResultsChanged();
         displayModel(false);
         replotData();
         QApplication::restoreOverrideCursor();
@@ -2331,7 +2331,7 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
             if (dlgFitProgress->isCanceled()) break;
         }
     }
-
+    record->enableEmitResultsChanged();
     displayModel(false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2387,6 +2387,7 @@ void QFFCSFitEvaluationEditor::fitAll() {
                 if (dlgFitProgress->isCanceled()) break;
             }
             dlgFitProgress->incSuperProgress();
+            record->enableEmitResultsChanged();
         }
     }
 
@@ -2438,6 +2439,8 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
         QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
 
         if (record && data) {
+            record->setResultsInitSize(qMax(1000, data->getCorrelationRuns()));
+            record->setEvaluationIDMetadataInitSize(1000);
             int runmax=data->getCorrelationRuns();
             if (runmax==1) runmax=0;
             for (int run=-1; run<runmax; run++) {
@@ -2454,6 +2457,7 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
                     if (dlgFitProgress->isCanceled()) break;
                 }
             }
+            record->enableEmitResultsChanged();
         }
     }
 

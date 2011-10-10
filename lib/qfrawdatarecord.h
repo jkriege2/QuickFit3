@@ -209,9 +209,29 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             QString label_rich; /**< a label describing the result (with richtext markup!) */
             QString group; /**< this result belongs to a group with the given name */
         };
+
+        /*! \brief initial size for results hash
+
+            You can increase this if you expect that there will be very many items in your evaluation
+         */
+        void setResultsInitSize(int initSize);
+
+        /*! \brief initial size for results hash in evaluationIDMetadata
+
+            You can increase this if you expect that there will be very many items in your evaluation
+         */
+        void setEvaluationIDMetadataInitSize(int initSize);
     protected:
+        /*! \brief initial size for results hash in evaluationIDMetadata
+
+            You can increase this if you expect that there will be very many items in your evaluation
+         */
+        int evaluationIDMetadataInitSize;
+
+
         /*! \brief this struct holds the metadata and also the data about an evaluationID */
         struct evaluationIDMetadata {
+            evaluationIDMetadata(int initsize);
             QString group; /**< group this evaluationID belongs to \b (optional), translated to a human-readable version, using evalGroupLabels */
             int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
             QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */

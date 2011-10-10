@@ -572,7 +572,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
                     }
                     if (frame<100) {
-                        qDebug()<<frame<<sum<<sum2<<video_frame[0];
+                        //qDebug()<<frame<<sum<<sum2<<video_frame[0];
                     }
                     if (frame==0) {
                         frames_min=frame_min;
@@ -591,7 +591,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     }
                     if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
                         float N=frame_width*frame_height*job.statistics_frames;
-                        qDebug()<<"stat "<<frame<<sum<<sum2<<N;
+                        //qDebug()<<"stat "<<frame<<sum<<sum2<<N;
                         statistics_time.append((float)frame*job.frameTime);
                         statistics_mean.append(sum/N);
                         statistics_min.append(sframe_min);
