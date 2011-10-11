@@ -631,11 +631,11 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
 
         datacut->disableSliderSignals();
         datacut->set_min(0);
-        datacut->set_max(data->getCorrelationN());
+        datacut->set_max(data->getCorrelationN()-1);
         QString run="avg";
         if (eval->getCurrentIndex()>-1) run=QString::number(eval->getCurrentIndex());
         datacut->set_userMin(getUserMin(0));
-        datacut->set_userMax(getUserMax(data->getCorrelationN()));
+        datacut->set_userMax(getUserMax(data->getCorrelationN()-1));
         datacut->enableSliderSignals();
         dataEventsEnabled=false;
         spinRun->setMaximum(data->getCorrelationRuns()-1);
@@ -2058,15 +2058,26 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
             }
         }
         // we also have to care for the data cutting
-        int cut_low=getUserMin(record, run);
-        int cut_up=getUserMax(record, run);
-        int cut_N=N-cut_low-(N-cut_up);
+        int cut_low=getUserMin(record, run, datacut->get_userMin());
+        int cut_up=getUserMax(record, run, datacut->get_userMax());
+        int cut_N=cut_up-cut_low+1;
         if (cut_N<0) {
             cut_low=0;
             cut_up=ffunc->paramCount()-1;
             if (cut_up>=N) cut_up=N;
-            cut_N=cut_up;
+            cut_N=cut_up+1;
         }
+
+        /*QString dt, dc;
+        for (int i=cut_low; i<=cut_up; i++) {
+            dt+=QString(", %1").arg(taudata[i]);
+            dc+=QString(", %1").arg(corrdata[i]);
+        }
+        services->log_text(tr("   - tau:  (%1)\n").arg(dt));
+        services->log_text(tr("   - corr: (%1)\n").arg(dc));*/
+
+
+        services->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
         weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
         if (!weightsOK) services->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
@@ -2093,140 +2104,145 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
             QString iparams="";
             QString oparams="";
             QString orparams="";
-
+            int fitparamcount=0;
             for (int i=0; i<ffunc->paramCount(); i++) {
                 if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
                     if (!iparams.isEmpty()) iparams=iparams+";  ";
+                    fitparamcount++;
                     iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(params[i]);
                 }
                 //printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
             }
 
 
+            if (cut_N>fitparamcount) {
 
 
+                if (!dlgFitProgress->isCanceled()) {
 
-            if (!dlgFitProgress->isCanceled()) {
-
-                dlgFitProgress->reportStatus(tr("fitting ..."));
-                dlgFitProgress->setProgressMax(100);
-                dlgFitProgress->setProgress(0);
-                doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-                doFitThread->start(QThread::HighestPriority);
-                while (!doFitThread->isFinished()) {
-                    QApplication::processEvents();
-                    if (dlgFitProgress->isCanceled()) {
-                      doFitThread->terminate();
-                      break;
+                    dlgFitProgress->reportStatus(tr("fitting ..."));
+                    dlgFitProgress->setProgressMax(100);
+                    dlgFitProgress->setProgress(0);
+                    doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                    doFitThread->start(QThread::HighestPriority);
+                    while (!doFitThread->isFinished()) {
+                        QApplication::processEvents();
+                        if (dlgFitProgress->isCanceled()) {
+                          doFitThread->terminate();
+                          break;
+                        }
                     }
+                    dlgFitProgress->setProgressFull();
+                    dlgFitProgress->reportStatus(tr("calculating parameters, errors and storing data ..."));
                 }
-                dlgFitProgress->setProgressFull();
-                dlgFitProgress->reportStatus(tr("calculating parameters, errors and storing data ..."));
-            }
-            //dlgFitProgress->setAllowCancel(false);
+                //dlgFitProgress->setAllowCancel(false);
 
 
-            if (!dlgFitProgress->isCanceled()) {
-                record->disableEmitResultsChanged();
+                if (!dlgFitProgress->isCanceled()) {
+                    record->disableEmitResultsChanged();
 
-                QFFitAlgorithm::FitResult result=doFitThread->getResult();
-                ffunc->calcParameter(params, errors);
-                ffunc->sortParameter(params, errors);
-                ffunc->calcParameter(params, errors);
+                    QFFitAlgorithm::FitResult result=doFitThread->getResult();
+                    ffunc->calcParameter(params, errors);
+                    ffunc->sortParameter(params, errors);
+                    ffunc->calcParameter(params, errors);
 
-                for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
-                        if (!oparams.isEmpty()) oparams=oparams+";  ";
-                        oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                    for (int i=0; i<ffunc->paramCount(); i++) {
+                        if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                            if (!oparams.isEmpty()) oparams=oparams+";  ";
+
+                            oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                        }
+                        //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                     }
-                    //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-                }
 
-                // round errors and values
-                for (int i=0; i<ffunc->paramCount(); i++) {
-                    errors[i]=roundError(errors[i], 2);
-                    params[i]=roundWithError(params[i], errors[i], 2);
-                }
-                eval->setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), paramsFix);
-
-                for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
-                        if (!orparams.isEmpty()) orparams=orparams+";  ";
-                        orparams=orparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                    // round errors and values
+                    for (int i=0; i<ffunc->paramCount(); i++) {
+                        errors[i]=roundError(errors[i], 2);
+                        params[i]=roundWithError(params[i], errors[i], 2);
                     }
-                    //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-                }
+                    eval->setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), paramsFix);
 
-                services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
-                services->log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
-                services->log_text(tr("   - initial params         (%1)\n").arg(iparams));
-                services->log_text(tr("   - output params          (%1)\n").arg(oparams));
-                services->log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
+                    for (int i=0; i<ffunc->paramCount(); i++) {
+                        if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                            if (!orparams.isEmpty()) orparams=orparams+";  ";
+                            orparams=orparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                        }
+                        //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                    }
 
-
-                QString evalID=eval->getEvaluationResultID(ffunc->id(), run);
-                QString param;
-                QString group="fit properties";
-                QString egroup=QString("%1%2__%3__%4").arg(eval->getType()).arg(eval->getID()).arg(falg->id()).arg(ffunc->id());
-                QString egrouplabel=QString("%1%2: %3, %4").arg(eval->getType()).arg(eval->getID()).arg(falg->shortName()).arg(ffunc->shortName());
-
-                record->resultsSetEvaluationGroup(evalID, egroup);
-                record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
-                record->resultsSetEvaluationGroupIndex(evalID, run);
-                record->resultsSetEvaluationDescription(evalID, QString(""));
-
-                record->resultsSetInteger(evalID, param="fit_used_run", run);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: used runs"));
-
-                record->resultsSetString(evalID, "fit_model_name", ffunc->id());
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: model"));
-
-                record->resultsSetString(evalID, "fitalg_name", falg->id());
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
-
-                record->resultsSetNumber(evalID, "fitalg_runtime", doFitThread->getDeltaTime(), "msecs");
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: runtime"));
-
-                record->resultsSetBoolean(evalID, "fitalg_success", result.fitOK);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: success"));
-
-                record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: message"));
-
-                record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
-
-                record->resultsSetInteger(evalID, "fit_datapoints", cut_N);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: datapoints"));
-
-                record->resultsSetInteger(evalID, "fit_cut_low", cut_low);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: first point"));
-
-                record->resultsSetInteger(evalID, "fit_cut_up", cut_up);
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: last point"));
+                    services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
+                    services->log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
+                    services->log_text(tr("   - initial params         (%1)\n").arg(iparams));
+                    services->log_text(tr("   - output params          (%1)\n").arg(oparams));
+                    services->log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
 
 
-                QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
-                while (it.hasNext()) {
-                    it.next();
-                    record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
+                    QString evalID=eval->getEvaluationResultID(ffunc->id(), run);
+                    QString param;
+                    QString group="fit properties";
+                    QString egroup=QString("%1%2__%3__%4").arg(eval->getType()).arg(eval->getID()).arg(falg->id()).arg(ffunc->id());
+                    QString egrouplabel=QString("%1%2: %3, %4").arg(eval->getType()).arg(eval->getID()).arg(falg->shortName()).arg(ffunc->shortName());
+
+                    record->resultsSetEvaluationGroup(evalID, egroup);
+                    record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
+                    record->resultsSetEvaluationGroupIndex(evalID, run);
+                    record->resultsSetEvaluationDescription(evalID, QString(""));
+
+                    record->resultsSetInteger(evalID, param="fit_used_run", run);
                     record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
+                    record->resultsSetLabel(evalID, param, tr("fit: used runs"));
+
+                    record->resultsSetString(evalID, "fit_model_name", ffunc->id());
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: model"));
+
+                    record->resultsSetString(evalID, "fitalg_name", falg->id());
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
+
+                    record->resultsSetNumber(evalID, "fitalg_runtime", doFitThread->getDeltaTime(), "msecs");
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: runtime"));
+
+                    record->resultsSetBoolean(evalID, "fitalg_success", result.fitOK);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: success"));
+
+                    record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: message"));
+
+                    record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
+
+                    record->resultsSetInteger(evalID, "fit_datapoints", cut_N);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: datapoints"));
+
+                    record->resultsSetInteger(evalID, "fit_cut_low", cut_low);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: first point"));
+
+                    record->resultsSetInteger(evalID, "fit_cut_up", cut_up);
+                    record->resultsSetGroup(evalID, param, group);
+                    record->resultsSetLabel(evalID, param, tr("fit: last point"));
+
+
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
+                    while (it.hasNext()) {
+                        it.next();
+                        record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
+                        record->resultsSetGroup(evalID, param, group);
+                        record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
+                    }
+                    record->enableEmitResultsChanged();
+                    emit resultsChanged();
+                } else {
+                    services->log_warning(tr("   - fit canceled by user!!!\n"));
                 }
-                record->enableEmitResultsChanged();
-                emit resultsChanged();
             } else {
-                services->log_warning(tr("   - fit canceled by user!!!\n"));
+                services->log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
             }
             eval->set_doEmitPropertiesChanged(true);
             eval->set_doEmitResultsChanged(true);
