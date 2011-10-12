@@ -8,15 +8,26 @@ QFCameraComboBox::QFCameraComboBox(QFExtensionManager* extManager, QWidget* pare
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(camIndexChanged(int)));
 }
 
+QFCameraComboBox::QFCameraComboBox(QWidget* parent):
+    QComboBox(parent)
+{
+    m_extManager=NULL;
+    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(camIndexChanged(int)));
+}
 QFCameraComboBox::~QFCameraComboBox()
 {
     //dtor
 }
 
+void QFCameraComboBox::init(QFExtensionManager* extManager) {
+    m_extManager=extManager;
+    findExtensions();
+}
 
 void QFCameraComboBox::findExtensions() {
     cameras.clear();
     clear();
+    if (m_extManager==NULL) return;
     // load available acquisition devices from extManager
     QStringList ids=m_extManager->getIDList();
     for (int i=0; i<ids.size(); i++) {

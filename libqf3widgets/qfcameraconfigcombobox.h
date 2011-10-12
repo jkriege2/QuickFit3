@@ -51,8 +51,10 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBoxNotifier: public QObject {
 class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QComboBox {
         Q_OBJECT
     public:
-        QFCameraConfigComboBox(QString configDirectory, QWidget* parent=NULL);
+        QFCameraConfigComboBox(QWidget* parent=NULL, QString configDirectory=QString(""));
         virtual ~QFCameraConfigComboBox();
+
+        void init(QString configDirectory);
 
         /** \brief connect the given combobox to this combobox and initialize this with the current item of combo */
         void connectTo(QFCameraComboBox* combo);
@@ -112,9 +114,10 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QComboBox {
 class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         Q_OBJECT
     public:
-        QFCameraConfigEditorWidget(QString configDirectory, QWidget* parent=NULL);
+    QFCameraConfigEditorWidget(QWidget* parent=NULL, QString configDirectory=QString(""));
         virtual ~QFCameraConfigEditorWidget();
 
+        void init(QString configDirectory);
         /** \brief connect the given combobox to this combobox and initialize this with the current item of combo */
         void connectTo(QFCameraComboBox* combo) { combobox->connectTo(combo); };
 

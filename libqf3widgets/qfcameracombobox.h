@@ -17,7 +17,9 @@ class QFWIDLIB_EXPORT QFCameraComboBox : public QComboBox {
         Q_OBJECT
     public:
         QFCameraComboBox(QFExtensionManager* extManager, QWidget* parent=NULL);
+        QFCameraComboBox(QWidget* parent=NULL);
         virtual ~QFCameraComboBox();
+        void init(QFExtensionManager* extManager);
         /** \brief return the currently selected camera extension as QFExtension */
         QFExtension* currentExtension() const;
         /** \brief return the currently selected camera extension as QFExtensionCamera */

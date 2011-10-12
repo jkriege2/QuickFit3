@@ -12,6 +12,7 @@ QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFPluginServices* pluginServices, Q
     camConfig1=NULL;
     camConfig2=NULL;
     widImageStack=NULL;
+    optSetup=NULL;
     m_pluginServices=pluginServices;
     // create widgets and actions
     createWidgets(pluginServices->getExtensionManager());
@@ -40,7 +41,7 @@ void QFESPIMB040MainWindow::loadSettings(ProgramOptions* settings) {
     if (sampleStages) sampleStages->loadSettings(settings, "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
-
+    if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
 }
 
 void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
@@ -50,6 +51,7 @@ void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
     if (sampleStages) sampleStages->storeSettings(settings, "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
+    if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
 
 }
 
@@ -84,6 +86,13 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     setLayout(mainl);
     tabMain=new QTabWidget(this);
     mainl->addWidget(tabMain);
+
+    optSetup=new QFESPIMB040OpticsSetup(this, m_pluginServices);
+    tabMain->addTab(optSetup, tr("Instrument Setup"));
+
+
+
+
     QWidget* mainWid=new QWidget(this);
     tabMain->addTab(mainWid, tr("Imaging"));
 

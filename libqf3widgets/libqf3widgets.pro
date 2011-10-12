@@ -67,7 +67,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     libwid_imexport.h \
     ../../../../LIB/trunk/lib_imexport.h \
     ../../../../LIB/trunk/qt/jkqtpimagetools.h \
-    ../../../../LIB/trunk/qt/jkqtpimageelements.h
+    ../../../../LIB/trunk/qt/jkqtpimageelements.h \
+    filters.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -102,10 +103,12 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfcameraconfigcombobox.cpp \
     qfcameracombobox.cpp \
     objectives.cpp \
-    ../../../../LIB/trunk/qt/jkqtpimageelements.cpp
+    ../../../../LIB/trunk/qt/jkqtpimageelements.cpp \
+    filters.cpp
 
 FORMS += qfdlg_csvparameters.ui \
-    qf3objectiveeditor.ui
+    qf3objectiveeditor.ui \
+    qf3filtereditor.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
@@ -121,6 +124,11 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
+
+
+
+
+
 
 
 

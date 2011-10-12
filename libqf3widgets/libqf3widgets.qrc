@@ -6,5 +6,13 @@
         <file alias="config_rename.png">icons/config_rename.png</file>
         <file alias="camera_config.png">icons/camera_config.png</file>
         <file alias="acquisition_configuration.png">icons/acquisition_configure.png</file>
+        <file alias="objective_add.png">icons/list_add.png</file>
+        <file alias="objective_delete.png">icons/list_remove.png</file>
+        <file alias="objective_rename.png">icons/edit.png</file>
+        <file alias="objective.png">icons/objectve.png</file>
+        <file alias="filter_add.png">icons/list_add.png</file>
+        <file alias="filter_delete.png">icons/list_remove.png</file>
+        <file alias="filter_rename.png">icons/edit.png</file>
+        <file alias="filter.png">icons/filter.png</file>
     </qresource>
 </RCC>

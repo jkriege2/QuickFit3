@@ -37,6 +37,7 @@
 #include "qfespimb040imagestackconfigwidget.h"
 #include "qfespimb040acquisitionconfigwidget.h"
 #include "qfhtmlhelpwindow.h"
+#include "qfespimb040opticssetup.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -64,7 +65,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         /** \brief main log widget */
         QtLogFile* logMain;
 
-
+        QFESPIMB040OpticsSetup* optSetup;
         QFESPIMB040CameraConfig* camConfig1;
         QFESPIMB040CameraConfig* camConfig2;
         QFESPIMB040SampleStageConfig* sampleStages;

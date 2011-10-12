@@ -22,7 +22,7 @@ void QFCameraConfigComboBoxNotifier::emitUpdate() {
 QFCameraConfigComboBoxNotifier* QFCameraConfigComboBox::m_notifier=NULL;
 
 
-QFCameraConfigComboBox::QFCameraConfigComboBox(QString configDirectory, QWidget* parent):
+QFCameraConfigComboBox::QFCameraConfigComboBox(QWidget* parent, QString configDirectory):
     QComboBox(parent)
 {
     m_configDirectory=configDirectory;
@@ -33,6 +33,11 @@ QFCameraConfigComboBox::QFCameraConfigComboBox(QString configDirectory, QWidget*
 //    std::cout<<"m_notifier="<<m_notifier<<std::endl;
     if (m_notifier==NULL) m_notifier=new QFCameraConfigComboBoxNotifier(NULL);
     connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(rereadConfigFiles()));
+    init(configDirectory);
+}
+
+void QFCameraConfigComboBox::init(QString configDirectory) {
+    m_configDirectory=configDirectory;
 }
 
 QFCameraConfigComboBox::~QFCameraConfigComboBox()
@@ -242,14 +247,14 @@ void QFCameraConfigComboBox::addNew() {
 
 
 
-QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, QWidget* parent):
+QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString configDirectory):
     QWidget(parent)
 {
     QHBoxLayout* layout=new QHBoxLayout();
     setLayout(layout);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
-    combobox=new QFCameraConfigComboBox(configDirectory, this);
+    combobox=new QFCameraConfigComboBox(this, configDirectory);
     layout->addWidget(combobox, 2);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 
@@ -297,4 +302,6 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QString configDirectory, 
 QFCameraConfigEditorWidget::~QFCameraConfigEditorWidget() {
 }
 
-
+void QFCameraConfigEditorWidget::init(QString configDirectory) {
+    combobox->init(configDirectory);
+}

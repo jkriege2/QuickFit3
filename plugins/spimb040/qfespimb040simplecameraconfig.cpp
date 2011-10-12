@@ -1,13 +1,12 @@
-#include "qfespimb040cameraconfig.h"
-#include "qfespimb040mainwindow.h"
+#include "qfespimb040simplecameraconfig.h"
 #include <QtGui>
 #include <iostream>
 
-QFESPIMB040CameraConfig::viewDataStruct::viewDataStruct() {
+QFESPIMB040SimpleCameraConfig::viewDataStruct::viewDataStruct() {
     reset();
 }
 
-void QFESPIMB040CameraConfig::viewDataStruct::reset() {
+void QFESPIMB040SimpleCameraConfig::viewDataStruct::reset() {
     rawImage.assign(100, 100, 0);
     acqFrames=acqFramesQR=0;
     acqStartedQR=acqStarted=lastAcquisitionTime=QTime::currentTime();
@@ -21,48 +20,64 @@ void QFESPIMB040CameraConfig::viewDataStruct::reset() {
 }
 
 
-QFCameraConfigNotifier* QFESPIMB040CameraConfig::m_notifier=NULL;
 
 
 
-QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFPluginServices* pluginServices):
+QFESPIMB040SimpleCameraConfig::QFESPIMB040SimpleCameraConfig(QWidget* parent):
     QGroupBox(parent)
 {
-    if (m_notifier==NULL) m_notifier=new QFCameraConfigNotifier(this);
-    m_camViewID=camViewID;
-    m_parent=parent;
-    m_pluginServices=pluginServices;
-    m_extManager=pluginServices->getExtensionManager();
+    m_camViewID=0;
+    m_extManager=NULL;
     camView=NULL;
     locked=false;
     restartPreview=false;
+    m_magnification=1;
 
 
     // initialize raw image memory ...
     viewData.reset();
 
     // create widgets and actions
-    setTitle(tr(" Camera %1: ").arg(camViewID+1));
-    createWidgets(m_pluginServices->getExtensionManager());
+
+    createWidgets();
     createActions();
-    displayStates(QFESPIMB040CameraConfig::Disconnected);
-    if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040CameraConfig::Inactive);
-    connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(loadObjectives()));
+    displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
+    if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
+    init(0, NULL);
 }
 
 
-QFESPIMB040CameraConfig::~QFESPIMB040CameraConfig() {
-    qDebug()<<"destroy";
+QFESPIMB040SimpleCameraConfig::~QFESPIMB040SimpleCameraConfig() {
+    //qDebug()<<"destroy";
     if (camView) {
         camView->close();
         delete camView;
         camView=NULL;
     }
-    qDebug()<<"destroy done";
+    //qDebug()<<"destroy done";
 }
 
+void QFESPIMB040SimpleCameraConfig::setMagnification(double mag) {
+    m_magnification=mag;
+}
 
-void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
+void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices) {
+    m_camViewID=camViewID;
+    m_pluginServices=pluginServices;
+    m_extManager=NULL;
+    if (pluginServices) m_extManager=pluginServices->getExtensionManager();
+    cmbAcquisitionDevice->init(m_extManager);
+    if (m_pluginServices) {
+        cmbPreviewConfiguration->init(m_pluginServices->getConfigFileDirectory());
+        cmbAcquisitionConfiguration->init(m_pluginServices->getConfigFileDirectory());
+    }
+    camView->init(camViewID, this);
+    setTitle(tr(" Camera %1: ").arg(camViewID+1));
+    displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
+    if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
+}
+
+void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
     stopPreview();
     previewTimer->stop();
     previewTimer->disconnect();
@@ -75,10 +90,10 @@ void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
         actDisConnect->setChecked(false);
         disconnectDevice();
     }
-    qDebug()<<"closed";
+    //qDebug()<<"closed";
 }
 
-bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {
+bool QFESPIMB040SimpleCameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {
     if (locked || (!actDisConnect->isChecked()) || (!viewData.camera) || (!viewData.extension)) {
         *camera=-1;
         *extension=NULL;
@@ -91,7 +106,7 @@ bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCam
     //QApplication::processEvents();
     //QApplication::processEvents();
     //QApplication::processEvents();
-    displayStates(QFESPIMB040CameraConfig::Locked);
+    displayStates(QFESPIMB040SimpleCameraConfig::Locked);
 
     QString filename="";
     *previewSettingsFilename="";
@@ -106,9 +121,9 @@ bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCam
     return true;
 }
 
-void QFESPIMB040CameraConfig::releaseCamera() {
+void QFESPIMB040SimpleCameraConfig::releaseCamera() {
     if (locked) {
-        displayStates(QFESPIMB040CameraConfig::Connected);
+        displayStates(QFESPIMB040SimpleCameraConfig::Connected);
         locked=false;
         if (restartPreview) {
             actStartStopPreview->setChecked(true);
@@ -118,28 +133,21 @@ void QFESPIMB040CameraConfig::releaseCamera() {
 }
 
 
-void QFESPIMB040CameraConfig::loadSettings(ProgramOptions* settings, QString prefix) {
+void QFESPIMB040SimpleCameraConfig::loadSettings(ProgramOptions* settings, QString prefix) {
     if (camView) camView->loadSettings(settings, prefix+"cam_view/");
 
-    loadObjectives();
 
     cmbAcquisitionDevice->setCurrentIndex(settings->getQSettings()->value(prefix+"last_device", 0).toInt());
     spinAcquisitionDelay->setValue(settings->getQSettings()->value(prefix+"acquisition_delay", 0).toDouble());
-    cmbObjective->setCurrentIndex(cmbObjective->findText(settings->getQSettings()->value(prefix+"objective", "").toString()));
-    cmbObjectiveProjection->setCurrentIndex(cmbObjectiveProjection->findText(settings->getQSettings()->value(prefix+"objective_projection", "").toString()));
-    cmbTubelens->setCurrentIndex(cmbTubelens->findText(settings->getQSettings()->value(prefix+"tubelens", "").toString()));
     cmbPreviewConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"preview_config", "default").toString());
     cmbAcquisitionConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"acquisition_config", "default").toString());
 }
 
-void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString prefix) {
+void QFESPIMB040SimpleCameraConfig::storeSettings(ProgramOptions* settings, QString prefix) {
     if (camView) camView->storeSettings(settings, prefix+"cam_view/");
 
     settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings->getQSettings()->setValue(prefix+"objective", cmbObjective->currentText());
-    settings->getQSettings()->setValue(prefix+"objective_projection", cmbObjectiveProjection->currentText());
-    settings->getQSettings()->setValue(prefix+"tubelens", cmbTubelens->currentText());
     settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
     settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
 
@@ -147,7 +155,7 @@ void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString pr
 
 
 
-void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
+void QFESPIMB040SimpleCameraConfig::createWidgets() {
     previewTimer=new QTimer(this);
     previewTimer->setSingleShot(true);
     previewTimer->setInterval(5);
@@ -172,7 +180,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    cmbAcquisitionDevice=new QFCameraComboBox(extManager, this);
+    cmbAcquisitionDevice=new QFCameraComboBox(this);
     QHBoxLayout* hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
     hbl->addWidget(cmbAcquisitionDevice);
@@ -182,51 +190,8 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     cmbAcquisitionDevice->setEnabled(false);
 
 
-    QGridLayout* ogl=new QGridLayout(this);
-    ogl->setContentsMargins(0,0,0,0);
-    ogl->setHorizontalSpacing(1);
-    ogl->setVerticalSpacing(1);
-    ogl->addWidget(new QLabel("detection:"), 0,0);
-    ogl->addWidget(new QLabel("lightsheet:"), 1,0);
-    ogl->addWidget(new QLabel("tube lens:"), 2,0);
-    cmbObjective=new QComboBox(this);
-    connect(cmbObjective, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbObjective, 0,1);
-    cmbObjectiveProjection=new QComboBox(this);
-    connect(cmbObjectiveProjection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbObjectiveProjection, 1,1);
-    cmbTubelens=new QComboBox(this);
-    connect(cmbTubelens, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
-    ogl->addWidget(cmbTubelens, 2,1);
-    btnAddObjective=new QToolButton(this);
-    btnAddObjective->setToolTip(tr("add a new objective"));
-    btnAddObjective->setIcon(QIcon(":/spimb040/objective_add.png"));
-    btnAddObjective->setEnabled(objectivesWritable());
-    connect(btnAddObjective, SIGNAL(clicked()), this, SLOT(addObjective()));
-    ogl->addWidget(btnAddObjective, 0,2);
-    btnDeleteObjective=new QToolButton(this);
-    btnDeleteObjective->setToolTip(tr("delete an objective"));
-    btnDeleteObjective->setIcon(QIcon(":/spimb040/objective_delete.png"));
-    btnDeleteObjective->setEnabled(objectivesWritable());
-    connect(btnDeleteObjective, SIGNAL(clicked()), this, SLOT(deleteObjective()));
-    ogl->addWidget(btnDeleteObjective, 0,3);
-    btnEditObjective=new QToolButton(this);
-    btnEditObjective->setToolTip(tr("edit an objective"));
-    btnEditObjective->setIcon(QIcon(":/spimb040/objective_rename.png"));
-    btnEditObjective->setEnabled(objectivesWritable());
-    connect(btnEditObjective, SIGNAL(clicked()), this, SLOT(editObjective()));
-    ogl->addWidget(btnEditObjective, 0,4);
-    labDetectObjectiveDescription=new QLabel(this);
-    ogl->addWidget(labDetectObjectiveDescription, 0,5);
-    labProjectObjectiveDescription=new QLabel(this);
-    ogl->addWidget(labProjectObjectiveDescription, 1,5);
-    labTubelensDescription=new QLabel(this);
-    ogl->addWidget(labTubelensDescription, 2,5);
-    ogl->setColumnStretch(5, 1);
 
-    camlayout->addRow(tr("<b>Objectives:</b>"), ogl);
-
-    cmbPreviewConfiguration=new QFCameraConfigEditorWidget(this, m_pluginServices->getConfigFileDirectory());
+    cmbPreviewConfiguration=new QFCameraConfigEditorWidget(this);
     cmbPreviewConfiguration->connectTo(cmbAcquisitionDevice);
     camlayout->addRow(tr("<b>Preview:</b>"), cmbPreviewConfiguration);
     connect(cmbPreviewConfiguration, SIGNAL(currentIndexChanged(int)), this, SLOT(previewCurrentIndexChanged(int)));
@@ -260,9 +225,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     camlayout->addRow("", hbl);
 
 
-
-
-    cmbAcquisitionConfiguration=new QFCameraConfigEditorWidget(this, m_pluginServices->getConfigFileDirectory());
+    cmbAcquisitionConfiguration=new QFCameraConfigEditorWidget(this);
     cmbAcquisitionConfiguration->connectTo(cmbAcquisitionDevice);
     camlayout->addRow(tr("<b>Acquisition:</b>"), cmbAcquisitionConfiguration);
 }
@@ -271,7 +234,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
 
 
 
-void QFESPIMB040CameraConfig::createActions() {
+void QFESPIMB040SimpleCameraConfig::createActions() {
     actDisConnect = new QAction(QIcon(":/spimb040/acquisitionconnect.png"), tr("&Connect"), this);
     actDisConnect->setCheckable(true);
     connect(actDisConnect, SIGNAL(triggered()), this, SLOT(disConnectAcquisitionDevice()));
@@ -299,8 +262,8 @@ void QFESPIMB040CameraConfig::createActions() {
 
 }
 
-void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States state) {
-    if (state==QFESPIMB040CameraConfig::Connected) {
+void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig::States state) {
+    if (state==QFESPIMB040SimpleCameraConfig::Connected) {
         setEnabled(true);
         actDisConnect->setIcon(QIcon(":/spimb040/acquisitiondisconnect.png"));
         actDisConnect->setText(tr("&Disconnect"));
@@ -318,7 +281,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         spinAcquisitionDelay->setEnabled(true);
 
 
-    } else if (state==QFESPIMB040CameraConfig::Previewing) {
+    } else if (state==QFESPIMB040SimpleCameraConfig::Previewing) {
         setEnabled(true);
         actDisConnect->setIcon(QIcon(":/spimb040/acquisitiondisconnect.png"));
         actDisConnect->setText(tr("&Disconnect"));
@@ -337,7 +300,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         spinAcquisitionDelay->setEnabled(true);
 
 
-    } else if (state==QFESPIMB040CameraConfig::Inactive) {
+    } else if (state==QFESPIMB040SimpleCameraConfig::Inactive) {
         setEnabled(false);
         actDisConnect->setIcon(QIcon(":/spimb040/acquisitionconnect.png"));
         actDisConnect->setText(tr("&Connect"));
@@ -356,7 +319,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
         spinAcquisitionDelay->setEnabled(false);
 
 
-    } else if (state==QFESPIMB040CameraConfig::Locked) {
+    } else if (state==QFESPIMB040SimpleCameraConfig::Locked) {
         setEnabled(true);
         actDisConnect->setIcon(QIcon(":/spimb040/acquisitiondisconnect.png"));
         actDisConnect->setText(tr("&Disconnect"));
@@ -394,7 +357,7 @@ void QFESPIMB040CameraConfig::displayStates(QFESPIMB040CameraConfig::States stat
 }
 
 
-bool QFESPIMB040CameraConfig::connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera) {
+bool QFESPIMB040SimpleCameraConfig::connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera) {
 
     viewData.reset();
 
@@ -406,12 +369,12 @@ bool QFESPIMB040CameraConfig::connectDevice(QFExtension* extension, QFExtensionC
         viewData.extension=extension;
         viewData.camera=cam;
         viewData.usedCamera=camera;
-        cam->setLogging(m_parent);
+        cam->setLogging(m_log);
         bool s=cam->connectDevice(camera);
         if (!s) {
             //cam->setLogging(NULL);
             viewData.reset();
-            if (m_parent) m_parent->log_error(tr("error connecting to device %1, camera %2 ...\n").arg(extension->getName()).arg(camera));
+            if (m_log) m_log->log_error(tr("error connecting to device %1, camera %2 ...\n").arg(extension->getName()).arg(camera));
         }
         QApplication::restoreOverrideCursor();
         return s;
@@ -420,8 +383,12 @@ bool QFESPIMB040CameraConfig::connectDevice(QFExtension* extension, QFExtensionC
     }
 }
 
+void QFESPIMB040SimpleCameraConfig::setLog(QFPluginLogService* logger) {
+    m_log=logger;
+}
 
-void QFESPIMB040CameraConfig::disconnectDevice() {
+
+void QFESPIMB040SimpleCameraConfig::disconnectDevice() {
     locked=false;
     if (viewData.camera) {
         if (viewData.camera->isConnected(viewData.usedCamera)) {
@@ -431,7 +398,7 @@ void QFESPIMB040CameraConfig::disconnectDevice() {
 }
 
 
-bool QFESPIMB040CameraConfig::acquireSingle() {
+bool QFESPIMB040SimpleCameraConfig::acquireSingle() {
     if (viewData.camera) {
         int usedcam=viewData.usedCamera;
         if (viewData.camera->isConnected(usedcam)) {
@@ -457,10 +424,10 @@ bool QFESPIMB040CameraConfig::acquireSingle() {
 
 
 
-void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
+void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
     if (cmbAcquisitionDevice->currentIndex()<0) {
         // if there are no devices registered: deactivate everything!
-        displayStates(QFESPIMB040CameraConfig::Disconnected);
+        displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
         return;
     }
 
@@ -476,22 +443,22 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
 
             connectDevice(cmbAcquisitionDevice->currentExtension(), cmbAcquisitionDevice->currentExtensionCamera(), cmbAcquisitionDevice->currentCameraID());
             if (!cam->isConnected(camIdx)) {
-                displayStates(QFESPIMB040CameraConfig::Disconnected);
-                if (m_parent) m_parent->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
+                displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
+                if (m_log) m_log->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
             } else {
-                displayStates(QFESPIMB040CameraConfig::Connected);
-                if (m_parent) m_parent->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
+                displayStates(QFESPIMB040SimpleCameraConfig::Connected);
+                if (m_log) m_log->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
                 //camView->show();
                 //previewSingle();
             }
         } else {
             //disconnect from the current device and delete the settings widget
-            displayStates(QFESPIMB040CameraConfig::Disconnected);
+            displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
             if (cam->isConnected(camIdx))  {
                 cam->disconnectDevice(camIdx);
                 //cam->setLogging(NULL);
             }
-            if (m_parent) m_parent->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
+            if (m_log) m_log->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
         }
     }
 }
@@ -499,7 +466,7 @@ void QFESPIMB040CameraConfig::disConnectAcquisitionDevice() {
 
 
 
-void QFESPIMB040CameraConfig::previewSingle() {
+void QFESPIMB040SimpleCameraConfig::previewSingle() {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
         //QFExtension* extension=viewData.extension;
@@ -513,10 +480,10 @@ void QFESPIMB040CameraConfig::previewSingle() {
             viewData.camera->useCameraSettings(camIdx, *settings);
             if (acquireSingle()) {
                 camView->show();
-                camView->setPixelSize(cam->getPixelWidth(camIdx)/magnification(), cam->getPixelHeight(camIdx)/magnification());
+                camView->setPixelSize(cam->getPixelWidth(camIdx)/m_magnification, cam->getPixelHeight(camIdx)/m_magnification);
                 camView->displayImageComplete(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             } else {
-                if (m_parent) m_parent->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
+                if (m_log) m_log->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
             }
             delete settings;
             QApplication::restoreOverrideCursor();
@@ -526,7 +493,7 @@ void QFESPIMB040CameraConfig::previewSingle() {
 
 
 
-void QFESPIMB040CameraConfig::stopPreview() {
+void QFESPIMB040SimpleCameraConfig::stopPreview() {
     //qDebug()<<"stopPreview()";
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
@@ -534,7 +501,7 @@ void QFESPIMB040CameraConfig::stopPreview() {
             //qDebug()<<"   cam connected";
             viewData.abort_continuous_acquisition=true;
             actStartStopPreview->setChecked(false);
-            displayStates(QFESPIMB040CameraConfig::Connected);
+            displayStates(QFESPIMB040SimpleCameraConfig::Connected);
             //QApplication::processEvents();
             viewData.abort_continuous_acquisition=true;
             previewTimer->stop();
@@ -543,7 +510,7 @@ void QFESPIMB040CameraConfig::stopPreview() {
 }
 
 
-void QFESPIMB040CameraConfig::startStopPreview() {
+void QFESPIMB040SimpleCameraConfig::startStopPreview() {
     //qDebug()<<"startStopPreview() actStartSTop="<<actStartStopPreview->isChecked();
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
@@ -551,7 +518,7 @@ void QFESPIMB040CameraConfig::startStopPreview() {
         //QFExtensionCamera* cam=viewData.camera;
         if (viewData.camera->isConnected(camIdx)) {
             if (actStartStopPreview->isChecked()) {
-                displayStates(QFESPIMB040CameraConfig::Previewing);
+                displayStates(QFESPIMB040SimpleCameraConfig::Previewing);
                 viewData.acqFrames=0;
                 viewData.acqFramesQR=0;
                 viewData.acqStarted.start();
@@ -570,7 +537,7 @@ void QFESPIMB040CameraConfig::startStopPreview() {
                 previewTimer->start();
                 delete settings;
             } else {
-                displayStates(QFESPIMB040CameraConfig::Connected);
+                displayStates(QFESPIMB040SimpleCameraConfig::Connected);
             }
         }
     }
@@ -578,7 +545,7 @@ void QFESPIMB040CameraConfig::startStopPreview() {
 
 
 
-void QFESPIMB040CameraConfig::previewContinuous() {
+void QFESPIMB040SimpleCameraConfig::previewContinuous() {
     if (!camView) return;
     static int cnt=0;
     cnt++;
@@ -588,7 +555,7 @@ void QFESPIMB040CameraConfig::previewContinuous() {
         QFExtensionCamera* cam=viewData.camera;
         //qDebug()<<"preview "<<cnt<<":  abort="<<viewData.abort_continuous_acquisition;
         if (viewData.abort_continuous_acquisition) {
-            displayStates(QFESPIMB040CameraConfig::Connected);
+            displayStates(QFESPIMB040SimpleCameraConfig::Connected);
             //qDebug()<<"preview_abort "<<cnt;
             cnt--;
             return;
@@ -599,11 +566,11 @@ void QFESPIMB040CameraConfig::previewContinuous() {
                 viewData.continuous_is_first=false;
             }
             if (acquireSingle()) {
-                camView->setPixelSize(cam->getPixelWidth(camIdx)/magnification(), cam->getPixelHeight(camIdx)/magnification());
+                camView->setPixelSize(cam->getPixelWidth(camIdx)/m_magnification, cam->getPixelHeight(camIdx)/m_magnification);
                 camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             }
         } else {
-            if (m_parent) m_parent->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
+            if (m_log) m_log->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
         }
 
 
@@ -640,157 +607,14 @@ void QFESPIMB040CameraConfig::previewContinuous() {
     }
 }
 
-double QFESPIMB040CameraConfig::magnification() {
-    return objective().magnification*tubelens().magnification;
-}
 
-bool QFESPIMB040CameraConfig::objectivesWritable() const {
-    return QSettings(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat).isWritable();
-}
-
-void QFESPIMB040CameraConfig::loadObjectives() {
-    QSettings inifile(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
-    QStringList groups=inifile.childGroups();
-    objectives.clear();
-    QString currentO=cmbObjective->currentText();
-    QString currentP=cmbObjectiveProjection->currentText();
-    QString currentT=cmbTubelens->currentText();
-    cmbObjective->clear();
-    cmbObjectiveProjection->clear();
-    for (int i=0; i<groups.size(); i++) {
-        QString g=groups[i];
-        ObjectiveDescription o;
-        o.name=inifile.value(g+"/name", "").toString();
-        o.manufacturer=inifile.value(g+"/manufacturer", "").toString();
-        o.magnification=inifile.value(g+"/magnification", 1).toDouble();
-        o.NA=inifile.value(g+"/na", 1).toDouble();
-        objectives.append(o);
-        cmbObjective->addItem(o.name);
-        cmbTubelens->addItem(o.name);
-        cmbObjectiveProjection->addItem(o.name);
-    }
-    int i=cmbObjective->findText(currentO);
-    if (i<0) i=0;
-    cmbObjective->setCurrentIndex(i);
-    i=cmbObjectiveProjection->findText(currentP);
-    if (i<0) i=0;
-    cmbObjectiveProjection->setCurrentIndex(i);
-    i=cmbTubelens->findText(currentP);
-    if (i<0) i=0;
-    cmbTubelens->setCurrentIndex(i);
-}
-
-void QFESPIMB040CameraConfig::storeObjectives() {
-    QSettings inifile(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", QSettings::IniFormat);
-    if (inifile.isWritable()) {
-        inifile.clear();
-        for (int i=0; i<objectives.size(); i++) {
-            ObjectiveDescription o=objectives[i];
-            QString g="objective"+QString::number(i);
-            inifile.setValue(g+"/name", o.name);
-            inifile.setValue(g+"/manufacturer", o.manufacturer);
-            inifile.setValue(g+"/magnification", o.magnification);
-            inifile.setValue(g+"/na", o.NA);
-        }
-        emit m_notifier->emitUpdate();
-    }
-    loadObjectives();
-}
-
-void QFESPIMB040CameraConfig::deleteObjective() {
-    int i=cmbObjective->currentIndex();
-    if (i>=0 && i<objectives.size()) {
-        objectives.removeAt(i);
-    }
-    storeObjectives();
-    loadObjectives();
-}
-
-
-void QFESPIMB040CameraConfig::editObjective() {
-    int i=cmbObjective->currentIndex();
-    if (i>=0 && i<objectives.size()) {
-        ObjectiveDescription d=objectives[i];
-
-        QF3ObjectiveEditor dlg(d, NULL);
-        if (dlg.exec()==QDialog::Accepted) {
-            objectives[i]=dlg.getData();
-        }
-
-    }
-    storeObjectives();
-    loadObjectives();
-}
-
-void QFESPIMB040CameraConfig::addObjective() {
-    ObjectiveDescription d;
-    d.name=tr("new objective");
-    QF3ObjectiveEditor dlg(d, NULL);
-    if (dlg.exec()==QDialog::Accepted) {
-        d=dlg.getData();
-        while (objectiveExists(d.name)) {
-            QMessageBox::critical(this, "Objective Editor", "An objective with the same name already exists. Please rename!", QMessageBox::Ok, QMessageBox::Ok);
-            if (dlg.exec()!=QDialog::Accepted) return;
-            d=dlg.getData();
-        }
-        //qDebug()<<d.name;
-        objectives.append(d);
-    }
-    storeObjectives();
-    loadObjectives();
-}
-
-ObjectiveDescription QFESPIMB040CameraConfig::getObjectiveDescription(int i) {
-    return objectives[i];
-}
-
-ObjectiveDescription QFESPIMB040CameraConfig::objective() {
-    ObjectiveDescription d;
-    int i=cmbObjective->currentIndex();
-    if (i>=0 && i<objectives.size()) return objectives[i];
-    return d;
-}
-
-ObjectiveDescription QFESPIMB040CameraConfig::tubelens() {
-    ObjectiveDescription d;
-    int i=cmbTubelens->currentIndex();
-    if (i>=0 && i<objectives.size()) return objectives[i];
-    return d;
-}
-ObjectiveDescription QFESPIMB040CameraConfig::objectiveProjection() {
-    ObjectiveDescription d;
-    int i=cmbObjectiveProjection->currentIndex();
-    if (i>=0 && i<objectives.size()) return objectives[i];
-    return d;
-}
-
-bool QFESPIMB040CameraConfig::objectiveExists(QString name) {
-    for (int i=0; i<objectives.size(); i++) {
-        if (name==objectives[i].name) return true;
-    }
-    return false;
-
-}
-
-void QFESPIMB040CameraConfig::currentObjectiveChanged(int idx) {
-    int iD=cmbObjective->currentIndex();
-    if (iD>=0 && iD<objectives.size()) labDetectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iD].magnification).arg(objectives[iD].NA));
-    else labDetectObjectiveDescription->setText("");
-    int iP=cmbObjectiveProjection->currentIndex();
-    if (iP>=0 && iP<objectives.size()) labProjectObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iP].magnification).arg(objectives[iP].NA));
-    else labProjectObjectiveDescription->setText("");
-    int iT=cmbTubelens->currentIndex();
-    if (iT>=0 && iT<objectives.size()) labTubelensDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iT].magnification).arg(objectives[iT].NA));
-    else labTubelensDescription->setText("");
-}
-
-void QFESPIMB040CameraConfig::stop() {
+void QFESPIMB040SimpleCameraConfig::stop() {
     //qDebug()<<"stop";
     restartPreview=actStartStopPreview->isChecked();
     stopPreview();
 }
 
-void QFESPIMB040CameraConfig::resume() {
+void QFESPIMB040SimpleCameraConfig::resume() {
     //qDebug()<<"resume";
     if (restartPreview) {
         actStartStopPreview->setChecked(true);
@@ -798,7 +622,7 @@ void QFESPIMB040CameraConfig::resume() {
     }
 }
 
-void QFESPIMB040CameraConfig::previewCurrentIndexChanged(int index) {
+void QFESPIMB040SimpleCameraConfig::previewCurrentIndexChanged(int index) {
     emit previewConfigChanged();
     if (actStartStopPreview->isChecked()) { // just stop & resume, as this will load the new settings in the resume operation!
         stopPreview();

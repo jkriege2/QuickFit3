@@ -1,12 +1,8 @@
-#ifndef QFESPIMB040CAMERACONFIG_H
-#define QFESPIMB040CAMERACONFIG_H
+#ifndef QFESPIMB040SIMPLECAMERACONFIG_H
+#define QFESPIMB040SIMPLECAMERACONFIG_H
 
 #include <QGroupBox>
-
-class QFESPIMB040MainWindow; // forward
-
 #include <QWidget>
-#include "qvisiblehandlesplitter.h"
 #include <QSplitter>
 #include <QWidget>
 #include <QComboBox>
@@ -37,29 +33,13 @@ class QFESPIMB040MainWindow; // forward
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"
 
-#include "objectives.h"
-
-/*! \brief This class is used to notify all QFESPIMB040CameraConfig in the application to update their contents,
-           if e.g. a configuration is deleted or added
-    \ingroup qf3ext_spimb040
-
- */
-class QFCameraConfigNotifier: public QObject {
-        Q_OBJECT
-    public:
-    QFCameraConfigNotifier(QObject* parent=NULL): QObject(parent) {};
-    public slots:
-        void emitUpdate() { emit doUpdate(); };
-    signals:
-        void doUpdate();
-};
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
     \ingroup qf3ext_spimb040
 
 
  */
-class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxStartResume {
+class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigComboBoxStartResume {
         Q_OBJECT
     protected:
         /** \brief states used in conjunction with displayStates() */
@@ -69,9 +49,13 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
 
 
         /** Default constructor */
-        QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFPluginServices* pluginServices);
+        QFESPIMB040SimpleCameraConfig(QWidget* parent);
         /** Default destructor */
-        virtual ~QFESPIMB040CameraConfig();
+        virtual ~QFESPIMB040SimpleCameraConfig();
+
+        void setLog(QFPluginLogService* logger);
+
+        void init(int camViewID, QFPluginServices* pluginServices);
 
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings, QString prefix);
@@ -99,26 +83,9 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         /*! \brief release a locked camera, for more details see lockCamera() */
         void releaseCamera();
 
-        /** \brief return the current magnification */
-        double magnification();
-
-        /** \brief return the current tubelens */
-        ObjectiveDescription tubelens();
-
-        /** \brief return the current objective */
-        ObjectiveDescription objective();
-
-        /** \brief return the current projection objective */
-        ObjectiveDescription objectiveProjection();
-
-
-        /** brief return the i-th objective description */
-        ObjectiveDescription getObjectiveDescription(int i);
-
-        bool objectiveExists(QString name);
-
         virtual void stop();
         virtual void resume();
+        void setMagnification(double mag);
 
     signals:
         /** \brief emitted when the set of configuration files changes */
@@ -127,22 +94,11 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         /** \brief selected preview config  changed */
         void previewConfigChanged();
     protected:
-        QFESPIMB040MainWindow* m_parent;
         int m_camViewID;
         QFExtensionManager* m_extManager;
-        QFPluginServices* m_pluginServices;
-
-        QList<ObjectiveDescription> objectives;
-        bool objectivesWritable() const;
 
 
     protected slots:
-        void loadObjectives();
-        void storeObjectives();
-        void addObjective();
-        void deleteObjective();
-        void editObjective();
-        void currentObjectiveChanged(int idx);
 
         void previewCurrentIndexChanged(int index);
     protected:
@@ -184,6 +140,11 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
 
         };
 
+        QFPluginServices* m_pluginServices;
+        double m_magnification;
+
+        QFPluginLogService* m_log;
+
         /** \brief list containing data about the acquisition devices connected to the views (last read image, when did acquisition start ...) */
         viewDataStruct viewData;
 
@@ -199,12 +160,6 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         QFCameraComboBox* cmbAcquisitionDevice;
         /** \brief spinbox to select delay between two subsequent frames */
         QDoubleSpinBox* spinAcquisitionDelay;
-        /** \brief select an objective */
-        QComboBox* cmbObjective;
-        /** \brief select an objective */
-        QComboBox* cmbObjectiveProjection;
-        /** \brief select a tubelens */
-        QComboBox* cmbTubelens;
         /** \brief view for images from camera */
         QFESPIMB040CameraView* camView;
         /** \brief combobox for the selected camera preview configuration */
@@ -219,13 +174,6 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         QToolButton* btnPreviewContinuous;
         /** \brief button to acquire a single frame */
         QToolButton* btnPreviewSingle;
-
-        QToolButton* btnAddObjective;
-        QToolButton* btnEditObjective;
-        QToolButton* btnDeleteObjective;
-        QLabel* labDetectObjectiveDescription;
-        QLabel* labProjectObjectiveDescription;
-        QLabel* labTubelensDescription;
 
         /** \brief action to connect/disconnect to acquisition device */
         QAction* actDisConnect;
@@ -242,8 +190,6 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
 
 
 
-        static QFCameraConfigNotifier* m_notifier;
-
         /** \brief handles the close event, also close all camera views in camViews
          *
          *  disconnect devices and close camera view
@@ -251,7 +197,7 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         void closeEvent ( QCloseEvent * event );
 
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
-        void createWidgets(QFExtensionManager* extManager);
+        void createWidgets();
         /** \brief Create ll QActions for this window, clled after createWidgets() in the constructor.
          *         So you also have to connect and add (e.g. to toolbars) QAction's here! */
         void createActions();
@@ -313,4 +259,4 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
     private:
 };
 
-#endif // QFESPIMB040CAMERACONFIG_H
+#endif // QFESPIMB040SIMPLECAMERACONFIG_H
