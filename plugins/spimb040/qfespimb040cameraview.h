@@ -197,6 +197,8 @@ class QFESPIMB040CameraView : public QWidget {
         QCheckBox* chkHistogramBinsAuto;
         /** \brief check box to use logarithmic histogram y-scale */
         QCheckBox* chkHistogramLog;
+        /** \brief check box to autimatically find defective pixels */
+        QCheckBox* chkFindDefectivePixels;
 
         /** \brief combobox to select fit function */
         QComboBox* cmbMarginalFitFunction;

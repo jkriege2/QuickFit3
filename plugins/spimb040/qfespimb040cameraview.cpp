@@ -320,6 +320,10 @@ void QFESPIMB040CameraView::createMainWidgets() {
     connect(chkHistogramLog, SIGNAL(stateChanged(int)), this, SLOT(displayImageStatistics()));
     vbl->addWidget(chkHistogramLog);
 
+    chkFindDefectivePixels=new QCheckBox(tr("&find defective pixels automatically"), w);
+    connect(chkFindDefectivePixels, SIGNAL(stateChanged(int)), this, SLOT(displayImageStatistics()));
+    vbl->addWidget(chkFindDefectivePixels);
+
     labImageStatistics=new QLabel(w);
     vbl->addWidget(labImageStatistics);
 
@@ -996,6 +1000,9 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
     double histogram_fmax=0;
     histogram_n=spinHistogramBins->value();
     if (!imageStatisticsCalculated) {
+        if(chkFindDefectivePixels->isChecked()) {
+          if(image.findDefectivePixels(mask.data()))maskEmpty=false;
+        }
         if (withHistogram) {
             if (!maskEmpty) image.calcImageStatistics(mask.data(), &imageBrokenPixels, &imageSum, &imageMean, &imageStddev, &imageImin, &imageImax, &histogram_x, &histogram_y, &histogram_n, &histogram_min, &histogram_max, &histogram_fmax, chkHistogramBinsAuto->isChecked());
             else {
