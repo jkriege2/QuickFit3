@@ -670,17 +670,17 @@ void QFESPIMB040MainWindow::doImageStack() {
         QTextStream pf(&positionsCSV);
         if (axisCount==3) {
             pf<<"# number, position 1[micrometer], position 2 [micrometer], position 3 [micrometer], ideal position 1 [micrometer], ideal position 2 [micrometer], ideal position 3 [micrometer] \n";
-            for (int i=0; i<positions.size(); i++) {
+            for (int i=0; i<qMin(positions.size(), moveTo.size()); i++) {
                 pf<<i<<", "<<CDoubleToQString(positions[i].toDouble())<<", "<<CDoubleToQString(positions2[i].toDouble())<<", "<<CDoubleToQString(positions3[i].toDouble())<<", "<<CDoubleToQString(moveTo[i].first)<<", "<<CDoubleToQString(moveTo[i].second)<<", "<<CDoubleToQString(moveTo[i].third)<<"\n";
             }
         } else if (axisCount==2) {
             pf<<"# number, position 1[micrometer], position 2 [micrometer], ideal position 1 [micrometer], ideal position 2 [micrometer] \n";
-            for (int i=0; i<positions.size(); i++) {
+            for (int i=0; i<qMin(positions.size(), moveTo.size()); i++) {
                 pf<<i<<", "<<CDoubleToQString(positions[i].toDouble())<<", "<<CDoubleToQString(positions2[i].toDouble())<<", "<<CDoubleToQString(moveTo[i].first)<<", "<<CDoubleToQString(moveTo[i].second)<<"\n";
             }
         } else if (axisCount==1) {
             pf<<"# number, position 1[micrometer], ideal position 1 [micrometer] \n";
-            for (int i=0; i<positions.size(); i++) {
+            for (int i=0; i<qMin(positions.size(), moveTo.size()); i++) {
                 pf<<i<<", "<<CDoubleToQString(positions[i].toDouble())<<", "<<CDoubleToQString(moveTo[i].first)<<"\n";
             }
         }
