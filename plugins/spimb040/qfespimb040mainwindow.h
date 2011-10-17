@@ -38,6 +38,8 @@
 #include "qfespimb040acquisitionconfigwidget.h"
 #include "qfhtmlhelpwindow.h"
 #include "qfespimb040opticssetup.h"
+#include "qtriple.h"
+#include "qftools.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040

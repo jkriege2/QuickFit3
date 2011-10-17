@@ -42,24 +42,62 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         QString prefix2() const;
         bool use1() const;
         bool use2() const;
-        int delay() const;
 
+        bool useStage2() const;
+        bool useStage3() const;
+
+        int delay() const;
         QFExtensionLinearStage* stage() const;
         QFExtension* stageExtension() const;
         int currentAxisID() const;
         int stackCount() const;
         double stackStart() const;
         double stackDelta() const;
+
+
+        QFExtensionLinearStage* stage2() const;
+        QFExtension* stageExtension2() const;
+        int currentAxisID2() const;
+        int stackCount2() const;
+        double stackStart2() const;
+        double stackDelta2() const;
+
+
+        QFExtensionLinearStage* stage3() const;
+        QFExtension* stageExtension3() const;
+        int currentAxisID3() const;
+        int stackCount3() const;
+        double stackStart3() const;
+        double stackDelta3() const;
     protected slots:
         void on_btnAcquire_clicked();
         void on_chkUse1_clicked(bool enabled);
         void on_chkUse2_clicked(bool enabled);
+
         void on_spinStart_valueChanged(double value);
         void on_spinDelta_valueChanged(double value);
         void on_spinSteps_valueChanged(int value);
         void on_btnGetCurrent_clicked();
         void on_btnConfig_clicked();
         void on_btnConnect_clicked();
+
+        void on_chkStage2_clicked(bool enabled);
+        void on_chkStage3_clicked(bool enabled);
+
+        void on_spinStart2_valueChanged(double value);
+        void on_spinDelta2_valueChanged(double value);
+        void on_spinSteps2_valueChanged(int value);
+        void on_btnGetCurrent2_clicked();
+        void on_btnConfig2_clicked();
+        void on_btnConnect2_clicked();
+
+        void on_spinStart3_valueChanged(double value);
+        void on_spinDelta3_valueChanged(double value);
+        void on_spinSteps3_valueChanged(int value);
+        void on_btnGetCurrent3_clicked();
+        void on_btnConfig3_clicked();
+        void on_btnConnect3_clicked();
+
         void checkStage();
         void updateLabel();
     private:
