@@ -492,7 +492,7 @@ void QFFitResultsEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, const
     }
 }
 
-void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix) {
+void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup) {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
         if (f) {
@@ -507,6 +507,8 @@ void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDat
                     r->resultsSetLabel(resultID, fpid, f->getDescription(pid).name, f->getDescription(pid).label);
                     if (fix) {
                         r->resultsSetBoolean(resultID, getFitParamFixID(pid), fix[i]);
+                        if (!fixGroup.isEmpty()) r->resultsSetGroup(resultID, getFitParamFixID(pid), fixGroup);
+                        r->resultsSetLabel(resultID, getFitParamFixID(pid), f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
                     }
                 }
             }

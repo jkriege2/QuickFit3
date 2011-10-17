@@ -275,8 +275,9 @@ public:
      *  \param errors errors to be stored
      *  \param group the fit parameter group to assign
      *  \param fix indicates whether a parameter was fixed
+     *  \param fixGroup the group the fix results should be added to
      */
-    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix=NULL);
+    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""));
 
 
 

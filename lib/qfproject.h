@@ -284,7 +284,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param stringDelimiter strings are surrounded by this character (one in front,one behind)
             \return \c true on success
         */
-        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QString separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"');
+        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"');
 
         /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
 

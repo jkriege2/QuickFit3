@@ -749,13 +749,13 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     QTime tim;
     tim.start();
     prepareImage();
-    qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   prepareImage = "<<tim.elapsed()<<" ms";
+    //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   prepareImage = "<<tim.elapsed()<<" ms";
     tim.start();
     displayImageStatistics(chkImageStatisticsHistogram->isChecked(), forceHisto);
-    qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
+    //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
     tim.start();
     redrawFrame();
-    qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
+    //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
     currentlyRedrawing=false;
 }
 

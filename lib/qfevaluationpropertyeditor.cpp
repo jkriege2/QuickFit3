@@ -579,11 +579,11 @@ void QFEvaluationPropertyEditor::saveResults() {
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
             if (f==1) {
-                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ";", ',', '"');
+                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ';', ',', '"');
             } else if (f==2) {
                 current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName);
             } else {
-                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ", ", '.', '"');
+                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ',', '.', '"');
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
         }

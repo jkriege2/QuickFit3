@@ -155,14 +155,15 @@ int QFFitResultsByIndexEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, in
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return defaultMin;
     const QString resultID=data->getEvaluationResultID(index);
-    return rec->getProperty(resultID+"_datacut_min", defaultMin).toInt();
+    return rec->getProperty(resultID+"_datacut_min", rec->getProperty("datacut_min", defaultMin).toInt()).toInt();
 }
 
 int QFFitResultsByIndexEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int index, int defaultMax) {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return defaultMax;
     const QString resultID=data->getEvaluationResultID(index);
-    return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
+    return rec->getProperty(resultID+"_datacut_max", rec->getProperty("datacut_max", defaultMax).toInt()).toInt();
+    //return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
 }
 
 int QFFitResultsByIndexEvaluationEditorBase::getUserMin(int defaultMin) {
@@ -170,7 +171,8 @@ int QFFitResultsByIndexEvaluationEditorBase::getUserMin(int defaultMin) {
     if (!data) return defaultMin;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
     const QString resultID=data->getEvaluationResultID();
-    return rdr->getProperty(resultID+"_datacut_min", defaultMin).toInt();
+    return rdr->getProperty(resultID+"_datacut_min", rec->getProperty("datacut_min", defaultMin).toInt()).toInt();
+    //return rdr->getProperty(resultID+"_datacut_min", defaultMin).toInt();
 }
 
 int QFFitResultsByIndexEvaluationEditorBase::getUserMax(int defaultMax) {
@@ -178,7 +180,8 @@ int QFFitResultsByIndexEvaluationEditorBase::getUserMax(int defaultMax) {
     if (!data) return defaultMax;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
     const QString resultID=data->getEvaluationResultID();
-    return rdr->getProperty(resultID+"_datacut_max", defaultMax).toInt();
+    return rec->getProperty(resultID+"_datacut_max", rec->getProperty("datacut_max", defaultMax).toInt()).toInt();
+    //return rdr->getProperty(resultID+"_datacut_max", defaultMax).toInt();
 }
 
 void QFFitResultsByIndexEvaluationEditorBase::setUserMin(int userMin) {
