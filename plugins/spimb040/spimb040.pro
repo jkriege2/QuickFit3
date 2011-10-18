@@ -30,7 +30,8 @@ HEADERS += spimb040.h \
            ../interfaces/qfextensionparameterdevice.h \
     qfespimb040acquisitionconfigwidget.h \
     qfespimb040opticssetup.h \
-    qfespimb040simplecameraconfig.h
+    qfespimb040simplecameraconfig.h \
+    qfespimb00histogrammaskdialog.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -44,12 +45,14 @@ SOURCES += spimb040.cpp \
            ../../../../../LIB/trunk/libtiff_tools.cpp \
     qfespimb040acquisitionconfigwidget.cpp \
     qfespimb040opticssetup.cpp \
-    qfespimb040simplecameraconfig.cpp
+    qfespimb040simplecameraconfig.cpp \
+    qfespimb00histogrammaskdialog.cpp
 
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \
-    qfespimb040opticssetup.ui
+    qfespimb040opticssetup.ui \
+    qfespimb00histogrammaskdialog.ui
 
 RESOURCES += spimb040.qrc
 
@@ -64,6 +67,9 @@ INCLUDEPATH += . \
 QT += gui xml svg opengl
 
 CONFIG += exceptions rtti stl
+
+
+
 
 
 

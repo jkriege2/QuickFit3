@@ -67,7 +67,6 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief remove the current record */
         void deleteRecord();
         void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-
         /** \brief delete selected results */
         void deleteSelectedResults();
 

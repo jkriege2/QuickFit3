@@ -196,8 +196,6 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvResults->setAlternatingRowColors(true);
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
-    tvResults->horizontalHeader()->setItemDelegate(new QFHTMLDelegate(tvResults));
-    tvResults->verticalHeader()->setItemDelegate(new QFHTMLDelegate(tvResults));
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);

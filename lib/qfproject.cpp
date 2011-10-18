@@ -434,10 +434,66 @@ QStringList QFProject::getAllPropertyNames() {
     return sl;
 }
 
-QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter) const {
+bool QFProject_StringPairCaseInsensitiveCompareSecond(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+    return s1.second.toLower() < s2.second.toLower();
+}
+
+bool QFProject_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+    return s1.first.toLower() < s2.first.toLower();
+}
+
+QList<QPair<QString, QString> > QFProject::rdrCalcMatchingResultsNamesAndLabels(const QString& evalFilter, const QString& groupFilter) const {
+    QList<QPair<QString, QString> > list, listp;
     QStringList l;
     QRegExp rx(evalFilter);
     rx.setPatternSyntax(QRegExp::Wildcard);
+    QRegExp rx1(groupFilter);
+    rx1.setPatternSyntax(QRegExp::Wildcard);
+    QMapIterator<int, QFRawDataRecord*> i(rawData);
+    // iterate over all raw data records
+    while (i.hasNext()) {
+        i.next();
+        // iterate over all evaluations that have save a result in the current rdr
+        for (int e=0; e<i.value()->resultsGetEvaluationCount(); e++) {
+            QString evalname=i.value()->resultsGetEvaluationName(e);
+
+            // futher look into an evaluation only if it matches evalFilter
+            if (rx.exactMatch(evalname)) {
+                for (int r=0; r<i.value()->resultsGetCount(evalname); r++) {
+                    QString rname=i.value()->resultsGetResultName(evalname, r);
+                    QString group=i.value()->resultsGetGroup(evalname, rname);
+                    QString label=i.value()->resultsGetLabel(evalname, rname);
+                    if (!l.contains(rname) && rx1.exactMatch(group)) {
+                        l.append(rname);
+                        if (i.value()->resultsGetSortPriority(evalname, rname)) {
+                            if (group.isEmpty()) listp.append(qMakePair(label, rname));
+                            else listp.append(qMakePair(group+QString(": ")+label, rname));
+                        } else {
+                            if (group.isEmpty()) list.append(qMakePair(label, rname));
+                            else list.append(qMakePair(group+QString(": ")+label, rname));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (list.size()>0) {
+        qSort(list.begin(), list.end(), QFProject_StringPairCaseInsensitiveCompareSecond);
+    }
+    if (listp.size()>0) {
+        qSort(listp.begin(), listp.end(), QFProject_StringPairCaseInsensitiveCompareSecond);
+    }
+    listp.append(list);
+    return listp;
+}
+
+QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter, const QString& groupFilter) const {
+    QStringList l, lp;
+    QRegExp rx(evalFilter);
+    rx.setPatternSyntax(QRegExp::Wildcard);
+    QRegExp rx1(groupFilter);
+    rx1.setPatternSyntax(QRegExp::Wildcard);
     QMapIterator<int, QFRawDataRecord*> i(rawData);
     // iterate over all raw data records
     while (i.hasNext()) {
@@ -449,14 +505,20 @@ QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter) co
             if (rx.exactMatch(evalname)) {
                 for (int r=0; r<i.value()->resultsGetCount(evalname); r++) {
                     QString rname=i.value()->resultsGetResultName(evalname, r);
-                    if (!l.contains(rname)) l.append(rname);
+                    QString group=i.value()->resultsGetGroup(evalname, rname);
+                    if (!l.contains(rname) && !lp.contains(rname) && rx1.exactMatch(group)) {
+                        if (i.value()->resultsGetSortPriority(evalname, rname)) lp.append(rname);
+                        else l.append(rname);
+                    }
                 }
             }
         }
     }
 
     if (l.size()>0) l.sort();
-    return l;
+    if (lp.size()>0) lp.sort();
+    lp.append(l);
+    return lp;
 }
 
 bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QChar separator, QChar decimalPoint, QChar stringDelimiter) {
@@ -468,6 +530,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
     header.append(sdel+tr("file")+sdel);
     header.append("");
     QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     for (int i=0; i<records.size(); i++) data.append(sdel+records[i].first->getName()+": "+records[i].second+sdel);
 
     for (int c=0; c<colnames.size(); c++) {
@@ -539,6 +602,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
         QStringList colnames=rdrCalcMatchingResultsNames(evalFilter);
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
         QLocale loc=QLocale::c();
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
         for (int i=0; i<records.size(); i++) {
             out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(i+3).arg(1).arg(records[i].first->getName()+": "+records[i].second);
         }
@@ -558,7 +622,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                             case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
                             case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c])); break;
                             case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
-                            case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter; break;
+                            case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter; break;
                             default: dat=""; break;
                         }
                     }

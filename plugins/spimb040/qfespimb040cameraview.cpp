@@ -405,6 +405,9 @@ void QFESPIMB040CameraView::createActions() {
     actMaskLoad = new QAction(QIcon(":/spimb040/maskload.png"), tr("&Load mask (broken pixels)"), this);
     connect(actMaskLoad, SIGNAL(triggered()), this, SLOT(loadMask()));
 
+    actMaskHisto = new QAction(QIcon(":/spimb040/maskhisto.png"), tr("&Create mask by histogram"), this);
+    connect(actMaskHisto, SIGNAL(triggered()), this, SLOT(histogramMask()));
+
     actPrintReport = new QAction(QIcon(":/spimb040/report_print.png"), tr("&Print a report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     actSaveReport = new QAction(QIcon(":/spimb040/report_save.png"), tr("&Save a report"), this);
@@ -433,6 +436,7 @@ void QFESPIMB040CameraView::createActions() {
     toolbar->addAction(actMaskLoad);
     toolbar->addAction(actMaskSave);
     toolbar->addAction(actMaskEdit);
+    toolbar->addAction(actMaskHisto);
     toolbar->addAction(actMaskClear);
     toolbar->addSeparator();
     toolbar->addAction(actCursor);
@@ -480,7 +484,8 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
     lastImagepath=(settings->getQSettings())->value(prefix+"last_imagepath", lastImagepath).toString();
     lastMaskpath=(settings->getQSettings())->value(prefix+"last_maskpath", lastMaskpath).toString();
     lastImagefilter=(settings->getQSettings())->value(prefix+"last_imagefilter", lastImagefilter).toString();
-
+    lastMaskHistogramMode=(settings->getQSettings())->value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
+    lastMaskHistogramPixels=(settings->getQSettings())->value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
     chkImageStatisticsHistogram->setChecked((settings->getQSettings())->value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
 }
 
@@ -509,6 +514,8 @@ void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString pref
     (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
 
     (settings->getQSettings())->setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
+    (settings->getQSettings())->setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
+    (settings->getQSettings())->setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
 
 
 }
@@ -1135,6 +1142,42 @@ void QFESPIMB040CameraView::loadMask() {
     maskEmpty=false;
     redrawFrameRecalc();
     QApplication::restoreOverrideCursor();
+    if (m_stopresume) m_stopresume->resume();
+}
+
+
+void QFESPIMB040CameraView::histogramMask() {
+    if (m_stopresume) m_stopresume->stop();
+    if (QMessageBox::question(this, tr("QuickFit SPIM Control"), tr("Do your really want to replace the mask with a mask based on the current frame?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes )==QMessageBox::No ) return;
+
+    QFESPIMB00HistogramMaskDialog* dlg=new QFESPIMB00HistogramMaskDialog(this);
+    dlg->setMode(lastMaskHistogramMode);
+    dlg->setPixels(lastMaskHistogramPixels, rawImage.width()*rawImage.height());
+    if (dlg->exec()) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        lastMaskHistogramMode=dlg->mode();
+        lastMaskHistogramPixels=dlg->pixels();
+
+        uint32_t* d=rawImage.dataCopy();
+        uint32_t N=rawImage.width()*rawImage.height();
+        statisticsSort(d, N);
+
+        if (dlg->mode()==1) {
+            mask.setAll(false);
+        }
+        uint32_t maxVal=d[N-1];
+        if (N-dlg->pixels()>=0) maxVal=d[N-dlg->pixels()];
+        for (int i=0; i<N; i++) {
+            if (rawImage(i)>=maxVal) {
+                mask(i)=true;
+            }
+        }
+
+        maskEmpty=false;
+        redrawFrameRecalc();
+        QApplication::restoreOverrideCursor();
+    }
+    delete dlg;
     if (m_stopresume) m_stopresume->resume();
 }
 

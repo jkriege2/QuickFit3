@@ -27,6 +27,7 @@
 #include "qfextensionmanager.h"
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"
+#include "qfespimb00histogrammaskdialog.h"
 
 
 
@@ -240,6 +241,8 @@ class QFESPIMB040CameraView : public QWidget {
         QAction* actSaveRaw;
         /** \brief action to activate/disactivate mask editing mode */
         QAction* actMaskEdit;
+        /** \brief create a mask based on the current histogram */
+        QAction* actMaskHisto;
         /** \brief action to clear mask */
         QAction* actMaskClear;
         /** \brief action to save mask */
@@ -324,6 +327,9 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief filter last used to save images */
         QString lastImagefilter;
 
+        int lastMaskHistogramMode;
+        int lastMaskHistogramPixels;
+
         /** \brief flag to indicate that we are currently redrawing */
         bool currentlyRedrawing;
 
@@ -375,7 +381,7 @@ class QFESPIMB040CameraView : public QWidget {
         void loadMask();
         /** \brief save the current image */
         void saveRaw();
-
+        void histogramMask();
         void histogramChecked(bool checked);
 
 };

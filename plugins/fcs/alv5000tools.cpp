@@ -182,6 +182,7 @@ ALV_TOKEN ALV_getToken(FILE* alv_file, bool readingHeader) {
         if (ferror(alv_file)) throw alv_exception(format("error during file access operation:\n  %s", strerror(errno)));
         t.value=t.value.trimmed();
         QLocale c(QLocale::C);
+        c.setNumberOptions(QLocale::OmitGroupSeparator);
         t.doubleValue=c.toDouble(t.value);
         return t;
     }

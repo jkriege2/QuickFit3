@@ -2301,7 +2301,8 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
         doFit(record, eval->getCurrentIndex());
-        record->enableEmitResultsChanged();
+        record->enableEmitResultsChanged(true);
+        current->emitResultsChanged();
         displayModel(false);
         replotData();
         QApplication::restoreOverrideCursor();
@@ -2347,7 +2348,8 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
             if (dlgFitProgress->isCanceled()) break;
         }
     }
-    record->enableEmitResultsChanged();
+    record->enableEmitResultsChanged(true);
+    current->emitResultsChanged();
     displayModel(false);
     replotData();
     QApplication::restoreOverrideCursor();
@@ -2403,9 +2405,10 @@ void QFFCSFitEvaluationEditor::fitAll() {
                 if (dlgFitProgress->isCanceled()) break;
             }
             dlgFitProgress->incSuperProgress();
-            record->enableEmitResultsChanged();
+            record->enableEmitResultsChanged(true);
         }
     }
+    current->emitResultsChanged();
 
     displayModel(false);
     replotData();
@@ -2473,9 +2476,10 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
                     if (dlgFitProgress->isCanceled()) break;
                 }
             }
-            record->enableEmitResultsChanged();
+            record->enableEmitResultsChanged(true);
         }
     }
+    current->emitResultsChanged();
 
     displayModel(false);
     replotData();

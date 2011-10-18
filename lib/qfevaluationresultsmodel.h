@@ -51,6 +51,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
 
         /** \brief current list of all shown result names (updated on model reset, using calcResultNames() */
         QStringList lastResultNames;
+        QStringList lastResultLabels;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > lastResults;
 };
 

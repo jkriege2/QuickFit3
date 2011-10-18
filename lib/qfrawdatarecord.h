@@ -195,11 +195,15 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             evaluationResult() {
                 type=qfrdreInvalid;
                 columns=0;
+                sortPriority=false;
+                group="";
+                label="";
+                label_rich="";
             }
             evaluationResultType type;  /**< type of data */
             double dvalue;  /**< double data value */
             double derror;  /**< error of double data */
-            /*int64_t*/qlonglong ivalue;  /**< value as 64-bit signed integer */
+            qlonglong ivalue;  /**< value as 64-bit signed integer */
             bool bvalue;  /**< value as boolean */
             QString svalue;  /**< value as string */
             QString unit; /**< unit name of the stored values */
@@ -208,6 +212,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             QString label;  /**< a label describing the result (no richtext markup!) */
             QString label_rich; /**< a label describing the result (with richtext markup!) */
             QString group; /**< this result belongs to a group with the given name */
+            bool sortPriority; /**< this result should appear towards the start of tables */
         };
 
         /*! \brief initial size for results hash
@@ -338,6 +343,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetGroup(QString evaluationName, QString resultName, QString group);
         /** \brief return the group of a result  */
         QString resultsGetGroup(QString evaluationName, QString resultName) const;
+
+        /** \brief set the sort priority of a result (the result already has to exist!) */
+        void resultsSetSortPriority(QString evaluationName, QString resultName, bool pr);
+        /** \brief return the sort priority of a result  */
+        bool resultsGetSortPriority(QString evaluationName, QString resultName) const;
 
         /** \brief set the human-readable label for a group name used as evalGroup  */
         void resultsSetEvaluationGroupLabel(QString evalGroup, QString label);

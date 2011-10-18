@@ -275,7 +275,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     QString s="";
                     for (int i=0; i<r.dvec.size(); i++) {
                         if (i>0) s=s+";";
-                        s=s+QLocale::c().toString(r.dvec[i], 'g', 10);
+                        s=s+loc.toString(r.dvec[i], 'g', 10);
                     }
                     w.writeAttribute("value", s);
                     w.writeAttribute("unit", r.unit);
@@ -285,7 +285,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     QString s="";
                     for (int i=0; i<r.dvec.size(); i++) {
                         if (i>0) s=s+";";
-                        s=s+QLocale::c().toString(r.dvec[i], 'g', 10);
+                        s=s+loc.toString(r.dvec[i], 'g', 10);
                     }
                     w.writeAttribute("value", s);
                     w.writeAttribute("unit", r.unit);
@@ -502,6 +502,20 @@ void QFRawDataRecord::resultsSetGroup(QString evaluationName, QString resultName
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results[resultName]=r;
     if (doEmitResultsChanged) emit resultsChanged();
+}
+
+void QFRawDataRecord::resultsSetSortPriority(QString evaluationName, QString resultName, bool pr) {
+    if (!resultsExists(evaluationName, resultName)) return;
+    evaluationResult r=resultsGet(evaluationName, resultName);
+    r.sortPriority=pr;
+    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
+    results[evaluationName]->results[resultName]=r;
+    if (doEmitResultsChanged) emit resultsChanged();
+}
+
+bool QFRawDataRecord::resultsGetSortPriority(QString evaluationName, QString resultName) const {
+    const evaluationResult& r=resultsGet(evaluationName, resultName);
+    return r.sortPriority;
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroupIndex(QString evaluationName, int64_t groupIndex) {
@@ -755,6 +769,7 @@ bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QCha
     header.append(sdel+tr("datafield")+sdel);
     header.append("");
     QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     for (int i=0; i<rownames.size(); i++) data.append(sdel+rownames[i]+sdel);
     for (int c=0; c<resultsGetEvaluationCount(); c++) {
         QString evalname=resultsGetEvaluationName(c);
@@ -812,7 +827,9 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
     QTextStream out(&file);
     out.setCodec(QTextCodec::codecForName("ISO-8859-1"));
-    out.setLocale(QLocale::c());
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    out.setLocale(loc);
 
 
     // write SYLK header
@@ -827,7 +844,6 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
         //out<<QString("F;Y%2;X1;SDB\n").arg(r+2);
     }
 
-    QLocale loc=QLocale::c();
     int col=2;
     for (int c=0; c<resultsGetEvaluationCount(); c++) {
         QString evalname=resultsGetEvaluationName(c);
@@ -840,11 +856,11 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
             QString dat="";
             if (resultsExists(evalname, rownames[r])) {
                 switch(resultsGet(evalname, rownames[r]).type) {
-                    case qfrdreNumber: dat=loc.toString(resultsGetAsDouble(evalname, rownames[r]), 'g', 15); break;
-                    case qfrdreNumberError: dat=loc.toString(resultsGetAsDouble(evalname, rownames[r]), 'g', 15); hasError=true; break;
+                    case qfrdreNumber: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r])); break;
+                    case qfrdreNumberError: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r])); hasError=true; break;
                     case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
-                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace('\"', "_")+stringDelimiter; break;
                     case qfrdreNumberVector:
                     case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                     default: break;
@@ -860,7 +876,7 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
                 QString dat="";
                 if (resultsExists(evalname, rownames[r])) {
                     if (resultsGet(evalname, rownames[r]).type==qfrdreNumberError) {
-                        dat=loc.toString(resultsGetErrorAsDouble(evalname, rownames[r]), 'g', 15);;
+                        dat=CDoubleToQString(resultsGetErrorAsDouble(evalname, rownames[r]));;
                     }
                 }
                 if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
@@ -878,6 +894,18 @@ bool QFRawDataRecord_StringPairCaseInsensitiveCompare(const QPair<QString, QStri
 
 bool QFRawDataRecord_StringTripleCaseInsensitiveCompare(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
     return s1.first.toLower() < s2.first.toLower();
+}
+
+bool QFRawDataRecord_StringPairCaseInsensitiveCompareSecond(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+    return s1.second.toLower() < s2.second.toLower();
+}
+
+bool QFRawDataRecord_StringTripleCaseInsensitiveCompareSecond(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
+    return s1.second.toLower() < s2.second.toLower();
+}
+
+bool QFRawDataRecord_StringTripleCaseInsensitiveCompareThird(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
+    return s1.third.toLower() < s2.third.toLower();
 }
 
 
@@ -993,7 +1021,7 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
 
 
 QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const QString& group, const QString& evalgroup) const {
-    QStringList l;
+    QStringList l, lp;
     int evalCount=resultsGetEvaluationCount();
     for (int i=0; i<evalCount; i++) {
         QString en=resultsGetEvaluationName(i);
@@ -1003,13 +1031,16 @@ QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const 
             for (int j=0; j<jmax; j++) {
                 QString rn=resultsGetResultName(en, j);
                 if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(rn))) {
-                    l.append(rn);
+                    if (resultsGetSortPriority(en, rn)) lp.append(rn);
+                    else l.append(rn);
                 }
             }
         }
     }
     if (l.size()>0) l.sort();
-    return l;
+    if (lp.size()>0) lp.sort();
+    lp.append(l);
+    return lp;
 }
 
 
@@ -1036,7 +1067,7 @@ QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const
 
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const QString& evalName, const QString& group, const QString& evalgroup) const {
     QStringList l;
-    QList<QPair<QString, QString> > list;
+    QList<QPair<QString, QString> > list, listp;
     int evalCount=resultsGetEvaluationCount();
     for (int i=0; i<evalCount; i++) {
         QString en=resultsGetEvaluationName(i);
@@ -1046,18 +1077,30 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const
             for (int j=0; j<jmax; j++) {
                 QString rn=resultsGetResultName(en, j);
                 QString lab=resultsGetLabel(en, rn);
+                QString g=resultsGetGroup(en, rn);
                 if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(lab))) {
                     l.append(lab);
-                    list.append(qMakePair(lab, rn));
+                    if (resultsGetSortPriority(en, rn)) {
+                        if (g.isEmpty()) listp.append(qMakePair(lab, rn));
+                        else listp.append(qMakePair(g+QString(": ")+lab, rn));
+                    } else {
+                        if (g.isEmpty()) list.append(qMakePair(lab, rn));
+                        else list.append(qMakePair(g+QString(": ")+lab, rn));
+                    }
                 }
             }
         }
     }
     if (list.size()>0) {
-        qSort(list.begin(), list.end(), QFRawDataRecord_StringPairCaseInsensitiveCompare);
+        qSort(list.begin(), list.end(), QFRawDataRecord_StringPairCaseInsensitiveCompareSecond);
+    }
+    if (listp.size()>0) {
+        qSort(listp.begin(), listp.end(), QFRawDataRecord_StringPairCaseInsensitiveCompareSecond);
     }
 
-    return list;
+    listp.append(list);
+
+    return listp;
 }
 
 
@@ -1068,7 +1111,7 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
        ist filtered according to the label (it's difficult to sort a rich-texted string!!!). Finally the list is shrunken down to the
        pair <richtext_label, result_id>!
       */
-    QList<QTriple<QString, QString, QString> > list;
+    QList<QTriple<QString, QString, QString> > list ,listp;
     QList<QPair<QString, QString> > list1;
     int evalCount=resultsGetEvaluationCount();
     for (int i=0; i<evalCount; i++) {
@@ -1082,18 +1125,24 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
                 QString labrt=resultsGetLabelRichtext(en, rn);
                 if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(lab))) {
                     l.append(lab);
-                    list.append(qMakeTriple(lab, labrt, rn));
+                    if (resultsGetSortPriority(en, rn)) listp.append(qMakeTriple(lab, labrt, rn));
+                    else list.append(qMakeTriple(lab, labrt, rn));
                 }
             }
         }
     }
     if (list.size()>0) {
-        qSort(list.begin(), list.end(), QFRawDataRecord_StringTripleCaseInsensitiveCompare);
-        for (int i=0; i<list.size(); i++) {
-            list1.append(qMakePair(list[i].second, list[i].third));
-        }
+        qSort(list.begin(), list.end(), QFRawDataRecord_StringTripleCaseInsensitiveCompareThird);
+    }
+    if (listp.size()>0) {
+        qSort(listp.begin(), listp.end(), QFRawDataRecord_StringTripleCaseInsensitiveCompareThird);
     }
 
+    listp.append(list);
+
+    for (int i=0; i<listp.size(); i++) {
+        list1.append(qMakePair(listp[i].second, listp[i].third));
+    }
     return list1;
 }
 

@@ -258,8 +258,16 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /*! \brief return a list of all result names for a given evaluation name for all raw data records in this project
 
             \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+            \param groupFilter a wildcard filter for the result group. Use \c "*" to select all evaluations.
         */
-        QStringList rdrCalcMatchingResultsNames(const QString& evalFilter) const;
+        QStringList rdrCalcMatchingResultsNames(const QString& evalFilter, const QString& groupFilter=QString("*")) const;
+
+        /*! \brief return a list of all result names (and labels) for a given evaluation name for all raw data records in this project
+
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+            \param groupFilter a wildcard filter for the result group. Use \c "*" to select all evaluations.
+        */
+        QList<QPair<QString, QString> > rdrCalcMatchingResultsNamesAndLabels(const QString& evalFilter, const QString& groupFilter=QString("*")) const;
 
         /*! \brief return a list of all QFRawDataRecord object that contain at least one evaluation which matched the given \a evalFilter
                    together with a list of all the matching evaluation results therein.

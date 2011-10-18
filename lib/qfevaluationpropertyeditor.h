@@ -10,6 +10,7 @@
 #include "qfpluginservices.h"
 #include "qftools.h"
 #include "qfhtmlhelpwindow.h"
+#include "qfhtmldelegate.h"
 #include "qfevaluationresultsmodel.h"
 #include "qenhancedtableview.h"
 #include "qvisiblehandlesplitter.h"
@@ -113,6 +114,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
+        void resultsChanged();
 
         /** \brief save results to a file */
         void saveResults();

@@ -24,10 +24,19 @@ void QFEvaluationResultsModel::init(QFEvaluationItem* evaluation, QString evalFi
 
 void QFEvaluationResultsModel::resultsChanged() {
     if (evaluation) {
-        lastResultNames=evaluation->getProject()->rdrCalcMatchingResultsNames(evalFilter);
+        //lastResultNames=evaluation->getProject()->rdrCalcMatchingResultsNames(evalFilter);
         lastResults=evaluation->getProject()->rdrCalcMatchingResults(evalFilter);
+        QList<QPair<QString, QString> > l=evaluation->getProject()->rdrCalcMatchingResultsNamesAndLabels(evalFilter);
+        lastResultNames.clear();
+        lastResultLabels.clear();
+        for (int i=0; i<l.size(); i++) {
+            lastResultNames.append(l[i].second);
+            if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
+            else lastResultLabels.append(l[i].first);
+        }
     } else {
         lastResultNames.clear();
+        lastResultLabels.clear();
         lastResults.clear();
     }
     reset();
@@ -109,7 +118,7 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
                 }
             } else return tr("Average +/- StdDev");
         } else {
-            if (section<lastResultNames.size()) return QVariant(lastResultNames[section]);
+            if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
 
         }
     }

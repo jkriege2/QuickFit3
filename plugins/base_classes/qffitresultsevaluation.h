@@ -276,8 +276,9 @@ public:
      *  \param group the fit parameter group to assign
      *  \param fix indicates whether a parameter was fixed
      *  \param fixGroup the group the fix results should be added to
+     *  \param sortPriority should the results be assigned sort priority?
      */
-    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""));
+    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""), bool sortPriority=true);
 
 
 

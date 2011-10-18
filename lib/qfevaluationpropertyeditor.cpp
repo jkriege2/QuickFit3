@@ -158,7 +158,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        disconnect(current, SIGNAL(resultsChanged()), resultsModel, SLOT(resultsChanged()));
+        disconnect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
         disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         if (c) {
             if (c->getType()!=oldType) {
@@ -225,7 +225,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        connect(current, SIGNAL(resultsChanged()), resultsModel, SLOT(resultsChanged()));
+        connect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
         connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
         selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
@@ -253,6 +253,11 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
     }
 }
 
+void QFEvaluationPropertyEditor::resultsChanged() {
+    if (!resultsModel) return;
+    resultsModel->resultsChanged();
+    tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+}
 
 void QFEvaluationPropertyEditor::displayHelp() {
     QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
@@ -384,6 +389,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     tvResults=new QEnhancedTableView(widResults);
     tvResults->setAlternatingRowColors(true);
+    tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
     QFontMetrics fm(font());
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     tvResults->setModel(resultsModel);
@@ -398,7 +404,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
-    connect(actRefreshResults, SIGNAL(triggered()), resultsModel, SLOT(resultsChanged()));
+    connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(resultsChanged()));
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 

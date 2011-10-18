@@ -265,7 +265,9 @@ bool QFTableModel::saveSYLK(const QString& filename, char format, int precision)
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
     QTextStream out(&file);
     out.setCodec(QTextCodec::codecForName("ISO-8859-1"));
-    out.setLocale(QLocale::c());
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    out.setLocale(loc);
 
 
     // write SYLK header
@@ -286,18 +288,18 @@ bool QFTableModel::saveSYLK(const QString& filename, char format, int precision)
                 QString num="";
                 switch(v.type()) {
                     case QVariant::Double:
-                        num=QLocale::c().toString(v.toDouble(), format, precision);
+                        num=loc.toString(v.toDouble(), format, precision);
                         break;
                     case QVariant::Int:
                     case QVariant::LongLong:
-                        num=QLocale::c().toString(v.toULongLong());
+                        num=loc.toString(v.toULongLong());
                         break;
                     case QVariant::UInt:
                     case QVariant::ULongLong:
-                        num=QLocale::c().toString(v.toDouble(), format, precision);
+                        num=loc.toString(v.toDouble(), format, precision);
                         break;
                     default:
-                        num=QString("\"%1\"").arg(v.toString());
+                        num=QString("\"%1\"").arg(v.toString().replace(';', ",").replace('\n', " ").replace('\"', " ").replace('\r', " ").replace('\t', " "));
                         break;
                 }
                 out<<QString("C;X%1;Y%2;N;K%3\n").arg(c+1).arg(r+2).arg(num);
@@ -315,7 +317,9 @@ bool QFTableModel::saveCSV(const QString& filename, QString column_separator, ch
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
     QTextStream out(&file);
     out.setCodec(QTextCodec::codecForName("ISO-8859-1"));
-    out.setLocale(QLocale::c());
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    out.setLocale(loc);
 
     // write column headers
     out<<header_start<<" ";
@@ -335,15 +339,15 @@ bool QFTableModel::saveCSV(const QString& filename, QString column_separator, ch
                 QString num="";
                 switch(v.type()) {
                     case QVariant::Double:
-                        num=QLocale::c().toString(v.toDouble(), format, precision);
+                        num=loc.toString(v.toDouble(), format, precision);
                         break;
                     case QVariant::Int:
                     case QVariant::LongLong:
-                        num=QLocale::c().toString(v.toULongLong());
+                        num=loc.toString(v.toULongLong());
                         break;
                     case QVariant::UInt:
                     case QVariant::ULongLong:
-                        num=QLocale::c().toString(v.toDouble(), format, precision);
+                        num=loc.toString(v.toDouble(), format, precision);
                         if (decimal_separator!='.') {
                             num=num.replace('.', decimal_separator);
                         }
@@ -383,7 +387,8 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
     QString line=in.readLine();
     bool header_read=false;
     quint16 row=0, rows=0, column=0, columns=0;
-
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     while (!line.isNull()) {
         bool dataread=false;
         line=line.trimmed();
@@ -445,7 +450,7 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
                         }
                         if (i<line.size()) i--;
                         bool ok=false;
-                        double d=QLocale::c().toDouble(s, &ok);
+                        double d=loc.toDouble(s, &ok);
                         if (ok) {
                             resize(rows, columns);
                             if (d==round(d)) {
@@ -458,7 +463,7 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
                                 dataread=true;
                             }
                         } else {
-                            QDateTime dt=QLocale::c().toDateTime(s);
+                            QDateTime dt=loc.toDateTime(s);
                             resize(rows, columns);
                             if (dt.isValid()) {
                                 setCell(row, column, dt);

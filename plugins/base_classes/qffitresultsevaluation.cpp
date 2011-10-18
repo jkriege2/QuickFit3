@@ -492,7 +492,7 @@ void QFFitResultsEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, const
     }
 }
 
-void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup) {
+void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority) {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction();
         if (f) {
@@ -502,13 +502,16 @@ void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDat
                     //setFitResultValue(pid, values[i], errors[i]);
                     QString unit=f->getDescription(pid).unit;
                     QString fpid=getFitParamID(pid);
+                    QString ffid= getFitParamFixID(pid);
                     r->resultsSetNumberError(resultID, fpid, values[i], errors[i], unit);
                     r->resultsSetGroup(resultID, fpid, group);
                     r->resultsSetLabel(resultID, fpid, f->getDescription(pid).name, f->getDescription(pid).label);
+                    r->resultsSetSortPriority(resultID, fpid, sortPriority);
                     if (fix) {
-                        r->resultsSetBoolean(resultID, getFitParamFixID(pid), fix[i]);
-                        if (!fixGroup.isEmpty()) r->resultsSetGroup(resultID, getFitParamFixID(pid), fixGroup);
-                        r->resultsSetLabel(resultID, getFitParamFixID(pid), f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
+                        r->resultsSetBoolean(resultID, ffid, fix[i]);
+                        if (!fixGroup.isEmpty()) r->resultsSetGroup(resultID,ffid, fixGroup);
+                        r->resultsSetLabel(resultID, ffid, f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
+                        r->resultsSetSortPriority(resultID,  ffid, sortPriority);
                     }
                 }
             }
