@@ -524,7 +524,7 @@ QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter, co
 bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QChar separator, QChar decimalPoint, QChar stringDelimiter) {
     QString sdel=stringDelimiter;
     QString dp=decimalPoint;
-    QStringList colnames=rdrCalcMatchingResultsNames(evalFilter);
+    QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
     QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
     QStringList header, data;
     header.append(sdel+tr("file")+sdel);
@@ -534,7 +534,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
     for (int i=0; i<records.size(); i++) data.append(sdel+records[i].first->getName()+": "+records[i].second+sdel);
 
     for (int c=0; c<colnames.size(); c++) {
-        header[0] += separator+sdel+colnames[c]+sdel;
+        header[0] += separator+sdel+colnames[c].first+sdel;
         header[1] += separator+sdel+tr("value")+sdel;
         bool hasError=false;
         for (int r=0; r<records.size(); r++) {
@@ -542,13 +542,13 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
             QString evalname=records[r].second;
             QString dat="";
             if (record) {
-                if (record->resultsExists(evalname, colnames[c])) {
-                    switch(record->resultsGet(evalname, colnames[c]).type) {
-                        case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); break;
-                        case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
-                        case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c])); break;
-                        case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
-                        case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace(separator, "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter; break;
+                if (record->resultsExists(evalname, colnames[c].second)) {
+                    switch(record->resultsGet(evalname, colnames[c].second).type) {
+                        case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
+                        case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
+                        case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
+                        case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c].second))?QString("1"):QString("0"); break;
+                        case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace(separator, "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter; break;
                         default: dat=""; break;
                     }
                 }
@@ -563,9 +563,9 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
                 QString evalname=records[r].second;
                 QString dat="";
                 if (record) {
-                    if (record->resultsExists(evalname, colnames[c])) {
-                        if (record->resultsGet(evalname, colnames[c]).type==QFRawDataRecord::qfrdreNumberError) {
-                            dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint);
+                    if (record->resultsExists(evalname, colnames[c].second)) {
+                        if (record->resultsGet(evalname, colnames[c].second).type==QFRawDataRecord::qfrdreNumberError) {
+                            dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
                         }
                     }
                 }
@@ -599,7 +599,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
 
         QChar stringDelimiter='"';
         QChar decimalPoint='.';
-        QStringList colnames=rdrCalcMatchingResultsNames(evalFilter);
+        QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
         QLocale loc=QLocale::c();
         loc.setNumberOptions(QLocale::OmitGroupSeparator);
@@ -608,7 +608,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
         }
         int col=2;
         for (int c=0; c<colnames.size(); c++) {
-            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(1).arg(col).arg(colnames[c]);
+            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(1).arg(col).arg(colnames[c].first);
             out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
             bool hasError=false;
             for (int r=0; r<records.size(); r++) {
@@ -616,13 +616,13 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                 QString evalname=records[r].second;
                 QString dat="";
                 if (record) {
-                    if (record->resultsExists(evalname, colnames[c])) {
-                        switch(record->resultsGet(evalname, colnames[c]).type) {
-                            case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); break;
-                            case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint); hasError=true; break;
-                            case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c])); break;
-                            case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c]))?QString("1"):QString("0"); break;
-                            case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c]).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter; break;
+                    if (record->resultsExists(evalname, colnames[c].second)) {
+                        switch(record->resultsGet(evalname, colnames[c].second).type) {
+                            case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
+                            case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
+                            case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
+                            case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c].second))?QString("1"):QString("0"); break;
+                            case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter; break;
                             default: dat=""; break;
                         }
                     }
@@ -637,9 +637,9 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                     QString evalname=records[r].second;
                     QString dat="";
                     if (record) {
-                        if (record->resultsExists(evalname, colnames[c])) {
-                            if (record->resultsGet(evalname, colnames[c]).type==QFRawDataRecord::qfrdreNumberError) {
-                                dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c]), 15, 'g', decimalPoint);
+                        if (record->resultsExists(evalname, colnames[c].second)) {
+                            if (record->resultsGet(evalname, colnames[c].second).type==QFRawDataRecord::qfrdreNumberError) {
+                                dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
                             }
                         }
                     }

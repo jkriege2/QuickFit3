@@ -764,13 +764,13 @@ void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
 bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QChar decimalPoint, QChar stringDelimiter) {
     QString sdel=stringDelimiter;
     QString dp=decimalPoint;
-    QStringList rownames=resultsCalcNames();
+    QList<QPair<QString,QString> > rownames=resultsCalcNamesAndLabels();
     QStringList header, data;
     header.append(sdel+tr("datafield")+sdel);
     header.append("");
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
-    for (int i=0; i<rownames.size(); i++) data.append(sdel+rownames[i]+sdel);
+    for (int i=0; i<rownames.size(); i++) data.append(sdel+rownames[i].first+sdel);
     for (int c=0; c<resultsGetEvaluationCount(); c++) {
         QString evalname=resultsGetEvaluationName(c);
         header[0] += separator+sdel+evalname+sdel;
@@ -778,15 +778,15 @@ bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QCha
         bool hasError=false;
         for (int r=0; r<rownames.size(); r++) {
             QString dat="";
-            if (resultsExists(evalname, rownames[r])) {
-                switch(resultsGet(evalname, rownames[r]).type) {
-                    case qfrdreNumber: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint); break;
-                    case qfrdreNumberError: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint); hasError=true; break;
-                    case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
-                    case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
-                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+            if (resultsExists(evalname, rownames[r].second)) {
+                switch(resultsGet(evalname, rownames[r].second).type) {
+                    case qfrdreNumber: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r].second), 15, 'g', decimalPoint); break;
+                    case qfrdreNumberError: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r].second), 15, 'g', decimalPoint); hasError=true; break;
+                    case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r].second)); break;
+                    case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r].second))?QString("1"):QString("0"); break;
+                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                     case qfrdreNumberVector:
-                    case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                     default: break;
                 }
             }
@@ -797,9 +797,9 @@ bool QFRawDataRecord::resultsSaveToCSV(QString filename, QString separator, QCha
             header[1] += separator+sdel+tr("error")+sdel;
             for (int r=0; r<rownames.size(); r++) {
                 QString dat="";
-                if (resultsExists(evalname, rownames[r])) {
-                    if (resultsGet(evalname, rownames[r]).type==qfrdreNumberError) {
-                        dat=doubleToQString(resultsGetErrorAsDouble(evalname, rownames[r]), 15, 'g', decimalPoint);
+                if (resultsExists(evalname, rownames[r].second)) {
+                    if (resultsGet(evalname, rownames[r].second).type==qfrdreNumberError) {
+                        dat=doubleToQString(resultsGetErrorAsDouble(evalname, rownames[r].second), 15, 'g', decimalPoint);
                     }
                 }
                 data[r]+=separator+dat;
@@ -836,11 +836,11 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
     out<<"ID;P\n";
 
     QChar stringDelimiter='"';
-    QStringList rownames=resultsCalcNames();
+    QList<QPair<QString,QString> > rownames=resultsCalcNamesAndLabels();
     // write column headers
     out<<QString("C;Y1;X1;K\"%1\"\n").arg(tr("datafield"));
     for (int r=0; r<rownames.size(); r++) {
-        out<<QString("C;Y%2;X1;K\"%1\"\n").arg(rownames[r]).arg(r+3);
+        out<<QString("C;Y%2;X1;K\"%1\"\n").arg(rownames[r].first).arg(r+3);
         //out<<QString("F;Y%2;X1;SDB\n").arg(r+2);
     }
 
@@ -854,15 +854,15 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
         bool hasError=false;
         for (int r=0; r<rownames.size(); r++) {
             QString dat="";
-            if (resultsExists(evalname, rownames[r])) {
-                switch(resultsGet(evalname, rownames[r]).type) {
-                    case qfrdreNumber: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r])); break;
-                    case qfrdreNumberError: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r])); hasError=true; break;
-                    case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r])); break;
-                    case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r]))?QString("1"):QString("0"); break;
-                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace('\"', "_")+stringDelimiter; break;
+            if (resultsExists(evalname, rownames[r].second)) {
+                switch(resultsGet(evalname, rownames[r].second).type) {
+                    case qfrdreNumber: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); break;
+                    case qfrdreNumberError: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); hasError=true; break;
+                    case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r].second)); break;
+                    case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r].second))?QString("1"):QString("0"); break;
+                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace('\"', "_")+stringDelimiter; break;
                     case qfrdreNumberVector:
-                    case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r]).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreNumberMatrix: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
                     default: break;
                 }
             }
@@ -874,9 +874,9 @@ bool QFRawDataRecord::resultsSaveToSYLK(QString filename) {
             //out<<QString("F;Y2;X%2;SDB\n").arg(col);
             for (int r=0; r<rownames.size(); r++) {
                 QString dat="";
-                if (resultsExists(evalname, rownames[r])) {
-                    if (resultsGet(evalname, rownames[r]).type==qfrdreNumberError) {
-                        dat=CDoubleToQString(resultsGetErrorAsDouble(evalname, rownames[r]));;
+                if (resultsExists(evalname, rownames[r].second)) {
+                    if (resultsGet(evalname, rownames[r].second).type==qfrdreNumberError) {
+                        dat=CDoubleToQString(resultsGetErrorAsDouble(evalname, rownames[r].second));;
                     }
                 }
                 if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
