@@ -2124,12 +2124,17 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                     dlgFitProgress->setProgressMax(100);
                     dlgFitProgress->setProgress(0);
                     doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-                    doFitThread->start(QThread::HighestPriority);
+                    doFitThread->start(QThread::HighPriority);
+                    QTime t;
+                    t.start();
                     while (!doFitThread->isFinished()) {
-                        QApplication::processEvents();
-                        if (dlgFitProgress->isCanceled()) {
-                          doFitThread->terminate();
-                          break;
+                        if (t.elapsed()>100) {
+                            QApplication::processEvents();
+                            if (dlgFitProgress->isCanceled()) {
+                              doFitThread->terminate();
+                              break;
+                            }
+                            t.start();
                         }
                     }
                     dlgFitProgress->setProgressFull();
@@ -2236,8 +2241,8 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
                         record->resultsSetGroup(evalID, param, group);
                         record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
                     }
-                    record->enableEmitResultsChanged();
-                    emit resultsChanged();
+                    record->enableEmitResultsChanged(false);
+                    //emit resultsChanged();
                 } else {
                     services->log_warning(tr("   - fit canceled by user!!!\n"));
                 }

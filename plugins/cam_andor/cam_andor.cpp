@@ -771,6 +771,7 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
         d.name=fileNames[i];
         d.type=fileTypes[i];
         d.description=tr("Andor camera acquisition image series");
+        files->append(d);
     }
     QFExtensionCameraAndor::CameraInfo info=camInfos[camera];
 

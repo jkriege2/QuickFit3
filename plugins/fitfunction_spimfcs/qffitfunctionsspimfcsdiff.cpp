@@ -53,7 +53,7 @@ void QFFitFunctionsSPIMFCSDiff::calcParameter(double* data, double* error) const
     double eN=0;
     //double D1=data[FCSSDiff_diff_coeff1];
     double eD1=0;
-    double sigmaz=data[FCSSDiff_focus_height];
+    double sigmaz=data[FCSSDiff_focus_height]/1.0e3;
     double esigmaz=0;
     //double wxy=data[FCSSDiff_focus_width]/1.0e3;
     double ewxy=0;
