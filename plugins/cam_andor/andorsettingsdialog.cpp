@@ -195,8 +195,10 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     int hend=settings.value(prefix+"subimage_hend", m_sensorWidth).toInt();
     int vend=settings.value(prefix+"subimage_vend", m_sensorHeight).toInt();
 
+    //qDebug()<<"******************************\n vstart="<<vstart<<"  vend="<<vend<<"  m_sensorHeight="<<m_sensorHeight;
+
     ui->spinLeft->setValue(hstart);
-    ui->spinTop->setValue(m_sensorHeight-vstart);
+    ui->spinTop->setValue(vstart);
     ui->spinWidth->setValue(abs(hend-hstart));
     ui->spinHeight->setValue(abs(vend-vstart));
     ui->spinHorizontalBinning->setValue(settings.value(prefix+"horizontal_binning", 1).toInt());
@@ -286,7 +288,7 @@ QRect AndorSettingsDialog::calcImageRect() {
 }
 
 void AndorSettingsDialog::updateSubregion() {
-    qDebug()<<"updateSubregion()";
+    //qDebug()<<"updateSubregion()";
     if (m_updatingSubregion) return;
     bool old_m_updatingSensorSetup=m_updatingSubregion;
     m_updatingSubregion=true;
@@ -303,6 +305,7 @@ void AndorSettingsDialog::updateSubregion() {
     if (mode==1) ui->spinVerticalBinning->setValue(1);
 
     QRect r=calcImageRect();
+    //qDebug()<<r;
 
     if (ui->spinWidth->value()!=r.width()) ui->spinWidth->setValue(r.width());
     if (ui->spinHeight->value()!=r.height()) ui->spinHeight->setValue(r.height());
@@ -319,7 +322,7 @@ void AndorSettingsDialog::updateSubregion() {
     updatePreview();
     calcTiming();
     m_updatingSubregion=old_m_updatingSensorSetup;
-    qDebug()<<"updateSubregion() ... DONE";
+    //qDebug()<<"updateSubregion() ... DONE";
 }
 
 int  AndorSettingsDialog::getReadMode() {
@@ -333,7 +336,7 @@ int AndorSettingsDialog::getPreamp() {
 
 void AndorSettingsDialog::resizeSubregion(int width, int height) {
     if (m_updatingSubregion) return;
-    qDebug()<<"resizeSubregion()";
+    //qDebug()<<"resizeSubregion()";
     QRect r=calcImageRect();
     QPoint c=r.center();
 
@@ -342,12 +345,12 @@ void AndorSettingsDialog::resizeSubregion(int width, int height) {
     ui->spinWidth->setValue(width);
     ui->spinHeight->setValue(height);
     updateSubregion();
-    qDebug()<<"resizeSubregion() ... DONE";
+    //qDebug()<<"resizeSubregion() ... DONE";
 }
 
 void AndorSettingsDialog::updateSensorSetup(int leaveout) {
     if (m_updatingSensorSetup) return;
-    qDebug()<<"updateSensorSetup()";
+    //qDebug()<<"updateSensorSetup()";
 
     bool old_m_updatingSensorSetup=m_updatingSensorSetup;
     m_updatingSensorSetup=true;
@@ -388,7 +391,7 @@ void AndorSettingsDialog::updateSensorSetup(int leaveout) {
     }
 
     m_updatingSensorSetup=old_m_updatingSensorSetup;
-    qDebug()<<"updateSensorSetup() ... DONE";
+    //qDebug()<<"updateSensorSetup() ... DONE";
 }
 
 void AndorSettingsDialog::setImage(uint32_t* image)  {
@@ -404,7 +407,7 @@ void AndorSettingsDialog::setImage(uint32_t* image)  {
 void AndorSettingsDialog::updatePreview() {
     bool old_m_updatingPreview=m_updatingPreview;
     if (m_updatingPreview) return;
-    qDebug()<<"updatePreview()";
+    //qDebug()<<"updatePreview()";
     m_updatingPreview=true;
     ui->labPlot->setText("");
     int scaleX=qMax(1, (int)floor(ui->labPlot->width()/m_sensorWidth));
@@ -424,12 +427,12 @@ void AndorSettingsDialog::updatePreview() {
     painter.end();
     ui->labPlot->setPixmap(pixmap);
     m_updatingPreview=old_m_updatingPreview;
-    qDebug()<<"updatePreview() ... DONE";
+    //qDebug()<<"updatePreview() ... DONE";
 }
 
 void AndorSettingsDialog::calcTiming() {
     if (m_calcTiming) return;
-    qDebug()<<"calcTiming()";
+    //qDebug()<<"calcTiming()";
     bool old_m_calcTiming=m_calcTiming;
     m_calcTiming=true;
     selectCamera(m_camera);
@@ -467,7 +470,7 @@ void AndorSettingsDialog::calcTiming() {
         CHECK(SetIsolatedCropMode(0, ui->spinHeight->value(), ui->spinWidth->value(), ui->spinVerticalBinning->value(), ui->spinHorizontalBinning->value()));
     }
 
-    qDebug()<<"SetImage: "<<ui->spinHorizontalBinning->value()<< ui->spinVerticalBinning->value()<< ui->spinLeft->value()+1<< ui->spinLeft->value()+ui->spinWidth->value()<< ui->spinTop->value()+1<< ui->spinTop->value()+ui->spinHeight->value();
+    //qDebug()<<"SetImage: "<<ui->spinHorizontalBinning->value()<< ui->spinVerticalBinning->value()<< ui->spinLeft->value()+1<< ui->spinLeft->value()+ui->spinWidth->value()<< ui->spinTop->value()+1<< ui->spinTop->value()+ui->spinHeight->value();
     CHECK(SetImage(ui->spinHorizontalBinning->value(), ui->spinVerticalBinning->value(),
              ui->spinLeft->value()+1, ui->spinLeft->value()+ui->spinWidth->value(),
              ui->spinTop->value()+1, ui->spinTop->value()+ui->spinHeight->value()));
@@ -487,7 +490,7 @@ void AndorSettingsDialog::calcTiming() {
     }
 
     m_calcTiming=old_m_calcTiming;
-    qDebug()<<"calcTiming() ... done";
+    //qDebug()<<"calcTiming() ... done";
 }
 
 
