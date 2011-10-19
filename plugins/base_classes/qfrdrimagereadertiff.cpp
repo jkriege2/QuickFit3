@@ -108,8 +108,9 @@ bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
     TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
     TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleformat);
     TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bitspersample);
-    if (samplesperpixel>1) {
-        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1')").arg(filename));
+    if (samplesperpixel>1 && samplesperpixel<500) {
+        // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
+        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
         return false;
     } else {
         uint16 photo, config;
@@ -184,8 +185,9 @@ bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
     TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
     TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleformat);
     TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bitspersample);
-    if (samplesperpixel>1) {
-        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1')").arg(filename));
+    if (samplesperpixel>1 && samplesperpixel<500) {
+        // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
+        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
         return false;
     } else {
         uint16 photo, config;

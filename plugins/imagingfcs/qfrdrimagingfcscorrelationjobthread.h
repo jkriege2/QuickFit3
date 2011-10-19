@@ -31,6 +31,8 @@ struct Job {
     QPointer<QFRDRImagingFCSCorrelationJobThread> thread;
     /** \brief name of the input file */
     QString filename;
+    /** \brief name of the background file */
+    QString filenameBackground;
     /** \brief name of the input file description */
     QString descriptionFilename;
     /** \brief fileformat of the input file */

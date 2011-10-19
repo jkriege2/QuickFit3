@@ -189,6 +189,16 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFile_clicked() {
     }
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_btnSelectBackgroundFile_clicked() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Background Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
+    if (!fileName.isEmpty()) {
+        lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
+        ui->edtBackgroundFile->setText(fileName);
+        ui->edtBackgroundFile->setFocus(Qt::MouseFocusReason);
+        writeSettings();
+    }
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_btnHelp_clicked() {
     pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("imaging_fcs")+"imfcs_correlator.html");
 }
@@ -317,6 +327,8 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.prefix=ui->edtPrefix->text();
     job.postfix=ui->edtPostfix->text();
     job.backgroundOffset=ui->edtOffset->value();
+    job.filenameBackground=ui->edtBackgroundFile->text();
+    qDebug()<<job.filenameBackground;
     job.range_min=-1;
     if (!ui->chkFirstFrame->isChecked()) {
         job.range_min=ui->spinFirstFrame->value();
@@ -423,6 +435,22 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     ui->labCorrelator->setText(tr("<i>spanned correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
+void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString backgroundfile) {
+    if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
+    else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
+    baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
+    //backgroundfile="";
+    int fcnt=set.value("files/count", 0).toInt();
+    for (int f=0; f<fcnt; f++) {
+        QString fn=set.value("files/name"+QString::number(f), "").toString();
+        //QString ft=set.value("files/type"+QString::number(f), "").toString();
+        QString fd=set.value("files/description"+QString::number(f), "").toString();
+        if (fd.toLower().simplified().contains("background")) {
+            backgroundfile=fn;
+        }
+    }
+}
+
 void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     QModernProgressDialog prg(this);
     prg.setWindowTitle(tr("imFCS: Correlator"));
@@ -435,6 +463,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     QString filename=QFileInfo(ui->edtImageFile->text()).absoluteFilePath();
     double frametime=ui->edtFrameTime->value();
     double baseline_offset=ui->edtOffset->value();
+    QString backgroundF=ui->edtBackgroundFile->text();
 
     //////////////////////////////////////////////////////////////////////////////////
     // now we search for a .configuration.ini file describing the selected file
@@ -442,18 +471,21 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     QDir d=QFileInfo(filename).absoluteDir();
     QStringList nameFilters;
     nameFilters<<"*.ini";
+    nameFilters<<"*.cfg";
+    nameFilters<<"*.txt";
     inputconfigfile="";
     d.setNameFilters(nameFilters);
     // could be that the absolute pathes are wrong. In this case we try to get a second guess by finding a file which
     // equals in the name, but not the directory ... the user can correct the data anyways. This second guess is stored
     // in these variables:
-    double sframetime=0;
-    double sbaseline_offset=0;
+    double sframetime=frametime;
+    double sbaseline_offset=baseline_offset;
+    QString sbackgroundF=backgroundF;
     bool hasSecond=false;
     bool hasFirst=false;
     bool sIsTiff=false;
     foreach (QString iniFile, d.entryList(QDir::Files)) {
-        QApplication::processEvents();
+        //QApplication::processEvents();
         inputconfigfile=d.absoluteFilePath(iniFile);
         QSettings set(d.absoluteFilePath(iniFile), QSettings::IniFormat);
         int fcnt=set.value("files/count", 0).toInt();
@@ -461,44 +493,67 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             for (int f=0; f<fcnt; f++) {
                 QString fn=set.value("files/name"+QString::number(f), "").toString();
                 QString ft=set.value("files/type"+QString::number(f), "").toString();
+                QString fd=set.value("files/description"+QString::number(f), "").toString();
                 if (!fn.isEmpty()) {
                     QString fnAbs=d.absoluteFilePath(fn);
-                    //qDebug()<<"ini:  "<<fnAbs;
-                    //qDebug()<<"file: "<<filename;
                     if (fnAbs==filename) {
                         hasFirst=true;
                         if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
-                        //else ui->cmbFileformat->setCurrentIndex(-1);
-
-                        if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
-                        else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
-
-                        baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
                     } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filename).fileName()) {
                         hasSecond=true;
                         if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
-                        //else ui->cmbFileformat->setCurrentIndex(-1);
-
-                        if (set.contains("acquisition/frame_time")) sframetime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
-                        else if (set.contains("acquisition/frame_rate")) sframetime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
-
-                        sbaseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
                     }
                 }
             }
+
+            if (hasFirst) {
+                readConfigFile(set, frametime, baseline_offset, backgroundF);
+            } else if (hasSecond) {
+                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF);
+            }
         }
+        if (hasFirst) break;
     }
+
+    // if we didn't find a second guess, we try to find a config file with the same
+    // basename + one of a set of extensions (newsuffix list) and try to read info from
+    // that.
+    if (!hasSecond) {
+        QString suffix=QFileInfo(filename).suffix();
+        QString cfgname;
+
+        QStringList newsuffix;
+        newsuffix<<"ini"
+                 <<"configuration.ini"
+                 <<"settings.ini"
+                 <<"settings.txt"
+                 <<"cfg";
+        for (int i=0; i<newsuffix.size(); i++) {
+            cfgname=filename.left(filename.size()-suffix.size())+newsuffix[i];
+            if (QFile::exists(cfgname)) {
+                QSettings set(cfgname, QSettings::IniFormat);
+                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF);
+                break;
+            }
+        }
+
+
+    }
+
     // if there is no direct match, we take the second best, if there is one
     if (!hasFirst && hasSecond)  {
         frametime=sframetime;
         baseline_offset=sbaseline_offset;
+        backgroundF=sbackgroundF;
         if (sIsTiff) ui->cmbFileformat->setCurrentIndex(0);
     }
+
 
     // SET THE FRAMETIME/RATE
     ui->edtFrameTime->setValue(frametime);
     frameTimeChanged(frametime);
     ui->edtOffset->setValue(baseline_offset);
+    ui->edtBackgroundFile->setText(backgroundF);
 
 
 

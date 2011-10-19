@@ -527,6 +527,9 @@
                <height>16777215</height>
               </size>
              </property>
+             <property name="currentIndex">
+              <number>2</number>
+             </property>
              <item>
               <property name="text">
                <string>none</string>
@@ -540,6 +543,11 @@
              <item>
               <property name="text">
                <string>remove minimum counts &amp; offset</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>remove background image &amp; offset</string>
               </property>
              </item>
             </widget>
@@ -592,7 +600,42 @@
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QLabel" name="label_31">
+             <property name="text">
+              <string>&amp;background image:</string>
+             </property>
+             <property name="buddy">
+              <cstring>edtBackgroundFile</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="edtBackgroundFile">
+             <property name="placeholderText">
+              <string>enter filename here</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSelectBackgroundFile">
+             <property name="toolTip">
+              <string>select an image series file to correlate</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfrdrimagingfcs.qrc">
+               <normaloff>:/imaging_fcs/fileopen.png</normaloff>:/imaging_fcs/fileopen.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="5" column="0">
           <widget class="QLabel" name="label_26">
            <property name="text">
             <string>correlation &amp;functions:</string>
@@ -602,7 +645,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QCheckBox" name="chkACF">
@@ -704,7 +747,7 @@
            </item>
           </layout>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -714,7 +757,7 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -892,7 +935,7 @@
            </item>
           </layout>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="label_27">
            <property name="text">
             <string>&amp;statistics:</string>
@@ -902,7 +945,7 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="QLabel" name="label_29">
@@ -978,7 +1021,7 @@
            </item>
           </layout>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
             <string>&amp;video:</string>
@@ -988,7 +1031,7 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QCheckBox" name="chkVideo">
@@ -1087,7 +1130,14 @@
            </item>
           </layout>
          </item>
-         <item row="9" column="0">
+         <item row="9" column="1">
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -1097,7 +1147,7 @@
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="10" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -1152,13 +1202,6 @@
             </widget>
            </item>
           </layout>
-         </item>
-         <item row="8" column="1">
-          <widget class="Line" name="line">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>
@@ -1277,8 +1320,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>850</width>
-           <height>150</height>
+           <width>838</width>
+           <height>128</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1380,6 +1423,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>edtFrameRate</tabstop>
   <tabstop>cmbBackground</tabstop>
   <tabstop>edtOffset</tabstop>
+  <tabstop>edtBackgroundFile</tabstop>
+  <tabstop>btnSelectBackgroundFile</tabstop>
   <tabstop>chkACF</tabstop>
   <tabstop>chkCCF</tabstop>
   <tabstop>spinSegments</tabstop>
@@ -1394,6 +1439,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>btnAddJob</tabstop>
   <tabstop>spinProcesses</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>btnHelp</tabstop>
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>

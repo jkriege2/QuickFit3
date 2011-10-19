@@ -6,6 +6,7 @@
 
 
 #define sqr(a) ((a)*(a))
+#define PROCESS_EVENTS_TIMEOUT_MS 100
 
 
 QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFPluginServices* pluginServices, QWidget* parent):
@@ -461,20 +462,29 @@ void QFESPIMB040MainWindow::doImageStack() {
             if (axisCount==1) {
                 log_text(tr("  - moving to position %1 micron ...").arg(newPos));
                 stage->move(stageAxis, newPos);
+                QTime t1;
+                t1.start();
                 while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving) {
-                    progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
-                    QApplication::processEvents();
-                    if (progress.wasCanceled()) break;
+                    if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                        progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
+                        QApplication::processEvents();
+                        if (progress.wasCanceled()) break;
+                        t1.start();
+                    }
                 }
 
                 // wait additional time-span after moving stages!
                 QTime t;
                 int DeltaT=qMin(5000,qMax(1,widImageStack->delay()));
                 t.start();
+                t1.start();
                 while (t.elapsed()<DeltaT) {
-                    progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
-                    QApplication::processEvents();
-                    if (progress.wasCanceled()) break;
+                    if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS)  {
+                        progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
+                        QApplication::processEvents();
+                        if (progress.wasCanceled()) break;
+                        t1.start();
+                    }
                 }
                 if (ok) {
                     if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready) {
@@ -490,22 +500,31 @@ void QFESPIMB040MainWindow::doImageStack() {
                 log_text(tr("  - moving to position (%1, %2) micron ...").arg(newPos).arg(newPos2));
                 stage->move(stageAxis, newPos);
                 stage2->move(stageAxis2, newPos2);
+                QTime t1;
+                t1.start();
                 while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving || stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Moving) {
-                    double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos)+sqr(stage2->getPosition(stageAxis2)-newPos2));
-                    progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ...").arg(newPos).arg(newPos2).arg(dist));
-                    QApplication::processEvents();
-                    if (progress.wasCanceled()) break;
+                    if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                        double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos)+sqr(stage2->getPosition(stageAxis2)-newPos2));
+                        progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ...").arg(newPos).arg(newPos2).arg(dist));
+                        QApplication::processEvents();
+                        if (progress.wasCanceled()) break;
+                        t1.start();
+                    }
                 }
 
                 // wait additional time-span after moving stages!
                 QTime t;
                 int DeltaT=qMin(5000,qMax(1,widImageStack->delay()));
                 t.start();
+                t1.start();
                 while (t.elapsed()<DeltaT) {
-                    double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos)+sqr(stage2->getPosition(stageAxis2)-newPos2));
-                    progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ... waiting").arg(newPos).arg(newPos2).arg(dist));
-                    QApplication::processEvents();
-                    if (progress.wasCanceled()) break;
+                    if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                        double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos)+sqr(stage2->getPosition(stageAxis2)-newPos2));
+                        progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ... waiting").arg(newPos).arg(newPos2).arg(dist));
+                        QApplication::processEvents();
+                        if (progress.wasCanceled()) break;
+                        t1.start();
+                    }
                 }
                 if (ok) {
                     if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready && stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Ready) {
@@ -522,22 +541,30 @@ void QFESPIMB040MainWindow::doImageStack() {
                 stage->move(stageAxis, newPos);
                 stage2->move(stageAxis2, newPos2);
                 stage3->move(stageAxis3, newPos3);
+                QTime t1;
+                t1.start();
                 while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving || stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Moving || stage3->getAxisState(stageAxis3)==QFExtensionLinearStage::Moving) {
-                    double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos) + sqr(stage2->getPosition(stageAxis2)-newPos2) + sqr(stage3->getPosition(stageAxis3)-newPos3));
-                    progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ...").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
-                    QApplication::processEvents();
-                    if (progress.wasCanceled()) break;
+                    if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                        double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos) + sqr(stage2->getPosition(stageAxis2)-newPos2) + sqr(stage3->getPosition(stageAxis3)-newPos3));
+                        progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ...").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
+                        QApplication::processEvents();
+                        if (progress.wasCanceled()) break;
+                        t1.start();
+                    }
                 }
 
                 // wait additional time-span after moving stages!
                 QTime t;
                 int DeltaT=qMin(5000,qMax(1,widImageStack->delay()));
                 t.start();
+                t1.start();
                 while (t.elapsed()<DeltaT) {
-                    double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos) + sqr(stage2->getPosition(stageAxis2)-newPos2) + sqr(stage3->getPosition(stageAxis3)-newPos3));
-                    progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
-                    QApplication::processEvents();
-                    if (progress.wasCanceled()) break;
+                    if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                        double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos) + sqr(stage2->getPosition(stageAxis2)-newPos2) + sqr(stage3->getPosition(stageAxis3)-newPos3));
+                        progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
+                        QApplication::processEvents();
+                        if (progress.wasCanceled()) break;
+                    }
                 }
                 if (ok) {
                     if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready && stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Ready && stage3->getAxisState(stageAxis3)==QFExtensionLinearStage::Ready) {
@@ -575,7 +602,7 @@ void QFESPIMB040MainWindow::doImageStack() {
                             IMAGESTACK_ERROR(tr("error acquiring image %1/%2 on camera 1!\n").arg(posIdx+1).arg(images));
                         }
                     }
-                    QApplication::processEvents();
+                    //QApplication::processEvents();
                     if (useCam2) {
                         if (ecamera2->acquire(camera2, buffer2)) {
                             TIFFTWriteUint16from32(tiff2, buffer2, width2, height2);
@@ -586,7 +613,7 @@ void QFESPIMB040MainWindow::doImageStack() {
                         }
                     }
 
-                    QApplication::processEvents();
+                    //QApplication::processEvents();
                 }
             }
             if (!ok) running=false;

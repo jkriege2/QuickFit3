@@ -126,6 +126,7 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     if (job.backgroundCorrection==0) back="none";
     if (job.backgroundCorrection==1) back="offset";
     if (job.backgroundCorrection==2) back="offsetmin";
+    if (job.backgroundCorrection==3) back="imgoffset";
     QString corr="unknown";
     if (job.correlator==0) corr="direct";
     if (job.correlator==1) corr="mtauallmon";
@@ -157,7 +158,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
     } else {
         m_status=1;
         emit statusChanged(m_status);
-        emit rangeChanged(0,2630);
+        emit rangeChanged(0,3130);
 
 
         reader=NULL;
@@ -223,6 +224,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     //qDebug()<<outputFilenameBase;
                     QString configFilename=outputFilenameBase+".evalsettings.txt";
                     QString averageFilename="";
+                    QString backgroundFilename="";
                     QString videoFilename="";
                     QString statisticsFilename="";
                     QString acfFilename="";
@@ -248,6 +250,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         ////////////////////////////////////////////////////////////////////////////////////////////
                         // SAVE THE RESULTS
                         ////////////////////////////////////////////////////////////////////////////////////////////
+
+                        //************** SAVE OVERVIEW IMAGE
                         if ((m_status==1) && !was_canceled && average_frame) {
                             emit messageChanged(tr("saving overview image ..."));
                             QString localFilename=averageFilename=outputFilenameBase+".overview.tif";
@@ -275,6 +279,33 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(10);
 
+                        //************** SAVE BACKGROUND IMAGE
+                        if ((m_status==1) && !was_canceled && backgroundImage) {
+                            bool doSave=false;
+                            for (uint32_t i=0; i<frame_width*frame_height; i++) {
+                                if (backgroundImage[i]!=0) {
+                                    doSave=true;
+                                    break;
+                                }
+                            }
+                            if (doSave) {
+                                emit messageChanged(tr("saving background image ..."));
+                                QString localFilename=backgroundFilename=outputFilenameBase+".background.tif";
+                                TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                if (tif) {
+                                    TIFFTWriteFloat(tif, backgroundImage, frame_width, frame_height);
+                                    TIFFClose(tif);
+                                } else {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    backgroundFilename="";
+                                    emit messageChanged(tr("could not create background image '%1'!").arg(localFilename));
+                                }
+                            }
+
+                        }
+                        emit progressIncrement(10);
+
+                        //************** SAVE VIDEO
                         if ((m_status==1) && !was_canceled && video && real_video_count>0 ) {
                             emit messageChanged(tr("saving video ..."));
                             QString localFilename=videoFilename=outputFilenameBase+".video.tif";
@@ -292,8 +323,6 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                                         img[i]=(uint16_t)round((float)(video[c*frame_width*frame_height+i]-avgMin)*(float)0xFFFF/fabs(avgMax-avgMin));
                                     }
-                                    //TIFFTWriteUint16(tif, img, frame_width, frame_height);
-                                    //TIFFWriteDirectory(tif);
                                     TinyTIFFWriter_writeImage(tif, img);
                                     if (c%5==0) {
                                         emit messageChanged(tr("saving video %1/%2...").arg(c+1).arg(video_count));
@@ -302,7 +331,6 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     }
                                 }
                                 free(img);
-                                //TIFFClose(tif);
                                 TinyTIFFWriter_close(tif);
                             } else {
                                 m_status=-1; emit statusChanged(m_status);
@@ -312,6 +340,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(50);
 
+                        //************** SAVE STATISTICS
                         if ((m_status==1) && !was_canceled && job.statistics) {
                             emit messageChanged(tr("saving statistics ..."));
                             QString localFilename=statisticsFilename=outputFilenameBase+".statistics.dat";
@@ -321,11 +350,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text.setLocale(outLocale);
                                 emit messageChanged(tr("saving statistics ..."));
                                 int count=statistics_time.size();//qMin(statistics_time.size(), statistics_mean.size());
-                                /*count=qMin(count, statistics_std.size());
-                                count=qMin(count, statistics_min.size());
-                                count=qMin(count, statistics_max.size());*/
                                 for (int i=0; i<count; i++) {
-                                    text<<statistics_time[i]<<", "<<statistics_mean[i]-baseline<<", "<<statistics_std[i]<<", "<<statistics_min[i]-baseline<<", "<<statistics_max[i]-baseline<<"\n";
+                                    text<<statistics_time[i]<<", "<<statistics_mean[i]<<", "<<statistics_std[i]<<", "<<statistics_min[i]<<", "<<statistics_max[i]<<"\n";
                                 }
                                 f.close();
                             } else {
@@ -336,6 +362,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(10);
 
+                        //************** SAVE ACF
                         if ((m_status==1) && !was_canceled && job.acf && acf && acf_tau && acf_N>0) {
                             QString localFilename=acfFilename=outputFilenameBase+".autocorrelation.dat";
                             QFile f(localFilename);
@@ -365,6 +392,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         emit progressIncrement(10);
 
 
+                        //************** SAVE CCF
                         if ((m_status==1) && !was_canceled && job.ccf && ccf_tau && ccf1 && ccf2 && ccf3 && ccf4 && ccf_N>0) {
                             QString localFilename=ccfFilename=outputFilenameBase+".crosscorrelation.dat";
                             QFile f(localFilename);
@@ -393,6 +421,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(10);
 
+                        //************** SAVE SETTINGS
                         if ((m_status==1) && !was_canceled) {
                             emit messageChanged(tr("saving settings ..."));
                             QString& localFilename=configFilename;
@@ -405,6 +434,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"input file                  : "<<job.filename << "\n";
                                 if (!job.descriptionFilename.isEmpty()) text<<"input description file      : "<<job.descriptionFilename << "\n";
                                 if (!averageFilename.isEmpty())         text<<"overview image file         : " << averageFilename << "\n";
+                                if (!backgroundFilename.isEmpty())      text<<"background image file       : " << backgroundFilename << "\n";
                                 if (!videoFilename.isEmpty())           text<<"video file                  : " << videoFilename << "\n";
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << statisticsFilename << "\n";
                                 if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << acfFilename << "\n";
@@ -525,34 +555,22 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
         register uint32_t frame=0;
-        float sum=0;
-        float sum2=0;
         float sframe_min=0;
         float sframe_max=0;
         uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
-        float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
         for (register uint16 i=0; i<frame_width*frame_height; i++) {
-            video_frame[i]=0;
             frame_data[i]=0;
         }
-        uint16_t video_frame_num=0;
         bool OK=true;
         while (OK && (frame<first_frame)) {
             OK=reader->nextFrame();
             frame++;
         }
         frame=0;
-        statistics_mean.clear();
-        statistics_std.clear();
-        statistics_min.clear();
-        statistics_max.clear();
-        statistics_time.clear();
         if (!OK) {
             m_status=-1; emit statusChanged(m_status);
             emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
         } else {
-            bool statFirst=true;
-            bool videoFirst=true;
             do {
                 if (!reader->readFrameUINT16(frame_data)) {
                     m_status=-1; emit statusChanged(m_status);
@@ -566,13 +584,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         image_series[frame*frame_width*frame_height+i] = v;
                         frame_min=(v<frame_min)?v:frame_min;
                         frame_max=(v>frame_max)?v:frame_max;
-                        average_frame[i]=average_frame[i]+(float)v/(float)frames;
-                        sum+=v;
-                        sum2+=(v*v);
-                        video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
-                    }
-                    if (frame<100) {
-                        //qDebug()<<frame<<sum<<sum2<<video_frame[0];
                     }
                     if (frame==0) {
                         frames_min=frame_min;
@@ -581,63 +592,123 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         frames_min=(frame_min<frames_min)?frame_min:frames_min;
                         frames_max=(frame_max>frames_max)?frame_max:frames_max;
                     }
-                    if (statFirst) {
-                        sframe_min=frame_min;
-                        sframe_max=frame_max;
-                        statFirst=false;
-                    } else {
-                        sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
-                        sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
-                    }
-                    if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
-                        float N=frame_width*frame_height*job.statistics_frames;
-                        //qDebug()<<"stat "<<frame<<sum<<sum2<<N;
-                        statistics_time.append((float)frame*job.frameTime);
-                        statistics_mean.append(sum/N);
-                        statistics_min.append(sframe_min);
-                        statistics_max.append(sframe_max);
-                        if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
-                        sum=0;
-                        sum2=0;
-                        sframe_min=0;
-                        sframe_max=0;
-                        statFirst=true;
-                    }
-                    if (job.video && video && ((frame+1)%job.video_frames==0)){
-                        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                            video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
-                            video_frame[i]=0;
-                        }
-                        video_frame_num++;
-                        //qDebug()<<video_frame_num;
-                    }
                     if (frames<500) {
                         emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
                     } else if ((frames/500==0) || (frame%(frames/500)==0)) {
                         emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(2);
                     }
                 }
-                real_video_count=video_frame_num;
-
-
                 frame++;
                 if (was_canceled) break;
             } while (reader->nextFrame() && (m_status==1) && (frame<frames));
 
         }
         free(frame_data);
-        free(video_frame);
     }
 
     if (m_status==1 && !was_canceled) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // NOW WE CORRECT THE IMAGE FOR IT'S BASELINE (ACCORDING TO THE USER SETTINGS)
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (!was_canceled) calcBackgroundCorrection();
-        emit messageChanged(tr("applying baseline correction..."));
-        for (uint32_t i=0; i<frame_width*frame_height*frames; i++) {
-            image_series[i]=image_series[i]-baseline-backgroundImage[i%(frame_width*frame_height)];
+        calcBackgroundCorrection();
+        if (m_status==1 && !was_canceled ) {
+            emit messageChanged(tr("applying baseline correction..."));
+            for (uint32_t i=0; i<frame_width*frame_height*frames; i++) {
+                image_series[i]=image_series[i]-baseline-backgroundImage[i%(frame_width*frame_height)];
+            }
         }
+    }
+
+    if (m_status==1 && !was_canceled) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // NOW WE CREATE THE VIDEO AND THE STATISTICS (from the corrected sequence!!!)
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        emit messageChanged(tr("calculating statistics/video ..."));
+        float sum=0;
+        float sum2=0;
+        float sframe_min=0;
+        float sframe_max=0;
+        float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (register uint16 i=0; i<frame_width*frame_height; i++) {
+            video_frame[i]=0;
+            average_frame[i]=0;
+        }
+        uint16_t video_frame_num=0;
+
+        statistics_mean.clear();
+        statistics_std.clear();
+        statistics_min.clear();
+        statistics_max.clear();
+        statistics_time.clear();
+
+        bool statFirst=true;
+        for(register uint32_t frame=0; frame<frames; frame++) {
+            const float* frame_data=&(image_series[frame*frame_width*frame_height]);
+            float frame_min=frame_data[0];
+            float frame_max=frame_data[0];
+
+            for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                float v=frame_data[i];
+                frame_min=(v<frame_min)?v:frame_min;
+                frame_max=(v>frame_max)?v:frame_max;
+                average_frame[i]=average_frame[i]+(float)v/(float)frames;
+                sum=sum+v;
+                sum2=sum2+(v*v);
+                video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
+            }
+            if (frame==0) {
+                frames_min=frame_min;
+                frames_max=frame_max;
+            } else {
+                frames_min=(frame_min<frames_min)?frame_min:frames_min;
+                frames_max=(frame_max>frames_max)?frame_max:frames_max;
+            }
+            if (statFirst) {
+                sframe_min=frame_min;
+                sframe_max=frame_max;
+                statFirst=false;
+            } else {
+                sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
+                sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
+            }
+            if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
+                float N=frame_width*frame_height*job.statistics_frames;
+                //qDebug()<<"stat "<<frame<<sum<<sum2<<N;
+                statistics_time.append((float)frame*job.frameTime);
+                statistics_mean.append(sum/N);
+                statistics_min.append(sframe_min);
+                statistics_max.append(sframe_max);
+                if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
+                sum=0;
+                sum2=0;
+                sframe_min=0;
+                sframe_max=0;
+                statFirst=true;
+            }
+            if (job.video && video && ((frame+1)%job.video_frames==0)){
+                for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                    video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
+                    video_frame[i]=0;
+                }
+                video_frame_num++;
+            }
+            if (frames<500) {
+                emit messageChanged(tr("calculating statistics/video (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
+            } else if ((frames/500==0) || (frame%(frames/500)==0)) {
+                emit messageChanged(tr("calculating statistics/video (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(2);
+            }
+
+            real_video_count=video_frame_num;
+
+
+            if (was_canceled) break;
+        }
+
+
+        free(video_frame);
+
     }
 
     if (m_status==1 && !was_canceled) {
@@ -869,30 +940,16 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
         register uint32_t frame=0;
-        float sum=0;
-        float sum2=0;
-        float sframe_min=0;
-        float sframe_max=0;
         uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
-        float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
         for (int64_t i=0; i<frame_width*frame_height; i++)  {
             frame_data[i]=0;
-            video_frame[i]=0;
         }
-        uint16_t video_frame_num=0;
         bool OK=true;
         while (OK && (frame<first_frame)) {
             OK=reader->nextFrame();
             frame++;
         }
         frame=0;
-        statistics_mean.clear();
-        statistics_std.clear();
-        statistics_min.clear();
-        statistics_max.clear();
-        statistics_time.clear();
-        bool statFirst=true;
-        bool videoFirst=true;
         do {
             if (!reader->readFrameUINT16(frame_data)) {
                 m_status=-1; emit statusChanged(m_status);
@@ -904,10 +961,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     register uint16_t v=frame_data[i];
                     frame_min=(v<frame_min)?v:frame_min;
                     frame_max=(v>frame_max)?v:frame_max;
-                    average_frame[i]=average_frame[i]+(float)v/(float)frames;
-                    sum+=v;
-                    sum2+=(v*v);
-                    video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
                 }
                 if (frame==0) {
                     frames_min=frame_min;
@@ -916,37 +969,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     frames_min=(frame_min<frames_min)?frame_min:frames_min;
                     frames_max=(frame_max>frames_max)?frame_max:frames_max;
                 }
-                if (statFirst) {
-                    sframe_min=frame_min;
-                    sframe_max=frame_max;
-                    statFirst=false;
-                } else {
-                    sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
-                    sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
-                }
-                if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
-                    float N=frame_width*frame_height*job.statistics_frames;
-                    statistics_time.append((float)frame*job.frameTime);
-                    statistics_mean.append(sum/N);
-                    statistics_min.append(sframe_min);
-                    statistics_max.append(sframe_max);
-                    if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
-                    sum=0;
-                    sum2=0;
-                    sframe_min=0;
-                    sframe_max=0;
-                    statFirst=true;
-                }
-                if (job.video && ((frame+1)%job.video_frames==0) && video){
-                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                        video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
-                        video_frame[i]=0;
-                    }
-                    video_frame_num++;
-                    //qDebug()<<video_frame_num;
-                }
             }
-            real_video_count=video_frame_num;
 
             if (frames<1000) {
                 emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1000/frames);
@@ -959,7 +982,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
 
         free(frame_data);
-        free(video_frame);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1065,6 +1087,24 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             frame++;
         }
         frame=0;
+
+        float sum=0;
+        float sum2=0;
+        float sframe_min=0;
+        float sframe_max=0;
+        float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (int64_t i=0; i<frame_width*frame_height; i++)  {
+            video_frame[i]=0;
+        }
+        uint16_t video_frame_num=0;
+        statistics_mean.clear();
+        statistics_std.clear();
+        statistics_min.clear();
+        statistics_max.clear();
+        statistics_time.clear();
+        bool statFirst=true;
+        bool videoFirst=true;
+
         uint32_t segment_frames=frames/job.segments;
         do {
             if (!reader->readFrameFloat(frame_data)) {
@@ -1075,6 +1115,62 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 for (register uint16 i=0; i<frame_width*frame_height; i++) {
                     frame_data[i]=frame_data[i]-baseline-backgroundImage[i];
                 }
+
+
+
+
+                float frame_min=frame_data[0];
+                float frame_max=frame_data[0];
+                for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    register float v=frame_data[i];
+                    frame_min=(v<frame_min)?v:frame_min;
+                    frame_max=(v>frame_max)?v:frame_max;
+                    average_frame[i]=average_frame[i]+(float)v/(float)frames;
+                    sum+=v;
+                    sum2+=(v*v);
+                    video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
+                }
+                if (frame==0) {
+                    frames_min=frame_min;
+                    frames_max=frame_max;
+                } else {
+                    frames_min=(frame_min<frames_min)?frame_min:frames_min;
+                    frames_max=(frame_max>frames_max)?frame_max:frames_max;
+                }
+                if (statFirst) {
+                    sframe_min=frame_min;
+                    sframe_max=frame_max;
+                    statFirst=false;
+                } else {
+                    sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
+                    sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
+                }
+                if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
+                    float N=frame_width*frame_height*job.statistics_frames;
+                    statistics_time.append((float)frame*job.frameTime);
+                    statistics_mean.append(sum/N);
+                    statistics_min.append(sframe_min);
+                    statistics_max.append(sframe_max);
+                    if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
+                    sum=0;
+                    sum2=0;
+                    sframe_min=0;
+                    sframe_max=0;
+                    statFirst=true;
+                }
+                if (job.video && ((frame+1)%job.video_frames==0) && video){
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                        video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
+                        video_frame[i]=0;
+                    }
+                    video_frame_num++;
+                }
+
+
+
+
+
+
                 // CALCULATE CORRELATIONS, we store the sum in acf and the sum of squares in acf_std
                 if (job.acf && acf_N>0) {
                     if (job.correlator==1) {
@@ -1216,6 +1312,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             if (was_canceled) break;
         } while (reader->nextFrame() && (m_status==1) && (frame<frames) && (!was_canceled));
 
+        real_video_count=video_frame_num;
+
         // calculate avg + stddev from sum and square-sum, as calculated above
         if (job.acf && acf_N>0 && (m_status==1) && (!was_canceled) ) {
             emit messageChanged(tr("averaging ACF segments ..."));
@@ -1330,16 +1428,91 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
         baseline=0;
     } else if (job.backgroundCorrection==1) {
         baseline=job.backgroundOffset;
-        frames_max=frames_max-baseline;
-        frames_min=frames_min-baseline;
+        //frames_max=frames_max-baseline;
+        //frames_min=frames_min-baseline;
     } else if (job.backgroundCorrection==2) {
         baseline=job.backgroundOffset+frames_min;
-        frames_max=frames_max-baseline;
-        frames_min=frames_min-baseline;
+        //frames_max=frames_max-baseline;
+        //frames_min=frames_min-baseline;
+    } else if (job.backgroundCorrection==3) {
+        baseline=job.backgroundOffset;
+        //frames_max=frames_max-baseline;
+        //frames_min=frames_min-baseline;
     }
+
+
+    // reset background image to 0
     for (register uint64_t i=0; i<frame_width*frame_height; i++) {
         backgroundImage[i]=0;
     }
+
+    // if we should use a background file for correction, we read it and create an averaged frame from it.
+    if (job.backgroundCorrection==3) {
+        qDebug()<<job.filenameBackground<<QFile::exists(job.filenameBackground);
+        if (QFile::exists(job.filenameBackground)) {
+            QFRDRImageReader* reader=NULL;
+            bool OK=false;
+            if (job.fileFormat>=0 && job.fileFormat<getImageReaderCount()) {
+                reader=getImageReader(job.fileFormat);
+            }
+            if (reader) {
+                emit messageChanged(tr("opening %1 background file ...").arg(reader->formatName()));
+                emit progressIncrement(10);
+                OK=reader->open(job.filenameBackground);
+                if (!OK) {
+                    m_status=-1; emit statusChanged(m_status);
+                    if (reader) messageChanged(tr("error opening background file '%1': %2").arg(job.filename).arg(reader->lastError()));
+                    else emit messageChanged(tr("error opening background file '%1'").arg(job.filename));
+                } else {
+                    emit progressIncrement(10);
+                    emit messageChanged(tr("reading frames in background file ..."));
+                    emit progressIncrement(10);
+                    uint16_t bframe_width=reader->frameWidth();
+                    uint16_t bframe_height=reader->frameHeight();
+
+                    if ((bframe_width==frame_width)&&(bframe_height==frame_height))  {
+
+                        float* frame_data=(float*)malloc(frame_width*frame_height*sizeof(float));
+                        uint64_t frames=0;
+                        do {
+                            if (!reader->readFrameFloat(frame_data)) {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("error reading background frame: %1").arg(reader->lastError()));
+                            } else {
+                                for (register uint64_t i=0; i<frame_width*frame_height; i++) {
+                                    backgroundImage[i]=backgroundImage[i]+frame_data[i];
+                                }
+
+                                if (frames%1000==0) {
+                                    emit messageChanged(tr("reading frames in background file (%1)...").arg(frames));
+                                }
+
+                                frames++;
+                            }
+                        } while (reader->nextFrame() && (m_status==1) && (!was_canceled));
+
+                        for (register uint64_t i=0; i<frame_width*frame_height; i++) {
+                            backgroundImage[i]=backgroundImage[i]/(float)frames;
+                        }
+
+                        free(frame_data);
+                    } else {
+                        m_status=-1; emit statusChanged(m_status);
+                        emit messageChanged(tr("background and data files have different framesize (data: %1x%2,  background:%3x%4)").arg(frame_width).arg(frame_height).arg(bframe_width).arg(bframe_height));
+                    }
+
+                    reader->close();
+                }
+                delete reader;
+                reader=NULL;
+            } else {
+                m_status=-1; emit statusChanged(m_status);
+                emit messageChanged(tr("could not create image reader object"));
+            }
+        }
+    }
+
+
 }
 
 

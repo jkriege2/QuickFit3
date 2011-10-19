@@ -112,6 +112,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
 bool QFRDRImagingFCSData::loadOverview(QString filename) {
     bool ok=false;
+
+    if (!overview) return false;
+
     if (QFile::exists(filename)) {
         TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
         if (tif) {
@@ -126,7 +129,7 @@ bool QFRDRImagingFCSData::loadOverview(QString filename) {
         }
     }
 
-    if (!ok) {
+    if (!ok && overview) {
         for (int i=0; i<width*height; i++) {
             overview[i]=0;
         }

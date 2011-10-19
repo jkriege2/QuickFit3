@@ -40,6 +40,7 @@ public:
 
 protected slots:
     void on_btnSelectImageFile_clicked();
+    void on_btnSelectBackgroundFile_clicked();
     void on_btnAddJob_clicked();
     void on_btnLoad_clicked();
     void on_btnHelp_clicked();
