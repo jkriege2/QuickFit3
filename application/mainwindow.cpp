@@ -4,8 +4,7 @@
 #include "ui_aboutplugins.h"
 #include "qftools.h"
 
-MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash)
-{
+MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     settings=s;
     splashPix=splash->pixmap();
 		project=NULL;

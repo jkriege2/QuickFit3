@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo -e "DEPLOYING QUICKFIT\n  in order to deploy without recompiling, call with option --nomake"
+
+
 ZIPFILE=quickfit3.zip
 REMOVEPLUGINS="cam_radhard2 cam_testcamera stage_pi863 cam_andor spimb040"
 
@@ -9,16 +12,20 @@ rm ${ZIPFILE}
 
 mkdir -p deploy
 
-cd ..
-#rm compiledate.h
-#rm svnversion.h
-#rm ./application/Makefile
-#rm ./application/Makefile.Release
-#rm ./application/Makefile.Debug
-qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
-make
-make install
-cd output
+
+if [ "$1" != "--nomake" ]; then
+	cd ..
+	#rm compiledate.h
+	#rm svnversion.h
+	#rm ./application/Makefile
+	#rm ./application/Makefile.Release
+	#rm ./application/Makefile.Debug
+	qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
+	make
+	make install
+	cd output
+fi
+
 
 for f in *
 do

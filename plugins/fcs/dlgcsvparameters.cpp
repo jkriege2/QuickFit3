@@ -1,6 +1,6 @@
 #include "dlgcsvparameters.h"
 #include <QtGui>
-
+#include <QtDebug>
 
 dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString startswith, QString columnSeparator, QString commentStart, double timefactor):
     QDialog(parent)
@@ -26,8 +26,23 @@ dlgCSVParameters::~dlgCSVParameters()
 void dlgCSVParameters::setFileContents(const QString& filename) {
     QString preview="";
     QFile file(filename);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
+    if (file.open(QIODevice::ReadOnly/* | QIODevice::Text*/)) {
+        /*QString data1=file.readAll();
+        for (int i=0; i<qMin(100, data1.size()); i++) {
+            int x=data1[i].toLatin1();
+            qDebug()<<QString("%1 ").arg(x, 2, 16);
+        }
+        qDebug()<<"\n\n";*/
+
+        file.seek(0);
+        QString data=file.readAll().replace("\n\r", "\n").replace("\r\n", "\n").replace("\r", "\n").replace("\n\n", "\n").replace(QChar(0x0D), "\n").trimmed();
+        /*for (int i=0; i<qMin(100, data.size()); i++) {
+            int x=data[i].toLatin1();
+            qDebug()<<QString("%1 ").arg(x, 2, 16);
+        }
+        qDebug()<<"\n\n";*/
+
+        QTextStream in(&data);
         while (!in.atEnd()) {
             preview=preview + in.readLine() +"\n";
         }

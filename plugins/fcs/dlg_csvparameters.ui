@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>608</width>
-    <height>616</height>
+    <height>618</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,9 +21,6 @@
   </property>
   <property name="windowTitle">
    <string>CSV Import Properties</string>
-  </property>
-  <property name="modal">
-   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
