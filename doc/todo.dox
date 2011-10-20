@@ -40,9 +40,12 @@
 
     \section qf3todo_fitalgorthms Fit Algorithms
 
+    \section qf3todo_imfcs imFCS Plugin
+        \todo save bachground image of correlation to INI
+        \todo set to remove background image, if an image is selected
 	
 	\section qf3todo_spim SPIM B040 Extension
-	\todo add functionality to scan two axes:\code for (ax1=ax1min...ax1max) { for (ax2=ax2min...ax2max) { acquire(); } }	\endcode
+	\todo check directory creation in standard acquisition
 	\todo add radiobuttons to select x, y, z, or custom axis (only in thelast case activate axis dropdown, in the other cases set it automatically to the right stage!
 	\todo add button to scan acquisition that allows to scan AROUND the current position (let the user enter steps in +/- direction in a modal dialog -> also display the scan size in microns there!)
 

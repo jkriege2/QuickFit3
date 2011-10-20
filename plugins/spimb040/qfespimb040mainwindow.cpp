@@ -6,7 +6,7 @@
 
 
 #define sqr(a) ((a)*(a))
-#define PROCESS_EVENTS_TIMEOUT_MS 100
+#define PROCESS_EVENTS_TIMEOUT_MS 20
 
 
 QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFPluginServices* pluginServices, QWidget* parent):

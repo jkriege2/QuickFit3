@@ -174,7 +174,11 @@ void CamAndorAcquisitionThread::run() {
                     }
                     imageCount++;
                 }
-                if (imageCount%(m_numKinetics/1000)==0) progress=100.0*(double)imageCount/(double)m_numKinetics;
+                if (m_numKinetics>1000) {
+                    if (imageCount%(m_numKinetics/1000)==0) progress=100.0*(double)imageCount/(double)m_numKinetics;
+                } else {
+                    progress=100.0*(double)imageCount/(double)m_numKinetics;
+                }
             }
             if (m_fileformat==0) {
                 TinyTIFFWriter_close(tiff);

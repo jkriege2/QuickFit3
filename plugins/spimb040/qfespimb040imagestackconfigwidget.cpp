@@ -236,6 +236,7 @@ void QFESPIMB040ImageStackConfigWidget::on_chkUse2_clicked(bool enabled) {
 void QFESPIMB040ImageStackConfigWidget::on_chkStage2_clicked(bool enabled) {
     ui->chkStage2->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage2->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
+    ui->chkStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_chkStage3_clicked(bool enabled) {
