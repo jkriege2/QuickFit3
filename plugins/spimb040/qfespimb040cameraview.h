@@ -28,6 +28,7 @@
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"
 #include "qfespimb00histogrammaskdialog.h"
+#include "qfasttablelabel.h"
 
 
 
@@ -204,7 +205,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief combobox to select fit function */
         QComboBox* cmbMarginalFitFunction;
         /** \brief label for marginal fit results */
-        QLabel* labMarginalFitResults;
+        QFastTableLabel* labMarginalFitResults;
         /** \brief left marginal fit plot */
         JKQTFPLinePlot* plteMarginalFitLeft;
         /** \brief bottom marginal fit plot */
@@ -219,6 +220,8 @@ class QFESPIMB040CameraView : public QWidget {
         double* pltDataMarginalFitLeftX;
         /** \brief marginal fit results as string */
         QString marginalResults;
+        /** \brief marginal fit results as string for QFastTableLabel */
+        QString marginalResultsSimple;
 
 
         /** \brief combobox to select color bar */

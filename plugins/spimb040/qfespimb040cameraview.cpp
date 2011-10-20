@@ -327,7 +327,8 @@ void QFESPIMB040CameraView::createMainWidgets() {
     labImageStatistics=new QLabel(w);
     vbl->addWidget(labImageStatistics);
 
-    labMarginalFitResults=new QLabel(w);
+    //labMarginalFitResults=new QLabel(w);
+    labMarginalFitResults=new QFastTableLabel(w);
     vbl->addWidget(labMarginalFitResults);
 
     tabSettings->addTab(w, tr("&Statistics"));
@@ -745,7 +746,8 @@ void QFESPIMB040CameraView::redrawFrame() {
         pltMarginalBottom->setVisible(false);
         pltMarginalLeft->setVisible(false);
     }
-    labMarginalFitResults->setText(marginalResults);
+    //labMarginalFitResults->setText(marginalResults);
+    labMarginalFitResults->setData(marginalResultsSimple);
 
 
 }
@@ -768,6 +770,7 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
 
 void QFESPIMB040CameraView::prepareImage() {
     marginalResults="";
+    marginalResultsSimple="";
     image.assign(rawImage);
     if (image.sizeDiffersFrom(mask)) {
         mask.assign(image.width(), image.height(), false);
@@ -894,6 +897,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 }
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">standard deviation = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2));
+                marginalResultsSimple+=tr(" | average | | stddev |\n");
+                marginalResultsSimple+=tr("left: | %1 px | %3 %5m |%2 px | %4 %5m\n").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2)).arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2)).arg(QChar(0xB5));
                 var=0;
                 avg=statisticsAverageVariance(var, pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
                 for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
@@ -904,6 +909,8 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 2)).arg(roundError(sqrt(var)*pixelW, 2));
                 marginalResults+=tr("</table></center>");
+
+                marginalResultsSimple+=tr("bottom: | %1 px | %3 %5m |%2 px | %4 %5m").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2)).arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 2)).arg(roundError(sqrt(var)*pixelW, 2)).arg(QChar(0xB5));
             } else if (cmbMarginalFitFunction->currentIndex()==2) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double pout[4];
@@ -927,6 +934,11 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>gauss</td></tr>").arg(status.fnorm);
 
+                marginalResultsSimple+=tr("left:\n|average = |%1 px|1/e%3-radius = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2)).arg(QChar(0xB2));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
+                marginalResultsSimple+=tr("|%2%3 = |%1|func:|gauss\n").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
+
 
 
                 m_dat=pltDataMarginalBottomN;
@@ -941,13 +953,18 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=fGauss(x, pout);
                 }
+
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func</td><td>gauss</td></tr>").arg(status.fnorm);
-
-
                 marginalResults+=tr("</table></center>");
+
+                marginalResultsSimple+=tr("bottom:\n|average = |%1 px|1/e%3-radius = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2)).arg(QChar(0xB2));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
+                marginalResultsSimple+=tr("|%2%3 = |%1|func:|gauss").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
+
             } else if (cmbMarginalFitFunction->currentIndex()==3) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double pout[4];
@@ -971,6 +988,10 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
 
+                marginalResultsSimple+=tr("left:\n|average = |%1 px|1. zero = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
+                marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit\n").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
 
 
                 m_dat=pltDataMarginalBottomN;
@@ -990,9 +1011,12 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, fabs(pout[3])*pixelW, 2)).arg(roundError(fabs(pout[3])*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
-
-
                 marginalResults+=tr("</table></center>");
+
+                marginalResultsSimple+=tr("bottom:\n|average = |%1 px|1. zero = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
+                marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
             }
         }
     }
@@ -1440,7 +1464,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
         tabCursor.insertHtml(labImageStatistics->text());
         tabCursor.insertBlock();
         tabCursor.insertBlock();
-        tabCursor.insertHtml(labMarginalFitResults->text());
+        tabCursor.insertHtml(marginalResults);
     }
 }
 
