@@ -313,8 +313,11 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
         dlg->setInfo(getCameraInfo(camera, false, false, true, false));
 
         uint32_t* data=(uint32_t*)calloc(info.width*info.height, sizeof(uint32_t));
+        uint32_t* data1=(uint32_t*)calloc(info.width*info.height, sizeof(uint32_t));
         useCameraSettings(camera, settings);
         acquireFullFrame(camera, data);
+        useCameraSettings(camera, settings);
+        acquire(camera, data1);
         dlg->setImage(data);
         int oldShutterMode=camGlobalSettings[camera].shutterMode;
         camGlobalSettings[camera].shutterMode=2; // close shutter
@@ -326,6 +329,7 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
         setGlobalSettings(camera);
 
         free(data);
+        free(data1);
         delete dlg;
     }
 }
@@ -501,6 +505,7 @@ bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* dat
     CameraInfo info;
     if (camInfos.contains(camera)) info=camInfos[camera];
 
+    CHECK(SetIsolatedCropMode(0, info.width, info.height, 1, 1), tr("error while switching off isolated crop mode"));
     CHECK(SetFullImage(1, 1), tr("error while settings full sensor size (no binnig) as image size"));
     CHECK(StartAcquisition(), tr("error while starting acquisition"));
 

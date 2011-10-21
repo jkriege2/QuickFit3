@@ -413,7 +413,13 @@ void AndorSettingsDialog::updatePreview() {
     int scaleX=qMax(1, (int)floor(ui->labPlot->width()/m_sensorWidth));
     int scaleY=qMax(1, (int)floor(ui->labPlot->height()/m_sensorHeight));
     int scale=qMin(scaleX, scaleY);
-    QPixmap pixmap((m_sensorWidth+16)*scale, (m_sensorHeight+16)*scale);
+    if ((m_sensorWidth+16)*scale>4096 || (m_sensorHeight+16)*scale>4096) {
+        qDebug()<<"SCALING PROBLEM m_sensorWidth="<<m_sensorWidth<<"   m_sensorHeight="<<m_sensorHeight<<"   scale="<<scale;
+        scale=1;
+    }
+    int imw=(m_sensorWidth+16)*scale;
+    int imh=(m_sensorHeight+16)*scale;
+    QPixmap pixmap(imw, imh);
     pixmap.fill(QColor("lightgray"));
     QPainter painter;
     painter.begin(&pixmap);
@@ -425,6 +431,7 @@ void AndorSettingsDialog::updatePreview() {
     painter.setPen(QColor("red"));
     painter.drawRect(sub.translated(8,8));
     painter.end();
+    ui->labPlot->setScaledContents(imw>1024 || imh>1024);
     ui->labPlot->setPixmap(pixmap);
     m_updatingPreview=old_m_updatingPreview;
     //qDebug()<<"updatePreview() ... DONE";
