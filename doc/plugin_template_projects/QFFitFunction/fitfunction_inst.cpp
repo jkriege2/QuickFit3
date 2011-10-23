@@ -1,4 +1,4 @@
-#include "fcs_fitfuctions.h"
+#include "fitfunction_inst.h"
 
 QStringList QFFitAlgorithmInst::getIDs() const {
     QStringList res;

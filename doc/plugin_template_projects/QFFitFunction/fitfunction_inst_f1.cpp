@@ -9,9 +9,9 @@
 
 QFFitAlgorithmInst_F1::QFFitAlgorithmInst_F1() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(FloatNumber,  "p1",                      "",                                                      "",                                "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.0,          -10,      10,       1,   -100    100  );
+    addParameter(FloatNumber,  "p1",                      "",                                                      "",                                "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.0,          -10,      10,       1,   -100,    100  );
     #define PARAM1 0
-    addParameter(FloatNumber,  "p2",                      "",                                                      "",                                "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.0,          -10,      10,       1,   -100    100  );
+    addParameter(FloatNumber,  "p2",                      "",                                                      "",                                "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.0,          -10,      10,       1,   -100,    100  );
     #define PARAM2 1
 
 }
@@ -36,7 +36,7 @@ void QFFitAlgorithmInst_F1::calcParameter(double* data, double* error) const {
     const double p1=data[PARAM1];
 	double ep1=0;
     if (error) {
-        eN=error[PARAM1];
+        ep1=error[PARAM1];
     }
 
     data[PARAM2]=2*p1;
