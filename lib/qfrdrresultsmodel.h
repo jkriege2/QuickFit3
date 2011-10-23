@@ -49,6 +49,8 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         QStringList lastResultNames;
         /** \brief current list of all shown result labels (updated on model reset, using calcResultNames() */
         QStringList lastResultLabels;
+        /** \brief list of all columns/evaluation result sets in the model (as they are unsorted in the QFRawDataRecord), where one string is the ID and the second the label */
+        QList<QPair<QString, QString> > lastResultSets;
 };
 
 #endif // QFRDRRESULTSMODEL_H

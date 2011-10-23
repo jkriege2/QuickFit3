@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>971</width>
-    <height>280</height>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -489,7 +489,7 @@ p, li { white-space: pre-wrap; }
          <string>&amp;start:</string>
         </property>
         <property name="buddy">
-         <cstring>spinStart</cstring>
+         <cstring>spinStart2</cstring>
         </property>
        </widget>
       </item>
@@ -535,7 +535,7 @@ p, li { white-space: pre-wrap; }
          <string>   &amp;delta:</string>
         </property>
         <property name="buddy">
-         <cstring>spinDelta</cstring>
+         <cstring>spinDelta2</cstring>
         </property>
        </widget>
       </item>
@@ -561,7 +561,7 @@ p, li { white-space: pre-wrap; }
          <string>   st&amp;eps::</string>
         </property>
         <property name="buddy">
-         <cstring>spinSteps</cstring>
+         <cstring>spinSteps2</cstring>
         </property>
        </widget>
       </item>
@@ -760,7 +760,7 @@ p, li { white-space: pre-wrap; }
          <string>&amp;start:</string>
         </property>
         <property name="buddy">
-         <cstring>spinStart</cstring>
+         <cstring>spinStart3</cstring>
         </property>
        </widget>
       </item>
@@ -806,7 +806,7 @@ p, li { white-space: pre-wrap; }
          <string>   &amp;delta:</string>
         </property>
         <property name="buddy">
-         <cstring>spinDelta</cstring>
+         <cstring>spinDelta3</cstring>
         </property>
        </widget>
       </item>
@@ -832,7 +832,7 @@ p, li { white-space: pre-wrap; }
          <string>   st&amp;eps::</string>
         </property>
         <property name="buddy">
-         <cstring>spinSteps</cstring>
+         <cstring>spinSteps3</cstring>
         </property>
        </widget>
       </item>
@@ -908,8 +908,8 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>79</x>
-     <y>91</y>
+     <x>107</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>144</x>
@@ -924,11 +924,11 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>75</x>
-     <y>65</y>
+     <x>93</x>
+     <y>66</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
+     <x>121</x>
      <y>64</y>
     </hint>
    </hints>

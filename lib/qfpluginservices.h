@@ -53,6 +53,8 @@ class QFPluginServices {
             QString mainhelp;
             QString plugintypehelp;
             QString plugintypename;
+            QString pluginDLLbasename;
+            QString pluginDLLSuffix;
         };
 
         /** Default destructor */

@@ -9,7 +9,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     splashPix=splash->pixmap();
 		project=NULL;
 
-    newProjectTimer.setInterval(500);
+    newProjectTimer.setInterval(2500);
     newProjectTimer.stop();
     connect(&newProjectTimer, SIGNAL(timeout()), this, SLOT(saveProjectFirstTime()));
 
@@ -73,6 +73,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getAssetsDirectory()+QString("/help/")));
+    htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a></div>")));
@@ -90,8 +91,12 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$").arg(settings->getAssetsDirectory()+"/help/")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.simplest"), tr("back: <a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getAssetsDirectory()+"/help/")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_rdrscreen.html\">Basic Raw Data Record Dialog Help</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"$$qf_ui_rdr_helpfil$$\">$$qf_ui_rdr_helpfiletitle$$</a>")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_rdr_helpfile"), tr("%1qf3_rdrscreen.html").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_rdr_helpfiletitle"), tr("Basic Raw Data Record Dialog Help")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Basic Evaluation Dialog Help</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfile"), tr("%1qf3_evalscreen.html").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfiletitle"), tr("Basic Evaluation Dialog Help")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.extension"), tr("")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Fit Functions Help</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
@@ -578,7 +583,7 @@ void MainWindow::createWidgets() {
     prgMainProgress=new QProgressBar(this);
     statusBar()->addPermanentWidget(prgMainProgress);
 
-    helpWindow=new QFHTMLHelpWindow(0, Qt::Tool | Qt::WindowStaysOnTopHint);
+    helpWindow=new QFHTMLHelpWindow(0, Qt::Tool/* | Qt::WindowStaysOnTopHint*/);
     //helpWindow->setHtmlReplacementList(&htmlReplaceList);
     helpWindow->initFromPluginServices(this);
     helpWindow->close();
@@ -1229,12 +1234,11 @@ void MainWindow::displayHelpWindow(const QString& helpfile) {
     if (helpfile.isEmpty()) helpWindow->updateHelp(settings->getAssetsDirectory()+QString("/help/quickfit.html"));
     else helpWindow->updateHelp(helpfile);
     helpWindow->show();
+    helpWindow->raise();
 }
 
 void MainWindow::displayHelp() {
-    helpWindow->clear();
-    helpWindow->updateHelp(settings->getAssetsDirectory()+QString("/help/quickfit.html"));
-    helpWindow->show();
+    displayHelpWindow("");
 }
 
 QMenu* MainWindow::getMenu(QString menu) {

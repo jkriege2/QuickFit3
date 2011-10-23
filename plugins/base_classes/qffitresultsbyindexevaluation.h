@@ -326,9 +326,22 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual QString getEvaluationResultID(int currentIndex);
 
 
+
+
+
+        /*! \brief perform a fit for the given \a record and \a run
+
+            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
+            If both are -1, the full range is used
+
+            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+          */
+        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL)=0;
+
     public slots:
         /** \brief set the current index to use */
-        void setCurrentIndex(int index);
+        virtual void setCurrentIndex(int index);
+
 
 
     protected:

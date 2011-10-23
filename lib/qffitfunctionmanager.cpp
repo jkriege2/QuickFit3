@@ -37,6 +37,8 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
                     info.plugintypename=tr("Fit Function Plugins");
+                    info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                    info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                     pluginHelpList->append(info);
                 }
             }

@@ -104,6 +104,25 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
         void setCurrentFPSSaveDir(QString d);
         QString currentSaveDirectory() const;
         void setCurrentSaveDirectory(QString d);
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin(QFRawDataRecord* rec)=0;
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int) with a viable choice for \a defaultMax */
+        virtual int getUserMax(QFRawDataRecord* rec)=0;
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(int) with a viable choice for \a defaultMin */
+        virtual int getUserMin()=0;
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(int) with a viable choice for \a defaultMax */
+        virtual int getUserMax()=0;
+
+        /** \brief get the lower datacut for the current record */
+        virtual int getUserMin(int defaultMin=0);
+        /** \brief get the upper datacut for the current record */
+        virtual int getUserMax(int defaultMax=1);
+        /** \brief get the lower datacut for the current record, the \a defaultMin should be read from editors current data cut widget */
+        virtual int getUserMin(QFRawDataRecord* rec, int defaultMin);
+        /** \brief get the upper datacut for the current record, the \a defaultMax should be read from editors current data cut widget */
+        virtual int getUserMax(QFRawDataRecord* rec, int defaultMax);
     signals:
 
     public slots:
@@ -118,6 +137,14 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
         /** \brief emitted when we should print a report */
         void printReport();
 
+        /** \brief set the lower datacut for the current record */
+        virtual void setUserMin(int userMin);
+
+        /** \brief set the upper datacut for the current record */
+        virtual void setUserMax(int userMax);
+
+        /** \brief set the upper and lower datacut for the current record */
+        virtual void setUserMinMax(int userMin, int userMax);
 
     protected slots:
         /*! \brief display all data and parameters describing the current record
@@ -130,10 +157,23 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
 
         /** \brief replot curves */
         virtual void replotData()=0;
+
+
         /** \brief read the settings */
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+
+
+        /** \brief reset current */
+        virtual void resetCurrent();
+        /** \brief reset all files */
+        virtual void resetAll();
+        /** \brief copy to all files, all runs */
+        virtual void copyToAll();
+        /** \brief copy to initial values */
+        virtual void copyToInitial(bool emitSignals=true);
+
 
     protected:
         /** \brief create a report in a given QTextDocument object

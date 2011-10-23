@@ -18,14 +18,16 @@ HEADERS += dlgcsvparameters.h \
            qfrdrfcsrateeditor.h \
 		   qfprdrfcs.h \
 		   ../interfaces/qfrdrfcsdatainterface.h \
-		   ../interfaces/qfrdrcountratesinterface.h
+		   ../interfaces/qfrdrcountratesinterface.h \
+    ../../../../../LIB/trunk/qt/completertextedit.h
 
 SOURCES += dlgcsvparameters.cpp \
            alv5000tools.cpp \
            qfrdrfcscorrelationeditor.cpp \
            qfrdrfcsdata.cpp \
            qfrdrfcsrateeditor.cpp \
-		   qfprdrfcs.cpp
+		   qfprdrfcs.cpp \
+    ../../../../../LIB/trunk/qt/completertextedit.cpp
 
 FORMS = dlg_csvparameters.ui
 
@@ -45,5 +47,7 @@ ASSETSTESTDATA_FILES.files = ./assets/fcs_testdata/*.*
 ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/fcs_testdata/
 
 INSTALLS += ASSETSTESTDATA_FILES
+
+
 
 

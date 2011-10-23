@@ -81,6 +81,16 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFFCSFitEvaluationEditor();
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin(QFRawDataRecord* rec, int index);
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMax */
+        virtual int getUserMax(QFRawDataRecord* rec, int index);
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin();
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(int) with a viable choice for \a defaultMax */
+        virtual int getUserMax();
     protected slots:
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -91,7 +101,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         /** \brief write the settings */
         virtual void writeSettings();
         /** \brief used to reread all parameter widget values from the datastore */
-        void updateParameterValues();
+        virtual void updateParameterValues();
 
 
     protected:
@@ -222,21 +232,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         /** \brief stores the last fit statistics report, created in updateFitFunction() */
         QString fitStatisticsReport;
 
-        QFFitAlgorithmThreadedFit* doFitThread;
 
-        /*! \brief execute a fit for the given record and run
-
-            \param record the record to to the fit for
-            \param run the run in \a record to do the fit for
-
-            This function is called from fitAll(), fitRunsAll(), fitRunsCurrent(), fitCurrent().
-
-            All parameters except \a record and \a run are read from the currently set parameters.
-
-            It will set some messages in dlgFitProgress, but won't display or hide this window. This will have to be
-            done in the calling function. Also the redisplay of the model ... won't be done by this method.
-        */
-        void doFit(QFRawDataRecord* record, int run);
         /** \brief create a report in a given QTextDocument object
          *
          *  For correct sizing of the plots: set the textWidth of the document before calling this function!
@@ -263,10 +259,6 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
             replotData().
         */
         virtual void updateFitFunctions();
-
-        /*! \brief fit model to current data
-         */
-        void fitCurrent();
 
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
@@ -309,30 +301,15 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         void parameterRangeChanged();
 
 
+        /*! \brief fit model to current data
+         */
+        void fitCurrent();
         /** \brief fit all files (current run) */
         void fitAll();
         /** \brief fit all files, all runs */
         void fitRunsAll();
         /** \brief fit all runs in current file */
         void fitRunsCurrent();
-        /** \brief reset current */
-        void resetCurrent();
-        /** \brief reset all files */
-        void resetAll();
-        /** \brief copy to all files, all runs */
-        void copyToAll();
-        /** \brief reset all runs in current file */
-        void resetAllRuns();
-        /** \brief copy to all runs in current file */
-        void copyToAllRuns();
-        /** \brief copy to all files, but only current run */
-        void copyToAllCurrentRun();
-        /** \brief copy to initial values */
-        void copyToInitial(bool emitSignals=true);
-
-        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
-         *         it with the appropriate values, according to the current settings */
-        double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
 
 
     private:
@@ -340,6 +317,17 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         void createWidgets();
 
 
+
+    public:
+
+        /* explicitly make some functions visible again, as the C++ compiler hides function definitions
+           from a base class that are also declared in the derived class, but with different parameter sets!
+
+           see http://www.parashift.com/c++-faq-lite/strange-inheritance.html#faq-23.9
+         */
+
+        using QFFitResultsByIndexEvaluationEditorBase::getUserMin;
+        using QFFitResultsByIndexEvaluationEditorBase::getUserMax;
 };
 
 #endif // QFFCSFITEVALUATIONEDITOR_H

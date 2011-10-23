@@ -84,71 +84,78 @@ void QFPRDRFCS::insertFCS() {
                               settings->getCurrentRawDataDir(),
                               alvf+";;"+asciif+";;"+albaf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
-        settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
-        QMap<QString, QVariant> p;
-        if (currentFCSFileFormatFilter==alvf) {
-            p["FILETYPE"]="ALV5000";
-            p["CHANNEL"]=0;
-        } else if (currentFCSFileFormatFilter==asciif) {
-            p["FILETYPE"]="CSV_CORR";
-            p["CSV_SEPARATOR"]=QString(",");
-            p["CSV_COMMENT"]=QString("#");
-            p["CSV_STARTSWITH"]=QString("");
-            p["CSV_TIMEFACTOR"]=1.0;
+        if (files.size()>0) {
+            settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
+            QMap<QString, QVariant> p;
+            if (currentFCSFileFormatFilter==alvf) {
+                p["FILETYPE"]="ALV5000";
+                p["CHANNEL"]=0;
+            } else if (currentFCSFileFormatFilter==asciif) {
+                p["FILETYPE"]="CSV_CORR";
+                p["CSV_SEPARATOR"]=QString(",");
+                p["CSV_COMMENT"]=QString("#");
+                p["CSV_STARTSWITH"]=QString("");
+                p["CSV_TIMEFACTOR"]=1.0;
+                p["CSV_FIRSTLINE"]=1;
 
-            dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
-                                                          settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
-                                                          settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
-                                                          settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble());
-            loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
-            if (files.size()>0) csvDlg->setFileContents(files[0]);
-            if (csvDlg->exec()==QDialog::Accepted) {
-                p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
-                p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
-                p["CSV_STARTSWITH"]=csvDlg->get_startswith();
-                p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
-                settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
-                settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
-                settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
-                settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
-                saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
-            } else {
-                services->setProgress(0);
-                return;
-            }
-        } else if (currentFCSFileFormatFilter==albaf) {
-            p["FILETYPE"]="ISS_ALBA";
-        }
-        QStringList paramsReadonly;
-        paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_TIMEFACTOR";
-        QStringList list = files;
-        QStringList::Iterator it = list.begin();
-        services->setProgressRange(0, list.size());
-        services->setProgress(0);
-        int i=0;
-        while(it != list.end()) {
-            i++;
-            if (QFile::exists(*it)) {
-                //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
-                services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
-                if (currentFCSFileFormatFilter==alvf) {
-                    insertALV5000File(*it, p, paramsReadonly);
-                } else if (currentFCSFileFormatFilter==albaf) {
-                    insertALBAFile(*it, p, paramsReadonly);
+                dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
+                                                              settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
+                                                              settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
+                                                              settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble(),
+                                                              settings->getQSettings()->value("fcs/csv_firstline", 1).toInt());
+                loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
+                if (files.size()>0) csvDlg->setFileContents(files[0]);
+                if (csvDlg->exec()==QDialog::Accepted) {
+                    p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
+                    p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
+                    p["CSV_STARTSWITH"]=csvDlg->get_startswith();
+                    p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
+                    p["CSV_FIRSTLINE"]=csvDlg->get_firstLine();
+                    settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
+                    settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
+                    settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
+                    settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
+                    settings->getQSettings()->setValue("fcs/csv_firstline", csvDlg->get_firstLine());
+                    saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
                 } else {
-                    insertCSVFile(*it, p, paramsReadonly);
+                    services->setProgress(0);
+                    return;
                 }
-                //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
-                settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
-                //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
-                ++it;
+            } else if (currentFCSFileFormatFilter==albaf) {
+                p["FILETYPE"]="ISS_ALBA";
             }
-            services->setProgress(i);
-            QApplication::processEvents();
+            QStringList paramsReadonly;
+            paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_TIMEFACTOR";
+            QStringList list = files;
+            QStringList::Iterator it = list.begin();
+            services->setProgressRange(0, list.size());
+            services->setProgress(0);
+            int i=0;
+            while(it != list.end()) {
+                i++;
+                if (QFile::exists(*it)) {
+                    //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
+                    services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
+                    if (currentFCSFileFormatFilter==alvf) {
+                        insertALV5000File(*it, p, paramsReadonly);
+                    } else if (currentFCSFileFormatFilter==albaf) {
+                        insertALBAFile(*it, p, paramsReadonly);
+                    } else {
+                        insertCSVFile(*it, p, paramsReadonly);
+                    }
+                    //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
+                    settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+                    //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
+                    ++it;
+                }
+                services->setProgress(i);
+                QApplication::processEvents();
+            }
+            services->setProgress(0);
+            //std::cout<<"loading done ...\n";
+            //tvMain->expandToDepth(2);
         }
-        services->setProgress(0);
-        //std::cout<<"loading done ...\n";
-        //tvMain->expandToDepth(2);
+
     }
 }
 

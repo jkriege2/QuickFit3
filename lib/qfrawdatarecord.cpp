@@ -361,13 +361,6 @@ void QFRawDataRecord::resultsClear(QString name) {
     }
 };
 
-bool QFRawDataRecord::resultsExists(QString evalName, QString resultName) const {
-    if (results.contains(evalName)) {
-        return results[evalName]->results.contains(resultName);
-    }
-    return false;
-};
-
 int QFRawDataRecord::resultsGetCount(QString evalName) const {
     if (results.contains(evalName)) return results[evalName]->results.size();
     return 0;
@@ -644,6 +637,38 @@ QString QFRawDataRecord::resultsGetAsString(QString evalName, QString resultName
         default: return ("");
     }
     return QString("");
+}
+
+QVariant QFRawDataRecord::resultsGetAsStringVariant(QString evalName, QString resultName) const {
+    const evaluationResult& r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreBoolean: if (r.bvalue) return QVariant(tr("true")); else return QVariant(tr("false"));
+        case qfrdreInteger: return QVariant(QString("%1 %2").arg(r.ivalue).arg(r.unit));
+        case qfrdreNumber: return QVariant(QString("%1 %2").arg(r.dvalue).arg(r.unit));
+        case qfrdreNumberVector: {
+            QString s="(";
+            for (int i=0; i<r.dvec.size(); i++) {
+                if (i>0) s=s+"; ";
+                s=s+QString::number(r.dvec[i]);
+            }
+            return QVariant(s+") "+r.unit);
+        }
+        case qfrdreNumberMatrix: {
+            QString s="(";
+            for (int i=0; i<r.dvec.size(); i++) {
+                if (i>0) {
+                    if (i%r.columns==0) s=s+";; ";
+                    else s=s+"; ";
+                }
+                s=s+QString::number(r.dvec[i]);
+            }
+            return QVariant(s+") "+r.unit);
+        }
+        case qfrdreNumberError: return QVariant(QString("(%1 +/- %2) %3").arg(r.dvalue).arg(r.derror).arg(r.unit));
+        case qfrdreString: return QVariant(r.svalue);
+        default: return QVariant();
+    }
+    return QVariant();
 }
 
 double QFRawDataRecord::resultsGetAsDouble(QString evalName, QString resultName, bool* ok) const {

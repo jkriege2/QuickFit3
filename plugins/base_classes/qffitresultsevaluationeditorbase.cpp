@@ -1,6 +1,6 @@
 #include "qffitresultsevaluationeditorbase.h"
 #include "qffitresultsevaluation.h"
-#include "qffitresultsbyindexevaluation.h"
+#include "QFFitResultsEvaluation.h"
 #include "qmodernprogresswidget.h"
 
 
@@ -282,4 +282,203 @@ void QFFitResultsEvaluationEditorBase::printReport() {
     delete p;
     progress.accept();
     QApplication::restoreOverrideCursor();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void QFFitResultsEvaluationEditorBase::resetCurrent() {
+    if (!current) return;
+    QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    eval->resetAllFitResultsCurrent();
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFitResultsEvaluationEditorBase::resetAll() {
+    if (!current) return;
+    QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    eval->resetAllFitResultsAllFiles();
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+
+
+void QFFitResultsEvaluationEditorBase::copyToAll() {
+
+    if (!current) return;
+    QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!eval) return;
+    copyToInitial(false);
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
+
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        if (record) {
+            record->disableEmitResultsChanged();
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                QString id=ffunc->getParameterID(i);
+                double value=eval->getFitValue(id);
+                double error=eval->getFitError(id);
+                bool fix=eval->getFitFix(id);
+                if (ffunc->isParameterVisible(i, params)) {
+                    if (eval->hasFit(record)) {
+                        eval->setFitResultValue(record, eval->getEvaluationResultID(), id, value, error);
+                        eval->setFitResultFix(record, eval->getEvaluationResultID(), id, fix);
+                    }
+                }
+            }
+            record->enableEmitResultsChanged();
+        };
+    }
+
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    eval->emitResultsChanged();
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+
+
+void QFFitResultsEvaluationEditorBase::copyToInitial(bool emitSignals) {
+    if (!current) return;
+    QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!eval) return;
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
+    for (int i=0; i<ffunc->paramCount(); i++) {
+        QString id=ffunc->getParameterID(i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        if (ffunc->isParameterVisible(i, params)) {
+            eval->setInitFitFix(id, fix);
+            eval->setInitFitValue(id, value, error);
+        };
+    }
+
+
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    if (emitSignals) eval->emitResultsChanged();
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+
+
+
+
+
+int QFFitResultsEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, int defaultMin) {
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return defaultMin;
+    const QString resultID=data->getEvaluationResultID();
+
+    // WORKROUND FOR OLD PROPERTY NAMES
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
+
+    return rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
+}
+
+int QFFitResultsEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int defaultMax) {
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return defaultMax;
+    const QString resultID=data->getEvaluationResultID();
+
+    // WORKROUND FOR OLD PROPERTY NAMES
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
+
+    return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+}
+
+int QFFitResultsEvaluationEditorBase::getUserMin(int defaultMin) {
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return defaultMin;
+    QFRawDataRecord* rdr=data->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID();
+
+    // WORKROUND FOR OLD PROPERTY NAMES
+    int defaultM=rdr->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
+
+    return rdr->getProperty(resultID+"_datacut_min", defaultM).toInt();
+}
+
+int QFFitResultsEvaluationEditorBase::getUserMax(int defaultMax) {
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return defaultMax;
+    QFRawDataRecord* rdr=data->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID();
+
+
+
+    // WORKROUND FOR OLD PROPERTY NAMES
+    int defaultM=rdr->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
+
+    return rdr->getProperty(resultID+"_datacut_max", defaultM).toInt();
+}
+
+
+void QFFitResultsEvaluationEditorBase::setUserMin(int userMin) {
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return;
+    QFRawDataRecord* rdr=data->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID();
+    rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
+}
+
+void QFFitResultsEvaluationEditorBase::setUserMax(int userMax) {
+    if (!current) return;
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return;
+    QFRawDataRecord* rdr=data->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID();
+    rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
+}
+
+void QFFitResultsEvaluationEditorBase::setUserMinMax(int userMin, int userMax) {
+    if (!current) return;
+    QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (!data) return;
+    QFRawDataRecord* rdr=data->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID();
+    rdr->disableEmitPropertiesChanged();
+    rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
+    rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
+    rdr->enableEmitPropertiesChanged(true);
 }

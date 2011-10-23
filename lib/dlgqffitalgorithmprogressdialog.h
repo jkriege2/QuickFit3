@@ -2,8 +2,8 @@
 #define DLGQFFITALGORITHMPROGRESSDIALOG_H
 
 #include <QDialog>
-#include "qffitalgorithm.h"
 #include "lib_imexport.h"
+#include "qffitalgorithm.h"
 
 
 namespace Ui {
@@ -11,7 +11,7 @@ namespace Ui {
 };
 
 
-/*! \brief a progress dialog for QFFitAlgorithm objects
+/*! \brief a progress dialog, which also supports a super-progress
     \ingroup qf3lib_fitting
 
     This dialog implements the methods, as in the interface QFFitAlgorithmReporter. In addition this dialog allows to display
@@ -48,7 +48,7 @@ class QFLIB_EXPORT dlgQFFitAlgorithmProgressDialog : public QDialog
 
 
         /** \brief return \c true, if the user has canceled the fit procedure */
-        bool isCanceled() { return m_canceled; };
+        virtual bool isCanceled() { return m_canceled; }
 
         /** \brief set the display delay in milliseconds */
         void setDisplayDelay(double delay_in_msecs) { m_displayDelay=delay_in_msecs; }
@@ -63,15 +63,15 @@ class QFLIB_EXPORT dlgQFFitAlgorithmProgressDialog : public QDialog
 
 
         /** \brief report a status message */
-        void reportStatus(const QString& message);
+        virtual void reportStatus(const QString& message);
         /** \brief set the progress maximum to \a max */
-        void setProgressMax(int max=100);
+        virtual void setProgressMax(int max=100);
         /** \brief set the current progress to the given value */
-        void setProgress(int value);
+        virtual void setProgress(int value);
         /** \brief set the current progress to 100% */
-        void setProgressFull();
+        virtual void setProgressFull();
         /** \brief increment the current progress */
-        void incProgress(int increment=1);
+        virtual void incProgress(int increment=1);
 
         /** \brief report a super status message */
         void reportSuperStatus(const QString& message);

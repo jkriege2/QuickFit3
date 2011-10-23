@@ -192,7 +192,9 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief check box to use automatic count range determination */
         QCheckBox* chkCountsRangeAutoHigh;
         /** \brief label for the image statistics output */
-        QLabel* labImageStatistics;
+        QFastTableLabel* labImageStatistics;
+        //QLabel* labImageStatistics;
+        QString labImageStatisticsText;
         /** \brief spin edit for number of histogram bins */
         QSpinBox* spinHistogramBins;
         /** \brief check box to use automatic histogram bin determination */

@@ -32,7 +32,8 @@ HEADERS += spimb040.h \
     qfespimb040opticssetup.h \
     qfespimb040simplecameraconfig.h \
     qfespimb00histogrammaskdialog.h \
-    ../../../../../LIB/trunk/qt/qfasttablelabel.h
+    ../../../../../LIB/trunk/qt/qfasttablelabel.h \
+    ../../../../../LIB/trunk/histogram.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -69,6 +70,7 @@ INCLUDEPATH += . \
 QT += gui xml svg opengl
 
 CONFIG += exceptions rtti stl
+
 
 
 

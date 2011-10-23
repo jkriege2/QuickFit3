@@ -18,14 +18,16 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow
     iconMovingOpposite=QPixmap(":/spimb040/stage_moving2.png");
     iconJoystick=QPixmap(":/spimb040/stage_joystick.png");
     iconNoJoystick=QPixmap(":/spimb040/stage_nojoystick.png");
-    timerDisplayUpdate.setInterval(stageStateUpdateInterval);
-    connect(&timerDisplayUpdate, SIGNAL(timeout()), this, SLOT(displayAxisStates()));
-    timerDisplayUpdate.start();
+    //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
+    //connect(&timerDisplayUpdate, SIGNAL(timeout()), this, SLOT(displayAxisStates()));
+    //timerDisplayUpdate.start();
 
     findStages(m_pluginServices->getExtensionManager());
     createWidgets();
     createActions();
     updateStates();
+
+    QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
 }
 
 QFESPIMB040SampleStageConfig::~QFESPIMB040SampleStageConfig()
@@ -39,7 +41,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(ProgramOptions* settings, QStrin
     cmbStageZ->setCurrentIndex((settings->getQSettings())->value(prefix+"stage_z", 2).toInt());
     spinJoystickMaxSpeed->setValue((settings->getQSettings())->value(prefix+"joystick_max_speed", 500).toDouble());
     stageStateUpdateInterval=(settings->getQSettings())->value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
-    timerDisplayUpdate.setInterval(stageStateUpdateInterval);
+    //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
 void QFESPIMB040SampleStageConfig::storeSettings(ProgramOptions* settings, QString prefix) {
@@ -672,6 +674,7 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
     /*if ((!locked) && anyconn && automatic) {
         QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
     }*/
+    QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
 }
 
 void QFESPIMB040SampleStageConfig::moveAbsolute() {

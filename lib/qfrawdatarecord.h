@@ -262,7 +262,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */
         void resultsClear(QString name, QString postfix);
         /** \brief check whether a result exists */
-        bool resultsExists(QString evalName, QString resultName) const;
+        inline bool resultsExists(QString evalName, QString resultName) const {
+            if (results.contains(evalName)) {
+                return results[evalName]->results.contains(resultName);
+            }
+            return false;
+        }
         /** \brief check whether there are any results from a given evauation */
         inline bool resultsExistsFromEvaluation(QString evalName) const {
             return results.contains(evalName);
@@ -303,8 +308,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 return results[evalName]->results.value(resultName).type;
             }
             return qfrdreInvalid;
-        };        /** \brief return a specified result as string */
+        };
+        /** \brief return a specified result as string */
         QString  resultsGetAsString(QString evalName, QString resultName) const;
+        /** \brief return a specified result as string, but returns as a QVariant. If the result is invalid, a QVariant() will be returned. */
+        QVariant  resultsGetAsStringVariant(QString evalName, QString resultName) const;
         /** \brief remove the value stored in the given position
          *
          *  If the results for the given \a evalName are empty after the delete, the entry for the

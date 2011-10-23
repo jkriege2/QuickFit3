@@ -2,7 +2,7 @@
 #include <QtGui>
 #include <QtDebug>
 
-dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString startswith, QString columnSeparator, QString commentStart, double timefactor):
+dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString startswith, QString columnSeparator, QString commentStart, double timefactor, int startInLine):
     QDialog(parent)
 {
     setupUi(this);
@@ -14,6 +14,7 @@ dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString startswith, QString 
     edtTimefactor->setText(QString::number(timefactor));
     edtColumn->setText(QString(columnSeparator));
     edtComment->setText(QString(commentStart));
+    spinStartInLine->setValue(startInLine);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(checkValues()));
 }
 
@@ -48,7 +49,8 @@ void dlgCSVParameters::setFileContents(const QString& filename) {
         }
         file.close();
     }
-    txtContents->setPlainText(preview);
+    //txtContents->setPlainText(preview);
+    txtContents->getEditor()->setPlainText(preview);
 }
 
 void dlgCSVParameters::checkValues() {
@@ -73,6 +75,7 @@ void dlgCSVParameters::checkValues() {
         comment_start=(s.size()>0)?s[0].toAscii():'#';
         startswith=edtStartswith->text();
         timefactor=edtTimefactor->text().toDouble();
+        firstline=spinStartInLine->value();
 
         accept();
     }

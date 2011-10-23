@@ -10,6 +10,7 @@
 #include "qffitfunction.h"
 #include "qffitalgorithm.h"
 #include "qffitparameterbasicinterface.h"
+#include "qffitalgorithmthreaddedfit.h"
 
 /*! \brief evaluation item base class for data fits using QFFitAlgorithm and QFFitFunction
     \ingroup qf3evaluationplugins
@@ -651,6 +652,8 @@ public:
     virtual bool getDefaultFitFix(const QString& id);
     /*! \brief reset the all fit results to the initial/global/default value in the currently displayed curve/data */
     virtual void resetAllFitResultsCurrent();
+    /*! \brief reset the all fit results to the initial/global/default value in all raw data arecords */
+    virtual void resetAllFitResultsAllFiles();
     /*! \brief reset all parameters to the initial/global/default value in current file and resultID */
     virtual void resetAllFitValueCurrent();
     /*! \brief reset all parameters to the initial/global/default fix in current file and resultID */
@@ -747,6 +750,10 @@ protected:
     QSettings* fitParamGlobalSettings;
     /** \brief settings object to access fit parameters */
     QSettings* fitParamSettings;
+
+
+    /** \brief thread used for fitting */
+    QFFitAlgorithmThreadedFit* doFitThread;
 
 
 

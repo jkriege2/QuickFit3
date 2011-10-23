@@ -19,15 +19,21 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
     public:
         /** \brief class constructor */
         explicit QFFitResultsByIndexEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QWidget *parent = 0);
-        /** \brief get the lower datacut for the current record */
-        virtual int getUserMin(int defaultMin=0);
-        /** \brief get the upper datacut for the current record */
-        virtual int getUserMax(int defaultMax=1);
 
-        /** \brief get the lower datacut for the current record */
-        virtual int getUserMin(QFRawDataRecord* rec, int index, int defaultMin=0);
-        /** \brief get the upper datacut for the current record */
-        virtual int getUserMax(QFRawDataRecord* rec, int index, int defaultMax=1);
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin(QFRawDataRecord* rec, int index)=0;
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMax */
+        virtual int getUserMax(QFRawDataRecord* rec, int index)=0;
+        /** \brief get the lower datacut for the current record, the \a defaultMin should be read from editors current data cut widget */
+        virtual int getUserMin(QFRawDataRecord* rec, int index, int defaultMin);
+        /** \brief get the upper datacut for the current record, the \a defaultMax should be read from editors current data cut widget */
+        virtual int getUserMax(QFRawDataRecord* rec, int index, int defaultMax);
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin(QFRawDataRecord* rec);
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int) with a viable choice for \a defaultMax */
+        virtual int getUserMax(QFRawDataRecord* rec);
     signals:
 
     public slots:
@@ -49,14 +55,34 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
         /** \brief copy max cut to all runs (except the current run) */
         void copyUserMaxToAllRuns(int userMax);
 
-        /** \brief set the lower datacut for the current record */
-        virtual void setUserMin(int userMin);
 
-        /** \brief set the upper datacut for the current record */
-        virtual void setUserMax(int userMax);
 
-        /** \brief set the upper and lower datacut for the current record */
-        virtual void setUserMinMax(int userMin, int userMax);
+        /** \brief reset current */
+        virtual void resetCurrent();
+        /** \brief reset all files */
+        virtual void resetAll();
+        /** \brief copy to all files, all runs */
+        virtual void copyToAll();
+        /** \brief reset all runs in current file */
+        virtual void resetAllRuns();
+        /** \brief copy to all runs in current file */
+        virtual void copyToAllRuns();
+        /** \brief copy to all files, but only current run */
+        virtual void copyToAllCurrentRun();
+
+
+
+    public:
+
+        /* explicitly make some functions visible again, as the C++ compiler hides function definitions
+           from a base class that are also declared in the derived class, but with different parameter sets!
+
+           see http://www.parashift.com/c++-faq-lite/strange-inheritance.html#faq-23.9
+         */
+
+        using QFFitResultsEvaluationEditorBase::getUserMin;
+        using QFFitResultsEvaluationEditorBase::getUserMax;
+
 };
 
 #endif // QFFITRESULTSBYINDEXEVALUATIONEDITORBASE_H

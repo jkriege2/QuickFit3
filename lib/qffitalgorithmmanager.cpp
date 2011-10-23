@@ -40,6 +40,8 @@ void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServi
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitalg.html");
                     info.plugintypename=tr("Fit Algorithm Plugins");
+                    info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                    info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                     pluginHelpList->append(info);
                 }
             }

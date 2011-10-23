@@ -188,11 +188,12 @@ int QFFitResultsByIndexEvaluation::getCurrentIndex() {
 void QFFitResultsByIndexEvaluation::resetAllFitResultsCurrentFileAllIndices() {
     QFRawDataRecord* r=getHighlightedRecord();
     if (!r) return;
-
+    r->disableEmitResultsChanged();
     for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
         QString en=getEvaluationResultID(idx);
         r->resultsClear(en);
     }
+    r->enableEmitResultsChanged();
 }
 
 
@@ -200,18 +201,23 @@ void QFFitResultsByIndexEvaluation::resetAllFitResultsCurrentFileAllIndices() {
 
 /*! \brief reset all fit results to the initial/global/default value in all files and all indexs */
 void QFFitResultsByIndexEvaluation::resetAllFitResultsAllFilesAllIndices() {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) return ;
     QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
         if (r) {
+            r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
                 QString en=getEvaluationResultID(idx);
                 r->resultsClear(en);
             }
+            r->enableEmitResultsChanged();
         }
     }
+}
+
+/*! \brief reset all fit results to the initial/global/default value in all files and all indexs */
+void QFFitResultsByIndexEvaluation::resetAllFitResults() {
+    resetAllFitResultsAllFilesAllIndices();
 }
 
 /*! \brief reset all parameters to the initial/global/default value in all files and all indexs */
@@ -222,6 +228,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitValue()  {
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
         if (r) {
+            r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
                 QString en=getEvaluationResultID(idx);
                 for (int j=0; j<f->paramCount(); j++) {
@@ -230,24 +237,13 @@ void QFFitResultsByIndexEvaluation::resetAllFitValue()  {
                     if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
                 }
             }
+            r->enableEmitResultsChanged();
         }
     }
 }
 
 
-/*! \brief reset all fit results to the initial/global/default value in all files and all indexs */
-void QFFitResultsByIndexEvaluation::resetAllFitResults() {
-    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
-    for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* r=recs[i];
-        if (r) {
-            for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString en=getEvaluationResultID(idx);
-                r->resultsClear(en);
-            }
-        }
-    }
-}
+
 
 /*! \brief reset all parameters to the initial/global/default fix in all files and all indexs */
 void QFFitResultsByIndexEvaluation::resetAllFitFix() {
@@ -257,6 +253,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitFix() {
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
         if (r) {
+            r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
                 QString en=getEvaluationResultID(idx);
                 for (int j=0; j<f->paramCount(); j++) {
@@ -265,6 +262,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitFix() {
                     if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
                 }
             }
+            r->enableEmitResultsChanged();
         }
     }
 }
@@ -324,4 +322,21 @@ void QFFitResultsByIndexEvaluation::setAllFitFixes(const QString& id, bool fix, 
     }
     emit resultsChanged();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

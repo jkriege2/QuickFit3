@@ -9,20 +9,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>608</width>
-    <height>618</height>
+    <width>680</width>
+    <height>640</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>CSV Import Properties</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <property name="windowIcon">
+   <iconset resource="qfrdrfcs.qrc">
+    <normaloff>:/fcs_rawdata.png</normaloff>:/fcs_rawdata.png</iconset>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0">
    <item>
     <widget class="QLabel" name="label_5">
      <property name="text">
@@ -30,9 +34,10 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;&lt;img src=&quot;:/lib/help.png&quot;&gt;&amp;nbsp;Help:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/lib/help.png&quot; /&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Help:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Please specify the parameters used to import correlation curves from a comma separated values (CSV) file into QuickFit.&lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If the data section starts late in the file, you can set this property and the importer will search through all lines in the file until it finds one &lt;span style=&quot; text-decoration: underline;&quot;&gt;containing&lt;/span&gt; the given string and start importing just after it.&lt;/li&gt;
+&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It is also possible to start reading in the n-th line (possibly after finding above's  string), i.e. to skip the first n-1 lines&lt;/li&gt;
 &lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The column separator specifies a character that separates the columns in the file. If you input a whitepsace, the columns are separated by whitespaces&lt;/li&gt;
 &lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If comments appear in the file, the should start with a special character which is set in this property&lt;/li&gt;
 &lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If the time column (column 0) does not give the lag time in second you may set this value and the time column values will be multiplied by it. E.g. if the lag time is given in milliseconds then this property has to be &lt;span style=&quot; font-style:italic;&quot;&gt;1e-3&lt;/span&gt;.&lt;/li&gt;&lt;/ul&gt;
@@ -57,19 +62,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="txtContents">
-     <property name="font">
-      <font>
-       <pointsize>7</pointsize>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="backgroundVisible">
-      <bool>false</bool>
-     </property>
-    </widget>
+    <widget class="CompleterTextEdit" name="txtContents" native="true"/>
    </item>
    <item>
     <widget class="QLabel" name="label_6">
@@ -89,6 +82,43 @@ p, li { white-space: pre-wrap; }
      <property name="fieldGrowthPolicy">
       <enum>QFormLayout::ExpandingFieldsGrow</enum>
      </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Data &amp;starts with:</string>
+       </property>
+       <property name="buddy">
+        <cstring>edtStartswith</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="edtStartswith">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Start read in line &amp;line:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinStartInLine</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSpinBox" name="spinStartInLine">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100000</number>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
@@ -164,23 +194,6 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Data &amp;starts with:</string>
-       </property>
-       <property name="buddy">
-        <cstring>edtStartswith</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="edtStartswith">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -195,7 +208,25 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>CompleterTextEdit</class>
+   <extends>QWidget</extends>
+   <header>completertextedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>edtStartswith</tabstop>
+  <tabstop>spinStartInLine</tabstop>
+  <tabstop>edtColumn</tabstop>
+  <tabstop>edtComment</tabstop>
+  <tabstop>edtTimefactor</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources>
+  <include location="qfrdrfcs.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
@@ -204,12 +235,28 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>290</x>
-     <y>210</y>
+     <x>299</x>
+     <y>608</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>303</x>
+     <y>607</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>500</x>
+     <y>500</y>
     </hint>
    </hints>
   </connection>

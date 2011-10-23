@@ -55,6 +55,11 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         /** \brief this slot is bound to the sliderHigh and is called whenever its value changes. It updates the internal variables and label */
         void sliderHighValueChanged(int value);
 
+        /** \brief this slot is bound to the sliderLow and is called whenever it finished editing. */
+        void sliderLowEditingFinished();
+        /** \brief this slot is bound to the sliderHigh and is called whenever it finishes editing */
+        void sliderHighEditingFinished();
+
         /** \brief this emity copyUserMinToAll() */
         void copyUserMinClicked() { emit copyUserMinToAll(userMin); }
 

@@ -32,7 +32,6 @@ QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, Q
     m_parameterCheckboxWidth=32;
     fitStatisticsReport="";
 
-    doFitThread=new QFFitAlgorithmThreadedFit(this);
 
     createWidgets();
 }
@@ -670,7 +669,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
 
-    qDebug()<<" **** displayModel()";
+    //qDebug()<<" **** displayModel()";
 
     if (!ffunc) {
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -885,7 +884,7 @@ void QFFCSFitEvaluationEditor::replotData() {
         return;
     }
 
-    qDebug()<<" **** replotData()";
+    //qDebug()<<" **** replotData()";
     QTime t, t1;
     t.start();
     t1.start();
@@ -1070,7 +1069,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     }
 
 
-    qDebug()<<" **** updateFitFunctions";
+    //qDebug()<<" **** updateFitFunctions";
     QTime t, t1;
     t.start();
     t1.start();
@@ -1121,7 +1120,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     }
                 }
 
-                double* weights=allocWeights(NULL, record, eval->getCurrentIndex(), datacut_min, datacut_max);
+                double* weights=eval->allocWeights(NULL, record, eval->getCurrentIndex(), datacut_min, datacut_max);
                 //qDebug()<<"    b "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1564,238 +1563,6 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
 
 
 
-void QFFCSFitEvaluationEditor::resetCurrent() {
-    if (!current) return;
-    if (!cmbModel) return;
-    //QFRawDataRecord* record=current->getHighlightedRecord();
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    eval->resetAllFitResultsCurrent();
-    updateParameterValues();
-    replotData();
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::resetAll() {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    eval->resetAllFitResultsAllFilesAllIndices();
-    //bool updEn=updatesEnabled();
-    //setUpdatesEnabled(false);
-    updateParameterValues();
-    replotData();
-    //setUpdatesEnabled(updEn);
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::resetAllRuns() {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-    eval->resetAllFitResultsCurrentFileAllIndices();
-    //bool updEn=updatesEnabled();
-    //setUpdatesEnabled(false);
-    updateParameterValues();
-    replotData();
-    //setUpdatesEnabled(updEn);
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::copyToAll() {
-
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    copyToInitial(false);
-
-    QFFitFunction* ffunc=eval->getFitFunction();
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
-
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-
-    eval->set_doEmitResultsChanged(false);
-    eval->set_doEmitPropertiesChanged(false);
-
-
-    for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* record=recs[i];
-        QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-        if (fcs) {
-            record->disableEmitResultsChanged();
-            for (int i=0; i<ffunc->paramCount(); i++) {
-                QString id=ffunc->getParameterID(i);
-                double value=eval->getFitValue(id);
-                double error=eval->getFitError(id);
-                bool fix=eval->getFitFix(id);
-                if (ffunc->isParameterVisible(i, params)) {
-                    int runmax=fcs->getCorrelationRuns();
-                    if (runmax<=1) runmax=0;
-                    for (int run=-1; run<runmax; run++) {
-                        if (eval->hasFit(record, run)) {
-                            eval->setFitResultValue(record, run, id, value, error);
-                            eval->setFitResultFix(record, run, id, fix);
-                        }
-                    }
-                }
-            }
-            record->enableEmitResultsChanged();
-        };
-    }
-
-    eval->set_doEmitResultsChanged(true);
-    eval->set_doEmitPropertiesChanged(true);
-    eval->emitResultsChanged();
-
-    free(params);
-    QApplication::restoreOverrideCursor();
-}
-
-
-void QFFCSFitEvaluationEditor::copyToAllRuns() {
-
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    copyToInitial(false);
-
-    QFFitFunction* ffunc=eval->getFitFunction();
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
-
-    eval->set_doEmitResultsChanged(false);
-    eval->set_doEmitPropertiesChanged(false);
-
-    QFRawDataRecord* record=eval->getHighlightedRecord();
-    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-    if (fcs) {
-        record->disableEmitResultsChanged();
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            QString id=ffunc->getParameterID(i);
-            double value=eval->getFitValue(id);
-            double error=eval->getFitError(id);
-            bool fix=eval->getFitFix(id);
-            if (ffunc->isParameterVisible(i, params)) {
-                int runmax=fcs->getCorrelationRuns();
-                if (runmax<=1) runmax=0;
-                for (int run=-1; run<runmax; run++) {
-                    if (eval->hasFit(record, run)) {
-                        eval->setFitResultValue(record, run, id, value, error);
-                        eval->setFitResultFix(record, run, id, fix);
-                    }
-                }
-            };
-        }
-        record->enableEmitResultsChanged();
-    }
-
-    eval->set_doEmitResultsChanged(true);
-    eval->set_doEmitPropertiesChanged(true);
-    eval->emitResultsChanged();
-
-    free(params);
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
-
-    if (!current) return;
-    if (!cmbModel) return;
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    copyToInitial(false);
-
-    QFFitFunction* ffunc=eval->getFitFunction();
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
-
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-
-    eval->set_doEmitResultsChanged(false);
-    eval->set_doEmitPropertiesChanged(false);
-
-    for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* record=recs[i];
-        QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-        if (fcs) {
-            record->disableEmitResultsChanged();
-            for (int i=0; i<ffunc->paramCount(); i++) {
-                QString id=ffunc->getParameterID(i);
-                double value=eval->getFitValue(id);
-                double error=eval->getFitError(id);
-                bool fix=eval->getFitFix(id);
-                if (ffunc->isParameterVisible(i, params)) {
-                    int runmax=fcs->getCorrelationRuns();
-                    if (runmax<=1) runmax=0;
-
-                    int run=eval->getCurrentIndex();
-
-                    if (eval->hasFit(record, run)) {
-                        eval->setFitResultValue(record, run, id, value, error);
-                        eval->setFitResultFix(record, run, id, fix);
-                    }
-                }
-            }
-            record->enableEmitResultsChanged();
-        };
-    }
-    eval->set_doEmitResultsChanged(true);
-    eval->set_doEmitPropertiesChanged(true);
-    eval->emitResultsChanged();
-
-    free(params);
-    QApplication::restoreOverrideCursor();
-}
-
-void QFFCSFitEvaluationEditor::copyToInitial(bool emitSignals) {
-    if (!current) return;
-    if (!cmbModel) return;
-    QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    if (!fcs) return;
-
-    QFFitFunction* ffunc=eval->getFitFunction();
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
-
-    eval->set_doEmitResultsChanged(false);
-    eval->set_doEmitPropertiesChanged(false);
-
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        double value=eval->getFitValue(id);
-        double error=eval->getFitError(id);
-        bool fix=eval->getFitFix(id);
-        if (ffunc->isParameterVisible(i, params)) {
-            eval->setInitFitFix(id, fix);
-            eval->setInitFitValue(id, value, error);
-        };
-    }
-
-
-    eval->set_doEmitResultsChanged(true);
-    eval->set_doEmitPropertiesChanged(true);
-    if (emitSignals) eval->emitResultsChanged();
-
-    free(params);
-    QApplication::restoreOverrideCursor();
-}
-
 
 
 
@@ -1934,6 +1701,7 @@ void QFFCSFitEvaluationEditor::configFitAlgorithm() {
         }
     }
 }
+
 void QFFCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!dataEventsEnabled) return;
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
@@ -2068,344 +1836,6 @@ void QFFCSFitEvaluationEditor::plotMouseMove(double x, double y) {
 
 
 
-
-
-/////////////////////////////////////////////////////////////////////
-// FITTING AND READING DATA FOR FIT, FIT STATISTICS
-/////////////////////////////////////////////////////////////////////
-
-double* QFFCSFitEvaluationEditor::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) {
-    if (weightsOKK) *weightsOKK=false;
-    if (!current) return NULL;
-    if (!cmbModel) return NULL;
-    QFRawDataRecord* record=record_in;
-    if (!record_in) record=current->getHighlightedRecord();
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    //JKQTPdatastore* ds=pltData->getDatastore();
-    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    //QFFitFunction* ffunc=eval->getFitFunction();
-    int run=run_in;
-    if (run<=-100) run=eval->getCurrentIndex();
-
-    int N=data->getCorrelationN();
-
-    QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
-    double* weights=(double*)malloc(N*sizeof(double));
-    bool weightsOK=false;
-    if (weighting==QFFCSFitEvaluation::StdDevWeighting) {
-        double* std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
-        double* std=NULL;
-        if (run>=0) std=data->getCorrelationRunError(run);
-        else std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (!weightsOK) {
-        for (int i=0; i<N; i++) weights[i]=1;
-        if (weighting==QFFCSFitEvaluation::EqualWeighting) weightsOK=true;
-    }
-    if (weightsOKK) *weightsOKK=weightsOK;
-    return weights;
-}
-
-
-void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
-    QApplication::processEvents();
-    QApplication::processEvents();
-
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!eval) return;
-    QFFitFunction* ffunc=eval->getFitFunction();
-    QFFitAlgorithm* falg=eval->getFitAlgorithm();
-    if ((!ffunc)||(!data)||(!falg)) return;
-
-    eval->restoreQFFitAlgorithmParameters(falg);
-
-    //QFFCSFitEvaluation::DataWeight weighting=eval->getFitDataWeighting();
-
-    if (data->getCorrelationN()>0) {
-        falg->setReporter(dlgFitProgressReporter);
-        QString runname=tr("average");
-        if (run>=0) runname=QString::number(run);
-        dlgFitProgress->reportStatus(tr("setting up ..."));
-        dlgFitProgress->setProgressMax(100);
-        dlgFitProgress->setProgress(0);
-
-        services->log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', run %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
-
-        long N=data->getCorrelationN();
-        double* weights=NULL;
-        double* taudata=data->getCorrelationT();
-        double* corrdata=NULL;
-        if (run<0) {
-            corrdata=data->getCorrelationMean();
-        } else {
-            if (run<(int)data->getCorrelationRuns()) {
-                corrdata=data->getCorrelationRun(run);
-            } else {
-                corrdata=data->getCorrelationMean();
-            }
-        }
-        // we also have to care for the data cutting
-        int cut_low=getUserMin(record, run, datacut->get_userMin());
-        int cut_up=getUserMax(record, run, datacut->get_userMax());
-        if (cut_low<0) cut_low=0;
-        if (cut_up>=N) cut_up=N-1;
-        int cut_N=cut_up-cut_low+1;
-        if (cut_N<0) {
-            cut_low=0;
-            cut_up=ffunc->paramCount()-1;
-            if (cut_up>=N) cut_up=N-1;
-            cut_N=cut_up+1;
-        }
-
-        /*QString dt, dc;
-        for (int i=cut_low; i<=cut_up; i++) {
-            dt+=QString(", %1").arg(taudata[i]);
-            dc+=QString(", %1").arg(corrdata[i]);
-        }
-        services->log_text(tr("   - tau:  (%1)\n").arg(dt));
-        services->log_text(tr("   - corr: (%1)\n").arg(dc));*/
-
-
-        services->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
-        bool weightsOK=false;
-        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
-        if (!weightsOK) services->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
-
-        // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
-        // we are working with a complete set of parameters
-        double* params=eval->allocFillParameters(record, run);
-        double* initialparams=eval->allocFillParameters(record, run);
-        double* errors=eval->allocFillParameterErrors(record, run);
-        double* paramsMin=eval->allocFillParametersMin();
-        double* paramsMax=eval->allocFillParametersMax();
-        bool* paramsFix=eval->allocFillFix(record, run);
-
-
-
-        try {
-            eval->set_doEmitPropertiesChanged(false);
-            eval->set_doEmitResultsChanged(false);
-            record->disableEmitResultsChanged();
-
-            ffunc->calcParameter(params, errors);
-            ffunc->calcParameter(initialparams, errors);
-
-            QString iparams="";
-            QString oparams="";
-            QString orparams="";
-            int fitparamcount=0;
-            for (int i=0; i<ffunc->paramCount(); i++) {
-                if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
-                    if (!iparams.isEmpty()) iparams=iparams+";  ";
-                    fitparamcount++;
-                    iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(params[i]);
-                }
-                //printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-            }
-
-
-            if (cut_N>fitparamcount) {
-
-
-                if (!dlgFitProgress->isCanceled()) {
-
-                    dlgFitProgress->reportStatus(tr("fitting ..."));
-                    dlgFitProgress->setProgressMax(100);
-                    dlgFitProgress->setProgress(0);
-                    doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-                    doFitThread->start(QThread::HighPriority);
-                    QTime t;
-                    t.start();
-                    while (!doFitThread->isFinished()) {
-                        if (t.elapsed()>100) {
-                            QApplication::processEvents();
-                            if (dlgFitProgress->isCanceled()) {
-                              doFitThread->terminate();
-                              break;
-                            }
-                            t.start();
-                        }
-                    }
-                    dlgFitProgress->setProgressFull();
-                    dlgFitProgress->reportStatus(tr("calculating parameters, errors and storing data ..."));
-                }
-                //dlgFitProgress->setAllowCancel(false);
-
-
-                if (!dlgFitProgress->isCanceled()) {
-                    record->disableEmitResultsChanged();
-
-                    QFFitAlgorithm::FitResult result=doFitThread->getResult();
-                    ffunc->calcParameter(params, errors);
-                    ffunc->sortParameter(params, errors);
-                    ffunc->calcParameter(params, errors);
-
-                    for (int i=0; i<ffunc->paramCount(); i++) {
-                        if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
-                            if (!oparams.isEmpty()) oparams=oparams+";  ";
-
-                            oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
-                        }
-                        //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-                    }
-
-                    // round errors and values
-                    for (int i=0; i<ffunc->paramCount(); i++) {
-                        errors[i]=roundError(errors[i], 2);
-                        params[i]=roundWithError(params[i], errors[i], 2);
-                    }
-                    eval->setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), paramsFix);
-
-                    for (int i=0; i<ffunc->paramCount(); i++) {
-                        if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
-                            if (!orparams.isEmpty()) orparams=orparams+";  ";
-                            orparams=orparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
-                        }
-                        //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
-                    }
-
-                    services->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
-                    services->log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
-                    services->log_text(tr("   - initial params         (%1)\n").arg(iparams));
-                    services->log_text(tr("   - output params          (%1)\n").arg(oparams));
-                    services->log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
-
-
-                    QString evalID=eval->getEvaluationResultID(ffunc->id(), run);
-                    QString param;
-                    QString group="fit properties";
-                    QString egroup=QString("%1%2__%3__%4").arg(eval->getType()).arg(eval->getID()).arg(falg->id()).arg(ffunc->id());
-                    QString egrouplabel=QString("%1%2: %3, %4").arg(eval->getType()).arg(eval->getID()).arg(falg->shortName()).arg(ffunc->shortName());
-
-                    record->resultsSetEvaluationGroup(evalID, egroup);
-                    record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
-                    record->resultsSetEvaluationGroupIndex(evalID, run);
-                    record->resultsSetEvaluationDescription(evalID, QString(""));
-
-                    record->resultsSetInteger(evalID, param="fit_used_run", run);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: used runs"));
-
-                    record->resultsSetString(evalID, "fit_model_name", ffunc->id());
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: model"));
-
-                    record->resultsSetString(evalID, "fitalg_name", falg->id());
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
-
-                    record->resultsSetNumber(evalID, "fitalg_runtime", doFitThread->getDeltaTime(), "msecs");
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: runtime"));
-
-                    record->resultsSetBoolean(evalID, "fitalg_success", result.fitOK);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: success"));
-
-                    record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: message"));
-
-                    record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
-
-                    record->resultsSetInteger(evalID, "fit_datapoints", cut_N);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: datapoints"));
-
-                    record->resultsSetInteger(evalID, "fit_cut_low", cut_low);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: first point"));
-
-                    record->resultsSetInteger(evalID, "fit_cut_up", cut_up);
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit: last point"));
-
-
-                    QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
-                    while (it.hasNext()) {
-                        it.next();
-                        record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
-                        record->resultsSetGroup(evalID, param, group);
-                        record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
-                    }
-                    record->enableEmitResultsChanged(false);
-                    //emit resultsChanged();
-                } else {
-                    services->log_warning(tr("   - fit canceled by user!!!\n"));
-                }
-            } else {
-                services->log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
-            }
-            eval->set_doEmitPropertiesChanged(true);
-            eval->set_doEmitResultsChanged(true);
-            record->enableEmitResultsChanged(false);
-            //eval->emitPropertiesChanged();
-            //eval->emitResultsChanged();
-        } catch(std::exception& E) {
-            services->log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
-        }
-
-        // clean temporary parameters
-        //delete doFitThread;
-        free(weights);
-        free(params);
-        free(initialparams);
-        free(errors);
-        free(paramsFix);
-        free(paramsMax);
-        free(paramsMin);
-
-        //displayModel(false);
-        //replotData();
-        //QApplication::restoreOverrideCursor();
-        //dlgFitProgress->done();
-        falg->setReporter(NULL);
-    }
-}
-
-
-
-
 void QFFCSFitEvaluationEditor::fitCurrent() {
     if (!current) return;
     if (!cmbModel) return;
@@ -2432,7 +1862,7 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
 
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-        doFit(record, eval->getCurrentIndex());
+        eval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter);
         record->enableEmitResultsChanged(true);
 
         dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
@@ -2481,7 +1911,8 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
             if (run>=0) runname=QString::number(run);
             dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
 
-            doFit(record, run);
+            //doFit(record, run);
+            eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter);
 
             dlgFitProgress->incSuperProgress();
             falg->setReporter(NULL);
@@ -2546,7 +1977,8 @@ void QFFCSFitEvaluationEditor::fitAll() {
                 falg->setReporter(dlgFitProgressReporter);
                 dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
 
-                doFit(record, run);
+                //doFit(record, run);
+                eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter);
 
                 falg->setReporter(NULL);
                 if (dlgFitProgress->isCanceled()) break;
@@ -2623,7 +2055,8 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
                     if (run>=0) runname=QString::number(run);
                     dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
 
-                    doFit(record, run);
+                    //doFit(record, run);
+                    eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter);
 
                     dlgFitProgress->incSuperProgress();
                     falg->setReporter(NULL);
@@ -2651,6 +2084,21 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
 
 
 
+int QFFCSFitEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index) {
+    return getUserMin(rec, index, datacut->get_userMin());
+}
+
+int QFFCSFitEvaluationEditor::getUserMax(QFRawDataRecord* rec, int index) {
+    return getUserMax(rec, index, datacut->get_userMax());
+}
+
+int QFFCSFitEvaluationEditor::getUserMin() {
+    return getUserMin(datacut->get_userMin());
+}
+
+int QFFCSFitEvaluationEditor::getUserMax() {
+    return getUserMax(datacut->get_userMax());
+}
 
 
 

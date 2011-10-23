@@ -47,6 +47,8 @@ void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_extension.html");
                     info.plugintypename=tr("Extension Plugins");
+                    info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                    info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                     pluginHelpList->append(info);
                 }
             }

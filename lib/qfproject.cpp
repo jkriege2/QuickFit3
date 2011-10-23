@@ -172,7 +172,6 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
-    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
     emitStructureChanged();
 
@@ -434,11 +433,13 @@ QStringList QFProject::getAllPropertyNames() {
     return sl;
 }
 
-bool QFProject_StringPairCaseInsensitiveCompareSecond(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+template <class T1>
+bool QFProject_StringPairCaseInsensitiveCompareSecond(const QPair<T1, QString> &s1, const QPair<T1, QString> &s2) {
     return s1.second.toLower() < s2.second.toLower();
 }
 
-bool QFProject_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+template <class T1>
+bool QFProject_StringPairCaseInsensitiveCompare(const QPair<QString, T1> &s1, const QPair<QString, T1> &s2) {
     return s1.first.toLower() < s2.first.toLower();
 }
 
@@ -479,10 +480,10 @@ QList<QPair<QString, QString> > QFProject::rdrCalcMatchingResultsNamesAndLabels(
     }
 
     if (list.size()>0) {
-        qSort(list.begin(), list.end(), QFProject_StringPairCaseInsensitiveCompareSecond);
+        qSort(list.begin(), list.end(), QFProject_StringPairCaseInsensitiveCompareSecond<QString>);
     }
     if (listp.size()>0) {
-        qSort(listp.begin(), listp.end(), QFProject_StringPairCaseInsensitiveCompareSecond);
+        qSort(listp.begin(), listp.end(), QFProject_StringPairCaseInsensitiveCompareSecond<QString>);
     }
     listp.append(list);
     return listp;
@@ -672,6 +673,10 @@ QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResu
                 l.append(pa);
             }
         }
+    }
+
+    if (l.size()>0) {
+        qSort(l.begin(), l.end(), QFProject_StringPairCaseInsensitiveCompareSecond<QPointer<QFRawDataRecord> > );
     }
 
     return l;

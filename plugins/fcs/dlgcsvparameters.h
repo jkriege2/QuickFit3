@@ -20,7 +20,7 @@ class dlgCSVParameters : public QDialog, private Ui::dlgCSVParameters
         Q_OBJECT
     public:
         /** Default constructor */
-        dlgCSVParameters(QWidget* parent=NULL, QString startswith=QString(""), QString columnSeparator=QString(","), QString commentStart=QString("#"), double timefactor=1);
+        dlgCSVParameters(QWidget* parent=NULL, QString startswith=QString(""), QString columnSeparator=QString(","), QString commentStart=QString("#"), double timefactor=1, int startInLine=1);
         /** Default destructor */
         virtual ~dlgCSVParameters();
         /** \brief display a preview of the file */
@@ -30,11 +30,13 @@ class dlgCSVParameters : public QDialog, private Ui::dlgCSVParameters
         char get_comment_start() { return comment_start; };
         double get_timefactor() { return timefactor; };
         QString get_startswith() { return startswith; };
+        int get_firstLine() { return firstline; }
     protected:
         char column_separator;
         char comment_start;
         double timefactor;
         QString startswith;
+        int firstline;
     private slots:
         void checkValues();
 };

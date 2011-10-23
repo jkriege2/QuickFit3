@@ -362,6 +362,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     if (pluginList) {
         for (int i=0; i<pluginList->size(); i++) {
             if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
+                QString pid=pluginList->at(i).plugin->getID();
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"%1\">").arg(pluginList->at(i).plugin->getIconFilename())));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), pluginList->at(i).plugin->getIconFilename()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
@@ -374,14 +375,19 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), pluginList->at(i).plugin->getWeblink()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), tr("<a href=\"%1\">Plugin Webpage</a>").arg(pluginList->at(i).plugin->getWeblink())));
-                fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pluginList->at(i).plugin->getID()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pid));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_dllbasename"), pluginList->at(i).pluginDLLbasename));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_dllsuffix"), pluginList->at(i).pluginDLLSuffix));
+                if (m_pluginServices) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), m_pluginServices->getAssetsDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
+                }
                 if (!pluginList->at(i).tutorial.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));
-                    fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\">Plugin Tutorial</a>").arg(pluginList->at(i).tutorial)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin Tutorial</b></a>").arg(pluginList->at(i).tutorial)));
                 }
                 if (!pluginList->at(i).mainhelp.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_file"), pluginList->at(i).mainhelp));
-                    fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\">Plugin Help</a>").arg(pluginList->at(i).mainhelp)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_link"), tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin Help</b></a>").arg(pluginList->at(i).mainhelp)));
                 }
                 int major=0, minor=0;
                 pluginList->at(i).plugin->getVersion(major, minor);

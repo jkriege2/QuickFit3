@@ -13,6 +13,7 @@
 #include "qffitparameterbasicinterface.h"
 #include "../base_classes/qffitresultsevaluation.h"
 #include "../base_classes/qffitresultsbyindexevaluation.h"
+#include "qffitalgorithm.h"
 
 /*! \brief evaluation item class for FCS least square fits
     \ingroup qf3evalp_fcsfit
@@ -40,18 +41,18 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         virtual ~QFFCSFitEvaluation();
 
         /** \brief return type (short type string) */
-        virtual QString getType() const { return QString("fcs_fit"); };
+        virtual QString getType() const { return QString("fcs_fit"); }
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr("FCS Fit"); };
+        virtual QString getTypeName() const { return tr("FCS Fit"); }
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/fcs_fit.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/fcs_fit.png"); }
         /** \brief return type description */
-        virtual QString getTypeDescription() const { return tr("Least squares fitting for fluorescence correlation spectroscopy data"); };
+        virtual QString getTypeDescription() const { return tr("Least squares fitting for fluorescence correlation spectroscopy data"); }
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/fcs_fit_logo.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/fcs_fit_logo.png"); }
         /** \brief returns the number of additional editor panes for this record */
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName() { return QString("Fit"); };
+        virtual QString getEditorName() { return QString("Fit"); }
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QWidget* parent=NULL);
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
@@ -60,9 +61,9 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
 
 
         /** \brief set the current fitting algorithm */
-        void setFitDataWeighting(DataWeight weighting) { m_weighting=weighting; };
+        void setFitDataWeighting(DataWeight weighting) { m_weighting=weighting; }
         /** \brief get the current fitting algorithm */
-        DataWeight getFitDataWeighting() const { return m_weighting; };
+        DataWeight getFitDataWeighting() const { return m_weighting; }
 
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
@@ -75,6 +76,20 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         virtual int getIndexMin(QFRawDataRecord* r);
         /** \brief return the largest available index */
         virtual int getIndexMax(QFRawDataRecord* r);
+
+        /*! \brief perform a fit for the given \a record and \a run
+
+            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
+            If both are -1, the full range is used
+
+            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+          */
+        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL);
+
+        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
+         *         it with the appropriate values, according to the current settings */
+        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
+
     protected:
         /*! \copydoc QFFitResultsEvaluation::intWriteDataAlgorithm()      */
         virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const;
@@ -89,7 +104,6 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         DataWeight m_weighting;
 
 
-
     public:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions
@@ -99,6 +113,8 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
          */
 
         using QFFitResultsByIndexEvaluation::getEvaluationResultID;
+
+
 };
 
 #endif // QFFCSFITEVALUATION_H

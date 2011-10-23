@@ -357,13 +357,14 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
+    int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", ",").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
     try {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
+        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
         long long lines=tab.get_line_count();
         long long columns=tab.get_column_count();
         resizeRates(lines, columns-1);
@@ -395,6 +396,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
+    int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", ",").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
@@ -402,7 +404,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
         //std::cout<<"startswith = "<<startswith<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith);        // load some csv file
+        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
         long long lines=tab.get_line_count();
         int columns=tab.get_column_count();
         resizeCorrelations(lines, columns-1);

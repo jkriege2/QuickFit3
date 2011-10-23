@@ -828,6 +828,7 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
     selectCamera(camera);
     GetAmpDesc(info.outputAmplifier, text, 512);
     (*parameters)["output_amplifier"]=QString(text);
+
     (*parameters)["sequence_length"]=info.numAccs;
     (*parameters)["frame_time"]=info.kinTime;
     (*parameters)["accumulation_time"]=info.accTime;
@@ -847,7 +848,9 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
     (*parameters)["frame_transfer"]=info.frameTransfer;
     (*parameters)["crop_mode"]=info.cropMode;
     (*parameters)["vertical_shift_amplitude"]=info.vsAmplitude;
-    (*parameters)["emgain"]=info.emgain;
+    int gain=0;
+    GetEMCCDGain(&gain);
+    (*parameters)["emgain"]=gain;
     (*parameters)["emgain_enabled"]=info.emgain_enabled;
     (*parameters)["emgain_advanced"]=info.advancedEMGain;
     (*parameters)["spooling_mode"]=info.spool;
@@ -1003,9 +1006,9 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
         if (info.emgain_enabled) {
-            CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain"));
+            CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain %1").arg(info.emgain));
         } else {
-            CHECK(SetEMCCDGain(0), tr("error while setting EM gain"));
+            CHECK(SetEMCCDGain(0), tr("error while setting EM gain 0 (switch off)"));
         }
         CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
         CHECK(SetBaselineClamp((info.baselineClamp)?1:0), tr("error while setting baseline clamp mode"));
@@ -1148,7 +1151,7 @@ void QFExtensionCameraAndor::updateTemperatures() {
         }
     }
 
-    QTimer::singleShot(250, this, SLOT(updateTemperatures()));
+    QTimer::singleShot(1000, this, SLOT(updateTemperatures()));
 }
 
 void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode) {

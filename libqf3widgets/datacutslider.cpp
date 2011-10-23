@@ -50,6 +50,9 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     connect(editLow, SIGNAL(valueChanged(int)), this, SLOT(sliderLowValueChanged(int)));
     connect(editHigh, SIGNAL(valueChanged(int)), this, SLOT(sliderHighValueChanged(int)));
 
+    connect(editLow, SIGNAL(editingFinished()), this, SLOT(sliderLowEditingFinished()));
+    connect(editHigh, SIGNAL(editingFinished()), this, SLOT(sliderHighEditingFinished()));
+
     update();
 }
 
@@ -81,17 +84,36 @@ void DataCutSliders::contextMenuEvent(QContextMenuEvent *event) {
 
 void DataCutSliders::sliderLowValueChanged(int value){
     userMin=value;
-    if (userMin>userMax) {
-        editHigh->setValue(userMin+1);
+    if (userMin>=userMax) userMin=userMax-1;
+    if (userMin<min) userMin=min;
+    if (userMax>max) userMax=max;
+    if (sliderSignals) {
+        emit slidersChanged(userMin, userMax, min, max);
     }
-    update();
+
 }
 
 void DataCutSliders::sliderHighValueChanged(int value){
     userMax=value;
-    if (userMin>userMax) {
-        editLow->setValue(userMax-1);
+    if (userMax<=userMin) userMax=userMin+1;
+    if (userMax>max) userMax=max;
+    if (userMax<min) userMax=min;
+    if (sliderSignals) {
+        emit slidersChanged(userMin, userMax, min, max);
     }
+}
+
+
+void DataCutSliders::sliderLowEditingFinished(){
+    userMin=editLow->value();
+    if (userMin>userMax) {
+        userMax=userMin+1;
+    }
+    update();
+}
+
+void DataCutSliders::sliderHighEditingFinished() {
+    userMax=editHigh->value();
     update();
 }
 
@@ -104,18 +126,20 @@ void DataCutSliders::setValues(int userMin, int userMax, int min, int max) {
 }
 
 void DataCutSliders::update() {
-    if (userMin>userMax) {
+    if (userMin>=userMax) {
         userMax=userMin+1;
     }
     bool h=sliderSignals;
     sliderSignals=false;
-    editLow->setRange(min, max);
-    editHigh->setRange(min, max);
+    bool upd=updatesEnabled();
+    setUpdatesEnabled(false);
+    editLow->setRange(min, qMin(userMax, max));
+    editHigh->setRange(qMax(userMin, min), max);
     editLow->setValue(userMin);
     editLow->setSuffix(tr("/%1").arg(max));
     editHigh->setValue(userMax);
     editHigh->setSuffix(tr("/%1").arg(max));
-
+    setUpdatesEnabled(upd);
     sliderSignals=h;
     if (sliderSignals) {
         emit slidersChanged(userMin, userMax, min, max);

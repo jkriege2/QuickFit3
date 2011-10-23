@@ -35,6 +35,8 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QList<QFPluginServ
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_rdrscreen.html");
                     info.plugintypename=tr("Raw Data Plugins");
+                    info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                    info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                     pluginHelpList->append(info);
                 }
             }

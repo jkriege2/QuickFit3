@@ -19,6 +19,8 @@ QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix,
     m_fitAlgorithm="";
     m_fitFunction="";
 
+    doFitThread=new QFFitAlgorithmThreadedFit(this);
+
 
     // get list of applicable fit functions
     m_fitFunctions=parent->getServices()->getFitFunctionManager()->getModels(fitFunctionPrefix, this);
@@ -966,12 +968,14 @@ void QFFitResultsEvaluation::resetAllFitValueCurrent() {
     if (f==NULL) return ;
     if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
+        r->disableEmitResultsChanged();
         QString en=getEvaluationResultID();
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
             QString pid=getFitParamID(id);
             if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
         }
+        r->enableEmitResultsChanged();
     }
 }
 
@@ -981,12 +985,14 @@ void QFFitResultsEvaluation::resetAllFitFixCurrent() {
     if (f==NULL) return ;
     if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
+        r->disableEmitResultsChanged();
         QString en=getEvaluationResultID();
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
             QString pid=getFitParamFixID(id);
             if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
         }
+        r->enableEmitResultsChanged();
     }
 }
 
@@ -998,7 +1004,18 @@ void QFFitResultsEvaluation::resetAllFitResultsCurrent() {
     re->resultsClear(getEvaluationResultID());
 }
 
-
+void QFFitResultsEvaluation::resetAllFitResultsAllFiles() {
+    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* r=recs[i];
+        if (r) {
+            r->disableEmitResultsChanged();
+            QString en=getEvaluationResultID();
+            r->resultsClear(en);
+            r->enableEmitResultsChanged();
+        }
+    }
+}
 
 void QFFitResultsEvaluation::setInitFitValue(const QString& id, double value, double error) {
     if (getHighlightedRecord()!=NULL) {

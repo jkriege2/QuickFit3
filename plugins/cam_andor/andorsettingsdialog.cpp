@@ -667,5 +667,5 @@ void AndorSettingsDialog::on_chkBaselineClamp_toggled(bool value) {
 }
 
 void AndorSettingsDialog::on_chkEMGain_toggled(bool value) {
-    ui->spinEMGain->setEnabled(!value);
+    ui->spinEMGain->setEnabled(value);
 }

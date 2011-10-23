@@ -36,6 +36,8 @@ void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginSer
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
                     info.plugintypename=tr("Evaluation Plugins");
+                    info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                    info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                     pluginHelpList->append(info);
                 }
             }

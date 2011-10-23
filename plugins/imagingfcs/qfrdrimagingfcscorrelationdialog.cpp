@@ -5,7 +5,7 @@
 #include <QDebug>
 #include "qmodernprogresswidget.h"
 
-#define UPDATE_TIMEOUT 50
+#define UPDATE_TIMEOUT 250
 
 QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent) :
     QDialog(parent),

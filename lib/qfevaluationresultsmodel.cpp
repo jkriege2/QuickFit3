@@ -71,17 +71,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 QString en=lastResults[resI].second;
                 QString rname=lastResultNames[resNameI];
                 if (record) {
-                    if (record->resultsExists(en, rname)) {
+                    /*if (record->resultsExists(en, rname)) {
                         QFRawDataRecord::evaluationResult r=record->resultsGet(en, rname);
                         return QVariant(record->resultsGetAsString(en, rname));
-                    }
+                    }*/
+                    return (record->resultsGetAsStringVariant(en, rname));
                 }
             }else if (resI==lastResults.size()) {
                 double average=0;
                 double stddev=0;
                 QString rname=lastResultNames[resNameI];
                 calcStatistics(rname, average, stddev);
-                return QVariant(QString("%1 +/- %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
+                return QVariant(QString("%1 %3 %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)).arg(QChar(0xB1)));
             }
         }
     } else if ((role==ValueRole)||(role==Qt::EditRole)) {
@@ -91,9 +92,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 QString en=lastResults[resI].second;
                 QString rname=lastResultNames[resNameI];
                 if (record) {
-                    if (record->resultsExists(en, rname)) {
-                        return record->resultsGetAsQVariant(en, rname);
-                    }
+                    return record->resultsGetAsQVariant(en, rname);
                 }
             }
         }
@@ -116,7 +115,7 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
                 } else {
                     return QVariant();
                 }
-            } else return tr("Average +/- StdDev");
+            } else return tr("Average %3 StdDev").arg(QChar(0xB1));
         } else {
             if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
 
