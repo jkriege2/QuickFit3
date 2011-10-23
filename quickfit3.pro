@@ -38,6 +38,9 @@ plg_fcs_fitfuctions.subdir=./plugins/fcs_fitfuctions
 SUBDIRS += plg_fitfunction_spimfcs
 plg_fitfunction_spimfcs.subdir=./plugins/fitfunction_spimfcs
 
+SUBDIRS += plg_fitfunction_fcsdistribution
+plg_fitfunction_fcsdistribution.subdir=./plugins/fitfunction_fcsdistribution
+
 SUBDIRS += plg_fitalgorithm_levmar
 plg_fitalgorithm_levmar.subdir=./plugins/fitalgorithm_levmar
 plg_fitalgorithm_levmar.depends = lib libqf3widgets

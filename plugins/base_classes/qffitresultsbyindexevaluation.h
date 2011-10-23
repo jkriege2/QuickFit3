@@ -20,7 +20,11 @@
 class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         Q_OBJECT
     public:
-        /** \brief class constructor */
+        /*! \brief class constructor
+
+          \param fitFunctionPrefix only fit functions with this prefix will be used by this object, leave empty to use all, you may supply a list, separated by commas
+          \param parent project this object belongs to
+        */
         QFFitResultsByIndexEvaluation(const QString& fitFunctionPrefix, QFProject* parent);
 
         /** \brief class destructor */

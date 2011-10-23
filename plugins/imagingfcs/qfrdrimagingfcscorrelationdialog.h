@@ -48,6 +48,7 @@ protected slots:
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
+    void on_cmbBackground_currentIndexChanged(int idx);
     void frameTimeChanged(double value);
     void frameRateChanged(double value);
     void updateProgress();

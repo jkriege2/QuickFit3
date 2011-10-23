@@ -1,7 +1,12 @@
 #include "fcs_fitfuctions.h"
 
 
-
+#include "qffitfunctionfcsmultidiffusion.h"
+#include "qffitfunctionfcsadiff.h"
+#include "qffitfunctionfcsdiff.h"
+#include "qffitfunctionfcssimplediff.h"
+#include "qffitfunctionfcsflow.h"
+#include "qffitfunctionfcsrot.h"
 
 
 
@@ -13,7 +18,7 @@
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff";
+    res<<"fcs_diff"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffrot";
     return res;
 }
 
@@ -26,6 +31,10 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCSADiff();
     } else if (id=="fcs_multidiff") {
         return new QFFitFunctionFCSMultiDiffusion();
+    } else if (id=="fcs_diffflow") {
+        return new QFFitFunctionFCSFlow();
+    } else if (id=="fcs_diffrot") {
+        return new QFFitFunctionFCSRot();
     }
     return NULL;
 }

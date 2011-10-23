@@ -16,13 +16,17 @@ HEADERS += fcs_fitfuctions.h \
            qffitfunctionfcsmultidiffusion.h \
            qffitfunctionfcsadiff.h \
            qffitfunctionfcsdiff.h \
-           qffitfunctionfcssimplediff.h
+           qffitfunctionfcssimplediff.h \
+    qffitfunctionfcsflow.h \
+    qffitfunctionfcsrot.h
 
 SOURCES += fcs_fitfuctions.cpp\
            qffitfunctionfcsmultidiffusion.cpp \
            qffitfunctionfcsadiff.cpp \
            qffitfunctionfcsdiff.cpp \
-           qffitfunctionfcssimplediff.cpp
+           qffitfunctionfcssimplediff.cpp \
+    qffitfunctionfcsflow.cpp \
+    qffitfunctionfcsrot.cpp
 
 FORMS +=
 
@@ -41,3 +45,7 @@ CONFIG += exceptions rtti stl
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \
                         $$FORMS
+
+
+
+

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Normal 3D Diffusion with one non-fluorescing component and flow</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+This file implement a one-component 3D diffusion model which also includes a flow and a triplett term. The model may be denoted as:
+<center><img src="./pic/equation_flow.png"></center>
+
+<p> The parameters are: </p>
+<ul>
+<li><img alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>
+<li><img alt="$ N $" src="./pic/form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><i>&Theta;<sub>trip</sub>, &Theta;<sub>non</sub></i>: fraction of the particles in the triplet/non-fluorescent state</li>
+<li><i>&tau;<sub>trip</sub>, &tau;<sub>non</sub></i>: decay time of the triplet/non-fluorescent state</li>
+<li><img alt="$ \tau_{diff} $" src="./pic/form_32.png">: diffusion decay time</li>
+<li><i>&tau;<sub>f</sub></i>: flow term decay time</li>
+<li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
+<li><img alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
+<li><img alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
+</ul>
+<p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
+<p>
+<img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_20.png">
+</p>
+<p> where <img alt="$ \tau_D $" src="./pic/form_21.png"> is the diffusion time. Also the effective focal volume <img alt="$ V_{eff} $" src="./pic/form_22.png"> is calculated: </p>
+<p>
+<img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_14.png">
+</p>
+<p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
+<p>
+<img alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_15.png">
+</p>
+<p>
+In this model the flow velocity may be calculated from the characterstic flow time <i>&tau;<sub>f</sub></i> via:
+<center><img src="./pic/vflow.png"></center>
+</p>
+<p>The plugin also calculates some parameter errors: </p>
+<p>
+<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_16.png">
+</p>
+ <p>
+<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_23.png">
+</p>
+ <p>
+<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_17.png">
+</p>
+ <p>
+<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_18.png">
+</p>
+ <p>
+<img src="./pic/form_402.png">
+</p>
+<p>This model was taken from the paper:<ul><li>Kohler, R.H., P. Schwille, W.W. Webb, and M.R. Hanson. 2000. Active protein transport through plastid tubules: velocity quantified by fluorescence correlation spectroscopy. J Cell Sci 113(22):3921–3930</li></ul></p>
+
+</body></html>

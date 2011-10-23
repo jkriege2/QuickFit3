@@ -23,7 +23,15 @@ QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix,
 
 
     // get list of applicable fit functions
-    m_fitFunctions=parent->getServices()->getFitFunctionManager()->getModels(fitFunctionPrefix, this);
+    if (!fitFunctionPrefix.contains(',')) {
+        m_fitFunctions=parent->getServices()->getFitFunctionManager()->getModels(fitFunctionPrefix, this);
+    } else {
+        QStringList sl=fitFunctionPrefix.split(',');
+        m_fitFunctions.clear();
+        for (int i=0; i<sl.size(); i++) {
+            m_fitFunctions=m_fitFunctions.unite(parent->getServices()->getFitFunctionManager()->getModels(sl[i], this));
+        }
+    }
     // select first fit function
     if (m_fitFunctions.size()>0) m_fitFunction=m_fitFunctions.keys().at(0);
 

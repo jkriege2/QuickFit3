@@ -57,7 +57,7 @@ class QFFitResultsEvaluation : public QFEvaluationItem, public QFFitParameterBas
 public:
     /*! \brief class conrtuctor
 
-        \param fitFunctionPrefix only fit functions with this prefix will be used by this object, leave empty to use all
+        \param fitFunctionPrefix only fit functions with this prefix will be used by this object, leave empty to use all, you may supply a list, separated by commas
         \param parent project this object belongs to
      */
     QFFitResultsEvaluation(const QString& fitFunctionPrefix, QFProject* parent);

@@ -165,6 +165,14 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int 
     updateCorrelator();
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int idx) {
+    ui->label_16->setEnabled(idx>0);
+    ui->edtOffset->setEnabled(idx>0);
+    ui->edtBackgroundFile->setEnabled(idx>2);
+    ui->label_31->setEnabled(idx>2);
+    ui->btnSelectBackgroundFile->setEnabled(idx>2);
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
     ui->spinFirstFrame->setEnabled(!checked);
     updateFrameCount();

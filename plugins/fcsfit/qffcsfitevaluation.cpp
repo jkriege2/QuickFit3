@@ -5,8 +5,7 @@
 
 
 QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
-    QFFitResultsByIndexEvaluation("fcs_", parent)
-    //QFEvaluationItem(parent, true, false)
+    QFFitResultsByIndexEvaluation("fcs_,dls_", parent)
 {
 
     m_weighting=EqualWeighting;

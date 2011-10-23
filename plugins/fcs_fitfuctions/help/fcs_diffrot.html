@@ -1,0 +1,90 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Normal 3D Diffusion with one non-fluorescing component and rotation</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+This file implement a one-component 3D diffusion model which also includes a rotational 
+diffusion term and a triplett term. The model may be denoted as:
+<center><img src="./pic/equation_rot.png"></center>
+
+
+<p> The parameters are: </p>
+<ul>
+<li><img alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>
+<li><img alt="$ N $" src="./pic/form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><i>F<sub>trip</sub></i>: fraction of the particles in the triplet state</li>
+<li><img alt="$ \tau_{trip} $" src="./pic/form_31.png">: decay time of the triplet state</li>
+<li><img alt="$ \tau_{diff} $" src="./pic/form_32.png">: diffusion decay time</li>
+<li><i>F<sub>rot</sub></i>: rotating fraction</li>
+<li><i>&tau;<sub>rot</sub></i>: rotation term decay time</li>
+<li><i>c<sub>1</sub>, c<sub>2</sub></i>: prefactors for flow, see below and reference</li>
+<li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
+<li><img alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
+<li><img alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
+</ul>
+<p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
+<p>
+<img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_20.png">
+</p>
+<p> where <img alt="$ \tau_D $" src="./pic/form_21.png"> is the diffusion time. Also the effective focal volume <img alt="$ V_{eff} $" src="./pic/form_22.png"> is calculated: </p>
+<p>
+<img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_14.png">
+</p>
+<p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
+<p>
+<img alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_15.png">
+</p>
+ <p> The rotational diffusion coefficient is defined as
+<img src="./pic/form_407.png">
+</p>
+
+<p>The plugin also calculates some parameter errors: </p>
+<p>
+<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_16.png">
+</p>
+ <p>
+<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_23.png">
+</p>
+ <p>
+<img src="./pic/form_408.png">
+</p>
+ <p>
+<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_17.png">
+</p>
+ <p>
+<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_18.png">
+</p>
+
+
+
+
+
+This model also calculates the diffusion coefficient, if the width <img src="./pic/wxy.png"> of the laser focus (xy plane) is known, as: 
+<center><img src="./pic/diffusion_coefficient.png"></center>
+<p>
+where &tau; is the diffusion time. In addition it calculates the <i>F<sub>rot</sub></i> parameter of the rotational component as it 
+is defines in the paper [Aragòn and Pecora 1975]: 
+<center><img src="./pic/form_285.png"></center>
+This paper also contains values for c<sub>1</sub> and c<sub>2</sub>, which are situatioin-dependent:
+<table border="1" cellpadding="3">
+  <tr><th>excitation light</th><th>detection</th><th>c<sub>1</sub></th><th>c<sub>2</sub></th></tr>
+  <tr><td>lin. polarized</td><td>parallel polarization</td><td>80</td><td>64/9</td></tr>
+  <tr><td>lin. polarized</td><td>perpendicular polarization</td><td>20/9</td><td>4</td></tr>
+  <tr><td>lin. polarized</td><td>no polarization</td><td>860/9</td><td>4</td></tr>
+  <tr><td>no polarization</td><td>parallel polarization</td><td>5/9</td><td>16/9</td></tr>
+  <tr><td>no polarization</td><td>perpendicular polarization</td><td>215/9</td><td>1</td></tr>
+  <tr><td>no polarization</td><td>no polarization</td><td>20</td><td>1</td></tr>
+</table>
+parallel and perpendicular polarizationare relative to the symmetry axis of the focal volume
+</p>
+<ul>
+<li>[Aragòn and Pecora 1975]: S. R. Aragòn, R. Pecora: <b>Fluorescence correlation spectroscopy and Brownian rotational diffusion</b>, Biopolymers, Volume 14, Issue 1, pages 119-137, January 1975, DOI: 10.1002/bip.1975.360140110
+
+    </li>
+</ul>
+
+</body></html>

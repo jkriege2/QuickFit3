@@ -2,10 +2,7 @@
 #define FCS_FITFUCTIONS_H
 
 #include "qfpluginfitfunction.h"
-#include "qffitfunctionfcsmultidiffusion.h"
-#include "qffitfunctionfcsadiff.h"
-#include "qffitfunctionfcsdiff.h"
-#include "qffitfunctionfcssimplediff.h"
+
 /*!
     \defgroup qf3fitfunp_fcs FCS Fitting Function Plugin
     \ingroup qf3fitfunplugins
@@ -49,7 +46,7 @@ class QFPFitFunctionFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2011 by Jan Krieger");
+            return tr("(c) 2010-2011 by Jan Krieger");
         };
 
         /** \brief weblink for the plugin */
