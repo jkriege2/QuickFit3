@@ -68,10 +68,10 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     hbl->addWidget(l);
     cmbAlgorithm->setEditable(false);
     hbl->addWidget(cmbAlgorithm);
-    btnConfigAlgorithm=new QPushButton(QIcon(":/fcs_fit_config.png"), tr("&Configure Algorithm"), this);
+    btnConfigAlgorithm=new QPushButton(QIcon(":/fcsfit/fit_config.png"), tr("&Configure Algorithm"), this);
     btnConfigAlgorithm->setMaximumWidth(250);
     hbl->addWidget(btnConfigAlgorithm);
-    btnAlgorithmHelp=new QPushButton(QIcon(":/fcs_fit_help.png"), tr("Algorithm &Help"), this);
+    btnAlgorithmHelp=new QPushButton(QIcon(":/fcsfit/fit_help.png"), tr("Algorithm &Help"), this);
     btnAlgorithmHelp->setMaximumWidth(250);
     hbl->addWidget(btnAlgorithmHelp);
     //fl->addRow(l, hbl);
@@ -102,7 +102,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     hbl->addWidget(l);
     cmbModel->setEditable(false);
     hbl->addWidget(cmbModel);
-    btnModelHelp=new QPushButton(QIcon(":/fcs_fit_help.png"), tr("Model H&elp"), this);
+    btnModelHelp=new QPushButton(QIcon(":/fcsfit/fit_help.png"), tr("Model H&elp"), this);
     btnModelHelp->setMaximumWidth(250);
     hbl->addWidget(btnModelHelp);
     hbl->addStretch();
@@ -121,32 +121,32 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     toolbar=new QToolBar("toolbar_fcs_fit", this);
     vbl->addWidget(toolbar);
-    actSaveReport=new QAction(QIcon(":/fcs_fit_savereport.png"), tr("Save Report"), this);
+    actSaveReport=new QAction(QIcon(":/fcsfit/fit_savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    actPrintReport=new QAction(QIcon(":/fcs_fit_printreport.png"), tr("Print Report"), this);
+    actPrintReport=new QAction(QIcon(":/fcsfit/fit_printreport.png"), tr("Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     QLabel* lPS=new QLabel(tr("   &Plots: "), toolbar);
     lPS->setFont(boldfont);
     cmbPlotStyle=new QComboBox(toolbar);
-    cmbPlotStyle->addItem(QIcon(":/fcsplot_points.png"), tr("points"));
-    cmbPlotStyle->addItem(QIcon(":/fcsplot_lines.png"), tr("lines"));
-    cmbPlotStyle->addItem(QIcon(":/fcsplot_pointslines.png"), tr("lines + points"));
+    cmbPlotStyle->addItem(QIcon(":/fcsfit/plot_points.png"), tr("points"));
+    cmbPlotStyle->addItem(QIcon(":/fcsfit/plot_lines.png"), tr("lines"));
+    cmbPlotStyle->addItem(QIcon(":/fcsfit/plot_pointslines.png"), tr("lines + points"));
     lPS->setBuddy(cmbPlotStyle);
     QLabel* lES=new QLabel(tr("   &Errors: "), toolbar);
     lES->setFont(boldfont);
     cmbErrorStyle=new QComboBox(toolbar);
-    cmbErrorStyle->addItem(QIcon(":/fcsplot_enone.png"), tr("none"));
-    cmbErrorStyle->addItem(QIcon(":/fcsplot_elines.png"), tr("lines"));
-    cmbErrorStyle->addItem(QIcon(":/fcsplot_ebars.png"), tr("bars"));
-    cmbErrorStyle->addItem(QIcon(":/fcsplot_elinesbars.png"), tr("bars + lines"));
+    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_enone.png"), tr("none"));
+    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_elines.png"), tr("lines"));
+    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_ebars.png"), tr("bars"));
+    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_elinesbars.png"), tr("bars + lines"));
     lES->setBuddy(cmbErrorStyle);
 
     QLabel* lRS=new QLabel(tr("   &Residuals: "), toolbar);
     lRS->setFont(boldfont);
     cmbResidualStyle=new QComboBox(toolbar);
-    cmbResidualStyle->addItem(QIcon(":/fcsplot_points.png"), tr("points"));
-    cmbResidualStyle->addItem(QIcon(":/fcsplot_lines.png"), tr("lines"));
-    cmbResidualStyle->addItem(QIcon(":/fcsplot_pointslines.png"), tr("lines + points"));
+    cmbResidualStyle->addItem(QIcon(":/fcsfit/plot_points.png"), tr("points"));
+    cmbResidualStyle->addItem(QIcon(":/fcsfit/plot_lines.png"), tr("lines"));
+    cmbResidualStyle->addItem(QIcon(":/fcsfit/plot_pointslines.png"), tr("lines + points"));
     lRS->setBuddy(cmbResidualStyle);
 
     chkWeightedResiduals=new QCheckBox(tr("&weighted  "), toolbar);
@@ -362,16 +362,16 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     QGridLayout* layBtn=new QGridLayout(this);
     layBtn->setContentsMargins(0,0,0,0);
-    btnFitCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("&Fit Current"), this);
+    btnFitCurrent=new QPushButton(QIcon(":/fcsfit/fit_fitcurrent.png"), tr("&Fit Current"), this);
     btnFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));
     layBtn->addWidget(btnFitCurrent, 0, 0);
-    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Runs "), this);
+    btnFitRunsCurrent=new QPushButton(QIcon(":/fcsfit/fit_fitallruns.png"), tr("Fit All &Runs"), this);
     btnFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently selected file "));
     layBtn->addWidget(btnFitRunsCurrent, 0, 1);
-    btnFitAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit All &Files (Current Run)"), this);
+    btnFitAll=new QPushButton(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current Run)"), this);
     btnFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
     layBtn->addWidget(btnFitAll, 1, 0);
-    btnFitRunsAll=new QPushButton(QIcon(":/fcs_fit_fit.png"), tr("Fit &Everything"), this);
+    btnFitRunsAll=new QPushButton(QIcon(":/fcsfit/fit_fitall.png"), tr("Fit &Everything"), this);
     btnFitRunsAll->setToolTip(tr("perform a fit for all runs in all files"));
     layBtn->addWidget(btnFitRunsAll, 1, 1);
     btnResetCurrent=new QPushButton(tr("&Reset Current"), this);
@@ -379,27 +379,35 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     layBtn->addWidget(btnResetCurrent, 2, 0);
     btnResetAll=new QPushButton(tr("&Reset All"), this);
     btnResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
-    layBtn->addWidget(btnResetAll, 2, 1);
+    layBtn->addWidget(btnResetAll, 3, 1);
+
+    btnResetAllRuns=new QPushButton(tr("&Reset All Runs"), this);
+    btnResetAllRuns->setToolTip(tr("reset all runs to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
+    layBtn->addWidget(btnResetAllRuns, 2, 1);
+
     btnCopyToInitial=new QPushButton(tr("Copy to &Initial"), this);
-    btnCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters, so they are used by files/runs that were not fit yet."));
-    layBtn->addWidget(btnCopyToInitial, 3, 0);
+    btnCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
+    layBtn->addWidget(btnCopyToInitial, 4, 0);
+    btnCopyToAllRuns=new QPushButton(tr("&Copy to All Runs"), this);
+    btnCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all runs in the current file."));
+    layBtn->addWidget(btnCopyToAllRuns, 4, 1);
     btnCopyToAll=new QPushButton(tr("&Copy to All"), this);
-    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters and also to all files."));
-    layBtn->addWidget(btnCopyToAll, 3, 1);
+    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set\n of initial parameters and also to all files."));
+    layBtn->addWidget(btnCopyToAll, 5, 1);
     btnCopyToAllCurrentRun=new QPushButton(tr("&Copy to All (Current Run)"), this);
-    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters and also to all files, but only to the current run therein."));
-    layBtn->addWidget(btnCopyToAllCurrentRun, 4, 0);
+    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current run therein."));
+    layBtn->addWidget(btnCopyToAllCurrentRun, 5, 0);
 
-    btnCalibrateFocalVolume=new QPushButton(QIcon(":/fcs_focalvolume.png"), tr("Focal &Volume"), this);
-    btnCalibrateFocalVolume->setToolTip(tr("estimate the focal volume"));
-    layBtn->addWidget(btnCalibrateFocalVolume, 5, 0);
+    btnCalibrateFocalVolume=new QPushButton(QIcon(":/fcsfit/focalvolume.png"), tr("Focal &Volume"), this);
+    btnCalibrateFocalVolume->setToolTip(tr("estimate the focal volume from a given concentration or diffusion coefficient"));
+    layBtn->addWidget(btnCalibrateFocalVolume, 6, 0);
 
-    btnLoadParameters=new QPushButton(QIcon(":/fcs_param_load.png"), tr("&Load Parameters"), this);
-    btnLoadParameters->setToolTip(tr("load a FCS fit parameter set"));
-    layBtn->addWidget(btnLoadParameters, 6, 0);
-    btnSaveParameters=new QPushButton(QIcon(":/fcs_param_save.png"), tr("&Save Parameters"), this);
-    btnSaveParameters->setToolTip(tr("save the current FCS fit parameter as a set"));
-    layBtn->addWidget(btnSaveParameters, 6, 1);
+    btnLoadParameters=new QPushButton(QIcon(":/fcsfit/param_load.png"), tr("&Load Parameters"), this);
+    btnLoadParameters->setToolTip(tr("load a FCS fit parameter set from a file.\nThe parameter set files can be created using \"Save Parameters\""));
+    layBtn->addWidget(btnLoadParameters, 7, 0);
+    btnSaveParameters=new QPushButton(QIcon(":/fcsfit/param_save.png"), tr("&Save Parameters"), this);
+    btnSaveParameters->setToolTip(tr("save the current FCS fit parameter as a set to a file\nfor later reuse with \"Load Parameters\""));
+    layBtn->addWidget(btnSaveParameters, 7, 1);
 
     layModel->addLayout(layBtn);
 
@@ -434,11 +442,11 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_plotter()->get_actSavePlot()); pltData->get_plotter()->get_actSavePlot()->setIcon(QIcon(":/fcsplot_saveplot.png"));
-    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsplot_savedata.png"));
-    toolbar->addAction(pltData->get_plotter()->get_actPrint()); pltData->get_plotter()->get_actPrint()->setIcon(QIcon(":/fcsplot_print.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSavePlot()); pltData->get_plotter()->get_actSavePlot()->setIcon(QIcon(":/fcsfit/plot_saveplot.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsfit/plot_savedata.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actPrint()); pltData->get_plotter()->get_actPrint()->setIcon(QIcon(":/fcsfit/plot_print.png"));
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_plotter()->get_actZoomAll()); pltData->get_plotter()->get_actZoomAll()->setIcon(QIcon(":/fcsplot_zoomall.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actZoomAll()); pltData->get_plotter()->get_actZoomAll()->setIcon(QIcon(":/fcsfit/plot_zoomall.png"));
     connect(pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), pltResiduals, SLOT(zoomToFit()));
     toolbar->addSeparator();
     toolbar->addWidget(lPS);
@@ -471,6 +479,8 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     connect(btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetAll()));
     connect(btnCopyToAll, SIGNAL(clicked()), this, SLOT(copyToAll()));
+    connect(btnResetAllRuns, SIGNAL(clicked()), this, SLOT(resetAllRuns()));
+    connect(btnCopyToAllRuns, SIGNAL(clicked()), this, SLOT(copyToAllRuns()));
     connect(btnCopyToInitial, SIGNAL(clicked()), this, SLOT(copyToInitial()));
     connect(btnCopyToAllCurrentRun, SIGNAL(clicked()), this, SLOT(copyToAllCurrentRun()));
     connect(btnLoadParameters, SIGNAL(clicked()), this, SLOT(loadCurrentFitResults()));
@@ -660,10 +670,14 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
 
+    qDebug()<<" **** displayModel()";
+
     if (!ffunc) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         // delete all fit parameter widgets
         /////////////////////////////////////////////////////////////////////////////////////////////
+        //bool updEn=updatesEnabled();
+        //setUpdatesEnabled(false);
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
@@ -677,9 +691,13 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             }
         }
         m_fitParameters.clear();
+        //setUpdatesEnabled(updEn);
         return;
     }
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
+
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
 
     if (newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -790,11 +808,15 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
     }
 
     updateParameterValues();
+    //setUpdatesEnabled(updEn);
 }
 
 void QFFCSFitEvaluationEditor::parameterValueChanged() {
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
     updateParameterValues();
     replotData();
+    //setUpdatesEnabled(updEn);
 }
 
 void QFFCSFitEvaluationEditor::parameterFixChanged() {
@@ -802,8 +824,11 @@ void QFFCSFitEvaluationEditor::parameterFixChanged() {
 }
 
 void QFFCSFitEvaluationEditor::parameterRangeChanged() {
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
     updateParameterValues();
     replotData();
+    //setUpdatesEnabled(updEn);
 }
 
 void QFFCSFitEvaluationEditor::updateParameterValues() {
@@ -860,10 +885,13 @@ void QFFCSFitEvaluationEditor::replotData() {
         return;
     }
 
-    //qDebug()<<"  replotData";
+    qDebug()<<" **** replotData()";
     QTime t, t1;
     t.start();
     t1.start();
+
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
 
     pltResiduals->set_doDrawing(false);
     pltResiduals->set_emitSignals(false);
@@ -1017,6 +1045,8 @@ void QFFCSFitEvaluationEditor::replotData() {
     //qDebug()<<"   k "<<t.elapsed()<<" ms";
     t.start();
     //qDebug()<<"  replotData end  runtime = "<<t1.elapsed()<<" ms";
+
+    //setUpdatesEnabled(updEn);
 }
 
 void QFFCSFitEvaluationEditor::updateFitFunctions() {
@@ -1040,7 +1070,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     }
 
 
-    //qDebug()<<"    updateFitFunctions";
+    qDebug()<<" **** updateFitFunctions";
     QTime t, t1;
     t.start();
     t1.start();
@@ -1050,6 +1080,9 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     int datacut_min=datacut->get_userMin();
     int datacut_max=datacut->get_userMax();
 
+
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
     try {
 
         if (data->getCorrelationN()>0) {
@@ -1522,6 +1555,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
     } catch(std::exception& E) {
         services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
     }
+    //setUpdatesEnabled(updEn);
     //qDebug()<<"    updateFitFunctions end   runtime = "<<t1.elapsed()<<"ms";
 
 }
@@ -1546,13 +1580,31 @@ void QFFCSFitEvaluationEditor::resetCurrent() {
 void QFFCSFitEvaluationEditor::resetAll() {
     if (!current) return;
     if (!cmbModel) return;
-    //QFRawDataRecord* record=current->getHighlightedRecord();
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    eval->resetAllFitResults();
+    eval->resetAllFitResultsAllFilesAllIndices();
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
     updateParameterValues();
     replotData();
+    //setUpdatesEnabled(updEn);
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::resetAllRuns() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    eval->resetAllFitResultsCurrentFileAllIndices();
+    //bool updEn=updatesEnabled();
+    //setUpdatesEnabled(false);
+    updateParameterValues();
+    replotData();
+    //setUpdatesEnabled(updEn);
     QApplication::restoreOverrideCursor();
 }
 
@@ -1562,7 +1614,7 @@ void QFFCSFitEvaluationEditor::copyToAll() {
     if (!cmbModel) return;
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
-    copyToInitial();
+    copyToInitial(false);
 
     QFFitFunction* ffunc=eval->getFitFunction();
 
@@ -1571,16 +1623,21 @@ void QFFCSFitEvaluationEditor::copyToAll() {
 
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        double value=eval->getFitValue(id);
-        double error=eval->getFitError(id);
-        bool fix=eval->getFitFix(id);
-        if (ffunc->isParameterVisible(i, params)) {
-            for (int i=0; i<recs.size(); i++) {
-                QFRawDataRecord* record=recs[i];
-                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-                if (fcs) {
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
+
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+        if (fcs) {
+            record->disableEmitResultsChanged();
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                QString id=ffunc->getParameterID(i);
+                double value=eval->getFitValue(id);
+                double error=eval->getFitError(id);
+                bool fix=eval->getFitFix(id);
+                if (ffunc->isParameterVisible(i, params)) {
                     int runmax=fcs->getCorrelationRuns();
                     if (runmax<=1) runmax=0;
                     for (int run=-1; run<runmax; run++) {
@@ -1591,8 +1648,61 @@ void QFFCSFitEvaluationEditor::copyToAll() {
                     }
                 }
             }
+            record->enableEmitResultsChanged();
         };
     }
+
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    eval->emitResultsChanged();
+
+    free(params);
+    QApplication::restoreOverrideCursor();
+}
+
+
+void QFFCSFitEvaluationEditor::copyToAllRuns() {
+
+    if (!current) return;
+    if (!cmbModel) return;
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!eval) return;
+    copyToInitial(false);
+
+    QFFitFunction* ffunc=eval->getFitFunction();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    double* params=eval->allocFillParameters();
+
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
+    QFRawDataRecord* record=eval->getHighlightedRecord();
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+    if (fcs) {
+        record->disableEmitResultsChanged();
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+            double value=eval->getFitValue(id);
+            double error=eval->getFitError(id);
+            bool fix=eval->getFitFix(id);
+            if (ffunc->isParameterVisible(i, params)) {
+                int runmax=fcs->getCorrelationRuns();
+                if (runmax<=1) runmax=0;
+                for (int run=-1; run<runmax; run++) {
+                    if (eval->hasFit(record, run)) {
+                        eval->setFitResultValue(record, run, id, value, error);
+                        eval->setFitResultFix(record, run, id, fix);
+                    }
+                }
+            };
+        }
+        record->enableEmitResultsChanged();
+    }
+
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    eval->emitResultsChanged();
 
     free(params);
     QApplication::restoreOverrideCursor();
@@ -1604,7 +1714,7 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
     if (!cmbModel) return;
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (!eval) return;
-    copyToInitial();
+    copyToInitial(false);
 
     QFFitFunction* ffunc=eval->getFitFunction();
 
@@ -1613,16 +1723,20 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
 
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        double value=eval->getFitValue(id);
-        double error=eval->getFitError(id);
-        bool fix=eval->getFitFix(id);
-        if (ffunc->isParameterVisible(i, params)) {
-            for (int i=0; i<recs.size(); i++) {
-                QFRawDataRecord* record=recs[i];
-                QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
-                if (fcs) {
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(record);
+        if (fcs) {
+            record->disableEmitResultsChanged();
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                QString id=ffunc->getParameterID(i);
+                double value=eval->getFitValue(id);
+                double error=eval->getFitError(id);
+                bool fix=eval->getFitFix(id);
+                if (ffunc->isParameterVisible(i, params)) {
                     int runmax=fcs->getCorrelationRuns();
                     if (runmax<=1) runmax=0;
 
@@ -1632,17 +1746,20 @@ void QFFCSFitEvaluationEditor::copyToAllCurrentRun() {
                         eval->setFitResultValue(record, run, id, value, error);
                         eval->setFitResultFix(record, run, id, fix);
                     }
-
                 }
             }
+            record->enableEmitResultsChanged();
         };
     }
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    eval->emitResultsChanged();
 
     free(params);
     QApplication::restoreOverrideCursor();
 }
 
-void QFFCSFitEvaluationEditor::copyToInitial() {
+void QFFCSFitEvaluationEditor::copyToInitial(bool emitSignals) {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -1656,6 +1773,9 @@ void QFFCSFitEvaluationEditor::copyToInitial() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double* params=eval->allocFillParameters();
 
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
     for (int i=0; i<ffunc->paramCount(); i++) {
         QString id=ffunc->getParameterID(i);
         double value=eval->getFitValue(id);
@@ -1666,6 +1786,11 @@ void QFFCSFitEvaluationEditor::copyToInitial() {
             eval->setInitFitValue(id, value, error);
         };
     }
+
+
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    if (emitSignals) eval->emitResultsChanged();
 
     free(params);
     QApplication::restoreOverrideCursor();
@@ -2060,11 +2185,13 @@ void QFFCSFitEvaluationEditor::doFit(QFRawDataRecord* record, int run) {
         // we also have to care for the data cutting
         int cut_low=getUserMin(record, run, datacut->get_userMin());
         int cut_up=getUserMax(record, run, datacut->get_userMax());
+        if (cut_low<0) cut_low=0;
+        if (cut_up>=N) cut_up=N-1;
         int cut_N=cut_up-cut_low+1;
         if (cut_N<0) {
             cut_low=0;
             cut_up=ffunc->paramCount()-1;
-            if (cut_up>=N) cut_up=N;
+            if (cut_up>=N) cut_up=N-1;
             cut_N=cut_up+1;
         }
 
@@ -2307,6 +2434,14 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
 
         doFit(record, eval->getCurrentIndex());
         record->enableEmitResultsChanged(true);
+
+        dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+        dlgFitProgress->reportStatus("");
+        dlgFitProgress->setProgressMax(100);
+        dlgFitProgress->setSuperProgressMax(100);
+        QApplication::processEvents();
+
+
         current->emitResultsChanged();
         displayModel(false);
         replotData();
@@ -2354,6 +2489,13 @@ void QFFCSFitEvaluationEditor::fitRunsCurrent() {
         }
     }
     record->enableEmitResultsChanged(true);
+
+    dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
     current->emitResultsChanged();
     displayModel(false);
     replotData();
@@ -2413,6 +2555,13 @@ void QFFCSFitEvaluationEditor::fitAll() {
             record->enableEmitResultsChanged(true);
         }
     }
+
+    dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
     current->emitResultsChanged();
 
     displayModel(false);
@@ -2484,6 +2633,13 @@ void QFFCSFitEvaluationEditor::fitRunsAll() {
             record->enableEmitResultsChanged(true);
         }
     }
+
+    dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    QApplication::processEvents();
+
     current->emitResultsChanged();
 
     displayModel(false);

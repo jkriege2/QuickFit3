@@ -180,11 +180,15 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         QPushButton* btnResetCurrent;
         /** \brief reset all parameter sets to default */
         QPushButton* btnResetAll;
+        /** \brief reset all runs in the current file to default */
+        QPushButton* btnResetAllRuns;
         /** \brief copy current parameter set to default parameters */
         QPushButton* btnCopyToInitial;
         /** \brief copy current parameter set to all files & initial parameters */
         QPushButton* btnCopyToAll;
-        /** \brief copy current parameter set to all files & initial parameters */
+        /** \brief copy current parameter set to all runs in the current file & initial parameters */
+        QPushButton* btnCopyToAllRuns;
+        /** \brief copy current parameter set to all files (but therein just the current run & initial parameters */
         QPushButton* btnCopyToAllCurrentRun;
         /** \brief button used to calculate the focal volume */
         QPushButton* btnCalibrateFocalVolume;
@@ -317,10 +321,14 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
         void resetAll();
         /** \brief copy to all files, all runs */
         void copyToAll();
+        /** \brief reset all runs in current file */
+        void resetAllRuns();
+        /** \brief copy to all runs in current file */
+        void copyToAllRuns();
         /** \brief copy to all files, but only current run */
         void copyToAllCurrentRun();
         /** \brief copy to initial values */
-        void copyToInitial();
+        void copyToInitial(bool emitSignals=true);
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
