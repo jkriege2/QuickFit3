@@ -586,7 +586,7 @@ void AndorSettingsDialog::on_cmbPreampGain_currentIndexChanged(int currentIndex)
     calcTiming();
 }
 
-void AndorSettingsDialog::on_cmbVerticalShiftSpeed_currentIndexChanged(int currentIndex) {
+void AndorSettingsDialog::on_cmbVerticalShiftSpeed_currentIndexChanged(int /*currentIndex*/) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     updateSensorSetup();
     calcTiming();

@@ -1,6 +1,6 @@
 #include "qffitresultsevaluationeditorbase.h"
 #include "qffitresultsevaluation.h"
-#include "QFFitResultsEvaluation.h"
+#include "qffitresultsevaluation.h"
 #include "qmodernprogresswidget.h"
 
 
