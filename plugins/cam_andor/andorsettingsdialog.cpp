@@ -229,6 +229,7 @@ void AndorSettingsDialog::writeSettings(QSettings& settings) const {
     settings.setValue(prefix+"advanced_emgain", false); // no advanced EM gain
     settings.setValue(prefix+"emgain", ui->spinEMGain->value());
     settings.setValue(prefix+"emgain_enabled", ui->chkEMGain->isChecked());
+    //qDebug()<<"SettingsDialog: EMGAIN_en="<<ui->chkEMGain->isChecked()<<"   from settings="<<settings.value(prefix+"emgain_enabled", "not there").toString();
     settings.setValue(prefix+"preamp_gain", ui->cmbPreampGain->currentIndex());
     settings.setValue(prefix+"vertical_shift_speed", ui->cmbVerticalShiftSpeed->currentIndex());
     settings.setValue(prefix+"vertical_shift_amplitude", ui->cmbVerticalShiftAmplitude->currentIndex());

@@ -353,7 +353,7 @@ void QFExtensionCameraAndor::setSettingsFromQSettings(QFExtensionCameraAndor::Ca
     info.baselineClamp=settings.value(prefix+"baseline_clamp", info.baselineClamp).toBool();
     info.baselineOffset=settings.value(prefix+"baseline_offset", info.baselineOffset).toInt();
     info.emgain=settings.value(prefix+"emgain", info.emgain).toInt();
-    info.emgain_enabled=settings.value(prefix+"emgain_enabled", info.emgain_enabled).toInt();
+    info.emgain_enabled=settings.value(prefix+"emgain_enabled", info.emgain_enabled).toBool();
     info.preamp_gain=settings.value(prefix+"preamp_gain", info.preamp_gain).toInt();
     info.vsSpeed=settings.value(prefix+"vertical_shift_speed", info.vsSpeed).toInt();
     info.vsAmplitude=settings.value(prefix+"vertical_shift_amplitude", info.vsAmplitude).toInt();
@@ -1006,8 +1006,10 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
         if (info.emgain_enabled) {
+            qDebug()<<"setting EMGain: "<<info.emgain;
             CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain %1").arg(info.emgain));
         } else {
+            qDebug()<<"setting EMGain off ("<<info.emgain<<")";
             CHECK(SetEMCCDGain(0), tr("error while setting EM gain 0 (switch off)"));
         }
         CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));
