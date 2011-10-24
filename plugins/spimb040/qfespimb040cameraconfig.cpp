@@ -567,6 +567,8 @@ void QFESPIMB040CameraConfig::startStopPreview() {
                 //previewContinuous();
                 previewTimer->setSingleShot(true);
                 previewTimer->setInterval(spinAcquisitionDelay->value()+2);
+                disconnect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
+                connect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
                 previewTimer->start();
                 delete settings;
             } else {
