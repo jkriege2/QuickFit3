@@ -3,7 +3,9 @@
 #include <QObject>
 #include <QtGlobal>
 
-QFRDRImageReaderRH::QFRDRImageReaderRH() {
+QFRDRImageReaderRH::QFRDRImageReaderRH():
+    QFRDRImageReader()
+{
     width=0;
     height=0;
     filename="";
@@ -113,20 +115,20 @@ void QFRDRImageReaderRH::reset() {
     open(fn);
 }
 
-uint16_t QFRDRImageReaderRH::frameWidth() {
+uint16_t QFRDRImageReaderRH::intFrameWidth() {
     return width;
 }
 
-uint16_t QFRDRImageReaderRH::frameHeight() {
+uint16_t QFRDRImageReaderRH::intFrameHeight() {
     return height;
 }
 
-bool QFRDRImageReaderRH::readFrameUINT16(uint16_t* data) {
+bool QFRDRImageReaderRH::intReadFrameUINT16(uint16_t* data) {
   if (!file) return false;
   return readFrame_<uint16_t>(data);
 }
 
-bool QFRDRImageReaderRH::readFrameFloat(float* data) {
+bool QFRDRImageReaderRH::intReadFrameFloat(float* data) {
     if (!file) return false;
   return readFrame_<float>(data);
 }

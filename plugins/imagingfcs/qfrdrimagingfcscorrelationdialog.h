@@ -55,6 +55,7 @@ protected slots:
     void updateFromFile(bool readFrameCount=true);
     void updateCorrelator();
     void updateFrameCount();
+    void updateImageSize();
     void startNextWaitingThread();
     void on_chkFirstFrame_clicked(bool checked);
     void on_chkLastFrame_clicked(bool checked);
@@ -79,6 +80,9 @@ private:
     bool closing;
     int32_t frame_count;
     QString inputconfigfile;
+
+    int image_width;
+    int image_height;
 
     int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
     int getLayoutIDForProgress(const QWidget* w) const;

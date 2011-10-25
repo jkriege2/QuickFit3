@@ -13,6 +13,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
 {
     this->pluginServices=pluginservices;
     closing=false;
+    image_width=image_height=1;
     this->options=opt;
     lastImagefileDir="";
     ui->setupUi(this);
@@ -242,6 +243,12 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/binning", ui->spinBinning->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop", ui->chkCrop->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_x0", ui->spinXFirst->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -264,6 +271,12 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkACF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked()).toBool());
     ui->chkCCF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked()).toBool());
     ui->spinSegments->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value()).toInt());
+    ui->spinBinning->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/binning", ui->spinBinning->value()).toInt());
+    ui->chkCrop->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop", ui->chkCrop->isChecked()).toBool());
+    ui->spinXFirst->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_x0", ui->spinXFirst->value()).toInt());
+    ui->spinXLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value()).toInt());
+    ui->spinYFirst->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value()).toInt());
+    ui->spinYLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value()).toInt());
 
 }
 
@@ -352,6 +365,12 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.statistics=true;
     job.statistics_frames=qMax(2, ui->spinStatistics->value());
     job.segments=ui->spinSegments->value();
+    job.binning=ui->spinBinning->value();
+    job.use_cropping=ui->chkCrop->isChecked();
+    job.crop_x0=ui->spinXFirst->value();
+    job.crop_x1=ui->spinXLast->value();
+    job.crop_y0=ui->spinYFirst->value();
+    job.crop_y1=ui->spinYLast->value();
     writeSettings();
 
     setEditControlsEnabled(false);
@@ -380,6 +399,25 @@ void QFRDRImagingFCSCorrelationDialog::frameRateChanged(double value) {
     }
     updateCorrelator();
     updateFrameCount();
+}
+
+void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
+    int w=image_width;
+    int h=image_height;
+
+    ui->spinXFirst->setMaximum(image_width-1);
+    ui->spinXLast->setMaximum(image_width-1);
+    ui->spinYFirst->setMaximum(image_height-1);
+    ui->spinYLast->setMaximum(image_height-1);
+
+    if (ui->chkCrop->isChecked()) {
+        w=fabs(ui->spinXLast->value()-ui->spinXFirst->value());
+        h=fabs(ui->spinYLast->value()-ui->spinYFirst->value());
+    }
+
+    w=w/ui->spinBinning->value();
+    h=h/ui->spinBinning->value();
+    ui->labSize->setText(tr("input: %1&times;%2   output: %3&times;%4").arg(image_width).arg(image_height).arg(w).arg(h));
 }
 
 void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
@@ -443,7 +481,9 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     ui->labCorrelator->setText(tr("<i>spanned correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
-void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString backgroundfile) {
+void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString backgroundfile, int& image_width, int& image_height) {
+    if (set.contains("acquisition/image_width")) image_width=set.value("acquisition/image_width", image_width).toInt();
+    if (set.contains("acquisition/image_height")) image_height=set.value("acquisition/image_height", image_height).toInt();
     if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
     else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
     baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
@@ -515,9 +555,9 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             }
 
             if (hasFirst) {
-                readConfigFile(set, frametime, baseline_offset, backgroundF);
+                readConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height);
             } else if (hasSecond) {
-                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF);
+                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
             }
         }
         if (hasFirst) break;
@@ -540,7 +580,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             cfgname=filename.left(filename.size()-suffix.size())+newsuffix[i];
             if (QFile::exists(cfgname)) {
                 QSettings set(cfgname, QSettings::IniFormat);
-                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF);
+                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
                 break;
             }
         }
@@ -582,6 +622,8 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             OK=reader->open(filename);
             if (OK)  {
                 QApplication::processEvents();
+                image_width=reader->frameWidth();
+                image_height=reader->frameHeight();
                 frame_count=reader->countFrames();
                 if (frame_count>0) {
                     ui->spinLastFrame->setMaximum(frame_count-1);
@@ -606,7 +648,12 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
 
     prg.close();
     QApplication::restoreOverrideCursor();
+
+    if (image_width<=1) image_width=1;
+    if (image_height<=1) image_height=1;
+
     updateFrameCount();
+    updateImageSize();
 }
 
 

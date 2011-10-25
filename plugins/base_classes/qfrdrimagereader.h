@@ -20,10 +20,12 @@
     } while (reader.nextFrame());
     reader.close();
 \endcode
-    .
+
+    The class also allows to set a binning and a cropping which will be applied transparently for the user.
 */
 class QFRDRImageReader {
     public:
+        QFRDRImageReader();
         virtual ~QFRDRImageReader()  {}
         /** \brief open the given image sequence file
          *  \param filename name of the image sequence file
@@ -42,13 +44,13 @@ class QFRDRImageReader {
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         virtual bool nextFrame()=0;
         /** \brief return the width of the frames (valid after open() returned \c true */
-        virtual uint16_t frameWidth()=0;
+        uint16_t frameWidth();
         /** \brief return the height of the frames (valid after open() returned \c true */
-        virtual uint16_t frameHeight()=0;
+        uint16_t frameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool readFrameFloat(float* data)=0;
+        bool readFrameFloat(float* data);
         /** \brief read a new frame into the given array of integers */
-        virtual bool readFrameUINT16(uint16_t* data)=0;
+        bool readFrameUINT16(uint16_t* data);
         /** \brief return a description of the last error that occured */
         QString lastError() const {
             return err;
@@ -57,13 +59,43 @@ class QFRDRImageReader {
         virtual QString filter() const =0;
         /** \brief return a name string for the file format */
         virtual QString formatName() const =0;
+
+        /** \brief set binning */
+        void setBinning(int bin) { binning=bin; }
+        int getBinning() const { return binning; }
+        /** \brief set cropping */
+        void setCropping(int x0, int x1, int y0, int y1);
+        void unsetCropping() { crop=false; }
+
+        bool getUseCropping() const { return crop; }
+        int getCropX0() const { return x0; }
+        int getCropX1() const { return x1; }
+        int getCropY0() const { return y0; }
+        int getCropY1() const { return y1; }
     protected:
+        /** \brief return the width of the frames (valid after open() returned \c true */
+        virtual uint16_t intFrameWidth()=0;
+        /** \brief return the height of the frames (valid after open() returned \c true */
+        virtual uint16_t intFrameHeight()=0;
+        /** \brief read a new frame into the given array of floating point numbers */
+        virtual bool intReadFrameFloat(float* data)=0;
+        /** \brief read a new frame into the given array of integers */
+        virtual bool intReadFrameUINT16(uint16_t* data)=0;
+
+
         void setLastError(QString err) {
             this->err=err;
         }
 
     private:
         QString err;
+
+        int binning;
+        int x0;
+        int x1;
+        int y0;
+        int y1;
+        bool crop;
 };
 
 

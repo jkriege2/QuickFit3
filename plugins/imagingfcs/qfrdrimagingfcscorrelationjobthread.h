@@ -75,6 +75,18 @@ struct Job {
     uint32_t video_frames;
     /** \brief cut the input sequencein thsi number of segments and calculate and average + stddev for every point in the ACF/CCF */
     int32_t segments;
+    /** \brief binning factor */
+    int binning;
+    /** \brief en-/disables cropping */
+    bool use_cropping;
+    /** \brief for cropping mode: first x-value */
+    int crop_x0;
+    /** \brief for cropping mode: last x-value */
+    int crop_x1;
+    /** \brief for cropping mode: first y-value */
+    int crop_y0;
+    /** \brief for cropping mode: last y-value */
+    int crop_y1;
 };
 
 /*! \brief this thread does all the correlation work

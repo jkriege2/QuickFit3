@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>878</width>
-    <height>665</height>
+    <height>704</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -157,9 +157,12 @@
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -187,9 +190,12 @@
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -208,7 +214,7 @@
            <item>
             <widget class="QLineEdit" name="edtPostfix">
              <property name="text">
-              <string>%COUNTER%</string>
+              <string>_corr%correlator%_back%backcorrection%_bin%binning%_%COUNTER%</string>
              </property>
             </widget>
            </item>
@@ -508,6 +514,146 @@
           </layout>
          </item>
          <item row="3" column="0">
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>&amp;binning</string>
+           </property>
+           <property name="buddy">
+            <cstring>spinBinning</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <item>
+            <widget class="QSpinBox" name="spinBinning">
+             <property name="suffix">
+              <string> pixels</string>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_29">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="labSize">
+             <property name="text">
+              <string>size</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <widget class="QCheckBox" name="chkCrop">
+           <property name="text">
+            <string>&amp;cropping</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QWidget" name="widSubregion" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_18">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_34">
+              <property name="text">
+               <string>x = </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinXFirst"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_35">
+              <property name="text">
+               <string> ... </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinXLast">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_30">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_36">
+              <property name="text">
+               <string>y = </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinYFirst"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_37">
+              <property name="text">
+               <string> ... </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinYLast">
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_32">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="5" column="0">
           <widget class="QLabel" name="label_12">
            <property name="text">
             <string>&amp;background correction:</string>
@@ -517,7 +663,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="5" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
             <widget class="QComboBox" name="cmbBackground">
@@ -600,7 +746,7 @@
            </item>
           </layout>
          </item>
-         <item row="4" column="1">
+         <item row="6" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_14">
            <item>
             <widget class="QLabel" name="label_31">
@@ -635,7 +781,7 @@
            </item>
           </layout>
          </item>
-         <item row="5" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="label_26">
            <property name="text">
             <string>correlation &amp;functions:</string>
@@ -645,7 +791,7 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="7" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QCheckBox" name="chkACF">
@@ -747,7 +893,7 @@
            </item>
           </layout>
          </item>
-         <item row="6" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -757,7 +903,7 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="8" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -935,7 +1081,7 @@
            </item>
           </layout>
          </item>
-         <item row="7" column="0">
+         <item row="9" column="0">
           <widget class="QLabel" name="label_27">
            <property name="text">
             <string>&amp;statistics:</string>
@@ -945,7 +1091,7 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="9" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="QLabel" name="label_29">
@@ -1021,7 +1167,7 @@
            </item>
           </layout>
          </item>
-         <item row="8" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
             <string>&amp;video:</string>
@@ -1031,7 +1177,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="10" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QCheckBox" name="chkVideo">
@@ -1130,14 +1276,14 @@
            </item>
           </layout>
          </item>
-         <item row="9" column="1">
+         <item row="11" column="1">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="10" column="0">
+         <item row="12" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -1147,7 +1293,7 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="1">
+         <item row="12" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -1324,7 +1470,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>838</width>
-           <height>128</height>
+           <height>113</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1424,6 +1570,11 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinLastFrame</tabstop>
   <tabstop>edtFrameTime</tabstop>
   <tabstop>edtFrameRate</tabstop>
+  <tabstop>spinBinning</tabstop>
+  <tabstop>spinXFirst</tabstop>
+  <tabstop>spinXLast</tabstop>
+  <tabstop>spinYFirst</tabstop>
+  <tabstop>spinYLast</tabstop>
   <tabstop>cmbBackground</tabstop>
   <tabstop>edtOffset</tabstop>
   <tabstop>edtBackgroundFile</tabstop>
@@ -1440,8 +1591,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinVideoFrames</tabstop>
   <tabstop>chkAddToProject</tabstop>
   <tabstop>btnAddJob</tabstop>
-  <tabstop>spinProcesses</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>spinProcesses</tabstop>
   <tabstop>btnHelp</tabstop>
   <tabstop>pushButton</tabstop>
  </tabstops>
@@ -1458,7 +1609,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>867</x>
-     <y>585</y>
+     <y>692</y>
     </hint>
     <hint type="destinationlabel">
      <x>719</x>
@@ -1473,12 +1624,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>244</x>
-     <y>285</y>
+     <x>265</x>
+     <y>390</y>
     </hint>
     <hint type="destinationlabel">
-     <x>342</x>
-     <y>283</y>
+     <x>437</x>
+     <y>392</y>
     </hint>
    </hints>
   </connection>
@@ -1489,14 +1640,113 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>291</y>
+     <x>265</x>
+     <y>390</y>
     </hint>
     <hint type="destinationlabel">
-     <x>481</x>
-     <y>286</y>
+     <x>506</x>
+     <y>392</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCrop</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>widSubregion</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>150</x>
+     <y>190</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>583</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBinning</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
+   <slot>updateImageSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>241</x>
+     <y>158</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>202</x>
+     <y>698</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinXFirst</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
+   <slot>updateImageSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>256</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>229</x>
+     <y>680</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinXLast</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
+   <slot>updateImageSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>275</x>
+     <y>682</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinYFirst</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
+   <slot>updateImageSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>570</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>365</x>
+     <y>681</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinYLast</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
+   <slot>updateImageSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>642</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>507</x>
+     <y>692</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>updateImageSize()</slot>
+ </slots>
 </ui>

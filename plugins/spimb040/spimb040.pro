@@ -50,7 +50,6 @@ SOURCES += spimb040.cpp \
     qfespimb040simplecameraconfig.cpp \
     qfespimb00histogrammaskdialog.cpp \
     ../../../../../LIB/trunk/qt/qfasttablelabel.cpp
-
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \
@@ -70,6 +69,7 @@ INCLUDEPATH += . \
 QT += gui xml svg opengl
 
 CONFIG += exceptions rtti stl
+
 
 
 

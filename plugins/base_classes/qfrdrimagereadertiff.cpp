@@ -4,7 +4,9 @@
 #include <QtGlobal>
 #include <QDebug>
 
-QFRDRImageReaderTIFF::QFRDRImageReaderTIFF() {
+QFRDRImageReaderTIFF::QFRDRImageReaderTIFF():
+    QFRDRImageReader()
+{
     width=0;
     height=0;
     filename="";
@@ -88,16 +90,16 @@ bool QFRDRImageReaderTIFF::nextFrame() {
     return TIFFReadDirectory(tif);
 }
 
-uint16_t QFRDRImageReaderTIFF::frameWidth() {
+uint16_t QFRDRImageReaderTIFF::intFrameWidth() {
     return width;
 }
 
-uint16_t QFRDRImageReaderTIFF::frameHeight() {
+uint16_t QFRDRImageReaderTIFF::intFrameHeight() {
     return height;
 }
 
 
-bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
+bool QFRDRImageReaderTIFF::intReadFrameUINT16(uint16_t* data) {
     if (!tif) return false;
     bool ok=true;
     uint16 samplesperpixel, bitspersample;
@@ -172,7 +174,7 @@ bool QFRDRImageReaderTIFF::readFrameUINT16(uint16_t* data) {
     return ok;
 }
 
-bool QFRDRImageReaderTIFF::readFrameFloat(float* data) {
+bool QFRDRImageReaderTIFF::intReadFrameFloat(float* data) {
     if (!tif) return false;
 
     bool ok=true;

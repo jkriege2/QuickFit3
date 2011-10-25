@@ -29,19 +29,21 @@ class QFRDRImageReaderTIFF : public QFRDRImageReader {
         virtual uint32_t countFrames();
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         virtual bool nextFrame();
-        /** \brief return the width of the frames (valid after open() returned \c true */
-        virtual uint16_t frameWidth();
-        /** \brief return the height of the frames (valid after open() returned \c true */
-        virtual uint16_t frameHeight();
-        /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool readFrameFloat(float* data);
-        /** \brief read a new frame into the given array of integers */
-        virtual bool readFrameUINT16(uint16_t* data);
+
         /** \brief return a filter string for the file format */
         virtual QString filter() const;
         /** \brief return a name string for the file format */
         virtual QString formatName() const ;
     protected:
+        /** \brief return the width of the frames (valid after open() returned \c true */
+        virtual uint16_t intFrameWidth();
+        /** \brief return the height of the frames (valid after open() returned \c true */
+        virtual uint16_t intFrameHeight();
+        /** \brief read a new frame into the given array of floating point numbers */
+        virtual bool intReadFrameFloat(float* data);
+        /** \brief read a new frame into the given array of integers */
+        virtual bool intReadFrameUINT16(uint16_t* data);
+
         uint16_t width;
         uint16_t height;
         TIFF* tif;

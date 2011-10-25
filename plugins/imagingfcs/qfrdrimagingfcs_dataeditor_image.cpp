@@ -2065,8 +2065,9 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
 
     //qDebug()<<"***** updateHistogram()   "<<plteImageData<<plteImageSize;
 
-    if (plteImageData && (plteImageSize>0)) {
-        double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+    if (plteImageData && (plteImageSize>=m->getDataImageWidth()*m->getDataImageHeight())) {
+        int imageSize=m->getDataImageWidth()*m->getDataImageHeight();
+        double* datahist=(double*)malloc(imageSize*sizeof(double));
         int32_t datasize=0;
         double mmin=edtHistogramMin->value();
         double mmax=edtHistogramMax->value();
@@ -2074,7 +2075,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
         if (chkHistogramRangeAuto->isChecked()) {
             int32_t ii=0;
             if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if (!m->leaveoutRun(i)) {
                         datahist[ii]=plteImageData[i];
                         ii++;
@@ -2082,7 +2083,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     datahist[i]=plteImageData[i];
                     datasize++;
                 }
@@ -2090,7 +2091,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
         } else {
             int32_t ii=0;
             if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if (!m->leaveoutRun(i) && (plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)) {
                         datahist[ii]=plteImageData[i];
                         ii++;
@@ -2098,7 +2099,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if ((plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)) {
                         datahist[ii]=plteImageData[i];
                         ii++;
@@ -2237,14 +2238,15 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
 
 
 
-    if (plteImageData && (plteImageSize>0) && (selected.size()>1)) {
+    if (plteImageData && (plteImageSize>=m->getDataImageWidth()*m->getDataImageHeight()) && (selected.size()>1)) {
+        int imageSize=m->getDataImageWidth()*m->getDataImageHeight();
         int32_t datasize=0;
-        double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+        double* datahist=(double*)malloc(imageSize*sizeof(double));
 
         int32_t ii=0;
         if (chkHistogramRangeAuto->isChecked()) {
             if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if (selected.contains(i) && !m->leaveoutRun(i)) {
                         datahist[ii]=plteImageData[i];
                         ii++;
@@ -2252,7 +2254,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if (selected.contains(i)) {
                         datahist[ii]=plteImageData[i];
                         ii++;
@@ -2265,7 +2267,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
             double mmax=edtHistogramMax->value();
             // && (plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)
             if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if (selected.contains(i) && (plteImageData[i]>=mmin) && (plteImageData[i]<=mmax) && !m->leaveoutRun(i)) {
                         datahist[ii]=plteImageData[i];
                         ii++;
@@ -2273,7 +2275,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for (register int32_t i=0; i<imageSize; i++) {
                     if (selected.contains(i) && (plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)) {
                         datahist[ii]=plteImageData[i];
                         ii++;

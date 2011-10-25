@@ -51,7 +51,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../../../../../LIB/trunk/tinytiffwriter.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
     ../../../../../LIB/trunk/statistics_tools.cpp \
-    ../base_classes/qfrdrimagereaderrh.cpp
+    ../base_classes/qfrdrimagereaderrh.cpp \
+    ../base_classes/qfrdrimagereader.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
