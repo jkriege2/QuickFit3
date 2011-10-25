@@ -2,7 +2,7 @@
 
 QStringList QFPFitFunctionsFCSDistribution::getIDs() const {
     QStringList res;
-    //res<<"fcs_dist_lognorm";
+    res<<"fcs_dist_lognorm";
     return res;
 }
 
