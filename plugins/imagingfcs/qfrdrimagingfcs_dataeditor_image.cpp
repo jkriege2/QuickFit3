@@ -220,7 +220,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     lpltOverview->addWidget(pltOverview, 1);
     pltOverview->set_zoomByDoubleAndRightMouseClick(false);
     pltOverview->set_displayMousePosition(false);
-    pltOverview->set_displayToolbar(false);
+    pltOverview->set_displayToolbar(true);
     pltOverview->get_plotter()->set_maintainAspectRatio(true);
     pltOverview->get_plotter()->set_aspectRatio(1);
     pltOverview->get_plotter()->set_maintainAxisAspectRatio(true);
@@ -275,7 +275,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     pltImage->set_zoomByDoubleAndRightMouseClick(false);
     pltImage->set_displayMousePosition(false);
-    pltImage->set_displayToolbar(false);
+    pltImage->set_displayToolbar(true);
     pltImage->get_plotter()->set_maintainAspectRatio(true);
     pltImage->get_plotter()->set_aspectRatio(1);
     pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
@@ -329,7 +329,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     pltGofImage->set_zoomByDoubleAndRightMouseClick(false);
     pltGofImage->set_displayMousePosition(false);
-    pltGofImage->set_displayToolbar(false);
+    pltGofImage->set_displayToolbar(true);
     pltGofImage->get_plotter()->set_maintainAspectRatio(true);
     pltGofImage->get_plotter()->set_aspectRatio(1);
     pltGofImage->get_plotter()->set_maintainAxisAspectRatio(true);
