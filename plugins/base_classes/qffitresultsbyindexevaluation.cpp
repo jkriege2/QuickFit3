@@ -292,7 +292,7 @@ void QFFitResultsByIndexEvaluation::setAllFitValues(const QString& id, double va
             recs[i]->enableEmitResultsChanged();
         }
     }
-    emit resultsChanged();
+    emitResultsChanged();
 }
 
 /*! \brief set the given parameter \a id to the given fix value */
@@ -320,7 +320,7 @@ void QFFitResultsByIndexEvaluation::setAllFitFixes(const QString& id, bool fix, 
             recs[i]->enableEmitResultsChanged();
         }
     }
-    emit resultsChanged();
+    emitResultsChanged();
 }
 
 

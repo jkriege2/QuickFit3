@@ -237,25 +237,15 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         }
     public slots:
         /** \brief set the name */
-        inline void setName(const QString n) {
-            name=n;
-            emitPropertiesChanged();
-        }
+        void setName(const QString n);
         /** \brief set the description  */
-        inline void setDescription(const QString& d) {
-            description=d;
-            emitPropertiesChanged();
-        };
+        void setDescription(const QString& d);
 
         /** \brief emits resultsChanged(), only if doEmitResultsChanged is \c true */
-        inline void emitResultsChanged() {
-            if (doEmitResultsChanged) emit resultsChanged();
-        }
+        void emitResultsChanged();
 
         /** \brief emits propertiesChanged(), only if doEmitPropertiesChanged is \c true */
-        inline void emitPropertiesChanged() {
-            if (doEmitPropertiesChanged) emit propertiesChanged();
-        }
+        void emitPropertiesChanged();
     signals:
         /** \brief emitted whenever at least one of the properties changes */
         void propertiesChanged();

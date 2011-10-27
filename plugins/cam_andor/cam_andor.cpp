@@ -452,7 +452,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
     CHECK(StartAcquisition(), tr("error starting acquisition"));
 
 #ifdef DEBUG_TIMING
-    qDebug()<<"init "<<timer.get_time()<<" us";
+    //qDebug()<<"init "<<timer.get_time()<<" us";
     timer.start();
 #endif
 
@@ -470,7 +470,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 		CHECK(GetStatus(&status), tr("error while waiting for frame"));
 	}
 #ifdef DEBUG_TIMING
-    qDebug()<<"acquisition "<<timer.get_time()<<" us";
+    //qDebug()<<"acquisition "<<timer.get_time()<<" us";
     timer.start();
 #endif
     if (time.elapsed()<=timeout)  {
@@ -484,7 +484,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
         free(imageData);
 #ifdef DEBUG_TIMING
-        qDebug()<<"data read "<<timer.get_time()<<" us";
+        //qDebug()<<"data read "<<timer.get_time()<<" us";
         timer.start();
 #endif
 
@@ -546,9 +546,8 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     progress.setWindowModality(Qt::WindowModal);
     progress.setHasCancel(false);
     progress.open();
-    QApplication::processEvents();
-    QApplication::processEvents();
-    QApplication::processEvents();
+    QApplication::processEvents(QEventLoop::AllEvents, 50);
+
 
     //at_32 *data = NULL;
 
@@ -568,7 +567,7 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
         // initialize camera, if init fails, call ShutDown and the Initialize again ... if this also fails -> exit with an error!
         strcpy(path, detectorsIniPath.toStdString().c_str());
         progress.setLabelText(tr("initializing camera %1 ...<br>&nbsp;&nbsp;&nbsp;&nbsp;detectorsIniPath='%2'").arg(camera).arg(detectorsIniPath));
-        QApplication::processEvents();
+
         QApplication::processEvents();
         QApplication::processEvents();
         { unsigned int error1=Initialize(path);
@@ -1012,10 +1011,10 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
         if (info.emgain_enabled) {
-            qDebug()<<"setting EMGain: "<<info.emgain;
+            //qDebug()<<"setting EMGain: "<<info.emgain;
             CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain %1").arg(info.emgain));
         } else {
-            qDebug()<<"setting EMGain off ("<<info.emgain<<")";
+            //qDebug()<<"setting EMGain off ("<<info.emgain<<")";
             CHECK(SetEMCCDGain(0), tr("error while setting EM gain 0 (switch off)"));
         }
         CHECK(SetBaselineOffset(info.baselineOffset), tr("error while setting baseline offset"));

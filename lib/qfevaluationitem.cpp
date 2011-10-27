@@ -120,6 +120,8 @@ void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {
         QFRawDataRecord* old=highlightedRecord;
         //disconnect(old, NULL, this, NULL);
         highlightedRecord=record;
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits highlightingChanged(old="<<old<<", record="<<record<<")";
+
         emit highlightingChanged(old, record);
     }
 }
@@ -130,6 +132,7 @@ void QFEvaluationItem::setSelectedRecords(QList<QPointer<QFRawDataRecord> > reco
         //disconnect(selectedRecords[i], NULL, this, NULL);
     }
     selectedRecords=records;
+    //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<records.size()<<")";
     emit selectionChanged(records);
     project->setDataChanged();
 }
@@ -138,6 +141,7 @@ void QFEvaluationItem::selectRecord(QFRawDataRecord* record) {
     if ((record!=NULL) && isApplicable(record)) {
         if (!selectedRecords.contains(record)) {
             selectedRecords.append(record);
+            //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
             emit selectionChanged(selectedRecords);
             project->setDataChanged();
         }
@@ -147,6 +151,7 @@ void QFEvaluationItem::selectRecord(QFRawDataRecord* record) {
 void QFEvaluationItem::deselectRecord(QFRawDataRecord* record) {
     if (selectedRecords.contains(record)) {
         selectedRecords.removeAll(record);
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
         emit selectionChanged(selectedRecords);
         project->setDataChanged();
     }
@@ -155,6 +160,7 @@ void QFEvaluationItem::deselectRecord(QFRawDataRecord* record) {
 void QFEvaluationItem::deselectRecord(int i) {
     if ((i>=0) && (i<selectedRecords.size())) {
         selectedRecords.removeAt(i);
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
         emit selectionChanged(selectedRecords);
         project->setDataChanged();
     }
@@ -170,6 +176,7 @@ QPointer<QFRawDataRecord> QFEvaluationItem::getSelectedRecord(int i) {
 void QFEvaluationItem::clearSelectedRecords() {
     if (selectedRecords.size()>0) {
         selectedRecords.clear();
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
         emit selectionChanged(selectedRecords);
         project->setDataChanged();
     }
@@ -186,6 +193,7 @@ void QFEvaluationItem::selectAllAplicableRecords() {
             }
         }
         if (added) {
+            //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
             emit selectionChanged(selectedRecords);
             project->setDataChanged();
         }
@@ -216,7 +224,35 @@ void QFEvaluationItem::recordAboutToBeDeleted(QFRawDataRecord* r) {
         selectedRecords.removeAll(r);
     }
     selectedRecords.removeAll(NULL);
+    //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
     emit selectionChanged(selectedRecords);
-    if (wasCurrent) emit highlightingChanged(r, highlightedRecord);
+    if (wasCurrent) {
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits highlightingChanged(r="<<r<<", highlighted="<<highlightedRecord<<")";
+        emit highlightingChanged(r, highlightedRecord);
+    }
     project->setDataChanged();
+}
+
+void QFEvaluationItem::setName(const QString n) {
+    name=n;
+    emitPropertiesChanged();
+}
+
+void QFEvaluationItem::setDescription(const QString& d) {
+    description=d;
+    emitPropertiesChanged();
+};
+
+void QFEvaluationItem::emitResultsChanged() {
+    if (doEmitResultsChanged) {
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits resultsChanged()";
+        emit resultsChanged();
+    }
+}
+
+void QFEvaluationItem::emitPropertiesChanged() {
+    if (doEmitPropertiesChanged) {
+        //qDebug()<<"QFEvaluationItem ("<<name<<") emits propertiesChanged()";
+        emit propertiesChanged();
+    }
 }

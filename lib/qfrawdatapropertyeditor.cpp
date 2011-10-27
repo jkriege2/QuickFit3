@@ -252,7 +252,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
                     QFRawDataEditor* w=editorList[i];
                     if (w) {
                         tabMain->removeTab(tabMain->indexOf(editorList[i]));
-                        QCoreApplication::processEvents();
+                        QApplication::processEvents(QEventLoop::AllEvents, 50);
                         w->saveSettings();
                         w->setSettings(NULL, id);
                         w->setCurrent(NULL, id);

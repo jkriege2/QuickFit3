@@ -15,7 +15,9 @@ QFRDRPropertyModel::~QFRDRPropertyModel()
 
 
 void QFRDRPropertyModel::propertiesChanged() {
+    //qDebug()<<"QFRDRPropertyModel::propertiesChanged()";
     reset();
+    //qDebug()<<"QFRDRPropertyModel::propertiesChanged() ... done";
 }
 
 void QFRDRPropertyModel::init(QFRawDataRecord* record) {

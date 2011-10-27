@@ -100,6 +100,7 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
 }
 
 QSize QFHTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    //qDebug()<<" QFHTMLDelegate::sizeHint()";
     QVariant data=index.data(Qt::DisplayRole).toString();
     if (data.type()==QVariant::String) {
         QTextDocument doc;

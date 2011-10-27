@@ -189,7 +189,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
                 runs++;
                 if (runs%50==0) QApplication::processEvents();
             }
-            //if (stream.atEnd()) qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
+            //if (stream.atEnd()) //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
         }
         width=getProperty("WIDTH").toInt();

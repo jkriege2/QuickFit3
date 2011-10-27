@@ -140,6 +140,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         virtual void readSettings();
         void closeEvent( QCloseEvent* event);
         void resizeEvent(QResizeEvent* event);
+        virtual bool event(QEvent * ev);
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();

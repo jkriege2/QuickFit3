@@ -115,19 +115,19 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void rawDataChanged();
     public:
         /** \copydoc QFProperties::emitPropertiesChanged() */
-        virtual void emitPropertiesChanged() { if (doEmitPropertiesChanged) emit propertiesChanged(); }
+        virtual void emitPropertiesChanged();
         /** \brief this function emits a resultsChanged() signal. */
-        virtual void emitResultsChanged() { if (doEmitResultsChanged) emit resultsChanged(); }
+        virtual void emitResultsChanged();
         /** \brief this function emits a rawDataChanged() signal. */
-        virtual void emitRawDataChanged() { emit rawDataChanged(); }
+        virtual void emitRawDataChanged();
         /** \brief disable emitting of rawDataChanged() signal*/
-        void disableEmitResultsChanged() { doEmitResultsChanged=false; }
+        void disableEmitResultsChanged();
         /** \brief enable emitting of rawDataChanged() signal and emit one signal */
-        void enableEmitResultsChanged(bool emitnow=true) { doEmitResultsChanged=true; if (emitnow) emit resultsChanged(); }
+        void enableEmitResultsChanged(bool emitnow=true);
         /** \brief disable emitting of propertiesChanged() signal*/
-        void disableEmitPropertiesChanged() { doEmitPropertiesChanged=false; }
+        void disableEmitPropertiesChanged();
         /** \brief enable emitting of propertiesChanged() signal and emit one signal */
-        void enableEmitPropertiesChanged(bool emitnow=true) { doEmitPropertiesChanged=true; if (emitnow) emit propertiesChanged(); }
+        void enableEmitPropertiesChanged(bool emitnow=true);
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message) { setError(message); }

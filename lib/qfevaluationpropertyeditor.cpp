@@ -79,7 +79,7 @@ void QFEvaluationRawDataModelProxy::setEditor(QFEvaluationPropertyEditor* editor
 void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords) {
     //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
     invalidateFilter();
-    qDebug()<<rowCount()<<editor;
+    //qDebug()<<rowCount()<<editor;
     if ((rowCount()<=0)&& editor) editor->close();
 }
 
@@ -255,8 +255,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
 
 void QFEvaluationPropertyEditor::resultsChanged() {
     if (!resultsModel) return;
-    resultsModel->resultsChanged();
-    tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    //resultsModel->resultsChanged();
+    if (tvResults->model()->columnCount()*tvResults->model()->rowCount()<10000) tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }
 
 void QFEvaluationPropertyEditor::displayHelp() {
@@ -460,7 +460,7 @@ void QFEvaluationPropertyEditor::deselectCurrent() {
 
         QModelIndex next;
 
-        qDebug()<<current<<current.row()<<rows;
+        //qDebug()<<current<<current.row()<<rows;
 
         if (current.row()>0) {
             next=lstRawData->model()->index(current.row()-1, current.column());
@@ -468,7 +468,7 @@ void QFEvaluationPropertyEditor::deselectCurrent() {
         } else {
             if (rows>1) next=lstRawData->model()->index(rows-1, current.column());
         }
-        qDebug()<<next;
+        //qDebug()<<next;
         //lstRawData->selectionModel()->select(next, QItemSelectionModel::SelectCurrent);
         if (next.isValid()) {
             lstRawData->selectionModel()->setCurrentIndex(next, QItemSelectionModel::SelectCurrent);
@@ -642,3 +642,11 @@ void QFEvaluationPropertyEditor::highlightingChanged(QFRawDataRecord* formerReco
 
 }*/
 
+bool QFEvaluationPropertyEditor::event(QEvent * ev) {
+    QTime t;
+    t.start();
+    //qDebug()<<"~~~ QFEvaluationPropertyEditor::event("<<ev->type()<<")";
+    bool ok=QWidget::event(ev);
+    //qDebug()<<"~~~ QFEvaluationPropertyEditor::event("<<ev->type()<<") done: "<<t.elapsed()<<" ms";
+    return ok;
+}

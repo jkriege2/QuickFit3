@@ -23,6 +23,9 @@ void QFEvaluationResultsModel::init(QFEvaluationItem* evaluation, QString evalFi
 }
 
 void QFEvaluationResultsModel::resultsChanged() {
+    QTime t;
+    t.start();
+    //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged()";
     if (evaluation) {
         //lastResultNames=evaluation->getProject()->rdrCalcMatchingResultsNames(evalFilter);
         lastResults=evaluation->getProject()->rdrCalcMatchingResults(evalFilter);
@@ -40,6 +43,7 @@ void QFEvaluationResultsModel::resultsChanged() {
         lastResults.clear();
     }
     reset();
+    //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
 }
 
 int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {

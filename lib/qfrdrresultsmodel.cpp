@@ -28,7 +28,11 @@ void QFRDRResultsModel::resultsChanged() {
     lastResultLabels.clear();
     lastResultSets.clear();
 
+    QTime t;
+    t.start();
+
     if (record) {
+        //qDebug()<<"--- QFRDRResultsModel (rec:"<<record->getName()<<")";
 
         /*if (record) lastResultNames=record->resultsCalcNames();
         else lastResultNames.clear();*/
@@ -49,8 +53,11 @@ void QFRDRResultsModel::resultsChanged() {
         if (lastResultSets.size()>0) {
             qSort(lastResultSets.begin(), lastResultSets.end(), QFRDRResultsModel_StringPairCaseInsensitiveCompareSecond<QString>);
         }
+    } else {
+        //qDebug()<<"--- QFRDRResultsModel (rec:"<<record<<")";
     }
     reset();
+    //qDebug()<<"--- QFRDRResultsModel ... done "<<t.elapsed();
 }
 
 void QFRDRResultsModel::init(QFRawDataRecord* record) {

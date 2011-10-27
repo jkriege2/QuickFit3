@@ -2,7 +2,7 @@
 #include <QDebug>
 
 QFPluginRawDataRecordBase::QFPluginRawDataRecordBase() {
-    qDebug()<<"QFPluginRawDataRecordBase::QFPluginRawDataRecordBase()";
+    //qDebug()<<"QFPluginRawDataRecordBase::QFPluginRawDataRecordBase()";
     services=NULL;
     project=NULL;
     settings=NULL;

@@ -11,8 +11,12 @@ QFRDRImagingFCSRunsModel::QFRDRImagingFCSRunsModel(QObject *parent) :
 
 
 void QFRDRImagingFCSRunsModel::setCurrent(QFRawDataRecord* current) {
+    QTime t;
+    t.start();
+    qDebug()<<" QFRDRImagingFCSRunsModel::setCurrent()";
     this->current=current;
     reset();
+    qDebug()<<" QFRDRImagingFCSRunsModel::setCurrent() ... done "<<t.elapsed();
 }
 
 

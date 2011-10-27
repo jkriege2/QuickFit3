@@ -349,7 +349,7 @@ void QFRawDataRecord::resultsClearAll() {
         delete j.value();
     }
     results.clear();
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 }
 
 void QFRawDataRecord::resultsClear(QString name) {
@@ -357,7 +357,7 @@ void QFRawDataRecord::resultsClear(QString name) {
         results[name]->results.clear();
         delete results[name];
         results.remove(name);
-        if (doEmitResultsChanged) emit resultsChanged();
+        emitResultsChanged();
     }
 };
 
@@ -382,7 +382,7 @@ void QFRawDataRecord::resultsSetNumber(QString evaluationName, QString resultNam
     r.unit=unit;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool emitChangedSignal) {
@@ -405,7 +405,7 @@ void QFRawDataRecord::resultsClear(QString name, QString postfix) {
             //cout << i.key() << ": " << i.value() << endl;
             if (i.key().endsWith(postfix)) results[name]->results.remove(i.key());
         }
-        if (doEmitResultsChanged) emit resultsChanged();
+        emitResultsChanged();
     }
 };
 
@@ -416,7 +416,7 @@ void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resul
     r.unit=unit;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSetNumberMatrix(QString evaluationName, QString resultName, QVector<double>& value, int columns, QString unit) {
@@ -427,7 +427,7 @@ void QFRawDataRecord::resultsSetNumberMatrix(QString evaluationName, QString res
     r.columns=columns;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resultName, double* value, int items, QString unit) {
@@ -456,7 +456,7 @@ void QFRawDataRecord::resultsSetNumberError(QString evaluationName, QString resu
     r.unit=unit;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSetInteger(QString evaluationName, QString resultName, int64_t value, QString unit) {
@@ -466,7 +466,7 @@ void QFRawDataRecord::resultsSetInteger(QString evaluationName, QString resultNa
     r.unit=unit;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSetString(QString evaluationName, QString resultName, QString value) {
@@ -475,7 +475,7 @@ void QFRawDataRecord::resultsSetString(QString evaluationName, QString resultNam
     r.svalue=value;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSetLabel(QString evaluationName, QString resultName, QString label, QString label_rich) {
@@ -485,7 +485,7 @@ void QFRawDataRecord::resultsSetLabel(QString evaluationName, QString resultName
     r.label_rich=label_rich;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results[resultName]=r;
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 }
 
 void QFRawDataRecord::resultsSetGroup(QString evaluationName, QString resultName, QString group) {
@@ -494,7 +494,7 @@ void QFRawDataRecord::resultsSetGroup(QString evaluationName, QString resultName
     r.group=group;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results[resultName]=r;
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 }
 
 void QFRawDataRecord::resultsSetSortPriority(QString evaluationName, QString resultName, bool pr) {
@@ -503,7 +503,7 @@ void QFRawDataRecord::resultsSetSortPriority(QString evaluationName, QString res
     r.sortPriority=pr;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results[resultName]=r;
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 }
 
 bool QFRawDataRecord::resultsGetSortPriority(QString evaluationName, QString resultName) const {
@@ -575,13 +575,13 @@ void QFRawDataRecord::resultsSetBoolean(QString evaluationName, QString resultNa
     r.bvalue=value;
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, r);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSet(QString evaluationName, QString resultName, const evaluationResult& result) {
     if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
     results[evaluationName]->results.insert(resultName, result);
-    if (doEmitResultsChanged) emit resultsChanged();
+    emitResultsChanged();
 }
 
 QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultName) const {
@@ -782,7 +782,7 @@ void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
             if (!results.contains(newEvalName)) results[newEvalName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
             results[newEvalName]->results.insert(i.key(), i.value());
         }
-        if (doEmitResultsChanged) emit resultsChanged();
+        emitResultsChanged();
     }
 }
 
@@ -1206,3 +1206,46 @@ QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup)
 }
 
 
+void QFRawDataRecord::emitPropertiesChanged() {
+    if (doEmitPropertiesChanged) {
+        //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
+        emit propertiesChanged();
+
+    }
+}
+
+void QFRawDataRecord::emitResultsChanged() {
+    if (doEmitResultsChanged) {
+        //qDebug()<<"QFRawDataRecord ("<<name<<") emits resultsChanged()";
+        emit resultsChanged();
+    }
+}
+
+void QFRawDataRecord::emitRawDataChanged() {
+    //qDebug()<<"QFRawDataRecord ("<<name<<") emits rawDataChanged()";
+    emit rawDataChanged();
+}
+
+void QFRawDataRecord::disableEmitResultsChanged() {
+    doEmitResultsChanged=false;
+}
+
+void QFRawDataRecord::enableEmitResultsChanged(bool emitnow) {
+    doEmitResultsChanged=true;
+    if (emitnow) {
+        //qDebug()<<"QFRawDataRecord ("<<name<<") emits resultsChanged()";
+        emit resultsChanged();
+    }
+}
+
+void QFRawDataRecord::disableEmitPropertiesChanged() {
+    doEmitPropertiesChanged=false;
+}
+
+void QFRawDataRecord::enableEmitPropertiesChanged(bool emitnow) {
+    doEmitPropertiesChanged=true;
+    if (emitnow) {
+        //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
+        emit  propertiesChanged();
+    }
+}

@@ -108,67 +108,43 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          */
         bool registerEvaluation(QFEvaluationItem* rec);
         /** \brief return \c true if ID is unused */
-        inline bool checkID(int ID)const  { return !IDs.contains(ID); }
+        bool checkID(int ID)const;
         /** \brief return the name */
-        inline QString getName()const  { return name; }
+        QString getName()const;
         /** \brief set name of project */
-        inline void setName(const QString& n) {
-            if (name!=n) {
-                name=n;
-                emit propertiesChanged();
-            }
-        }
+        void setName(const QString& n);
         /** \brief return the description  */
-        inline QString getDescription()const  { return description; };
+        QString getDescription()const;
         /** \brief set description of project */
-        inline void setDescription(const QString& d) {
-            if (description!=d) {
-                description=d;
-                emit propertiesChanged();
-            }
-        }
+        void setDescription(const QString& d);
         /** \brief return the creator  */
-        inline QString getCreator()const  { return creator; };
+        QString getCreator()const;
         /** \brief set creator of project */
-        inline void setCreator(const QString& c) {
-            if (creator!=c) {
-                creator=c;
-                emit propertiesChanged();
-            }
-        }
+        void setCreator(const QString& c);
         /** \brief return the file name  */
-        inline QString getFile()const  { return file; };
+        QString getFile()const;
 
         /** \brief return the number of raw data records in the project */
-        inline int getRawDataCount()const  { return rawData.size(); }
+        int getRawDataCount()const;
 
         /** \brief return the number of raw data records in the project */
-        inline int getEvaluationCount()const  { return evaluations.size(); }
+        int getEvaluationCount()const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        inline bool rawDataIDExists(int ID)const  { return rawData.contains(ID); }
+        bool rawDataIDExists(int ID)const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        inline bool evaluationIDExists(int ID)const  { return evaluations.contains(ID); }
+        bool evaluationIDExists(int ID)const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        inline bool rawDataExists(QFRawDataRecord* rec) const  { return rawData.values().contains(rec); }
+        bool rawDataExists(QFRawDataRecord* rec) const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        inline bool evaluationExists(QFEvaluationItem* rec) const  { return evaluations.values().contains(rec); }
+        bool evaluationExists(QFEvaluationItem* rec) const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        inline int getRawDataIndex(QFRawDataRecord* rec) const  { return rawData.values().indexOf(rec); }
+        int getRawDataIndex(QFRawDataRecord* rec) const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        inline bool getEvaluationIndex(QFEvaluationItem* rec) const  { return evaluations.values().indexOf(rec); }
+        bool getEvaluationIndex(QFEvaluationItem* rec) const;
         /** \brief return the raw data record specified by the ID, or \c NULL */
-        inline QFRawDataRecord* getRawDataByID(int ID) {
-            if (rawDataIDExists(ID)) return rawData[ID];
-            return NULL;
-        }
+        QFRawDataRecord* getRawDataByID(int ID);
         /** \brief return the i-th raw data record, or \c NULL */
-        inline QFRawDataRecord* getRawDataByNum(int i) const {
-            QList<int> keys=rawData.keys();
-            if ((i>=keys.size()) || (i<0)) return NULL;
-            int ID=keys.at(i);
-            if (rawData.contains(ID)) return rawData[ID];
-            else return NULL;
-        }
+        QFRawDataRecord* getRawDataByNum(int i) const;
         /** \brief return the next sibling rawdata record, or NULL if none */
         QFRawDataRecord* getNextRawData(QFRawDataRecord* current);
         /** \brief return the previous sibling rawdata record, or NULL if none */
@@ -178,18 +154,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief return the previous sibling rawdata record, or NULL if none, which has the same type as current */
         QFRawDataRecord* getPreviousRawDataOfSameType(QFRawDataRecord* current);
         /** \brief return the raw data record specified by the ID, or \c NULL */
-        inline QFEvaluationItem* getEvaluationByID(int ID) {
-            if (evaluationIDExists(ID)) return evaluations[ID];
-            return NULL;
-        }
+        QFEvaluationItem* getEvaluationByID(int ID) const;
         /** \brief return the i-th raw data record, or \c NULL */
-        inline QFEvaluationItem* getEvaluationByNum(int i) const {
-            QList<int> keys=evaluations.keys();
-            if ((i>=keys.size()) || (i<0)) return NULL;
-            int ID=keys.at(i);
-            if (evaluations.contains(ID)) { return evaluations[ID]; }
-            else return NULL;
-        }
+        QFEvaluationItem* getEvaluationByNum(int i) const;
         /** \brief return the next sibling rawdata record, or NULL if none */
         QFEvaluationItem* getNextEvaluation(QFEvaluationItem* current);
         /** \brief return the previous sibling rawdata record, or NULL if none */
@@ -328,31 +295,19 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         //void rdDataChanged(QFRawDataRecord* record);
     public slots:
         /** \brief tell the project that the data contained in it has changed ... and it needs to be saved */
-        void setDataChanged() {
-            dataChange=true;
-            emit wasChanged(dataChange);
-        }
+        void setDataChanged();
 
-        virtual void setStructureChanged() {
-            emitStructureChanged();
-        };
+        virtual void setStructureChanged();
 
     protected:
         /** \brief set the internal error flag and description */
-        inline void setError(QString description) {
-            errorOcc=true;
-            errorDesc=description;
-            emit errorOccured(description);
-        }
+        void setError(QString description);
         /** \copydoc QFProperties::emitPropertiesChanged() */
-        virtual void emitPropertiesChanged() { emit propertiesChanged(); };
+        virtual void emitPropertiesChanged();
 
-        virtual void emitStructureChanged() {
-            setDataChanged();
-            emit structureChanged();
-        };
+        virtual void emitStructureChanged();
         /** \copybrief QFProperties::setPropertiesError() */
-        virtual void setPropertiesError(QString message) { setError(message); };
+        virtual void setPropertiesError(QString message);
 
     protected slots:
         void projectChanged();

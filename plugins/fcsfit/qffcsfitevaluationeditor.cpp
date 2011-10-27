@@ -576,8 +576,6 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
     replotData();
 }
 
-void QFFCSFitEvaluationEditor::resultsChanged() {
-}
 
 void QFFCSFitEvaluationEditor::readSettings() {
     if (cmbModel) {
@@ -633,7 +631,7 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
     bool modelChanged=false;
-    //std::cout<<"QFFCSFitEvaluationEditor::highlightingChanged("<<formerRecord<<", "<<currentRecord<<")  eval="<<eval<<"   data="<<data<<"\n";
+    std::cout<<"QFFCSFitEvaluationEditor::highlightingChanged("<<formerRecord<<", "<<currentRecord<<")  eval="<<eval<<"   data="<<data<<"\n";
     if (data) {
         //labRecord->setText(tr("<b>current:</b> <i>%1</i>").arg(currentRecord->getName()) );
         connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(replotData()));
@@ -813,8 +811,13 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
 void QFFCSFitEvaluationEditor::parameterValueChanged() {
     //bool updEn=updatesEnabled();
     //setUpdatesEnabled(false);
+    QTime t;
+    t.start();
+    //qDebug()<<"QFFCSFitEvaluationEditor::parameterValueChanged()";
     updateParameterValues();
+    //qDebug()<<"QFFCSFitEvaluationEditor::parameterValueChanged() ... half "<<t.elapsed()<<" ms";
     replotData();
+    //qDebug()<<"QFFCSFitEvaluationEditor::parameterValueChanged() ... done "<<t.elapsed()<<" ms";
     //setUpdatesEnabled(updEn);
 }
 
@@ -833,6 +836,11 @@ void QFFCSFitEvaluationEditor::parameterRangeChanged() {
 void QFFCSFitEvaluationEditor::updateParameterValues() {
     if (!current) return;
     if (!cmbModel) return;
+
+    QTime t;
+    t.start();
+
+    //qDebug()<<"QFFCSFitEvaluationEditor::updateParameterValues()";
     //QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
@@ -863,6 +871,8 @@ void QFFCSFitEvaluationEditor::updateParameterValues() {
 
     if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
     else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
+    //qDebug()<<"QFFCSFitEvaluationEditor::updateParameterValues() ... done "<<t.elapsed()<<" ms";
+
 }
 
 void QFFCSFitEvaluationEditor::replotData() {
@@ -1718,7 +1728,7 @@ void QFFCSFitEvaluationEditor::runChanged(int run) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
 
-    ////qDebug()<<"runChanged";
+    //qDebug()<<"runChanged";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QTime t;
 
@@ -1865,19 +1875,27 @@ void QFFCSFitEvaluationEditor::fitCurrent() {
         eval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter);
         record->enableEmitResultsChanged(true);
 
+        QTime tim;
+        tim.start();
+
+        //qDebug()<<"++++++ updating fit interface";
         dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
         dlgFitProgress->reportStatus("");
         dlgFitProgress->setProgressMax(100);
         dlgFitProgress->setSuperProgressMax(100);
-        QApplication::processEvents();
-
-
-        current->emitResultsChanged();
+        //qDebug()<<"++++++ before displayModel "<<tim.elapsed();
         displayModel(false);
+        //qDebug()<<"++++++ before replotData "<<tim.elapsed();
         replotData();
         QApplication::restoreOverrideCursor();
+        //qDebug()<<"++++++ before dlgFitProgress->done() "<<tim.elapsed();
         dlgFitProgress->done();
         falg->setReporter(NULL);
+        //qDebug()<<"++++++ before processing events "<<tim.elapsed();
+        QApplication::processEvents();
+        //qDebug()<<"++++++ before emitting results changed "<<tim.elapsed();
+        current->emitResultsChanged();
+        //qDebug()<<"++++++ done "<<tim.elapsed();
     }
 }
 

@@ -719,7 +719,10 @@ void QFRDRImagingFCSImageEditor::includeRuns() {
 }
 
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
-    if (old) disconnect(old, 0, this, 0);
+    if (old) {
+        disconnect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+        disconnect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+    }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         connect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
@@ -741,7 +744,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
 
     //readSettings();
     //qDebug()<<"connectWidgets ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
-};
+}
 
 
 void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardModifiers modifiers) {

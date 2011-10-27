@@ -290,8 +290,8 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                         QTime t;
                         t.start();
                         while (!doFitThread->isFinished()) {
-                            if (t.elapsed()>100) {
-                                QApplication::processEvents();
+                            if (t.elapsed()>10) {
+                                QApplication::processEvents(QEventLoop::AllEvents, 50);
                                 if (dlgFitProgress->isCanceled()) {
                                   doFitThread->terminate();
                                   break;
@@ -309,8 +309,8 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                     QTime t;
                     t.start();
                     while (!doFitThread->isFinished()) {
-                        if (t.elapsed()>100) {
-                            QApplication::processEvents();
+                        if (t.elapsed()>10) {
+                            QApplication::processEvents(QEventLoop::AllEvents, 50);
                             t.start();
                         }
                     }

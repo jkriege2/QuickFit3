@@ -149,7 +149,7 @@ void QFPRDRFCS::insertFCS() {
                     ++it;
                 }
                 services->setProgress(i);
-                QApplication::processEvents();
+                QApplication::processEvents(QEventLoop::AllEvents, 50);
             }
             services->setProgress(0);
             //std::cout<<"loading done ...\n";

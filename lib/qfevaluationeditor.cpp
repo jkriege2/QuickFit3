@@ -1,6 +1,7 @@
 #include "qfevaluationeditor.h"
 #include "qfevaluationitem.h"
 #include <QCloseEvent>
+#include <QDebug>
 
 QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QWidget* parent):
     QWidget(parent)
@@ -33,3 +34,11 @@ void QFEvaluationEditor::closeEvent( QCloseEvent * event ) {
     event->accept();
 }
 
+bool QFEvaluationEditor::event(QEvent * ev) {
+    QTime t;
+    t.start();
+    //qDebug()<<"~~~ QFEvaluationEditor::event("<<ev->type()<<")";
+    bool ok=QWidget::event(ev);
+    //qDebug()<<"~~~ QFEvaluationEditor::event("<<ev->type()<<") done: "<<t.elapsed()<<" ms";
+    return ok;
+}

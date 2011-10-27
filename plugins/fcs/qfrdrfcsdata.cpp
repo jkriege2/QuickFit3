@@ -79,7 +79,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     correlationErrors=(double*)calloc(correlationN*correlationRuns, sizeof(double));
     if (!correlationT || !correlation || !correlationMean || !correlationStdDev || !correlationErrors)
         setError(tr("Error while allocating memory for correlation function data!"));
-    emit rawDataChanged();
+    emitRawDataChanged();
 }
 
 void QFRDRFCSData::resizeRates(long long N, int runs) {
@@ -95,7 +95,7 @@ void QFRDRFCSData::resizeRates(long long N, int runs) {
     rate=(double*)calloc(rateN*rateRuns, sizeof(double));
     if (!rateT || !rate)
         setError(tr("Error while allocating memory for count rate data!"));
-    emit rawDataChanged();
+    emitRawDataChanged();
     rateMean.clear();
     rateStdDev.clear();
 }
@@ -114,7 +114,7 @@ void QFRDRFCSData::resizeBinnedRates(long long N) {
             setError(tr("Error while allocating memory for binned count rate data!"));
         setIntProperty("BINNED_RATE_N", binnedRateN, false, false);
     }
-    emit rawDataChanged();
+    emitRawDataChanged();
 }
 
 void QFRDRFCSData::calcBinnedRate() {
@@ -144,7 +144,7 @@ void QFRDRFCSData::calcBinnedRate() {
             }
         }
     }
-   emit rawDataChanged();
+   emitRawDataChanged();
 }
 
 void QFRDRFCSData::recalculateCorrelations() {
@@ -169,7 +169,7 @@ void QFRDRFCSData::recalculateCorrelations() {
         if (cnt<=1) correlationStdDev[i]=0;
         else correlationStdDev[i]=sqrt(s/cnt-m*m/cnt/cnt);
     }
-    emit rawDataChanged();
+    emitRawDataChanged();
 }
 
 double QFRDRFCSData::calcRateMean(int run) {
@@ -385,7 +385,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
         setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(filename).arg(QString(e.get_message().c_str())));
     }
     //std::cout<<"opening CSV: "<<filename.toStdString()<<" ... DONE!\n";
-    emit rawDataChanged();
+    emitRawDataChanged();
     calcBinnedRate();
     return true;
 }
@@ -426,7 +426,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
         setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(filename).arg(QString(e.get_message().c_str())));
     }
     //std::cout<<"opening CSV: "<<filename.toStdString()<<" ... DONE!\n";
-    emit rawDataChanged();
+    emitRawDataChanged();
     return true;
 }
 
@@ -464,7 +464,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QString filename) {
         return false;
     }
     recalculateCorrelations();
-    emit rawDataChanged();
+    emitRawDataChanged();
     return true;
 }
 
@@ -658,7 +658,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
    // std::cout<<"calc binned rates ..."<<std::endl;
     calcBinnedRate();
     //std::cout<<"DONE !!!"<<std::endl;
-    emit rawDataChanged();
+    emitRawDataChanged();
     return true;
 }
 

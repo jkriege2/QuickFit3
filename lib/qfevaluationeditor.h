@@ -40,6 +40,7 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         /** \brief write the settings */
         virtual void writeSettings() =0;
     protected:
+        virtual bool	event ( QEvent * event );
         void closeEvent( QCloseEvent * event );
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;

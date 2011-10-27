@@ -26,7 +26,11 @@ void QFProjectRawDataModel::setProject(QFProject* parent) {
 }
 
 void QFProjectRawDataModel::projectChanged(bool data) {
+    QTime t;
+    t.start();
+    //qDebug()<<"QFProjectRawDataModel::projectChanged()";
     reset();
+    //qDebug()<<"QFProjectRawDataModel::projectChanged() end: "<<t.elapsed()<<" ms";
 }
 
 QVariant QFProjectRawDataModel::data(const QModelIndex &index, int role) const {

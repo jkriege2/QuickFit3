@@ -271,7 +271,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     if (resetDataChanged) {
         if (!errorOcc) {
             emitStructureChanged();
-            if (namechanged) emit propertiesChanged();
+            if (namechanged) emitPropertiesChanged();
         }
     }
 
@@ -327,7 +327,7 @@ void QFProject::readXML(const QString& file) {
                     while (!rd.isNull()) {
                         if (services) {
                             services->incProgress();
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 50);
                         }
                         QString t=rd.attribute("type", "invalid").toLower();
                         //std::cout<<t.toStdString()<<std::endl;
@@ -346,7 +346,7 @@ void QFProject::readXML(const QString& file) {
                     while (!rd.isNull()) {
                         if (services) {
                             services->incProgress();
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 50);
                         }
                         QString t=rd.attribute("type", "invalid").toLower();
 
@@ -381,9 +381,11 @@ void QFProject::readXML(const QString& file) {
     }
     if (!errorOcc) {
         dataChange=false;
+        //qDebug()<<"QFProject emits wasChanged("<<dataChange<<")";
         emit wasChanged(dataChange);
+        //qDebug()<<"QFProject emits structureChanged";
         emit structureChanged();
-        if (namechanged) emit propertiesChanged();
+        if (namechanged) emitPropertiesChanged();
     }
 
 }
@@ -681,3 +683,138 @@ QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResu
 
     return l;
 }
+
+
+void QFProject::setDataChanged() {
+    dataChange=true;
+    //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
+    emit wasChanged(dataChange);
+}
+
+void QFProject::setStructureChanged() {
+    emitStructureChanged();
+};
+
+
+void QFProject::setError(QString description) {
+    errorOcc=true;
+    errorDesc=description;
+    emit errorOccured(description);
+}
+
+void QFProject::emitPropertiesChanged() {
+    //qDebug()<<"QFProject emit propertiesChanged()";
+    emit propertiesChanged();
+};
+
+void QFProject::emitStructureChanged() {
+    setDataChanged();
+    //qDebug()<<"QFProject emit structureChanged()";
+    emit structureChanged();
+};
+
+void QFProject::setPropertiesError(QString message) {
+    setError(message);
+};
+
+void QFProject::setName(const QString& n) {
+    if (name!=n) {
+        name=n;
+        emitPropertiesChanged();
+    }
+}
+
+QString QFProject::getDescription()const  {
+    return description;
+}
+
+void QFProject::setDescription(const QString& d) {
+    if (description!=d) {
+        description=d;
+        emitPropertiesChanged();
+    }
+}
+
+QString QFProject::getCreator()const  {
+    return creator;
+}
+
+void QFProject::setCreator(const QString& c) {
+    if (creator!=c) {
+        creator=c;
+        emitPropertiesChanged();
+    }
+}
+
+QString QFProject::getFile()const  {
+    return file;
+}
+
+int QFProject::getRawDataCount()const  {
+    return rawData.size();
+}
+
+
+int QFProject::getEvaluationCount()const  {
+    return evaluations.size();
+}
+
+bool QFProject::rawDataIDExists(int ID)const  {
+    return rawData.contains(ID);
+}
+
+bool QFProject::evaluationIDExists(int ID)const  {
+    return evaluations.contains(ID);
+}
+
+bool QFProject::rawDataExists(QFRawDataRecord* rec) const  {
+    return rawData.values().contains(rec);
+}
+
+bool QFProject::evaluationExists(QFEvaluationItem* rec) const  {
+    return evaluations.values().contains(rec);
+}
+
+int QFProject::getRawDataIndex(QFRawDataRecord* rec) const  {
+    return rawData.values().indexOf(rec);
+}
+
+bool QFProject::getEvaluationIndex(QFEvaluationItem* rec) const  {
+    return evaluations.values().indexOf(rec);
+}
+
+QFRawDataRecord* QFProject::getRawDataByID(int ID) {
+    if (rawDataIDExists(ID)) return rawData[ID];
+    return NULL;
+}
+
+QFRawDataRecord* QFProject::getRawDataByNum(int i) const {
+    QList<int> keys=rawData.keys();
+    if ((i>=keys.size()) || (i<0)) return NULL;
+    int ID=keys.at(i);
+    if (rawData.contains(ID)) return rawData[ID];
+    else return NULL;
+}
+
+
+QFEvaluationItem* QFProject::getEvaluationByID(int ID) const {
+    if (evaluationIDExists(ID)) return evaluations[ID];
+    return NULL;
+}
+
+QFEvaluationItem* QFProject::getEvaluationByNum(int i) const {
+    QList<int> keys=evaluations.keys();
+    if ((i>=keys.size()) || (i<0)) return NULL;
+    int ID=keys.at(i);
+    if (evaluations.contains(ID)) { return evaluations[ID]; }
+    else return NULL;
+}
+
+bool QFProject::checkID(int ID)const {
+    return !IDs.contains(ID);
+}
+
+QString QFProject::getName()const {
+    return name;
+}
+
