@@ -154,7 +154,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
 
         /** \brief called when global settings have changed */
-        void globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode);
+        void globalSettingsChanged(int camera, int fan_mode, bool cooling_on, bool cooling_wait, int temperature, int shutterMode);
 
         void tlog_error(QString message) { log_error(message); };
         void tlog_warning(QString message) { log_warning(message); };
@@ -178,6 +178,9 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         struct CameraGlobalSettings {
             /** \brief cooler on/off  */
             bool coolerOn;
+
+            /** \brief wait for 5°C when switching off the camera */
+            bool cooling_wait;
 
             /** \brief set temperature °C */
             int setTemperature;

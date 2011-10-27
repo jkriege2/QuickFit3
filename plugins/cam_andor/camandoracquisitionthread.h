@@ -24,6 +24,8 @@ class CamAndorAcquisitionThread : public QThread {
         bool init(int camera, QString filenamePrefix, int fileformat, int64_t numKinetics, int width, int height, double exposureTime, QString log_prefix);
         /** \brief progress of acquisition 0..100 */
         double getProgress() { return progress; };
+        /** \brief duration of acquisition in milliseconds */
+        double getDurationMilliseconds() { return duration_msecs; };
 
         QStringList getOutputFilenames() { return outputFilenames; }
         QStringList getOutputFilenameTypes() { return outputFilenameTypes; }
@@ -46,6 +48,7 @@ class CamAndorAcquisitionThread : public QThread {
         bool spooling;
         bool canceled;
         double progress;
+        double duration_msecs;
         QString m_log_prefix;
         QStringList outputFilenames;
         QStringList outputFilenameTypes;

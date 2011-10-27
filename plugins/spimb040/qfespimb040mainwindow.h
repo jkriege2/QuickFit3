@@ -106,7 +106,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
             \param moreFiles a list of additionally created files
             \return filename of the settings file
         */
-        QString saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles);
+        QString saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, bool getAcquisitionSettings=true);
 
         /*! \brief save a description of an acquisition in preview mode to a QSettings object
 

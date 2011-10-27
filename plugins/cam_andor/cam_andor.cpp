@@ -81,18 +81,21 @@ QFExtensionCameraAndor::CameraGlobalSettings::CameraGlobalSettings() {
     shutterMode=1;
     shutterOpeningTime=50;
     shutterClosingTime=50;
+    cooling_wait=true;
 }
 
 
 void QFExtensionCameraAndor::CameraGlobalSettings::readSettings(QSettings& settings, int camera) {
     settings.sync();
     coolerOn=settings.value(QString("camera%1/cooler_on").arg(camera), coolerOn).toBool();
+    cooling_wait=settings.value(QString("camera%1/cooling_wait").arg(camera), cooling_wait).toBool();
     setTemperature=settings.value(QString("camera%1/set_temperature").arg(camera), setTemperature).toInt();
     fanMode=settings.value(QString("camera%1/fan_mode").arg(camera), fanMode).toInt();
 }
 
 void QFExtensionCameraAndor::CameraGlobalSettings::writeSettings(QSettings& settings, int camera) const {
     settings.setValue(QString("camera%1/cooler_on").arg(camera), coolerOn);
+    settings.setValue(QString("camera%1/cooling_wait").arg(camera), cooling_wait);
     settings.setValue(QString("camera%1/set_temperature").arg(camera), setTemperature);
     settings.setValue(QString("camera%1/fan_mode").arg(camera), fanMode);
     settings.sync();
@@ -649,7 +652,7 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
         progress.setWindowModality(Qt::ApplicationModal);
         progress.setHasCancel(false);
         progress.open();
-        while (!tempOK) {
+        while (!tempOK && camGlobalSettings[camera].cooling_wait) {
             tempOK=true;
             int temp1=getTemperature(i);
             //progress.setValue(33);
@@ -767,9 +770,11 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
     QStringList fileNames, fileTypes;
     CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
     char text[512];
+    double duration=0;
     if (thread) {
         fileNames=thread->getOutputFilenames();
         fileTypes=thread->getOutputFilenameTypes();
+        duration=thread->getDurationMilliseconds();
     }
     for (int i=0; i<fileNames.size(); i++) {
         QFExtensionCamera::AcquititonFileDescription d;
@@ -869,6 +874,7 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
         case 10: (*parameters)["trigger_mode"]="software (10)"; break;
         default: (*parameters)["trigger_mode"]=info.trigMode; break;
     }
+    (*parameters)["duration_milliseconds"]=duration;
 
 }
 
@@ -1113,12 +1119,12 @@ void QFExtensionCameraAndor::updateTemperatures() {
             widget=new AndorGlobalCameraSettingsWidget(i, dlgGlobalSettings);
             camGlobalSettingsWidgets[i]=widget;
             dlgGlobalSettings_layout->addWidget(widget);
-            connect(widget, SIGNAL(settingsChanged(int,int,bool,int,int)), this, SLOT(globalSettingsChanged(int,int,bool,int,int)));
+            connect(widget, SIGNAL(settingsChanged(int,int,bool,bool,int,int)), this, SLOT(globalSettingsChanged(int,int,bool,bool,int,int)));
         }
 
         if (isConnected(i)) {
             if (widget) {
-                widget->setSettings(camGlobalSettings[i].fanMode, camGlobalSettings[i].coolerOn, camGlobalSettings[i].setTemperature, camGlobalSettings[i].shutterMode);
+                widget->setSettings(camGlobalSettings[i].fanMode, camGlobalSettings[i].coolerOn, camGlobalSettings[i].cooling_wait, camGlobalSettings[i].setTemperature, camGlobalSettings[i].shutterMode);
                 widget->setVisible(true);
                 widget->setInfo(getCameraInfo(i, true, true, true, true));
                 if (selectCamera(i)) {
@@ -1156,7 +1162,7 @@ void QFExtensionCameraAndor::updateTemperatures() {
     QTimer::singleShot(1000, this, SLOT(updateTemperatures()));
 }
 
-void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, int temperature, int shutterMode) {
+void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, bool cooling_wait, int temperature, int shutterMode) {
     if (!camGlobalSettings.contains(camera)) {
         QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
         CameraGlobalSettings global;
@@ -1165,6 +1171,7 @@ void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, boo
     }
 
     camGlobalSettings[camera].coolerOn=cooling_on;
+    camGlobalSettings[camera].cooling_wait=cooling_wait;
     camGlobalSettings[camera].fanMode=fan_mode;
     camGlobalSettings[camera].setTemperature=temperature;
     camGlobalSettings[camera].shutterMode=shutterMode;

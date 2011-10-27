@@ -1065,6 +1065,16 @@ void QFESPIMB040MainWindow::doAcquisition() {
 
 
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // retrieve acquisition description
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (ok && useCam1) {
+        ecamera1->getAcquisitionDescription(camera1, &moreFiles1, &acquisitionDescription1);
+    }
+    if (ok && useCam2) {
+        ecamera2->getAcquisitionDescription(camera2, &moreFiles2, &acquisitionDescription2);
+    }
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -1125,20 +1135,20 @@ void QFESPIMB040MainWindow::doAcquisition() {
     }
 
 
-
     //////////////////////////////////////////////////////////////////////////////////////
     // write acquisition data
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok && useCam1) {
         log_text(tr("  - writing acquisition description 1 ..."));
-        saveAcquisitionDescription(extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1);
+        saveAcquisitionDescription(extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1, false);
         log_text(tr(" DONE!\n"));
     }
     if (ok && useCam2) {
         log_text(tr("  - writing acquisition description 2 ..."));
-        saveAcquisitionDescription(extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2);
+        saveAcquisitionDescription(extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2, false);
         log_text(tr(" DONE!\n"));
     }
+
 
     //////////////////////////////////////////////////////////////////////////////////////
     // release cameras
@@ -1157,7 +1167,7 @@ void QFESPIMB040MainWindow::doAcquisition() {
 }
 
 
-QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles) {
+QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, bool getAcquisitionSettings) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
@@ -1166,7 +1176,7 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
 
     QList<QFExtensionCamera::AcquititonFileDescription> files;
     QMap<QString, QVariant> parameters;
-    ecamera->getAcquisitionDescription(camera, &files, &parameters);
+    if (getAcquisitionSettings) ecamera->getAcquisitionDescription(camera, &files, &parameters);
 
     // WRITE ACQUISITION SETTINGS
     settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)*cam->objective().magnification*cam->tubelens().magnification);

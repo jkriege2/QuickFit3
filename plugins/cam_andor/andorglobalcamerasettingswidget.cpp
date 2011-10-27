@@ -19,17 +19,18 @@ AndorGlobalCameraSettingsWidget::~AndorGlobalCameraSettingsWidget()
     delete ui;
 }
 
-void AndorGlobalCameraSettingsWidget::setSettings(int fan_mode, bool cooling_on, int temperature, int shutterMode) {
+void AndorGlobalCameraSettingsWidget::setSettings(int fan_mode, bool cooling_on, bool cooling_wait, int temperature, int shutterMode) {
     m_emit=false;
     if (ui->cmbFanMode->currentIndex()!=fan_mode) ui->cmbFanMode->setCurrentIndex(fan_mode);
     if (ui->chkCooling->isChecked()!=cooling_on) ui->chkCooling->setChecked(cooling_on);
+    if (ui->chkCoolingWait->isChecked()!=cooling_wait) ui->chkCoolingWait->setChecked(cooling_wait);
     if (ui->spinTemperature->value()!=temperature) ui->spinTemperature->setValue(temperature);
     if (ui->cmbShutter->currentIndex()!=shutterMode) ui->cmbShutter->setCurrentIndex(shutterMode);
     m_emit=true;
 }
 
 void AndorGlobalCameraSettingsWidget::forceSettingsChanged() {
-    emit settingsChanged(m_camera, ui->cmbFanMode->currentIndex(), ui->chkCooling->isChecked(), ui->spinTemperature->value(), ui->cmbShutter->currentIndex());
+    emit settingsChanged(m_camera, ui->cmbFanMode->currentIndex(), ui->chkCooling->isChecked(), ui->chkCoolingWait->isChecked(), ui->spinTemperature->value(), ui->cmbShutter->currentIndex());
 }
 
 void AndorGlobalCameraSettingsWidget::showCurrentTemperature(int progress, float temperature) {

@@ -48,6 +48,7 @@ CamAndorAcquisitionThread::CamAndorAcquisitionThread(QObject* parent):
     QThread(parent)
 {
     setPriority(QThread::HighestPriority);
+    duration_msecs=0;
 }
 
 CamAndorAcquisitionThread::~CamAndorAcquisitionThread()
@@ -163,9 +164,12 @@ void CamAndorAcquisitionThread::run() {
             int status=DRV_ACQUIRING;
             int64_t imageCount=0;
             uint16_t* imageBuffer=(uint16_t*)calloc(m_width*m_height, sizeof(uint16_t));
+            QTime duration;
+            duration.start();
             while ((!canceled) && ok && (status==DRV_ACQUIRING)) {
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
+                if (status==DRV_ACQUIRING) duration_msecs=duration.elapsed();
                 while (GetOldestImage16(imageBuffer, m_width*m_height)==DRV_SUCCESS) {
                     if (m_fileformat==0) {
                         TinyTIFFWriter_writeImage(tiff, imageBuffer);
@@ -180,6 +184,7 @@ void CamAndorAcquisitionThread::run() {
                     progress=100.0*(double)imageCount/(double)m_numKinetics;
                 }
             }
+
             if (m_fileformat==0) {
                 TinyTIFFWriter_close(tiff);
             } else if (m_fileformat==4) {
