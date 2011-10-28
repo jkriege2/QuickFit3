@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>262</width>
-    <height>213</height>
+    <width>570</width>
+    <height>432</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -239,12 +239,12 @@ switching off</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>201</x>
-     <y>119</y>
+     <x>407</x>
+     <y>120</y>
     </hint>
     <hint type="destinationlabel">
-     <x>165</x>
-     <y>145</y>
+     <x>197</x>
+     <y>180</y>
     </hint>
    </hints>
   </connection>
@@ -255,12 +255,12 @@ switching off</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>201</x>
-     <y>119</y>
+     <x>327</x>
+     <y>116</y>
     </hint>
     <hint type="destinationlabel">
-     <x>56</x>
-     <y>145</y>
+     <x>60</x>
+     <y>178</y>
     </hint>
    </hints>
   </connection>
@@ -271,8 +271,8 @@ switching off</string>
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>201</x>
-     <y>99</y>
+     <x>348</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>59</x>
@@ -287,8 +287,8 @@ switching off</string>
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
-     <y>145</y>
+     <x>197</x>
+     <y>178</y>
     </hint>
     <hint type="destinationlabel">
      <x>58</x>
@@ -303,8 +303,8 @@ switching off</string>
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>201</x>
-     <y>119</y>
+     <x>257</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>67</x>
@@ -325,6 +325,22 @@ switching off</string>
     <hint type="destinationlabel">
      <x>32</x>
      <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCoolingWait</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>AndorGlobalCameraSettingsWidget</receiver>
+   <slot>valuesChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>155</x>
+     <y>141</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>274</y>
     </hint>
    </hints>
   </connection>
