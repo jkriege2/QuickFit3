@@ -485,16 +485,14 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                         QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
                         QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
                         // gather information about plugins
-                        for (int i=0; i<m_pluginServices->getFitFunctionManager()->pluginCount(); i++) {
-                            int id=i;
-                            QString aID="";
-                            QString dir=m_pluginServices->getFitFunctionManager()->getPluginHelp(id);
-                            QString name=m_pluginServices->getFitFunctionManager()->getName(id);
-                            QString icon=m_pluginServices->getFitFunctionManager()->getIconFilename(id);
                             QMap<QString, QFFitFunction*> models= m_pluginServices->getFitFunctionManager()->getModels(filter);
                             QMapIterator<QString, QFFitFunction*> j(models);
                             while (j.hasNext()) {
                                 j.next();
+                                int id=m_pluginServices->getFitFunctionManager()->getPluginForID(j.key());
+                                QString dir=m_pluginServices->getFitFunctionManager()->getPluginHelp(id);
+                                QString name=m_pluginServices->getFitFunctionManager()->getName(id);
+                                QString icon=m_pluginServices->getFitFunctionManager()->getIconFilename(id);
                                 QFFitFunction* a=j.value();
                                 if (a) {
                                     name=a->name();
@@ -504,7 +502,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                                     else text+=item_template_nolink.arg(icon).arg(name);
                                 }
                             }
-                        }
+
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
                         }
