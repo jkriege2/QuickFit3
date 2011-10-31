@@ -341,7 +341,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                         errors[i]=roundError(errors[i], 2);
                         params[i]=roundWithError(params[i], errors[i], 2);
                     }
-                    setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), paramsFix);
+                    setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), paramsFix, tr("fit results"), true);
 
                     for (int i=0; i<ffunc->paramCount(); i++) {
                         if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {

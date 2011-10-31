@@ -243,10 +243,11 @@ void QFEvaluationItem::setDescription(const QString& d) {
     emitPropertiesChanged();
 };
 
-void QFEvaluationItem::emitResultsChanged() {
+void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName) {
     if (doEmitResultsChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits resultsChanged()";
         emit resultsChanged();
+        emit resultsChanged(record, evaluationName, resultName);
     }
 }
 

@@ -14,36 +14,56 @@ QFEvaluationResultsModel::~QFEvaluationResultsModel()
 }
 
 void QFEvaluationResultsModel::init(QFEvaluationItem* evaluation, QString evalFilter) {
-    disconnect(this->evaluation, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+    disconnect(this->evaluation, SIGNAL(resultsChanged(QFRawDataRecord* , const QString& , const QString& )), this, SLOT(resultsChanged(QFRawDataRecord* , const QString& , const QString& )));
     setParent(evaluation);
     this->evaluation=evaluation;
     this->evalFilter=evalFilter;
-    if (evaluation) connect(evaluation, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
     resultsChanged();
+    if (evaluation) connect(evaluation, SIGNAL(resultsChanged(QFRawDataRecord* , const QString& , const QString& )), this, SLOT(resultsChanged(QFRawDataRecord* , const QString& , const QString& )));
 }
 
-void QFEvaluationResultsModel::resultsChanged() {
-    QTime t;
-    t.start();
-    //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged()";
-    if (evaluation) {
-        //lastResultNames=evaluation->getProject()->rdrCalcMatchingResultsNames(evalFilter);
-        lastResults=evaluation->getProject()->rdrCalcMatchingResults(evalFilter);
-        QList<QPair<QString, QString> > l=evaluation->getProject()->rdrCalcMatchingResultsNamesAndLabels(evalFilter);
-        lastResultNames.clear();
-        lastResultLabels.clear();
-        for (int i=0; i<l.size(); i++) {
-            lastResultNames.append(l[i].second);
-            if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
-            else lastResultLabels.append(l[i].first);
+void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName) {
+    int column=-1;
+    int row=-1;
+    if (record!=NULL && !evaluationName.isEmpty() && !resultName.isEmpty()) {
+        QPair<QPointer<QFRawDataRecord>, QString> colPair=qMakePair((QPointer<QFRawDataRecord>)record, evaluationName);
+        column=lastResults.indexOf(colPair);
+        if (column>=0) {
+            row=lastResultNames.indexOf(resultName);
+            if (row>=0) {
+                QModelIndex idx=index(row, column);
+                QModelIndex idx1=index(lastResults.size(), column);
+                emit dataChanged(idx, idx);
+                emit dataChanged(idx1, idx1);
+            }
         }
-    } else {
-        lastResultNames.clear();
-        lastResultLabels.clear();
-        lastResults.clear();
+
+
     }
-    reset();
-    //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
+    if ( column<0 || row<0 ) {
+        QTime t;
+        t.start();
+        //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged()";
+        if (evaluation) {
+            //lastResultNames=evaluation->getProject()->rdrCalcMatchingResultsNames(evalFilter);
+            lastResults=evaluation->getProject()->rdrCalcMatchingResults(evalFilter);
+            QList<QPair<QString, QString> > l=evaluation->getProject()->rdrCalcMatchingResultsNamesAndLabels(evalFilter);
+            lastResultNames.clear();
+            lastResultLabels.clear();
+            for (int i=0; i<l.size(); i++) {
+                lastResultNames.append(l[i].second);
+                if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
+                else lastResultLabels.append(l[i].first);
+            }
+        } else {
+            lastResultNames.clear();
+            lastResultLabels.clear();
+            lastResults.clear();
+        }
+        reset();
+        //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
+    }
+
 }
 
 int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {

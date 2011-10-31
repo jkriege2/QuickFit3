@@ -342,14 +342,14 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumber(resultID, getFitParamID(parameterID), value, unit);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, QString unit) {
     if (r!=NULL) {
         //QFFitFunction* f=getFitFunction();
         r->resultsSetNumber(resultID, getFitParamID(parameterID), value, unit);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -362,7 +362,7 @@ void QFFitResultsEvaluation::setFitResultValueString(QFRawDataRecord* r, const Q
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetString(resultID, getFitParamID(parameterID), value);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -375,7 +375,7 @@ void QFFitResultsEvaluation::setFitResultValueBool(QFRawDataRecord* r, const QSt
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetBoolean(resultID, getFitParamID(parameterID), value);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -388,7 +388,7 @@ void QFFitResultsEvaluation::setFitResultValueInt(QFRawDataRecord* r, const QStr
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetInteger(resultID, getFitParamID(parameterID), value, unit);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -396,7 +396,7 @@ void QFFitResultsEvaluation::setFitResultValueInt(QFRawDataRecord* r, const QStr
     if (r!=NULL) {
         //QFFitFunction* f=getFitFunction();
         r->resultsSetInteger(resultID, getFitParamID(parameterID), value, unit);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -449,7 +449,7 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumberError(resultID, getFitParamID(parameterID), value, error, unit);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -462,7 +462,7 @@ void QFFitResultsEvaluation::setFitResultError(QFRawDataRecord* r, const QString
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetNumberError(resultID, getFitParamID(parameterID), getFitValue(parameterID), error, unit);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -615,7 +615,7 @@ void QFFitResultsEvaluation::setFitResultFix(QFRawDataRecord* r, const QString& 
             if (pid>-1) unit=f->getDescription(pid).unit;
         }
         r->resultsSetBoolean(resultID, getFitParamFixID(parameterID), fix);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamFixID(parameterID));
     }
 }
 
@@ -647,7 +647,7 @@ void QFFitResultsEvaluation::setFitResultGroup(QFRawDataRecord* r, const QString
             int pid=f->getParameterNum(parameterID);
         }*/
         r->resultsSetGroup(resultID, getFitParamID(parameterID), group);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -659,7 +659,7 @@ void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString
             int pid=f->getParameterNum(parameterID);
         }*/
         r->resultsSetLabel(resultID, getFitParamID(parameterID), label, label_richtext);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
 }
 
@@ -667,7 +667,7 @@ void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString
 void QFFitResultsEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, const QString& resultID, const QString& group) {
     if (r!=NULL) {
         r->resultsSetEvaluationGroup(resultID, group);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID);
     }
 }
 
@@ -675,7 +675,7 @@ void QFFitResultsEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, con
 void QFFitResultsEvaluation::setFitResultEvaluationDescription(QFRawDataRecord* r, const QString& resultID, const QString& description) {
     if (r!=NULL) {
         r->resultsSetEvaluationDescription(resultID, description);
-        emitResultsChanged();
+        emitResultsChanged(r, resultID);
     }
 }
 

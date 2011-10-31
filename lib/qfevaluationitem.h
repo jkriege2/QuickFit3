@@ -242,7 +242,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         void setDescription(const QString& d);
 
         /** \brief emits resultsChanged(), only if doEmitResultsChanged is \c true */
-        void emitResultsChanged();
+        void emitResultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));
 
         /** \brief emits propertiesChanged(), only if doEmitPropertiesChanged is \c true */
         void emitPropertiesChanged();
@@ -251,6 +251,8 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         void propertiesChanged();
         /** \brief emitted whenever the evaluation results change */
         void resultsChanged();
+        /** \brief emitted whenever the evaluation results change, if both arguments are empty, the changes are larger than just the given result */
+        void resultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName);
         /** \brief signal emitted when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
         /** \brief signal emitted when the selection changed */

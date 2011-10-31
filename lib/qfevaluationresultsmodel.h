@@ -38,7 +38,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
             NameRole=Qt::UserRole+1
         };
     public slots:
-        void resultsChanged();
+        void resultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));
     protected:
         QFEvaluationItem* evaluation;
         QString evalFilter;

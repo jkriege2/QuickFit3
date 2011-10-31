@@ -158,7 +158,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix=NULL);
+        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""), bool sortPriority=true);
 
         /*! \brief return the value of a given parameter
             \param r the record to adress

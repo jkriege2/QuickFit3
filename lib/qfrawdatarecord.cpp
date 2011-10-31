@@ -115,6 +115,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                 r.group=re.attribute("group", "");
                 r.label=re.attribute("label", "");
                 r.label_rich=re.attribute("labelrich", "");
+                r.sortPriority=QVariant(re.attribute("sortprior", "false")).toBool();
                 //r.name=n;
                 r.type=qfrdreInvalid;
                 if (t=="boolean") {
@@ -242,6 +243,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
             if (!r.label.isEmpty()) w.writeAttribute("label", r.label);
             if (!r.group.isEmpty()) w.writeAttribute("group", r.group);
             if (!r.label_rich.isEmpty()) w.writeAttribute("labelrich", r.label_rich);
+            if (r.sortPriority) w.writeAttribute("sortprior", (r.sortPriority)?QString("true"):QString("false"));
             QLocale loc=QLocale::c();
             loc.setNumberOptions(QLocale::OmitGroupSeparator);
             switch(r.type) {

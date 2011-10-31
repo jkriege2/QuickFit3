@@ -94,8 +94,8 @@ void QFFitResultsByIndexEvaluation::setFitResultValuesVisible(QFRawDataRecord* r
     setFitResultValuesVisible(r, getEvaluationResultID(index),  values, errors);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix) {
-    setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(index),  values, errors, group, fix);
+void QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority) {
+    setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(index),  values, errors, group, fix, fixGroup, sortPriority);
 }
 
 double QFFitResultsByIndexEvaluation::getFitValue(QFRawDataRecord* r, int index, const QString& id) {
