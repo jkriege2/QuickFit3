@@ -569,8 +569,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
         register uint32_t frame=0;
-        float sframe_min=0;
-        float sframe_max=0;
+        //float sframe_min=0;
+        //float sframe_max=0;
         uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
         for (register uint16 i=0; i<frame_width*frame_height; i++) {
             frame_data[i]=0;
@@ -1117,7 +1117,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         statistics_max.clear();
         statistics_time.clear();
         bool statFirst=true;
-        bool videoFirst=true;
+        //bool videoFirst=true;
 
         uint32_t segment_frames=frames/job.segments;
         do {

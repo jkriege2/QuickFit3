@@ -1214,7 +1214,7 @@ void QFESPIMB040CameraView::histogramMask() {
         }
         uint32_t maxVal=d[N-1];
         if (N-dlg->pixels()>=0) maxVal=d[N-dlg->pixels()];
-        for (int i=0; i<N; i++) {
+        for (long i=0; i<(long)N; i++) {
             if (rawImage(i)>=maxVal) {
                 mask(i)=true;
             }
@@ -1577,13 +1577,13 @@ void QFESPIMB040CameraView::saveData() {
         datat.resize(col, rows);
         datat.set_title(col-4, "marginal_left_x");
         datat.set_title(col-3, "marginal_left_data");
-        for (int i=0; i<pltDataMarginalLeftN; i++) {
+        for (long i=0; i<(long)pltDataMarginalLeftN; i++) {
             datat.set(col-4, i, pltDataMarginalLeftX[i]);
             datat.set(col-3, i, pltDataMarginalLeftY[i]);
         }
         datat.set_title(col-2, "marginal_bottom_x");
         datat.set_title(col-1, "marginal_bottom_data");
-        for (int i=0; i<pltDataMarginalBottomN; i++) {
+        for (long i=0; i<(long)pltDataMarginalBottomN; i++) {
             datat.set(col-2, i, pltDataMarginalBottomX[i]);
             datat.set(col-1, i, pltDataMarginalBottomY[i]);
         }
@@ -1594,7 +1594,7 @@ void QFESPIMB040CameraView::saveData() {
         datat.resize(col, rows);
         datat.set_title(col-2, "histogram_x");
         datat.set_title(col-1, "histogram_data");
-        for (int i=0; i<histogram_n; i++) {
+        for (long i=0; i<(long)histogram_n; i++) {
             datat.set(col-2, i, histogram_x[i]);
             datat.set(col-1, i, histogram_y[i]);
         }

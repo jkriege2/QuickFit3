@@ -2156,7 +2156,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
         size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, "histY");
         size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, "barY");
         size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, "mean");;
-        size_t pltcPHBarStd=ds->addCopiedColumn(&dstd, 1, "stddev");;
+        /*size_t pltcPHBarStd=*/ds->addCopiedColumn(&dstd, 1, "stddev");;
         size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, "median");;
         size_t pltcPHBarMin=ds->addCopiedColumn(&dmin, 1, "min");;
         size_t pltcPHBarMax=ds->addCopiedColumn(&dmax, 1, "max");;
@@ -2325,7 +2325,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
         size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, "sel_histY");
         size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, "sel_barY");
         size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, "sel_mean");
-        size_t pltcPHBarStd=ds->addCopiedColumn(&dstd, 1, "sel_stddev");
+        /*size_t pltcPHBarStd=*/ds->addCopiedColumn(&dstd, 1, "sel_stddev");
         size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, "sel_median");
         size_t pltcPHBarMin=ds->addCopiedColumn(&dmin, 1, "sel_min");
         size_t pltcPHBarMax=ds->addCopiedColumn(&dmax, 1, "sel_max");

@@ -122,7 +122,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   int                rv;
   int                flag;
   struct usb_bus    *bus;
-  struct usb_device *device;
+  struct usb_device *device=NULL;
   usb_dev_handle    *h_device;
 
   // bitstream related variables
@@ -197,7 +197,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
     strcat(message, tmpMessage);
     return 0;
   }
-  for (i = 0; i < flen; i++)
+  for (i = 0; i < (long)flen; i++)
   {
     byte     = fgetc(infile);
     inv_byte = 0x00;
