@@ -110,8 +110,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
          */
         virtual void intReadData(QDomElement* e=NULL);
 
-		/** \brief load data file */
+        /** \brief load data file */
         bool loadVideoCorrelatorFile(QString filename);
+
+        /** \brief load data file */
+        bool loadRadhard2File(QString filename);
 
         /** \brief load overview image file */
         bool loadOverview(QString filename);

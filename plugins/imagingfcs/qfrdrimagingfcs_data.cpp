@@ -84,21 +84,25 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         }
     }
 
-	width=getProperty("WIDTH").toInt();
-	height=getProperty("HEIGHT").toInt();
-	QString filetype=getProperty("FILETYPE", "unknown").toString();
+    width=getProperty("WIDTH", 0).toInt();
+    height=getProperty("HEIGHT", 0).toInt();
+    QString filetype=getProperty("FILETYPE", "unknown").toString();
 
-	// now also load the data file(s) this record is linked to
-	// an error is reported when no file is given!
-	if (files.size()<=0) {
-		setError(tr("there are no files in the %1 record!").arg(getName()));
-		return;
-	}
-	if (filetype.toUpper()=="VIDEO_CORRELATOR") {
+    // now also load the data file(s) this record is linked to
+    // an error is reported when no file is given!
+    if (files.size()<=0) {
+            setError(tr("there are no files in the %1 record!").arg(getName()));
+            return;
+    }
+    if (filetype.toUpper()=="VIDEO_CORRELATOR") {
         loadVideoCorrelatorFile(files[0]);
-	} else {
-	    setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[0]));
-	}
+    } else if (filetype.toUpper()=="RADHARD2") {
+        loadRadhard2File(files[0]);
+        width=getProperty("WIDTH", 0).toInt();
+        height=getProperty("HEIGHT", 0).toInt();
+    } else {
+        setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[0]));
+    }
     if (files.size()>1) {
         for (int i=1; i<files.size(); i++) {
             if (i<files_types.size()) {
@@ -237,6 +241,44 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
 
 
 
+bool QFRDRImagingFCSData::loadRadhard2File(QString filename) {
+    bool ok=true;
+    QString errorDescription="";
+
+
+    // LOAD FILE
+
+    if (ok) {
+
+        width=32;
+        height=32;
+        int NN=100; // number of lags per correlation function
+        //setQFProperty("WIDTH", width, false, true);
+        //setQFProperty("HEIGHT", height, false, true);
+
+
+        allocateContents(width, height, NN);
+
+        for (int i=0; i<width*height; i++) {
+            for (int j=0; j<NN; j++) {
+                tau[j]=j;//data_matrix[i].at(j).first;
+                correlations[i*NN+j]=0;//data_matrix[i].at(j).second;
+                sigmas[i*NN+j]=0;//data_matrix[i].at(j).third;
+            }
+        }
+
+        QApplication::processEvents();
+        recalcCorrelations();
+        QApplication::processEvents();
+    } else {
+        ok=false;
+        errorDescription=tr("error loading file");
+    }
+
+
+    if (!ok) setError(tr("Error while reading Radhard2 file '%1': %2").arg(filename).arg(errorDescription));
+    return ok;
+}
 
 
 
@@ -312,8 +354,8 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
         width=x;
         height=y;
         this->N=N;
-        setProperty("WIDTH", x);
-        setProperty("HEIGHT", y);
+        setQFProperty("WIDTH", x, false, true);
+        setQFProperty("HEIGHT", y, false, true);
     }
 }
 

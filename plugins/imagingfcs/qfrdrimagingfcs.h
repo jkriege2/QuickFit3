@@ -46,10 +46,10 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getDescription() const  { return tr("manages FCS correlation curves from an imaging FCS experiment (SPIM-FCS, TIR-FCS ...)"); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger, Jan Buchholz"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan W. Krieger, Jan Buchholz"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
@@ -73,6 +73,11 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
             \param filename_overview filename of a file containing an overview image
         */
         void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""));
+        /*! \brief add a Radhard2 file to the current project
+
+            \param filename filename of the input file
+        */
+        void insertRadhard2File(const QString& filename);
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);

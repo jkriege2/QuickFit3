@@ -84,13 +84,16 @@ void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
         // file format to import
         QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat; *.crosscorrelation.dat)");
+        QString format_Radhard2=tr("SPAD array Correlations (*.dat)");
+        QStringList formats;
+        formats<<format_videoCorrelator<<format_Radhard2;
         // look into INI which was the last used format
         QString current_format_name=settings->getQSettings()->value("imaging_fcs/current_format_filter", format_videoCorrelator).toString();
         // let the user select some files to import
         QStringList files = QFileDialog::getOpenFileNames(parentWidget,
                               tr("Select Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              format_videoCorrelator, &current_format_name);
+                              formats.join(";;"), &current_format_name);
         // store the format we just used
         settings->getQSettings()->setValue("imaging_fcs/current_format_filter", current_format_name);
 
@@ -119,6 +122,9 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 }
                 if (!QFile::exists(overview)) overview="";
                 insertVideoCorrelatorFile(filename, overview);
+            } else if (current_format_name==format_Radhard2) {
+                QString filename=*it;
+                insertRadhard2File(filename);
             }
             settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
             services->setProgress(i);
@@ -134,12 +140,12 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     int result=0;
     QFile file(filename);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QTextStream stream(&file);
-		while ((!stream.atEnd()) && (result<=0)) {
+        QTextStream stream(&file);
+        while ((!stream.atEnd()) && (result<=0)) {
             QVector<double> data=csvReadline(stream, ',', '#', 0);
             result=data.size();
-		}
-		file.close();
+        }
+        file.close();
     }
     return result;
 }
@@ -312,5 +318,35 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 }
 
 
+
+void QFRDRImagingFCSPlugin::insertRadhard2File(const QString& filename) {
+    // here we store some initial parameters
+    QMap<QString, QVariant> initParams;
+
+    // add all properties in initParams that will be readonly
+    QStringList paramsReadonly;
+    paramsReadonly<<"FILETYPE";
+
+    bool ok=true;
+
+
+
+    // set whatever you want (FILETYPE is just an example)!
+    initParams["FILETYPE"]="RADHARD2";
+
+    if (QFile::exists(filename)) {
+        QStringList files, files_types;
+        files<<filename;
+        files_types<<"acf";
+        // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
+        QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files,            initParams,         paramsReadonly, files_types);
+        if (e->error()) { // when an error occured: remove record and output an error message
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+            services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
+        }
+    }
+
+}
 
 Q_EXPORT_PLUGIN2(imaging_fcs, QFRDRImagingFCSPlugin)
