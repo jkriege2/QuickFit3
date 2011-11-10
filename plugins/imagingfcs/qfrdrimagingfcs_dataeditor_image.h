@@ -25,6 +25,7 @@
 #include "qffitfunction.h"
 #include "qenhancedtableview.h"
 #include "../base_classes/qftablemodel.h"
+#include "qfhistogramview.h"
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -293,7 +294,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
 
         /** \brief plotter widget for the parameter histogram */
-        JKQtPlotter* pltParamHistogram;
+        /*JKQtPlotter* pltParamHistogram;
         QCheckBox* chkLogHistogram;
         QSpinBox* spinHistogramBins;
         QGroupBox* grpHistogramSettings;
@@ -302,10 +303,15 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QVisibleHandleSplitter* splitterHistogram;
         QCheckBox* chkNormalizedHistograms;
         double mainHistogramMax;
-        QCheckBox* chkExcludeExcludedRunsFromHistogram;
         QCheckBox* chkHistogramRangeAuto;
         JKDoubleEdit* edtHistogramMin;
-        JKDoubleEdit* edtHistogramMax;
+        JKDoubleEdit* edtHistogramMax;*/
+        QFHistogramView* histogram;
+        QCheckBox* chkExcludeExcludedRunsFromHistogram;
+        double* datahist;
+        double* datahistsel;
+        int32_t datasize;
+        int32_t datasizesel;
 
 
 

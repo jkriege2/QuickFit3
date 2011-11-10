@@ -35,7 +35,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qfrdrimagereaderrh.h \
     ../../../../../LIB/trunk/frame.h \
     ../../../../../LIB/trunk/crc_ccitt.h \
-    ../../../../../LIB/trunk/crc.h
+    ../../../../../LIB/trunk/crc.h \
+    ../base_classes/qfhistogramview.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -52,7 +53,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
     ../../../../../LIB/trunk/statistics_tools.cpp \
     ../base_classes/qfrdrimagereaderrh.cpp \
-    ../base_classes/qfrdrimagereader.cpp
+    ../base_classes/qfrdrimagereader.cpp \
+    ../base_classes/qfhistogramview.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -75,6 +77,8 @@ ASSETS_TESTDATA.files = ./assets/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/imfcs_testdata/
 
 INSTALLS += ASSETS_TESTDATA
+
+
 
 
 
