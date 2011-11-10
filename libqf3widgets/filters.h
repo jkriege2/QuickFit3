@@ -87,6 +87,8 @@ public:
 
     void setFilterINI(QString globalfilters, QString localfilters=QString(""));
 
+    void loadSettings(QSettings& settings, QString property);
+    void saveSettings(QSettings& settings, QString property);
 public slots:
     void loadFilters();
     void storeFilters();

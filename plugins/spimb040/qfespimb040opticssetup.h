@@ -12,7 +12,7 @@ namespace Ui {
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): instrument setup widget
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040OpticsSetup : public QWidget
+class QFESPIMB040OpticsSetup : public QWidget, public QFPluginLogService
 {
     Q_OBJECT
 
@@ -25,6 +25,11 @@ public:
     /** \brief save settings */
     void storeSettings(QSettings& settings, QString prefix);
 
+    virtual void log_text(QString message);
+
+    virtual void log_warning(QString message);
+
+    virtual void log_error(QString message);
 private:
     Ui::QFESPIMB040OpticsSetup *ui;
     QFESPIMB040MainWindow* m_parent;

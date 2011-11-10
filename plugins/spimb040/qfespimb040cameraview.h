@@ -55,9 +55,9 @@ class QFESPIMB040CameraView : public QWidget {
 
         void init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume);
         /** \brief load settings */
-        void loadSettings(ProgramOptions* settings, QString prefix);
+        void loadSettings(QSettings&, QString prefix);
         /** \brief save settings */
-        void storeSettings(ProgramOptions* settings, QString prefix);
+        void storeSettings(QSettings&, QString prefix);
 
         /** \brief set size of pixels */
         void setPixelSize(double pixelWidth, double pixelHeight);

@@ -119,7 +119,7 @@ void QFESPIMB040CameraConfig::releaseCamera() {
 
 
 void QFESPIMB040CameraConfig::loadSettings(ProgramOptions* settings, QString prefix) {
-    if (camView) camView->loadSettings(settings, prefix+"cam_view/");
+    if (camView) camView->loadSettings(*(settings->getQSettings()), prefix+"cam_view/");
 
     loadObjectives();
 
@@ -133,7 +133,7 @@ void QFESPIMB040CameraConfig::loadSettings(ProgramOptions* settings, QString pre
 }
 
 void QFESPIMB040CameraConfig::storeSettings(ProgramOptions* settings, QString prefix) {
-    if (camView) camView->storeSettings(settings, prefix+"cam_view/");
+    if (camView) camView->storeSettings(*(settings->getQSettings()), prefix+"cam_view/");
 
     settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());

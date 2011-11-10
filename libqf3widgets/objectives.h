@@ -89,7 +89,8 @@ public:
     bool objectiveExists(QString name);
 
     void setObjectivesINI(QString globalobjectives, QString localobjectives=QString(""));
-
+    void loadSettings(QSettings& settings, QString property);
+    void saveSettings(QSettings& settings, QString property);
 public slots:
     void loadObjectives();
     void storeObjectives();

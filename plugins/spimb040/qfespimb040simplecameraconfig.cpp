@@ -133,23 +133,23 @@ void QFESPIMB040SimpleCameraConfig::releaseCamera() {
 }
 
 
-void QFESPIMB040SimpleCameraConfig::loadSettings(ProgramOptions* settings, QString prefix) {
+void QFESPIMB040SimpleCameraConfig::loadSettings(QSettings& settings, QString prefix) {
     if (camView) camView->loadSettings(settings, prefix+"cam_view/");
 
 
-    cmbAcquisitionDevice->setCurrentIndex(settings->getQSettings()->value(prefix+"last_device", 0).toInt());
-    spinAcquisitionDelay->setValue(settings->getQSettings()->value(prefix+"acquisition_delay", 0).toDouble());
-    cmbPreviewConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"preview_config", "default").toString());
-    cmbAcquisitionConfiguration->setCurrentConfig(settings->getQSettings()->value(prefix+"acquisition_config", "default").toString());
+    cmbAcquisitionDevice->setCurrentIndex(settings.value(prefix+"last_device", 0).toInt());
+    spinAcquisitionDelay->setValue(settings.value(prefix+"acquisition_delay", 0).toDouble());
+    cmbPreviewConfiguration->setCurrentConfig(settings.value(prefix+"preview_config", "default").toString());
+    cmbAcquisitionConfiguration->setCurrentConfig(settings.value(prefix+"acquisition_config", "default").toString());
 }
 
-void QFESPIMB040SimpleCameraConfig::storeSettings(ProgramOptions* settings, QString prefix) {
+void QFESPIMB040SimpleCameraConfig::storeSettings(QSettings& settings, QString prefix) {
     if (camView) camView->storeSettings(settings, prefix+"cam_view/");
 
-    settings->getQSettings()->setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
-    settings->getQSettings()->setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings->getQSettings()->setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
-    settings->getQSettings()->setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
+    settings.setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
+    settings.setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
+    settings.setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
+    settings.setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
 
 }
 
@@ -247,9 +247,6 @@ void QFESPIMB040SimpleCameraConfig::createActions() {
     connect(actPreviewSingle, SIGNAL(triggered()), this, SLOT(previewSingle()));
 
     actPreviewConfig=cmbPreviewConfiguration->configAction();
-    //actPreviewConfig= new QAction(QIcon(":/spimb040/stagesettings.png"), tr("&Configure preview settings"), this);
-    //connect(actPreviewConfig, SIGNAL(triggered()), this, SLOT(configPreview()));
-
 
     camView->addUserAction(actPreviewConfig);//cmbPreviewConfiguration->configAction());
     camView->addUserAction(actStartStopPreview);
@@ -257,9 +254,6 @@ void QFESPIMB040SimpleCameraConfig::createActions() {
     btnConnect->setDefaultAction(actDisConnect);
     btnPreviewSingle->setDefaultAction(actPreviewSingle);
     btnPreviewContinuous->setDefaultAction(actStartStopPreview);
-
-
-
 }
 
 void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig::States state) {
@@ -402,7 +396,6 @@ bool QFESPIMB040SimpleCameraConfig::acquireSingle() {
     if (viewData.camera) {
         int usedcam=viewData.usedCamera;
         if (viewData.camera->isConnected(usedcam)) {
-            //viewData.camera->acquire(usedcam);
             int dw=viewData.camera->getImageWidth(usedcam);
             int dh=viewData.camera->getImageHeight(usedcam);
             uint64_t timestamp=0;
@@ -448,15 +441,14 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
             } else {
                 displayStates(QFESPIMB040SimpleCameraConfig::Connected);
                 if (m_log) m_log->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
-                //camView->show();
-                //previewSingle();
+
             }
         } else {
             //disconnect from the current device and delete the settings widget
             displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
             if (cam->isConnected(camIdx))  {
                 cam->disconnectDevice(camIdx);
-                //cam->setLogging(NULL);
+
             }
             if (m_log) m_log->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
         }
@@ -469,12 +461,10 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
 void QFESPIMB040SimpleCameraConfig::previewSingle() {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        //QFExtension* extension=viewData.extension;
         QFExtensionCamera* cam=viewData.camera;
         if (viewData.camera->isConnected(camIdx)) {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QString filename="";
-            //if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
             filename=cmbPreviewConfiguration->currentConfigFilename();
             QSettings* settings=new QSettings(filename, QSettings::IniFormat);
             viewData.camera->useCameraSettings(camIdx, *settings);
@@ -502,7 +492,6 @@ void QFESPIMB040SimpleCameraConfig::stopPreview() {
             viewData.abort_continuous_acquisition=true;
             actStartStopPreview->setChecked(false);
             displayStates(QFESPIMB040SimpleCameraConfig::Connected);
-            //QApplication::processEvents();
             viewData.abort_continuous_acquisition=true;
             previewTimer->stop();
         }
@@ -514,8 +503,6 @@ void QFESPIMB040SimpleCameraConfig::startStopPreview() {
     //qDebug()<<"startStopPreview() actStartSTop="<<actStartStopPreview->isChecked();
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        //QFExtension* extension=viewData.extension;
-        //QFExtensionCamera* cam=viewData.camera;
         if (viewData.camera->isConnected(camIdx)) {
             if (actStartStopPreview->isChecked()) {
                 displayStates(QFESPIMB040SimpleCameraConfig::Previewing);
@@ -526,12 +513,10 @@ void QFESPIMB040SimpleCameraConfig::startStopPreview() {
                 viewData.abort_continuous_acquisition=false;
                 viewData.continuous_is_first=true;
                 QString filename="";
-                //if (cmbPreviewConfiguration->currentIndex()>=0) filename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
                 filename=cmbPreviewConfiguration->currentConfigFilename();
                 QSettings* settings=new QSettings(filename, QSettings::IniFormat);
                 viewData.camera->useCameraSettings(camIdx, *settings);
                 camView->show();
-                //previewContinuous();
                 previewTimer->setSingleShot(true);
                 previewTimer->setInterval(spinAcquisitionDelay->value()+2);
                 previewTimer->start();
@@ -576,7 +561,6 @@ void QFESPIMB040SimpleCameraConfig::previewContinuous() {
 
         if (viewData.acqFramesQR%5==0) {
             double framerate=(double)viewData.acqFramesQR/(double)(viewData.acqStartedQR.elapsed()/1000.0);
-            //labVideoSettings->setText(tr("%1 x %2 : %3 fps     ").arg(image.width()).arg(image.height()).arg(framerate));
             camView->displayCameraConfig(extension->getName()+" #"+QString::number(camIdx), framerate);
             if (viewData.acqStartedQR.elapsed()>10000) {
                 viewData.acqStartedQR.start();
@@ -588,21 +572,10 @@ void QFESPIMB040SimpleCameraConfig::previewContinuous() {
 
         // start timer till next acquisition
         if (actStartStopPreview->isChecked()) {
-            //QApplication::processEvents();
-            //QTimer::singleShot(spinAcquisitionDelay->value()+3, this, SLOT(previewContinuous()));
             previewTimer->setSingleShot(true);
             previewTimer->setInterval(spinAcquisitionDelay->value()+2);
             previewTimer->start();
         }
-        /*} else {
-            actStartStopAcquisition->setChecked(false);
-            actStartStopAcquisition->setIcon(QIcon(":/spimb040/acquisitionstart.png"));
-            actStartStopAcquisition->setText(tr("&Start Acquisition"));
-            actStartStopAcquisition->setEnabled(false);
-            actAcquireSingle->setEnabled(false);
-            actCameraConfig->setEnabled(false);
-        }*/
-        //qDebug()<<"preview_done "<<cnt;
         cnt--;
     }
 }

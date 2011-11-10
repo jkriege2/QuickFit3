@@ -228,3 +228,10 @@ bool QF3ObjectiveCombobox::objectiveExists(QString name) {
 }
 
 
+void QF3ObjectiveCombobox::loadSettings(QSettings& settings, QString property) {
+    cmbObjective->setCurrentIndex(cmbObjective->findText(settings.value(property, "").toString()));
+}
+
+void QF3ObjectiveCombobox::saveSettings(QSettings& settings, QString property) {
+    settings.setValue(property, cmbObjective->currentText());
+}

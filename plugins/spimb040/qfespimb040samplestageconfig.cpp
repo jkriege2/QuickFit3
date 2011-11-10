@@ -3,11 +3,41 @@
 #include <QtGui>
 #include <iostream>
 
+QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent):
+        QGroupBox(parent)
+{
+    setTitle(tr(" Sample Translation Stages: "));
+    m_log=NULL;
+    m_pluginServices=NULL;
+    locked=false;
+    stageStateUpdateInterval=250;
+    iconDisconnected=QPixmap(":/spimb040/stage_disconnected.png");
+    iconReady=QPixmap(":/spimb040/stage_ready.png");
+    iconError=QPixmap(":/spimb040/stage_error.png");
+    iconMoving=QPixmap(":/spimb040/stage_moving.png");
+    iconMovingOpposite=QPixmap(":/spimb040/stage_moving2.png");
+    iconJoystick=QPixmap(":/spimb040/stage_joystick.png");
+    iconNoJoystick=QPixmap(":/spimb040/stage_nojoystick.png");
+    //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
+    //connect(&timerDisplayUpdate, SIGNAL(timeout()), this, SLOT(displayAxisStates()));
+    //timerDisplayUpdate.start();
+
+    //findStages(m_pluginServices->getExtensionManager());
+    createWidgets();
+    createActions();
+    updateStates();
+
+    QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
+}
+
+
+/*
 QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices):
         QGroupBox(parent)
 {
     setTitle(tr(" Sample Translation Stages: "));
     m_parent=parent;
+    m_log=parent;
     m_pluginServices=pluginServices;
     locked=false;
     stageStateUpdateInterval=250;
@@ -29,27 +59,55 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow
 
     QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
 }
-
+*/
 QFESPIMB040SampleStageConfig::~QFESPIMB040SampleStageConfig()
 {
     //dtor
 }
 
-void QFESPIMB040SampleStageConfig::loadSettings(ProgramOptions* settings, QString prefix) {
-    cmbStageX->setCurrentIndex((settings->getQSettings())->value(prefix+"stage_x", 0).toInt());
-    cmbStageY->setCurrentIndex((settings->getQSettings())->value(prefix+"stage_y", 1).toInt());
-    cmbStageZ->setCurrentIndex((settings->getQSettings())->value(prefix+"stage_z", 2).toInt());
-    spinJoystickMaxSpeed->setValue((settings->getQSettings())->value(prefix+"joystick_max_speed", 500).toDouble());
-    stageStateUpdateInterval=(settings->getQSettings())->value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
+void QFESPIMB040SampleStageConfig::init(QFPluginLogService* log, QFPluginServices* pluginServices) {
+    m_log=log;
+    m_pluginServices=pluginServices;
+
+    if (m_pluginServices) {
+        findStages(m_pluginServices->getExtensionManager());
+        // fill axis selection comboboxes with available choices
+        for (int i=0; i<stages.size(); i++) {
+            QFExtension* extension=qobject_cast<QFExtension*>(stages[i]);
+            QFExtensionLinearStage* stage = qobject_cast<QFExtensionLinearStage*>(stages[i]);
+            for (unsigned int j=0; j<stage->getAxisCount(); j++) {
+                QPoint sl(i, j);
+                QString name=extension->getName();
+                if (stage->getAxisCount()>0) name=name+QString(" #%1").arg(j);
+                cmbStageX->addItem(QIcon(extension->getIconFilename()), name, sl);
+                cmbStageY->addItem(QIcon(extension->getIconFilename()), name, sl);
+                cmbStageZ->addItem(QIcon(extension->getIconFilename()), name, sl);
+            }
+        }
+    } else {
+        stages.clear();
+        cmbStageX->clear();
+        cmbStageY->clear();
+        cmbStageZ->clear();
+    }
+    updateStates();
+}
+
+void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString prefix) {
+    cmbStageX->setCurrentIndex(settings.value(prefix+"stage_x", 0).toInt());
+    cmbStageY->setCurrentIndex(settings.value(prefix+"stage_y", 1).toInt());
+    cmbStageZ->setCurrentIndex(settings.value(prefix+"stage_z", 2).toInt());
+    spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
+    stageStateUpdateInterval=settings.value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
-void QFESPIMB040SampleStageConfig::storeSettings(ProgramOptions* settings, QString prefix) {
-    (settings->getQSettings())->setValue(prefix+"stage_x", cmbStageX->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"stage_y", cmbStageY->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"stage_z", cmbStageZ->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
-    (settings->getQSettings())->setValue(prefix+"update_interval", stageStateUpdateInterval);
+void QFESPIMB040SampleStageConfig::storeSettings(QSettings& settings, QString prefix) {
+    settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
+    settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());
+    settings.setValue(prefix+"stage_z", cmbStageZ->currentIndex());
+    settings.setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
+    settings.setValue(prefix+"update_interval", stageStateUpdateInterval);
 }
 
 void QFESPIMB040SampleStageConfig::findStages(QFExtensionManager* extManager) {
@@ -112,19 +170,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     stagelayout->addRow(tr("<b>z axis:</b>"), hbl);
     cmbStageZ->setEnabled(false);
 
-    // fill axis selection comboboxes with available choices
-    for (int i=0; i<stages.size(); i++) {
-        QFExtension* extension=qobject_cast<QFExtension*>(stages[i]);
-        QFExtensionLinearStage* stage = qobject_cast<QFExtensionLinearStage*>(stages[i]);
-        for (unsigned int j=0; j<stage->getAxisCount(); j++) {
-            QPoint sl(i, j);
-            QString name=extension->getName();
-            if (stage->getAxisCount()>0) name=name+QString(" #%1").arg(j);
-            cmbStageX->addItem(QIcon(extension->getIconFilename()), name, sl);
-            cmbStageY->addItem(QIcon(extension->getIconFilename()), name, sl);
-            cmbStageZ->addItem(QIcon(extension->getIconFilename()), name, sl);
-        }
-    }
+
 
 
     hbl=new QHBoxLayout(this);
@@ -392,18 +438,18 @@ void QFESPIMB040SampleStageConfig::disConnectX() {
     chkJoystick->setChecked(false);
     if (stage) {
         if (conn) {
-            stage->setLogging(m_parent);
+            stage->setLogging(m_log);
             stage->connectDevice(axis);
             if (stage->isConnected(axis) && (stage->getAxisState(axis)==QFExtensionLinearStage::Ready)) {
-                m_parent->log_text("connected to x-axis stage driver ...");
+                m_log->log_text("connected to x-axis stage driver ...");
             } else {
                 actConnectX->setChecked(false);
                 stage->disconnectDevice(axis);
-                m_parent->log_error("error connecting to x-axis stage driver ...");
+                m_log->log_error("error connecting to x-axis stage driver ...");
             }
         } else {
             stage->disconnectDevice(axis);
-            m_parent->log_text("disconnected from x-axis stage driver ...");
+            m_log->log_text("disconnected from x-axis stage driver ...");
         }
     } else {
         actConnectX->setChecked(false);
@@ -421,18 +467,18 @@ void QFESPIMB040SampleStageConfig::disConnectY() {
     chkJoystick->setChecked(false);
     if (stage) {
         if (conn) {
-            stage->setLogging(m_parent);
+            stage->setLogging(m_log);
             stage->connectDevice(axis);
             if (stage->isConnected(axis) && (stage->getAxisState(axis)==QFExtensionLinearStage::Ready)) {
-                m_parent->log_text("connected to y-axis stage driver ...");
+                m_log->log_text("connected to y-axis stage driver ...");
             } else {
                 actConnectY->setChecked(false);
                 stage->disconnectDevice(axis);
-                m_parent->log_error("error connecting to y-axis stage driver ...");
+                m_log->log_error("error connecting to y-axis stage driver ...");
             }
         } else {
             stage->disconnectDevice(axis);
-            m_parent->log_text("disconnected from y-axis stage driver ...");
+            m_log->log_text("disconnected from y-axis stage driver ...");
         }
     } else {
         actConnectY->setChecked(false);
@@ -449,18 +495,18 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (stage) {
         if (conn) {
-            stage->setLogging(m_parent);
+            stage->setLogging(m_log);
             stage->connectDevice(axis);
             if (stage->isConnected(axis) && (stage->getAxisState(axis)==QFExtensionLinearStage::Ready)) {
-                m_parent->log_text("connected to z-axis stage driver ...");
+                m_log->log_text("connected to z-axis stage driver ...");
             } else {
                 actConnectZ->setChecked(false);
                 stage->disconnectDevice(axis);
-                m_parent->log_error("error connecting to z-axis stage driver ...");
+                m_log->log_error("error connecting to z-axis stage driver ...");
             }
         } else {
             stage->disconnectDevice(axis);
-            m_parent->log_text("disconnected from z-axis stage driver ...");
+            m_log->log_text("disconnected from z-axis stage driver ...");
         }
     } else {
         actConnectZ->setChecked(false);

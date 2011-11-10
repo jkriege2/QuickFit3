@@ -58,9 +58,9 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         void init(int camViewID, QFPluginServices* pluginServices);
 
         /** \brief load settings */
-        void loadSettings(ProgramOptions* settings, QString prefix);
+        void loadSettings(QSettings& settings, QString prefix);
         /** \brief save settings */
-        void storeSettings(ProgramOptions* settings, QString prefix);
+        void storeSettings(QSettings& settings, QString prefix);
 
         /*! \brief returns a pointer to the QFExtensionCamera and ensures exclusive access to one camera therein.
 

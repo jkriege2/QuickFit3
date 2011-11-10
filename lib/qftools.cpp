@@ -63,7 +63,7 @@ double roundWithError(double value, double error, int addSignifcant)  {
 
     int sbits_error=ceil(log(fabs(error))/log(10.0));
     if (sbits_error>=0) sbits_error=-1;
-    double f=pow(10.0, sbits_error-1-addSignifcant);
+    double f=pow(10.0, sbits_error-(addSignifcant+1));
 
     return round(value/f)*f;
 }

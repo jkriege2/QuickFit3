@@ -41,7 +41,7 @@ void QFESPIMB040MainWindow::loadSettings(ProgramOptions* settings) {
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     if (camConfig1) camConfig1->loadSettings(settings, "plugin_spim_b040/cam_config1/");
     if (camConfig2) camConfig2->loadSettings(settings, "plugin_spim_b040/cam_config2/");
-    if (sampleStages) sampleStages->loadSettings(settings, "plugin_spim_b040/sample_stages/");
+    if (sampleStages) sampleStages->loadSettings((*settings->getQSettings()), "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
@@ -51,7 +51,7 @@ void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     if (camConfig1) camConfig1->storeSettings(settings, "plugin_spim_b040/cam_config1/");
     if (camConfig2) camConfig2->storeSettings(settings, "plugin_spim_b040/cam_config2/");
-    if (sampleStages) sampleStages->storeSettings(settings, "plugin_spim_b040/sample_stages/");
+    if (sampleStages) sampleStages->storeSettings((*settings->getQSettings()), "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
@@ -124,8 +124,8 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    logMain=new QtLogFile(this);
-    mainlayout->addWidget(logMain, 3,0,1,2);
+    //logMain=new QtLogFile(this);
+    //mainlayout->addWidget(logMain, 3,0,1,2);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,8 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create sample stage widget
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    sampleStages=new QFESPIMB040SampleStageConfig(this, m_pluginServices);
+    sampleStages=new QFESPIMB040SampleStageConfig(this);//, m_pluginServices);
+    sampleStages->init(this, m_pluginServices);
     mainlayout->addWidget(sampleStages, 1, 0);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1302,15 +1303,18 @@ QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QF
 }
 
 void QFESPIMB040MainWindow::log_text(QString message) {
-    logMain->log_text(message);
+    //logMain->log_text(message);
+    optSetup->log_text(message);
 };
 
 void QFESPIMB040MainWindow::log_warning(QString message) {
-    logMain->log_warning(message);
+    //logMain->log_warning(message);
+    optSetup->log_warning(message);
 };
 
 void QFESPIMB040MainWindow::log_error(QString message) {
-    logMain->log_error(message);
+    //logMain->log_error(message);
+    optSetup->log_error(message);
 };
 
 

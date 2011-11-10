@@ -220,3 +220,11 @@ bool QF3FilterCombobox::filterExists(QString name) {
     return false;
 
 }
+
+void QF3FilterCombobox::loadSettings(QSettings& settings, QString property) {
+    cmbFilters->setCurrentIndex(cmbFilters->findText(settings.value(property, "").toString()));
+}
+
+void QF3FilterCombobox::saveSettings(QSettings& settings, QString property) {
+    settings.setValue(property, cmbFilters->currentText());
+}

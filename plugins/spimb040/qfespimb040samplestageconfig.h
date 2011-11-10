@@ -40,20 +40,24 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
+        QFESPIMB040SampleStageConfig(QWidget* parent);
+        //QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
         /** Default destructor */
         virtual ~QFESPIMB040SampleStageConfig();
 
+        void init(QFPluginLogService* log, QFPluginServices* pluginServices);
+
         /** \brief load settings */
-        void loadSettings(ProgramOptions* settings, QString prefix);
+        void loadSettings(QSettings& settings, QString prefix);
         /** \brief save settings */
-        void storeSettings(ProgramOptions* settings, QString prefix);
+        void storeSettings(QSettings& settings, QString prefix);
 
     protected slots:
         void updateStates();
 
     protected:
-        QFESPIMB040MainWindow* m_parent;
+        //QFESPIMB040MainWindow* m_parent;
+        QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
         /** \brief list of all available QFExtensionLinearStage plugins, initialized by findCameras() */
         QList<QObject*> stages;

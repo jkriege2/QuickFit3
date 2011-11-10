@@ -144,9 +144,9 @@ void QFESPIMB040CameraView::createMainWidgets() {
     toolbar=new QToolBar(tr("camera_toolbar"), this);
     vbl->addWidget(toolbar);
     splitVert=new QVisibleHandleSplitter(Qt::Horizontal, this);
-    splitHor=new QVisibleHandleSplitter(Qt::Vertical, this);
-    vbl->addWidget(splitHor);
-
+    //splitHor=new QVisibleHandleSplitter(Qt::Vertical, this);
+    //vbl->addWidget(splitHor);
+    vbl->addWidget(splitVert);
 
     QWidget* wPltMain=new QWidget(this);
     vbl=new QVBoxLayout(wPltMain);
@@ -223,12 +223,12 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
     vbl->addLayout(layPlt, 10);
     tabSettings=new QTabWidget(this);
-    tabResults=new QTabWidget(this);
+    //tabResults=new QTabWidget(this);
 
     splitVert->addWidget(wPltMain);
     splitVert->addWidget(tabSettings);
-    splitHor->addWidget(splitVert);
-    splitHor->addWidget(tabResults);
+    //splitHor->addWidget(splitVert);
+    //splitHor->addWidget(tabResults);
 
 
     ///////////////////////////////////////////////////////////////
@@ -451,19 +451,19 @@ void QFESPIMB040CameraView::createActions() {
 }
 
 
-void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefix) {
-    jkloadWidgetGeometry((*settings->getQSettings()), this, prefix+"geometry/");
-    jkloadSplitter((*settings->getQSettings()), splitHor,  prefix+"split_hor/");
-    jkloadSplitter((*settings->getQSettings()), splitVert, prefix+"split_vert/");
+void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
+    jkloadWidgetGeometry(settings, this, prefix+"geometry/");
+    //jkloadSplitter(settings, splitHor,  prefix+"split_hor/");
+    jkloadSplitter(settings, splitVert, prefix+"split_vert/");
 
-    spinCountsLower->setValue((settings->getQSettings())->value(prefix+"histogram.min", 0).toInt());
-    spinCountsUpper->setValue((settings->getQSettings())->value(prefix+"histogram.max", 255).toInt());
-    chkCountsRangeAutoLow->setChecked((settings->getQSettings())->value(prefix+"histogram.autolow", true).toBool());
-    chkCountsRangeAutoHigh->setChecked((settings->getQSettings())->value(prefix+"histogram.autohigh", true).toBool());
+    spinCountsLower->setValue(settings.value(prefix+"histogram.min", 0).toInt());
+    spinCountsUpper->setValue(settings.value(prefix+"histogram.max", 255).toInt());
+    chkCountsRangeAutoLow->setChecked(settings.value(prefix+"histogram.autolow", true).toBool());
+    chkCountsRangeAutoHigh->setChecked(settings.value(prefix+"histogram.autohigh", true).toBool());
     setCountsAutoscale();
-    bool b=(settings->getQSettings())->value(prefix+"histogram.log", false).toBool();
+    bool b=settings.value(prefix+"histogram.log", false).toBool();
     chkHistogramLog->setChecked(b);
-    histogram_n=(settings->getQSettings())->value(prefix+"histogram.items", histogram_n).toUInt();
+    histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
     spinHistogramBins->setValue(histogram_n);
     // reallocate histogram and initialize
     if (histogram_x) free(histogram_x);
@@ -474,53 +474,53 @@ void QFESPIMB040CameraView::loadSettings(ProgramOptions* settings, QString prefi
         histogram_x[i]=i;
         histogram_y[i]=0;
     }
-    b=(settings->getQSettings())->value(prefix+"histogram.items_auto", true).toBool();
+    b=settings.value(prefix+"histogram.items_auto", true).toBool();
     chkHistogramBinsAuto->setChecked(b);
     setHistogramBinsAutoscale(b);
 
-    cmbColorscale->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.palette", 6).toInt());
-    cmbMaskColor->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.mask_color", 0).toInt());
-    cmbRotation->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.rotation", 0).toInt());
-    cmbMarginalPlots->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.marginal", 1).toInt());
-    cmbMarginalFitFunction->setCurrentIndex((settings->getQSettings())->value(prefix+"imagesettings.marginal_fitfunction", 0).toInt());
-    pltDataMarginalXPixel=(settings->getQSettings())->value(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel).toInt();
-    pltDataMarginalYPixel=(settings->getQSettings())->value(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel).toInt();
+    cmbColorscale->setCurrentIndex(settings.value(prefix+"imagesettings.palette", 6).toInt());
+    cmbMaskColor->setCurrentIndex(settings.value(prefix+"imagesettings.mask_color", 0).toInt());
+    cmbRotation->setCurrentIndex(settings.value(prefix+"imagesettings.rotation", 0).toInt());
+    cmbMarginalPlots->setCurrentIndex(settings.value(prefix+"imagesettings.marginal", 1).toInt());
+    cmbMarginalFitFunction->setCurrentIndex(settings.value(prefix+"imagesettings.marginal_fitfunction", 0).toInt());
+    pltDataMarginalXPixel=settings.value(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel).toInt();
+    pltDataMarginalYPixel=settings.value(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel).toInt();
 
-    lastImagepath=(settings->getQSettings())->value(prefix+"last_imagepath", lastImagepath).toString();
-    lastMaskpath=(settings->getQSettings())->value(prefix+"last_maskpath", lastMaskpath).toString();
-    lastImagefilter=(settings->getQSettings())->value(prefix+"last_imagefilter", lastImagefilter).toString();
-    lastMaskHistogramMode=(settings->getQSettings())->value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
-    lastMaskHistogramPixels=(settings->getQSettings())->value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
-    chkImageStatisticsHistogram->setChecked((settings->getQSettings())->value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
+    lastImagepath=settings.value(prefix+"last_imagepath", lastImagepath).toString();
+    lastMaskpath=settings.value(prefix+"last_maskpath", lastMaskpath).toString();
+    lastImagefilter=settings.value(prefix+"last_imagefilter", lastImagefilter).toString();
+    lastMaskHistogramMode=settings.value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
+    lastMaskHistogramPixels=settings.value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
+    chkImageStatisticsHistogram->setChecked(settings.value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
 }
 
-void QFESPIMB040CameraView::storeSettings(ProgramOptions* settings, QString prefix) {
-    jksaveWidgetGeometry((*settings->getQSettings()), this, prefix+"geometry/");
-    jksaveSplitter((*settings->getQSettings()), splitHor,  prefix+"split_hor/");
-    jksaveSplitter((*settings->getQSettings()), splitVert, prefix+"split_vert/");
+void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
+    jksaveWidgetGeometry(settings, this, prefix+"geometry/");
+    //jksaveSplitter(settings, splitHor,  prefix+"split_hor/");
+    jksaveSplitter(settings, splitVert, prefix+"split_vert/");
 
-    (settings->getQSettings())->setValue(prefix+"last_imagepath", lastImagepath);
-    (settings->getQSettings())->setValue(prefix+"last_maskpath", lastMaskpath);
-    (settings->getQSettings())->setValue(prefix+"last_imagefilter", lastImagefilter);
+    settings.setValue(prefix+"last_imagepath", lastImagepath);
+    settings.setValue(prefix+"last_maskpath", lastMaskpath);
+    settings.setValue(prefix+"last_imagefilter", lastImagefilter);
 
-    (settings->getQSettings())->setValue(prefix+"histogram.min", spinCountsLower->value());
-    (settings->getQSettings())->setValue(prefix+"histogram.max", spinCountsUpper->value());
-    (settings->getQSettings())->setValue(prefix+"histogram.autolow", chkCountsRangeAutoLow->isChecked());
-    (settings->getQSettings())->setValue(prefix+"histogram.autohigh", chkCountsRangeAutoHigh->isChecked());
-    (settings->getQSettings())->setValue(prefix+"histogram.log", chkHistogramLog->isChecked());
-    (settings->getQSettings())->setValue(prefix+"histogram.items", histogram_n);
+    settings.setValue(prefix+"histogram.min", spinCountsLower->value());
+    settings.setValue(prefix+"histogram.max", spinCountsUpper->value());
+    settings.setValue(prefix+"histogram.autolow", chkCountsRangeAutoLow->isChecked());
+    settings.setValue(prefix+"histogram.autohigh", chkCountsRangeAutoHigh->isChecked());
+    settings.setValue(prefix+"histogram.log", chkHistogramLog->isChecked());
+    settings.setValue(prefix+"histogram.items", histogram_n);
 
-    (settings->getQSettings())->setValue(prefix+"imagesettings.palette", cmbColorscale->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"imagesettings.mask_color", cmbMaskColor->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"imagesettings.rotation", cmbRotation->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal", cmbMarginalPlots->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_fitfunction", cmbMarginalFitFunction->currentIndex());
-    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel);
-    (settings->getQSettings())->setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
+    settings.setValue(prefix+"imagesettings.palette", cmbColorscale->currentIndex());
+    settings.setValue(prefix+"imagesettings.mask_color", cmbMaskColor->currentIndex());
+    settings.setValue(prefix+"imagesettings.rotation", cmbRotation->currentIndex());
+    settings.setValue(prefix+"imagesettings.marginal", cmbMarginalPlots->currentIndex());
+    settings.setValue(prefix+"imagesettings.marginal_fitfunction", cmbMarginalFitFunction->currentIndex());
+    settings.setValue(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel);
+    settings.setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
 
-    (settings->getQSettings())->setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
-    (settings->getQSettings())->setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
-    (settings->getQSettings())->setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
+    settings.setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
+    settings.setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
+    settings.setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
 
 
 }
@@ -899,11 +899,11 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftX[i]=x;
                     pltDataMarginalFitLeftY[i]=pltDataMarginalLeftYMin+(pltDataMarginalLeftYMax-pltDataMarginalLeftYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
-                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">standard deviation = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
-                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2));
+                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">standard deviation = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 1)).arg(roundError(sqrt(var)*pixelH, 1));
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
                 marginalResultsSimple+=tr(" | average | | stddev |\n");
-                marginalResultsSimple+=tr("left: | %1 px | %3 %5m |%2 px | %4 %5m\n").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2)).arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 2)).arg(roundError(sqrt(var)*pixelH, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("left: | %1 px | %3 %5m |%2 px | %4 %5m\n").arg(roundWithError(avg, sqrt(var), 0)).arg(roundError(sqrt(var), 1)).arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 1)).arg(roundError(sqrt(var)*pixelH, 1)).arg(QChar(0xB5));
                 var=0;
                 avg=statisticsAverageVariance(var, pltDataMarginalBottomY, pltDataMarginalBottomX, pltDataMarginalBottomN);
                 for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
@@ -911,11 +911,11 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=pltDataMarginalBottomYMin+(pltDataMarginalBottomYMax-pltDataMarginalBottomYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
-                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2));
-                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 2)).arg(roundError(sqrt(var)*pixelW, 2));
+                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 1)).arg(roundError(sqrt(var)*pixelW, 1));
                 marginalResults+=tr("</table></center>");
 
-                marginalResultsSimple+=tr("bottom: | %1 px | %3 %5m |%2 px | %4 %5m").arg(roundWithError(avg, sqrt(var), 2)).arg(roundError(sqrt(var), 2)).arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 2)).arg(roundError(sqrt(var)*pixelW, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("bottom: | %1 px | %3 %5m |%2 px | %4 %5m").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1)).arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 1)).arg(roundError(sqrt(var)*pixelW,1)).arg(QChar(0xB5));
             } else if (cmbMarginalFitFunction->currentIndex()==2) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double pout[4];
@@ -935,13 +935,13 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fGauss(x, pout);
                 }
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
-                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
-                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2));
+                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 1)).arg(roundError(sqrt(fabs(pout[3])), 1));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 1)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>gauss</td></tr>").arg(status.fnorm);
 
-                marginalResultsSimple+=tr("left:|average = |%1 px|1/e%3-radius = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2)).arg(QChar(0xB2));
-                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("left:|average = |%1 px|1/e%3-radius = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 1)).arg(roundError(sqrt(fabs(pout[3])), 1)).arg(QChar(0xB2));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 1)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 1)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
                 marginalResultsSimple+=tr("|%2%3 = |%1|func:|gauss\n").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
 
@@ -960,14 +960,14 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=fGauss(x, pout);
                 }
 
-                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
-                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2));
+                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 1)).arg(roundError(sqrt(fabs(pout[3])), 1));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 1)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func</td><td>gauss</td></tr>").arg(status.fnorm);
                 marginalResults+=tr("</table></center>");
 
-                marginalResultsSimple+=tr("bottom:|average = |%1 px|1/e%3-radius = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2)).arg(QChar(0xB2));
-                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("bottom:|average = |%1 px|1/e%3-radius = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 1)).arg(roundError(sqrt(fabs(pout[3])), 1)).arg(QChar(0xB2));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 1)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 1)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
                 marginalResultsSimple+=tr("|%2%3 = |%1|func:|gauss").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
 
@@ -990,13 +990,13 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fSlit(x, pout);
                 }
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
-                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 2)).arg(roundError(fabs(pout[3]), 2));
-                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, fabs(pout[3])*pixelH, 2)).arg(roundError(fabs(pout[3])*pixelH, 2));
+                marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 1)).arg(roundError(fabs(pout[3]), 1));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, fabs(pout[3])*pixelH, 1)).arg(roundError(fabs(pout[3])*pixelH, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
 
-                marginalResultsSimple+=tr("left:|average = |%1 px|1. zero = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
-                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("left:|average = |%1 px|1. zero = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 1)).arg(roundError(sqrt(fabs(pout[3])), 1));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 1)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 1)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
                 marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit\n").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
 
@@ -1014,14 +1014,14 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomX[i]=x;
                     pltDataMarginalFitBottomY[i]=fSlit(x, pout);
                 }
-                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 2)).arg(roundError(fabs(pout[3]), 2));
-                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, fabs(pout[3])*pixelW, 2)).arg(roundError(fabs(pout[3])*pixelW, 2));
+                marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 1)).arg(roundError(fabs(pout[3]), 1));
+                marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, fabs(pout[3])*pixelW, 1)).arg(roundError(fabs(pout[3])*pixelW, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
                 marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
                 marginalResults+=tr("</table></center>");
 
-                marginalResultsSimple+=tr("bottom:|average = |%1 px|1. zero = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
-                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 2)).arg(QChar(0xB5));
+                marginalResultsSimple+=tr("bottom:|average = |%1 px|1. zero = |%2 px\n").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 1)).arg(roundError(sqrt(fabs(pout[3])), 1));
+                marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 1)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 1)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
                 marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
             }
@@ -1119,8 +1119,8 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
         labImageStatisticsText=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
                         .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0, 3).c_str())
-                        .arg(roundWithError(imageMean, imageStddev, 2)).arg(roundError(imageStddev, 2))
-                        .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 2)).arg(roundError(imageStddev/imageExposureTime/1000.0, 2))
+                        .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
+                        .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
                         .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight);
         //labImageStatistics->setText(labImageStatisticsText);
         QString s=tr(">b20|40|40\n"
@@ -1134,8 +1134,8 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
                      "min ... max = |%10 ... %11|%12 ... %13")
                   .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(imageSum)
                   .arg(roundError(imageSum/imageExposureTime/1000.0, 3))
-                  .arg(roundWithError(imageMean, imageStddev, 2)).arg(roundError(imageStddev, 2))
-                  .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 2)).arg(roundError(imageStddev/imageExposureTime/1000.0, 2))
+                  .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
+                  .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
                   .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight)
                   .arg(QChar(0xB5)).arg(QChar(0xB2)).arg('x').arg(QChar(0xB1));
         labImageStatistics->setData(s);
@@ -1325,7 +1325,7 @@ void QFESPIMB040CameraView::clearImage() {
 }
 
 void QFESPIMB040CameraView::displayCameraConfig(QString camera, double framerate) {
-    labVideoSettings->setText(tr("<div align=\"right\"><b>camera:</b> %1<br><b>framerate:</b> %2 fps&nbsp;&nbsp;<b>exposure:</b> %5ms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>size:</b> %3&times;%4").arg(camera).arg(framerate).arg(rawImage.width()).arg(rawImage.height()).arg(imageExposureTime*1e3));
+    labVideoSettings->setText(tr("<div align=\"right\"><b>camera:</b> %1<br><b>framerate:</b> %2 fps&nbsp;&nbsp;<b>exposure:</b> %5ms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>size:</b> %3&times;%4").arg(camera).arg(roundError(framerate,2)).arg(rawImage.width()).arg(rawImage.height()).arg(imageExposureTime*1e3));
 }
 
 
