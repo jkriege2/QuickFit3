@@ -97,7 +97,8 @@ public slots:
     void addObjective();
     void deleteObjective();
     void editObjective();
-
+signals:
+    void objectiveChanged();
 protected slots:
     void currentObjectiveChanged(int idx);
 

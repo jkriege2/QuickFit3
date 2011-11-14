@@ -84,7 +84,7 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main tab and help widget
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QHBoxLayout* mainl=new QHBoxLayout(this);
+    QVBoxLayout* mainl=new QVBoxLayout(this);
     mainl->setContentsMargins(0,0,0,0);
     setLayout(mainl);
     tabMain=new QTabWidget(this);
@@ -124,8 +124,9 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    //logMain=new QtLogFile(this);
-    //mainlayout->addWidget(logMain, 3,0,1,2);
+    logMain=new QtLogFile(this);
+    mainl->addWidget(new QLabel(tr("<b>Log Messages:</b>")));
+    mainl->addWidget(logMain);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1303,18 +1304,18 @@ QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QF
 }
 
 void QFESPIMB040MainWindow::log_text(QString message) {
-    //logMain->log_text(message);
-    optSetup->log_text(message);
+    logMain->log_text(message);
+    //optSetup->log_text(message);
 };
 
 void QFESPIMB040MainWindow::log_warning(QString message) {
-    //logMain->log_warning(message);
-    optSetup->log_warning(message);
+    logMain->log_warning(message);
+    //optSetup->log_warning(message);
 };
 
 void QFESPIMB040MainWindow::log_error(QString message) {
-    //logMain->log_error(message);
-    optSetup->log_error(message);
+    logMain->log_error(message);
+    //optSetup->log_error(message);
 };
 
 

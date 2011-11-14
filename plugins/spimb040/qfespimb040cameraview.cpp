@@ -128,6 +128,10 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
     free(pltDataMarginalFitLeftX);
 }
 
+void QFESPIMB040CameraView::closeEvent(QCloseEvent * event) {
+    //if (m_stopresume) m_stopresume->stop();
+}
+
 void QFESPIMB040CameraView::setPixelSize(double pixelWidth, double pixelHeight) {
     this->pixelHeight=pixelHeight;
     this->pixelWidth=pixelWidth;

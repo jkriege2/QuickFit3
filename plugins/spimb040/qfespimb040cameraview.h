@@ -112,6 +112,8 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief create actions and register them to toolbar */
         void createActions();
 
+        void closeEvent(QCloseEvent * event);
+
 
         QVisibleHandleSplitter* splitHor;
         QVisibleHandleSplitter* splitVert;
