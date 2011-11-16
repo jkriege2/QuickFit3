@@ -1,6 +1,7 @@
 #include "qfrdrimagingfcs_data.h"
 #include <QtXml>
 #include "libtiff_tools.h"
+#include "qfrdrimagereaderrh.h"
 
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
@@ -243,27 +244,103 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
 
 bool QFRDRImagingFCSData::loadRadhard2File(QString filename) {
     bool ok=true;
+
     QString errorDescription="";
 
+    QFRDRImageReaderRH ReaderRH;
+
+    ok=ReaderRH.open(filename);
 
     // LOAD FILE
 
     if (ok) {
+        width= ReaderRH.frameWidth();
+        height=ReaderRH.frameHeight();
+        if((width==(128*8))&&(height==32)) {
 
-        width=32;
-        height=32;
-        int NN=100; // number of lags per correlation function
-        //setQFProperty("WIDTH", width, false, true);
-        //setQFProperty("HEIGHT", height, false, true);
+            uint32_t **hwc_dump = (uint32_t **)malloc(1024 * sizeof(uint32_t*));
+                for(int i=0;i<1024;i++)
+                    hwc_dump[i]=(uint32_t*)malloc((128) * sizeof(uint32_t));
+            unsigned char *hwc_line = (unsigned char*) malloc(2*4+(64*128)*4+2);
+            uint32_t header;
+            //read data
+            do {
+                //ReaderRH.readFrameCharRaw(hwc_line,&header);
+                uint32_t id= (header >> 8) & 0x00FFFFFFU;
+                uint32_t *src=(uint32_t *) &hwc_line[4]; //first dword: tics
+                uint32_t ticks=*((uint32_t *)hwc_line);
+                for(int x=0;x<32;x++) {
+                    uint32_t *dst=hwc_dump[(id&31)*32+x];
+                    for(int i=0;i<128;i++)
+                    {
+                        *dst=*src;
+                        dst++;
+                        src++;
+                    }
+                    src+=128; //skip delay registers
+                }
+
+            }while(true);
+            for(unsigned int correlator=0;correlator<1024;correlator++)
+            {
+                    uint32_t *hwc_value=hwc_dump[correlator];
+                    unsigned int tau=0;
+
+                    uint32_t channel0=*hwc_value & 0xFFFFFFFFU;
+                    uint32_t count_global=hwc_dump[correlator][126];
+                    uint32_t count_local=hwc_dump[correlator][127];
+unsigned int blocks=14;
+unsigned int lags=8;
+unsigned int steps=blocks*lags;
+                    for(unsigned int block=0;block<blocks;block++)
+                    {
 
 
-        allocateContents(width, height, NN);
+                            for(unsigned int lag=0;lag<lags;lag++)
+                            {
+                                    uint32_t dword=*hwc_value;
+                                    hwc_value++;
+                                    unsigned int value=(dword & 0xFFFFFFFFU);
 
-        for (int i=0; i<width*height; i++) {
-            for (int j=0; j<NN; j++) {
-                tau[j]=j;//data_matrix[i].at(j).first;
-                correlations[i*NN+j]=0;//data_matrix[i].at(j).second;
-                sigmas[i*NN+j]=0;//data_matrix[i].at(j).third;
+                                    //G, taken from correlator_multitau.h, should use buitl-in normalization function
+                                    float result=1.0;
+                                    if(steps>tau)
+                                    {
+                                            float correction_factor=(float(steps-tau))/(float)steps;
+                                            result=((float)value*(float)steps)/((float)(1<<block)*(float)(correction_factor*count_global*count_local));// see "A distributed algorithm for multi-tau autocorrelation"
+                                    }
+                                    //\G
+
+                                    //correlator_hw_values[correlator][block*lags+lag].tau=tau*10;//*10E-6s
+                                    //correlator_hw_values[correlator][block*lags+lag].raw=value;
+                                    //6correlator_hw_values[correlator][block*lags+lag].val=result;
+                                    tau+=(1<<block);
+                            }
+                    }
+            }
+                        allocateContents(32,height,14*8);
+           // correlations[]
+
+
+        } else {
+            ok=false;
+        }
+        if(ok) {
+            width=32;
+            height=32;
+            int NN=100; // number of lags per correlation function
+            //setQFProperty("WIDTH", width, false, true);
+            //setQFProperty("HEIGHT", height, false, true);
+
+
+
+
+            for (int i=0; i<width*height; i++) {
+                for (int j=0; j<NN; j++) {
+                    tau[j]=j;//data_matrix[i].at(j).first;
+                    correlations[i*NN+j]=0;//data_matrix[i].at(j).second;
+                    sigmas[i*NN+j]=0;//data_matrix[i].at(j).third;
+                }
             }
         }
 
@@ -274,6 +351,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(QString filename) {
         ok=false;
         errorDescription=tr("error loading file");
     }
+    ReaderRH.close();
 
 
     if (!ok) setError(tr("Error while reading Radhard2 file '%1': %2").arg(filename).arg(errorDescription));

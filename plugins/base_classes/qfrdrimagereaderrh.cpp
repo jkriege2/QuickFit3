@@ -66,8 +66,9 @@ bool QFRDRImageReaderRH::open(QString filename) {
   frameSize=calculateFrameSize();
   fprintf(stderr,"FRAMESIZE: %i",frameSize);
   switch(frameSize) {
-    case  134: width= 32; height= 32; break;
-    case 2058: width=128; height=128; break;
+    case   134: width=   32; height= 32; break; //RH2
+    case  2058: width=  128; height=128; break; //MS
+    case 32778: width= 1024; height= 32; break; //RH2 CORR
     default: frameSize=0; break;
   }
   if(width==0||height==0) {

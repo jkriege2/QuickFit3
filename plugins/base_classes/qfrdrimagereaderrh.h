@@ -8,7 +8,7 @@
 #include <QDataStream>
 #include <stdint.h>
 
-#define MAX_FRAME_SIZE (2100)
+#define MAX_FRAME_SIZE (64*1024)
 
 /*! \brief image reader class for Radhard raw images (implements QFRDRImageReader)
     \ingroup qf3rdrdp_imaging_fcs
