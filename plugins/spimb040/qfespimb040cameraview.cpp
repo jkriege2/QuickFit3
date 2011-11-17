@@ -4,6 +4,7 @@
 #include "lmcurve.h"
 #include "qmoretextobject.h"
 #include "datatable2.h"
+#include <typeinfo>
 
 #include <QtGui>
 #include <QtCore>
@@ -27,6 +28,8 @@ double fSlit( double t, const double *p )
     const double s=sin(x)/x;
     return offset+A*s*s;
 }
+
+
 
 #define LABEL_UPDATE_INTERVAL_MS 250
 #define HISTOGRAM_UPDATE_INTERVAL_MS 250
@@ -128,8 +131,8 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
     free(pltDataMarginalFitLeftX);
 }
 
-void QFESPIMB040CameraView::closeEvent(QCloseEvent * event) {
-    //if (m_stopresume) m_stopresume->stop();
+void QFESPIMB040CameraView::hideEvent(QHideEvent * event) {
+    if (m_stopresume) m_stopresume->stop();
 }
 
 void QFESPIMB040CameraView::setPixelSize(double pixelWidth, double pixelHeight) {
@@ -185,6 +188,9 @@ void QFESPIMB040CameraView::createMainWidgets() {
     pltMain->addPlot(plteFrame);
     plteMask=new JKQTFPimageOverlayPlot(pltMain, mask.data(), mask.width(), mask.height());
     pltMain->addPlot(plteMask);
+    plteGrid=new JKQTFPQOverlayLinearGridPlot(pltMain);
+    plteGrid->setVisible(false);
+    pltMain->addPlot(plteGrid);
     plteMarginalPos=new JKQTFPVCrossPlot(pltMain, 1, &pltDataMarginalXPixelF, &pltDataMarginalYPixelF, QColor("red"));
     plteMarginalPos->set_crossWidth(15);
     plteMainDistance=new JKQTFPLinePlot(pltMain, 2, measureX, measureY, QColor("red"));
@@ -377,6 +383,36 @@ void QFESPIMB040CameraView::createMainWidgets() {
     fl->addRow(tr("&rotation:"), cmbRotation);
     connect(cmbRotation, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
 
+    cmbImageMode=new QComboBox(w);
+    cmbImageMode->setMaximumWidth(100);
+    cmbImageMode->addItem(tr("none"));
+    cmbImageMode->addItem(tr("top-bottom half"));
+    cmbImageMode->addItem(tr("left-right half"));
+    fl->addRow(tr("frame &transform:"), cmbImageMode);
+
+    QHBoxLayout* glay=new QHBoxLayout(w);
+    glay->setContentsMargins(0,0,0,0);
+    chkGrid=new QCheckBox(w);
+    chkGrid->setChecked(false);
+    glay->addWidget(chkGrid);
+    glay->addWidget(new QLabel(tr("     width: ")));
+    spinGridWidth=new QSpinBox(w);
+    spinGridWidth->setRange(1,10000);
+    spinGridWidth->setSingleStep(10);
+    spinGridWidth->setEnabled(false);
+    glay->addWidget(spinGridWidth);
+    glay->addStretch();
+    fl->addRow(tr("grid:"), glay);
+    cmbGridColor=new ColorComboBox(w);
+    cmbGridColor->setMaximumWidth(200);
+    cmbGridColor->setEnabled(false);
+    fl->addRow(tr("&grid color:"), cmbGridColor);
+    connect(chkGrid, SIGNAL(toggled(bool)), spinGridWidth, SLOT(setEnabled(bool)));
+    connect(chkGrid, SIGNAL(toggled(bool)), cmbGridColor, SLOT(setEnabled(bool)));
+    connect(chkGrid, SIGNAL(toggled()), this, SLOT(updateGrid()));
+    connect(spinGridWidth, SIGNAL(valueChanged(int)), this, SLOT(updateGrid()));
+    connect(cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGrid()));
+
     cmbMarginalPlots=new QComboBox(w);
     cmbMarginalPlots->addItem(tr("none"));
     cmbMarginalPlots->addItem(tr("marked line/column"));
@@ -404,6 +440,9 @@ void QFESPIMB040CameraView::createActions() {
     actSaveRaw = new QAction(QIcon(":/spimb040/saveraw.png"), tr("Save &raw image as ..."), this);
     actSaveRaw->setShortcut(QKeySequence::Save);
     connect(actSaveRaw, SIGNAL(triggered()), this, SLOT(saveRaw()));
+
+    actSaveTransformed = new QAction(QIcon(":/spimb040/savetransformed.png"), tr("Save &transformed image as ..."), this);
+    connect(actSaveTransformed, SIGNAL(triggered()), this, SLOT(saveTransformedImage()));
 
     actMaskClear = new QAction(QIcon(":/spimb040/maskclear.png"), tr("&Clear mask (broken pixels)"), this);
     connect(actMaskClear, SIGNAL(triggered()), this, SLOT(clearMask()));
@@ -439,6 +478,8 @@ void QFESPIMB040CameraView::createActions() {
 
     toolbar->addAction(actSaveRaw);
     toolbar->addAction(actSaveData);
+    toolbar->addAction(actSaveTransformed);
+    toolbar->addSeparator();
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
@@ -496,6 +537,11 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     lastMaskHistogramMode=settings.value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
     lastMaskHistogramPixels=settings.value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
     chkImageStatisticsHistogram->setChecked(settings.value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
+
+    chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
+    spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
+    cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
+    cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
 }
 
 void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
@@ -526,6 +572,11 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
     settings.setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
     settings.setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
 
+    settings.setValue(prefix+"grid", chkGrid->isChecked());
+    settings.setValue(prefix+"grid_width", spinGridWidth->value());
+    settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
+    settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
+
 
 }
 
@@ -549,7 +600,8 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
             double dy=measureY[0]-measureY[1];
             double d=sqrt(dx*dx+dy*dy);
             double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
-            labCurrentPos->setText(tr("<b></b>image(%1, %2) = image(%4&mu;m, %5&mu;m) = %3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;distance = %6px = %7&mu;m").arg(xx).arg(yy).arg(s).arg(xx*pixelW).arg(yy*pixelH).arg(d).arg(du));
+            double angle=atan(dy/dx)/M_PI*180.0;
+            labCurrentPos->setText(tr("<b></b>img(%1, %2) = img(%4&mu;m, %5&mu;m) = %3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>l</i><sub>meas</sub> = %6px = %7&mu;m&nbsp;&nbsp;&nbsp;&alpha;<sub>meas</sub> = %8°").arg(xx).arg(yy).arg(s).arg(xx*pixelW).arg(yy*pixelH).arg(d).arg(du).arg(angle));
         } else {
             labCurrentPos->setText("");
         }
@@ -652,8 +704,10 @@ void QFESPIMB040CameraView::redrawFrame() {
         plteFrame->set_ymax(image.width());
         pltMain->setXRange(0, image.height());
         pltMain->setYRange(0, image.width());
-        pltMain->set_xTickDistance(xtickdist);
-        pltMain->set_yTickDistance(ytickdist);
+        if (!chkGrid->isChecked()) {
+            pltMain->set_xTickDistance(xtickdist);
+            pltMain->set_yTickDistance(ytickdist);
+        }
         plteMask->set_xmax(image.height());
         plteMask->set_ymax(image.width());
         pltMain->set_aspectRatio((double)image.height()/(double)image.width());
@@ -664,8 +718,10 @@ void QFESPIMB040CameraView::redrawFrame() {
         plteFrame->set_ymax(image.height());
         pltMain->setXRange(0, image.width());
         pltMain->setYRange(0, image.height());
-        pltMain->set_xTickDistance(xtickdist);
-        pltMain->set_yTickDistance(ytickdist);
+        if (!chkGrid->isChecked()) {
+            pltMain->set_xTickDistance(xtickdist);
+            pltMain->set_yTickDistance(ytickdist);
+        }
         plteMask->set_xmax(image.width());
         plteMask->set_ymax(image.height());
         pltMain->set_aspectRatio((double)image.width()/(double)image.height());
@@ -680,13 +736,20 @@ void QFESPIMB040CameraView::redrawFrame() {
     plteFrame->set_colorMin(spinCountsLower->value());
     plteFrame->set_colorMax(spinCountsUpper->value());
     //plteFrame->set_image(image, JKQTFP_double, image.width(), image.height());
-    #if (QFESPIMB040CameraView_internalImageType==uint32_t)
+    //#if (QFESPIMB040CameraView_internalImageType==uint32_t)
+    if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(uint32_t)) {
         plteFrame->set_image(image.data(), JKQTFP_uint32, image.width(), image.height());
-    #elif (QFESPIMB040CameraView_internalImageType==double)
+    //#elif (QFESPIMB040CameraView_internalImageType==int64_t)
+    } else if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(int64_t)) {
+        plteFrame->set_image(image.data(), JKQTFP_int64, image.width(), image.height());
+    //#elif (QFESPIMB040CameraView_internalImageType==double)
+    } else if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(double)) {
         plteFrame->set_image(image.data(), JKQTFP_double, image.width(), image.height());
-    #elif (QFESPIMB040CameraView_internalImageType==float)
+    //#elif (QFESPIMB040CameraView_internalImageType==float)
+    } else if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(float)) {
         plteFrame->set_image(image.data(), JKQTFP_float, image.width(), image.height());
-    #endif
+    }
+    //#endif
 
     pltMain->deletePlot(plteMainDistance);
     if (actMeasure->isChecked()) pltMain->addPlot(plteMainDistance);
@@ -779,7 +842,8 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
 void QFESPIMB040CameraView::prepareImage() {
     marginalResults="";
     marginalResultsSimple="";
-    image.assign(rawImage);
+    //image.assign(rawImage);
+    transformImage(image, rawImage);
     if (image.sizeDiffersFrom(mask)) {
         mask.assign(image.width(), image.height(), false);
     }
@@ -1203,14 +1267,14 @@ void QFESPIMB040CameraView::histogramMask() {
 
     QFESPIMB00HistogramMaskDialog* dlg=new QFESPIMB00HistogramMaskDialog(this);
     dlg->setMode(lastMaskHistogramMode);
-    dlg->setPixels(lastMaskHistogramPixels, rawImage.width()*rawImage.height());
+    dlg->setPixels(lastMaskHistogramPixels, image.width()*image.height());
     if (dlg->exec()) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
         lastMaskHistogramMode=dlg->mode();
         lastMaskHistogramPixels=dlg->pixels();
 
-        uint32_t* d=rawImage.dataCopy();
-        uint32_t N=rawImage.width()*rawImage.height();
+        QFESPIMB040CameraView_internalImageType* d=image.dataCopy();
+        uint32_t N=image.width()*image.height();
         statisticsSort(d, N);
 
         if (dlg->mode()==1) {
@@ -1219,10 +1283,12 @@ void QFESPIMB040CameraView::histogramMask() {
         uint32_t maxVal=d[N-1];
         if (N-dlg->pixels()>=0) maxVal=d[N-dlg->pixels()];
         for (long i=0; i<(long)N; i++) {
-            if (rawImage(i)>=maxVal) {
+            if (image(i)>=maxVal) {
                 mask(i)=true;
             }
         }
+
+        free(d);
 
         maskEmpty=false;
         redrawFrameRecalc();
@@ -1233,88 +1299,30 @@ void QFESPIMB040CameraView::histogramMask() {
 }
 
 
+
 void QFESPIMB040CameraView::saveRaw() {
     if (m_stopresume) m_stopresume->stop();
-    QStringList imageFilters;
-    imageFilters<<tr("16-Bit Grayscal TIFF (*.tif *.tiff16)");
-    imageFilters<<tr("Float Grayscal TIFF (*.tif *.tiff)");
-    imageFilters<<tr("Comma Separated Values (*.dat)");
-    imageFilters<<tr("Color Coded PNG (*.png)");
-    imageFilters<<tr("Color Coded BMP (*.bmp)");
-    imageFilters<<tr("Color Coded TIFF (*.tif)");
-
-    QString imFilter=lastImagefilter;
-
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Raw Image"),
-                            lastImagepath,
-                            imageFilters.join(";;"),&imFilter);
-
-    /*QFileDialog dialog(this, tr("Save Raw Image as ..."), lastImagepath);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setNameFilters(imageFilters);
-    dialog.setNameFilter(imFilter);
-    if (dialog.exec() != QDialog::Accepted) return ;
-    imFilter = dialog.selectedNameFilter();
-    QString fileName = dialog.selectedFiles()[0];*/
-
-    if (fileName.isEmpty()) return;
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("QuickFit SPIM Control"),
-                          tr("Cannot write file %1:\n%2.")
-                          .arg(fileName)
-                          .arg(file.errorString()));
-        if (m_stopresume) m_stopresume->resume();
-        return;
-    }
-    file.close();
-    file.remove();
-    lastImagepath=QFileInfo(fileName).absolutePath();
-    lastImagefilter=imFilter;
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-
-    if (lastImagefilter==imageFilters[0]) {
-        rawImage.save_tiffuint16(fileName.toStdString());
-    } else if (lastImagefilter==imageFilters[1]) {
-        rawImage.save_tifffloat(fileName.toStdString());
-    } else if (lastImagefilter==imageFilters[2]) {
-        rawImage.save_csv(fileName.toStdString());
-    } else if (lastImagefilter==imageFilters[3]) {
-        QImage img;
-        JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), img, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
-        img.save(fileName, "PNG");
-    } else if (lastImagefilter==imageFilters[4]) {
-        QImage img;
-        JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), img, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
-        img.save(fileName, "BMP");
-    } else if (lastImagefilter==imageFilters[5]) {
-        QImage img;
-        JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), img, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
-        img.save(fileName, "TIFF");
-    } else {
-            rawImage.save_tiffuint16(fileName.toStdString());
-
-    }
-
-
-    QApplication::restoreOverrideCursor();
+    saveJKImage(rawImage, tr("Save Raw Image ..."));
     if (m_stopresume) m_stopresume->resume();
+}
 
+void QFESPIMB040CameraView::saveTransformedImage() {
+    if (m_stopresume) m_stopresume->stop();
+    saveJKImage(image, tr("Save Transformed Image ..."));
+    if (m_stopresume) m_stopresume->resume();
 }
 
 
-void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& image, double timeindex, double exposuretime) {
-    rawImage.assign(image);
+void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime) {
+    rawImage.assign(imageInput);
     imageTimeindex=timeindex;
     imageExposureTime=exposuretime;
     imageStatisticsCalculated=false;
     redrawFrameRecalc(false);
 }
 
-void QFESPIMB040CameraView::displayImageComplete(JKImage<uint32_t>& image, double timeindex, double exposuretime) {
-    rawImage.assign(image);
+void QFESPIMB040CameraView::displayImageComplete(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime) {
+    rawImage.assign(imageInput);
     imageTimeindex=timeindex;
     imageExposureTime=exposuretime;
     imageStatisticsCalculated=false;
@@ -1433,7 +1441,8 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
             double dy=measureY[0]-measureY[1];
             double d=sqrt(dx*dx+dy*dy);
             double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
-            tabCursor.insertHtml(tr("distance = %1px = %2&mu;m").arg(d).arg(du));
+            double angle=atan(dy/dx)/M_PI*180.0;
+            tabCursor.insertHtml(tr("<i>l</i><sub>meas</sub> = %1px = %2&mu;m   &alpha;<sub>meas</sub> = %3°").arg(d).arg(du).arg(angle));
         }
 
 
@@ -1618,6 +1627,59 @@ void QFESPIMB040CameraView::saveData() {
     QApplication::restoreOverrideCursor();
     if (m_stopresume) m_stopresume->resume();
 
+
+
+}
+
+void QFESPIMB040CameraView::updateGrid() {
+    pltMain->set_xTickDistance(spinGridWidth->value());
+    pltMain->set_yTickDistance(spinGridWidth->value());
+    plteGrid->set_width(spinGridWidth->value());
+    plteGrid->set_color(cmbGridColor->currentColor());
+    plteGrid->set_style(Qt::DashLine);
+    plteGrid->set_lineWidth(1);
+    plteGrid->setVisible(chkGrid->isChecked());
+    //qDebug()<<pltMain->get_drawGrid();
+}
+
+
+void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_internalImageType>& out, const JKImage<uint32_t>& raw) {
+    if (cmbImageMode->currentIndex()==1)  {
+        out.resize(raw.width(), (uint32_t)ceil((double)raw.height()/2.0));
+       /* QFESPIMB040CameraView_internalImageType* dat=out.data();
+        int64_t* dout=(int64_t*)calloc(out.width()*out.height(), sizeof(int64_t));
+        const uint32_t* din=raw.data();
+        int64_t mino=0;
+        int64_t maxo=0;
+        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
+            register int64_t d=din[i]-din[i+out.width()*(out.height()/2)];
+            if (i==0) mino=maxo=d;
+            else {
+                mino=(d<mino)?d:mino;
+                maxo=(d>maxo)?d:maxo;
+            }
+        }
+        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
+
+        }
+        free(dout);*/
+        QFESPIMB040CameraView_internalImageType* dout=out.data();
+        const uint32_t* din=raw.data();
+        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
+            dout[i]=(QFESPIMB040CameraView_internalImageType)din[i]-(QFESPIMB040CameraView_internalImageType)din[i+out.width()*out.height()];
+        }
+    } else if (cmbImageMode->currentIndex()==2)  {
+        out.resize((uint32_t)ceil((double)raw.width()/2.0), raw.height());
+        QFESPIMB040CameraView_internalImageType* dout=out.data();
+        const uint32_t* din=raw.data();
+        for (register uint32_t x=0; x<out.width(); x++) {
+            for (register uint32_t y=0; y<out.height(); y++) {
+                dout[y*out.width()+x]=(QFESPIMB040CameraView_internalImageType)din[y*raw.width()+x]-(QFESPIMB040CameraView_internalImageType)din[y*raw.width()+x+raw.width()/2];
+            }
+        }
+    } else {
+        out.assign(raw);
+    }
 
 
 }

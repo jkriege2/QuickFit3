@@ -11,9 +11,11 @@
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
 	 <a name="preview"></a>
+	 <h2>Overview</h2>
 	 <p>As already mentioned the preview can be started in the <a href="#camconfig">camera configuration boxes</a> using the <img src="./pic/btn_preview_single.png"> and <img src="./pic/btn_start_preview.png"> buttons. A continuous preview reads single frames with only a short delay (configurable in the camera configuration) between them. The delay helps to not completely block the user interface. Every preview frame is displayed in the preview window: <br>
 	 <center><img src="./pic/cam_preview.png"></center></p>
-	 <p>In the center of the image you see a color-coded version of the <strong>current image</strong>. The plot axes are given in pixels. It is potentially surounded by <strong>marginal plots</strong>, which either contain an average along one axis or simply a horizontal/vertical cut through the image (in that case the position of the cut is marked by a red cross). In the marginal plots the data is shown in red and (possibly) fits to the data re shown in blue. Below the some <strong>information about the acquisition</strong> (exposure time, size, ...) are shown. ABove the plot the current position of the mouse is shown in pixels and micrometers (taking the current detection objective into account). Also the grey value of the pixel below the mouse is shown.</p>
+	 <p>In the center of the image you see a color-coded version of the <strong>current image</strong>. The plot axes are given in pixels. It is potentially surounded by <strong>marginal plots</strong>, which either contain an average along one axis or simply a horizontal/vertical cut through the image (in that case the position of the cut is marked by a red cross). In the marginal plots the data is shown in red and (possibly) fits to the data re shown in blue. Below the some <strong>information about the acquisition</strong> (exposure time, size, ...) are shown. Above the plot the current position of the mouse is shown in pixels and micrometers (taking the current detection objective into account). Also the grey value of the pixel below the mouse is shown.</p>
+	 <h2>Statistics</h2>
 	 <p>In the <strong>statistics tab</strong> on the right-hand side of the preview window, several image statistics informations are shown:
 	 <ul>
 	   <li>The <strong>histogram</strong> (if activated) shows a grey histogram of the current image. You can choose whether the y-axis scaling should be linear or logarithmic below. </li>
@@ -22,11 +24,14 @@
 	   <li>The <strong>marginal fit results</strong> show the fit parameters resulting from fits to the marginal plots. The depend on which settings are done for these (see below)</li>
 	 </ul>
 	 </p>
+	 <h2>Settings</h2>
 	 <p>In the <strong>settings tab</strong> on the right-hand side of the preview window, you set several options for the window and image display:
 	 <ul>
 	   <li>The <strong>color palette</strong> select the type of color coding. </li>
 	   <li>The <strong>maks color</strong> select the color in which masked pixels are displayed. </li>
 	   <li>With <strong>rotation</strong> you can rotate the acquired image in steps of 90°. </li>
+	   <li>Using <strong>frame transform</strong> you can select some preprocessing options for the image (see <a href="#transforms">image transformations</a>).</li>
+	   <li>With the <strong>grid</strong> settings you can overlay a colored grid over the plot. You can select the distance between grid lines in pixels and also its color.</li>
 	   <li>The <strong>marginal plots</strong> combo decides about the type of marginal plot to be displayed and also allows to switch them off completely. </li>
 	   <li>The <strong>marginal evaluation</strong> sets which evaluation to perform for the marginal plots:
             <ol>
@@ -37,7 +42,9 @@
 	   </li>
 	 </ul>
 	 </p>
-	 <p>You can also <strong>mask broken pixels</strong>. Then they are not taken into account for the color scaling and statistics. This function can be used to exclude broen pixels from your camera. The mask is altered by these buttons:
+	 <a name="transforms"></a><h2>Image Transformations</h2>
+	 <h2>Masking</h2>
+	 <p>You can also <strong>mask broken pixels</strong>. Then they are not taken into account for the color scaling and statistics. This function can be used to exclude broken pixels from your camera. The mask is altered by these buttons:
 	 <ul>
 	     <li><img src=":/spimb040/maskclear.png"> removes all pixels from the mask (deactivates the mask)</li>
 	     <li><img src=":/spimb040/maskedit.png"> after a click on this button you can click single pixels that you want to exclude on the image. They will be added/be removed (on a second click) from the mask.</li>
@@ -45,8 +52,10 @@
 	     <li><img src=":/spimb040/masksave.png"> This saves the current mask to a file. The file is a text-file that will conatin the pixel coordinates of the broken pixels.</li>
 	 </ul>
 	 </p>
+	 <h2>Measurements in the image</h2>
 	 <p>The button <img src=":/spimb040/measure.png"> activates the <strong>measure mode</strong>. Now you can click any two points on the image and their distance will be measured (displayed above the image, as long as the mouse hovers over the image). The distance is also indicated by a red line.</p>
 	 <p>The button <img src=":/spimb040/cursor.png"> activates the <strong>standard mouse cursor mode</strong>. Now you can no longer edit the mask or measure distance. If the marginal <style>plots option "marked line/column"</style> is activated, you can move the center of the marginal image cuts to a new psoition (red cross) by a click on the image!</p>
+	 <h2>Image acquisition control</h2>
 	 <p>There are also buttons to control the image acquisition:
 	 <ul>
 	     <li><img src=":/spimb040/acquisitionstart.png">/<img src=":/spimb040/acquisitionstop.png"> will start and stop the continuous preview (video)</li>
@@ -55,9 +64,11 @@
 	 </ul>
 	 </p>
 	 <p></p>
+	 <h2>Saving images/reports</h2>
 	 <p>Finally you can save the current image:
 	 <ul>
-	     <li><img src=":/spimb040/saveraw.png"> will save the current frame only in different formats (PNG, TIFF, ... color coded or as raw data). Please select the file type in the drop down field of the selection dialog.</li>
+	     <li><img src=":/spimb040/saveraw.png"> will save the current raw (unprocessed) frame in different formats (PNG, TIFF, ... color coded or as raw data). Please select the file type in the drop down field of the selection dialog.</li>
+	     <li><img src=":/spimb040/savetransformed.png"> will save the current frame as displayed, i.e. after a possible transformation (see dettings tab) in different formats (PNG, TIFF, ... color coded or as raw data). Please select the file type in the drop down field of the selection dialog.</li>
 	     <li><img src=":/spimb040/report_save.png"> Will save the contents of the window (including marginals, statistics and fit results) to a PDF or PostScript file.</li>
 	     <li><img src=":/spimb040/report_print.png"> Will print the contents of the window (including marginals, statistics and fit results).</li>
 	 </ul>

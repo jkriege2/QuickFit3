@@ -2,7 +2,8 @@
     <qresource prefix="/">
         <file alias="spimb040_logo.png">b040spim_logo.png</file>
         <file alias="spimb040/savebackground.png">../../images/22x22/savebackground.png</file>
-        <file alias="spimb040/saveraw.png">../../images/22x22/save_raw.png</file>
+        <file alias="spimb040/saveraw.png">icons/saveraw.png</file>
+        <file alias="spimb040/savetransformed.png">icons/savetransformed.png</file>
         <file alias="spimb040/capturebackground.png">../../images/22x22/capturebackground.png</file>
         <file alias="spimb040/maskedit.png">icons/maskedit.png</file>
         <file alias="spimb040/maskload.png">icons/maskload.png</file>

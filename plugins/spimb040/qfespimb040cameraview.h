@@ -33,7 +33,8 @@
 
 
 /** \brief defines the type of the internal image representation of QFESPIMB040CameraView::image, may be uint32_t OR double OR float (nothing else!!!)  */
-#define QFESPIMB040CameraView_internalImageType uint32_t
+#define QFESPIMB040CameraView_internalImageType int64_t
+//uint32_t
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) camera view widget
     \ingroup qf3ext_spimb040
@@ -65,7 +66,7 @@ class QFESPIMB040CameraView : public QWidget {
     public slots:
         /** \brief display a new image in the widget, this does not gurantee an update of the statistics
 
-            \param image points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
+            \param imageInput points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
             \param width width of \a image
             \param height height of \a image
             \param timeindex time index of image \a image in seconds
@@ -74,16 +75,16 @@ class QFESPIMB040CameraView : public QWidget {
             \note This does NOT guarantee that the statistics are calculated for every frame (to increase frame rate!). If you need
                   the statistics, call displayImageComplete() instead.
         */
-        void displayImage(JKImage<uint32_t>& image, double timeindex, double exposuretime);
+        void displayImage(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime);
         /** \brief display a new image in the widget, in comparison to displayImage() this guarantees an update of the statistics!
 
-            \param image points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
+            \param imageInput points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
             \param width width of \a image
             \param height height of \a image
             \param timeindex time index of image \a image in seconds
             \param exposuretime exposure time of the image in seconds (used to calculate count rates in units of kHz).
         */
-        void displayImageComplete(JKImage<uint32_t>& image, double timeindex, double exposuretime);
+        void displayImageComplete(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime);
         /** \brief clear the display */
         void clearImage();
         /*! \brief display the current camera data/config
@@ -112,7 +113,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief create actions and register them to toolbar */
         void createActions();
 
-        void closeEvent(QCloseEvent * event);
+        void hideEvent(QHideEvent * event);
 
 
         QVisibleHandleSplitter* splitHor;
@@ -134,6 +135,8 @@ class QFESPIMB040CameraView : public QWidget {
         JKQTFPimagePlot* plteFrame;
         /** \brief plot used to display an overlay with the broken pixels saved in mask */
         JKQTFPimageOverlayPlot* plteMask;
+        /** \brief overlay grid for image plot (image is drawn over the grid of the plotter class) */
+        JKQTFPQOverlayLinearGridPlot* plteGrid;
         /** \brief plot used to display the position where the marginal plots are taken */
         JKQTFPVCrossPlot* plteMarginalPos;
         /** \brief plot used to display the range in the histogram */
@@ -206,6 +209,15 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief check box to autimatically find defective pixels */
         QCheckBox* chkFindDefectivePixels;
 
+        /** \brief checkbox that alows to switch a grid over the image on and off */
+        QCheckBox* chkGrid;
+        /** \brief spinbox that allows to set the spacing of the grid */
+        QSpinBox* spinGridWidth;
+        /** \brief color combobox for the overlay color */
+        ColorComboBox* cmbGridColor;
+        /** \brief combobox for special image transfromation modes */
+        QComboBox* cmbImageMode;
+
         /** \brief combobox to select fit function */
         QComboBox* cmbMarginalFitFunction;
         /** \brief label for marginal fit results */
@@ -246,6 +258,8 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief action to save the current raw image */
         QAction* actSaveRaw;
+        /** \brief action to save the current transformed image */
+        QAction* actSaveTransformed;
         /** \brief action to activate/disactivate mask editing mode */
         QAction* actMaskEdit;
         /** \brief create a mask based on the current histogram */
@@ -386,10 +400,96 @@ class QFESPIMB040CameraView : public QWidget {
         void saveMask();
         /** \brief load mask */
         void loadMask();
-        /** \brief save the current image */
+        /** \brief save the current raw image (rawImage) */
         void saveRaw();
+        /** \brief save the current transformed image (image) */
+        void saveTransformedImage();
         void histogramMask();
         void histogramChecked(bool checked);
+
+        void updateGrid();
+
+
+
+
+    protected:
+        /*! \brief save a given JKImage as a file (different formats)
+
+            This method displays a filename selection dialog and then saves the given JKImage in the user-selected
+            file format. THe parameter \A dialogTitle is used as the title line for the filnemae selection dialog
+         */
+        template<class T>
+        void saveJKImage(const JKImage<T>& img, const QString& dialogTitle) {
+            QStringList imageFilters;
+            QString filtTIFF16, filtTIFFFloat, filtPNG, filtBMP, filtTIFF, filtCSV;
+            imageFilters<<(filtTIFF16=tr("16-Bit Grayscal TIFF (*.tif *.tiff16)"));
+            imageFilters<<(filtTIFFFloat=tr("Float Grayscal TIFF (*.tif *.tiff)"));
+            imageFilters<<(filtPNG=tr("Color Coded PNG (*.png)"));
+            imageFilters<<(filtBMP=tr("Color Coded BMP (*.bmp)"));
+            imageFilters<<(filtTIFF=tr("Color Coded TIFF (*.tif)"));
+            imageFilters<<(filtCSV=tr("Comma Separated Values (*.dat)"));
+
+            QString imFilter=lastImagefilter;
+
+
+            QString fileName = QFileDialog::getSaveFileName(this, dialogTitle,
+                                    lastImagepath,
+                                    imageFilters.join(";;"),&imFilter);
+
+            /*QFileDialog dialog(this, tr("Save Raw Image as ..."), lastImagepath);
+            dialog.setAcceptMode(QFileDialog::AcceptSave);
+            dialog.setNameFilters(imageFilters);
+            dialog.setNameFilter(imFilter);
+            if (dialog.exec() != QDialog::Accepted) return ;
+            imFilter = dialog.selectedNameFilter();
+            QString fileName = dialog.selectedFiles()[0];*/
+
+            if (fileName.isEmpty()) return;
+            QFile file(fileName);
+            if (!file.open(QFile::WriteOnly | QFile::Text)) {
+                QMessageBox::warning(this, tr("QuickFit SPIM Control: %1").arg(dialogTitle),
+                                  tr("Cannot write file '%1':\nreason: %2.")
+                                  .arg(fileName)
+                                  .arg(file.errorString()));
+                if (m_stopresume) m_stopresume->resume();
+                return;
+            }
+            file.close();
+            file.remove();
+            lastImagepath=QFileInfo(fileName).absolutePath();
+            lastImagefilter=imFilter;
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+
+
+            if (lastImagefilter==filtTIFF16) {
+                img.save_tiffuint16(fileName.toStdString());
+            } else if (lastImagefilter==filtTIFFFloat) {
+                img.save_tifffloat(fileName.toStdString());
+            } else if (lastImagefilter==filtCSV) {
+                img.save_csv(fileName.toStdString());
+            } else if (lastImagefilter==filtPNG) {
+                QImage imgo;
+                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+                imgo.save(fileName, "PNG");
+            } else if (lastImagefilter==filtBMP) {
+                QImage imgo;
+                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+                imgo.save(fileName, "BMP");
+            } else if (lastImagefilter==filtTIFF) {
+                QImage imgo;
+                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+                imgo.save(fileName, "TIFF");
+            } else {
+                img.save_tiffuint16(fileName.toStdString());
+            }
+            QApplication::restoreOverrideCursor();
+        }
+
+
+
+
+        void transformImage(JKImage<QFESPIMB040CameraView_internalImageType>& out, const JKImage<uint32_t>& raw);
+
 
 };
 
