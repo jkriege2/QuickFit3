@@ -735,21 +735,15 @@ void QFESPIMB040CameraView::redrawFrame() {
 
     plteFrame->set_colorMin(spinCountsLower->value());
     plteFrame->set_colorMax(spinCountsUpper->value());
-    //plteFrame->set_image(image, JKQTFP_double, image.width(), image.height());
-    //#if (QFESPIMB040CameraView_internalImageType==uint32_t)
     if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(uint32_t)) {
         plteFrame->set_image(image.data(), JKQTFP_uint32, image.width(), image.height());
-    //#elif (QFESPIMB040CameraView_internalImageType==int64_t)
     } else if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(int64_t)) {
         plteFrame->set_image(image.data(), JKQTFP_int64, image.width(), image.height());
-    //#elif (QFESPIMB040CameraView_internalImageType==double)
     } else if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(double)) {
         plteFrame->set_image(image.data(), JKQTFP_double, image.width(), image.height());
-    //#elif (QFESPIMB040CameraView_internalImageType==float)
     } else if (typeid(QFESPIMB040CameraView_internalImageType)==typeid(float)) {
         plteFrame->set_image(image.data(), JKQTFP_float, image.width(), image.height());
     }
-    //#endif
 
     pltMain->deletePlot(plteMainDistance);
     if (actMeasure->isChecked()) pltMain->addPlot(plteMainDistance);
@@ -1184,17 +1178,29 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
 
 
     if ((labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) || forceHistogram ) {
-        labImageStatisticsText=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
+        QString correlation="";
+        switch (cmbImageMode->currentIndex()) {
+            case 1:
+            case 2: correlation=tr("<tr><td>correlation =</td><td>%1</td><td></td></tr>").arg(correlationCoefficient);
+                    break;
+        }
+        labImageStatisticsText=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr>%16<tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
                         .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0, 3).c_str())
                         .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
                         .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
-                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight);
+                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight).arg(correlation);
         //labImageStatistics->setText(labImageStatisticsText);
+        correlation="";
+        switch (cmbImageMode->currentIndex()) {
+            case 1:
+            case 2: correlation=tr("correlation = |%1\n").arg(correlationCoefficient);
+                    break;
+        }
         QString s=tr(">b20|40|40\n"
                      "Image Statistics:\n"
                      "size = |%1 %18 %2|= %14 %18 %15 %16m%17\n"
-                     "broken pixels = |%3\n"
+                     "broken pixels = |%3\n%20"
                      "||\n"
                      "|# photons|count rate [kHz]\n"
                      "sum = |%4|%5\n"
@@ -1205,7 +1211,7 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
                   .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
                   .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
                   .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight)
-                  .arg(QChar(0xB5)).arg(QChar(0xB2)).arg('x').arg(QChar(0xB1));
+                  .arg(QChar(0xB5)).arg(QChar(0xB2)).arg('x').arg(QChar(0xB1)).arg(correlation);
         labImageStatistics->setData(s);
         labelUpdateTime.start();
     }
@@ -1665,18 +1671,56 @@ void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_interna
         free(dout);*/
         QFESPIMB040CameraView_internalImageType* dout=out.data();
         const uint32_t* din=raw.data();
+        register double amean=0, bmean=0;
+        /* calculate subtracted output image and grey value averages */
         for (register uint32_t i=0; i<out.width()*out.height(); i++) {
-            dout[i]=(QFESPIMB040CameraView_internalImageType)din[i]-(QFESPIMB040CameraView_internalImageType)din[i+out.width()*out.height()];
+            const QFESPIMB040CameraView_internalImageType a=din[i];
+            const QFESPIMB040CameraView_internalImageType b=din[i+out.width()*out.height()];
+            dout[i]=a-b;
+            amean+=a;
+            bmean+=b;
         }
+        amean=amean/(double)(out.width()*out.height());
+        bmean=bmean/(double)(out.width()*out.height());
+        /* calculate correlation coefficient */
+        double corr=0, vara=0, varb=0;
+        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
+            const double a=din[i];
+            const double b=din[i+out.width()*out.height()];
+            corr += (a-amean)*(b-bmean);
+            vara += (a-amean)*(a-amean);
+            varb += (b-bmean)*(b-bmean);
+        }
+        correlationCoefficient=corr/sqrt(vara*varb);
     } else if (cmbImageMode->currentIndex()==2)  {
         out.resize((uint32_t)ceil((double)raw.width()/2.0), raw.height());
         QFESPIMB040CameraView_internalImageType* dout=out.data();
         const uint32_t* din=raw.data();
+        register double amean=0, bmean=0;
+        /* calculate subtracted output image and grey value averages */
         for (register uint32_t x=0; x<out.width(); x++) {
             for (register uint32_t y=0; y<out.height(); y++) {
-                dout[y*out.width()+x]=(QFESPIMB040CameraView_internalImageType)din[y*raw.width()+x]-(QFESPIMB040CameraView_internalImageType)din[y*raw.width()+x+raw.width()/2];
+                const QFESPIMB040CameraView_internalImageType a=din[y*raw.width()+x];
+                const QFESPIMB040CameraView_internalImageType b=din[y*raw.width()+x+raw.width()/2];
+                dout[y*out.width()+x]=a-b;
+                amean+=a;
+                bmean+=b;
             }
         }
+        amean=amean/(double)(out.width()*out.height());
+        bmean=bmean/(double)(out.width()*out.height());
+        /* calculate correlation coefficient */
+        double corr=0, vara=0, varb=0;
+        for (register uint32_t x=0; x<out.width(); x++) {
+            for (register uint32_t y=0; y<out.height(); y++) {
+                const double a=din[y*raw.width()+x];
+                const double b=din[y*raw.width()+x+raw.width()/2];
+                corr += (a-amean)*(b-bmean);
+                vara += (a-amean)*(a-amean);
+                varb += (b-bmean)*(b-bmean);
+            }
+        }
+        correlationCoefficient=corr/sqrt(vara*varb);
     } else {
         out.assign(raw);
     }

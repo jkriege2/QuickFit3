@@ -363,6 +363,9 @@ class QFESPIMB040CameraView : public QWidget {
         double measureX[2];
         double measureY[2];
 
+        /** \brief image correlation coefficient */
+        double correlationCoefficient;
+
     protected slots:
         /** \brief called when the mouse moves over the image plot window */
         void imageMouseMoved(double x, double y);
