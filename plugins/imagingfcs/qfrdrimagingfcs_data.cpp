@@ -126,10 +126,23 @@ bool QFRDRImagingFCSData::loadOverview(QString filename) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            //qDebug()<<nx<<ny;
-            if (nx*ny>=width*height) {
-                ok=TIFFReadFrame<uint16_t>(tif, overview);
+            uint16_t* ovw=(uint16_t*)malloc(nx*ny*sizeof(uint16_t));
+            ok=TIFFReadFrame<uint16_t>(tif, ovw);
+
+            qDebug()<<"TIFF: "<<nx<<"x"<<ny<<"    data: "<<width<<"x"<<height;
+
+            if (width*height<=nx*ny) {
+                for (uint32_t y=0; y<height; y++) {
+                    for (uint32_t x=0; x<width; x++) {
+                        overview[y*width+x]=ovw[y*nx+x];
+                    }
+
+                }
+            } else {
+                ok=false;
             }
+
+            free(ovw);
             TIFFClose(tif);
         }
     }
@@ -289,9 +302,9 @@ bool QFRDRImagingFCSData::loadRadhard2File(QString filename) {
                     uint32_t channel0=*hwc_value & 0xFFFFFFFFU;
                     uint32_t count_global=hwc_dump[correlator][126];
                     uint32_t count_local=hwc_dump[correlator][127];
-unsigned int blocks=14;
-unsigned int lags=8;
-unsigned int steps=blocks*lags;
+                    unsigned int blocks=14;
+                    unsigned int lags=8;
+                    unsigned int steps=blocks*lags;
                     for(unsigned int block=0;block<blocks;block++)
                     {
 

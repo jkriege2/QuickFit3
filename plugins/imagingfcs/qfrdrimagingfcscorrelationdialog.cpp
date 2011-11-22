@@ -249,6 +249,9 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -277,6 +280,9 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinXLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value()).toInt());
     ui->spinYFirst->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value()).toInt());
     ui->spinYLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value()).toInt());
+    ui->spinDistanceCCFDeltaX->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value()).toInt());
+    ui->spinDistanceCCFDeltaY->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value()).toInt());
+    ui->chkDistanceCCD->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked()).toBool());
 
 }
 
@@ -371,6 +377,9 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.crop_x1=ui->spinXLast->value();
     job.crop_y0=ui->spinYFirst->value();
     job.crop_y1=ui->spinYLast->value();
+    job.distanceCCF=ui->chkDistanceCCD->isChecked();
+    job.DCCFDeltaX=ui->spinDistanceCCFDeltaX->value();
+    job.DCCFDeltaY=ui->spinDistanceCCFDeltaY->value();
     writeSettings();
 
     setEditControlsEnabled(false);
@@ -409,6 +418,8 @@ void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
     ui->spinXLast->setMaximum(image_width-1);
     ui->spinYFirst->setMaximum(image_height-1);
     ui->spinYLast->setMaximum(image_height-1);
+    ui->spinDistanceCCFDeltaX->setRange(-1*image_width, image_width);
+    ui->spinDistanceCCFDeltaY->setRange(-1*image_height, image_height);
 
     if (ui->chkCrop->isChecked()) {
         w=fabs(ui->spinXLast->value()-ui->spinXFirst->value());

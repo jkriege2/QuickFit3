@@ -825,7 +825,7 @@
               <string>CCF to 4 neighbors</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -893,7 +893,90 @@
            </item>
           </layout>
          </item>
-         <item row="8" column="0">
+         <item row="8" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <item>
+            <widget class="QCheckBox" name="chkDistanceCCD">
+             <property name="text">
+              <string>CCF to distant &amp;pixel</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_31">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_33">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>&amp;Delta;x=</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinDistanceCCFDeltaX">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_38">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>&amp;Delta;y=</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinDistanceCCFDeltaY">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_33">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="9" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -903,7 +986,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="9" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1081,7 +1164,7 @@
            </item>
           </layout>
          </item>
-         <item row="9" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="label_27">
            <property name="text">
             <string>&amp;statistics:</string>
@@ -1091,7 +1174,7 @@
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="10" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="QLabel" name="label_29">
@@ -1167,7 +1250,7 @@
            </item>
           </layout>
          </item>
-         <item row="10" column="0">
+         <item row="11" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
             <string>&amp;video:</string>
@@ -1177,7 +1260,7 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="1">
+         <item row="11" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QCheckBox" name="chkVideo">
@@ -1276,14 +1359,14 @@
            </item>
           </layout>
          </item>
-         <item row="11" column="1">
+         <item row="12" column="1">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="12" column="0">
+         <item row="13" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -1293,7 +1376,7 @@
            </property>
           </widget>
          </item>
-         <item row="12" column="1">
+         <item row="13" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -1470,7 +1553,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>838</width>
-           <height>113</height>
+           <height>85</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1625,11 +1708,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>265</x>
-     <y>390</y>
+     <y>418</y>
     </hint>
     <hint type="destinationlabel">
      <x>437</x>
-     <y>392</y>
+     <y>420</y>
     </hint>
    </hints>
   </connection>
@@ -1641,11 +1724,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>265</x>
-     <y>390</y>
+     <y>418</y>
     </hint>
     <hint type="destinationlabel">
      <x>506</x>
-     <y>392</y>
+     <y>420</y>
     </hint>
    </hints>
   </connection>
@@ -1742,6 +1825,70 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>507</x>
      <y>692</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDistanceCCD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_33</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>298</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>363</x>
+     <y>296</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDistanceCCD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinDistanceCCFDeltaX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>298</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>409</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDistanceCCD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_38</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>295</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>437</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDistanceCCD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinDistanceCCFDeltaY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>217</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>480</x>
+     <y>295</y>
     </hint>
    </hints>
   </connection>

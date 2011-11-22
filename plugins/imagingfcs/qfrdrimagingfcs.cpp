@@ -83,7 +83,7 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
 void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
         // file format to import
-        QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat; *.crosscorrelation.dat)");
+        QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat *.crosscorrelation.dat *.dccf.dat)");
         QString format_Radhard2=tr("SPAD array Correlations (*.dat)");
         QStringList formats;
         formats<<format_videoCorrelator<<format_Radhard2;
@@ -119,6 +119,18 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 if (!QFile::exists(overview)) {
                     overview=filename;
                     overview=overview.replace(".crosscorrelation.dat", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".dccf.dat", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".ccf.dat", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".acf.dat", ".overview.tif");
                 }
                 if (!QFile::exists(overview)) overview="";
                 insertVideoCorrelatorFile(filename, overview);
@@ -168,6 +180,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     QString evalFilename="";
     QString evalFilename1="";
     bool isCross=false;
+    bool isDCCF=false;
     if (filename.endsWith(".autocorrelation.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".autocorrelation.dat", ".evalsettings.txt");
@@ -179,6 +192,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename1=filename;
         evalFilename1=evalFilename1.replace(".crosscorrelation.dat", ".configuration.ini");
         isCross=true;
+    } else if (filename.endsWith(".dccf.dat")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".dccf.dat", ".evalsettings.txt");
+        evalFilename1=filename;
+        evalFilename1=evalFilename1.replace(".dccf.dat", ".configuration.ini");
+        isDCCF=true;
     }
 
     if (QFile::exists(filename)) {
@@ -196,17 +215,41 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         QString name=reg.cap(1).toLower().trimmed();
                         QString value=reg.cap(3);
 
+                        //qDebug()<<name <<"  =  "<<value;
+
                         if (name=="width") {
-                            initParams["WIDTH"]=value.toInt();
-                            width=value.toInt();
-                            paramsReadonly<<"WIDTH";
+                            if (!isDCCF) {
+                                initParams["WIDTH"]=value.toInt();
+                                width=value.toInt();
+                                paramsReadonly<<"WIDTH";
+                            }
                         } else if (name=="height") {
-                            initParams["HEIGHT"]=value.toInt();
-                            height=value.toInt();
-                            paramsReadonly<<"HEIGHT";
+                            if (!isDCCF) {
+                                initParams["HEIGHT"]=value.toInt();
+                                height=value.toInt();
+                                paramsReadonly<<"HEIGHT";
+                            }
+                         } else if (name=="dccf frame width") {
+                            if (isDCCF) {
+                                initParams["WIDTH"]=value.toInt();
+                                width=value.toInt();
+                                paramsReadonly<<"WIDTH";
+                            }
+                        } else if (name=="dccf frame height") {
+                            if (isDCCF) {
+                                initParams["HEIGHT"]=value.toInt();
+                                height=value.toInt();
+                                paramsReadonly<<"HEIGHT";
+                            }
                         } else if (name=="reading frame count") {
                             initParams["FRAME_COUNT"]=value.toInt();
                             paramsReadonly<<"FRAME_COUNT";
+                        } else if (name=="DCCF Delta x") {
+                            initParams["DCCF_DELTAX"]=value.toInt();
+                            paramsReadonly<<"DCCF_DELTAX";
+                        } else if (name=="DCCF Delta y") {
+                            initParams["DCCF_DELTAY"]=value.toInt();
+                            paramsReadonly<<"DCCF_DELTAY";
                         } else if (name=="frame count") {
                             initParams["FRAME_COUNT"]=value.toInt();
                             paramsReadonly<<"FRAME_COUNT";
@@ -269,7 +312,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             initParams["HEIGHT"]=height;
             initParams["TAU_COLUMN"]=0;
             int columns=checkColumns(filename);
-            if (!isCross) {
+            if (!isCross && !isDCCF) {
                 initParams["CORRELATION_COLUMN"]=1;
                 QStringList files, files_types;
                 files<<filename;
@@ -287,7 +330,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
                     project->deleteRawData(e->getID());
                 }
-            } else {
+            } else if (isCross) {
 
                 for (int c=1; c<=qMin(4,columns); c++) {
                     initParams["CORRELATION_COLUMN"]=c;
@@ -306,6 +349,24 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
                         project->deleteRawData(e->getID());
                     }
+                }
+            } else if (isDCCF) {
+
+                initParams["CORRELATION_COLUMN"]=1;
+                QStringList files, files_types;
+                files<<filename;
+                files_types<<"dccf";
+                if (QFile::exists(filename_overview)) {
+                    files<<filename_overview;
+                    files_types<<"overview";
+                }
+                if (columns>2) initParams["CORRELATION_ERROR_COLUMN"]=2;
+                // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - DCCF"), files, initParams, paramsReadonly, files_types);
+                if (e->error()) { // when an error occured: remove record and output an error message
+                    QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+                    services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+                    project->deleteRawData(e->getID());
                 }
             }
 
@@ -327,7 +388,7 @@ void QFRDRImagingFCSPlugin::insertRadhard2File(const QString& filename) {
     QStringList paramsReadonly;
     paramsReadonly<<"FILETYPE";
 
-    bool ok=true;
+    //bool ok=true;
 
 
 

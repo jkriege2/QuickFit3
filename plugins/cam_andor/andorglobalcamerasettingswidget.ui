@@ -239,12 +239,12 @@ switching off</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>407</x>
-     <y>120</y>
+     <x>511</x>
+     <y>119</y>
     </hint>
     <hint type="destinationlabel">
-     <x>197</x>
-     <y>180</y>
+     <x>161</x>
+     <y>181</y>
     </hint>
    </hints>
   </connection>
@@ -252,7 +252,7 @@ switching off</string>
    <sender>chkCooling</sender>
    <signal>toggled(bool)</signal>
    <receiver>label_3</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>327</x>
@@ -287,8 +287,8 @@ switching off</string>
    <slot>valuesChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>197</x>
-     <y>178</y>
+     <x>161</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>58</x>

@@ -36,6 +36,7 @@ double QFRDRImagingFCSCorrelationJobThread::durationS() const {
 QStringList QFRDRImagingFCSCorrelationJobThread::getAddFiles() const {
     return addFiles;
 }
+
 Job QFRDRImagingFCSCorrelationJobThread::getJob() const {
     return job;
 }
@@ -159,7 +160,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
     } else {
         m_status=1;
         emit statusChanged(m_status);
-        emit rangeChanged(0,3130);
+        emit rangeChanged(0,4280);
 
 
         reader=NULL;
@@ -169,7 +170,6 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
         }
         if (reader) {
             emit messageChanged(tr("opening %1 file ...").arg(reader->formatName()));
-            emit progressIncrement(10);
             OK=reader->open(job.filename);
             if (!OK) {
                 m_status=-1; emit statusChanged(m_status);
@@ -178,7 +178,6 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
             } else {
                 emit progressIncrement(10);
                 emit messageChanged(tr("counting frames ..."));
-                emit progressIncrement(10);
                 reader->setBinning(job.binning);
                 if (job.use_cropping) {
                     reader->setCropping(job.crop_x0, job.crop_x1, job.crop_y0, job.crop_y1);
@@ -212,6 +211,12 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     ccf3_std=NULL;
                     ccf4_std=NULL;
                     ccf_N=0;
+                    dccf_tau=NULL;
+                    dccf=NULL;
+                    dccf_std=NULL;
+                    dccf_N=0;
+                    dccfframe_width=0;
+                    dccfframe_height=0;
 
                     video_count=floor(frames/job.video_frames);
                     real_video_count=video_count;
@@ -236,6 +241,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString statisticsFilename="";
                     QString acfFilename="";
                     QString ccfFilename="";
+                    QString dccfFilename="";
                     QString localFileDirectory=QFileInfo(d.absoluteFilePath(configFilename)).dir().absolutePath();
                     if (d.mkpath(localFileDirectory)) {
 
@@ -331,12 +337,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                         img[i]=(uint16_t)round((float)(video[c*frame_width*frame_height+i]-avgMin)*(float)0xFFFF/fabs(avgMax-avgMin));
                                     }
                                     TinyTIFFWriter_writeImage(tif, img);
-                                    if (c%5==0) {
-                                        emit messageChanged(tr("saving video %1/%2...").arg(c+1).arg(video_count));
-                                        if (real_video_count<500) emit progressIncrement(5*500/real_video_count);
-                                        else if (c%(real_video_count/500)==0) emit progressIncrement(5);
+                                    if (real_video_count/10>0) {
+                                        if (c%(real_video_count/10)==0) {
+                                            emit messageChanged(tr("saving video %1/%2...").arg(c+1).arg(video_count));
+                                            progressIncrement(10);
+                                        }
                                     }
                                 }
+                                if (real_video_count/10<=0) progressIncrement(100);
                                 free(img);
                                 TinyTIFFWriter_close(tif);
                             } else {
@@ -344,8 +352,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 emit messageChanged(tr("could not create video '%1'!").arg(localFilename));
                             }
 
-                        }
-                        emit progressIncrement(50);
+                        } else emit progressIncrement(100);
 
                         //************** SAVE STATISTICS
                         if ((m_status==1) && !was_canceled && job.statistics) {
@@ -399,6 +406,36 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         emit progressIncrement(10);
 
 
+                        //************** SAVE DCCF
+                        if ((m_status==1) && !was_canceled && job.distanceCCF && dccf && dccf_tau && dccf_N>0) {
+                            QString localFilename=dccfFilename=outputFilenameBase+".dccf.dat";
+                            QFile f(localFilename);
+                            if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&f);
+                                text.setLocale(outLocale);
+                                emit messageChanged(tr("saving distance crosscorrelation ..."));
+
+                                for (register uint32_t p=0; p<(frame_width-abs(job.DCCFDeltaX))*(frame_height-abs(job.DCCFDeltaY)); p++) {
+                                    for (register uint32_t i=0; i<dccf_N; i++) {
+                                        if (dccf_tau[i]<input_length)  {
+                                            text<<dccf_tau[i]<<", "<<dccf[p*dccf_N+i]-1.0;
+                                            if (dccf_std) text<<", "<<dccf_std[p*dccf_N+i];
+                                            text<<"\n";
+                                        } else break;
+                                    }
+                                    text<<"\n\n";
+                                }
+                                addFiles.append(localFilename);
+                                f.close();
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create distance crosscorrelation file '%1': %2!").arg(localFilename).arg(f.errorString()));
+                            }
+
+                        }
+                        emit progressIncrement(10);
+
+
                         //************** SAVE CCF
                         if ((m_status==1) && !was_canceled && job.ccf && ccf_tau && ccf1 && ccf2 && ccf3 && ccf4 && ccf_N>0) {
                             QString localFilename=ccfFilename=outputFilenameBase+".crosscorrelation.dat";
@@ -446,6 +483,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << statisticsFilename << "\n";
                                 if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << acfFilename << "\n";
                                 if (!ccfFilename.isEmpty())             text<<"crosscorrelation file       : " << ccfFilename << "\n";
+                                if (!ccfFilename.isEmpty())             text<<"distance ccf file           : " << dccfFilename << "\n";
                                 text<<"width                       : "<<outLocale.toString(frame_width) << "\n";
                                 text<<"height                      : "<<outLocale.toString(frame_height) << "\n";
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
@@ -471,6 +509,13 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 }
                                 if (job.statistics) {
                                     text<<"statistics over             : "<<outLocale.toString(job.statistics_frames) << "\n";
+                                }
+                                if (job.distanceCCF) {
+                                    text<<"DCCF Delta x                : "<<outLocale.toString(job.DCCFDeltaX) << "\n";
+                                    text<<"DCCF Delta y                : "<<outLocale.toString(job.DCCFDeltaY) << "\n";
+                                    text<<"DCCF frame width            : "<<outLocale.toString(dccfframe_width) << "\n";
+                                    text<<"DCCF frame height           : "<<outLocale.toString(dccfframe_height) << "\n";
+
                                 }
                                 text<<"duration [s]                : "<<ptime.elapsed()/1000.0 << "\n";
 
@@ -501,6 +546,9 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     if (ccf2_std) free(ccf2_std);
                     if (ccf3_std) free(ccf3_std);
                     if (ccf4_std) free(ccf4_std);
+                    if (dccf_tau) free(dccf_tau);
+                    if (dccf) free(dccf);
+                    if (dccf_std) free(dccf_std);
                     if (m_status==1) {
                         if (was_canceled) {
                             m_status=-1; emit statusChanged(m_status);
@@ -606,15 +654,20 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         frames_min=(frame_min<frames_min)?frame_min:frames_min;
                         frames_max=(frame_max>frames_max)?frame_max:frames_max;
                     }
-                    if (frames<500) {
-                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
-                    } else if ((frames/500==0) || (frame%(frames/500)==0)) {
-                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(2);
+                    /*if (frames<1000) {
+                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1000/frames);
+                    } else if ((frames/1000==0) || (frame%(frames/1000)==0)) {
+                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1);
+                    }*/
+                    if ((frames/500>0) && (frame%(frames/500)==0)) {
+                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames));
+                        emit progressIncrement(1);
                     }
                 }
                 frame++;
                 if (was_canceled) break;
             } while (reader->nextFrame() && (m_status==1) && (frame<frames));
+            if (frames/500<=0) emit progressIncrement(500);
 
         }
         free(frame_data);
@@ -740,7 +793,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 acf_std=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
             }
             acf_tau=(double*)calloc(acf_N,sizeof(double));
-            long* acf_t=(long*)calloc(acf_N*frame_width*frame_height,sizeof(long));
+            long* acf_t=(long*)calloc(acf_N,sizeof(long));
             statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
             for (uint32_t p=0; p<frame_width*frame_height; p++) {
                 if (job.segments<=1) {
@@ -772,9 +825,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     free(sum2);
                 }
                 if (m_status==1 && !was_canceled) {
-                    if (frame_width*frame_height<500) {
-                        emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(500/frame_width*frame_height);
-                    } else if (p%(frame_width*frame_height/500)==0) {
+                    if (frame_width*frame_height<1000) {
+                        emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1000/(frame_width*frame_height));
+                    } else if (p%(frame_width*frame_height/1000)==0) {
                         emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1);
                     }
 
@@ -786,6 +839,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 acf_tau[i]=(double)acf_t[i]*job.frameTime;
             }
             free(acf_t);
+        } else {
+            emit progressIncrement(1000);
         }
 
     }
@@ -814,7 +869,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 ccf4_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
             }
             ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-            long* ccf_t=(long*)calloc(ccf_N*frame_width*frame_height,sizeof(long));
+            long* ccf_t=(long*)calloc(ccf_N,sizeof(long));
             statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
             for (uint32_t p=0; p<frame_width*frame_height; p++) {
 
@@ -890,9 +945,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 }
 
                 if (m_status==1 && !was_canceled) {
-                    if (frame_width*frame_height<500) {
-                        emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(500/frame_width*frame_height);
-                    } else if (p%(frame_width*frame_height/500)==0) {
+                    if (frame_width*frame_height<1000) {
+                        emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1000/(frame_width*frame_height));
+                    } else if (p%(frame_width*frame_height/1000)==0) {
                         emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1);
                     }
 
@@ -900,12 +955,100 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     break;
                 }
             }
-            for (uint32_t i=0; i<acf_N; i++) {
+            for (uint32_t i=0; i<ccf_N; i++) {
                 ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
             }
             free(ccf_t);
+        } else {
+            emit progressIncrement(1000);
         }
     }
+
+
+
+
+    if (m_status==1 && !was_canceled) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CALCULATE THE DCCFs
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (job.distanceCCF && job.correlator==0) {
+            emit messageChanged(tr("calculating distance crosscorrelations ..."));
+
+            dccfframe_width=frame_width-abs(job.DCCFDeltaX);
+            dccfframe_height=frame_height-abs(job.DCCFDeltaY);
+
+            dccf_N=job.S*job.P;
+            dccf=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
+            for (uint32_t nn=0; nn<dccf_N*dccfframe_width*dccfframe_height; nn++) {
+                dccf[nn]=1.0;
+            }
+            if (job.segments>1) {
+                dccf_std=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
+            }
+            dccf_tau=(double*)calloc(dccf_N,sizeof(double));
+            long* dccf_t=(long*)calloc(dccf_N,sizeof(long));
+            statisticsAutocorrelateCreateMultiTau(dccf_t, job.S, job.m, job.P);
+            int32_t corrcount=0;
+            for (int32_t x=0; x<dccfframe_width; x++) {
+                for (int32_t y=0; y<dccfframe_height; y++) {
+                    const int32_t p=y*frame_width+x;
+                    const int32_t x1=x+job.DCCFDeltaX;
+                    const int32_t y1=y+job.DCCFDeltaY;
+                    const int32_t p1=y1*frame_width+x1;
+                    if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
+                        if (job.segments<=1) {
+                            statisticsCrosscorrelateMultiTauSymmetric(&(dccf[p*dccf_N]), &(image_series[p]), &(image_series[p1]), frames, dccf_t, dccf_N, frame_width*frame_height);
+                        } else {
+                            uint32_t segment_frames=frames/job.segments;
+                            double* cftemp=(double*)calloc(dccf_N,sizeof(double));
+                            double* sum=(double*)calloc(dccf_N,sizeof(double));
+                            double* sum2=(double*)calloc(dccf_N,sizeof(double));
+                            for (register uint32_t ct=0; ct<dccf_N; ct++) {
+                                sum[ct]=0;
+                                sum2[ct]=0;
+                            }
+                            for (int32_t seg=0; seg<job.segments; seg++) {
+                                for (register uint32_t ct=0; ct<dccf_N; ct++) cftemp[ct]=0;
+                                statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[0*dccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p1]), segment_frames, dccf_t, dccf_N, frame_width*frame_height);
+                                for (register uint32_t ct=0; ct<dccf_N; ct++) {
+                                    sum[0*dccf_N+ct]  += cftemp[0*dccf_N+ct];
+                                    sum2[0*dccf_N+ct] += cftemp[0*dccf_N+ct]*cftemp[0*dccf_N+ct];
+                                }
+                            }
+                            free(cftemp);
+                            double segs=job.segments;
+                            for (register uint32_t ct=0; ct<dccf_N; ct++) {
+                                dccf[p*dccf_N+ct]=sum[0*dccf_N+ct]/segs;
+                                dccf_std[p*dccf_N+ct]=sqrt((sum2[0*dccf_N+ct]-sum[0*dccf_N+ct]*sum[0*dccf_N+ct]/segs)/(segs-1.0));
+                            }
+                            free(sum);
+                            free(sum2);
+                        }
+
+                        if (m_status==1 && !was_canceled) {
+                            if (frame_width*frame_height<1000) {
+                                emit messageChanged(tr("calculating distance crosscorrelations (%1/%2)...").arg(corrcount+1).arg(dccfframe_width*dccfframe_height)); emit progressIncrement(1000/(dccfframe_width*dccfframe_height));
+                            } else if (corrcount%(frame_width*frame_height/1000)==0) {
+                                emit messageChanged(tr("calculating distance crosscorrelations (%1/%2)...").arg(corrcount+1).arg(dccfframe_width*dccfframe_height)); emit progressIncrement(1);
+                            }
+                            corrcount++;
+
+                        } else {
+                            break;
+                        }
+                    }
+
+                }
+            }
+            for (uint32_t i=0; i<dccf_N; i++) {
+                dccf_tau[i]=(double)dccf_t[i]*job.frameTime;
+            }
+            free(dccf_t);
+        } else {
+            emit progressIncrement(1000);
+        }
+    }
+
 
     if (image_series) free(image_series);
     image_series=NULL;
@@ -1317,9 +1460,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 }
             }
 
-            if (frames<1000) {
-                emit messageChanged(tr("calculating correlations (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1000/frames);
-            } else if (frame%(frames/1000)==0) {
+            if (frames<2000) {
+                emit messageChanged(tr("calculating correlations (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(2000/frames);
+            } else if (frame%(frames/2000)==0) {
                 emit messageChanged(tr("calculating correlations (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1);
             }
             frame++;
@@ -1471,7 +1614,6 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
             }
             if (reader) {
                 emit messageChanged(tr("opening %1 background file ...").arg(reader->formatName()));
-                emit progressIncrement(10);
                 OK=reader->open(job.filenameBackground);
                 if (!OK) {
                     m_status=-1; emit statusChanged(m_status);
@@ -1484,9 +1626,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                     } else {
                         reader->unsetCropping();
                     }
-                    emit progressIncrement(10);
                     emit messageChanged(tr("reading frames in background file ..."));
-                    emit progressIncrement(10);
                     uint16_t bframe_width=reader->frameWidth();
                     uint16_t bframe_height=reader->frameHeight();
 
@@ -1532,6 +1672,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
         }
     }
 
+    emit progressIncrement(100);
 
 }
 
