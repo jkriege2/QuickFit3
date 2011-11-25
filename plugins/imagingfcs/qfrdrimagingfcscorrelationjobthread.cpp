@@ -10,9 +10,12 @@
 #include <stdint.h>
 #include "tinytiffwriter.h"
 
+QMutex* QFRDRImagingFCSCorrelationJobThread::mutexFilename=NULL;
+
 QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QObject *parent) :
     QThread(parent)
 {
+    if (!mutexFilename) mutexFilename=new QMutex();
     outLocale=QLocale::c();
     outLocale.setNumberOptions(QLocale::OmitGroupSeparator);
     m_status=0;
@@ -228,6 +231,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     QDir d=QFileInfo(job.filename).dir();
 
+                    if (mutexFilename) mutexFilename->lock();
                     int counter=-1;
                     do {
                         outputFilenameBase=d.absoluteFilePath(replacePostfixSpecials(job.prefix)+QFileInfo(job.filename).completeBaseName()+replacePostfixSpecials(job.postfix, counter));
@@ -243,7 +247,16 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString ccfFilename="";
                     QString dccfFilename="";
                     QString localFileDirectory=QFileInfo(d.absoluteFilePath(configFilename)).dir().absolutePath();
+
                     if (d.mkpath(localFileDirectory)) {
+                        ////////////////////////////////////////////////////////////////////////////////////////////
+                        // TOUCH OUTPUT FILE (.evalsettings.txt)
+                        ////////////////////////////////////////////////////////////////////////////////////////////
+
+                        touchFile(configFilename);
+
+                        if (mutexFilename) mutexFilename->unlock();
+
 
 
 
@@ -415,7 +428,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text.setLocale(outLocale);
                                 emit messageChanged(tr("saving distance crosscorrelation ..."));
 
-                                for (register uint32_t p=0; p<(frame_width-abs(job.DCCFDeltaX))*(frame_height-abs(job.DCCFDeltaY)); p++) {
+                                for (register uint32_t p=0; p<dccfframe_width*dccfframe_height; p++) {
                                     for (register uint32_t i=0; i<dccf_N; i++) {
                                         if (dccf_tau[i]<input_length)  {
                                             text<<dccf_tau[i]<<", "<<dccf[p*dccf_N+i]-1.0;
@@ -528,6 +541,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(10);
                     } else {
+                        if (mutexFilename) mutexFilename->unlock();
                         m_status=-1; emit statusChanged(m_status);
                         emit messageChanged(tr("could not create output subdirectory '%1' in '%2'!").arg(localFileDirectory).arg(d.absolutePath()));
                     }
@@ -606,8 +620,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         }
         msleep(50);
     }
-    for (register uint64_t i=0; i<(frames+2)*frame_width*frame_height; i++) {
-        image_series[i]=0;
+    if (image_series) {
+        for (register uint64_t i=0; i<(frames+2)*frame_width*frame_height; i++) {
+            image_series[i]=0;
+        }
     }
 
 
@@ -989,8 +1005,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             long* dccf_t=(long*)calloc(dccf_N,sizeof(long));
             statisticsAutocorrelateCreateMultiTau(dccf_t, job.S, job.m, job.P);
             int32_t corrcount=0;
-            for (int32_t x=0; x<dccfframe_width; x++) {
-                for (int32_t y=0; y<dccfframe_height; y++) {
+            for (uint32_t x=0; x<dccfframe_width; x++) {
+                for (uint32_t y=0; y<dccfframe_height; y++) {
                     const int32_t p=y*frame_width+x;
                     const int32_t x1=x+job.DCCFDeltaX;
                     const int32_t y1=y+job.DCCFDeltaY;
@@ -1060,12 +1076,14 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     QList<MultiTauCorrelator<double, double>* > ccf2jk;
     QList<MultiTauCorrelator<double, double>* > ccf3jk;
     QList<MultiTauCorrelator<double, double>* > ccf4jk;
+    QList<MultiTauCorrelator<double, double>* > dccfjk;
 
     QList<correlatorjb<double, double>* > acfjb;
     QList<correlatorjb<double, double>* > ccf1jb;
     QList<correlatorjb<double, double>* > ccf2jb;
     QList<correlatorjb<double, double>* > ccf3jb;
     QList<correlatorjb<double, double>* > ccf4jb;
+    QList<correlatorjb<double, double>* > dccfjb;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // AS NOT ENOUGH MEMORY MAY BE AVAILABLE; WE WAIT HERE UNTIL ENOUGH MEMORY IS AVAILABLE AND MAY BE ALLOCATED
@@ -1073,21 +1091,47 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     emit messageChanged(tr("allocating memory ..."));
     frames_min=0;
     frames_max=0;
+    if (job.distanceCCF) {
+        dccfframe_width=frame_width-abs(job.DCCFDeltaX);
+        dccfframe_height=frame_height-abs(job.DCCFDeltaY);
+    }
     if (job.correlator==1) {
-        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-            acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            ccf1jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            ccf2jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            ccf3jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            ccf4jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+        if (job.acf) {
+            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+            }
+        }
+        if (job.ccf) {
+            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                ccf1jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+                ccf2jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+                ccf3jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+                ccf4jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+            }
+        }
+        if (job.distanceCCF) {
+            for (register uint32_t i=0; i<dccfframe_width*dccfframe_height; i++) {
+                dccfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+            }
         }
     } else {
-        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-            acfjb.append(new correlatorjb<double, double>(job.S, job.P));
-            ccf1jb.append(new correlatorjb<double, double>(job.S, job.P));
-            ccf2jb.append(new correlatorjb<double, double>(job.S, job.P));
-            ccf3jb.append(new correlatorjb<double, double>(job.S, job.P));
-            ccf4jb.append(new correlatorjb<double, double>(job.S, job.P));
+        if (job.acf) {
+            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                acfjb.append(new correlatorjb<double, double>(job.S, job.P));
+            }
+        }
+        if (job.ccf) {
+            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                ccf1jb.append(new correlatorjb<double, double>(job.S, job.P));
+                ccf2jb.append(new correlatorjb<double, double>(job.S, job.P));
+                ccf3jb.append(new correlatorjb<double, double>(job.S, job.P));
+                ccf4jb.append(new correlatorjb<double, double>(job.S, job.P));
+            }
+        }
+        if (job.distanceCCF) {
+            for (register uint32_t i=0; i<dccfframe_width*dccfframe_height; i++) {
+                dccfjb.append(new correlatorjb<double, double>(job.S, job.P));
+            }
         }
     }
 
@@ -1149,7 +1193,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CALCULATE THE ACFs AND CCFs
+    // CALCULATE THE ACFs, CCFs AND DCCFs
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!was_canceled && m_status==1) {
         emit messageChanged(tr("preparing correlations ..."));
@@ -1227,8 +1271,42 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     }
                 } else {
                     double** corr1=ccf1jb[0]->get_array_G();
-                    for (uint32_t tt=0; tt<acf_N; tt++) {
+                    for (uint32_t tt=0; tt<ccf_N; tt++) {
                         ccf_tau[tt]=job.frameTime*corr1[0][tt];
+                    }
+                    free(corr1[0]);
+                    free(corr1[1]);
+                }
+            }
+        }
+
+        dccf_N=0;
+        if (job.distanceCCF) {
+            if (job.correlator==1) {
+                dccf_N=dccfjk[0]->getSlots();
+            } else {
+                dccf_N=job.S*job.P;
+            }
+
+            if (dccf_N>0) {
+                dccf=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
+                for (uint32_t nn=0; nn<dccf_N*dccfframe_width*dccfframe_height; nn++) {
+                    dccf[nn]=0.0;
+                }
+                dccf_std=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
+                for (uint32_t nn=0; nn<dccf_N*dccfframe_width*dccfframe_height; nn++) {
+                    dccf_std[nn]=0.0;
+                }
+                dccf_tau=(double*)calloc(dccf_N,sizeof(double));
+                if (job.correlator==1) {
+                    double* tau=dccfjk[0]->getCorTau();
+                    for (uint32_t tt=0; tt<dccf_N; tt++) {
+                        dccf_tau[tt]=tau[tt];
+                    }
+                } else {
+                    double** corr1=dccfjb[0]->get_array_G();
+                    for (uint32_t tt=0; tt<dccf_N; tt++) {
+                        dccf_tau[tt]=job.frameTime*corr1[0][tt];
                     }
                     free(corr1[0]);
                     free(corr1[1]);
@@ -1372,10 +1450,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 if (job.ccf && ccf_N>0) {
                     if (job.correlator==1) {
                         for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                            if ((int32_t)i-1>=0) ccf1jk[i]->crosscorrelate_step(frame_data[i], frame_data[i]-1);
-                            if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jk[i]->crosscorrelate_step(frame_data[i], frame_data[i]+1);
-                            if ((int32_t)i-(int32_t)frame_width>=0)  ccf3jk[i]->crosscorrelate_step(frame_data[i], frame_data[i]-frame_width);
-                            if ((int32_t)i+(int32_t)frame_width<(int32_t)(frame_width*frame_height))  ccf4jk[i]->crosscorrelate_step(frame_data[i], frame_data[i]+frame_width);
+                            if ((int32_t)i-1>=0) ccf1jk[i]->crosscorrelate_step(frame_data[i], frame_data[i-1]);
+                            if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jk[i]->crosscorrelate_step(frame_data[i], frame_data[i+1]);
+                            if ((int32_t)i-(int32_t)frame_width>=0)  ccf3jk[i]->crosscorrelate_step(frame_data[i], frame_data[i-frame_width]);
+                            if ((int32_t)i+(int32_t)frame_width<(int32_t)(frame_width*frame_height))  ccf4jk[i]->crosscorrelate_step(frame_data[i], frame_data[i+frame_width]);
 
 
 
@@ -1415,10 +1493,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                         }
                     } else {
                         for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                            if ((int32_t)i-1>=0) ccf1jb[i]->run(frame_data[i], frame_data[i]-1);
-                            if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jb[i]->run(frame_data[i], frame_data[i]+1);
-                            if ((int32_t)i-(int32_t)frame_width>=0)  ccf3jb[i]->run(frame_data[i], frame_data[i]-frame_width);
-                            if ((int32_t)i+(int32_t)frame_width<(int32_t)(frame_width*frame_height))  ccf4jb[i]->run(frame_data[i], frame_data[i]+frame_width);
+                            if ((int32_t)i-1>=0) ccf1jb[i]->run(frame_data[i], frame_data[i-1]);
+                            if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jb[i]->run(frame_data[i], frame_data[i+1]);
+                            if ((int32_t)i-(int32_t)frame_width>=0)  ccf3jb[i]->run(frame_data[i], frame_data[i-frame_width]);
+                            if ((int32_t)i+(int32_t)frame_width<(int32_t)(frame_width*frame_height))  ccf4jb[i]->run(frame_data[i], frame_data[i+frame_width]);
 
 
 
@@ -1428,19 +1506,19 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                                 double** corr2=ccf2jb[i]->get_array_G();
                                 double** corr3=ccf3jb[i]->get_array_G();
                                 double** corr4=ccf4jb[i]->get_array_G();
-                                for (register uint32_t tt=0; tt<acf_N; tt++) {
+                                for (register uint32_t tt=0; tt<ccf_N; tt++) {
                                     register double v=corr1[1][tt];
-                                    ccf1[i*acf_N+tt]=ccf1[i*acf_N+tt]+v;
-                                    ccf1_std[i*acf_N+tt]=ccf1_std[i*acf_N+tt]+v*v;
+                                    ccf1[i*ccf_N+tt]=ccf1[i*ccf_N+tt]+v;
+                                    ccf1_std[i*ccf_N+tt]=ccf1_std[i*ccf_N+tt]+v*v;
                                     v=corr2[1][tt];
-                                    ccf2[i*acf_N+tt]=ccf2[i*acf_N+tt]+v;
-                                    ccf2_std[i*acf_N+tt]=ccf2_std[i*acf_N+tt]+v*v;
+                                    ccf2[i*ccf_N+tt]=ccf2[i*ccf_N+tt]+v;
+                                    ccf2_std[i*ccf_N+tt]=ccf2_std[i*ccf_N+tt]+v*v;
                                     v=corr3[1][tt];
-                                    ccf3[i*acf_N+tt]=ccf3[i*acf_N+tt]+v;
-                                    ccf3_std[i*acf_N+tt]=ccf3_std[i*acf_N+tt]+v*v;
+                                    ccf3[i*ccf_N+tt]=ccf3[i*ccf_N+tt]+v;
+                                    ccf3_std[i*ccf_N+tt]=ccf3_std[i*ccf_N+tt]+v*v;
                                     v=corr4[1][tt];
-                                    ccf4[i*acf_N+tt]=ccf4[i*acf_N+tt]+v;
-                                    ccf4_std[i*acf_N+tt]=ccf4_std[i*acf_N+tt]+v*v;
+                                    ccf4[i*ccf_N+tt]=ccf4[i*ccf_N+tt]+v;
+                                    ccf4_std[i*ccf_N+tt]=ccf4_std[i*ccf_N+tt]+v*v;
                                 }
                                 delete ccf1jb[i];
                                 ccf1jb[i]=new correlatorjb<double, double>(job.S, job.P);
@@ -1454,6 +1532,68 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                                 free(corr2[0]); free(corr2[1]);
                                 free(corr3[0]); free(corr3[1]);
                                 free(corr4[0]); free(corr4[1]);
+                            }
+                        }
+                    }
+                }
+                if (job.distanceCCF && dccf_N>0) {
+                    if (job.correlator==1) {
+                        uint16_t i=0;
+                        for (register uint16 y=0; y<dccfframe_height; y++) {
+                            for (register uint16 x=0; x<dccfframe_width; x++) {
+
+                                const int32_t p=y*frame_width+x;
+                                const int32_t x1=x+job.DCCFDeltaX;
+                                const int32_t y1=y+job.DCCFDeltaY;
+                                const int32_t p1=y1*frame_width+x1;
+                                if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
+
+                                    dccfjk[i]->crosscorrelate_step(frame_data[p], frame_data[p1]);
+
+                                    if ((frame%segment_frames)==(segment_frames-1)) {
+                                        dccfjk[i]->crossnormalize();
+                                        qDebug()<<"normalize jk ("<<x<<", "<<y<<": "<<i<<") !";
+                                        double* corr1=dccfjk[i]->getCor();
+                                        for (register uint32_t tt=0; tt<dccf_N; tt++) {
+                                            register double v=corr1[tt];
+                                            dccf[i*dccf_N+tt]=dccf[i*dccf_N+tt]+v;
+                                            dccf_std[i*dccf_N+tt]=dccf_std[i*dccf_N+tt]+v*v;
+                                        }
+                                        delete dccfjk[i];
+                                        dccfjk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
+                                    }
+                                }
+                                i++;
+                            }
+                        }
+                    } else {
+                        uint16_t i=0;
+                        for (register uint16 y=0; y<dccfframe_height; y++) {
+                            for (register uint16 x=0; x<dccfframe_width; x++) {
+
+                                const int32_t p=y*frame_width+x;
+                                const int32_t x1=x+job.DCCFDeltaX;
+                                const int32_t y1=y+job.DCCFDeltaY;
+                                const int32_t p1=y1*frame_width+x1;
+                                if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
+
+                                    dccfjb[i]->run(frame_data[p], frame_data[p1]);
+
+                                    if ((frame%segment_frames)==(segment_frames-1)) {
+                                        double** corr1=dccfjb[i]->get_array_G();
+                                        qDebug()<<"normalize jb ("<<x<<", "<<y<<": "<<i<<") !";
+                                        for (register uint32_t tt=0; tt<dccf_N; tt++) {
+                                            register double v=corr1[1][tt];
+                                            dccf[i*dccf_N+tt]=dccf[i*dccf_N+tt]+v;
+                                            dccf_std[i*dccf_N+tt]=dccf_std[i*dccf_N+tt]+v*v;
+                                        }
+                                        delete dccfjb[i];
+                                        dccfjb[i]=new correlatorjb<double, double>(job.S, job.P);
+                                        free(corr1[0]);
+                                        free(corr1[1]);
+                                    }
+                                }
+                                i++;
                             }
                         }
                     }
@@ -1540,6 +1680,23 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 ccf4_std=NULL;
             }
         }
+        if (job.distanceCCF && dccf_N>0 && (m_status==1) && (!was_canceled)) {
+            emit messageChanged(tr("averaging distance CCF segments ..."));
+            for (register uint64_t tt=0; tt<dccf_N*dccfframe_width*dccfframe_height; tt++) {
+                double sum=dccf[tt];
+                double sum2=dccf_std[tt];
+                dccf[tt]=sum/(double)job.segments;
+                if (job.segments>1) {
+                    dccf_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
+                } else {
+                    dccf_std[tt]=0;
+                }
+            }
+            if (job.segments<=1) {
+                free(dccf_std);
+                dccf_std=NULL;
+            }
+        }
         free(frame_data);
     }
 
@@ -1558,6 +1715,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     for (register int i=0; i<ccf4jk.size(); i++) {
         if (ccf4jk[i]) delete ccf4jk[i];
     }
+    for (register int i=0; i<dccfjk.size(); i++) {
+        if (dccfjk[i]) delete dccfjk[i];
+    }
 
     for (register int i=0; i<acfjb.size(); i++) {
         if (acfjb[i]) delete acfjb[i];
@@ -1573,6 +1733,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     }
     for (register int i=0; i<ccf4jb.size(); i++) {
         if (ccf4jb[i]) delete ccf4jb[i];
+    }
+    for (register int i=0; i<dccfjb.size(); i++) {
+        if (dccfjb[i]) delete dccfjb[i];
     }
 
 }

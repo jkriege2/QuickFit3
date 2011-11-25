@@ -26,7 +26,7 @@
 class QFRDRImageReader {
     public:
         QFRDRImageReader();
-        virtual ~QFRDRImageReader()  {}
+        virtual ~QFRDRImageReader() {}
         /** \brief open the given image sequence file
          *  \param filename name of the image sequence file
          *  \return \c true on success

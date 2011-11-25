@@ -244,10 +244,10 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="reading frame count") {
                             initParams["FRAME_COUNT"]=value.toInt();
                             paramsReadonly<<"FRAME_COUNT";
-                        } else if (name=="DCCF Delta x") {
+                        } else if (name=="dccf delta x") {
                             initParams["DCCF_DELTAX"]=value.toInt();
                             paramsReadonly<<"DCCF_DELTAX";
-                        } else if (name=="DCCF Delta y") {
+                        } else if (name=="dccf delta y") {
                             initParams["DCCF_DELTAY"]=value.toInt();
                             paramsReadonly<<"DCCF_DELTAY";
                         } else if (name=="frame count") {
@@ -274,6 +274,30 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="baseline") {
                             initParams["BASELINE"]=value.toDouble();
                             paramsReadonly<<"BASELINE";
+                        } else if (name=="statistics over") {
+                            initParams["STATISTICS_SUMFRAMES"]=value.toInt();
+                            paramsReadonly<<"STATISTICS_SUMFRAMES";
+                        } else if (name=="video sum up") {
+                            initParams["VIDEO_AVGFRAMES"]=value.toInt();
+                            paramsReadonly<<"VIDEO_AVGFRAMES";
+                        } else if (name=="duration [s]") {
+                            initParams["EVALUATION_DURATION"]=value.toInt();
+                            paramsReadonly<<"EVALUATION_DURATION";
+                        } else if (name=="binning") {
+                            initParams["BINNING"]=value.toInt();
+                            paramsReadonly<<"BINNING";
+                        } else if (name=="crop x0") {
+                            initParams["CROP_X0"]=value.toInt();
+                            paramsReadonly<<"CROP_X0";
+                        } else if (name=="crop x1") {
+                            initParams["CROP_X1"]=value.toInt();
+                            paramsReadonly<<"CROP_X1";
+                        } else if (name=="crop y0") {
+                            initParams["CROP_Y0"]=value.toInt();
+                            paramsReadonly<<"CROP_Y0";
+                        } else if (name=="crop y1") {
+                            initParams["CROP_Y1"]=value.toInt();
+                            paramsReadonly<<"CROP_Y1";
                         /*} else if (name=="") {
                             initParams[""]=value.toInt();
                             paramsReadonly<<"";*/

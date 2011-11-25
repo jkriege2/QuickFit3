@@ -183,3 +183,13 @@ bool QStringToBool(const QString& data){
     if (ok) return i!=0;
     return false;
 }
+
+bool touchFile(const QString& filename) {
+    if (QFile::exists(filename)) return true;
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly)) {
+        f.close();
+        return true;
+    }
+    return false;
+}

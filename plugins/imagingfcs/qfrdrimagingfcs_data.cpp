@@ -131,9 +131,9 @@ bool QFRDRImagingFCSData::loadOverview(QString filename) {
 
             qDebug()<<"TIFF: "<<nx<<"x"<<ny<<"    data: "<<width<<"x"<<height;
 
-            if (width*height<=nx*ny) {
-                for (uint32_t y=0; y<height; y++) {
-                    for (uint32_t x=0; x<width; x++) {
+            if (width*height<=(int64_t)nx*(int64_t)ny) {
+                for (int32_t y=0; y<height; y++) {
+                    for (int32_t x=0; x<width; x++) {
                         overview[y*width+x]=ovw[y*nx+x];
                     }
 

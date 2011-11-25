@@ -1,6 +1,7 @@
 #include "qfrdrimagereader.h"
 #include <cstdlib>
 #include <cmath>
+#include<QDebug>
 
 QFRDRImageReader::QFRDRImageReader() {
     binning=1;
@@ -35,7 +36,7 @@ uint16_t QFRDRImageReader::frameHeight() {
         yy1=intFrameHeight()-1;
     }
     if (yy0<0) yy0=0;
-    if (yy0>intFrameWidth()-1) yy0=intFrameWidth()-1;
+    if (yy0>intFrameHeight()-1) yy0=intFrameHeight()-1;
     if (yy1<0) yy1=0;
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
 
@@ -75,7 +76,7 @@ bool QFRDRImageReader::readFrameFloat(float* data) {
         yy1=intFrameHeight()-1;
     }
     if (yy0<0) yy0=0;
-    if (yy0>intFrameWidth()-1) yy0=intFrameWidth()-1;
+    if (yy0>intFrameHeight()-1) yy0=intFrameHeight()-1;
     if (yy1<0) yy1=0;
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
     if (yy0>yy1) qSwap(yy0, yy1);
@@ -91,7 +92,7 @@ bool QFRDRImageReader::readFrameFloat(float* data) {
         }
     }
 
-    for (int i=0; i<w*h; i++) data[i]=0;
+    for (register int i=0; i<w*h; i++) data[i]=0;
     for (register int y=0; y<h*binning; y++) {
         for (register int x=0; x<w*binning; x++) {
             data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
@@ -135,7 +136,7 @@ bool QFRDRImageReader::readFrameUINT16(uint16_t* data) {
         yy1=intFrameHeight()-1;
     }
     if (yy0<0) yy0=0;
-    if (yy0>intFrameWidth()-1) yy0=intFrameWidth()-1;
+    if (yy0>intFrameHeight()-1) yy0=intFrameHeight()-1;
     if (yy1<0) yy1=0;
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
     if (yy0>yy1) qSwap(yy0, yy1);
@@ -151,7 +152,7 @@ bool QFRDRImageReader::readFrameUINT16(uint16_t* data) {
         }
     }
 
-    for (int i=0; i<w*h; i++) data[i]=0;
+    for (register int i=0; i<w*h; i++) data[i]=0;
     for (register int y=0; y<h*binning; y++) {
         for (register int x=0; x<w*binning; x++) {
             data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
@@ -169,4 +170,5 @@ void QFRDRImageReader::setCropping(int x0, int x1, int y0, int y1) {
     this->y0=y0;
     this->y1=y1;
     crop=true;
+    qDebug()<<"enabled cropping   x = "<<x0<<"..."<<x1<<"   y = "<<y0<<"..."<<y1;
 }

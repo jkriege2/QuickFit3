@@ -85,6 +85,7 @@ void QFRDRImagingFCSCorrelationDialog::startNextWaitingThread()   {
     for (int i=0; i<jobs.size(); i++) {
         if (jobs[i].thread->status()==0) {
             jobs[i].thread->start();
+            break;
         }
     }
 }
@@ -320,8 +321,10 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
         ////////////////////////////////////////////////////////////////////////////////////
         // CHECK WHETHER WE HAVE TO START SOME MORE THREADS
         ////////////////////////////////////////////////////////////////////////////////////
-        while ((waitingThreads()>0)&&(runningThreads()<ui->spinProcesses->value())) {
+        //int started=0;
+        while ((waitingThreads()>0)&&(runningThreads()<ui->spinProcesses->value()) /*&& (started<=0)*/) {
             startNextWaitingThread();
+            //started++;
         }
 
 
@@ -414,16 +417,16 @@ void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
     int w=image_width;
     int h=image_height;
 
-    ui->spinXFirst->setMaximum(image_width-1);
-    ui->spinXLast->setMaximum(image_width-1);
-    ui->spinYFirst->setMaximum(image_height-1);
-    ui->spinYLast->setMaximum(image_height-1);
-    ui->spinDistanceCCFDeltaX->setRange(-1*image_width, image_width);
-    ui->spinDistanceCCFDeltaY->setRange(-1*image_height, image_height);
+    if (image_width-1>0) ui->spinXFirst->setMaximum(image_width-1);
+    if (image_width-1>0) ui->spinXLast->setMaximum(image_width-1);
+    if (image_height-1>0) ui->spinYFirst->setMaximum(image_height-1);
+    if (image_height-1>0) ui->spinYLast->setMaximum(image_height-1);
+    if (image_width>0) ui->spinDistanceCCFDeltaX->setRange(-1*image_width, image_width);
+    if (image_height>0) ui->spinDistanceCCFDeltaY->setRange(-1*image_height, image_height);
 
     if (ui->chkCrop->isChecked()) {
-        w=fabs(ui->spinXLast->value()-ui->spinXFirst->value());
-        h=fabs(ui->spinYLast->value()-ui->spinYFirst->value());
+        w=fabs(ui->spinXLast->value()-ui->spinXFirst->value())+1;
+        h=fabs(ui->spinYLast->value()-ui->spinYFirst->value())+1;
     }
 
     w=w/ui->spinBinning->value();

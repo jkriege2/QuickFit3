@@ -584,7 +584,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinXFirst"/>
+             <widget class="QSpinBox" name="spinXFirst">
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_35">
@@ -595,6 +599,9 @@
             </item>
             <item>
              <widget class="QSpinBox" name="spinXLast">
+              <property name="maximum">
+               <number>10000</number>
+              </property>
               <property name="value">
                <number>1</number>
               </property>
@@ -621,7 +628,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinYFirst"/>
+             <widget class="QSpinBox" name="spinYFirst">
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_37">
@@ -632,6 +643,9 @@
             </item>
             <item>
              <widget class="QSpinBox" name="spinYLast">
+              <property name="maximum">
+               <number>10000</number>
+              </property>
               <property name="value">
                <number>1</number>
               </property>
@@ -939,6 +953,12 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="minimum">
+              <number>-10000</number>
+             </property>
+             <property name="maximum">
+              <number>10000</number>
+             </property>
             </widget>
            </item>
            <item>
@@ -958,6 +978,12 @@
             <widget class="QSpinBox" name="spinDistanceCCFDeltaY">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="minimum">
+              <number>-10000</number>
+             </property>
+             <property name="maximum">
+              <number>10000</number>
              </property>
             </widget>
            </item>
@@ -1702,7 +1728,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>chkVideo</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>label_24</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1718,7 +1744,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>chkVideo</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>spinVideoFrames</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1734,7 +1760,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>chkCrop</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>widSubregion</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>

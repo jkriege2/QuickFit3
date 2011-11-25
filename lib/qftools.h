@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QWidget>
 #include <QSplitter>
+#include <QFile>
 #include "lib_imexport.h"
 
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
@@ -137,4 +138,10 @@ QFLIB_EXPORT double CQStringToDouble(QString value);
 
 */
 QFLIB_EXPORT bool QStringToBool(const QString& data);
+
+/*! \brief make sure the given file exists (creates an empty file)
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT bool touchFile(const QString& filename);
 #endif // QFTOOLS_H

@@ -8,6 +8,8 @@
 #include <QList>
 #include <QVector>
 #include <QStringList>
+#include <QMutex>
+#include "qftools.h"
 
 class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward
@@ -237,6 +239,8 @@ protected:
     QString outputFilenameBase;
 
     float* backgroundImage;
+
+    static QMutex* mutexFilename;
 
 };
 
