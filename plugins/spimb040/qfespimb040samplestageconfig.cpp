@@ -31,38 +31,13 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent):
 }
 
 
-/*
-QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices):
-        QGroupBox(parent)
-{
-    setTitle(tr(" Sample Translation Stages: "));
-    m_parent=parent;
-    m_log=parent;
-    m_pluginServices=pluginServices;
-    locked=false;
-    stageStateUpdateInterval=250;
-    iconDisconnected=QPixmap(":/spimb040/stage_disconnected.png");
-    iconReady=QPixmap(":/spimb040/stage_ready.png");
-    iconError=QPixmap(":/spimb040/stage_error.png");
-    iconMoving=QPixmap(":/spimb040/stage_moving.png");
-    iconMovingOpposite=QPixmap(":/spimb040/stage_moving2.png");
-    iconJoystick=QPixmap(":/spimb040/stage_joystick.png");
-    iconNoJoystick=QPixmap(":/spimb040/stage_nojoystick.png");
-    //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
-    //connect(&timerDisplayUpdate, SIGNAL(timeout()), this, SLOT(displayAxisStates()));
-    //timerDisplayUpdate.start();
-
-    findStages(m_pluginServices->getExtensionManager());
-    createWidgets();
-    createActions();
-    updateStates();
-
-    QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
-}
-*/
 QFESPIMB040SampleStageConfig::~QFESPIMB040SampleStageConfig()
 {
     //dtor
+}
+
+void QFESPIMB040SampleStageConfig::setLog(QFPluginLogService* log) {
+    m_log=log;
 }
 
 void QFESPIMB040SampleStageConfig::init(QFPluginLogService* log, QFPluginServices* pluginServices) {
@@ -99,6 +74,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString pre
     cmbStageZ->setCurrentIndex(settings.value(prefix+"stage_z", 2).toInt());
     spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
     stageStateUpdateInterval=settings.value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
+    chkJoystick->setChecked(settings.value(prefix+"joystick_enabled", false).toBool());
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
@@ -107,6 +83,7 @@ void QFESPIMB040SampleStageConfig::storeSettings(QSettings& settings, QString pr
     settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());
     settings.setValue(prefix+"stage_z", cmbStageZ->currentIndex());
     settings.setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
+    settings.setValue(prefix+"joystick_enabled", chkJoystick->isChecked());
     settings.setValue(prefix+"update_interval", stageStateUpdateInterval);
 }
 
@@ -207,8 +184,8 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinMoveZ->setRange(-1e6,1e6);
     spinMoveZ->setSingleStep(1);
     gl->addWidget(spinMoveZ, 1,2);
-    btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/stagemove.png"), tr("&abs"), this);
-    btnMoveRelative=new QPushButton(QIcon(":/spimb040/stagemove.png"), tr("&rel"), this);
+    btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
+    btnMoveRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);
     gl->addWidget(btnMoveRelative, 1, 3);
     gl->addWidget(btnMoveAbsolute, 1, 4);
     gl->addWidget(new QWidget(this), 1, 5);

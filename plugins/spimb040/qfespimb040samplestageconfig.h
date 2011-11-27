@@ -46,6 +46,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         virtual ~QFESPIMB040SampleStageConfig();
 
         void init(QFPluginLogService* log, QFPluginServices* pluginServices);
+        void setLog(QFPluginLogService* log);
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);

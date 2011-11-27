@@ -67,7 +67,6 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         /** \brief main log widget */
         QtLogFile* logMain;
 
-        QFESPIMB040OpticsSetup* optSetup;
         QFESPIMB040CameraConfig* camConfig1;
         QFESPIMB040CameraConfig* camConfig2;
         QFESPIMB040SampleStageConfig* sampleStages;

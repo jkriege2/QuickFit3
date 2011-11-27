@@ -76,6 +76,10 @@ void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* plugin
     displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
 }
+void QFESPIMB040SimpleCameraConfig::showEvent ( QShowEvent * event ) {
+    previewTimer->disconnect();
+    connect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
+}
 
 void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
     stopPreview();
@@ -83,7 +87,7 @@ void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
     previewTimer->disconnect();
     //QApplication::processEvents();
     if (camView) {
-        camView->close();
+        camView->hide();
     }
     // disconnect devices and close camera view:
     if (actDisConnect->isChecked()) {

@@ -379,12 +379,12 @@ void QFESPIMB040CameraView::createMainWidgets() {
     cmbRotation->addItem(tr("90 degrees"));
     cmbRotation->addItem(tr("180 degrees"));
     cmbRotation->addItem(tr("270 degrees"));
-    cmbRotation->setMaximumWidth(100);
+    cmbRotation->setMaximumWidth(200);
     fl->addRow(tr("&rotation:"), cmbRotation);
     connect(cmbRotation, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
 
     cmbImageMode=new QComboBox(w);
-    cmbImageMode->setMaximumWidth(100);
+    cmbImageMode->setMaximumWidth(200);
     cmbImageMode->addItem(tr("none"));
     cmbImageMode->addItem(tr("top-bottom half"));
     cmbImageMode->addItem(tr("left-right half"));
@@ -409,7 +409,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     fl->addRow(tr("&grid color:"), cmbGridColor);
     connect(chkGrid, SIGNAL(toggled(bool)), spinGridWidth, SLOT(setEnabled(bool)));
     connect(chkGrid, SIGNAL(toggled(bool)), cmbGridColor, SLOT(setEnabled(bool)));
-    connect(chkGrid, SIGNAL(toggled()), this, SLOT(updateGrid()));
+    connect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(updateGrid()));
     connect(spinGridWidth, SIGNAL(valueChanged(int)), this, SLOT(updateGrid()));
     connect(cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGrid()));
 

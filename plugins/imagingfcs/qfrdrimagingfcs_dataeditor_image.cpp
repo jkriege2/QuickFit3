@@ -66,11 +66,13 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     int row=0;
     cmbResultGroup=new QComboBox(this);
+    cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0);
     l->setBuddy(cmbResultGroup);
     topgrid->addWidget(cmbResultGroup, row, 1);
 
     cmbParameter=new QComboBox(this);
+    cmbParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 3);
     labParameter->setBuddy(cmbParameter);
     topgrid->addWidget(cmbParameter, row, 4);
@@ -86,6 +88,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     row++;
     cmbGofParameter=new QComboBox(this);
+    cmbGofParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     topgrid->addWidget((labGofParameter=new QLabel(tr("&goodness of fit:"))), row, 3);
     labGofParameter->setBuddy(cmbGofParameter);
     topgrid->addWidget(cmbGofParameter, row, 4);

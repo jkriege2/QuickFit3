@@ -15,12 +15,11 @@ QFESPIMB040MainWindow::QFESPIMB040MainWindow(QFPluginServices* pluginServices, Q
     camConfig1=NULL;
     camConfig2=NULL;
     widImageStack=NULL;
-    optSetup=NULL;
     m_pluginServices=pluginServices;
     // create widgets and actions
     createWidgets(pluginServices->getExtensionManager());
-    setWindowTitle("B040 SPIM Control");
-    setWindowIcon(QIcon(":/spimb040_logo.png"));
+    setWindowTitle("Old B040 SPIM Control");
+    setWindowIcon(QIcon(":/spimb040_logo_shaded.png"));
 }
 
 QFESPIMB040MainWindow::~QFESPIMB040MainWindow()
@@ -44,7 +43,6 @@ void QFESPIMB040MainWindow::loadSettings(ProgramOptions* settings) {
     if (sampleStages) sampleStages->loadSettings((*settings->getQSettings()), "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
-    if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
 }
 
 void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
@@ -54,7 +52,6 @@ void QFESPIMB040MainWindow::storeSettings(ProgramOptions* settings) {
     if (sampleStages) sampleStages->storeSettings((*settings->getQSettings()), "plugin_spim_b040/sample_stages/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
-    if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
 
 }
 
@@ -90,22 +87,13 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     tabMain=new QTabWidget(this);
     mainl->addWidget(tabMain);
 
-    optSetup=new QFESPIMB040OpticsSetup(this, m_pluginServices);
-    tabMain->addTab(optSetup, tr("Instrument Setup"));
-
-
 
 
     QWidget* mainWid=new QWidget(this);
     tabMain->addTab(mainWid, tr("Imaging"));
 
 
-    /*help=new QFHTMLHelpWindow(tabMain);
-    help->initFromPluginServices(m_pluginServices);
-    tabMain->addTab(help, QIcon(":/lib/help.png"), tr("Help"));
-    help->initFromPluginServices(m_pluginServices);
-    help->updateHelp( extManager->getPluginHelp("ext_spimb040") );
-    qDebug()<<extManager->getPluginHelp("ext_spimb040");*/
+
     btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("Help"), this);
     btnHelp->setToolTip(tr("display the online help window"));
     connect(btnHelp, SIGNAL(clicked()), this,SLOT(displayHelp()));
@@ -137,8 +125,8 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     camConfig2=new QFESPIMB040CameraConfig(this, 1, m_pluginServices);
     mainlayout->addWidget(camConfig2, 0, 1);
 
-    connect(camConfig1, SIGNAL(configFilesChanged()), camConfig2, SLOT(rereadConfigCombos()));
-    connect(camConfig2, SIGNAL(configFilesChanged()), camConfig1, SLOT(rereadConfigCombos()));
+    //connect(camConfig1, SIGNAL(configFilesChanged()), camConfig2, SLOT(rereadConfigCombos()));
+    //connect(camConfig2, SIGNAL(configFilesChanged()), camConfig1, SLOT(rereadConfigCombos()));
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create sample stage widget
@@ -1305,17 +1293,14 @@ QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QF
 
 void QFESPIMB040MainWindow::log_text(QString message) {
     logMain->log_text(message);
-    //optSetup->log_text(message);
 };
 
 void QFESPIMB040MainWindow::log_warning(QString message) {
     logMain->log_warning(message);
-    //optSetup->log_warning(message);
 };
 
 void QFESPIMB040MainWindow::log_error(QString message) {
     logMain->log_error(message);
-    //optSetup->log_error(message);
 };
 
 

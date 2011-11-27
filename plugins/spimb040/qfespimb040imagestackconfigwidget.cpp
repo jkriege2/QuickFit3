@@ -12,11 +12,10 @@
 
 #define STAGE_INTERVAL_MS 250
 
-QFESPIMB040ImageStackConfigWidget::QFESPIMB040ImageStackConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices) :
+QFESPIMB040ImageStackConfigWidget::QFESPIMB040ImageStackConfigWidget(QWidget* parent, QFPluginServices* pluginServices) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ImageStackConfigWidget)
 {
-    m_parent=parent;
     m_pluginServices=pluginServices;
     ui->setupUi(this);
     ui->cmbStage->init(pluginServices->getExtensionManager());

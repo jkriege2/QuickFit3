@@ -64,11 +64,12 @@ QF3ObjectiveCombobox::QF3ObjectiveCombobox(QWidget* parent):
     globalobjectives="";
     localobjectives="";
 
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout(this);
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     cmbObjective=new QComboBox(this);
+    cmbObjective->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbObjective, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
     hbl->addWidget(cmbObjective);
 
@@ -137,6 +138,8 @@ void QF3ObjectiveCombobox::loadObjectives() {
     int i=cmbObjective->findText(currentO);
     if (i<0) i=0;
     cmbObjective->setCurrentIndex(i);
+    hbl->update();
+
 }
 
 void QF3ObjectiveCombobox::setObjectivesINI(QString globalobjectives, QString localobjectives) {

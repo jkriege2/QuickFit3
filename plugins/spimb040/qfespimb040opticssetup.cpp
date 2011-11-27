@@ -5,13 +5,12 @@
 #include "filters.h"
 #include "qfespimb040mainwindow.h"
 
-QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices) :
+QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040OpticsSetup)
 {
-    m_parent=parent;
     m_pluginServices=pluginServices;
-    m_log=parent;
+    m_log=log;
     ui->setupUi(this);
     ui->camConfig1->init(0, m_pluginServices);
     ui->camConfig1->setLog(m_log);
@@ -19,6 +18,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QFESPIMB040MainWindow* parent, QF
     ui->camConfig2->setLog(m_log);
     ui->stageSetup->init(m_log, m_pluginServices);
     ui->filtTransmission->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtDetection->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
     ui->filtSplitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
     ui->filtDetection11->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
     ui->filtDetection21->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
@@ -33,6 +33,16 @@ QFESPIMB040OpticsSetup::~QFESPIMB040OpticsSetup()
     delete ui;
 }
 
+void QFESPIMB040OpticsSetup::closeEvent(QCloseEvent * event) {
+    ui->camConfig1->close();
+    ui->camConfig2->close();
+}
+
+void QFESPIMB040OpticsSetup::showEvent( QShowEvent * event ) {
+    ui->camConfig1->show();
+    ui->camConfig2->show();
+}
+
 void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
@@ -41,10 +51,11 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->filtDetection21->loadSettings(settings, prefix+"filters/detection21");
     ui->filtSplitter->loadSettings(settings, prefix+"filters/detection_splitter");
     ui->filtTransmission->loadSettings(settings, prefix+"filters/illumination_transmission");
+    ui->filtDetection->loadSettings(settings, prefix+"filters/illumination_transmission");
     ui->objDetection->loadSettings(settings, prefix+"objectives/detection");
     ui->objProjection->loadSettings(settings, prefix+"objectives/projection");
     ui->objTube1->loadSettings(settings, prefix+"objectives/tubelens1");
-    ui->objTube2->loadSettings(settings, prefix+"objectives/tubelens1");
+    ui->objTube2->loadSettings(settings, prefix+"objectives/tubelens2");
 
 }
 
@@ -56,17 +67,103 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->filtDetection21->saveSettings(settings, prefix+"filters/detection21");
     ui->filtSplitter->saveSettings(settings, prefix+"filters/detection_splitter");
     ui->filtTransmission->saveSettings(settings, prefix+"filters/illumination_transmission");
+    ui->filtDetection->saveSettings(settings, prefix+"filters/detection");
     ui->objDetection->saveSettings(settings, prefix+"objectives/detection");
     ui->objProjection->saveSettings(settings, prefix+"objectives/projection");
     ui->objTube1->saveSettings(settings, prefix+"objectives/tubelens1");
-    ui->objTube2->saveSettings(settings, prefix+"objectives/tubelens1");
+    ui->objTube2->saveSettings(settings, prefix+"objectives/tubelens2");
 
 }
 
+double QFESPIMB040OpticsSetup::getCameraMagnification(int setup_cam) const {
+    if (setup_cam==0) {
+        return ui->objDetection->objective().magnification*ui->objTube1->objective().magnification;
+    } else if (setup_cam==1) {
+        return ui->objDetection->objective().magnification*ui->objTube2->objective().magnification;
+    }
+    return 1;
+}
+
+QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam ) const {
+    QMap<QString, QVariant> setup;
+
+    FilterDescription filter=ui->filtDetection->filter();
+    if (filter.isValid) {
+        setup["filters/detection/name"]=filter.name;
+        setup["filters/detection/type"]=filter.type;
+        setup["filters/detection/manufacturer"]=filter.manufacturer;
+    }
+
+    if (setup_cam<0 || setup_cam==0) {
+        filter=ui->filtDetection11->filter();
+        if (filter.isValid) {
+            setup["filters/detection_cam1/name"]=filter.name;
+            setup["filters/detection_cam1/type"]=filter.type;
+            setup["filters/detection_cam1/manufacturer"]=filter.manufacturer;
+        }
+    }
+
+    if (setup_cam<0 || setup_cam==1) {
+        filter=ui->filtDetection21->filter();
+        if (filter.isValid) {
+            setup["filters/detection_cam2/name"]=filter.name;
+            setup["filters/detection_cam2/type"]=filter.type;
+            setup["filters/detection_cam2/manufacturer"]=filter.manufacturer;
+        }
+    }
+
+    filter=ui->filtSplitter->filter();
+    if (filter.isValid) {
+        setup["filters/detection_splitter/name"]=filter.name;
+        setup["filters/detection_splitter/type"]=filter.type;
+        setup["filters/detection_splitter/manufacturer"]=filter.manufacturer;
+    }
+
+    filter=ui->filtTransmission->filter();
+    if (filter.isValid) {
+        setup["filters/illumination_transmission/name"]=filter.name;
+        setup["filters/illumination_transmission/type"]=filter.type;
+        setup["filters/illumination_transmission/manufacturer"]=filter.manufacturer;
+    }
+
+    ObjectiveDescription objective=ui->objDetection->objective();
+    setup["objectives/detection/name"]=objective.name;
+    setup["objectives/detection/manufacturer"]=objective.manufacturer;
+    setup["objectives/detection/NA"]=objective.NA;
+    setup["objectives/detection/magnification"]=objective.magnification;
+
+    objective=ui->objProjection->objective();
+    setup["objectives/projection/name"]=objective.name;
+    setup["objectives/projection/manufacturer"]=objective.manufacturer;
+    setup["objectives/projection/NA"]=objective.NA;
+    setup["objectives/projection/magnification"]=objective.magnification;
+
+    if (setup_cam<0 || setup_cam==0) {
+        objective=ui->objTube1->objective();
+        setup["objectives/tube_lens1/name"]=objective.name;
+        setup["objectives/tube_lens1/manufacturer"]=objective.manufacturer;
+        setup["objectives/tube_lens1/NA"]=objective.NA;
+        setup["objectives/tube_lens1/magnification"]=objective.magnification;
+    }
+
+    if (setup_cam<0 || setup_cam==1) {
+        objective=ui->objTube2->objective();
+        setup["objectives/tube_lens2/name"]=objective.name;
+        setup["objectives/tube_lens2/manufacturer"]=objective.manufacturer;
+        setup["objectives/tube_lens2/NA"]=objective.NA;
+        setup["objectives/tube_lens2/magnification"]=objective.magnification;
+    }
+
+
+    return setup;
+}
 
 
 void QFESPIMB040OpticsSetup::setLogging(QFPluginLogService* log) {
     m_log=log;
+    ui->camConfig1->setLog(m_log);
+    ui->camConfig2->setLog(m_log);
+    ui->stageSetup->setLog(m_log);
 }
 
 bool QFESPIMB040OpticsSetup::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {

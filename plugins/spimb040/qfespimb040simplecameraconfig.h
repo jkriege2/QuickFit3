@@ -196,6 +196,8 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
          */
         void closeEvent ( QCloseEvent * event );
 
+        void showEvent ( QShowEvent * event );
+
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
         void createWidgets();
         /** \brief Create ll QActions for this window, clled after createWidgets() in the constructor.

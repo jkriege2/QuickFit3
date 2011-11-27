@@ -5,6 +5,7 @@ FilterDescription::FilterDescription() {
     manufacturer="";
     name=QObject::tr("invalid");
     type="";
+    isValid=false;
 }
 
 
@@ -22,9 +23,11 @@ QF3FilterEditor::~QF3FilterEditor()
 }
 
 void QF3FilterEditor::init(const FilterDescription& filter) {
-    ui->edtManufacturer->setText(filter.manufacturer);
-    ui->edtName->setText(filter.name);
-    ui->cmbType->setEditText(filter.type);
+    if (filter.isValid) {
+        ui->edtManufacturer->setText(filter.manufacturer);
+        ui->edtName->setText(filter.name);
+        ui->cmbType->setEditText(filter.type);
+    }
 }
 
 FilterDescription QF3FilterEditor::getData() {
@@ -32,6 +35,7 @@ FilterDescription QF3FilterEditor::getData() {
     o.name=ui->edtName->text();
     o.manufacturer=ui->edtManufacturer->text();
     o.type=ui->cmbType->currentText();
+    o.isValid=true;
     return o;
 }
 
@@ -61,11 +65,12 @@ QF3FilterCombobox::QF3FilterCombobox(QWidget* parent):
     globalfilters="";
     localfilters="";
 
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout(this);
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     cmbFilters=new QComboBox(this);
+    cmbFilters->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbFilters, SIGNAL(currentIndexChanged(int)), this, SLOT(currentFilterChanged(int)));
     hbl->addWidget(cmbFilters);
 
@@ -100,7 +105,7 @@ QF3FilterCombobox::~QF3FilterCombobox() {
 }
 
 void QF3FilterCombobox::currentFilterChanged(int idx) {
-    int iD=cmbFilters->currentIndex();
+    int iD=cmbFilters->currentIndex()-1;
     if (iD>=0 && iD<filters.size()) labFilterDescription->setText(tr(""));
     else labFilterDescription->setText("");
 }
@@ -118,19 +123,32 @@ void QF3FilterCombobox::loadFilters() {
     for (int i=0; i<groupsg.size(); i++) {
         if (!groups.contains(groupsg[i])) groups.append(groupsg[i]);
     }
+    cmbFilters->addItem(QIcon(":/libqf3widgets/filter_none.png"), tr("--- none ---"));
     for (int i=0; i<groups.size(); i++) {
         QString g=groups[i];
         FilterDescription o;
         o.name=inifile.value(g+"/name", inifileg.value(g+"/name", "")).toString();
         o.manufacturer=inifile.value(g+"/manufacturer", inifileg.value(g+"/manufacturer", "")).toString();
         o.type=inifile.value(g+"/type", inifileg.value(g+"/type", "")).toString();
+        o.isValid=true;
         filters.append(o);
-        cmbFilters->addItem(QIcon(":/libqf3widgets/filter.png"), o.name);
+        if (o.type.contains("dichro")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_dichroic.png"), o.name);
+        else if (o.type.contains("polar")) {
+            if (o.type.contains("split")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_splitterpol.png"), o.name);
+            else cmbFilters->addItem(QIcon(":/libqf3widgets/filter_pol_lin.png"), o.name);
+        } else if (o.type.contains("bandpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_bandpass.png"), o.name);
+        else if (o.type.contains("longpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_longpass.png"), o.name);
+        else if (o.type.contains("shortpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_shortpass.png"), o.name);
+        else if (o.type.contains("shortpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_shortpass.png"), o.name);
+        else if (o.type.contains("notch")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_notch.png"), o.name);
+        else if (o.type.contains("neutral density") || o.type.contains("grey")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_neutraldensity.png"), o.name);
+        else cmbFilters->addItem(QIcon(":/libqf3widgets/filter.png"), o.name);
     }
 
     int i=cmbFilters->findText(currentO);
     if (i<0) i=0;
     cmbFilters->setCurrentIndex(i);
+    hbl->update();
 }
 
 void QF3FilterCombobox::setFilterINI(QString globalfilters, QString localfilters) {
@@ -161,7 +179,7 @@ void QF3FilterCombobox::storeFilters() {
 }
 
 void QF3FilterCombobox::deleteFilter() {
-    int i=cmbFilters->currentIndex();
+    int i=cmbFilters->currentIndex()-1;
     if (i>=0 && i<filters.size()) {
         filters.removeAt(i);
     }
@@ -171,7 +189,7 @@ void QF3FilterCombobox::deleteFilter() {
 
 
 void QF3FilterCombobox::editFilter() {
-    int i=cmbFilters->currentIndex();
+    int i=cmbFilters->currentIndex()-1;
     if (i>=0 && i<filters.size()) {
         FilterDescription d=filters[i];
 
@@ -204,12 +222,16 @@ void QF3FilterCombobox::addFilter() {
 }
 
 FilterDescription QF3FilterCombobox::getFilterDescription(int i) {
-    return filters[i];
+    if (i>0 && i<=filters.size())
+        return filters[i-1];
+    FilterDescription o;
+    o.isValid=false;
+    return o;
 }
 
 FilterDescription QF3FilterCombobox::filter() {
     FilterDescription d;
-    int i=cmbFilters->currentIndex();
+    int i=cmbFilters->currentIndex()-1;
     if (i>=0 && i<filters.size()) return filters[i];
     return d;
 }

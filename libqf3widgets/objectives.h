@@ -112,6 +112,7 @@ protected:
     static QF3ObjectiveComboboxNotifier* m_notifier;
     QString globalobjectives;
     QString localobjectives;
+    QHBoxLayout* hbl;
 
 };
 

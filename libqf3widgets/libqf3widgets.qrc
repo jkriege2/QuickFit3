@@ -14,5 +14,16 @@
         <file alias="filter_delete.png">icons/list_remove.png</file>
         <file alias="filter_rename.png">icons/edit.png</file>
         <file alias="filter.png">icons/filter.png</file>
+        <file alias="filter_dichroic.png">icons/dichroic.png</file>
+        <file alias="filter_bandpass.png">icons/filter_bandpass.png</file>
+        <file alias="filter_longpass.png">icons/filter_longpass.png</file>
+        <file alias="filter_none.png">icons/filter_none.png</file>
+        <file alias="filter_pol_circ.png">icons/filter_pol_circ.png</file>
+        <file alias="filter_pol_lin.png">icons/filter_pol_lin.png</file>
+        <file alias="filter_shortpass.png">icons/filter_shortpass.png</file>
+        <file alias="filter_splitterneutral.png">icons/filter_splitterneutral.png</file>
+        <file alias="filter_splitterpol.png">icons/filter_splitterpol.png</file>
+        <file alias="filter_neutraldensity.png">icons/filter_neutraldensity.png</file>
+        <file alias="filter_notch.png">icons/filter_notch.png</file>
     </qresource>
 </RCC>

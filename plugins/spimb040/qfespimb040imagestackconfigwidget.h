@@ -23,7 +23,7 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040ImageStackConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
+        explicit QFESPIMB040ImageStackConfigWidget(QWidget* parent, QFPluginServices* pluginServices);
         ~QFESPIMB040ImageStackConfigWidget();
 
     signals:
@@ -102,7 +102,6 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         void updateLabel();
     private:
         Ui::QFESPIMB040ImageStackConfigWidget *ui;
-        QFESPIMB040MainWindow* m_parent;
         QFPluginServices* m_pluginServices;
 
 };

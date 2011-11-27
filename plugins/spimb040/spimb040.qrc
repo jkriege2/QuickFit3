@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file alias="spimb040_logo.png">b040spim_logo.png</file>
+        <file alias="spimb040_logo_shaded.png">b040spim_logo_shaded.png</file>
         <file alias="spimb040/savebackground.png">../../images/22x22/savebackground.png</file>
         <file alias="spimb040/saveraw.png">icons/saveraw.png</file>
         <file alias="spimb040/savetransformed.png">icons/savetransformed.png</file>
@@ -44,5 +45,7 @@
         <file alias="preview_savedata.png">icons/preview_savedata.png</file>
         <file alias="optics_setup.svg">icons/optics_setup.svg</file>
         <file alias="optics_setup.png">icons/optics_setup.png</file>
+        <file alias="move_abs.png">icons/move_abs.png</file>
+        <file alias="move_rel.png">icons/move_rel.png</file>
     </qresource>
 </RCC>

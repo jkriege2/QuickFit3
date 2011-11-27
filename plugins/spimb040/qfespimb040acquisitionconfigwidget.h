@@ -20,7 +20,7 @@ class QFESPIMB040AcquisitionConfigWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit QFESPIMB040AcquisitionConfigWidget(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
+    explicit QFESPIMB040AcquisitionConfigWidget(QWidget* parent, QFPluginServices* pluginServices);
     ~QFESPIMB040AcquisitionConfigWidget();
 signals:
     void doAcquisition();
@@ -45,7 +45,6 @@ protected slots:
     void on_chkUse1_clicked(bool enabled);
     void on_chkUse2_clicked(bool enabled);
 private:
-    QFESPIMB040MainWindow* m_parent;
     QFPluginServices* m_pluginServices;
     Ui::QFESPIMB040AcquisitionConfigWidget *ui;
 };

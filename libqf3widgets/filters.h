@@ -23,6 +23,7 @@ struct QFWIDLIB_EXPORT FilterDescription {
     QString name;
     QString manufacturer;
     QString type;
+    bool isValid;
     FilterDescription();
 };
 
@@ -109,6 +110,7 @@ protected:
     static QF3FilterComboboxNotifier* m_notifier;
     QString globalfilters;
     QString localfilters;
+    QHBoxLayout* hbl;
 
 };
 
