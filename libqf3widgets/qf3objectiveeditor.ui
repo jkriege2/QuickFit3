@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Objecive Editor</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">

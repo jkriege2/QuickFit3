@@ -38,6 +38,7 @@ QFCameraConfigComboBox::QFCameraConfigComboBox(QWidget* parent, QString configDi
 
 void QFCameraConfigComboBox::init(QString configDirectory) {
     m_configDirectory=configDirectory;
+    cameraChanged(m_extension, m_cam, m_camIdx);
 }
 
 QFCameraConfigComboBox::~QFCameraConfigComboBox()

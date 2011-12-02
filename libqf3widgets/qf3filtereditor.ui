@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Filter Editor</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -98,6 +98,15 @@
       <property name="icon">
        <iconset resource="libqf3widgets.qrc">
         <normaloff>:/libqf3widgets/filter_notch.png</normaloff>:/libqf3widgets/filter_notch.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>neutral density filter</string>
+      </property>
+      <property name="icon">
+       <iconset resource="libqf3widgets.qrc">
+        <normaloff>:/libqf3widgets/filter_neutraldensity.png</normaloff>:/libqf3widgets/filter_neutraldensity.png</iconset>
       </property>
      </item>
      <item>

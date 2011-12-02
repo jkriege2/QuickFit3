@@ -136,13 +136,14 @@ void QF3FilterCombobox::loadFilters() {
         else if (o.type.contains("polar")) {
             if (o.type.contains("split")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_splitterpol.png"), o.name);
             else cmbFilters->addItem(QIcon(":/libqf3widgets/filter_pol_lin.png"), o.name);
-        } else if (o.type.contains("bandpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_bandpass.png"), o.name);
-        else if (o.type.contains("longpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_longpass.png"), o.name);
-        else if (o.type.contains("shortpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_shortpass.png"), o.name);
-        else if (o.type.contains("shortpass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_shortpass.png"), o.name);
+        } else if (o.type.contains("bandpass")||o.type.contains("band pass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_bandpass.png"), o.name);
+        else if (o.type.contains("longpass")||o.type.contains("long pass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_longpass.png"), o.name);
+        else if (o.type.contains("shortpass")||o.type.contains("short pass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_shortpass.png"), o.name);
         else if (o.type.contains("notch")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_notch.png"), o.name);
-        else if (o.type.contains("neutral density") || o.type.contains("grey")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_neutraldensity.png"), o.name);
-        else cmbFilters->addItem(QIcon(":/libqf3widgets/filter.png"), o.name);
+        else if (o.type.contains("neutral density") || o.type.contains("neutral") || o.type.contains("grey")) {
+            if (o.type.contains("split")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_splitterneutral.png"), o.name);
+            else cmbFilters->addItem(QIcon(":/libqf3widgets/filter_neutraldensity.png"), o.name);
+        } else cmbFilters->addItem(QIcon(":/libqf3widgets/filter.png"), o.name);
     }
 
     int i=cmbFilters->findText(currentO);

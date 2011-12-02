@@ -171,18 +171,24 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(new QLabel("<b>x [&mu;m]:</b>", this), 0, 0);
     gl->addWidget(new QLabel("<b>y [&mu;m]:</b>", this), 0, 1);
     gl->addWidget(new QLabel("<b>z [&mu;m]:</b>", this), 0, 2);
-    gl->addWidget(new QLabel("<b>move ...</b>", this), 0, 3);
+    gl->addWidget(new QLabel("<b>move ...</b>", this), 0, 3,1,2);
     spinMoveX=new QDoubleSpinBox(this);
     spinMoveX->setRange(-1e6,1e6);
     spinMoveX->setSingleStep(1);
+    spinMoveX->setDecimals(2);
+    spinMoveX->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveX, 1,0);
     spinMoveY=new QDoubleSpinBox(this);
     spinMoveY->setRange(-1e6,1e6);
     spinMoveY->setSingleStep(1);
+    spinMoveY->setDecimals(2);
+    spinMoveY->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveY, 1,1);
     spinMoveZ=new QDoubleSpinBox(this);
     spinMoveZ->setRange(-1e6,1e6);
     spinMoveZ->setSingleStep(1);
+    spinMoveZ->setDecimals(2);
+    spinMoveZ->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveZ, 1,2);
     btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
     btnMoveRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);
@@ -190,6 +196,9 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(btnMoveAbsolute, 1, 4);
     gl->addWidget(new QWidget(this), 1, 5);
     gl->setColumnStretch(5,10);
+    gl->setContentsMargins(0,0,0,0);
+    gl->setHorizontalSpacing(1);
+    gl->setVerticalSpacing(1);
     connect(btnMoveAbsolute, SIGNAL(clicked()), this, SLOT(moveAbsolute()));
     connect(btnMoveRelative, SIGNAL(clicked()), this, SLOT(moveRelative()));
     stagelayout->addRow(tr("<b>movement:</b>"), gl);
@@ -281,6 +290,9 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(new QWidget(this), 4,4);
     gl->setColumnStretch(4,10);
     gl->setRowStretch(4,10);
+    gl->setContentsMargins(0,0,0,0);
+    gl->setHorizontalSpacing(2);
+    gl->setVerticalSpacing(2);
     stagelayout->addRow(tr("<b>status:</b>"), gl);
 
 }

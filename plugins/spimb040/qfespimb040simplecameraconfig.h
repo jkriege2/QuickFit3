@@ -55,7 +55,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
 
         void setLog(QFPluginLogService* logger);
 
-        void init(int camViewID, QFPluginServices* pluginServices);
+        void init(int camViewID, QFPluginServices* pluginServices, QString configDirectory);
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);

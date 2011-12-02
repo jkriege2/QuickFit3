@@ -43,7 +43,7 @@ QFESPIMB040SimpleCameraConfig::QFESPIMB040SimpleCameraConfig(QWidget* parent):
     createActions();
     displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
-    init(0, NULL);
+    init(0, NULL, "");
 }
 
 
@@ -61,12 +61,14 @@ void QFESPIMB040SimpleCameraConfig::setMagnification(double mag) {
     m_magnification=mag;
 }
 
-void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices) {
+void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices, QString configDirectory) {
     m_camViewID=camViewID;
     m_pluginServices=pluginServices;
     m_extManager=NULL;
     if (pluginServices) m_extManager=pluginServices->getExtensionManager();
     cmbAcquisitionDevice->init(m_extManager);
+    cmbPreviewConfiguration->init(configDirectory);
+    cmbAcquisitionConfiguration->init(configDirectory);
     if (m_pluginServices) {
         cmbPreviewConfiguration->init(m_pluginServices->getConfigFileDirectory());
         cmbAcquisitionConfiguration->init(m_pluginServices->getConfigFileDirectory());

@@ -27,6 +27,9 @@ void AndorGlobalCameraSettingsWidget::setSettings(int fan_mode, bool cooling_on,
     if (ui->spinTemperature->value()!=temperature) ui->spinTemperature->setValue(temperature);
     if (ui->cmbShutter->currentIndex()!=shutterMode) ui->cmbShutter->setCurrentIndex(shutterMode);
     m_emit=true;
+    int w=qMax(width(), sizeHint().width());
+    int h=qMax(height(), sizeHint().height());
+    resize(w,h);
 }
 
 void AndorGlobalCameraSettingsWidget::forceSettingsChanged() {
