@@ -68,7 +68,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/lib_imexport.h \
     ../../../../LIB/trunk/qt/jkqtpimagetools.h \
     ../../../../LIB/trunk/qt/jkqtpimageelements.h \
-    filters.h
+    filters.h \
+    ../../../../LIB/trunk/qt/qenhancedcombobox.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -104,7 +105,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfcameracombobox.cpp \
     objectives.cpp \
     ../../../../LIB/trunk/qt/jkqtpimageelements.cpp \
-    filters.cpp
+    filters.cpp \
+    ../../../../LIB/trunk/qt/qenhancedcombobox.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
@@ -124,6 +126,8 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
+
+
 
 
 

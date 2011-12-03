@@ -68,7 +68,7 @@ QF3ObjectiveCombobox::QF3ObjectiveCombobox(QWidget* parent):
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
-    cmbObjective=new QComboBox(this);
+    cmbObjective=new QEnhancedComboBox(this);
     cmbObjective->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbObjective, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
     hbl->addWidget(cmbObjective);
@@ -105,7 +105,7 @@ QF3ObjectiveCombobox::~QF3ObjectiveCombobox() {
 
 void QF3ObjectiveCombobox::currentObjectiveChanged(int idx) {
     int iD=cmbObjective->currentIndex();
-    if (iD>=0 && iD<objectives.size()) labObjectiveDescription->setText(tr("magn.: %1x  NA: %2").arg(objectives[iD].magnification).arg(objectives[iD].NA));
+    if (iD>=0 && iD<objectives.size()) labObjectiveDescription->setText(tr("magn.: %1x<br>NA: %2").arg(objectives[iD].magnification).arg(objectives[iD].NA));
     else labObjectiveDescription->setText("");
 
     emit objectiveChanged();
@@ -239,4 +239,11 @@ void QF3ObjectiveCombobox::loadSettings(QSettings& settings, QString property) {
 
 void QF3ObjectiveCombobox::saveSettings(QSettings& settings, QString property) {
     settings.setValue(property, cmbObjective->currentText());
+}
+
+void QF3ObjectiveCombobox::setReadOnly(bool readonly) {
+    cmbObjective->setReadOnly(readonly);
+    btnAddObjective->setEnabled(!readonly);
+    btnEditObjective->setEnabled(!readonly);
+    btnDeleteObjective->setEnabled(!readonly);
 }

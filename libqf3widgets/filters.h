@@ -13,6 +13,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "libwid_imexport.h"
+#include "qenhancedcombobox.h"
 
 /*! \brief description of a filter
     \ingroup qf3lib_widgets
@@ -24,6 +25,7 @@ struct QFWIDLIB_EXPORT FilterDescription {
     QString manufacturer;
     QString type;
     bool isValid;
+
     FilterDescription();
 };
 
@@ -96,13 +98,14 @@ public slots:
     void addFilter();
     void deleteFilter();
     void editFilter();
+    void setReadOnly(bool readonly);
 
 protected slots:
     void currentFilterChanged(int idx);
 
 protected:
     QList<FilterDescription> filters;
-    QComboBox* cmbFilters;
+    QEnhancedComboBox* cmbFilters;
     QToolButton* btnAddFilter;
     QToolButton* btnEditFilter;
     QToolButton* btnDeleteFilter;

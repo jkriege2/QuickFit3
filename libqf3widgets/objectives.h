@@ -13,6 +13,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include "libwid_imexport.h"
+#include "qenhancedcombobox.h"
 
 /*! \brief description of an objective
     \ingroup qf3lib_widgets
@@ -97,6 +98,7 @@ public slots:
     void addObjective();
     void deleteObjective();
     void editObjective();
+    void setReadOnly(bool readonly);
 signals:
     void objectiveChanged();
 protected slots:
@@ -104,7 +106,7 @@ protected slots:
 
 protected:
     QList<ObjectiveDescription> objectives;
-    QComboBox* cmbObjective;
+    QEnhancedComboBox* cmbObjective;
     QToolButton* btnAddObjective;
     QToolButton* btnEditObjective;
     QToolButton* btnDeleteObjective;

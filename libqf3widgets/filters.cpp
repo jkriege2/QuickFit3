@@ -69,7 +69,7 @@ QF3FilterCombobox::QF3FilterCombobox(QWidget* parent):
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
-    cmbFilters=new QComboBox(this);
+    cmbFilters=new QEnhancedComboBox(this);
     cmbFilters->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbFilters, SIGNAL(currentIndexChanged(int)), this, SLOT(currentFilterChanged(int)));
     hbl->addWidget(cmbFilters);
@@ -250,4 +250,10 @@ void QF3FilterCombobox::loadSettings(QSettings& settings, QString property) {
 
 void QF3FilterCombobox::saveSettings(QSettings& settings, QString property) {
     settings.setValue(property, cmbFilters->currentText());
+}
+void QF3FilterCombobox::setReadOnly(bool readonly) {
+    cmbFilters->setReadOnly(readonly);
+    btnAddFilter->setEnabled(!readonly);
+    btnEditFilter->setEnabled(!readonly);
+    btnDeleteFilter->setEnabled(!readonly);
 }

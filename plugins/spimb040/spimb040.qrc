@@ -5,7 +5,6 @@
         <file alias="spimb040/savebackground.png">../../images/22x22/savebackground.png</file>
         <file alias="spimb040/saveraw.png">icons/saveraw.png</file>
         <file alias="spimb040/savetransformed.png">icons/savetransformed.png</file>
-        <file alias="spimb040/capturebackground.png">../../images/22x22/capturebackground.png</file>
         <file alias="spimb040/maskedit.png">icons/maskedit.png</file>
         <file alias="spimb040/maskload.png">icons/maskload.png</file>
         <file alias="spimb040/masksave.png">icons/masksave.png</file>
@@ -14,11 +13,6 @@
         <file alias="spimb040/acquisitionstart.png">../../images/22x22/player_play.png</file>
         <file alias="spimb040/acquisitionstop.png">../../images/22x22/player_pause.png</file>
         <file alias="spimb040/acquisitionsingle.png">../../images/22x22/lphoto.png</file>
-        <file alias="spimb040/acquisitionconnect.png">../../images/22x22/stage_connect.png</file>
-        <file alias="spimb040/acquisitiondisconnect.png">../../images/22x22/stage_disconnect.png</file>
-        <file alias="spimb040/acquisitionsettings.png">../../images/22x22/camerasetup.png</file>
-        <file alias="spimb040/stageconnect.png">../../images/22x22/stage_connect.png</file>
-        <file alias="spimb040/stagedisconnect.png">../../images/22x22/stage_disconnect.png</file>
         <file alias="spimb040/stagesettings.png">icons/configure_alt.png</file>
         <file alias="spimb040/stagemove.png">../../images/22x22/2rightarrow.png</file>
         <file alias="spimb040/stage_error.png">../../images/16x16/stage_error.png</file>
@@ -47,5 +41,16 @@
         <file alias="optics_setup.png">icons/optics_setup.png</file>
         <file alias="move_abs.png">icons/move_abs.png</file>
         <file alias="move_rel.png">icons/move_rel.png</file>
+        <file alias="lock_closed.png">icons/lock_closed.png</file>
+        <file alias="lock_opened.png">icons/lock_opened.png</file>
+        <file alias="connect_cameras.png">icons/connect_cameras.png</file>
+        <file alias="connect_devices.png">icons/connect_devices.png</file>
+        <file alias="disconnect_cameras.png">icons/disconnect_cameras.png</file>
+        <file alias="disconnect_devices.png">icons/disconnect_devices.png</file>
+        <file alias="acquisitionconnect.png">icons/connect_cameras.png</file>
+        <file alias="acquisitiondisconnect.png">icons/disconnect_cameras.png</file>
+        <file alias="stageconnect.png">icons/connect_stage.png</file>
+        <file alias="stagedisconnect.png">icons/disconnect_stage.png</file>
+        <file alias="acquisitionsettings.png">icons/camera_settings.png</file>
     </qresource>
 </RCC>

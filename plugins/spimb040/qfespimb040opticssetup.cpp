@@ -26,6 +26,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogServ
     ui->objProjection->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube1->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube2->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
+    ui->btnLockFiltersEtc->setChecked(true);
 }
 
 QFESPIMB040OpticsSetup::~QFESPIMB040OpticsSetup()
