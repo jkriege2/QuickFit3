@@ -24,6 +24,7 @@
 #include "jkimage.h"
 #include "qfespimb040cameraview.h"
 #include "jkqttools.h"
+#include "qvisiblehandlesplitter.h"
 
 
 #include "qtlogfile.h"
@@ -67,6 +68,9 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
 
         /** \brief main log widget */
         QtLogFile* logMain;
+
+        /** \brief main splitter */
+        QVisibleHandleSplitter* splitter;
 
         QFESPIMB040OpticsSetup* optSetup;
         QFESPIMB040ExperimentDescription* widExperimentDescription;

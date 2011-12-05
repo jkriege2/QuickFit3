@@ -26,7 +26,6 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent):
     createWidgets();
     createActions();
     updateStates();
-
     QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
 }
 
@@ -301,17 +300,17 @@ void QFESPIMB040SampleStageConfig::createActions() {
     std::cout<<">>>> createActions()\n";
     actConnectX=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
     actConnectX->setCheckable(true);
-    connect(actConnectX, SIGNAL(triggered()), this, SLOT(disConnectX()));
+    connect(actConnectX, SIGNAL(toggled(bool)), this, SLOT(disConnectX()));
     btnConnectX->setDefaultAction(actConnectX);
 
     actConnectY=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect y-axis ..."), this);
     actConnectY->setCheckable(true);
-    connect(actConnectY, SIGNAL(triggered()), this, SLOT(disConnectY()));
+    connect(actConnectY, SIGNAL(toggled(bool)), this, SLOT(disConnectY()));
     btnConnectY->setDefaultAction(actConnectY);
 
     actConnectZ=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect z-axis ..."), this);
     actConnectZ->setCheckable(true);
-    connect(actConnectZ, SIGNAL(triggered()), this, SLOT(disConnectZ()));
+    connect(actConnectZ, SIGNAL(toggled(bool)), this, SLOT(disConnectZ()));
     btnConnectZ->setDefaultAction(actConnectZ);
 
 
@@ -773,4 +772,16 @@ void QFESPIMB040SampleStageConfig::moveRelative() {
             stage->move(axis, stage->getPosition(axis)+z);
         }
     }
+}
+
+void QFESPIMB040SampleStageConfig::connectStages() {
+    actConnectX->setChecked(true);
+    actConnectY->setChecked(true);
+    actConnectZ->setChecked(true);
+}
+
+void QFESPIMB040SampleStageConfig::disconnectStages() {
+    actConnectX->setChecked(false);
+    actConnectY->setChecked(false);
+    actConnectZ->setChecked(false);
 }

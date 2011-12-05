@@ -53,6 +53,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix);
 
+        void connectStages();
+        void disconnectStages();
+
     protected slots:
         void updateStates();
 

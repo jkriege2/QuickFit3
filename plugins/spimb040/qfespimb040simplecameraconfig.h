@@ -87,6 +87,9 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         virtual void resume();
         void setMagnification(double mag);
 
+        void connectCamera();
+        void disconnectCamera();
+
     signals:
         /** \brief emitted when the set of configuration files changes */
         void configFilesChanged();

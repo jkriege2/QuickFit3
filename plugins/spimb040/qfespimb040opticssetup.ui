@@ -197,6 +197,9 @@ p, li { white-space: pre-wrap; }
          <property name="title">
           <string>Camera 2:</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
@@ -246,6 +249,9 @@ p, li { white-space: pre-wrap; }
         <widget class="QFESPIMB040SimpleCameraConfig" name="camConfig1">
          <property name="title">
           <string>Camera 1:</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -819,6 +825,134 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>902</x>
      <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_15</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>712</x>
+     <y>421</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>732</x>
+     <y>445</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filtDetection21</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>782</x>
+     <y>424</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>791</x>
+     <y>439</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_16</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>757</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>692</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>objTube2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>843</x>
+     <y>425</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>839</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_13</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>743</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>709</x>
+     <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filtDetection11</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>827</x>
+     <y>249</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>828</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_14</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>739</x>
+     <y>251</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>722</x>
+     <y>289</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>camConfig1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>objTube1</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>791</x>
+     <y>249</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>792</x>
+     <y>290</y>
     </hint>
    </hints>
   </connection>

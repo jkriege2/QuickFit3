@@ -44,6 +44,8 @@ QFESPIMB040SimpleCameraConfig::QFESPIMB040SimpleCameraConfig(QWidget* parent):
     displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
     init(0, NULL, "");
+    setCheckable(true);
+    setChecked(true);
 }
 
 
@@ -142,7 +144,7 @@ void QFESPIMB040SimpleCameraConfig::releaseCamera() {
 void QFESPIMB040SimpleCameraConfig::loadSettings(QSettings& settings, QString prefix) {
     if (camView) camView->loadSettings(settings, prefix+"cam_view/");
 
-
+    setChecked(settings.value(prefix+"enabled", 0).toBool());
     cmbAcquisitionDevice->setCurrentIndex(settings.value(prefix+"last_device", 0).toInt());
     spinAcquisitionDelay->setValue(settings.value(prefix+"acquisition_delay", 0).toDouble());
     cmbPreviewConfiguration->setCurrentConfig(settings.value(prefix+"preview_config", "default").toString());
@@ -152,6 +154,7 @@ void QFESPIMB040SimpleCameraConfig::loadSettings(QSettings& settings, QString pr
 void QFESPIMB040SimpleCameraConfig::storeSettings(QSettings& settings, QString prefix) {
     if (camView) camView->storeSettings(settings, prefix+"cam_view/");
 
+    settings.setValue(prefix+"enabled", isChecked());
     settings.setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings.setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
     settings.setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
@@ -243,11 +246,11 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
 void QFESPIMB040SimpleCameraConfig::createActions() {
     actDisConnect = new QAction(QIcon(":/spimb040/acquisitionconnect.png"), tr("&Connect"), this);
     actDisConnect->setCheckable(true);
-    connect(actDisConnect, SIGNAL(triggered()), this, SLOT(disConnectAcquisitionDevice()));
+    connect(actDisConnect, SIGNAL(toggled(bool)), this, SLOT(disConnectAcquisitionDevice()));
 
     actStartStopPreview = new QAction(QIcon(":/spimb040/acquisitionstart.png"), tr("&Start acquisition"), this);
     actStartStopPreview->setCheckable(true);
-    connect(actStartStopPreview, SIGNAL(triggered()), this, SLOT(startStopPreview()));
+    connect(actStartStopPreview, SIGNAL(toggled(bool)), this, SLOT(startStopPreview()));
 
     actPreviewSingle = new QAction(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acquire single image"), this);
     connect(actPreviewSingle, SIGNAL(triggered()), this, SLOT(previewSingle()));
@@ -608,4 +611,14 @@ void QFESPIMB040SimpleCameraConfig::previewCurrentIndexChanged(int index) {
         actStartStopPreview->setChecked(true);
         startStopPreview();
     }
+}
+
+void QFESPIMB040SimpleCameraConfig::connectCamera() {
+    if (!isChecked()) return;
+    actDisConnect->setChecked(true);
+}
+
+void QFESPIMB040SimpleCameraConfig::disconnectCamera() {
+    if (!isChecked()) return;
+    actDisConnect->setChecked(false);
 }

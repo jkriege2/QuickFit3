@@ -286,111 +286,113 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
         histEnd=which+1;
     }
     for (int hh=histStart; hh<histEnd; hh++) {
-        QFHistogramView::Histogram hist=histograms[hh];
-        if (hist.data && (hist.size>0)) {
-            int imageSize=hist.size;
-            double* datahist=(double*)malloc(imageSize*sizeof(double));
-            int32_t datasize=0;
-            double mmin=edtHistogramMin->value();
-            double mmax=edtHistogramMax->value();
-            if (chkHistogramRangeAuto->isChecked()) {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    datahist[i]=hist.data[i];
-                    datasize++;
-                }
-            } else {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if ((hist.data[i]>=mmin) && (hist.data[i]<=mmax)) {
-                        datahist[datasize]=hist.data[i];
+        if (hh>0 && hh<histograms.size()) {
+            QFHistogramView::Histogram hist=histograms[hh];
+            if (hist.data && (hist.size>0)) {
+                int imageSize=hist.size;
+                double* datahist=(double*)malloc(imageSize*sizeof(double));
+                int32_t datasize=0;
+                double mmin=edtHistogramMin->value();
+                double mmax=edtHistogramMax->value();
+                if (chkHistogramRangeAuto->isChecked()) {
+                    for (register int32_t i=0; i<imageSize; i++) {
+                        datahist[i]=hist.data[i];
                         datasize++;
                     }
+                } else {
+                    for (register int32_t i=0; i<imageSize; i++) {
+                        if ((hist.data[i]>=mmin) && (hist.data[i]<=mmax)) {
+                            datahist[datasize]=hist.data[i];
+                            datasize++;
+                        }
+                    }
                 }
+
+
+                statisticsSort(datahist, datasize);
+                double dmean, dstd, dmin, dmax, dmedian, dq25, dq75;
+                dmean=statisticsAverageVariance(dstd, datahist, datasize);
+                dstd=sqrt(dstd);
+                dmin=statisticsSortedMin(datahist, datasize);
+                dmax=statisticsSortedMax(datahist, datasize);
+                dmedian=statisticsSortedMedian(datahist, datasize);
+                dq25=statisticsSortedQuantile(datahist, datasize, 0.25);
+                dq75=statisticsSortedQuantile(datahist, datasize, 0.75);
+                tabHistogramParameters->setCell(0, hh+1, datasize);
+                tabHistogramParameters->setCell(1, hh+1, dmean);
+                tabHistogramParameters->setCell(2, hh+1, dmedian);
+                tabHistogramParameters->setCell(3, hh+1, dstd);
+                tabHistogramParameters->setCell(4, hh+1, dmin);
+                tabHistogramParameters->setCell(5, hh+1, dq25);
+                tabHistogramParameters->setCell(6, hh+1, dq75);
+                tabHistogramParameters->setCell(7, hh+1, dmax);
+                tabHistogramParameters->setColumnTitle(hh+1, hist.name);
+
+                if (chkHistogramRangeAuto->isChecked()) {
+                    connectParameterWidgets(false);
+                    edtHistogramMin->setValue(dmin);
+                    edtHistogramMax->setValue(dmax);
+                    connectParameterWidgets(true);
+                }
+
+                long histBins=spinHistogramBins->value();
+                double* histX=(double*)malloc(histBins*sizeof(double));
+                double* histY=(double*)malloc(histBins*sizeof(double));
+
+
+                if (chkHistogramRangeAuto->isChecked()) {
+                    statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                } else {
+                    statisticsHistogramRanged<double, double>(datahist, datasize, edtHistogramMin->value(), edtHistogramMax->value(), histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                }
+
+                if (hh==0) mainHistogramMax=statisticsMax(histY, histBins);
+                double barY=mainHistogramMax*1.1;
+
+                QString prefix=QString("hist%1_").arg(hh);
+
+                size_t pltcPHHistogramX=ds->addCopiedColumn(histX, histBins, prefix+"histX");
+                size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, prefix+"histY");
+                size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, prefix+"barY");
+                size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, prefix+"mean");;
+                /*size_t pltcPHBarStd=*/ds->addCopiedColumn(&dstd, 1, prefix+"stddev");;
+                size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, prefix+"median");;
+                size_t pltcPHBarMin=ds->addCopiedColumn(&dmin, 1, prefix+"min");;
+                size_t pltcPHBarMax=ds->addCopiedColumn(&dmax, 1, prefix+"max");;
+                size_t pltcPHBarQ25=ds->addCopiedColumn(&dq25, 1, prefix+"quant25");;
+                size_t pltcPHBarQ75=ds->addCopiedColumn(&dq75, 1, prefix+"quant75");;
+
+                JKQTPboxplotHorizontalGraph* plteParamHistogramBoxplot=new JKQTPboxplotHorizontalGraph(pltParamHistogram->get_plotter());
+                plteParamHistogramBoxplot->set_boxWidth(mainHistogramMax*0.08);
+                plteParamHistogramBoxplot->set_maxColumn(pltcPHBarMax);
+                plteParamHistogramBoxplot->set_minColumn(pltcPHBarMin);
+                plteParamHistogramBoxplot->set_medianColumn(pltcPHBarMedian);
+                plteParamHistogramBoxplot->set_meanColumn(pltcPHBarMean);
+                plteParamHistogramBoxplot->set_percentile25Column(pltcPHBarQ25);
+                plteParamHistogramBoxplot->set_percentile75Column(pltcPHBarQ75);
+                plteParamHistogramBoxplot->set_posColumn(pltcPHBarY);
+                //plteParamHistogramBoxplot->set_color(QColor("blue"));
+                plteParamHistogramBoxplot->set_title(tr("boxplot (%1)").arg(hist.name));
+                pltParamHistogram->addGraph(plteParamHistogramBoxplot);
+
+                JKQTPbarHorizontalGraph* plteParamHistogram=new JKQTPbarHorizontalGraph(pltParamHistogram->get_plotter());
+                QColor fill=plteParamHistogramBoxplot->get_color();
+                fill.setAlphaF(0.7);
+                plteParamHistogram->set_fillColor(fill);
+                plteParamHistogram->set_xColumn(pltcPHHistogramX);
+                plteParamHistogram->set_yColumn(pltcPHHistogramY);
+                plteParamHistogram->set_width(1);
+                /*if (!chkHistogramRangeAuto->isChecked()) {
+                    plteParamHistogram->set_width(1.0/(double)histograms.size());
+                    plteParamHistogram->set_shift(hh*1.0/(double)histograms.size());
+                //}*/
+                plteParamHistogram->set_title(tr("histogram (%1)").arg(hist.name));
+                pltParamHistogram->addGraph(plteParamHistogram);
+
+                free(histX);
+                free(histY);
+                free(datahist);
             }
-
-
-            statisticsSort(datahist, datasize);
-            double dmean, dstd, dmin, dmax, dmedian, dq25, dq75;
-            dmean=statisticsAverageVariance(dstd, datahist, datasize);
-            dstd=sqrt(dstd);
-            dmin=statisticsSortedMin(datahist, datasize);
-            dmax=statisticsSortedMax(datahist, datasize);
-            dmedian=statisticsSortedMedian(datahist, datasize);
-            dq25=statisticsSortedQuantile(datahist, datasize, 0.25);
-            dq75=statisticsSortedQuantile(datahist, datasize, 0.75);
-            tabHistogramParameters->setCell(0, hh+1, datasize);
-            tabHistogramParameters->setCell(1, hh+1, dmean);
-            tabHistogramParameters->setCell(2, hh+1, dmedian);
-            tabHistogramParameters->setCell(3, hh+1, dstd);
-            tabHistogramParameters->setCell(4, hh+1, dmin);
-            tabHistogramParameters->setCell(5, hh+1, dq25);
-            tabHistogramParameters->setCell(6, hh+1, dq75);
-            tabHistogramParameters->setCell(7, hh+1, dmax);
-            tabHistogramParameters->setColumnTitle(hh+1, hist.name);
-
-            if (chkHistogramRangeAuto->isChecked()) {
-                connectParameterWidgets(false);
-                edtHistogramMin->setValue(dmin);
-                edtHistogramMax->setValue(dmax);
-                connectParameterWidgets(true);
-            }
-
-            long histBins=spinHistogramBins->value();
-            double* histX=(double*)malloc(histBins*sizeof(double));
-            double* histY=(double*)malloc(histBins*sizeof(double));
-
-
-            if (chkHistogramRangeAuto->isChecked()) {
-                statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
-            } else {
-                statisticsHistogramRanged<double, double>(datahist, datasize, edtHistogramMin->value(), edtHistogramMax->value(), histX, histY, histBins, chkNormalizedHistograms->isChecked());
-            }
-
-            if (hh==0) mainHistogramMax=statisticsMax(histY, histBins);
-            double barY=mainHistogramMax*1.1;
-
-            QString prefix=QString("hist%1_").arg(hh);
-
-            size_t pltcPHHistogramX=ds->addCopiedColumn(histX, histBins, prefix+"histX");
-            size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, prefix+"histY");
-            size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, prefix+"barY");
-            size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, prefix+"mean");;
-            /*size_t pltcPHBarStd=*/ds->addCopiedColumn(&dstd, 1, prefix+"stddev");;
-            size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, prefix+"median");;
-            size_t pltcPHBarMin=ds->addCopiedColumn(&dmin, 1, prefix+"min");;
-            size_t pltcPHBarMax=ds->addCopiedColumn(&dmax, 1, prefix+"max");;
-            size_t pltcPHBarQ25=ds->addCopiedColumn(&dq25, 1, prefix+"quant25");;
-            size_t pltcPHBarQ75=ds->addCopiedColumn(&dq75, 1, prefix+"quant75");;
-
-            JKQTPboxplotHorizontalGraph* plteParamHistogramBoxplot=new JKQTPboxplotHorizontalGraph(pltParamHistogram->get_plotter());
-            plteParamHistogramBoxplot->set_boxWidth(mainHistogramMax*0.08);
-            plteParamHistogramBoxplot->set_maxColumn(pltcPHBarMax);
-            plteParamHistogramBoxplot->set_minColumn(pltcPHBarMin);
-            plteParamHistogramBoxplot->set_medianColumn(pltcPHBarMedian);
-            plteParamHistogramBoxplot->set_meanColumn(pltcPHBarMean);
-            plteParamHistogramBoxplot->set_percentile25Column(pltcPHBarQ25);
-            plteParamHistogramBoxplot->set_percentile75Column(pltcPHBarQ75);
-            plteParamHistogramBoxplot->set_posColumn(pltcPHBarY);
-            //plteParamHistogramBoxplot->set_color(QColor("blue"));
-            plteParamHistogramBoxplot->set_title(tr("boxplot (%1)").arg(hist.name));
-            pltParamHistogram->addGraph(plteParamHistogramBoxplot);
-
-            JKQTPbarHorizontalGraph* plteParamHistogram=new JKQTPbarHorizontalGraph(pltParamHistogram->get_plotter());
-            QColor fill=plteParamHistogramBoxplot->get_color();
-            fill.setAlphaF(0.7);
-            plteParamHistogram->set_fillColor(fill);
-            plteParamHistogram->set_xColumn(pltcPHHistogramX);
-            plteParamHistogram->set_yColumn(pltcPHHistogramY);
-            plteParamHistogram->set_width(1);
-            /*if (!chkHistogramRangeAuto->isChecked()) {
-                plteParamHistogram->set_width(1.0/(double)histograms.size());
-                plteParamHistogram->set_shift(hh*1.0/(double)histograms.size());
-            //}*/
-            plteParamHistogram->set_title(tr("histogram (%1)").arg(hist.name));
-            pltParamHistogram->addGraph(plteParamHistogram);
-
-            free(histX);
-            free(histY);
-            free(datahist);
         }
     }
 

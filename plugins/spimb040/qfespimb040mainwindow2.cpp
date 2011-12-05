@@ -27,6 +27,7 @@ QFESPIMB040MainWindow2::~QFESPIMB040MainWindow2()
 
 void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
+    jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
@@ -35,6 +36,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
+    jksaveSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
@@ -61,8 +63,10 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     QVBoxLayout* mainl=new QVBoxLayout(this);
     mainl->setContentsMargins(0,0,0,0);
     setLayout(mainl);
+    splitter=new QVisibleHandleSplitter(Qt::Vertical, this);
+    mainl->addWidget(splitter);
     tabMain=new QTabWidget(this);
-    mainl->addWidget(tabMain);
+    splitter->addWidget(tabMain);
     btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("Help"), this);
     btnHelp->setToolTip(tr("display the online help window"));
     connect(btnHelp, SIGNAL(clicked()), this,SLOT(displayHelp()));
@@ -73,9 +77,14 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    QVBoxLayout* loglayout=new QVBoxLayout(this);
+    QWidget* w=new QWidget(this);
+    w->setLayout(loglayout);
+    splitter->addWidget(w);
+    loglayout->setContentsMargins(0,0,0,0);
     logMain=new QtLogFile(this);
-    mainl->addWidget(new QLabel(tr("<b>Log Messages:</b>")));
-    mainl->addWidget(logMain);
+    loglayout->addWidget(new QLabel(tr("<b>Log Messages:</b>")));
+    loglayout->addWidget(logMain);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

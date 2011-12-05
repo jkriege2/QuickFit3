@@ -110,6 +110,12 @@ class QFESPIMB040OpticsSetup : public QWidget {
     protected slots:
         void updateMagnifications();
 
+        void on_btnConnectDevices_clicked();
+        void on_btnConnectCameras_clicked();
+        void on_btnDisconnectDevices_clicked();
+        void on_btnDisconnectCameras_clicked();
+
+
     protected:
         void closeEvent(QCloseEvent * event);
         void showEvent( QShowEvent * event );

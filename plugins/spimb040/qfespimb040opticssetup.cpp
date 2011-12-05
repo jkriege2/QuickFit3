@@ -182,6 +182,25 @@ void QFESPIMB040OpticsSetup::releaseCamera(int setup_cam) {
     }
 }
 
+void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
+    ui->stageSetup->connectStages();
+}
+
+void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
+    ui->camConfig1->connectCamera();
+    ui->camConfig2->connectCamera();
+}
+
+void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
+    ui->stageSetup->disconnectStages();
+}
+
+void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
+    ui->camConfig1->disconnectCamera();
+    ui->camConfig2->disconnectCamera();
+}
+
+
 void QFESPIMB040OpticsSetup::updateMagnifications() {
     double m=ui->objDetection->objective().magnification*ui->objTube1->objective().magnification;
     ui->camConfig1->setMagnification(m);
