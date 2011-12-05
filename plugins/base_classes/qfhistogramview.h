@@ -55,9 +55,9 @@ class QFHistogramView : public QWidget {
         /** \brief replot histogram */
         void replotHistogram();
 
-        /** \brief recalculate histogram over all pixels
+        /** \brief recalculate histograms
          *
-         * \which==-1 means all histograms, \a which >=0 means a specific histogram
+         * \which==-1 means all histograms, \a which>=0 means a specific histogram
          */
         void updateHistogram(bool replot=false, int which=-1);
 

@@ -252,6 +252,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
+        /** \brief cobobox to select what should happen to the out-of-range pixels */
+        QComboBox* cmbOutOfRangeMode;
 
         ///** \brief combobox for the color bar of plteOverview */
         //QComboBox* cmbOverviewColorbar;
@@ -294,18 +296,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
 
         /** \brief plotter widget for the parameter histogram */
-        /*JKQtPlotter* pltParamHistogram;
-        QCheckBox* chkLogHistogram;
-        QSpinBox* spinHistogramBins;
-        QGroupBox* grpHistogramSettings;
-        QEnhancedTableView* tvHistogramParameters;
-        QFTableModel* tabHistogramParameters;
-        QVisibleHandleSplitter* splitterHistogram;
-        QCheckBox* chkNormalizedHistograms;
-        double mainHistogramMax;
-        QCheckBox* chkHistogramRangeAuto;
-        JKDoubleEdit* edtHistogramMin;
-        JKDoubleEdit* edtHistogramMax;*/
+
         QFHistogramView* histogram;
         QCheckBox* chkExcludeExcludedRunsFromHistogram;
         double* datahist;

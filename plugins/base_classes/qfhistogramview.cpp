@@ -286,7 +286,8 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
         histEnd=which+1;
     }
     for (int hh=histStart; hh<histEnd; hh++) {
-        if (hh>0 && hh<histograms.size()) {
+        qDebug()<<hh<<histograms.size();
+        if (hh>=0 && hh<histograms.size()) {
             QFHistogramView::Histogram hist=histograms[hh];
             if (hist.data && (hist.size>0)) {
                 int imageSize=hist.size;

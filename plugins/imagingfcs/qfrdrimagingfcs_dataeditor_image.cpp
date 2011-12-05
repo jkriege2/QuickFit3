@@ -146,6 +146,16 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     coll->setContentsMargins(0,0,0,0);
     gli->addRow(QString(""), coll);
 
+    cmbOutOfRangeMode=new QComboBox(wimg);
+    cmbOutOfRangeMode->addItem(tr("min/max color"));
+    cmbOutOfRangeMode->addItem(tr("black"));
+    cmbOutOfRangeMode->addItem(tr("white"));
+    cmbOutOfRangeMode->addItem(tr("transparent"));
+    cmbOutOfRangeMode->addItem(tr("red"));
+    cmbOutOfRangeMode->addItem(tr("green"));
+    cmbOutOfRangeMode->addItem(tr("blue"));
+    gli->addRow(tr("out-of-range mode:"), cmbOutOfRangeMode);
+
     chkDisplayImageOverlay=new QCheckBox(wimg);
     gli->addRow(tr("show &overlays:"), chkDisplayImageOverlay);
 
@@ -502,78 +512,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     histogram=new QFHistogramView(this);
     QWidget* widHist=histogram;
     chkExcludeExcludedRunsFromHistogram=new QCheckBox("", this);
-    //flHistSet->addRow(tr("mind excluded runs:"), chkExcludeExcludedRunsFromHistogram);
     chkExcludeExcludedRunsFromHistogram->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
     histogram->addSettingsWidget(tr("mind excluded runs:"), chkExcludeExcludedRunsFromHistogram);
-    /*QGridLayout* layHist=new QGridLayout();
-    widHist->setLayout(layHist);
-
-    // HISTOGRAM SETTINGS/////////////////////////////////////////////////////////////////////
-    grpHistogramSettings=new QGroupBox(tr("histogram style"), this);
-    QFormLayout* flHistSet=new QFormLayout(grpHistogramSettings);
-    grpHistogramSettings->setLayout(flHistSet);
-    spinHistogramBins=new QSpinBox(this);
-    spinHistogramBins->setRange(5,99999);
-    spinHistogramBins->setValue(25);
-    flHistSet->addRow(tr("# bins:"), spinHistogramBins);
-    chkLogHistogram=new QCheckBox("", grpHistogramSettings);
-    flHistSet->addRow(tr("log-scale:"), chkLogHistogram);
-    chkNormalizedHistograms=new QCheckBox("", grpHistogramSettings);
-    flHistSet->addRow(tr("normalized:"), chkNormalizedHistograms);
-    chkHistogramRangeAuto=new QCheckBox("auto", grpHistogramSettings);
-    flHistSet->addRow(tr("range:"), chkHistogramRangeAuto);
-    edtHistogramMin=new JKDoubleEdit(wimg);
-    edtHistogramMin->setCheckBounds(false, false);
-    edtHistogramMin->setValue(0);
-    edtHistogramMax=new JKDoubleEdit(wimg);
-    edtHistogramMax->setCheckBounds(false, false);
-    edtHistogramMax->setValue(10);
-    coll=new QHBoxLayout();
-    coll->addWidget(edtHistogramMin,1);
-    coll->addWidget(new QLabel(" ... "));
-    coll->addWidget(edtHistogramMax,1);
-    coll->setContentsMargins(0,0,0,0);
-    flHistSet->addRow(QString(""), coll);
-
-    // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
-    splitterHistogram=new QVisibleHandleSplitter(this);
-    pltParamHistogram=new JKQtPlotter(this);
-    tvHistogramParameters=new QEnhancedTableView(this);
-    tabHistogramParameters=new QFTableModel(this);
-    tabHistogramParameters->setReadonly(false);
-    tabHistogramParameters->clear();
-    tabHistogramParameters->appendColumn();
-    tabHistogramParameters->setColumnTitle(0, tr("parameter"));
-    tabHistogramParameters->appendColumn();
-    tabHistogramParameters->setColumnTitle(1, tr("complete histogram"));
-    tabHistogramParameters->appendColumn();
-    tabHistogramParameters->setColumnTitle(2, tr("selection histogram"));
-    for (int r=0; r<8; r++) tabHistogramParameters->appendRow();
-    tabHistogramParameters->setCell(0, 0, tr("data points N"));
-    tabHistogramParameters->setCell(1, 0, tr("average"));
-    tabHistogramParameters->setCell(2, 0, tr("median"));
-    tabHistogramParameters->setCell(3, 0, tr("std. dev. &sigma;"));
-    tabHistogramParameters->setCell(4, 0, tr("min"));
-    tabHistogramParameters->setCell(5, 0, tr("25% quantile"));
-    tabHistogramParameters->setCell(6, 0, tr("75% quantile"));
-    tabHistogramParameters->setCell(7, 0, tr("max"));
-    tabHistogramParameters->setReadonly(true);
-
-    tvHistogramParameters->setModel(tabHistogramParameters);
-    tvHistogramParameters->setItemDelegate(new QFHTMLDelegate(tvParams));
-    tvHistogramParameters->setAlternatingRowColors(true);
-    tvHistogramParameters->verticalHeader()->setDefaultSectionSize((int)round((double)tvfm.height()*1.5));
-
-
-
-    splitterHistogram->addWidget(pltParamHistogram);
-    splitterHistogram->addWidget(tvHistogramParameters);
-    layHist->addWidget(splitterHistogram, 0, 0);
-    layHist->addWidget(grpHistogramSettings, 0, 1);
-    layHist->setColumnStretch(0,5);
-    layHist->setContentsMargins(0,0,0,0);*/
-
-
 
 
 
@@ -607,6 +547,7 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             writeSettings();
         } else {
             current->setQFProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param), cmbColorbar->currentIndex(), false, false);
+            current->setQFProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), chkImageAutoScale->isChecked(), false, false);
             if (!chkImageAutoScale->isChecked()) {
@@ -622,16 +563,6 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
                 current->setQFProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), histogram->getMin(), false, false);
                 current->setQFProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), histogram->getMax(), false, false);
             }
-
-            /*current->setQFProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), spinHistogramBins->value(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histnorm_%1_%2").arg(egroup).arg(param), chkNormalizedHistograms->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histlog_%1_%2").arg(egroup).arg(param), chkLogHistogram->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histrauto_%1_%2").arg(egroup).arg(param), chkHistogramRangeAuto->isChecked(), false, false);
-            if (!chkHistogramRangeAuto->isChecked()) {
-                current->setQFProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), edtHistogramMin->value(), false, false);
-                current->setQFProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), edtHistogramMax->value(), false, false);
-            }*/
         }
 
     }
@@ -652,6 +583,7 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
                                        settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex())).toInt();
             if (d>=0) cmbColorbar->setCurrentIndex(d);
             else if (cmbColorbar->count()>0) cmbColorbar->setCurrentIndex(0);
+            cmbOutOfRangeMode->setCurrentIndex(current->getProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex()).toInt());
             chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), false).toBool());
             chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true).toBool());
             if (!chkImageAutoScale->isChecked()) {
@@ -667,19 +599,9 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
                 histogram->setMin(current->getProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
                 histogram->setMax(current->getProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
             }
-/*
-            spinHistogramBins->setValue(current->getProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), 25).toInt());
-            chkNormalizedHistograms->setChecked(current->getProperty(QString("imfcs_imed_histnorm_%1_%2").arg(egroup).arg(param), true).toBool());
-            chkLogHistogram->setChecked(current->getProperty(QString("imfcs_imed_histlog_%1_%2").arg(egroup).arg(param), false).toBool());
-            chkExcludeExcludedRunsFromHistogram->setChecked(current->getProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), true).toBool());
-            chkHistogramRangeAuto->setChecked(current->getProperty(QString("imfcs_imed_histrauto_%1_%2").arg(egroup).arg(param), true).toBool());
-            if (!chkHistogramRangeAuto->isChecked()) {
-                edtHistogramMin->setValue(current->getProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
-                edtHistogramMax->setValue(current->getProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
-            }
-  */
+
             connectParameterWidgets(true);
-            //histogram->connectParameterWidgets(true);
+
             pltImage->update_plot();
         }
 
@@ -699,12 +621,54 @@ void QFRDRImagingFCSImageEditor::displayOverlayChanged() {
         pltGofImage->addGraph(plteGofImageExcluded);
     }
     saveImageSettings();
-    //pltImage->update_data();
+
 }
 
 void QFRDRImagingFCSImageEditor::paletteChanged() {
     plteImage->set_palette(cmbColorbar->currentIndex());
     plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
+    switch(cmbOutOfRangeMode->currentIndex()) {
+        case 0:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::LastPaletteColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::LastPaletteColor);
+            break;
+        default:
+        case 1:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailColor(QColor("black"));
+            plteImage->set_rangeMaxFailColor(QColor("black"));
+            break;
+        case 2:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailColor(QColor("white"));
+            plteImage->set_rangeMaxFailColor(QColor("white"));
+            break;
+        case 3:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::Transparent);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::Transparent);
+            break;
+        case 4:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailColor(QColor("red"));
+            plteImage->set_rangeMaxFailColor(QColor("red"));
+            break;
+        case 5:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailColor(QColor("green"));
+            plteImage->set_rangeMaxFailColor(QColor("green"));
+            break;
+        case 6:
+            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailColor(QColor("blue"));
+            plteImage->set_rangeMaxFailColor(QColor("blue"));
+            break;
+    }
+
     edtColMin->setEnabled(!chkImageAutoScale->isChecked());
     edtColMax->setEnabled(!chkImageAutoScale->isChecked());
     if (!chkImageAutoScale->isChecked()) {
@@ -721,10 +685,7 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
 }
 
 void QFRDRImagingFCSImageEditor::histogramSettingsChanged() {
-    /*edtHistogramMin->setEnabled(!chkHistogramRangeAuto->isChecked());
-    edtHistogramMax->setEnabled(!chkHistogramRangeAuto->isChecked());
-    saveImageSettings();
-    updateHistogram();*/
+
     histogram->histogramSettingsChanged(false);
     updateHistogram();
     saveImageSettings();
@@ -778,14 +739,10 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         selected.clear();
         selected.insert(0);
     } else {
-//        runs.setCurrent(current);
         selected.clear();
     }
 
     fillParameterSet();
-
-    //readSettings();
-    //qDebug()<<"connectWidgets ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
 
 
@@ -807,13 +764,13 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
     QTime t;
     t.start();
     replotData();
-    qDebug()<<t.elapsed()<<" ms for replotData()";
+    //qDebug()<<t.elapsed()<<" ms for replotData()";
     t.start();
     replotSelection(true);
-    qDebug()<<t.elapsed()<<" ms for replotSelection()";
+     //qDebug()<<t.elapsed()<<" ms for replotSelection()";
     t.start();
     updateSelectionHistogram(true);
-    qDebug()<<t.elapsed()<<" ms for updateSelectionHistogram()";
+     //qDebug()<<t.elapsed()<<" ms for updateSelectionHistogram()";
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
@@ -1120,7 +1077,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
 }
 
 void QFRDRImagingFCSImageEditor::replotData() {
-    qDebug()<<"replotData";
+     //qDebug()<<"replotData";
     QTime t;
     t.start();
 
@@ -1144,15 +1101,15 @@ void QFRDRImagingFCSImageEditor::replotData() {
     plotterResid->set_emitSignals(false);
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
-    qDebug()<<"replotData   settings sliders: "<<t.elapsed(); t.start();
+     //qDebug()<<"replotData   settings sliders: "<<t.elapsed(); t.start();
     plotter->clearGraphs();
     plotterResid->clearGraphs();
-    qDebug()<<"replotData   clearing graphs: "<<t.elapsed(); t.start();
+     //qDebug()<<"replotData   clearing graphs: "<<t.elapsed(); t.start();
     plotter->get_plotter()->set_showKey(chkKeys->isChecked());
     plotterResid->get_plotter()->set_showKey(chkKeys->isChecked());
-    qDebug()<<"replotData   setting show_key: "<<t.elapsed(); t.start();
+     //qDebug()<<"replotData   setting show_key: "<<t.elapsed(); t.start();
     ds->clear();
-    qDebug()<<"replotData   ds->clear: "<<t.elapsed(); t.start();
+     //qDebug()<<"replotData   ds->clear: "<<t.elapsed(); t.start();
 
 
     if (m->getCorrelationN()>0) {
@@ -1209,7 +1166,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
             g->set_symbol(avgSymbol);
             plotter->addGraph(g);
         }
-        qDebug()<<"replotData   add avg: "<<t.elapsed(); t.start();
+         //qDebug()<<"replotData   add avg: "<<t.elapsed(); t.start();
 
        //////////////////////////////////////////////////////////////////////////////////
        // Plot ALL RUNS (left out runs in gray)
@@ -1244,7 +1201,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 g->set_errorColor(g->get_color().lighter());
                 plotter->addGraph(g);
 
-                qDebug()<<"replotData   add graph "<<i<<": "<<t.elapsed(); t.start();
+                 //qDebug()<<"replotData   add graph "<<i<<": "<<t.elapsed(); t.start();
 
                 double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
                 double* resid=(double*)calloc(m->getCorrelationN(), sizeof(double));
@@ -1262,7 +1219,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                         break;
                     }
                 }
-                qDebug()<<"replotData   search eval "<<i<<": "<<t.elapsed(); t.start();
+                 //qDebug()<<"replotData   search eval "<<i<<": "<<t.elapsed(); t.start();
 
                 // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
                 if (evaluateFitFunction(m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, en)) {
@@ -1285,7 +1242,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     gfit->set_symbolSize(5);
                     gfit->set_color(g->get_color());
                     plotter->addGraph(gfit);
-                    qDebug()<<"replotData   add fit graph "<<i<<": "<<t.elapsed(); t.start();
+                     //qDebug()<<"replotData   add fit graph "<<i<<": "<<t.elapsed(); t.start();
                     JKQTPxyLineGraph* gr=new JKQTPxyLineGraph();
                     gr->set_lineWidth(1.5);
                     gr->set_xColumn(c_tau);
@@ -1299,7 +1256,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     gr->set_symbolSize(5);
                     gr->set_color(g->get_color());
                     plotterResid->addGraph(gr);
-                    qDebug()<<"replotData   add resid graph "<<i<<": "<<t.elapsed(); t.start();
+                     //qDebug()<<"replotData   add resid graph "<<i<<": "<<t.elapsed(); t.start();
 
                     tabFitvals->appendColumn();
                     tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
@@ -1322,7 +1279,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                         if (fix[ii]) tabFitvals->setCellCheckedRole(row, col, Qt::Checked);
                         else tabFitvals->setCellCheckedRole(row, col, Qt::Unchecked);
                     }
-                    qDebug()<<"replotData   set table cells "<<i<<": "<<t.elapsed(); t.start();
+                     //qDebug()<<"replotData   set table cells "<<i<<": "<<t.elapsed(); t.start();
 
                 }
 
@@ -1335,7 +1292,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
         tvParams->resizeColumnsToContents();
 
 
-        qDebug()<<"replotData   add plots: "<<t.elapsed(); t.start();
+         //qDebug()<<"replotData   add plots: "<<t.elapsed(); t.start();
 
 
 
@@ -1344,18 +1301,18 @@ void QFRDRImagingFCSImageEditor::replotData() {
         plotterResid->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotterResid->setX(plotter->getXMin(), plotter->getXMax());
         plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
-        qDebug()<<"replotData   zoom: "<<t.elapsed(); t.start();
+         //qDebug()<<"replotData   zoom: "<<t.elapsed(); t.start();
 
     }
     plotter->set_doDrawing(true);
     plotter->set_emitSignals(true);
     plotterResid->set_doDrawing(true);
     plotterResid->set_emitSignals(true);
-    qDebug()<<"replotData   emit signals: "<<t.elapsed(); t.start();
+     //qDebug()<<"replotData   emit signals: "<<t.elapsed(); t.start();
     //QTime t;
     //t.start();
     plotter->update_plot();
-    qDebug()<<"replotData   update plots: "<<t.elapsed(); t.start();
+     //qDebug()<<"replotData   update plots: "<<t.elapsed(); t.start();
     //qDebug()<<"plotting in "<<t.elapsed()<<" ms";
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotData ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
@@ -1375,6 +1332,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_style"), 0).toInt());
     cmbAverageErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_error_style"), 2).toInt());
     cmbColorbar->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), 0).toInt());
+    cmbOutOfRangeMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/outofrange_mode"), 1).toInt());
     chkDisplayImageOverlay->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), false).toBool());
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_style"), 1).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), 1).toInt());
@@ -1405,6 +1363,7 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_resid"), chkDisplayResiduals->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_avg"), chkDisplayAverage->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/outofrange_mode"), cmbOutOfRangeMode->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_style"), cmbAverageStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_error_style"), cmbAverageErrorStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_style"), cmbRunStyle->currentIndex());
@@ -1590,17 +1549,12 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
             connect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
             connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
+            connect(cmbOutOfRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
             connect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
             connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
             connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
             connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
-            //connect(chkLogHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
-            //connect(chkNormalizedHistograms, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
-            //connect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
-            //connect(chkHistogramRangeAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
-            //connect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
-            //connect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             histogram->connectParameterWidgets(connectTo);
             connect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
         }
@@ -1612,17 +1566,12 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
         disconnect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
         disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
+        disconnect(cmbOutOfRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
         disconnect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
         disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         disconnect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
-        //disconnect(chkLogHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
-        //disconnect(chkNormalizedHistograms, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
-        //disconnect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
-        //disconnect(chkHistogramRangeAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
-        //disconnect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
-        //disconnect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         histogram->connectParameterWidgets(connectTo);
         disconnect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
     }
@@ -1975,7 +1924,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     QTextTableFormat tableFormat1=tableFormat;
     tableFormat1.setWidth(QTextLength(QTextLength::VariableLength, 1));
-    QTextTable* table = cursor.insertTable(4, 2, tableFormat);
+    QTextTable* table = cursor.insertTable(5, 2, tableFormat);
     table->mergeCells(0,0,1,2);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
@@ -1992,6 +1941,8 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(cmbColorbar->currentText())));
         tabCursor=table->cellAt(3, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(edtColMin->value()).arg(edtColMax->value())));
+        tabCursor=table->cellAt(4, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>out-of-range mode:</i> <b>%1</b></small>").arg(cmbOutOfRangeMode->currentText())));
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);
@@ -2034,7 +1985,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         delete painter;
         double scale=document->textWidth()*w3/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
-        tabCursor.insertText(tr("parameter image:\n"), fTextBoldSmall);
+        tabCursor.insertText(tr("overview image:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     cursor.movePosition(QTextCursor::End);
@@ -2062,28 +2013,6 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
 
 
 
-    /*w1=qMax(1,pltParamHistogram->width());
-    w2=qMax(1,tvHistogramParameters->width());
-    allwidth=qMax(1.0,w1+w2);
-    cursor.insertBlock();
-    cursor.insertText(tr("Parameter Histograms:\n").arg(m->getName()), fHeading2);
-    table = cursor.insertTable(1, 2, tableFormat1);
-    {
-        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
-        QPicture pic;
-        QPainter* painter=new QPainter(&pic);
-        pltParamHistogram->get_plotter()->draw(*painter, QRect(0,0,pltParamHistogram->width(),pltParamHistogram->height()));
-        delete painter;
-        double scale=document->textWidth()*w1/allwidth/pic.boundingRect().width();
-        if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
-
-        tabCursor=table->cellAt(0, 1).firstCursorPosition();
-        tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-4\">%1</font></center>").arg(tvHistogramParameters->toHtml())));
-    }
-    QApplication::processEvents();
-    cursor.movePosition(QTextCursor::End);*/
     histogram->writeReport(cursor, document);
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
@@ -2116,11 +2045,6 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
 
 
 void QFRDRImagingFCSImageEditor::replotHistogram() {
-    /*pltParamHistogram->set_doDrawing(false);
-    pltParamHistogram->getYAxis()->set_logAxis(chkLogHistogram->isChecked());
-    pltParamHistogram->zoomToFit(true, true, false, !chkLogHistogram->isChecked());
-    pltParamHistogram->set_doDrawing(true);
-    pltParamHistogram->update_plot();*/
     histogram->replotHistogram();
 }
 
@@ -2155,162 +2079,6 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
     updateSelectionHistogram(false);
     histogram->updateHistogram(true);
 
-        /*
-    if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
-    edtHistogramMin->setEnabled(!chkHistogramRangeAuto->isChecked());
-    edtHistogramMax->setEnabled(!chkHistogramRangeAuto->isChecked());
-
-    //qDebug()<<"updateHistogram";
-    pltParamHistogram->set_doDrawing(false);
-    tvHistogramParameters->setModel(NULL);
-    tabHistogramParameters->setReadonly(false);
-
-    pltParamHistogram->clearGraphs(true);
-    JKQTPdatastore* ds=pltParamHistogram->getDatastore();
-    ds->clear();
-
-    for (int r=0; r<tabHistogramParameters->rowCount(); r++) {
-        tabHistogramParameters->setCell(r, 1, QVariant());
-    }
-
-    //qDebug()<<"***** updateHistogram()   "<<plteImageData<<plteImageSize;
-
-    if (plteImageData && (plteImageSize>=m->getDataImageWidth()*m->getDataImageHeight())) {
-        int imageSize=m->getDataImageWidth()*m->getDataImageHeight();
-        double* datahist=(double*)malloc(imageSize*sizeof(double));
-        int32_t datasize=0;
-        double mmin=edtHistogramMin->value();
-        double mmax=edtHistogramMax->value();
-        // && (plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)
-        if (chkHistogramRangeAuto->isChecked()) {
-            int32_t ii=0;
-            if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if (!m->leaveoutRun(i)) {
-                        datahist[ii]=plteImageData[i];
-                        ii++;
-                        datasize++;
-                    }
-                }
-            } else  {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    datahist[i]=plteImageData[i];
-                    datasize++;
-                }
-            }
-        } else {
-            int32_t ii=0;
-            if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if (!m->leaveoutRun(i) && (plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)) {
-                        datahist[ii]=plteImageData[i];
-                        ii++;
-                        datasize++;
-                    }
-                }
-            } else  {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if ((plteImageData[i]>=mmin) && (plteImageData[i]<=mmax)) {
-                        datahist[ii]=plteImageData[i];
-                        ii++;
-                        datasize++;
-                    }
-                }
-            }
-        }
-
-
-        statisticsSort(datahist, datasize);
-        double dmean, dstd, dmin, dmax, dmedian, dq25, dq75;
-        dmean=statisticsAverageVariance(dstd, datahist, datasize);
-        dstd=sqrt(dstd);
-        dmin=statisticsSortedMin(datahist, datasize);
-        dmax=statisticsSortedMax(datahist, datasize);
-        dmedian=statisticsSortedMedian(datahist, datasize);
-        dq25=statisticsSortedQuantile(datahist, datasize, 0.25);
-        dq75=statisticsSortedQuantile(datahist, datasize, 0.75);
-        tabHistogramParameters->setCell(0, 1, datasize);
-        tabHistogramParameters->setCell(1, 1, dmean);
-        tabHistogramParameters->setCell(2, 1, dmedian);
-        tabHistogramParameters->setCell(3, 1, dstd);
-        tabHistogramParameters->setCell(4, 1, dmin);
-        tabHistogramParameters->setCell(5, 1, dq25);
-        tabHistogramParameters->setCell(6, 1, dq75);
-        tabHistogramParameters->setCell(7, 1, dmax);
-
-        if (chkHistogramRangeAuto->isChecked()) {
-            connectImageWidgets(false);
-            edtHistogramMin->setValue(dmin);
-            edtHistogramMax->setValue(dmax);
-            connectImageWidgets(true);
-        }
-
-        long histBins=spinHistogramBins->value();
-        double* histX=(double*)malloc(histBins*sizeof(double));
-        double* histY=(double*)malloc(histBins*sizeof(double));
-
-
-        if (chkHistogramRangeAuto->isChecked()) {
-            statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
-        } else {
-            statisticsHistogramRanged<double, double>(datahist, datasize, edtHistogramMin->value(), edtHistogramMax->value(), histX, histY, histBins, chkNormalizedHistograms->isChecked());
-        }
-
-        mainHistogramMax=statisticsMax(histY, histBins);
-        double barY=mainHistogramMax*1.1;
-
-        size_t pltcPHHistogramX=ds->addCopiedColumn(histX, histBins, "histX");
-        size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, "histY");
-        size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, "barY");
-        size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, "mean");;
-        size_t pltcPHBarStd=ds->addCopiedColumn(&dstd, 1, "stddev");;
-        size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, "median");;
-        size_t pltcPHBarMin=ds->addCopiedColumn(&dmin, 1, "min");;
-        size_t pltcPHBarMax=ds->addCopiedColumn(&dmax, 1, "max");;
-        size_t pltcPHBarQ25=ds->addCopiedColumn(&dq25, 1, "quant25");;
-        size_t pltcPHBarQ75=ds->addCopiedColumn(&dq75, 1, "quant75");;
-
-        JKQTPboxplotHorizontalGraph* plteParamHistogramBoxplot=new JKQTPboxplotHorizontalGraph(pltParamHistogram->get_plotter());
-        plteParamHistogramBoxplot->set_boxWidth(mainHistogramMax*0.08);
-        plteParamHistogramBoxplot->set_maxColumn(pltcPHBarMax);
-        plteParamHistogramBoxplot->set_minColumn(pltcPHBarMin);
-        plteParamHistogramBoxplot->set_medianColumn(pltcPHBarMedian);
-        plteParamHistogramBoxplot->set_meanColumn(pltcPHBarMean);
-        plteParamHistogramBoxplot->set_percentile25Column(pltcPHBarQ25);
-        plteParamHistogramBoxplot->set_percentile75Column(pltcPHBarQ75);
-        plteParamHistogramBoxplot->set_posColumn(pltcPHBarY);
-        plteParamHistogramBoxplot->set_color(QColor("blue"));
-        plteParamHistogramBoxplot->set_title(tr("boxplot (complete)"));
-        pltParamHistogram->addGraph(plteParamHistogramBoxplot);
-
-        JKQTPbarHorizontalGraph* plteParamHistogram=new JKQTPbarHorizontalGraph(pltParamHistogram->get_plotter());
-        plteParamHistogram->set_fillColor(plteParamHistogramBoxplot->get_color());
-        plteParamHistogram->set_xColumn(pltcPHHistogramX);
-        plteParamHistogram->set_yColumn(pltcPHHistogramY);
-        plteParamHistogram->set_width(1);
-        if (!chkHistogramRangeAuto->isChecked()) {
-            plteParamHistogram->set_width(0.5);
-            plteParamHistogram->set_shift(0);
-        }
-        plteParamHistogram->set_title(tr("histogram (complete)"));
-        pltParamHistogram->addGraph(plteParamHistogram);
-
-        free(histX);
-        free(histY);
-        free(datahist);
-    }
-
-
-    updateSelectionHistogram(false);
-
-
-    tabHistogramParameters->setReadonly(true);
-    tvHistogramParameters->setModel(tabHistogramParameters);
-    tvHistogramParameters->resizeColumnsToContents();
-    replotHistogram();*/
-    //qDebug()<<"updateHistogram ... end";
 }
 
 void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
