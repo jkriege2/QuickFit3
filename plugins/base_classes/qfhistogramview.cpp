@@ -460,7 +460,7 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         QPainter* painter=new QPainter(&pic);
         pltParamHistogram->get_plotter()->draw(*painter, QRect(0,0,pltParamHistogram->width(),pltParamHistogram->height()));
         delete painter;
-        double scale=document->textWidth()*w1/allwidth/pic.boundingRect().width();
+        double scale=0.5;//document->textWidth()*w1/allwidth/pic.boundingRect().width();
         if (scale<=0) scale=1;
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 

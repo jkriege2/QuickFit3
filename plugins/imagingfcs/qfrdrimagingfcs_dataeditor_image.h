@@ -73,8 +73,15 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         ImageTransforms currentGofParameterTransfrom() const;
 
     protected slots:
+        /** \brief switch plots on and off according to selected visible plots */
+        void showHidePlots();
+        /** \brief move color bars to appropriate position */
+        void moveColorbarsAuto();
+
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
+        /** \brief update selection etz. after click on image */
+        void updateAfterClick();
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old);
 
@@ -107,6 +114,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief draw overview plot */
         void replotOverview();
+        /** \brief draw mask plot */
+        void replotMask();
         /** \brief excludes the currently selected items from the evaluation and recalculates the average */
         void excludeRuns();
         /** \brief includes the currently selected items from the evaluation and recalculates the average */
@@ -164,6 +173,13 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         int connectParameterWidgetsCounter;
         int connectImageWidgetsCounter;
 
+        /** \brief indicates whether the overview plot is visible */
+        QCheckBox* chkOverviewVisible;
+        /** \brief indicates whether the goodnes of fit plot is visible */
+        QCheckBox* chkGofVisible;
+        /** \brief indicates whether the mask plot is visible */
+        QCheckBox* chkMaskVisible;
+
 
         /** \brief plotter widget for the correlation curve */
         JKQtPlotter* plotter;
@@ -176,7 +192,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief splitter between bottom plot and parameter table */
         QVisibleHandleSplitter* splitterBot;
         /** \brief splitter between bottom plot and parameter table */
-        QVisibleHandleSplitter* splitterBotPlots;
+        //QVisibleHandleSplitter* splitterBotPlots;
         /** \brief splitter between top plots and bottom plots */
         QVisibleHandleSplitter* splitterTopBot;
         /** \brief checkbox to select whether to display errors or not */
@@ -223,6 +239,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief size of plteOverviewSelectedData */
         int plteOverviewSize;
 
+        /** \brief  plotter for mask image */
+        JKQtPlotter* pltMask;
+        /** \brief plot for the mask image in pltMask */
+        JKQTPOverlayImage* plteMask;
+        /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
+        JKQTPOverlayImageEnhanced* plteMaskSelected;
 
         /** \brief  plotter for overview image */
         JKQtPlotter* pltImage;
@@ -307,7 +329,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
 
 
-        /** \nrief tab widget to select whether to display ACF, histogram, ... */
+        /** \brief tab widget to select whether to display ACF, histogram, ... */
         QTabWidget* tabDisplay;
 
 
@@ -316,6 +338,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QSet<int32_t> selected;
 
         QString lastSavePath;
+
+        QTimer* timUpdateAfterClick;
 
 
 

@@ -129,7 +129,7 @@ bool QFRDRImagingFCSData::loadOverview(QString filename) {
             uint16_t* ovw=(uint16_t*)malloc(nx*ny*sizeof(uint16_t));
             ok=TIFFReadFrame<uint16_t>(tif, ovw);
 
-            qDebug()<<"TIFF: "<<nx<<"x"<<ny<<"    data: "<<width<<"x"<<height;
+            //qDebug()<<"TIFF: "<<nx<<"x"<<ny<<"    data: "<<width<<"x"<<height;
 
             if (width*height<=(int64_t)nx*(int64_t)ny) {
                 for (int32_t y=0; y<height; y++) {

@@ -13,7 +13,7 @@
 
 
 
-
+#define CLICK_UPDATE_TIMEOUT 500
 
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent):
     QFRawDataEditor(services, parent)
@@ -30,6 +30,10 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     connectParameterWidgetsCounter=0;
     datahist=datahistsel=NULL;
     datasize=datasizesel=0;
+    timUpdateAfterClick=new QTimer(this);
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->setInterval(CLICK_UPDATE_TIMEOUT);
+    connect(timUpdateAfterClick, SIGNAL(timeout()), this, SLOT(updateAfterClick()));
     createWidgets();
     //QTimer::singleShot(500, this, SLOT(debugInfo()));
 }
@@ -59,6 +63,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     setLayout(lb);
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: parameter selection group box
+    ///////////////////////////////////////////////////////////////
 
     QGroupBox* grpTop=new QGroupBox(tr(" Parameter Image Plot Settings "), this);
     QGridLayout* topgrid=new QGridLayout(this);
@@ -121,6 +128,37 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* vbl=new QVBoxLayout();
     w->setLayout(vbl);
 
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: visible plots
+    ///////////////////////////////////////////////////////////////
+    QGroupBox* grpVisiblePlots=new QGroupBox(tr(" visible plots "), this);
+    QGridLayout* glVisPlots=new QGridLayout(this);
+    grpVisiblePlots->setLayout(glVisPlots);
+    chkOverviewVisible=new QCheckBox(tr("overview"), grpVisiblePlots);
+    chkOverviewVisible->setChecked(true);
+    chkGofVisible=new QCheckBox(tr("goodnes of fit"), grpVisiblePlots);
+    chkGofVisible->setChecked(true);
+    chkMaskVisible=new QCheckBox(tr("mask/selected"), grpVisiblePlots);
+    chkMaskVisible->setChecked(false);
+    glVisPlots->addWidget(chkOverviewVisible, 0,0);
+    glVisPlots->addWidget(chkGofVisible, 0,1);
+    glVisPlots->addWidget(chkMaskVisible, 1,0);
+    vbl->addWidget(grpVisiblePlots);
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: parameter image style
+    ///////////////////////////////////////////////////////////////
     QGroupBox* wimg=new QGroupBox(tr(" parameter image style "), this);
     vbl->addWidget(wimg);
     QFormLayout* gli=new QFormLayout(this);
@@ -154,7 +192,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbOutOfRangeMode->addItem(tr("red"));
     cmbOutOfRangeMode->addItem(tr("green"));
     cmbOutOfRangeMode->addItem(tr("blue"));
-    gli->addRow(tr("out-of-range mode:"), cmbOutOfRangeMode);
+    gli->addRow(tr("out-&of-range mode:"), cmbOutOfRangeMode);
 
     chkDisplayImageOverlay=new QCheckBox(wimg);
     gli->addRow(tr("show &overlays:"), chkDisplayImageOverlay);
@@ -164,6 +202,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: correlation plot styles
+    ///////////////////////////////////////////////////////////////
     QGroupBox* wcp=new QGroupBox(tr(" correlation plot styles "), this);
     vbl->addWidget(wcp);
     QFormLayout* gl=new QFormLayout(this);
@@ -183,7 +224,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
 
-    gl->addRow((l=new QLabel(tr("average &options:"))), cmbAverageStyle);
+    gl->addRow((l=new QLabel(tr("average opt&ions:"))), cmbAverageStyle);
     gl->addRow("", cmbAverageErrorStyle);
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageStyle, SLOT(setEnabled(bool)));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageErrorStyle, SLOT(setEnabled(bool)));
@@ -230,7 +271,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: overview image plot
+    ///////////////////////////////////////////////////////////////
     QWidget* wpltOverview=new QWidget(this);
     QVBoxLayout* lpltOverview=new QVBoxLayout();
     wpltOverview->setLayout(lpltOverview);
@@ -280,12 +323,57 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: mask image plot
+    ///////////////////////////////////////////////////////////////
+    QWidget* wpltMask=new QWidget(this);
+    wpltMask->setVisible(false);
+    QVBoxLayout* lpltMask=new QVBoxLayout();
+    wpltMask->setLayout(lpltMask);
+    pltMask=new JKQtPlotter(wpltMask);
+    lpltMask->addWidget(new QLabel(tr("Mask/Selected:")));
+    lpltMask->addWidget(pltMask, 1);
+    pltMask->set_zoomByDoubleAndRightMouseClick(false);
+    pltMask->set_displayMousePosition(false);
+    pltMask->set_displayToolbar(true);
+    pltMask->get_plotter()->set_maintainAspectRatio(true);
+    pltMask->get_plotter()->set_aspectRatio(1);
+    pltMask->get_plotter()->set_maintainAxisAspectRatio(true);
+    pltMask->get_plotter()->set_axisAspectRatio(1);
+    pltMask->setXY(0,0,1,1);
+    pltMask->setAbsoluteXY(0,1,0,1);
+    pltMask->get_plotter()->getXAxis()->set_axisMinWidth(1);
+    pltMask->get_plotter()->getYAxis()->set_axisMinWidth(1);
+
+    pltMask->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
+    pltMask->get_plotter()->getYAxis()->set_tickLabelFontSize(8);
+    pltMask->get_plotter()->getXAxis()->set_axisLabel("");
+    pltMask->get_plotter()->getYAxis()->set_axisLabel("");
+    pltMask->get_plotter()->setGrid(false);
+    pltMask->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltMask->get_plotter()->set_useAntiAliasingForGraphs(true);
+    connect(pltMask, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+    connect(pltMask, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+
+    plteMask=new JKQTPOverlayImage(0,0,1,1,NULL, 0,0, QColor("black"), pltMask->get_plotter());
+    plteMask->set_falseColor(QColor("white"));
+    pltMask->addGraph(plteMask);
+
+    plteMaskSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltMask->get_plotter());
+    pltMask->addGraph(plteMaskSelected);
 
 
 
 
 
 
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: parameter image plot
+    ///////////////////////////////////////////////////////////////
 
     QWidget* wpltImage=new QWidget(this);
     QVBoxLayout* lpltImage=new QVBoxLayout();
@@ -314,7 +402,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-
     connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
 
     plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltImage->get_plotter());
@@ -342,6 +429,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: goodnes of fit image plot
+    ///////////////////////////////////////////////////////////////
 
     QWidget* wpltGofImage=new QWidget(this);
     QVBoxLayout* lpltGofImage=new QVBoxLayout();
@@ -370,8 +460,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-
     connect(pltGofImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+
 
     plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
     pltGofImage->addGraph(plteGofImage);
@@ -382,12 +472,18 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     plteImageData=NULL;
 
+    connect(pltOverview, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
+    connect(pltImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
+    connect(pltGofImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
 
 
 
 
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: correlation&residuals plot
+    ///////////////////////////////////////////////////////////////
 
     plotter = new JKQtPlotter(true, this);
     plotter->get_plotter()->set_showKey(true);
@@ -456,13 +552,21 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     splitterTop=new QVisibleHandleSplitter(Qt::Horizontal, this);
     splitterTop->addWidget(wpltImage);
     splitterTop->addWidget(wpltGofImage);
+    splitterTop->addWidget(wpltMask);
     splitterTop->addWidget(wpltOverview);
     splitterTopBot->addWidget(splitterTop);
-    splitterBotPlots=new QVisibleHandleSplitter(Qt::Vertical, this);
+    /*splitterBotPlots=new QVisibleHandleSplitter(Qt::Vertical, this);
     splitterBotPlots->addWidget(plotter);
-    splitterBotPlots->addWidget(wp);
+    splitterBotPlots->addWidget(wp);*/
+    QVBoxLayout* layPlotsBot=new QVBoxLayout(this);
+    QWidget* wPlotsBot=new QWidget(this);
+    wPlotsBot->setLayout(layPlotsBot);
+    layPlotsBot->setContentsMargins(0,0,0,0);
+    layPlotsBot->addWidget(plotter,3);
+    layPlotsBot->addWidget(wp,2);
     splitterBot=new QVisibleHandleSplitter(Qt::Horizontal, this);
-    splitterBot->addWidget(splitterBotPlots);
+    //splitterBot->addWidget(splitterBotPlots);
+    splitterBot->addWidget(wPlotsBot);
     splitterBot->addWidget(tvParams);
     splitterTopBot->addWidget(splitterBot);
 
@@ -475,6 +579,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: buttons for data/report saving
+    ///////////////////////////////////////////////////////////////
 
     QGridLayout* grdTop=new QGridLayout(this);
     btnPrintReport = new QPushButton(QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
@@ -533,6 +640,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     lb->addWidget(tabDisplay, 1,0);
 
 
+    connect(chkOverviewVisible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
+    connect(chkGofVisible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
+    connect(chkMaskVisible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
 
 
 
@@ -761,24 +871,30 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
         selected.clear();
         selected.insert(idx);
     }
-    QTime t;
-    t.start();
-    replotData();
-    //qDebug()<<t.elapsed()<<" ms for replotData()";
-    t.start();
     replotSelection(true);
-     //qDebug()<<t.elapsed()<<" ms for replotSelection()";
-    t.start();
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->stop();
+    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+}
+
+void QFRDRImagingFCSImageEditor::updateAfterClick() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    replotData();
+    //replotSelection(true);
+    replotMask();
     updateSelectionHistogram(true);
-     //qDebug()<<t.elapsed()<<" ms for updateSelectionHistogram()";
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     replotSelection(false);
     replotOverview();
     replotImage();
     replotData();
+    replotMask();
     updateHistogram();
+    QApplication::restoreOverrideCursor();
 };
 
 void QFRDRImagingFCSImageEditor::resultsChanged() {
@@ -886,14 +1002,18 @@ void QFRDRImagingFCSImageEditor::replotImage() {
 
         if (w>3*h) {
             pltImage->get_plotter()->getXAxis()->set_minTicks(3);
-            plteImage->get_colorBarAxis()->set_minTicks(3);
+            plteImage->get_colorBarRightAxis()->set_minTicks(3);
+            plteImage->get_colorBarTopAxis()->set_minTicks(5);
             pltGofImage->get_plotter()->getXAxis()->set_minTicks(3);
-            plteGofImage->get_colorBarAxis()->set_minTicks(3);
+            plteGofImage->get_colorBarRightAxis()->set_minTicks(3);
+            plteGofImage->get_colorBarTopAxis()->set_minTicks(5);
         } else {
             pltImage->get_plotter()->getXAxis()->set_minTicks(7);
-            plteImage->get_colorBarAxis()->set_minTicks(5);
+            plteImage->get_colorBarRightAxis()->set_minTicks(5);
+            plteImage->get_colorBarTopAxis()->set_minTicks(3);
             pltGofImage->get_plotter()->getXAxis()->set_minTicks(7);
-            plteGofImage->get_colorBarAxis()->set_minTicks(5);
+            plteGofImage->get_colorBarRightAxis()->set_minTicks(5);
+            plteGofImage->get_colorBarTopAxis()->set_minTicks(3);
         }
         pltImage->setXY(0, w, 0, h);
         pltGofImage->setXY(0, w, 0, h);
@@ -961,6 +1081,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     pltOverview->set_doDrawing(false);
     pltImage->set_doDrawing(false);
     pltGofImage->set_doDrawing(false);
+    pltMask->set_doDrawing(false);
     updateSelectionArrays();
 
     if (!chkDisplayImageOverlay->isChecked()) {
@@ -968,11 +1089,13 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         pltImage->deleteGraph(plteImageExcluded, false);
         pltGofImage->deleteGraph(plteGofImageSelected, false);
         pltGofImage->deleteGraph(plteGofImageExcluded, false);
+        pltMask->deleteGraph(plteMaskSelected, false);
     } else {
         pltImage->addGraph(plteImageSelected);
         pltImage->addGraph(plteImageExcluded);
         pltGofImage->addGraph(plteGofImageSelected);
         pltGofImage->addGraph(plteGofImageExcluded);
+        pltMask->addGraph(plteMaskSelected);
     }
 
     if (!m) {
@@ -982,6 +1105,8 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteImageExcluded->set_data(NULL, 1, 1);
         plteGofImageSelected->set_data(NULL, 1, 1);
         plteGofImageExcluded->set_data(NULL, 1, 1);
+        plteMask->set_data(NULL, 1, 1);
+        plteMaskSelected->set_data(NULL, 1, 1);
     } else {
         //uint16_t* ov=m->getDataImagePreview();
         double w=m->getDataImageWidth();
@@ -1014,16 +1139,26 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteGofImageExcluded->set_height(h);
         plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
 
+        plteMaskSelected->set_width(w);
+        plteMaskSelected->set_height(h);
+        plteMaskSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+
+        plteMask->set_width(w);
+        plteMask->set_height(h);
+        plteMask->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+
 
     }
 
     pltOverview->set_doDrawing(true);
     pltImage->set_doDrawing(true);
     pltGofImage->set_doDrawing(true);
+    pltMask->set_doDrawing(true);
     if (replot) {
         pltOverview->update_plot();
         pltImage->update_plot();
         pltGofImage->update_plot();
+        pltMask->update_plot();
     }
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotSelection ... end";
@@ -1054,13 +1189,14 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         pltOverview->get_plotter()->set_maintainAxisAspectRatio(true);
         pltOverview->get_plotter()->set_axisAspectRatio(1.0*w/h);
 
-
         if (w>3*h) {
             pltOverview->get_plotter()->getXAxis()->set_minTicks(3);
-            plteOverview->get_colorBarAxis()->set_minTicks(3);
+            plteOverview->get_colorBarRightAxis()->set_minTicks(3);
+            plteOverview->get_colorBarTopAxis()->set_minTicks(5);
         } else {
             pltOverview->get_plotter()->getXAxis()->set_minTicks(7);
-            plteOverview->get_colorBarAxis()->set_minTicks(5);
+            plteOverview->get_colorBarRightAxis()->set_minTicks(5);
+            plteOverview->get_colorBarTopAxis()->set_minTicks(3);
         }
         pltOverview->setXY(0, w, 0, h);
 
@@ -1074,6 +1210,40 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
     pltOverview->update_plot();
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotOverview ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
+}
+
+void QFRDRImagingFCSImageEditor::replotMask() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    pltMask->set_doDrawing(false);
+
+    if (!m) {
+        plteMask->set_data(NULL, 1, 1);
+        plteMaskSelected->set_data(NULL, 1, 1);
+    } else {
+        double w=m->getDataImageWidth();
+        double h=m->getDataImageHeight();
+        if ((w==0) || (h==0)) {
+            w=h=1;
+        }
+
+        pltMask->setAbsoluteXY(0, w, 0, h);
+        pltMask->get_plotter()->set_maintainAspectRatio(true);
+        pltMask->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
+        pltMask->get_plotter()->set_maintainAxisAspectRatio(true);
+        pltMask->get_plotter()->set_axisAspectRatio(1.0*w/h);
+
+        pltMask->setXY(0, w, 0, h);
+
+        if (plteOverviewExcludedData) plteMask->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        else plteMask->set_data(NULL, m->getDataImageWidth(), m->getDataImageHeight());
+        plteMask->set_width(w);
+        plteMask->set_height(h);
+    }
+
+    pltMask->set_doDrawing(true);
+    pltMask->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRImagingFCSImageEditor::replotData() {
@@ -1326,6 +1496,9 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     lastSavePath=settings->getQSettings()->value(QString("imfcsimageeditor/last_save_path"), lastSavePath).toString();
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsimageeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_tau_axis"), true).toBool());
+    chkOverviewVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), true).toBool());
+    chkGofVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/gof_visible"), true).toBool());
+    chkMaskVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), true).toBool());
     chkKeys->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_keys"), false).toBool());
     chkDisplayResiduals->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_resid"), true).toBool());
     chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_avg"), true).toBool());
@@ -1342,7 +1515,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     loadSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     loadSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
-    loadSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
+    //loadSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
     //loadSplitter(*(settings->getQSettings()), splitterHistogram, "imfcsimageeditor/splitterhistogramSizes");
     histogram->readSettings(*(settings->getQSettings()), "imfcsimageeditor/");
     connectParameterWidgets(true);
@@ -1368,12 +1541,15 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_error_style"), cmbAverageErrorStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_style"), cmbRunStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_error_style"), cmbRunErrorStyle->currentIndex());
+    settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), chkOverviewVisible->isChecked());
+    settings->getQSettings()->value(QString("imfcsimageeditor/gof_visible"), chkGofVisible->isChecked());
+    settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), chkMaskVisible->isChecked());
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/log_histogram"), chkLogHistogram->isChecked());
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/normalized_histograms"), chkNormalizedHistograms->isChecked());
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/exclude_in_histograms"), chkExcludeExcludedRunsFromHistogram->isChecked());
     saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     saveSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
-    saveSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
+    //saveSplitter(*(settings->getQSettings()), splitterBotPlots, "imfcsimageeditor/splitterbotplotsSizes");
     saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     //saveSplitter(*(settings->getQSettings()), splitterHistogram, "imfcsimageeditor/splitterhistogramSizes");
     histogram->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/");
@@ -1584,12 +1760,19 @@ void QFRDRImagingFCSImageEditor::imageZoomChangedLocally(double newxmin, double 
     if (sender==pltImage) {
         pltOverview->setXY(newxmin, newxmax, newymin, newymax);
         pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltMask->setXY(newxmin, newxmax, newymin, newymax);
     } else if (sender==pltGofImage) {
-            pltOverview->setXY(newxmin, newxmax, newymin, newymax);
-            pltImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltOverview->setXY(newxmin, newxmax, newymin, newymax);
+        pltImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltMask->setXY(newxmin, newxmax, newymin, newymax);
     } else if (sender==pltOverview) {
-            pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
-            pltImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltMask->setXY(newxmin, newxmax, newymin, newymax);
+    } else if (sender==pltMask) {
+        pltOverview->setXY(newxmin, newxmax, newymin, newymax);
+        pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltImage->setXY(newxmin, newxmax, newymin, newymax);
     }
 }
 void QFRDRImagingFCSImageEditor::acfZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
@@ -1770,6 +1953,12 @@ void QFRDRImagingFCSImageEditor::saveReport() {
         lastSavePath=QFileInfo(fn).absolutePath();
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+        int i=tabDisplay->currentIndex();
+        tabDisplay->setCurrentIndex(0);
+        tabDisplay->setCurrentIndex(1);
+        tabDisplay->setCurrentIndex(i);
+
+
         QFileInfo fi(fn);
         QPrinter* printer=new QPrinter();
         printer->setPaperSize(QPrinter::A4);
@@ -1804,6 +1993,10 @@ void QFRDRImagingFCSImageEditor::printReport() {
     }
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    int i=tabDisplay->currentIndex();
+    tabDisplay->setCurrentIndex(0);
+    tabDisplay->setCurrentIndex(1);
+    tabDisplay->setCurrentIndex(i);
     QTextDocument* doc=new QTextDocument();
     doc->setTextWidth(p->pageRect().size().width());
     createReportDoc(doc);
@@ -1949,10 +2142,12 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     cursor.insertBlock();
     cursor.insertText(tr("Parameter Images:\n").arg(m->getName()), fHeading2);
     double w1=pltImage->width();
-    double w2=pltGofImage->width();
-    double w3=pltOverview->width();
-    double allwidth=w1+w2+w3;
-    table = cursor.insertTable(1, 3, tableFormat);
+    double w2=(chkGofVisible->isChecked())?pltGofImage->width():0;
+    double w3=(chkOverviewVisible->isChecked())?pltOverview->width():0;
+    double w4=(chkMaskVisible->isChecked())?pltMask->width():0;
+
+    double allwidth=w1+w2+w3+w4;
+    table = cursor.insertTable(1, 4, tableFormat);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
@@ -1965,7 +2160,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     QApplication::processEvents();
-    {
+    if (chkGofVisible->isChecked()) {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
@@ -1977,8 +2172,20 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     QApplication::processEvents();
-    {
+    if (chkMaskVisible->isChecked()){
         QTextCursor tabCursor=table->cellAt(0, 2).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        pltMask->get_plotter()->draw(*painter, QRect(0,0,pltMask->width(),pltMask->height()));
+        delete painter;
+        double scale=document->textWidth()*w4/allwidth*0.9/pic.boundingRect().width();
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("mask:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    QApplication::processEvents();
+    if (chkOverviewVisible->isChecked()){
+        QTextCursor tabCursor=table->cellAt(0, 3).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
         pltOverview->get_plotter()->draw(*painter, QRect(0,0,pltOverview->width(),pltOverview->height()));
@@ -1991,21 +2198,21 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
 
-    table = cursor.insertTable(1, 2, tableFormat1);
+    table = cursor.insertTable(2,1, tableFormat1);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
         plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->height()+plotterResid->height()));
         delete painter;
-        double scale=document->textWidth()*(double)plotter->width()/allwidth/pic.boundingRect().width();
+        double scale=0.6;//document->textWidth()*(double)plotter->width()/allwidth/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 
-        tabCursor=table->cellAt(0, 1).firstCursorPosition();
+        tabCursor=table->cellAt(1,0).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-4\">%1</font></center>").arg(tvParams->toHtml())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-6\">%1</font></center>").arg(tvParams->toHtml())));
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);
@@ -2121,4 +2328,58 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
 
     if (replot) histogram->updateHistogram(true, 1);
 
+}
+
+void QFRDRImagingFCSImageEditor::moveColorbarsAuto() {
+    if ((double)pltImage->width()>(double)pltImage->height()) {
+        plteImage->set_colorBarRightVisible(true);
+        plteImage->set_colorBarTopVisible(false);
+    } else {
+        plteImage->set_colorBarRightVisible(false);
+        plteImage->set_colorBarTopVisible(true);
+    }
+    if ((double)pltGofImage->width()>(double)pltGofImage->height()) {
+        plteGofImage->set_colorBarRightVisible(true);
+        plteGofImage->set_colorBarTopVisible(false);
+    } else {
+        plteGofImage->set_colorBarRightVisible(false);
+        plteGofImage->set_colorBarTopVisible(true);
+    }
+    if ((double)pltOverview->width()>(double)pltOverview->height()) {
+        plteOverview->set_colorBarRightVisible(true);
+        plteOverview->set_colorBarTopVisible(false);
+    } else {
+        plteOverview->set_colorBarRightVisible(false);
+        plteOverview->set_colorBarTopVisible(true);
+    }
+
+}
+
+void QFRDRImagingFCSImageEditor::showHidePlots()  {
+    bool changed=  (splitterTop->widget(1)->isVisible() != chkGofVisible->isChecked())
+                 ||(splitterTop->widget(2)->isVisible() != chkMaskVisible->isChecked())
+                 ||(splitterTop->widget(3)->isVisible() != chkOverviewVisible->isChecked());
+
+    if (changed) {
+        int oldcnt=1;
+        if (splitterTop->widget(1)->isVisible()) oldcnt++;
+        if (splitterTop->widget(2)->isVisible()) oldcnt++;
+        if (splitterTop->widget(3)->isVisible()) oldcnt++;
+
+        int cnt=1;
+        if (chkGofVisible->isChecked()) cnt++;
+        if (chkMaskVisible->isChecked()) cnt++;
+        if (chkOverviewVisible->isChecked()) cnt++;
+
+        splitterTop->widget(1)->setVisible(chkGofVisible->isChecked());
+        splitterTop->widget(2)->setVisible(chkMaskVisible->isChecked());
+        splitterTop->widget(3)->setVisible(chkOverviewVisible->isChecked());
+
+        if (cnt!=oldcnt) {
+            QList<int> list;
+            int corrWidth=splitterTop->width()-(cnt-1)*splitterTop->handleWidth();
+            for (int i=0; i<cnt; i++) list<<corrWidth/cnt;
+            splitterTop->setSizes(list);
+        }
+    }
 }

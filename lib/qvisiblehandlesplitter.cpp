@@ -75,6 +75,7 @@ void QVisibleGripSplitterHandle::enterEvent(QEvent* event) {
 QVisibleHandleSplitter::QVisibleHandleSplitter(Qt::Orientation orientation, QWidget *parent) :
     QSplitter(orientation, parent)
 {
+    setChildrenCollapsible(false);
 }
 
 QVisibleHandleSplitter::QVisibleHandleSplitter(QWidget *parent) :
