@@ -438,7 +438,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString pre
 
     spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
     stageStateUpdateInterval=settings.value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
-    chkJoystick->setChecked(settings.value(prefix+"joystick_enabled", false).toBool());
+    chkJoystick->setChecked(settings.value(prefix+"joystick_enabled", true).toBool());
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
@@ -813,6 +813,7 @@ void QFESPIMB040SampleStageConfig::disConnectX() {
     bool conn=actConnectX->isChecked();
     QFExtensionLinearStage* stage=getXStage();
     int axis=getXStageAxis();
+    bool oldJoystick=chkJoystick->isChecked();
     chkJoystick->setChecked(false);
     if (stage) {
         if (conn) {
@@ -832,6 +833,7 @@ void QFESPIMB040SampleStageConfig::disConnectX() {
     } else {
         actConnectX->setChecked(false);
     }
+    chkJoystick->setChecked(oldJoystick);
     updateStates();
     QApplication::restoreOverrideCursor();
     if (useThread) stageThread->start();
@@ -844,6 +846,7 @@ void QFESPIMB040SampleStageConfig::disConnectY() {
     bool conn=actConnectY->isChecked();
     QFExtensionLinearStage* stage=getYStage();
     int axis=getYStageAxis();
+    bool oldJoystick=chkJoystick->isChecked();
     chkJoystick->setChecked(false);
     if (stage) {
         if (conn) {
@@ -875,6 +878,8 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
     bool conn=actConnectZ->isChecked();
     QFExtensionLinearStage* stage=getZStage();
     int axis=getZStageAxis();
+    bool oldJoystick=chkJoystick->isChecked();
+    chkJoystick->setChecked(false);
     if (stage) {
         if (conn) {
             stage->setLogging(m_log);
@@ -893,6 +898,7 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
     } else {
         actConnectZ->setChecked(false);
     }
+    chkJoystick->setChecked(oldJoystick);
     updateStates();
     QApplication::restoreOverrideCursor();
     if (useThread) stageThread->start();
@@ -1200,11 +1206,11 @@ void QFESPIMB040SampleStageConfig::stageXMoved(QFExtensionLinearStage::AxisState
 }
 
 void QFESPIMB040SampleStageConfig::stageYMoved(QFExtensionLinearStage::AxisState state, double position, double speed) {
-    updateStageStateWidgets(labXPosition, labYSpeed, labYState, getXStage(), state, position, speed);
+    updateStageStateWidgets(labYPosition, labYSpeed, labYState, getYStage(), state, position, speed);
 }
 
 void QFESPIMB040SampleStageConfig::stageZMoved(QFExtensionLinearStage::AxisState state, double position, double speed) {
-    updateStageStateWidgets(labXPosition, labZSpeed, labZState, getXStage(), state, position, speed);
+    updateStageStateWidgets(labZPosition, labZSpeed, labZState, getZStage(), state, position, speed);
 }
 
 void QFESPIMB040SampleStageConfig::updateStageStateWidgets(QLabel* labPos, QLabel* labSpeed, QLabel* labState, bool present, QFExtensionLinearStage::AxisState state, double position, double speed) {
