@@ -26,6 +26,7 @@
 #include "qenhancedtableview.h"
 #include "../base_classes/qftablemodel.h"
 #include "qfhistogramview.h"
+#include "jkqtptools.h"
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -73,6 +74,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         ImageTransforms currentGofParameterTransfrom() const;
 
     protected slots:
+
         /** \brief switch plots on and off according to selected visible plots */
         void showHidePlots();
         /** \brief move color bars to appropriate position */
@@ -107,7 +109,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void replotImage();
 
         /** \brief replot the selection displays only */
-        void replotSelection(bool replot);
+        void replotSelection(bool replot=true);
 
         /** \brief fill the selection/expluded arrays for the overlays, does not plot */
         void updateSelectionArrays();
@@ -141,7 +143,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void paletteChanged();
         void histogramSettingsChanged();
         /** \brief called when the user selects to display overlays or not */
-        void displayOverlayChanged();
+        void updateOverlaySettings();
 
         /** \brief save the image plot settings to the raw data record properties */
         void saveImageSettings();
@@ -205,6 +207,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QComboBox* cmbAverageStyle;
         /** \brief a combobox to select how the error of the average run are displayed */
         QComboBox* cmbAverageErrorStyle;
+
+        /** \brief a combobox to select how to display the selected pixel */
+        QComboBox* cmbSelectionStyle;
 
         /** \brief a combobox to select how the runs are displayed */
         QComboBox* cmbRunStyle;
@@ -274,6 +279,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
+        /** \brief combobox for the display style of plteImage */
+        QComboBox* cmbImageStyle;
         /** \brief cobobox to select what should happen to the out-of-range pixels */
         QComboBox* cmbOutOfRangeMode;
 
@@ -325,6 +332,11 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         double* datahistsel;
         int32_t datasize;
         int32_t datasizesel;
+
+        QColor selectionColor;
+        QColor excludedColor;
+
+        void setSelectedOverlayStyle(JKQTPOverlayImageEnhanced* plot);
 
 
 

@@ -63,6 +63,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     setLayout(lb);
 
 
+    QColor ovlSelCol=QColor("red");
+    ovlSelCol.setAlphaF(0.5);
+    selectionColor=ovlSelCol;
+    QColor ovlExCol=QColor("blue");
+    ovlExCol.setAlphaF(0.5);
+    excludedColor=ovlExCol;
+
+
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter selection group box
     ///////////////////////////////////////////////////////////////
@@ -163,6 +171,16 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     vbl->addWidget(wimg);
     QFormLayout* gli=new QFormLayout(this);
     wimg->setLayout(gli);
+
+    cmbImageStyle=new QComboBox(wimg);
+    cmbImageStyle->addItem(tr("masked image, black"));
+    cmbImageStyle->addItem(tr("masked image, white"));
+    cmbImageStyle->addItem(tr("masked image, grey"));
+    cmbImageStyle->addItem(tr("image + overlay mask"));
+    cmbImageStyle->addItem(tr("image only"));
+    gli->addRow(tr("st&yle:"), cmbImageStyle);
+
+
     cmbColorbar=new QComboBox(wimg);
     QStringList sl=JKQTFPimagePlot_getPalettes();
     for (int i=0; i<sl.size(); i++) {
@@ -196,6 +214,44 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     chkDisplayImageOverlay=new QCheckBox(wimg);
     gli->addRow(tr("show &overlays:"), chkDisplayImageOverlay);
+
+    cmbSelectionStyle=new QComboBox(wimg);
+    QPixmap selPix(15,15);
+    selPix.fill(ovlSelCol);
+    cmbSelectionStyle->addItem(QIcon(selPix), tr("overlay image"));
+    selPix.fill(QColor(Qt::transparent));
+    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, ovlSelCol, ovlSelCol.lighter());
+    cmbSelectionStyle->addItem(QIcon(selPix), tr("symbol"));
+    selPix.fill(QColor(Qt::transparent));
+    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("black"), QColor("black").lighter());
+    cmbSelectionStyle->addItem(QIcon(selPix), tr("black symbol"));
+    selPix.fill(QColor(Qt::transparent));
+    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("white"), QColor("white").lighter());
+    cmbSelectionStyle->addItem(QIcon(selPix), tr("white symbol"));
+    selPix.fill(QColor(Qt::transparent));
+    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("grey"), QColor("grey").lighter());
+    cmbSelectionStyle->addItem(QIcon(selPix), tr("grey symbol"));
+    gli->addRow(tr("selection style:"), cmbSelectionStyle);
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: mask options
+    ///////////////////////////////////////////////////////////////
+    QGroupBox* wmask=new QGroupBox(tr(" mask options "), this);
+    vbl->addWidget(wmask);
+    QGridLayout* glmask=new QGridLayout(this);
+    wmask->setLayout(glmask);
+
+    btnDontUse=new QPushButton(tr("exclude sel."), w);
+    connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
+    glmask->addWidget(btnDontUse, 0, 0);
+    btnUse=new QPushButton(tr("include sel."), w);
+    connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
+    glmask->addWidget(btnUse, 0, 1);
+
 
 
 
@@ -261,13 +317,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-    /*btnDontUse=new QPushButton(tr("exclude sel."), w);
-    connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
-    gl->addWidget(btnDontUse, row, 1);
-    btnUse=new QPushButton(tr("include sel."), w);
-    connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
-    gl->addWidget(btnUse, row, 2);
-    row++;*/
+
 
 
 
@@ -305,14 +355,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImage::GRAY, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverview);
 
-    QColor ovlSelCol=QColor("red");
-    ovlSelCol.setAlphaF(0.5);
     plteOverviewSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverviewSelected);
 
 
-    QColor ovlExCol=QColor("blue");
-    ovlExCol.setAlphaF(0.5);
     plteOverviewExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverviewExcluded);
 
@@ -324,7 +370,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     ///////////////////////////////////////////////////////////////
-    // GROUPBOX: mask image plot
+    // WIDGET: mask image plot
     ///////////////////////////////////////////////////////////////
     QWidget* wpltMask=new QWidget(this);
     wpltMask->setVisible(false);
@@ -372,7 +418,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     ///////////////////////////////////////////////////////////////
-    // GROUPBOX: parameter image plot
+    // WIDGET: parameter image plot
     ///////////////////////////////////////////////////////////////
 
     QWidget* wpltImage=new QWidget(this);
@@ -424,13 +470,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-
-
-
-
-
     ///////////////////////////////////////////////////////////////
-    // GROUPBOX: goodnes of fit image plot
+    // WIDGET: goodnes of fit image plot
     ///////////////////////////////////////////////////////////////
 
     QWidget* wpltGofImage=new QWidget(this);
@@ -482,7 +523,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     ///////////////////////////////////////////////////////////////
-    // GROUPBOX: correlation&residuals plot
+    // WIDGET: correlation&residuals plot
     ///////////////////////////////////////////////////////////////
 
     plotter = new JKQtPlotter(true, this);
@@ -657,8 +698,10 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             writeSettings();
         } else {
             current->setQFProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param), cmbColorbar->currentIndex(), false, false);
+            current->setQFProperty(QString("imfcs_imed_style_%1_%2").arg(egroup).arg(param), cmbImageStyle->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), cmbSelectionStyle->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), chkImageAutoScale->isChecked(), false, false);
             if (!chkImageAutoScale->isChecked()) {
                 current->setQFProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), edtColMin->value(), false, false);
@@ -693,8 +736,10 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
                                        settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex())).toInt();
             if (d>=0) cmbColorbar->setCurrentIndex(d);
             else if (cmbColorbar->count()>0) cmbColorbar->setCurrentIndex(0);
+            cmbImageStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_style_%1_%2").arg(egroup).arg(param), cmbImageStyle->currentIndex()).toInt());
             cmbOutOfRangeMode->setCurrentIndex(current->getProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex()).toInt());
-            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), false).toBool());
+            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
+            cmbSelectionStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), false).toBool());
             chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true).toBool());
             if (!chkImageAutoScale->isChecked()) {
                 edtColMin->setValue(current->getProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), mi).toDouble());
@@ -718,18 +763,64 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
     }
 }
 
-void QFRDRImagingFCSImageEditor::displayOverlayChanged() {
+/*void QFRDRImagingFCSImageEditor::replotOverlays() {
+    pltOverview->set_doDrawing(false);
+    pltImage->set_doDrawing(false);
+    pltGofImage->set_doDrawing(false);
+    pltMask->set_doDrawing(false);
+    updateOverlaySettings();
+    pltOverview->set_doDrawing(true);
+    pltImage->set_doDrawing(true);
+    pltGofImage->set_doDrawing(true);
+    pltMask->set_doDrawing(true);
+    if (replot) {
+        pltOverview->update_plot();
+        pltImage->update_plot();
+        pltGofImage->update_plot();
+        pltMask->update_plot();
+    }
+}*/
+
+void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
     if (!chkDisplayImageOverlay->isChecked()) {
         pltImage->deleteGraph(plteImageSelected, false);
         pltImage->deleteGraph(plteImageExcluded, false);
         pltGofImage->deleteGraph(plteGofImageSelected, false);
         pltGofImage->deleteGraph(plteGofImageExcluded, false);
+        pltMask->deleteGraph(plteMaskSelected, false);
     } else {
-        pltImage->addGraph(plteImageSelected);
         pltImage->addGraph(plteImageExcluded);
+        pltImage->addGraph(plteImageSelected);
         pltGofImage->addGraph(plteGofImageSelected);
         pltGofImage->addGraph(plteGofImageExcluded);
+        pltMask->addGraph(plteMaskSelected);
     }
+
+    setSelectedOverlayStyle(plteOverviewSelected);
+    setSelectedOverlayStyle(plteImageSelected);
+    setSelectedOverlayStyle(plteGofImageSelected);
+    setSelectedOverlayStyle(plteMaskSelected);
+
+    if (cmbImageStyle->currentIndex()<cmbImageStyle->count()-1) {
+        pltImage->deleteGraph(plteImageExcluded, false);
+        pltImage->addGraph(plteImageExcluded);
+    }
+    if (cmbImageStyle->currentIndex()==cmbImageStyle->count()-1) {
+        pltImage->deleteGraph(plteImageExcluded, false);
+    }
+    if (cmbImageStyle->currentIndex()==0) {
+        plteImageExcluded->set_trueColor(QColor("black"));
+    } else if (cmbImageStyle->currentIndex()==1) {
+        plteImageExcluded->set_trueColor(QColor("white"));
+    } else if (cmbImageStyle->currentIndex()==2) {
+        plteImageExcluded->set_trueColor(QColor("grey"));
+    } else if (cmbImageStyle->currentIndex()==3) {
+        plteImageExcluded->set_trueColor(excludedColor);
+    } else if (cmbImageStyle->currentIndex()==3) {
+        plteImageExcluded->set_trueColor(Qt::transparent);
+    }
+
+    if (pltImage->containsGraph(plteImageSelected)) pltImage->moveGraphTop(plteImageSelected);
     saveImageSettings();
 
 }
@@ -812,8 +903,7 @@ void QFRDRImagingFCSImageEditor::excludeRuns() {
         }
         m->recalcCorrelations();
     }
-    replotData();
-    updateHistogram();
+    rawDataChanged();
 }
 
 void QFRDRImagingFCSImageEditor::includeRuns() {
@@ -827,8 +917,7 @@ void QFRDRImagingFCSImageEditor::includeRuns() {
         }
         m->recalcCorrelations();
     }
-    replotData();
-    updateHistogram();
+    rawDataChanged();
 }
 
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -1074,6 +1163,30 @@ void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
     //qDebug()<<"updateSelectionArrays ... end";
 }
 
+void QFRDRImagingFCSImageEditor::setSelectedOverlayStyle(JKQTPOverlayImageEnhanced* plot) {
+    if (cmbSelectionStyle->currentIndex()==1) {
+        plot->set_drawAsRectangles(false);
+        plot->set_trueColor(QColor("red"));
+        plot->set_symbolSizeFactor(0.7);
+    } else if (cmbSelectionStyle->currentIndex()==2) {
+        plot->set_drawAsRectangles(false);
+        plot->set_trueColor(QColor("black"));
+        plot->set_symbolSizeFactor(0.7);
+    } else if (cmbSelectionStyle->currentIndex()==3) {
+        plot->set_drawAsRectangles(false);
+        plot->set_trueColor(QColor("white"));
+        plot->set_symbolSizeFactor(0.7);
+    } else if (cmbSelectionStyle->currentIndex()==4) {
+        plot->set_drawAsRectangles(false);
+        plot->set_trueColor(QColor("grey"));
+        plot->set_symbolSizeFactor(0.7);
+    } else {
+        plot->set_drawAsRectangles(true);
+        plot->set_trueColor(selectionColor);
+        plot->set_symbolSizeFactor(0.7);
+    }
+}
+
 void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -1082,21 +1195,12 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     pltImage->set_doDrawing(false);
     pltGofImage->set_doDrawing(false);
     pltMask->set_doDrawing(false);
+
+    saveImageSettings();
+
     updateSelectionArrays();
 
-    if (!chkDisplayImageOverlay->isChecked()) {
-        pltImage->deleteGraph(plteImageSelected, false);
-        pltImage->deleteGraph(plteImageExcluded, false);
-        pltGofImage->deleteGraph(plteGofImageSelected, false);
-        pltGofImage->deleteGraph(plteGofImageExcluded, false);
-        pltMask->deleteGraph(plteMaskSelected, false);
-    } else {
-        pltImage->addGraph(plteImageSelected);
-        pltImage->addGraph(plteImageExcluded);
-        pltGofImage->addGraph(plteGofImageSelected);
-        pltGofImage->addGraph(plteGofImageExcluded);
-        pltMask->addGraph(plteMaskSelected);
-    }
+    updateOverlaySettings();
 
     if (!m) {
         plteOverviewSelected->set_data(NULL, 1, 1);
@@ -1119,6 +1223,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteOverviewSelected->set_height(h);
         plteOverviewSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
 
+
         plteOverviewExcluded->set_width(w);
         plteOverviewExcluded->set_height(h);
         plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
@@ -1126,6 +1231,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteImageSelected->set_width(w);
         plteImageSelected->set_height(h);
         plteImageSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+
 
         plteImageExcluded->set_width(w);
         plteImageExcluded->set_height(h);
@@ -1505,8 +1611,10 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_style"), 0).toInt());
     cmbAverageErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_error_style"), 2).toInt());
     cmbColorbar->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), 0).toInt());
+    cmbImageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/paramstyle"), 0).toInt());
     cmbOutOfRangeMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/outofrange_mode"), 1).toInt());
-    chkDisplayImageOverlay->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), false).toBool());
+    chkDisplayImageOverlay->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), true).toBool());
+    cmbSelectionStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlay_style"), 0).toBool());
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_style"), 1).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), 1).toInt());
     //chkLogHistogram->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_histogram"), false).toBool());
@@ -1533,9 +1641,11 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/log_tau_axis"), chkLogTauAxis->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_keys"), chkKeys->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlays"), chkDisplayImageOverlay->isChecked());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlay_style"), cmbSelectionStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_resid"), chkDisplayResiduals->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_avg"), chkDisplayAverage->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/paramstyle"), cmbImageStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/outofrange_mode"), cmbOutOfRangeMode->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_style"), cmbAverageStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_error_style"), cmbAverageErrorStyle->currentIndex());
@@ -1637,7 +1747,7 @@ void QFRDRImagingFCSImageEditor::transformChanged() {
     replotImage();
     loadImageSettings();
     paletteChanged();
-    displayOverlayChanged();
+    updateOverlaySettings();
     connectParameterWidgets(true);
     updateHistogram();
 }
@@ -1729,7 +1839,9 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
             connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
             connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
-            connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
+            connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
+            connect(cmbImageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
+            connect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
             connect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             histogram->connectParameterWidgets(connectTo);
             connect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
@@ -1746,7 +1858,9 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
         disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
         disconnect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
-        disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(displayOverlayChanged()));
+        disconnect(cmbImageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
+        disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
+        disconnect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
         disconnect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         histogram->connectParameterWidgets(connectTo);
         disconnect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
@@ -2133,8 +2247,10 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         tabCursor=table->cellAt(3, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(cmbColorbar->currentText())));
         tabCursor=table->cellAt(3, 1).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(edtColMin->value()).arg(edtColMax->value())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>image style:</i> <b>%1</b></small>").arg(cmbImageStyle->currentText())));
         tabCursor=table->cellAt(4, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(edtColMin->value()).arg(edtColMax->value())));
+        tabCursor=table->cellAt(4, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>out-of-range mode:</i> <b>%1</b></small>").arg(cmbOutOfRangeMode->currentText())));
     }
     QApplication::processEvents();
@@ -2378,7 +2494,10 @@ void QFRDRImagingFCSImageEditor::showHidePlots()  {
         if (cnt!=oldcnt) {
             QList<int> list;
             int corrWidth=splitterTop->width()-(cnt-1)*splitterTop->handleWidth();
-            for (int i=0; i<cnt; i++) list<<corrWidth/cnt;
+            for (int i=0; i<splitterTop->count(); i++) {
+                if (splitterTop->widget(i)->isVisible()) list<<corrWidth/cnt;
+                else list<<0;
+            }
             splitterTop->setSizes(list);
         }
     }
