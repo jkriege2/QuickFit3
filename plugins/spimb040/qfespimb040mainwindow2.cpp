@@ -1202,12 +1202,12 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
     // WRITE FILES LIST
     settings.setValue("files/count", files.size()+moreFiles.size());
     for (int i=0; i<moreFiles.size(); i++) {
-        settings.setValue("files/name"+QString::number(i), moreFiles[i].name);
+        settings.setValue("files/name"+QString::number(i), QFileInfo(settings.fileName()).absoluteDir().relativeFilePath(moreFiles[i].name));
         settings.setValue("files/type"+QString::number(i), moreFiles[i].type);
         settings.setValue("files/description"+QString::number(i), moreFiles[i].description);
     }
     for (int i=0; i<files.size(); i++) {
-        settings.setValue("files/name"+QString::number(moreFiles.size()+i), files[i].name);
+        settings.setValue("files/name"+QString::number(moreFiles.size()+i), QFileInfo(settings.fileName()).absoluteDir().relativeFilePath(files[i].name));
         settings.setValue("files/type"+QString::number(moreFiles.size()+i), files[i].type);
         settings.setValue("files/description"+QString::number(moreFiles.size()+i), files[i].description);
     }
@@ -1285,7 +1285,7 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
     // WRITE FILES LIST
     settings.setValue("files/count", files.size());
     for (int i=0; i<files.size(); i++) {
-        settings.setValue("files/name"+QString::number(i), files[i].name);
+        settings.setValue("files/name"+QString::number(i), QFileInfo(settings.fileName()).absoluteDir().relativeFilePath(files[i].name));
         settings.setValue("files/type"+QString::number(i), files[i].type);
         settings.setValue("files/description"+QString::number(i), files[i].description);
     }

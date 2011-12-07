@@ -552,17 +552,19 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
         QSettings set(d.absoluteFilePath(iniFile), QSettings::IniFormat);
         int fcnt=set.value("files/count", 0).toInt();
         if (fcnt>0) {
+            bool foundSecond=false;
             for (int f=0; f<fcnt; f++) {
                 QString fn=set.value("files/name"+QString::number(f), "").toString();
                 QString ft=set.value("files/type"+QString::number(f), "").toString();
                 QString fd=set.value("files/description"+QString::number(f), "").toString();
                 if (!fn.isEmpty()) {
                     QString fnAbs=d.absoluteFilePath(fn);
+                    //qDebug()<<"fn="<<fn<<"  fnAbs="<<fnAbs<<"  fn(filename)="<<QFileInfo(filename).fileName()<<"  fn(fnAbs)="<<QFileInfo(fnAbs).fileName();
                     if (fnAbs==filename) {
                         hasFirst=true;
                         if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
                     } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filename).fileName()) {
-                        hasSecond=true;
+                        foundSecond=true;
                         if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
                     }
                 }
@@ -570,8 +572,11 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
 
             if (hasFirst) {
                 readConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height);
-            } else if (hasSecond) {
+                //qDebug()<<"read first  "<<frametime<<baseline_offset<<backgroundF<<image_width<<image_height;
+            } else if (foundSecond) {
                 readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
+                //qDebug()<<"read second  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
+                hasSecond=true;
             }
         }
         if (hasFirst) break;
@@ -595,6 +600,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             if (QFile::exists(cfgname)) {
                 QSettings set(cfgname, QSettings::IniFormat);
                 readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
+                //qDebug()<<"read third  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 break;
             }
         }
