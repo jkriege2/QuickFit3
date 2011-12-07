@@ -131,7 +131,7 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create sample stage widget
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    sampleStages=new QFESPIMB040SampleStageConfig(this);//, m_pluginServices);
+    sampleStages=new QFESPIMB040SampleStageConfig(this, false);//, m_pluginServices);
     sampleStages->init(this, m_pluginServices);
     mainlayout->addWidget(sampleStages, 1, 0);
 
@@ -172,7 +172,8 @@ void QFESPIMB040MainWindow::doImageStack() {
 
 
     log_text(tr("starting image stack acquisition:\n"));
-
+    log_text(tr("  - locking stages\n"));
+    sampleStages->lockStages();
     bool ok=true;
     int axisCount=1; // number of axes to use for scan
 
@@ -185,6 +186,7 @@ void QFESPIMB040MainWindow::doImageStack() {
     if (!stage) {
         IMAGESTACK_ERROR(tr("no stage selected"));
         QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage selected!"));
+        sampleStages->unlockStages();
         return;
     }
     if (ok && (!stage->isConnected(stageAxis))) {
@@ -200,7 +202,11 @@ void QFESPIMB040MainWindow::doImageStack() {
         stageInitialPos=stage->getPosition(stageAxis);
     }
 
-    if (!ok) return;
+    if (!ok){
+        sampleStages->unlockStages();
+
+        return;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // CHECK/CONNECT SELECTED STAGE 2 (if selected)
@@ -212,6 +218,7 @@ void QFESPIMB040MainWindow::doImageStack() {
         if (!stage2) {
             IMAGESTACK_ERROR(tr("no stage 2 selected"));
             QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 2 selected!"));
+            sampleStages->unlockStages();
             return;
         }
         if (ok && (!stage2->isConnected(stageAxis2))) {
@@ -229,7 +236,10 @@ void QFESPIMB040MainWindow::doImageStack() {
         }
     }
 
-    if (!ok) return;
+    if (!ok) {
+        sampleStages->unlockStages();
+        return;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // CHECK/CONNECT SELECTED STAGE 3 (if selected)
@@ -241,6 +251,7 @@ void QFESPIMB040MainWindow::doImageStack() {
         if (!stage3) {
             IMAGESTACK_ERROR(tr("no stage 3 selected"));
             QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 3 selected!"));
+            sampleStages->unlockStages();
             return;
         }
         if (ok && (!stage3->isConnected(stageAxis3))) {
@@ -258,7 +269,10 @@ void QFESPIMB040MainWindow::doImageStack() {
         }
     }
 
-    if (!ok) return;
+    if (!ok) {
+        sampleStages->unlockStages();
+        return;
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -794,6 +808,7 @@ void QFESPIMB040MainWindow::doImageStack() {
 
     if (ok) log_text(tr("image stack acquisition DONE!\n"));
     if (ok) widImageStack->incCounter();
+    sampleStages->unlockStages();
 }
 
 

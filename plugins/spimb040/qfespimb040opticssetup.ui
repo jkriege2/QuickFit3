@@ -624,12 +624,18 @@ p, li { white-space: pre-wrap; }
    <extends>QGroupBox</extends>
    <header>qfespimb040simplecameraconfig.h</header>
    <container>1</container>
+   <slots>
+    <slot>setReadOnly(bool)</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>QFESPIMB040SampleStageConfig</class>
    <extends>QGroupBox</extends>
    <header>qfespimb040samplestageconfig.h</header>
    <container>1</container>
+   <slots>
+    <slot>setReadOnly(bool)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -953,6 +959,54 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>792</x>
      <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>stageSetup</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>954</x>
+     <y>33</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>116</x>
+     <y>579</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>camConfig1</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>947</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>947</x>
+     <y>253</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>camConfig2</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>963</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>873</x>
+     <y>421</y>
     </hint>
    </hints>
   </connection>

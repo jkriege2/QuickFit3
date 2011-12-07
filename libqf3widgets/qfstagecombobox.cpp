@@ -1,13 +1,13 @@
 #include "qfstagecombobox.h"
 
 QFStageComboBox::QFStageComboBox(QFExtensionManager* extManager, QWidget* parent):
-    QComboBox(parent)
+    QEnhancedComboBox(parent)
 {
     init(extManager);
 }
 
 QFStageComboBox::QFStageComboBox(QWidget* parent):
-    QComboBox(parent)
+    QEnhancedComboBox(parent)
 {
     m_extManager=NULL;
 }
@@ -106,4 +106,35 @@ int QFStageComboBox::currentExtensionID() const {
 
     QPoint p = itemData(currentIndex()).toPoint();
     return p.x();
+}
+
+void QFStageComboBox::storeSettings(QSettings& settings, QString prefix) const {
+    if (currentExtension()) {
+        settings.setValue(prefix+"stage_plugin_id", currentExtension()->getID());
+        settings.setValue(prefix+"stage_axis_id", currentAxisID());
+    } else {
+        settings.setValue(prefix+"stage_plugin_id", "");
+        settings.setValue(prefix+"stage_axis_id", -1);
+    }
+}
+
+void QFStageComboBox::loadSettings(QSettings& settings, QString prefix) {
+   QString id=settings.value(prefix+"stage_plugin_id", "").toString();
+   int axisIdx=settings.value(prefix+"stage_axis_id", -1).toInt();
+   bool ok=false;
+   QFExtension* extension=NULL;
+   for (int i=0; i<count(); i++) {
+       QPoint p = itemData(i).toPoint();
+       int axisIdxC=p.y();
+       if ((p.x()>=0)&&(p.x()<stages.size())) {
+           extension=qobject_cast<QFExtension*>(stages[p.x()]);
+           if (extension && extension->getID()==id && axisIdx==axisIdxC) {
+               ok=true;
+               setCurrentIndex(i);
+               break;
+           }
+       }
+   }
+   if (!ok) setCurrentIndex(-1);
+
 }

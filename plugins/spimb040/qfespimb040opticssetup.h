@@ -40,7 +40,14 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void loadSettings(QSettings& settings, QString prefix);
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix);
+        /*! \brief lock access to stages: stop the thread used for stage access by this widget
 
+            \note call this, if you want to access the stage from any other method outside this widget!!! otherwise concurrent thread accesses are possible!!!
+            \note You can release the lock y calling unlockStages().
+          */
+        void lockStages();
+        /** \brief unlock access to stages: restart the thread used for stage access by this widget  */
+        void unlockStages();
         /*! \brief return a map containing a description of the optics setup, suitable for meta-data storage
 
             This function saves a description of the optics setup to a QMap. This method saves:
@@ -96,6 +103,12 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
         /** \brief return a pointer to the z-axis QFExtension class */
         QFExtension* getZStageExtension();
+
+        bool isXStageConnected() const;
+        bool isYStageConnected() const;
+        bool isZStageConnected() const;
+
+        bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
 
 
 

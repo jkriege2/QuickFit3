@@ -22,6 +22,9 @@ class QFESPIMB040MainWindow; // forward
 #include <QTabWidget>
 #include <QGroupBox>
 #include <QTimer>
+#include <QThread>
+#include <QQueue>
+#include <QMutex>
 
 #include "programoptions.h"
 #include "jkqttools.h"
@@ -30,6 +33,59 @@ class QFESPIMB040MainWindow; // forward
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
+#include "qfstagecombobox.h"
+
+class QFESPIMB040SampleStageConfig; // forward
+
+/*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): thread that reads three stages and sends signals for the current states
+    \ingroup qf3ext_spimb040
+
+
+ */
+class QFESPIMB040SampleStageConfigThread: public QThread {
+        Q_OBJECT
+    public:
+        QFESPIMB040SampleStageConfigThread(QFESPIMB040SampleStageConfig* parent);
+        ~QFESPIMB040SampleStageConfigThread();
+        void run();
+        void move(double x, double y, double z);
+        void moveRel(double x, double y, double z);
+        void setJoystick(bool enabled, double maxSpeed);
+        /** \brief stop the thread and block until it is stopped! */
+        void stopThread();
+        bool anyConnected() const;
+    public slots:
+        void start(Priority priority = InheritPriority );
+    signals:
+        void stageXMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void stageYMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void stageZMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void joystickStateChanged(bool enabled);
+        void stagesConnectedChanged(bool connX, bool connY, bool connZ);
+    protected:
+        QFESPIMB040SampleStageConfig* m_parent;
+        QMutex* InstructionMutex;
+        bool stopped;
+
+        enum InstructionType { Move, MoveRel, SetJoystick };
+        struct Instruction {
+            InstructionType type;
+            double pd1;
+            double pd2;
+            double pd3;
+            bool pb1;
+        };
+
+        QQueue<Instruction> instructions;
+
+        int readCounter;
+        bool connX;
+        bool connY;
+        bool connZ;
+    protected slots:
+        void nextInstruction();
+
+};
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a sample translation stage
     \ingroup qf3ext_spimb040
@@ -40,7 +96,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFESPIMB040SampleStageConfig(QWidget* parent);
+        QFESPIMB040SampleStageConfig(QWidget* parent, bool useThread=true);
         //QFESPIMB040SampleStageConfig(QFESPIMB040MainWindow* parent, QFPluginServices* pluginServices);
         /** Default destructor */
         virtual ~QFESPIMB040SampleStageConfig();
@@ -53,31 +109,52 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix);
 
+        /** \brief connect to all selected stages */
         void connectStages();
+        /** \brief disconnect from all selected stages */
         void disconnectStages();
+
+        /*! \brief lock access to stages: stop the thread used for stage access by this widget
+
+            \note call this, if you want to access the stage from any other method outside this widget!!! otherwise concurrent thread accesses are possible!!!
+            \note You can release the lock y calling unlockStages().
+          */
+        void lockStages();
+        /** \brief unlock access to stages: restart the thread used for stage access by this widget  */
+        void unlockStages();
+
+    public slots:
+        void setReadOnly(bool readonly);
 
     protected slots:
         void updateStates();
 
+        void stageXMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void stageYMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void stageZMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void joystickStateChanged(bool enabled);
+        void stagesConnectedChanged(bool connX, bool connY, bool connZ);
+        void threadStarted();
+        void threadFinished();
     protected:
         //QFESPIMB040MainWindow* m_parent;
         QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
         /** \brief list of all available QFExtensionLinearStage plugins, initialized by findCameras() */
-        QList<QObject*> stages;
+        //QList<QObject*> stages;
 
         /** \brief fill stages */
-        void findStages(QFExtensionManager* extManager);
+        //void findStages(QFExtensionManager* extManager);
 
         void createWidgets();
         void createActions();
 
         /** \brief combobox to select a x-stage */
-        QComboBox* cmbStageX;
+        QFStageComboBox* cmbStageX;
         /** \brief combobox to select a y-stage */
-        QComboBox* cmbStageY;
+        QFStageComboBox* cmbStageY;
         /** \brief combobox to select a z-stage */
-        QComboBox* cmbStageZ;
+        QFStageComboBox* cmbStageZ;
 
         /** \brief tool button to connect to stage for axis x */
         QToolButton* btnConnectX;
@@ -132,6 +209,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QLabel* labZSpeed;
         /** \brief label to display joystick status */
         QLabel* labJoystick;
+        QLabel* labThread;
 
 
         /** \brief action to connect to stage for axis x */
@@ -148,6 +226,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief action to configuzre stage for axis z */
         QAction* actConfigureZ;
 
+        QTimer* timUpdate;
+
         bool locked;
 
         double stageStateUpdateInterval;
@@ -161,7 +241,11 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QPixmap iconNoJoystick;
 
         QTimer timerDisplayUpdate;
+        QFESPIMB040SampleStageConfigThread* stageThread;
 
+        bool useThread;
+
+        void updateStageStateWidgets(QLabel* labPos, QLabel* labSpeed, QLabel* labState, bool present, QFExtensionLinearStage::AxisState state, double position, double speed);
 
     public:
 
@@ -193,6 +277,10 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
 
         /** \brief get the axis number of z-axis stage inside its class */
         int getZStageAxis();
+
+        bool isXStageConnected() const;
+        bool isYStageConnected() const;
+        bool isZStageConnected() const;
 
     protected slots:
         void disConnectX();

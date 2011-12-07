@@ -9,14 +9,16 @@
 #include "qfextension.h"
 #include <QtGui>
 #include <QtCore>
+#include "qfespimb040opticssetup.h"
 
 #define STAGE_INTERVAL_MS 250
 
-QFESPIMB040ImageStackConfigWidget::QFESPIMB040ImageStackConfigWidget(QWidget* parent, QFPluginServices* pluginServices) :
+QFESPIMB040ImageStackConfigWidget::QFESPIMB040ImageStackConfigWidget(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ImageStackConfigWidget)
 {
     m_pluginServices=pluginServices;
+    this->stageConfig=stageConfig;
     ui->setupUi(this);
     ui->cmbStage->init(pluginServices->getExtensionManager());
     ui->cmbStage2->init(pluginServices->getExtensionManager());
@@ -32,9 +34,13 @@ QFESPIMB040ImageStackConfigWidget::~QFESPIMB040ImageStackConfigWidget()
 
 
 void QFESPIMB040ImageStackConfigWidget::loadSettings(QSettings& settings, QString prefix) {
-    ui->cmbStage->setCurrentIndex(settings.value(prefix+"stage", 0).toInt());
+    /*ui->cmbStage->setCurrentIndex(settings.value(prefix+"stage", 0).toInt());
     ui->cmbStage2->setCurrentIndex(settings.value(prefix+"stage2", 0).toInt());
-    ui->cmbStage3->setCurrentIndex(settings.value(prefix+"stage3", 0).toInt());
+    ui->cmbStage3->setCurrentIndex(settings.value(prefix+"stage3", 0).toInt());*/
+    ui->cmbStage->loadSettings(settings, prefix+"stage/");
+    ui->cmbStage2->loadSettings(settings, prefix+"stage2/");
+    ui->cmbStage3->loadSettings(settings, prefix+"stage3/");
+
     ui->chkUse1->setChecked(settings.value(prefix+"use1", true).toBool());
     ui->chkUse2->setChecked(settings.value(prefix+"use2", true).toBool());
     ui->edtPrefix1->setText(settings.value(prefix+"prefix1", "stack_cam1_%counter%").toString());
@@ -62,9 +68,12 @@ void QFESPIMB040ImageStackConfigWidget::loadSettings(QSettings& settings, QStrin
 
 
 void QFESPIMB040ImageStackConfigWidget::storeSettings(QSettings& settings, QString prefix) const {
-    settings.setValue(prefix+"stage", ui->cmbStage->currentIndex());
+    /*settings.setValue(prefix+"stage", ui->cmbStage->currentIndex());
     settings.setValue(prefix+"stage2", ui->cmbStage2->currentIndex());
-    settings.setValue(prefix+"stage3", ui->cmbStage3->currentIndex());
+    settings.setValue(prefix+"stage3", ui->cmbStage3->currentIndex());*/
+    ui->cmbStage->storeSettings(settings, prefix+"stage/");
+    ui->cmbStage2->storeSettings(settings, prefix+"stage2/");
+    ui->cmbStage3->storeSettings(settings, prefix+"stage3/");
     settings.setValue(prefix+"use1", ui->chkUse1->isChecked());
     settings.setValue(prefix+"use2", ui->chkUse2->isChecked());
     settings.setValue(prefix+"prefix1", ui->edtPrefix1->text());
@@ -199,10 +208,13 @@ void QFESPIMB040ImageStackConfigWidget::updateLabel() {
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConfig_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage()) stage()->showSettingsDialog(currentAxisID());
+    if (stageConfig) stageConfig->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConnect_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage()) {
         if (stage()->isConnected(currentAxisID())) {
             stage()->disconnectDevice(currentAxisID());
@@ -210,6 +222,7 @@ void QFESPIMB040ImageStackConfigWidget::on_btnConnect_clicked() {
             stage()->connectDevice(currentAxisID());
         }
     }
+    if (stageConfig) stageConfig->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_chkUse1_clicked(bool enabled) {
@@ -244,9 +257,15 @@ void QFESPIMB040ImageStackConfigWidget::on_chkStage3_clicked(bool enabled) {
 }
 
 void QFESPIMB040ImageStackConfigWidget::checkStage() {
+    //if (stageConfig) stageConfig->lockStages();
+
     bool conn=false;
+    bool found;
     if (stage()) {
-        conn=stage()->isConnected(currentAxisID());
+        found=false;
+        if (stageConfig) conn=stageConfig->isStageConnected(stage(), currentAxisID(), found);
+        if (!stageConfig || !found) conn=stage()->isConnected(currentAxisID());
+        //conn=stage()->isConnected(currentAxisID());
         if (conn) {
             ui->btnConnect->setChecked(true);
             ui->btnConnect->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -260,7 +279,10 @@ void QFESPIMB040ImageStackConfigWidget::checkStage() {
     }
 
     if (stage2()) {
-        conn=stage2()->isConnected(currentAxisID2());
+        found=false;
+        if (stageConfig) conn=stageConfig->isStageConnected(stage2(), currentAxisID2(), found);
+        if (!stageConfig || !found) conn=stage2()->isConnected(currentAxisID2());
+        //conn=stage2()->isConnected(currentAxisID2());
         if (conn) {
             ui->btnConnect2->setChecked(true);
             ui->btnConnect2->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -274,7 +296,10 @@ void QFESPIMB040ImageStackConfigWidget::checkStage() {
     }
 
     if (stage3()) {
-        conn=stage3()->isConnected(currentAxisID3());
+        found=false;
+        if (stageConfig) conn=stageConfig->isStageConnected(stage3(), currentAxisID3(), found);
+        if (!stageConfig || !found) conn=stage3()->isConnected(currentAxisID3());
+        //conn=stage3()->isConnected(currentAxisID3());
         if (conn) {
             ui->btnConnect3->setChecked(true);
             ui->btnConnect3->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -286,6 +311,8 @@ void QFESPIMB040ImageStackConfigWidget::checkStage() {
         }
         ui->btnConfig3->setEnabled(true);
     }
+    //if (stageConfig) stageConfig->unlockStages();
+
 
     QTimer::singleShot(STAGE_INTERVAL_MS, this, SLOT(checkStage()));
 }
@@ -322,11 +349,13 @@ double QFESPIMB040ImageStackConfigWidget::stackDelta2() const {
 
 
 void QFESPIMB040ImageStackConfigWidget::on_btnGetCurrent2_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage2()!=NULL) {
         if (stage2()->isConnected(currentAxisID2())) {
             ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2()));
         }
     }
+    if (stageConfig) stageConfig->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_spinStart2_valueChanged(double value) {
@@ -342,10 +371,13 @@ void QFESPIMB040ImageStackConfigWidget::on_spinSteps2_valueChanged(int value) {
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConfig2_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage2()) stage2()->showSettingsDialog(currentAxisID2());
+    if (stageConfig) stageConfig->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConnect2_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage2()) {
         if (stage2()->isConnected(currentAxisID2())) {
             stage2()->disconnectDevice(currentAxisID2());
@@ -353,6 +385,8 @@ void QFESPIMB040ImageStackConfigWidget::on_btnConnect2_clicked() {
             stage2()->connectDevice(currentAxisID2());
         }
     }
+    if (stageConfig) stageConfig->unlockStages();
+
 }
 
 
@@ -389,11 +423,13 @@ double QFESPIMB040ImageStackConfigWidget::stackDelta3() const {
 
 
 void QFESPIMB040ImageStackConfigWidget::on_btnGetCurrent3_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage3()!=NULL) {
         if (stage3()->isConnected(currentAxisID3())) {
             ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3()));
         }
     }
+    if (stageConfig) stageConfig->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_spinStart3_valueChanged(double value) {
@@ -409,10 +445,13 @@ void QFESPIMB040ImageStackConfigWidget::on_spinSteps3_valueChanged(int value) {
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConfig3_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage3()) stage3()->showSettingsDialog(currentAxisID3());
+    if (stageConfig) stageConfig->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget::on_btnConnect3_clicked() {
+    if (stageConfig) stageConfig->lockStages();
     if (stage3()) {
         if (stage3()->isConnected(currentAxisID3())) {
             stage3()->disconnectDevice(currentAxisID3());
@@ -420,4 +459,5 @@ void QFESPIMB040ImageStackConfigWidget::on_btnConnect3_clicked() {
             stage3()->connectDevice(currentAxisID3());
         }
     }
+    if (stageConfig) stageConfig->unlockStages();
 }

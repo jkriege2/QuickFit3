@@ -10,6 +10,7 @@
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
 class QFExtension;
+class QFESPIMB040OpticsSetup;
 
 namespace Ui {
     class QFESPIMB040ImageStackConfigWidget;
@@ -23,7 +24,7 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040ImageStackConfigWidget(QWidget* parent, QFPluginServices* pluginServices);
+        explicit QFESPIMB040ImageStackConfigWidget(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig=NULL);
         ~QFESPIMB040ImageStackConfigWidget();
 
     signals:
@@ -103,6 +104,7 @@ class QFESPIMB040ImageStackConfigWidget : public QWidget {
     private:
         Ui::QFESPIMB040ImageStackConfigWidget *ui;
         QFPluginServices* m_pluginServices;
+        QFESPIMB040OpticsSetup* stageConfig;
 
 };
 

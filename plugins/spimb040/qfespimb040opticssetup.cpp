@@ -34,6 +34,14 @@ QFESPIMB040OpticsSetup::~QFESPIMB040OpticsSetup()
     delete ui;
 }
 
+void QFESPIMB040OpticsSetup::lockStages() {
+    ui->stageSetup->lockStages();
+}
+
+void QFESPIMB040OpticsSetup::unlockStages() {
+    ui->stageSetup->unlockStages();
+}
+
 void QFESPIMB040OpticsSetup::closeEvent(QCloseEvent * event) {
     ui->camConfig1->close();
     ui->camConfig2->close();
@@ -245,3 +253,25 @@ int QFESPIMB040OpticsSetup::getZStageAxis() {
     return ui->stageSetup->getZStageAxis();
 }
 
+bool QFESPIMB040OpticsSetup::isXStageConnected() const {
+    return ui->stageSetup->isXStageConnected();
+}
+
+bool QFESPIMB040OpticsSetup::isYStageConnected() const {
+    return ui->stageSetup->isYStageConnected();
+}
+
+bool QFESPIMB040OpticsSetup::isZStageConnected() const {
+    return ui->stageSetup->isZStageConnected();
+}
+
+bool QFESPIMB040OpticsSetup::isStageConnected(QFExtensionLinearStage* stage, int id, bool& found) {
+    found=false;
+    if (!stage || id<0) return false;
+    found=true;
+    if (stage==getXStage() && id==getXStageAxis()) return isXStageConnected();
+    if (stage==getYStage() && id==getYStageAxis()) return isYStageConnected();
+    if (stage==getZStage() && id==getZStageAxis()) return isZStageConnected();
+    found=false;
+    return false;
+}

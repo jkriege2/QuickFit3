@@ -89,6 +89,9 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
 
         void connectCamera();
         void disconnectCamera();
+    public slots:
+        void setReadOnly(bool readonly);
+
 
     signals:
         /** \brief emitted when the set of configuration files changes */
