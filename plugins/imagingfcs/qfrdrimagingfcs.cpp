@@ -367,11 +367,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         files_types<<"video";
                     }
                     if (!filename_video.isEmpty()) {
-                        files<<filename_statistics;
+                        files<<filename_settings;
                         files_types<<"acquisition_settings";
                     }
                     if (!filename_video.isEmpty()) {
-                        files<<filename_settings;
+                        files<<filename_statistics;
                         files_types<<"statistics";
                     }
                     if (!filename_video.isEmpty()) {
@@ -380,7 +380,9 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     }
 
                 }
-                if (columns>2) initParams["CORRELATION_ERROR_COLUMN"]=2;
+                if (columns>2){
+                    initParams["CORRELATION_ERROR_COLUMN"]=2;
+                }
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
                 QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files, initParams, paramsReadonly, files_types);
                 if (e->error()) { // when an error occured: remove record and output an error message
