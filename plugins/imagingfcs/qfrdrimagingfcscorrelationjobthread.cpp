@@ -385,6 +385,51 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create statistics file '%1': %2!").arg(localFilename).arg(f.errorString()));
                             }
+                            localFilename=outputFilenameBase+".statistics.plt";
+                            QFile f1(localFilename);
+                            if (f1.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&f1);
+                                text.setLocale(outLocale);
+                                text<<QString("set xlabel 'time [seconds]'\n");
+                                text<<QString("set ylabel 'pixel grey value'\n");
+                                text<<QString("set title \"Statistics '%1'\" noenhanced\n").arg(job.filename);
+                                text<<QString("set style fill transparent solid 0.5 noborder\n");
+                                text<<QString("set multiplot layout 1,2\n");
+                                text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("unset multiplot\n");
+                                text<<QString("pause -1\n");
+                                text<<QString("set multiplot layout 2,2\n");
+                                text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("unset multiplot\n");
+                                text<<QString("pause -1\n");
+                                text<<QString("f(t)=a0+a1*exp(-t/t1)+a2*exp(-t/t2)\n");
+                                text<<QString("f1(t)=a10+a11*exp(-t/t11)\n");
+                                text<<QString("t1=5\n");
+                                text<<QString("t11=5\n");
+                                text<<QString("t1=50\n");
+                                text<<QString("a0=0\n");
+                                text<<QString("a1=1\n");
+                                text<<QString("a2=1\n");
+                                text<<QString("a10=0\n");
+                                text<<QString("a11=1\n");
+                                text<<QString("fit f1(x) '%1' using 1:2 via a10, a11, t11\n");
+                                text<<QString("fit f(x) '%1' using 1:2 via a0, a1, a2, t1, t2\n");
+                                text<<QString("set label sprintf('1exp: a10=%f a11=%f t11=%f', a10, a11, t11) at graph 0.5,0.9\n");
+                                text<<QString("set label sprintf('2exp: a0=%f a1=%f t1=%f a2=%f t2=%f', a0, a1, t1, a2, t2) at graph 0.5,0.8\n");
+                                text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'bi-exponential fit, f1(x) title 'mono-exponential fit\n").arg(QFileInfo(statisticsFilename).fileName());
+                                text<<QString("pause -1\n");
+                                text<<QString("\n");
+                                text<<QString("\n");
+                                text<<QString("\n");
+                                f1.close();
+                            } else {
+                                emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create statistics plot file '%1': %2!").arg(localFilename).arg(f.errorString()));
+                            }
 
                         }
                         emit progressIncrement(10);

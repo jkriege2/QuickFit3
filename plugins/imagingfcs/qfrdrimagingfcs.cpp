@@ -166,6 +166,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
     QString filename_overview=filename_overvieww;
+    QString filename_background="";
+    QString filename_statistics="";
+    QString filename_settings="";
+    QString filename_acquisition="";
+    QString filename_video="";
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
@@ -310,6 +315,16 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         //qDebug()<<name<<value;
                         if (name=="overview image file") {
                             filename_overview=QFileInfo(value).canonicalFilePath();
+                        } else if (name=="background image file") {
+                            filename_background=QFileInfo(value).canonicalFilePath();
+                        } else if (name=="video file") {
+                            filename_video=QFileInfo(value).canonicalFilePath();
+                        } else if (name=="statistics file") {
+                            filename_statistics=QFileInfo(value).canonicalFilePath();
+                        } else if (name=="input description file") {
+                            filename_settings=QFileInfo(value).canonicalFilePath();
+                        } else if (name=="input file") {
+                            filename_acquisition=QFileInfo(value).canonicalFilePath();
                         } else if (name=="date/time") {
                             initParams["CORRELATION_DATE"]=value;
                             paramsReadonly<<"CORRELATION_DATE";
@@ -343,8 +358,27 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 files_types<<"acf";
                 //qDebug()<<"filename_overview: "<<filename_overview;
                 if (QFile::exists(filename_overview)) {
-                    files<<filename_overview;
-                    files_types<<"overview";
+                    if (!filename_overview.isEmpty()) {
+                        files<<filename_overview;
+                        files_types<<"overview";
+                    }
+                    if (!filename_video.isEmpty()) {
+                        files<<filename_video;
+                        files_types<<"video";
+                    }
+                    if (!filename_video.isEmpty()) {
+                        files<<filename_statistics;
+                        files_types<<"acquisition_settings";
+                    }
+                    if (!filename_video.isEmpty()) {
+                        files<<filename_settings;
+                        files_types<<"statistics";
+                    }
+                    if (!filename_video.isEmpty()) {
+                        files<<filename_acquisition;
+                        files_types<<"input";
+                    }
+
                 }
                 if (columns>2) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
