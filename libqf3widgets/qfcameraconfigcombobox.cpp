@@ -150,8 +150,9 @@ void QFCameraConfigComboBox::deleteCurrent() {
 }
 
 void QFCameraConfigComboBox::saveAsCurrent() {
-        QString filename=currentConfigFilename();
-        if (filename.size()>0) {
+    if (m_stopresume) m_stopresume->stop();
+    QString filename=currentConfigFilename();
+    if (filename.size()>0) {
         bool ok;
         QString newname = QInputDialog::getText(this, tr("Save Camera Configurtion As ..."),
                                           tr("New Name:"), QLineEdit::Normal,
@@ -172,11 +173,13 @@ void QFCameraConfigComboBox::saveAsCurrent() {
             }
         }
     }
+    if (m_stopresume) m_stopresume->resume();
 }
 
 void QFCameraConfigComboBox::renameCurrent() {
-        QString filename=currentConfigFilename();
-        if (filename.size()>0) {
+    if (m_stopresume) m_stopresume->stop();
+    QString filename=currentConfigFilename();
+    if (filename.size()>0) {
         bool ok;
         QString newname = QInputDialog::getText(this, tr("Rename Camera Configurtion As ..."),
                                           tr("New Name:"), QLineEdit::Normal,
@@ -197,10 +200,13 @@ void QFCameraConfigComboBox::renameCurrent() {
             }
         }
     }
+    if (m_stopresume) m_stopresume->resume();
+
 }
 
 
 void QFCameraConfigComboBox::addNew() {
+    if (m_stopresume) m_stopresume->stop();
     QString tempFile="qf3b040spim_XXXXX.tmp";
     {
         QTemporaryFile file;
@@ -210,12 +216,10 @@ void QFCameraConfigComboBox::addNew() {
         }
     }
 
-    if (m_stopresume) m_stopresume->stop();
     QSettings* settings=new QSettings(tempFile, QSettings::IniFormat);
     m_cam->showCameraSettingsDialog(m_camIdx, *settings, this);
     settings->sync();
     delete settings;
-    if (m_stopresume) m_stopresume->resume();
 
     QString filename=currentConfigFilename();
     bool ok;
@@ -239,6 +243,7 @@ void QFCameraConfigComboBox::addNew() {
             setCurrentConfig(newname);
         }
     }
+    if (m_stopresume) m_stopresume->resume();
 }
 
 

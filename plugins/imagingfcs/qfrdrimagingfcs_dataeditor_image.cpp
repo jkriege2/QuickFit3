@@ -1807,7 +1807,7 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
             connect(cmbAverageErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
             connect(cmbRunStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
             connect(cmbRunErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
-            connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+            connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         }
@@ -1818,7 +1818,7 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
         disconnect(cmbAverageErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
         disconnect(cmbRunStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
         disconnect(cmbRunErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
-        disconnect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+        disconnect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
     }

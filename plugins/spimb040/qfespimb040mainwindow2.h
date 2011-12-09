@@ -35,8 +35,8 @@
 #include "tools.h"
 #include "qfespimb040cameraconfig.h"
 #include "qfespimb040samplestageconfig.h"
-#include "qfespimb040imagestackconfigwidget.h"
-#include "qfespimb040acquisitionconfigwidget.h"
+#include "qfespimb040imagestackconfigwidget2.h"
+#include "qfespimb040acquisitionconfigwidget2.h"
 #include "qfhtmlhelpwindow.h"
 #include "qfespimb040opticssetup.h"
 #include "qtriple.h"
@@ -77,8 +77,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         QFPluginServices* m_pluginServices;
 
         QTabWidget* tabAcquisition;
-        QFESPIMB040AcquisitionConfigWidget* widAcquisition;
-        QFESPIMB040ImageStackConfigWidget* widImageStack;
+        QFESPIMB040AcquisitionConfigWidget2* widAcquisition;
+        QFESPIMB040ImageStackConfigWidget2* widImageStack;
 
 
         QTabWidget* tabMain;
@@ -110,7 +110,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
             \param moreFiles a list of additionally created files
             \return filename of the settings file
         */
-        QString saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, bool getAcquisitionSettings=true);
+        QString saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings=true);
 
         /*! \brief save a description of an acquisition in preview mode to a QSettings object
 
@@ -124,7 +124,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
             \param files files that have been stored (see  QFExtensionCamera::AcquititonFileDescription)
             \return filename of the settings file
         */
-        QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files);
+        QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime);
 
     protected slots:
         /*! \brief runs an image acquisition

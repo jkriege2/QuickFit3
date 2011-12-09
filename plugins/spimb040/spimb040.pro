@@ -35,7 +35,10 @@ HEADERS += spimb040.h \
     ../../../../../LIB/trunk/qt/qfasttablelabel.h \
     ../../../../../LIB/trunk/histogram.h \
     qfespimb040mainwindow2.h \
-    qfespimb040experimentdescription.h
+    qfespimb040experimentdescription.h \
+    qfespimb040samplestageconfigthread.h \
+    qfespimb040imagestackconfigwidget2.h \
+    qfespimb040acquisitionconfigwidget2.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -53,13 +56,18 @@ SOURCES += spimb040.cpp \
     qfespimb00histogrammaskdialog.cpp \
     ../../../../../LIB/trunk/qt/qfasttablelabel.cpp \
     qfespimb040mainwindow2.cpp \
-    qfespimb040experimentdescription.cpp
+    qfespimb040experimentdescription.cpp \
+    qfespimb040samplestageconfigthread.cpp \
+    qfespimb040imagestackconfigwidget2.cpp \
+    qfespimb040acquisitionconfigwidget2.cpp
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
-    qfespimb040experimentdescription.ui
+    qfespimb040experimentdescription.ui \
+    qfespimb040imagestackconfigwidget2.ui \
+    qfespimb040acquisitionconfigwidget2.ui
 
 RESOURCES += spimb040.qrc
 
@@ -74,6 +82,11 @@ INCLUDEPATH += . \
 QT += gui xml svg opengl
 
 CONFIG += exceptions rtti stl
+
+
+
+
+
 
 
 

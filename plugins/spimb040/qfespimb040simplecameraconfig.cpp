@@ -81,14 +81,25 @@ void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* plugin
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
 }
 void QFESPIMB040SimpleCameraConfig::showEvent ( QShowEvent * event ) {
+    stopTimer();
+    startTimerSingleShot(true);
+}
+
+void QFESPIMB040SimpleCameraConfig::startTimerSingleShot(bool connect) {
+    if (connect) this->connect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
+    previewTimer->setSingleShot(true);
+    previewTimer->setInterval(spinAcquisitionDelay->value()+5);
+    previewTimer->start();
+}
+
+void QFESPIMB040SimpleCameraConfig::stopTimer() {
+    previewTimer->stop();
     previewTimer->disconnect();
-    connect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
 }
 
 void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
     stopPreview();
-    previewTimer->stop();
-    previewTimer->disconnect();
+    stopTimer();
     //QApplication::processEvents();
     if (camView) {
         camView->hide();
@@ -170,8 +181,7 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     previewTimer=new QTimer(this);
     previewTimer->setSingleShot(true);
     previewTimer->setInterval(5);
-    previewTimer->stop();
-    connect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
@@ -504,7 +514,7 @@ void QFESPIMB040SimpleCameraConfig::stopPreview() {
             actStartStopPreview->setChecked(false);
             displayStates(QFESPIMB040SimpleCameraConfig::Connected);
             viewData.abort_continuous_acquisition=true;
-            previewTimer->stop();
+            stopTimer();
         }
     }
 }
@@ -528,9 +538,7 @@ void QFESPIMB040SimpleCameraConfig::startStopPreview() {
                 QSettings* settings=new QSettings(filename, QSettings::IniFormat);
                 viewData.camera->useCameraSettings(camIdx, *settings);
                 camView->show();
-                previewTimer->setSingleShot(true);
-                previewTimer->setInterval(spinAcquisitionDelay->value()+2);
-                previewTimer->start();
+                startTimerSingleShot(true);
                 delete settings;
             } else {
                 displayStates(QFESPIMB040SimpleCameraConfig::Connected);
@@ -583,9 +591,7 @@ void QFESPIMB040SimpleCameraConfig::previewContinuous() {
 
         // start timer till next acquisition
         if (actStartStopPreview->isChecked()) {
-            previewTimer->setSingleShot(true);
-            previewTimer->setInterval(spinAcquisitionDelay->value()+2);
-            previewTimer->start();
+            startTimerSingleShot(true);
         }
         cnt--;
     }

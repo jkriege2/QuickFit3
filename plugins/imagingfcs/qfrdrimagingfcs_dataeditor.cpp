@@ -190,7 +190,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     gl->addWidget((l=new QLabel(tr("log &tau;-axis:"))), row, 0);
     l->setTextFormat(Qt::RichText);
     gl->addWidget(chkLogTauAxis, row, 1);
-    connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+    connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
     row++;
 
     grpInfo=new QGroupBox(tr("Info"), w);

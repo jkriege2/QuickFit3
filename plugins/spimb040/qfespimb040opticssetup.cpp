@@ -275,3 +275,17 @@ bool QFESPIMB040OpticsSetup::isStageConnected(QFExtensionLinearStage* stage, int
     found=false;
     return false;
 }
+
+QFCameraComboBox* QFESPIMB040OpticsSetup::cameraComboBox(int camera) const {
+    if (camera==0) return ui->camConfig1->cameraComboBox();
+    if (camera==1) return ui->camConfig2->cameraComboBox();
+
+    return NULL;
+}
+
+QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup::getStopRelease(int camera) const {
+    if (camera==0) return ui->camConfig1;
+    if (camera==1) return ui->camConfig2;
+
+    return NULL;
+}

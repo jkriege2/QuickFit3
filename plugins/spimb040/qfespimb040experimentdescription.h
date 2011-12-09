@@ -18,13 +18,14 @@ class QFESPIMB040ExperimentDescription : public QWidget {
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);
         /** \brief save settings */
-        void storeSettings(QSettings& settings, QString prefix);
+        void storeSettings(QSettings& settings, QString prefix) const;
 
         /*! \brief return a map containing the experiment description
          */
         QMap<QString, QVariant> getDescription() const;
     protected slots:
-        void on_btnNow_clicked();
+        void updateTime();
+        void on_btnClearAll_clicked();
     private:
         Ui::QFESPIMB040ExperimentDescription *ui;
 };

@@ -138,7 +138,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     chkDisplayStatistics=new QCheckBox("", w);
     gl->addWidget(new QLabel(tr("display statistics:")), 9, 0);
     gl->addWidget(chkDisplayStatistics, 9, 1);
-    connect(chkDisplayStatistics, SIGNAL(clicked()), this, SLOT(replotData()));
+    connect(chkDisplayStatistics, SIGNAL(toggled()), this, SLOT(replotData()));
 
     chkDisplayAverage=new QCheckBox("", w);
     gl->addWidget(new QLabel(tr("display average<br>in plot:")), 10, 0);

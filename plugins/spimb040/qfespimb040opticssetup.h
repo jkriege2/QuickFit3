@@ -18,6 +18,8 @@
 #include "objectives.h"
 #include "qfextensionlinearstage.h"
 #include "qfextensioncamera.h"
+#include "qfcameraconfigcombobox.h"
+#include "qfcameracombobox.h"
 
 
 class QFESPIMB040MainWindow; // forward
@@ -110,6 +112,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
         bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
 
+        QFCameraComboBox* cameraComboBox(int camera) const;
+
+        QFCameraConfigComboBoxStartResume* getStopRelease(int camera) const;
 
 
         /** \brief get the axis number of x-axis stage inside its class */

@@ -35,57 +35,7 @@ class QFESPIMB040MainWindow; // forward
 #include "tools.h"
 #include "qfstagecombobox.h"
 
-class QFESPIMB040SampleStageConfig; // forward
-
-/*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): thread that reads three stages and sends signals for the current states
-    \ingroup qf3ext_spimb040
-
-
- */
-class QFESPIMB040SampleStageConfigThread: public QThread {
-        Q_OBJECT
-    public:
-        QFESPIMB040SampleStageConfigThread(QFESPIMB040SampleStageConfig* parent);
-        ~QFESPIMB040SampleStageConfigThread();
-        void run();
-        void move(double x, double y, double z);
-        void moveRel(double x, double y, double z);
-        void setJoystick(bool enabled, double maxSpeed);
-        /** \brief stop the thread and block until it is stopped! */
-        void stopThread();
-        bool anyConnected() const;
-    public slots:
-        void start(Priority priority = InheritPriority );
-    signals:
-        void stageXMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
-        void stageYMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
-        void stageZMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
-        void joystickStateChanged(bool enabled);
-        void stagesConnectedChanged(bool connX, bool connY, bool connZ);
-    protected:
-        QFESPIMB040SampleStageConfig* m_parent;
-        QMutex* InstructionMutex;
-        bool stopped;
-
-        enum InstructionType { Move, MoveRel, SetJoystick };
-        struct Instruction {
-            InstructionType type;
-            double pd1;
-            double pd2;
-            double pd3;
-            bool pb1;
-        };
-
-        QQueue<Instruction> instructions;
-
-        int readCounter;
-        bool connX;
-        bool connY;
-        bool connZ;
-    protected slots:
-        void nextInstruction();
-
-};
+class QFESPIMB040SampleStageConfigThread; // forward
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a sample translation stage
     \ingroup qf3ext_spimb040
@@ -122,6 +72,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void lockStages();
         /** \brief unlock access to stages: restart the thread used for stage access by this widget  */
         void unlockStages();
+
+        bool isJoystickChecked() const;
+        double joystickMaxSpeed();
 
     public slots:
         void setReadOnly(bool readonly);

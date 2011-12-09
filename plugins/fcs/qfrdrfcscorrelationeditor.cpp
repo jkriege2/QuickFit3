@@ -150,7 +150,7 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     chkLogTauAxis=new QCheckBox("", w);
     gl->addWidget(new QLabel(tr("log-scale on<br>lag time axis:")), 9, 0);
     gl->addWidget(chkLogTauAxis, 9, 1);
-    connect(chkLogTauAxis, SIGNAL(clicked()), this, SLOT(replotData()));
+    connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
     grpInfo=new QGroupBox(tr("Info"), w);
     QGridLayout* ggl=new QGridLayout(grpInfo);

@@ -89,6 +89,8 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
 
         void connectCamera();
         void disconnectCamera();
+
+        QFCameraComboBox* cameraComboBox() const { return cmbAcquisitionDevice; }
     public slots:
         void setReadOnly(bool readonly);
 
@@ -194,6 +196,9 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
 
         QTimer* previewTimer;
 
+
+        void startTimerSingleShot(bool connect=false);
+        void stopTimer();
 
 
         /** \brief handles the close event, also close all camera views in camViews

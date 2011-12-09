@@ -4,3 +4,10 @@ win32 {
 }
 
 LIBS += -landor
+
+HEADERS +=
+
+SOURCES +=
+
+
+

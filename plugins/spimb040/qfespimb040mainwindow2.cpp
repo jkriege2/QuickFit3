@@ -104,21 +104,23 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create tab which groups different acquisition modes
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    tabAcquisition=new QTabWidget(this);
-    tabMain->addTab(tabAcquisition, tr("Acquisition"));
+    //tabAcquisition=new QTabWidget(this);
+    //tabMain->addTab(tabAcquisition, tr("Acquisition"));
 
         //------------------------------------------------------------------------------------------
         // create tab for image series acquisition
         //------------------------------------------------------------------------------------------
-        widAcquisition=new QFESPIMB040AcquisitionConfigWidget(this, m_pluginServices);
-        tabAcquisition->addTab(widAcquisition, tr("Image Series Acquisition"));
+        widAcquisition=new QFESPIMB040AcquisitionConfigWidget2(this, m_pluginServices);
+        //tabAcquisition->addTab(widAcquisition, tr("Image Series Acquisition"));
+        tabMain->addTab(widAcquisition, tr("Acquisition: Image Series"));
         connect(widAcquisition, SIGNAL(doAcquisition()), this, SLOT(doAcquisition()));
 
         //------------------------------------------------------------------------------------------
         // create tab for image stack acquisition
         //------------------------------------------------------------------------------------------
-        widImageStack=new QFESPIMB040ImageStackConfigWidget(this, m_pluginServices, optSetup);
-        tabAcquisition->addTab(widImageStack, tr("Image S&tack"));
+        widImageStack=new QFESPIMB040ImageStackConfigWidget2(this, m_pluginServices, optSetup, m_pluginServices->getConfigFileDirectory());
+        //tabAcquisition->addTab(widImageStack, tr("Image S&tack"));
+        tabMain->addTab(widImageStack, tr("Acquisition: Image S&tack"));
         connect(widImageStack, SIGNAL(doStack()), this, SLOT(doImageStack()));
 }
 
@@ -132,6 +134,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
         QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No camera selected!"));
         return;
     }
+
+    QDateTime startDateTime=QDateTime::currentDateTime();
 
 
     log_text(tr("starting image stack acquisition:\n"));
@@ -251,6 +255,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 IMAGESTACK_ERROR(tr("error locking camer 1!\n"));
             }
         }
+        if (QFile::exists(widImageStack->currentConfigFilename(0))) acquisitionSettingsFilename1=widImageStack->currentConfigFilename(0);
 
         //////////////////////////////////////////////////////////////////////////////////////
         // LOCK/INIT CAMERA 2
@@ -268,6 +273,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 IMAGESTACK_ERROR(tr("error locking camer 2!\n"));
             }
         }
+        if (QFile::exists(widImageStack->currentConfigFilename(1))) acquisitionSettingsFilename2=widImageStack->currentConfigFilename(1);
 
         if (ok && !useCam1 && !useCam2) {
             IMAGESTACK_ERROR(tr("Cannot start image acquisition: No camera selected, or both cameras not usable!"));
@@ -704,7 +710,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
 
             log_text(tr("  - writing acquisition description 1 ..."));
-            savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files);
+            savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files, startDateTime);
             log_text(tr(" DONE!\n"));
         }
         if (ok && useCam2) {
@@ -732,7 +738,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
 
             log_text(tr("  - writing acquisition description 2 ..."));
-            savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files);
+            savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files, startDateTime);
             log_text(tr(" DONE!\n"));
         }
 
@@ -845,6 +851,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
 void QFESPIMB040MainWindow2::doAcquisition() {
     if (!(widAcquisition->use1() || widAcquisition->use2())) return;
 
+    QDateTime startDateTime=QDateTime::currentDateTime();
 
     bool ok=true;
 
@@ -894,12 +901,14 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
             QApplication::processEvents();
             QString filename32="";
+            QDateTime time=QDateTime::currentDateTime();
             ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview.tif", &filename32);
             if (ok) {
                 log_text(tr("  - acquired overview image from camer 1!\n"));
                 acquisitionDescription1["overview/image_width"]=ecamera1->getImageWidth(camera1);
                 acquisitionDescription1["overview/image_height"]=ecamera1->getImageHeight(camera1);
                 acquisitionDescription1["overview/exposure_time"]=ecamera1->getExposureTime(camera1);
+                acquisitionDescription1["overview/timestamp"]=time;
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview before acquisition  with preview settings";
                 d.name=acquisitionPrefix1+"_overview.tif";
@@ -919,12 +928,14 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             progress.setLabelText(tr("acquiring overview image from camera 2 ..."));
             QApplication::processEvents();
             QString filename32="";
+            QDateTime time=QDateTime::currentDateTime();
             ok=savePreview(extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview.tif", &filename32);
             if (ok) {
                 log_text(tr("  - acquired overview image from camer 2!\n"));
                 acquisitionDescription2["overview/image_width"]=ecamera2->getImageWidth(camera2);
                 acquisitionDescription2["overview/image_height"]=ecamera2->getImageHeight(camera2);
                 acquisitionDescription2["overview/exposure_time"]=ecamera2->getExposureTime(camera2);
+                acquisitionDescription2["overview/timestamp"]=time;
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview before acquisition  with preview settings";
                 d.name=acquisitionPrefix2+"_overview.tif";
@@ -1035,12 +1046,14 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
             QApplication::processEvents();
             QString filename32="";
+            QDateTime time=QDateTime::currentDateTime();
             ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview_after.tif", &filename32);
             if (ok) {
                 log_text(tr("  - acquired overview image from camer 1!\n"));
                 acquisitionDescription1["overview_after/image_width"]=ecamera1->getImageWidth(camera1);
                 acquisitionDescription1["overview_after/image_height"]=ecamera1->getImageHeight(camera1);
                 acquisitionDescription1["overview_after/exposure_time"]=ecamera1->getExposureTime(camera1);
+                acquisitionDescription1["overview_after/timestamp"]=time;
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview with preview settings";
                 d.name=acquisitionPrefix1+"_overview_after.tif";
@@ -1060,12 +1073,14 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             progress.setLabelText(tr("acquiring overview image from camera 2 ..."));
             QApplication::processEvents();
             QString filename32="";
+            QDateTime time=QDateTime::currentDateTime();
             ok=savePreview(extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview_after.tif", &filename32);
             if (ok) {
                 log_text(tr("  - acquired overview image from camer 2!\n"));
                 acquisitionDescription2["overview_after/image_width"]=ecamera2->getImageWidth(camera2);
                 acquisitionDescription2["overview_after/image_height"]=ecamera2->getImageHeight(camera2);
                 acquisitionDescription2["overview_after/exposure_time"]=ecamera2->getExposureTime(camera2);
+                acquisitionDescription2["overview_after/timestamp"]=time;
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview after acquisition with preview settings";
                 d.name=acquisitionPrefix2+"_overview_after.tif";
@@ -1090,12 +1105,12 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok && useCam1) {
         log_text(tr("  - writing acquisition description 1 ..."));
-        saveAcquisitionDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1, false);
+        saveAcquisitionDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1, startDateTime, false);
         log_text(tr(" DONE!\n"));
     }
     if (ok && useCam2) {
         log_text(tr("  - writing acquisition description 2 ..."));
-        saveAcquisitionDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2, false);
+        saveAcquisitionDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2, startDateTime, false);
         log_text(tr(" DONE!\n"));
     }
 
@@ -1117,7 +1132,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 }
 
 
-QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, bool getAcquisitionSettings) {
+QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
@@ -1184,6 +1199,7 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 
     // Experiment Description
     QMap<QString, QVariant> experiment=widExperimentDescription->getDescription();
+    experiment["start_time"]= startDateTime;
     {
         QMapIterator <QString, QVariant> it(experiment);
         while (it.hasNext()) {
@@ -1216,7 +1232,7 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 }
 
 
-QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files) {
+QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
@@ -1267,6 +1283,7 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
 
     // Experiment Description
     QMap<QString, QVariant> experiment=widExperimentDescription->getDescription();
+    experiment["start_time"]= startDateTime;
     {
         QMapIterator <QString, QVariant> it(experiment);
         while (it.hasNext()) {
@@ -1281,7 +1298,6 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
             }
         }
     }
-
     // WRITE FILES LIST
     settings.setValue("files/count", files.size());
     for (int i=0; i<files.size(); i++) {
