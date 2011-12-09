@@ -86,6 +86,7 @@ void QFESPIMB040SimpleCameraConfig::showEvent ( QShowEvent * event ) {
 }
 
 void QFESPIMB040SimpleCameraConfig::startTimerSingleShot(bool connect) {
+    this->disconnect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
     if (connect) this->connect(previewTimer, SIGNAL(timeout()), this, SLOT(previewContinuous()));
     previewTimer->setSingleShot(true);
     previewTimer->setInterval(spinAcquisitionDelay->value()+5);
@@ -550,6 +551,7 @@ void QFESPIMB040SimpleCameraConfig::startStopPreview() {
 
 
 void QFESPIMB040SimpleCameraConfig::previewContinuous() {
+
     if (!camView) return;
     static int cnt=0;
     cnt++;
