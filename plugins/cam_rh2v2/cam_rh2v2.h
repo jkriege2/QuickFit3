@@ -131,6 +131,14 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         virtual double getPixelHeight(unsigned int camera);
 
 
+
+        /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
+        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const;
+        /** \copydoc QFExtensionCamera::changeCameraSetting() */
+        virtual void changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value);
+        /** \copydoc QFExtensionCamera::getCameraSetting() */
+        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
+
         /** \brief log project text message
          *  \param message the message to log
          */

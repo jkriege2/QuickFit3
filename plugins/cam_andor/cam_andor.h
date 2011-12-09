@@ -97,6 +97,12 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual bool isShutterOpen(unsigned int shutter) ;
         /** \copydoc QFExtensionShutter::setShutterState() */
         virtual void setShutterState(unsigned int shutter, bool opened);
+        /** \copydoc QFExtensionShutter::getShutterDescription() */
+        virtual QString getShutterDescription(unsigned int shutter);
+        /** \copydoc QFExtensionShutter::getShutterShortName() */
+        virtual QString getShutterShortName(unsigned int shutter);
+        /** \copydoc QFExtensionShutter::isLastShutterActionFinished() */
+        virtual bool isLastShutterActionFinished(unsigned int shutter);
 
 
 
@@ -156,6 +162,15 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
         /** \copydoc QFExtensionCamera::getAcquisitionProgress() */
         virtual int getAcquisitionProgress(unsigned int camera);
+
+
+        /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
+        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const;
+        /** \copydoc QFExtensionCamera::changeCameraSetting() */
+        virtual void changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value);
+        /** \copydoc QFExtensionCamera::getCameraSetting() */
+        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
+
 
         /** \brief log project text message
          *  \param message the message to log
@@ -222,6 +237,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief shutter opening time in milliseconds */
             int shutterOpeningTime;
 
+            /** \brief when has the shutter been changed the last time */
+            QTime lastShutterAction;
 
             /** \brief set default values */
             CameraGlobalSettings();
@@ -374,7 +391,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         bool setTemperature(int camera, bool coolerOn, int temperature, int fanMode=0);
 
         /** \brief set the shutter mode */
-        bool setShutter(int camera, int mode, int closingtime=50, int openingtime=50);
+        bool setCamShutter(int camera, int mode, int closingtime=50, int openingtime=50);
 
         /** \brief get camera info as HTML string for the given \A camera. The other options switch on/off parts of the report*/
         QString getCameraInfo(int camera, bool showHeadModel=true, bool showSensorSize=true, bool extendedInfo=false, bool currentSettings=false);
@@ -433,6 +450,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief acquire a single frame with current settings, but before set the image size to full sensor! */
         bool acquireFullFrame(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL);
+
+
 };
 
 #endif // CAM_ANDOR

@@ -590,6 +590,17 @@ double QFECamTestCamera::getPixelHeight(unsigned int camera) {
     return 10;
 }
 
+bool QFECamTestCamera::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+    return false;
+}
+
+void QFECamTestCamera::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {
+
+}
+
+QVariant QFECamTestCamera::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    return QVariant();
+}
 
 void QFECamTestCamera::log_text(QString message) {
 	if (logService) logService->log_text(message);

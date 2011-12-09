@@ -35,6 +35,9 @@
       -# After the acquisition ended a call to getAcquisitionDescription() should return information about the last
          acquisition.
     .
+    There is also the possibility to alter the acquisition settings in a controlled manner. This may be done,
+    using the functions isCameraSettingChangable() and changeCameraSetting() which are applied to the QSettings
+    object, used to configure in prepareAcquisition().
  */
 class QFExtensionCamera {
     public:
@@ -189,6 +192,18 @@ class QFExtensionCamera {
              \return the progress as an integer between 0 and 100
          */
          virtual int getAcquisitionProgress(unsigned int camera)=0;
+
+         enum CameraSetting {
+             CamSetExposureTime,
+             CamSetNumberFrames
+         };
+
+         /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
+         virtual bool isCameraSettingChangable(CameraSetting which) const =0;
+         /** \brief change the given CameraSetting in the given QSettings object */
+         virtual void changeCameraSetting(QSettings& settings, CameraSetting which, QVariant value) =0;
+         /** \brief extract the given CameraSetting from the given QSettings object */
+         virtual QVariant getCameraSetting(QSettings& settings, CameraSetting which) const =0;
 
 
 };

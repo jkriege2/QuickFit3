@@ -388,6 +388,18 @@ int QFExtensionCameraRh2v2::getAcquisitionProgress(unsigned int camera) {
     return 0;
 }
 
+bool QFExtensionCameraRh2v2::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+    return false;
+}
+
+void QFExtensionCameraRh2v2::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {
+
+}
+
+QVariant QFExtensionCameraRh2v2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    return QVariant();
+}
+
 void QFExtensionCameraRh2v2::log_text(QString message) {
 	if (logService) logService->log_text(message);
 	else if (services) services->log_text(message);

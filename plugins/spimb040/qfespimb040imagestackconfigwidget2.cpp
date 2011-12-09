@@ -123,13 +123,13 @@ void QFESPIMB040ImageStackConfigWidget2::incCounter() {
 
 QString QFESPIMB040ImageStackConfigWidget2::prefix1() const {
     QString filename= ui->edtPrefix1->text();
-    filename=filename.replace("%counter%", QString::number(counter()));
+    filename=filename.replace("%counter%", QString("%1").arg((qlonglong)counter(), (int)3, (int)10, QChar('0')));
     return filename;
 }
 
 QString QFESPIMB040ImageStackConfigWidget2::prefix2() const {
     QString filename= ui->edtPrefix2->text();
-    filename=filename.replace("%counter%", QString::number(counter()));
+    filename=filename.replace("%counter%", QString("%1").arg((qlonglong)counter(), (int)3, (int)10, QChar('0')));
     return filename;
 }
 

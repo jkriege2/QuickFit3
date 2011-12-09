@@ -84,6 +84,7 @@ QFExtensionCameraAndor::CameraGlobalSettings::CameraGlobalSettings() {
     shutterOpeningTime=50;
     shutterClosingTime=50;
     cooling_wait=true;
+    lastShutterAction=QTime::currentTime();
 }
 
 
@@ -169,6 +170,7 @@ QFExtensionCameraAndor::QFExtensionCameraAndor(QObject* parent):
 {
     logService=NULL;
     conn=false;
+
     #ifdef __LINUX__
     detectorsIniPath=detectorsIniPath_init="/usr/local/etc/andor";
     #else
@@ -686,6 +688,24 @@ double QFExtensionCameraAndor::getExposureTime(unsigned int camera) {
 }
 
 
+bool QFExtensionCameraAndor::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+    if (which==QFExtensionCamera::CamSetExposureTime) return true;
+    if (which==QFExtensionCamera::CamSetNumberFrames) return true;
+    return false;
+}
+
+void QFExtensionCameraAndor::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {
+    QString prefix="cam_andor/";
+    if (which==QFExtensionCamera::CamSetExposureTime) settings.setValue(prefix+"exposure_time", value);
+    if (which==QFExtensionCamera::CamSetNumberFrames) settings.setValue(prefix+"kinetic_cycles", value);
+}
+
+QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    QString prefix="cam_andor/";
+    if (which==QFExtensionCamera::CamSetExposureTime) return settings.value(prefix+"exposure_time");
+    if (which==QFExtensionCamera::CamSetNumberFrames) return settings.value(prefix+"kinetic_cycles");
+    return QVariant();
+}
 
 bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
@@ -1035,7 +1055,7 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
     return false;
 }
 
-bool QFExtensionCameraAndor::setShutter(int camera, int mode, int closingtime, int openingtime) {
+bool QFExtensionCameraAndor::setCamShutter(int camera, int mode, int closingtime, int openingtime) {
     if (selectCamera(camera)) {
         /* SetShutter(
             typ = 0 (TTL low opens shutter)
@@ -1043,6 +1063,7 @@ bool QFExtensionCameraAndor::setShutter(int camera, int mode, int closingtime, i
             closingtime = 50
             openingtime = 50
         */
+        camGlobalSettings[camera].lastShutterAction=QTime::currentTime();
         CHECK(SetShutter(1,mode,closingtime, openingtime), tr("error while setting shutter"));
         return true;
     } else {
@@ -1099,13 +1120,13 @@ bool QFExtensionCameraAndor::setGlobalSettings(int cam) {
             camera=it.key();
             if (isConnected(camera)) {
                 ok=ok&&setTemperature(camera, it.value().coolerOn, it.value().setTemperature, it.value().fanMode);
-                ok=ok&&setShutter(camera, it.value().shutterMode, it.value().shutterClosingTime, it.value().shutterOpeningTime);
+                ok=ok&&setCamShutter(camera, it.value().shutterMode, it.value().shutterClosingTime, it.value().shutterOpeningTime);
             }
         }
     } else {
         if (camGlobalSettings.contains(camera) && isConnected(camera)) {
             ok=setTemperature(camera, camGlobalSettings[camera].coolerOn, camGlobalSettings[camera].setTemperature, camGlobalSettings[camera].fanMode);
-            ok=ok&&setShutter(camera, camGlobalSettings[camera].shutterMode, camGlobalSettings[camera].shutterClosingTime, camGlobalSettings[camera].shutterOpeningTime);
+            ok=ok&&setCamShutter(camera, camGlobalSettings[camera].shutterMode, camGlobalSettings[camera].shutterClosingTime, camGlobalSettings[camera].shutterOpeningTime);
         }
     }
     return ok;
@@ -1212,16 +1233,30 @@ bool  QFExtensionCameraAndor::isShutterOpen(unsigned int shutter)  {
 }
 
 void  QFExtensionCameraAndor::setShutterState(unsigned int shutter, bool opened) {
+    if (shutter>=getShutterCount()) return;
     if (opened) camGlobalSettings[shutter].shutterMode=1;
     else camGlobalSettings[shutter].shutterMode=2;
     setGlobalSettings(shutter);
     storeGlobalSettings();
     updateGlobalSettingsWidgets(false);
+
+}
+
+QString QFExtensionCameraAndor::getShutterDescription(unsigned int shutter) {
+    if (shutter<getShutterCount()) return tr("internal camera shutter");
+    return QString("");
 }
 
 
+QString QFExtensionCameraAndor::getShutterShortName(unsigned int shutter) {
+    if (shutter<getShutterCount()) return tr("camera shutter");
+    return QString("");
+}
 
-
+bool QFExtensionCameraAndor::isLastShutterActionFinished(unsigned int shutter) {
+    if (shutter>=getShutterCount()) return true;
+    return camGlobalSettings[shutter].lastShutterAction.elapsed()>150;
+}
 
 
 

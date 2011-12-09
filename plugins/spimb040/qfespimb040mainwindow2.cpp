@@ -28,19 +28,19 @@ QFESPIMB040MainWindow2::~QFESPIMB040MainWindow2()
 void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
-    if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
-    if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
     if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
+    if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
+    if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jksaveSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
-    if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
-    if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
     if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
+    if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
+    if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
 
 }
 
@@ -110,7 +110,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //------------------------------------------------------------------------------------------
         // create tab for image series acquisition
         //------------------------------------------------------------------------------------------
-        widAcquisition=new QFESPIMB040AcquisitionConfigWidget2(this, m_pluginServices);
+        widAcquisition=new QFESPIMB040AcquisitionConfigWidget2(this, m_pluginServices, optSetup, m_pluginServices->getConfigFileDirectory());
         //tabAcquisition->addTab(widAcquisition, tr("Image Series Acquisition"));
         tabMain->addTab(widAcquisition, tr("Acquisition: Image Series"));
         connect(widAcquisition, SIGNAL(doAcquisition()), this, SLOT(doAcquisition()));
@@ -859,9 +859,11 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     // collect common acquisition data
     //////////////////////////////////////////////////////////////////////////////////////
     QMap<QString, QVariant> acquisitionDescription1, acquisitionDescription2;
+    QMap<QString, QVariant> backgroundDescription1, backgroundDescription2;
     acquisitionDescription1["type"]="acquisition";
     acquisitionDescription2["type"]="acquisition";
     QList<QFExtensionCamera::AcquititonFileDescription> moreFiles1, moreFiles2;
+    QList<QFExtensionCamera::AcquititonFileDescription> backgroundFiles1, backgroundFiles2;
 
     //////////////////////////////////////////////////////////////////////////////////////
     // lock cameras for use by this routine
@@ -873,16 +875,25 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     QString acquisitionSettingsFilename1="", previewSettingsFilename1="";
     QString acquisitionPrefix1=widAcquisition->prefix1();
     QString acquisitionPrefix2=widAcquisition->prefix2();
+    int backgroundFrames1=1;
     if (widAcquisition->use1()) {
         useCam1=optSetup->lockCamera(0,&extension1, &ecamera1, &camera1, &acquisitionSettingsFilename1, &previewSettingsFilename1);
+        if (QFile::exists(widAcquisition->currentConfigFilename(0))) acquisitionSettingsFilename1=widAcquisition->currentConfigFilename(0);
+        if (QFile::exists(widAcquisition->currentPreviewConfigFilename(0))) previewSettingsFilename1=widAcquisition->currentPreviewConfigFilename(0);
+        backgroundFrames1=widAcquisition->currentBackgroundFrames(0);
     }
+
     bool useCam2=false;
     QFExtension* extension2=NULL;
     QFExtensionCamera* ecamera2=NULL;
     QString acquisitionSettingsFilename2="", previewSettingsFilename2="";
     int camera2=0;
+    int backgroundFrames2=1;
     if (widAcquisition->use2()) {
         useCam2=optSetup->lockCamera(1,&extension2, &ecamera2, &camera2, &acquisitionSettingsFilename2, &previewSettingsFilename2);
+        if (QFile::exists(widAcquisition->currentConfigFilename(1))) acquisitionSettingsFilename2=widAcquisition->currentConfigFilename(1);
+        if (QFile::exists(widAcquisition->currentPreviewConfigFilename(1))) previewSettingsFilename2=widAcquisition->currentPreviewConfigFilename(1);
+        backgroundFrames2=widAcquisition->currentBackgroundFrames(1);
     }
 
     QProgressDialog progress(tr("Image Series Acquisition"), tr("&Cancel"), 0, 100, this);
@@ -890,6 +901,109 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     progress.setMinimumDuration(0);
     progress.setValue(0);
     log_text(tr("starting image series acquisition:\n"));
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // acquire background images
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (widAcquisition->saveBackground()) {
+        QDateTime time=QDateTime::currentDateTime();
+        progress.setLabelText(tr("acquiring background frames from cameras ..."));
+        QApplication::processEvents();
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // prepare cameras  (set camera settings)
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (ok && useCam1) {
+            progress.setLabelText(tr("preparing camera 1 for background ..."));
+            QApplication::processEvents();
+            QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
+            if (ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, widAcquisition->currentBackgroundFrames(0));
+            ok=ecamera1->prepareAcquisition(camera1, settings, acquisitionPrefix1+"_background");
+            if (ok) {
+                log_text(tr("  - prepared camer 1 for background!\n"));
+            } else {
+                ACQUISITION_ERROR(tr("  - error preparing camera 1 for background!\n"));
+            }
+        }
+        if (ok && useCam2) {
+            progress.setLabelText("preparing camera 2 for background ...");
+            QApplication::processEvents();
+            QSettings settings(acquisitionSettingsFilename2, QSettings::IniFormat);
+            if (ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, widAcquisition->currentBackgroundFrames(1));
+            ok=ecamera2->prepareAcquisition(camera2, settings, acquisitionPrefix2+"_background");
+            if (ok) {
+                log_text(tr("  - prepared camer 2 for background!\n"));
+            } else {
+                ACQUISITION_ERROR(tr("  - error preparing camera 2 for background!\n"));
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // start background acquisition and wait until finished
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (ok) {
+            progress.setLabelText(tr("acquiring background images ..."));
+            log_text(tr("  - acquiring background frames!\n"));
+            if (useCam1) {
+                ok=ecamera1->startAcquisition(camera1);
+                if (!ok) {
+                    ACQUISITION_ERROR(tr("  - error starting acquisition on camera 1 for background!\n"));
+                }
+            }
+            if (ok && useCam2) {
+                ok=ecamera2->startAcquisition(camera2);
+                if (!ok) {
+                    ACQUISITION_ERROR(tr("  - error starting acquisition on camera 1 for background!\n"));
+                }
+            }
+            bool running=ok;
+            QTime time=QTime::currentTime();
+            while (running) {
+                if (time.elapsed()>250) {
+                    int prog1=99, prog2=99;
+                    if (useCam1) prog1=ecamera1->getAcquisitionProgress(camera1);
+                    if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
+                    progress.setValue(qMin(prog1,prog2));
+                    time.start();
+                }
+
+                QApplication::processEvents();
+
+                if (progress.wasCanceled()) {
+                    running=false;
+                    if (useCam1) ecamera1->cancelAcquisition(camera1);
+                    if (useCam2) ecamera2->cancelAcquisition(camera2);
+                    log_warning(tr("  - background acquisition canceled by user!\n"));
+                } else {
+                    bool run1=false;
+                    bool run2=false;
+                    if (useCam1) run1=ecamera1->isAcquisitionRunning(camera1);
+                    if (useCam2) run2=ecamera2->isAcquisitionRunning(camera2);
+                    running=run1||run2;
+                }
+            }
+        }
+        progress.setValue(100);
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // retrieve background acquisition description
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (ok && useCam1) {
+            ecamera1->getAcquisitionDescription(camera1, &backgroundFiles1, &backgroundDescription1);
+            log_text(tr("  - acquired background image from camera 1!\n"));
+            acquisitionDescription1["background_timestamp"]=time;
+        }
+        if (ok && useCam2) {
+            ecamera2->getAcquisitionDescription(camera2, &backgroundFiles2, &backgroundDescription2);
+            log_text(tr("  - acquired background image from camera 2!\n"));
+            acquisitionDescription2["background_timestamp"]=time;
+        }
+    }
+
 
 
 
@@ -953,7 +1067,6 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         }
 
     }
-
 
     //////////////////////////////////////////////////////////////////////////////////////
     // prepare cameras  (set camera settings)
@@ -1105,11 +1218,37 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok && useCam1) {
         log_text(tr("  - writing acquisition description 1 ..."));
+        // add the background stuff to the description, files list
+        for (int i=0; i<backgroundFiles1.size(); i++) {
+            QFExtensionCamera::AcquititonFileDescription d=backgroundFiles1[i];
+            d.description="background "+d.description;
+            moreFiles1.append(d);
+        }
+        QMapIterator<QString, QVariant> it(backgroundDescription1);
+        while (it.hasNext()) {
+            it.next();
+            if ( (!acquisitionDescription1.contains(it.key())) || (acquisitionDescription1.value(it.key(), it.value())!=it.value()) ) {
+                acquisitionDescription1["background/"+it.key()]=it.value();
+            }
+        }
         saveAcquisitionDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1, startDateTime, false);
         log_text(tr(" DONE!\n"));
     }
     if (ok && useCam2) {
         log_text(tr("  - writing acquisition description 2 ..."));
+        // add the background stuff to the description, files list
+        for (int i=0; i<backgroundFiles2.size(); i++) {
+            QFExtensionCamera::AcquititonFileDescription d=backgroundFiles2[i];
+            d.description="background "+d.description;
+            moreFiles2.append(d);
+        }
+        QMapIterator<QString, QVariant> it(backgroundDescription2);
+        while (it.hasNext()) {
+            it.next();
+            if ( (!acquisitionDescription2.contains(it.key())) || (acquisitionDescription2.value(it.key(), it.value())!=it.value()) ) {
+                acquisitionDescription2["background/"+it.key()]=it.value();
+            }
+        }
         saveAcquisitionDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2, startDateTime, false);
         log_text(tr(" DONE!\n"));
     }

@@ -381,6 +381,17 @@ double QFExtensionCameraRadhard2::getPixelHeight(unsigned int camera) {
 	return 30;
 }
 
+bool QFExtensionCameraRadhard2::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+    return false;
+}
+
+void QFExtensionCameraRadhard2::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {
+
+}
+
+QVariant QFExtensionCameraRadhard2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    return QVariant();
+}
 
 //Q_EXPORT_PLUGIN2(cam_radhard2, QFExtensionCameraRadhard2)
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCameraRadhard2)
