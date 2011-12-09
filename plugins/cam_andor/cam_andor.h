@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <QtPlugin>
 #include "andortools.h"
+#include "qfextensionshutter.h"
 
 
 
@@ -29,8 +30,10 @@
 /*! \brief QFExtensionCamera implementation for Andor cameras
     \ingroup qf3ext_andor
 
+    This class implements two interfaces: QFExtensionCamera to operate the camera and QFExtensionShutter to operate the shutter inside the camera.
+
  */
-class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera {
+class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera)
     public:
@@ -60,7 +63,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
@@ -76,6 +79,30 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual void loadSettings(ProgramOptions* settings);
         /** \copydoc QFExtensionBase::storeSettings() */
         virtual void storeSettings(ProgramOptions* settings);
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    // QFExtensionShutter routines
+    /////////////////////////////////////////////////////////////////////////////
+    public:
+        /** \copydoc QFExtensionShutter::getShutterCount() */
+        virtual unsigned int  getShutterCount() ;
+        /** \copydoc QFExtensionShutter::shutterConnect() */
+        virtual void shutterConnect(unsigned int shutter);
+        /** \copydoc QFExtensionShutter::shutterDisonnect() */
+        virtual void shutterDisonnect(unsigned int shutter);
+        /** \copydoc QFExtensionShutter::isShutterConnected() */
+        virtual bool isShutterConnected(unsigned int shutter) ;
+        /** \copydoc QFExtensionShutter::isShutterOpen() */
+        virtual bool isShutterOpen(unsigned int shutter) ;
+        /** \copydoc QFExtensionShutter::setShutterState() */
+        virtual void setShutterState(unsigned int shutter, bool opened);
+
+
+
+
+
+
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -150,7 +177,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
     protected slots:
         /** \brief update the current temperature of the sensors ... calls itself again using a QTimer::singleShot() */
-        void updateTemperatures();
+        void updateGlobalSettingsWidgets(bool startTimer=true);
 
 
         /** \brief called when global settings have changed */

@@ -40,9 +40,11 @@
 
 
 
+#define UPDATE_TEMP_INTERVAL 1131
 
 #define LOG_PREFIX "[Andor]:  "
 #define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
+
 
 #define CHECK(s, msg) \
 { \
@@ -262,7 +264,7 @@ void QFExtensionCameraAndor::initExtension() {
     loadSettings(NULL);
 
     // start continuous display of global settings
-    updateTemperatures();
+    updateGlobalSettingsWidgets();
 
     services->log_global_text(tr("%2initializing extension '%1' ... DONE\n").arg(getName()).arg(LOG_PREFIX));
 }
@@ -1111,7 +1113,7 @@ bool QFExtensionCameraAndor::setGlobalSettings(int cam) {
 
 
 
-void QFExtensionCameraAndor::updateTemperatures() {
+void QFExtensionCameraAndor::updateGlobalSettingsWidgets(bool startTimer) {
     for (unsigned int i=0; i<getCameraCount(); i++) {
         AndorGlobalCameraSettingsWidget* widget=camGlobalSettingsWidgets.value(i, NULL);
         if (!widget) {
@@ -1158,8 +1160,10 @@ void QFExtensionCameraAndor::updateTemperatures() {
         }
     }
 
-    QTimer::singleShot(1000, this, SLOT(updateTemperatures()));
+    if (startTimer) QTimer::singleShot(UPDATE_TEMP_INTERVAL, this, SLOT(updateGlobalSettingsWidgets()));
 }
+
+
 
 void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, bool cooling_on, bool cooling_wait, int temperature, int shutterMode) {
     if (!camGlobalSettings.contains(camera)) {
@@ -1179,7 +1183,50 @@ void QFExtensionCameraAndor::globalSettingsChanged(int camera, int fan_mode, boo
 }
 
 
+
+
+
+
+unsigned int QFExtensionCameraAndor::getShutterCount()  {
+    return getCameraCount();
+}
+
+void  QFExtensionCameraAndor::shutterConnect(unsigned int shutter) {
+
+}
+
+void  QFExtensionCameraAndor::shutterDisonnect(unsigned int shutter) {
+
+}
+
+bool  QFExtensionCameraAndor::isShutterConnected(unsigned int shutter)  {
+    return isConnected(shutter);
+}
+
+bool  QFExtensionCameraAndor::isShutterOpen(unsigned int shutter)  {
+    if (camGlobalSettings.contains(shutter)) {
+        if (camGlobalSettings[shutter].shutterMode!=2) return true;
+        else return false;
+    }
+    return false;
+}
+
+void  QFExtensionCameraAndor::setShutterState(unsigned int shutter, bool opened) {
+    if (opened) camGlobalSettings[shutter].shutterMode=1;
+    else camGlobalSettings[shutter].shutterMode=2;
+    setGlobalSettings(shutter);
+    storeGlobalSettings();
+    updateGlobalSettingsWidgets(false);
+}
+
+
+
+
+
+
+
 Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)
+
 
 
 

@@ -197,10 +197,18 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
 
     //qDebug()<<"******************************\n vstart="<<vstart<<"  vend="<<vend<<"  m_sensorHeight="<<m_sensorHeight;
 
+    // set values twice to ensure they are not altered by events
+    ui->spinWidth->setValue(abs(hend-hstart));
+    ui->spinHeight->setValue(abs(vend-vstart));
     ui->spinLeft->setValue(hstart);
     ui->spinTop->setValue(vstart);
     ui->spinWidth->setValue(abs(hend-hstart));
     ui->spinHeight->setValue(abs(vend-vstart));
+    ui->spinLeft->setValue(hstart);
+    ui->spinTop->setValue(vstart);
+    // end doubling
+
+
     ui->spinHorizontalBinning->setValue(settings.value(prefix+"horizontal_binning", 1).toInt());
     ui->spinVerticalBinning->setValue(settings.value(prefix+"vertical_binning", 1).toInt());
     ui->cmbAmplifier->setCurrentIndex(settings.value(prefix+"amplifier", 0).toInt());
