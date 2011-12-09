@@ -183,20 +183,25 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnAcquire_clicked() {
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrent_clicked() {
+    if (opticsSetup) opticsSetup->lockStages();
     if (stage()!=NULL) {
         if (stage()->isConnected(currentAxisID())) {
             ui->spinStart->setValue(stage()->getPosition(currentAxisID()));
         }
     }
+    if (opticsSetup) opticsSetup->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround_clicked() {
+    if (opticsSetup) opticsSetup->lockStages();
     if (stage()!=NULL) {
         if (stage()->isConnected(currentAxisID())) {
             ui->spinStart->setValue(stage()->getPosition(currentAxisID())-ui->spinDelta->value()*(double)ui->spinSteps->value());
         }
     }
+    if (opticsSetup) opticsSetup->unlockStages();
 }
+
 void QFESPIMB040ImageStackConfigWidget2::on_spinStart_valueChanged(double value) {
     updateLabel();
 }
