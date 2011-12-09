@@ -196,7 +196,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround_clicked() {
     if (opticsSetup) opticsSetup->lockStages();
     if (stage()!=NULL) {
         if (stage()->isConnected(currentAxisID())) {
-            ui->spinStart->setValue(stage()->getPosition(currentAxisID())-ui->spinDelta->value()*(double)ui->spinSteps->value());
+            ui->spinStart->setValue(stage()->getPosition(currentAxisID())-ui->spinDelta->value()*(double)ui->spinSteps->value()/2.0);
         }
     }
     if (opticsSetup) opticsSetup->unlockStages();
@@ -392,7 +392,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround2_clicked() {
     if (opticsSetup) opticsSetup->lockStages();
     if (stage2()!=NULL) {
         if (stage2()->isConnected(currentAxisID2())) {
-            ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2())-ui->spinDelta2->value()*(double)ui->spinSteps2->value());
+            ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2())-ui->spinDelta2->value()*(double)ui->spinSteps2->value()/2.0);
         }
     }
     if (opticsSetup) opticsSetup->unlockStages();
@@ -475,7 +475,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround3_clicked() {
     if (opticsSetup) opticsSetup->lockStages();
     if (stage3()!=NULL) {
         if (stage3()->isConnected(currentAxisID3())) {
-            ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3())-ui->spinDelta3->value()*(double)ui->spinSteps3->value());
+            ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3())-ui->spinDelta3->value()*(double)ui->spinSteps3->value()/2.0);
         }
     }
     if (opticsSetup) opticsSetup->unlockStages();

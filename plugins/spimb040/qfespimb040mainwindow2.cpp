@@ -918,7 +918,9 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         if (ok && useCam1) {
             progress.setLabelText(tr("preparing camera 1 for background ..."));
             QApplication::processEvents();
-            QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
+            QString tmpName=QDir::temp().absoluteFilePath("qf3spimb040_cam1backgrndsettings.ini");
+            QFile::copy(acquisitionSettingsFilename1, tmpName);
+            QSettings settings(tmpName, QSettings::IniFormat);
             if (ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, widAcquisition->currentBackgroundFrames(0));
             ok=ecamera1->prepareAcquisition(camera1, settings, acquisitionPrefix1+"_background");
             if (ok) {
@@ -930,7 +932,9 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         if (ok && useCam2) {
             progress.setLabelText("preparing camera 2 for background ...");
             QApplication::processEvents();
-            QSettings settings(acquisitionSettingsFilename2, QSettings::IniFormat);
+            QString tmpName=QDir::temp().absoluteFilePath("qf3spimb040_cam2backgrndsettings.ini");
+            QFile::copy(acquisitionSettingsFilename2, tmpName);
+            QSettings settings(tmpName, QSettings::IniFormat);
             if (ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, widAcquisition->currentBackgroundFrames(1));
             ok=ecamera2->prepareAcquisition(camera2, settings, acquisitionPrefix2+"_background");
             if (ok) {

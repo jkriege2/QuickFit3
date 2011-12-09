@@ -200,7 +200,10 @@ class QFExtensionCamera {
 
          /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
          virtual bool isCameraSettingChangable(CameraSetting which) const =0;
-         /** \brief change the given CameraSetting in the given QSettings object */
+         /*! \brief change the given CameraSetting in the given QSettings object
+
+             \note <b>this will change the contents of your QSettings object, so possibly this changed version is also written back to the harddisk!!!</b>
+          */
          virtual void changeCameraSetting(QSettings& settings, CameraSetting which, QVariant value) =0;
          /** \brief extract the given CameraSetting from the given QSettings object */
          virtual QVariant getCameraSetting(QSettings& settings, CameraSetting which) const =0;
