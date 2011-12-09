@@ -168,9 +168,11 @@ void QFESPIMB040ImageStackConfigWidget::on_btnAcquire_clicked() {
 
 void QFESPIMB040ImageStackConfigWidget::on_btnGetCurrent_clicked() {
     if (stage()!=NULL) {
+        if (stageConfig) stageConfig->lockStages();
         if (stage()->isConnected(currentAxisID())) {
             ui->spinStart->setValue(stage()->getPosition(currentAxisID()));
         }
+        if (stageConfig) stageConfig->unlockStages();
     }
 }
 
