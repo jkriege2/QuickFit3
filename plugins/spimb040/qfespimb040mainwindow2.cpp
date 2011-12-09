@@ -946,6 +946,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         if (ok) {
             progress.setLabelText(tr("acquiring background images ..."));
             log_text(tr("  - acquiring background frames!\n"));
+            QTime time=QTime::currentTime();
             if (useCam1) {
                 ok=ecamera1->startAcquisition(camera1);
                 if (!ok) {
@@ -959,7 +960,6 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 }
             }
             bool running=ok;
-            QTime time=QTime::currentTime();
             while (running) {
                 if (time.elapsed()>250) {
                     int prog1=99, prog2=99;

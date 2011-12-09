@@ -443,14 +443,14 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
     if (!ui->chkLastFrame->isChecked()) last= ui->spinLastFrame->value();
     frames=last-first+1;
 
-    if (frame_count>0) {
+    if (frames>0) {
         ui->labInputLength->setText(tr("length: %1 = %2 s").arg((int64_t)round(frames)).arg(frames*taumin));
         ui->labRange->setText(tr("= %1 frames").arg(round(frames)));
-        if (ui->spinSegments->value()!=0) ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frame_count/ui->spinSegments->value()).arg(taumin*(double)(frame_count/ui->spinSegments->value())));
+        if (ui->spinSegments->value()!=0) ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frames/ui->spinSegments->value()).arg(taumin*(double)(frames/ui->spinSegments->value())));
         else ui->labSegments->setText("");
-        if (ui->spinStatistics->value()!=0) ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frame_count/ui->spinStatistics->value()));
+        if (ui->spinStatistics->value()!=0) ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frames/ui->spinStatistics->value()));
         else ui->labStatistics->setText("");
-        if (ui->spinVideoFrames->value()!=0) ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(1e6*taumin*(double)ui->spinVideoFrames->value()).arg(frame_count/ui->spinVideoFrames->value()));
+        if (ui->spinVideoFrames->value()!=0) ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(1e6*taumin*(double)ui->spinVideoFrames->value()).arg(frames/ui->spinVideoFrames->value()));
         else ui->labVideo->setText(QString(""));
     } else {
         ui->labInputLength->setText(QString(""));
@@ -495,7 +495,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     ui->labCorrelator->setText(tr("<i>spanned correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
-void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString backgroundfile, int& image_width, int& image_height) {
+void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height) {
     if (set.contains("acquisition/image_width")) image_width=set.value("acquisition/image_width", image_width).toInt();
     if (set.contains("acquisition/image_height")) image_height=set.value("acquisition/image_height", image_height).toInt();
     if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
@@ -504,7 +504,7 @@ void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, 
     //backgroundfile="";
     int fcnt=set.value("files/count", 0).toInt();
     for (int f=0; f<fcnt; f++) {
-        QString fn=set.value("files/name"+QString::number(f), "").toString();
+        QString fn=QFileInfo(set.fileName()).dir().absoluteFilePath(set.value("files/name"+QString::number(f), "").toString());
         //QString ft=set.value("files/type"+QString::number(f), "").toString();
         QString fd=set.value("files/description"+QString::number(f), "").toString();
         if (fd.toLower().simplified().contains("background")) {
