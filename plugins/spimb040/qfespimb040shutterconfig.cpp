@@ -154,9 +154,10 @@ void QFESPIMB040ShutterConfig::updateStates() {
             actConnect->setText(tr("Connect from shutter driver/hardware ..."));
         }
     }
-    actConfigure->setEnabled(true);
+    actConfigure->setEnabled(shutter!=NULL && shutterID>=0);
+    actConnect->setEnabled(shutter!=NULL && shutterID>=0);
     cmbShutter->setEnabled(!conn);
-    actState->setEnabled(conn);
+    actState->setEnabled(conn && shutter!=NULL);
 
 }
 

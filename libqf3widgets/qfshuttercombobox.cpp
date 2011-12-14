@@ -36,6 +36,8 @@ void QFShutterComboBox::findExtensions() {
         QFExtensionShutter* shutter = qobject_cast<QFExtensionShutter*>(extobj);
         if (shutter) shutters.append(extobj);
     }
+    QPoint sl(-1,-1);
+    addItem(QIcon(":/libqf3widgets/shutter_none.png"), tr("--- none ---"), sl);
 
     for (int i=0; i<shutters.size(); i++) {
         QFExtension* extension=qobject_cast<QFExtension*>(shutters[i]);
@@ -137,6 +139,7 @@ void QFShutterComboBox::storeSettings(QSettings& settings, QString prefix) const
 void QFShutterComboBox::loadSettings(QSettings& settings, QString prefix) {
    QString id=settings.value(prefix+"shutter_plugin_id", "").toString();
    int shutterIdx=settings.value(prefix+"shutter_id", -1).toInt();
+   setCurrentIndex(0);
    bool ok=false;
    QFExtension* extension=NULL;
    QFExtensionShutter* shutter=NULL;
@@ -153,6 +156,6 @@ void QFShutterComboBox::loadSettings(QSettings& settings, QString prefix) {
            }
        }
    }
-   if (!ok) setCurrentIndex(-1);
+   if (!ok) setCurrentIndex(0);
 
 }

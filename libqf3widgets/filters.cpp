@@ -245,7 +245,9 @@ bool QF3FilterCombobox::filterExists(QString name) {
 }
 
 void QF3FilterCombobox::loadSettings(QSettings& settings, QString property) {
-    cmbFilters->setCurrentIndex(cmbFilters->findText(settings.value(property, "").toString()));
+    QString id=settings.value(property, "").toString();
+    if (id.isEmpty()) cmbFilters->setCurrentIndex(0);
+    else cmbFilters->setCurrentIndex(cmbFilters->findText(id));
 }
 
 void QF3FilterCombobox::saveSettings(QSettings& settings, QString property) {

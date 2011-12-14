@@ -14,7 +14,7 @@
    version="1.1"
    id="layer1"
    sodipodi:version="0.32"
-   inkscape:version="0.48.2 r9819"
+   inkscape:version="0.48.1 "
    sodipodi:docname="objective.svg"
    inkscape:label="Layer 1"
    inkscape:groupmode="layer"
@@ -26,8 +26,8 @@
    xml:space="preserve"
    inkscape:output_extension="org.inkscape.output.svgz.inkscape"
    inkscape:export-filename="objectve.png"
-   inkscape:export-xdpi="9.84375"
-   inkscape:export-ydpi="9.84375"><defs
+   inkscape:export-xdpi="11.25"
+   inkscape:export-ydpi="11.25"><defs
    id="defs518"><linearGradient
      y2="63.698586"
      x2="23.997318"
@@ -977,8 +977,8 @@
      cx="102"
      cy="112.3047"
      r="139.55859" /></defs><sodipodi:namedview
-   inkscape:window-height="708"
-   inkscape:window-width="1024"
+   inkscape:window-height="988"
+   inkscape:window-width="1680"
    inkscape:pageshadow="2"
    inkscape:pageopacity="0.0"
    guidetolerance="10.0"
@@ -991,8 +991,8 @@
    inkscape:zoom="2.9765625"
    inkscape:cx="88.193896"
    inkscape:cy="70.307381"
-   inkscape:window-x="-4"
-   inkscape:window-y="-4"
+   inkscape:window-x="1272"
+   inkscape:window-y="-8"
    inkscape:current-layer="layer1"
    showgrid="false"
    inkscape:window-maximized="1" />
@@ -1998,5 +1998,6 @@
      x="82.475662"
      y="107.81304"
      style="font-style:oblique;font-family:times new roman;-inkscape-font-specification:times new roman">f</tspan></text>
+
 
 </svg>
