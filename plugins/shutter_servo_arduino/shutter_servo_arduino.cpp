@@ -12,8 +12,8 @@ QFExtensionShutterServoArduino::QFExtensionShutterServoArduino(QObject* parent):
 	logService=NULL;
     shutter_count=4;
     COMPort="COM1";
-    COMPortSpeed=115200;
-    shutter_operation_duration=250;
+    COMPortSpeed=9600;
+    shutter_operation_duration=150;
     lastAction=QTime::currentTime();
 
 }
@@ -84,12 +84,16 @@ void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
     com.set_databits(JKSC8databits);
     com.open();
     if (com.isConnectionOpen()) {
-        std::string info=serial->queryCommand("?");
-        infoMessage=info.c_str();
-        if (!(infoMessage.toLower().contains("servo controller") && infoMessage.toLower().contains("jan krieger"))) com.close();
+        infoMessage=serial->queryCommand("?");
+        qDebug()<<"infoMessage '"<<infoMessage<<"'";
+        if (!(infoMessage.toLower().contains("servo controller") && infoMessage.toLower().contains("jan krieger"))) {
+            com.close();
+            log_error(tr("%1 Could not connect to Servo Shutter Driver (B040)!!!\n"));
+            log_error(tr("%1 reason: received wrong ID string from shutter driver: string was '%2'\n").arg(LOG_PREFIX).arg(infoMessage));
+        }
     } else {
-        log_error(tr(LOG_PREFIX " Could not connect to Servo Shutter Driver (B040)!!!\n"));
-        log_error(tr(LOG_PREFIX " reason: %1\n").arg(com.getLastError().c_str()));
+        log_error(tr("%1 Could not connect to Servo Shutter Driver (B040)!!!\n").arg(LOG_PREFIX));
+        log_error(tr("%1 reason: %2\n").arg(LOG_PREFIX).arg(com.getLastError().c_str()));
     }
 }
 
@@ -102,14 +106,16 @@ bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
 }
 
 bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
-    QString result=serial->queryCommand(format("Q%d", shutter)).c_str();
+    if (!isShutterConnected(shutter)) return false;
+    QString result=serial->queryCommand(QString("Q")+QString::number(shutter+1));
     if (result.startsWith("0")) return false;
     else return true;
 }
 
 void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool opened) {
-    if (opened) serial->sendCommand(format("S%d1", shutter));
-    else serial->sendCommand(format("S%d0", shutter));
+    if (!isShutterConnected(shutter)) return ;
+    if (opened) serial->sendCommand(QString("S")+QString::number(shutter+1)+"1");
+    else serial->sendCommand(QString("S")+QString::number(shutter+1)+"0");
     lastAction=QTime::currentTime();
 }
 

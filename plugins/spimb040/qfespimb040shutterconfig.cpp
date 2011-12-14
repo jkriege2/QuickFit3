@@ -23,9 +23,10 @@ QFESPIMB040ShutterConfig::QFESPIMB040ShutterConfig(QWidget* parent):
     m_log=NULL;
     m_pluginServices=NULL;
     locked=false;
+    moving=false;
 
 
-    shutterStateUpdateInterval=250;
+    shutterStateUpdateInterval=351;
     iconOpened=QPixmap(":/spimb040/shutter_opened.png");
     iconClosed=QPixmap(":/spimb040/shutter_closed.png");
     createWidgets();
@@ -128,7 +129,9 @@ void QFESPIMB040ShutterConfig::createActions() {
 
 
     actState=new QAction(iconClosed, tr("closed"), this);
-    connect(actState, SIGNAL(toggled(bool)), this, SLOT(setShutter(bool)));
+    actState->setCheckable(true);
+    actState->setToolTip(tr("click to open and close the shutter"));
+    connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
     btnState->setDefaultAction(actState);
 
 }
@@ -168,6 +171,7 @@ void QFESPIMB040ShutterConfig::disConnect() {
     int shutterID=getShutterID();
 
     if (shutter) {
+        qDebug()<<"connecting "<<conn;
         if (conn) {
             shutter->setShutterLogging(m_log);
             shutter->shutterConnect(shutterID);
@@ -233,8 +237,9 @@ void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
     int shutterID;
     shutter=getShutter();
     shutterID=getShutterID();
-    if (shutter) {
+    if (shutter && !moving) {
         bool opened=shutter->isShutterOpen(shutterID);
+        disconnect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
         if (opened) {
             actState->setIcon(iconOpened);
             actState->setText(tr("opened"));
@@ -244,6 +249,7 @@ void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
             actState->setText(tr("closed"));
             actState->setChecked(false);
         }
+        connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
     }
     updateStates();
 
@@ -260,11 +266,15 @@ void QFESPIMB040ShutterConfig::shutterActionClicked(bool opened) {
     shutter=getShutter();
     shutterID=getShutterID();
     if (shutter) {
+        qDebug()<<"set shutter state opened="<<opened;
         shutter->setShutterState(shutterID, opened);
+        moving=true;
         QTime started=QTime::currentTime();
         while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<5000)) {
+            //qDebug()<<started.elapsed();
             QApplication::processEvents();
         }
+        moving=false;
     }
 }
 

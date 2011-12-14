@@ -14,11 +14,11 @@ class QF3SimpleB040SerialProtocolHandler {
         bool checkComConnected();
 
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return) */
-        void sendCommand(std::string command);
+        void sendCommand(QString command);
 
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
          *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */
-        std::string queryCommand(std::string command);
+        QString queryCommand(QString command);
 
         void checkComError();
     private:

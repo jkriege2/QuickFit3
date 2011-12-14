@@ -128,6 +128,8 @@ class QFESPIMB040ShutterConfig : public QWidget {
         QPixmap iconOpened;
         QPixmap iconClosed;
 
+        bool moving;
+
 
         /** \brief get the shutter number of the given axis */
         int getShutterID();

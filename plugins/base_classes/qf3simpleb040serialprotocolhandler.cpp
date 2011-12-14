@@ -13,23 +13,27 @@ void QF3SimpleB040SerialProtocolHandler::setLogging(QFPluginLogService* log, QSt
     this->LOG_PREFIX=LOG_PREFIX;
 }
 
-void QF3SimpleB040SerialProtocolHandler::sendCommand(std::string command) {
-    com->write(command+"\n");
+void QF3SimpleB040SerialProtocolHandler::sendCommand(QString command) {
+    com->write(QString(command+"\n").toStdString());
 }
 
-std::string QF3SimpleB040SerialProtocolHandler::queryCommand(std::string command) {
+QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
     std::string res="";
-    //std::cout<<"\n\ncommand: '"<<command<<"'";
+    //std::cout<<"\n\ncommand: '"<<command<<"'\n";
     com->clearBuffer();
-    if (com->write(command+"\n")) {
+    if (com->write(QString(command+"\n").toStdString())) {
         res=com->readUntil("\n\n");
         //std::cout<<" ... reading ... ";
     }
     //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
     checkComError();
-    if (res.size()>=2) res=res.erase(res.size()-2, 2);
+    //if (res.size()>=2) res=res.erase(res.size()-2, 2);
     //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
-    return res;
+    QString data="";
+    for (int i=0; i<res.size(); i++) {
+        data+=QLatin1Char(res[i]);
+    }
+    return data.left(data.size()-2);
 }
 
 void QF3SimpleB040SerialProtocolHandler::checkComError() {
