@@ -208,6 +208,7 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     hbl->addWidget(cmbAcquisitionDevice);
     btnConnect=new QToolButton(this);
     hbl->addWidget(btnConnect);
+    hbl->addStretch();
     camlayout->addRow(tr("<b>Device:</b>"), hbl);
     cmbAcquisitionDevice->setEnabled(false);
 

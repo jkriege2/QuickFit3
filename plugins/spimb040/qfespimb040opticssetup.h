@@ -125,6 +125,11 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
         /** \brief get the axis number of z-axis stage inside its class */
         int getZStageAxis();
+
+        /** \brief set main illumination shutter state */
+        void setMainIlluminationShutter(bool opened);
+        /** \brief get main illumination shutter state */
+        bool getMainIlluminationShutter();
     protected slots:
         void updateMagnifications();
 

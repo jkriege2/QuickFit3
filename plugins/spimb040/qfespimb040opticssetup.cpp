@@ -26,6 +26,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogServ
     ui->objProjection->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube1->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube2->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
+    ui->shutterMainIllumination->init(m_log, m_pluginServices);
     ui->btnLockFiltersEtc->setChecked(true);
 }
 
@@ -65,7 +66,7 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->objProjection->loadSettings(settings, prefix+"objectives/projection");
     ui->objTube1->loadSettings(settings, prefix+"objectives/tubelens1");
     ui->objTube2->loadSettings(settings, prefix+"objectives/tubelens2");
-
+    ui->shutterMainIllumination->loadSettings(settings, prefix+"main_illumination_shutter");
 }
 
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {
@@ -81,6 +82,7 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->objProjection->saveSettings(settings, prefix+"objectives/projection");
     ui->objTube1->saveSettings(settings, prefix+"objectives/tubelens1");
     ui->objTube2->saveSettings(settings, prefix+"objectives/tubelens2");
+    ui->shutterMainIllumination->saveSettings(settings, prefix+"main_illumination_shutter");
 
 }
 
@@ -173,6 +175,7 @@ void QFESPIMB040OpticsSetup::setLogging(QFPluginLogService* log) {
     ui->camConfig1->setLog(m_log);
     ui->camConfig2->setLog(m_log);
     ui->stageSetup->setLog(m_log);
+    ui->shutterMainIllumination->setLog(m_log);
 }
 
 bool QFESPIMB040OpticsSetup::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {
@@ -192,6 +195,7 @@ void QFESPIMB040OpticsSetup::releaseCamera(int setup_cam) {
 
 void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     ui->stageSetup->connectStages();
+    ui->shutterMainIllumination->connectShutter();
 }
 
 void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
@@ -201,6 +205,7 @@ void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
     ui->stageSetup->disconnectStages();
+    ui->shutterMainIllumination->disconnectShutter();
 }
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
@@ -288,4 +293,12 @@ QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup::getStopRelease(int ca
     if (camera==1) return ui->camConfig2;
 
     return NULL;
+}
+
+void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened) {
+    ui->shutterMainIllumination->setShutter(opened);
+}
+
+bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
+    return ui->shutterMainIllumination->getShutterState();
 }

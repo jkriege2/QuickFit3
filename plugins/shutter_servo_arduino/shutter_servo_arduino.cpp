@@ -102,7 +102,9 @@ bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
 }
 
 bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
-    return serial->queryCommand(format("Q%d", shutter)).substr(0,1)!="0";
+    QString result=serial->queryCommand(format("Q%d", shutter)).c_str();
+    if (result.startsWith("0")) return false;
+    else return true;
 }
 
 void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool opened) {
@@ -191,6 +193,10 @@ void QFExtensionShutterServoArduino::log_warning(QString message) {
 void QFExtensionShutterServoArduino::log_error(QString message) {
 	if (logService) logService->log_error(message);
 	else if (services) services->log_error(message);
+}
+
+void QFExtensionShutterServoArduino::setShutterLogging(QFPluginLogService* logService) {
+    this->logService=logService;
 }
 
 

@@ -1262,6 +1262,10 @@ void QFExtensionCameraAndor::showShutterSettingsDialog(unsigned int axis, QWidge
     QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the internal shutter!"));
 }
 
+void QFExtensionCameraAndor::setShutterLogging(QFPluginLogService* logService) {
+    setLogging(logService);
+}
+
 Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)
 
 

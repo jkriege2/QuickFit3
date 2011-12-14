@@ -19,7 +19,7 @@ void QF3SimpleB040SerialProtocolHandler::sendCommand(std::string command) {
 
 std::string QF3SimpleB040SerialProtocolHandler::queryCommand(std::string command) {
     std::string res="";
-    //std::cout<<"\n\ncommand (stage "<<currentID<<"): '"<<command<<"'";
+    //std::cout<<"\n\ncommand: '"<<command<<"'";
     com->clearBuffer();
     if (com->write(command+"\n")) {
         res=com->readUntil("\n\n");

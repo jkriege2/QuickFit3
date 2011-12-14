@@ -103,6 +103,8 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
         virtual QString getShutterShortName(unsigned int shutter) ;
         /** \copydoc QFExtensionShutter::showShutterSettingsDialog() */
         virtual void showShutterSettingsDialog(unsigned int shutter, QWidget* parent=NULL);
+        /** \copydoc QFExtensionShutter::setShutterLogging() */
+        virtual void setShutterLogging(QFPluginLogService* logService);
 
 	protected:
         QFPluginLogService* logService;

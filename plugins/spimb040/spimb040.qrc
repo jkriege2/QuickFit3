@@ -54,5 +54,10 @@
         <file alias="acquisitionsettings.png">icons/camera_settings.png</file>
         <file alias="get_current_pos.png">icons/get_current_pos.png</file>
         <file alias="get_current_pos_around.png">icons/get_current_pos_around.png</file>
+        <file alias="shutter_closed.png">icons/shutter_closed.png</file>
+        <file alias="shutter_opened.png">icons/shutter_open.png</file>
+        <file alias="connect_shutter.png">icons/connect_shutter.png</file>
+        <file alias="disconnect_shutter.png">icons/disconnect_shutter.png</file>
+        <file alias="configure_shutter.png">icons/configure_alt.png</file>
     </qresource>
 </RCC>

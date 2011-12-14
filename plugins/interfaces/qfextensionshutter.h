@@ -25,6 +25,9 @@ class QFExtensionShutter {
         virtual void shutterConnect(unsigned int shutter)=0;
         /** \brief disconnect from a shutter controller/driver/.... */
         virtual void shutterDisonnect(unsigned int shutter)=0;
+        /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
+        virtual void setShutterLogging(QFPluginLogService* logService)=0;
+
         /** \brief returns \c true if the device is connected */
         virtual bool isShutterConnected(unsigned int shutter) =0;
         /** \brief read the shutter state and return it.

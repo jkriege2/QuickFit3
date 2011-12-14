@@ -35,7 +35,7 @@
  */
 class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionCamera)
+        Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionShutter)
     public:
         /** Default constructor */
         QFExtensionCameraAndor(QObject* parent=NULL);
@@ -105,6 +105,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual bool isLastShutterActionFinished(unsigned int shutter);
         /** \copydoc QFExtensionShutter::showShutterSettingsDialog() */
         virtual void showShutterSettingsDialog(unsigned int axis, QWidget* parent=NULL);
+        /** \copydoc QFExtensionShutter::setShutterLogging() */
+        virtual void setShutterLogging(QFPluginLogService* logService);
 
 
 

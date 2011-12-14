@@ -261,6 +261,7 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
     combobox=new QFCameraConfigComboBox(this, configDirectory);
+    //combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     layout->addWidget(combobox, 2);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 
@@ -302,6 +303,7 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     layout->addWidget(btnRename, 0);
     layout->addWidget(btnSaveAs, 0);
     layout->addWidget(btnDelete, 0);
+    layout->addStretch(1);
 
 }
 

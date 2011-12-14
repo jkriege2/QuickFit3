@@ -44,8 +44,7 @@ void QFShutterComboBox::findExtensions() {
             QPoint sl(i, j);
             QString name=extension->getName();
             QString cname=shutter->getShutterShortName(j);
-            if (!shutter->getShutterShortName(j).isEmpty()) cname+=QString(" (%1)").arg(shutter->getShutterShortName(j));
-            if (shutter->getShutterCount()>0) name=name+QString(" #%1: %2").arg(j).arg(cname);
+            if (shutter->getShutterCount()>0) name=name+QString(" #%1").arg(j).arg((cname!=name && !cname.isEmpty())?QString(" (%1)").arg(cname):QString(""));
             addItem(QIcon(extension->getIconFilename()), name, sl);
         }
     }
