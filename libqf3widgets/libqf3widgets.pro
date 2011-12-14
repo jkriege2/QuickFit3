@@ -69,7 +69,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/jkqtpimagetools.h \
     ../../../../LIB/trunk/qt/jkqtpimageelements.h \
     filters.h \
-    ../../../../LIB/trunk/qt/qenhancedcombobox.h
+    ../../../../LIB/trunk/qt/qenhancedcombobox.h \
+    qfshuttercombobox.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -106,7 +107,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     objectives.cpp \
     ../../../../LIB/trunk/qt/jkqtpimageelements.cpp \
     filters.cpp \
-    ../../../../LIB/trunk/qt/qenhancedcombobox.cpp
+    ../../../../LIB/trunk/qt/qenhancedcombobox.cpp \
+    qfshuttercombobox.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
