@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>B040 Arduino Servo Shutter Plugin</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	 <p>This plugin controls up to four servos connected to an Arduino board running a custom written C program with a simple protocoll, developed by Jan Krieger (B040, DKFZ).</p>
+	 <p>The controllers are configured by a global configuration file <tt>shutter_servo_arduino.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
+	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>shutter_servo_arduino.ini</tt> either in
+	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/shutter_servo_arduino/</tt>) for the plugin.
+	 </p>
+	 <p>In the <tt>shutter_servo_arduino.ini</tt> you will have to tell the plugin which stages are available:
+	 <blockquote><tt>
+[<b>driver</b>]<br>
+<b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
+<b>port_speed</b> = <i>port speed (9600 | 19200 | 38400)</i><br>
+<b>shuttetr_count</b> = <i>number of connected servos</i><br>
+<br>
+	 </tt></blockquote
+	 </p>
+	 <p>Here is an example configuration file for windows and two servos:
+	 <blockquote><tt>
+[driver]<br>
+port=COM1<br>
+port_speed=38400<br>
+shuttetr_count=2
+	 </tt></blockquote></p>
+  </body>
+</html>

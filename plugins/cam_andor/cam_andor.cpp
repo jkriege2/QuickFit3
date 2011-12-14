@@ -1258,7 +1258,9 @@ bool QFExtensionCameraAndor::isLastShutterActionFinished(unsigned int shutter) {
     return camGlobalSettings[shutter].lastShutterAction.elapsed()>150;
 }
 
-
+void QFExtensionCameraAndor::showShutterSettingsDialog(unsigned int axis, QWidget* parent) {
+    QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the internal shutter!"));
+}
 
 Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)
 

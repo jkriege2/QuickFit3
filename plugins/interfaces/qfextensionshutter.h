@@ -45,5 +45,21 @@ class QFExtensionShutter {
         virtual QString getShutterDescription(unsigned int shutter) =0;
         /** \brief return a human-readable short name for the given shutter */
         virtual QString getShutterShortName(unsigned int shutter) =0;
+        /*! \brief displays a modal dialog which allows the user to set the configuration options
+                   of the controled shutter.
+
+            The options are stored internally and written/read using QFExtension::readSettings() and
+            QFExtension::writeSettings().
+
+            \param[in] shutter the shutter for which to display the dialog
+            \param[in] parent parent widget for the returned QWidget
+         */
+         virtual void showShutterSettingsDialog(unsigned int shutter, QWidget* parent=NULL)=0;
 };
+
+
+
+Q_DECLARE_INTERFACE( QFExtensionShutter,
+                     "www.dkfz.de.b040.quickfit3.extensions.QFExtensionShutter/1.0")
+
 #endif // QFEXTENSIONSHUTTER_H

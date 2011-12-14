@@ -103,7 +103,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual QString getShutterShortName(unsigned int shutter);
         /** \copydoc QFExtensionShutter::isLastShutterActionFinished() */
         virtual bool isLastShutterActionFinished(unsigned int shutter);
-
+        /** \copydoc QFExtensionShutter::showShutterSettingsDialog() */
+        virtual void showShutterSettingsDialog(unsigned int axis, QWidget* parent=NULL);
 
 
 
