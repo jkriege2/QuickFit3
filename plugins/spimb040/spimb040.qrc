@@ -59,5 +59,8 @@
         <file alias="connect_shutter.png">icons/connect_shutter.png</file>
         <file alias="disconnect_shutter.png">icons/disconnect_shutter.png</file>
         <file alias="configure_shutter.png">icons/configure_alt.png</file>
+        <file alias="lightpath.png">icons/lightpath.png</file>
+        <file alias="lightpath_delete.png">icons/lightpath_delete.png</file>
+        <file alias="lightpath_save.png">icons/lightpath_save.png</file>
     </qresource>
 </RCC>

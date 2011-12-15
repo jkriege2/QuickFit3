@@ -610,17 +610,17 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>...</string>
+         <string>save the current lightpath (shutters, filterwheels, ...) to a config file</string>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnLightpathAdd">
-        <property name="enabled">
-         <bool>false</bool>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/lightpath_save.png</normaloff>:/spimb040/lightpath_save.png</iconset>
         </property>
-        <property name="text">
-         <string>...</string>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -630,7 +630,17 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>...</string>
+         <string>delete the currently selected lightpath (shutters, filterwheels, ...) config file</string>
+        </property>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/lightpath_delete.png</normaloff>:/spimb040/lightpath_delete.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -665,6 +675,12 @@ p, li { white-space: pre-wrap; }
          <iconset resource="spimb040.qrc">
           <normaloff>:/spimb040/lock_opened.png</normaloff>
           <normalon>:/spimb040/lock_closed.png</normalon>:/spimb040/lock_opened.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -742,7 +758,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>btnDisconnectCameras</tabstop>
   <tabstop>cmbLightpathConfig</tabstop>
   <tabstop>btnLightpathSave</tabstop>
-  <tabstop>btnLightpathAdd</tabstop>
   <tabstop>btnLightpathDelete</tabstop>
   <tabstop>btnLockFiltersEtc</tabstop>
   <tabstop>camConfig1</tabstop>
@@ -1149,22 +1164,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>589</x>
      <y>21</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnLockFiltersEtc</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnLightpathAdd</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>963</x>
-     <y>31</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>626</x>
-     <y>23</y>
     </hint>
    </hints>
   </connection>
