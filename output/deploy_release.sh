@@ -2,9 +2,12 @@
 
 echo -e "DEPLOYING QUICKFIT\n  in order to deploy without recompiling, call with option --nomake"
 
-
-ZIPFILE=quickfit3.zip
-REMOVEPLUGINS="cam_radhard2 cam_testcamera stage_pi863 cam_andor spimb040"
+SVNVER=`svnversion`
+#if [ -z $SVNVER]
+#	SVNVER=newest
+#fi
+ZIPFILE=quickfit3_${SVNVER}.zip
+REMOVEPLUGINS="cam_radhard2 cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino"
 
 rm -rf deploy
 cp ${ZIPFILE} "${ZIPFILE}.backup"
@@ -40,7 +43,8 @@ rmdir ./globalconfig
 rm ./qtplugins/q*d4.dll
 rm ./Qt*d4.dll
 
-find -name "*.sh" -type d -exec rm -rf {} \;
+find -name "quickfit3_*.zip" -exec rm -rf {} \;
+find -name "*.sh" -exec rm -rf {} \;
 find -name ".svn" -type d -exec rm -rf {} \;
 find -name "*.log" -exec rm -rf {} \;
 find -name "*.prl" -exec rm -rf {} \;
