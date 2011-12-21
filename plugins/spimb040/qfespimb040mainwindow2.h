@@ -142,6 +142,13 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
 
         void displayHelp();
 
+        /*! \brief switch on/off the laser by opening/closing the main shutter
+
+            If \A blocking is \c true, the function blocks (calling QApplication::processEvents() )
+            until the shutter reached its desired state.
+         */
+        bool setMainIlluminationShutter(bool on_off=true, bool blocking=true);
+
     protected:
         /*! \brief save an image from the given camera as a 16-bit TIFF image into \a filename
 

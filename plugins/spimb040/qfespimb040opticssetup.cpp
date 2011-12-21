@@ -303,3 +303,7 @@ void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened) {
 bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
     return ui->shutterMainIllumination->getShutterState();
 }
+
+bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {
+    return ui->shutterMainIllumination->isShutterConnected();
+}

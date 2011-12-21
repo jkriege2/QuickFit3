@@ -866,6 +866,12 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     QList<QFExtensionCamera::AcquititonFileDescription> backgroundFiles1, backgroundFiles2;
 
     //////////////////////////////////////////////////////////////////////////////////////
+    // switch on light
+    //////////////////////////////////////////////////////////////////////////////////////
+    log_text(tr("  - switch main shutter on!\n"));
+    setMainIlluminationShutter(true, true);
+
+    //////////////////////////////////////////////////////////////////////////////////////
     // lock cameras for use by this routine
     //////////////////////////////////////////////////////////////////////////////////////
     bool useCam1=false;
@@ -911,6 +917,12 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         QDateTime time=QDateTime::currentDateTime();
         progress.setLabelText(tr("acquiring background frames from cameras ..."));
         QApplication::processEvents();
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off light
+        //////////////////////////////////////////////////////////////////////////////////////
+        log_text(tr("  - switch main shutter off!\n"));
+        ok=ok&setMainIlluminationShutter(false, true);
 
         //////////////////////////////////////////////////////////////////////////////////////
         // prepare cameras  (set camera settings)
@@ -991,6 +1003,12 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         }
         progress.setValue(100);
 
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch on light
+        //////////////////////////////////////////////////////////////////////////////////////
+        log_text(tr("  - switch main shutter back on!\n"));
+        ok=ok&setMainIlluminationShutter(true, true);
 
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -1468,7 +1486,26 @@ void QFESPIMB040MainWindow2::log_error(QString message) {
     //optSetup->log_error(message);
 };
 
+bool QFESPIMB040MainWindow2::setMainIlluminationShutter(bool on_off, bool blocking) {
+    if (optSetup->isMainIlluminationShutterAvailable()) {
+        optSetup->setMainIlluminationShutter(on_off);
+        if (blocking) {
+            QTime t;
+            t.start();
+            while (optSetup->getMainIlluminationShutter()!=on_off && t.elapsed()<10000) {
+                QApplication::processEvents();
+            }
 
+            if (t.elapsed()>=10000) {
+                log_error("main shutter timed out after 10s!\n");
+                return false;
+            }
+        }
+        return true;
+    }
+    log_error("main shutter not available!\n");
+    return false;
+}
 
 
 
