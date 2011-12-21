@@ -4,6 +4,7 @@
 #include <iostream>
 
 #define LOG_PREFIX "[ShutArd]: "
+#define CONNECTION_DELAY_MS 50
 
 QFExtensionShutterServoArduino::QFExtensionShutterServoArduino(QObject* parent):
     QObject(parent)
@@ -84,15 +85,21 @@ void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
     com.set_databits(JKSC8databits);
     com.open();
     if (com.isConnectionOpen()) {
+        QTime t;
+        t.start();
+        // wait CONNECTION_DELAY_MS ms for connection!
+        while (t.elapsed()<CONNECTION_DELAY_MS)  {
+            QApplication::processEvents();
+        }
         infoMessage=serial->queryCommand("?");
         qDebug()<<"infoMessage '"<<infoMessage<<"'";
         if (!(infoMessage.toLower().contains("servo controller") && infoMessage.toLower().contains("jan krieger"))) {
             com.close();
-            log_error(tr("%1 Could not connect to Servo Shutter Driver (B040)!!!\n"));
+            log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(COMPort).arg(COMPortSpeed));
             log_error(tr("%1 reason: received wrong ID string from shutter driver: string was '%2'\n").arg(LOG_PREFIX).arg(infoMessage));
         }
     } else {
-        log_error(tr("%1 Could not connect to Servo Shutter Driver (B040)!!!\n").arg(LOG_PREFIX));
+        log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(COMPort).arg(COMPortSpeed));
         log_error(tr("%1 reason: %2\n").arg(LOG_PREFIX).arg(com.getLastError().c_str()));
     }
 }
