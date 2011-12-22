@@ -923,6 +923,9 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         //////////////////////////////////////////////////////////////////////////////////////
         log_text(tr("  - switch main shutter off!\n"));
         ok=ok&setMainIlluminationShutter(false, true);
+        if (!ok) {
+            ACQUISITION_ERROR(tr("  - could not switch main shutter off!\n"));
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////
         // prepare cameras  (set camera settings)
@@ -931,29 +934,55 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             progress.setLabelText(tr("preparing camera 1 for background ..."));
             QApplication::processEvents();
             QString tmpName=QDir::temp().absoluteFilePath("qf3spimb040_cam1backgrndsettings.ini");
+            QTemporaryFile file;
+            if (file.open()) {
+                 tmpName=file.fileName();
+            }
+            if (QFile::exists(tmpName)) QFile::remove(tmpName);
+
             QFile::copy(acquisitionSettingsFilename1, tmpName);
+
             QSettings settings(tmpName, QSettings::IniFormat);
             if (ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, widAcquisition->currentBackgroundFrames(0));
+
+
             ok=ecamera1->prepareAcquisition(camera1, settings, acquisitionPrefix1+"_background");
+
             if (ok) {
                 log_text(tr("  - prepared camer 1 for background!\n"));
             } else {
                 ACQUISITION_ERROR(tr("  - error preparing camera 1 for background!\n"));
             }
+
+            if (QFile::exists(tmpName)) QFile::remove(tmpName);
         }
         if (ok && useCam2) {
             progress.setLabelText("preparing camera 2 for background ...");
             QApplication::processEvents();
             QString tmpName=QDir::temp().absoluteFilePath("qf3spimb040_cam2backgrndsettings.ini");
+
+            QTemporaryFile file;
+            if (file.open()) {
+                 tmpName=file.fileName();
+            }
+            if (QFile::exists(tmpName)) QFile::remove(tmpName);
+
             QFile::copy(acquisitionSettingsFilename2, tmpName);
+
             QSettings settings(tmpName, QSettings::IniFormat);
+
             if (ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, widAcquisition->currentBackgroundFrames(1));
+
             ok=ecamera2->prepareAcquisition(camera2, settings, acquisitionPrefix2+"_background");
+
             if (ok) {
                 log_text(tr("  - prepared camer 2 for background!\n"));
             } else {
                 ACQUISITION_ERROR(tr("  - error preparing camera 2 for background!\n"));
             }
+
+            if (QFile::exists(tmpName)) QFile::remove(tmpName);
+
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -972,7 +1001,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             if (ok && useCam2) {
                 ok=ecamera2->startAcquisition(camera2);
                 if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error starting acquisition on camera 1 for background!\n"));
+                    ACQUISITION_ERROR(tr("  - error starting acquisition on camera 2 for background!\n"));
                 }
             }
             bool running=ok;
