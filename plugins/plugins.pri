@@ -62,9 +62,9 @@ win32 {
     INSTALLS += GLOBALCONFIGWIN32_FILES
 } else {
     macx {
-        INSTALLS += GLOBALCONFIGLINUX_FILES
-    } else {
         INSTALLS += GLOBALCONFIGMACX_FILES
+    } else {
+        INSTALLS += GLOBALCONFIGLINUX_FILES
     }
 }
 
