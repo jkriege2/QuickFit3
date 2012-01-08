@@ -133,9 +133,10 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     if (job.backgroundCorrection==2) back="offsetmin";
     if (job.backgroundCorrection==3) back="imgoffset";
     QString corr="unknown";
-    if (job.correlator==0) corr="direct";
-    if (job.correlator==1) corr="mtauallmon";
-    if (job.correlator==2) corr="mtauonemon";
+    if (job.correlator==CORRELATOR_DIRECT) corr="direct";
+    if (job.correlator==CORRELATOR_DIRECTAVG) corr="directavg";
+    if (job.correlator==CORRELATOR_MTAUALLMON) corr="mtauallmon";
+    if (job.correlator==CORRELATOR_MTAUONEMON) corr="mtauonemon";
 
     result=result.replace("%backcorrection%", back, Qt::CaseInsensitive);
     result=result.replace("%correlator%", corr, Qt::CaseInsensitive);
@@ -263,7 +264,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         ////////////////////////////////////////////////////////////////////////////////////////////
                         // RUN THE CORRELATION
                         ////////////////////////////////////////////////////////////////////////////////////////////
-                        if (job.correlator>0) {
+                        if (job.correlator==CORRELATOR_MTAUALLMON || job.correlator==CORRELATOR_MTAUONEMON) {
                             correlate_loadsingle();
                         } else {
                             correlate_loadall();
@@ -551,6 +552,15 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"correlator m                : "<<outLocale.toString(job.m) << "\n";
                                 text<<"correlator P                : "<<outLocale.toString(job.P) << "\n";
                                 text<<"correlator type             : "<<outLocale.toString(job.correlator) << "\n";
+                                text<<"correlator type name        : ";
+                                switch(job.correlator) {
+                                    case CORRELATOR_DIRECT:      text<<"direct\n"; break;
+                                    case CORRELATOR_DIRECTAVG:   text<<"direct with averaging\n"; break;
+                                    case CORRELATOR_MTAUALLMON:  text<<"multi-tau with monitors for all channels\n"; break;
+                                    case CORRELATOR_MTAUONEMON:  text<<"multi-tau with a single monitor\n"; break;
+
+                                    default: text<<"correlator type name        : unknown\n"; break;
+                                }
                                 text<<"smallest tau [s]            : "<<outLocale.toString(job.frameTime) << "\n";
                                 text<<"baseline                    : "<<outLocale.toString(baseline) << "\n";
                                 if (video && job.video) {
@@ -835,7 +845,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE THE ACFs
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (job.acf && job.correlator==0) {
+        if (job.acf && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
             emit messageChanged(tr("calculating autocorrelations ..."));
             acf_N=job.S*job.P;
             acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
@@ -850,7 +860,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
             for (uint32_t p=0; p<frame_width*frame_height; p++) {
                 if (job.segments<=1) {
-                    statisticsAutocorrelateMultiTauSymmetric(&(acf[p*acf_N]), &(image_series[p]), frames, acf_t, acf_N, frame_width*frame_height);
+                    if (job.correlator==CORRELATOR_DIRECT) statisticsAutocorrelateMultiTauSymmetricMemOptimized(&(acf[p*acf_N]), &(image_series[p]), frames, acf_t, acf_N, frame_width*frame_height);
+                    else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsAutocorrelateMultiTauAvgSymmetric<float, float>(&(acf[p*acf_N]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
                 } else {
                     uint32_t segment_frames=frames/job.segments;
                     double* cftemp=(double*)calloc(acf_N,sizeof(double));
@@ -862,7 +873,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     }
                     for (int32_t seg=0; seg<job.segments; seg++) {
                         for (register uint32_t ct=0; ct<acf_N; ct++) cftemp[ct]=0;
-                        statisticsAutocorrelateMultiTauSymmetric(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, acf_t, acf_N, frame_width*frame_height);
+                        if (job.correlator==CORRELATOR_DIRECT) statisticsAutocorrelateMultiTauSymmetricMemOptimized(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, acf_t, acf_N, frame_width*frame_height);
+                        else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsAutocorrelateMultiTauAvgSymmetric<float, float>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
                         for (register uint32_t ct=0; ct<acf_N; ct++) {
                             sum[ct]=sum[ct]+cftemp[ct];
                             sum2[ct]=sum2[ct]+cftemp[ct]*cftemp[ct];
@@ -902,7 +914,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE THE CCFs
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (job.ccf && job.correlator==0) {
+        if (job.ccf && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
             emit messageChanged(tr("calculating crosscorrelations ..."));
             ccf_N=job.S*job.P;
             ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
@@ -928,10 +940,17 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
                 if (job.segments<=1) {
-                    if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetric(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                    if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    if (job.correlator==CORRELATOR_DIRECT) {
+                        if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    } else if (job.correlator==CORRELATOR_DIRECTAVG) {
+                        if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                        if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                    }
                 } else {
                     uint32_t segment_frames=frames/job.segments;
                     double* cftemp=(double*)calloc(4*ccf_N,sizeof(double));
@@ -943,10 +962,17 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     }
                     for (int32_t seg=0; seg<job.segments; seg++) {
                         for (register uint32_t ct=0; ct<4*ccf_N; ct++) cftemp[ct]=0;
-                        if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                        if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        if (job.correlator==CORRELATOR_DIRECT) {
+                            if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                            if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                            if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        } else if (job.correlator==CORRELATOR_DIRECTAVG) {
+                            if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                            if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                            if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                        }
                         for (register uint32_t ct=0; ct<ccf_N; ct++) {
                             if ((int32_t)p-1>=0) {
                                 sum[0*ccf_N+ct]  += cftemp[0*ccf_N+ct];
@@ -1024,7 +1050,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE THE DCCFs
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (job.distanceCCF && job.correlator==0) {
+        if (job.distanceCCF && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
             emit messageChanged(tr("calculating distance crosscorrelations ..."));
 
             dccfframe_width=frame_width-abs(job.DCCFDeltaX);
@@ -1050,7 +1076,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     const int32_t p1=y1*frame_width+x1;
                     if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
                         if (job.segments<=1) {
-                            statisticsCrosscorrelateMultiTauSymmetric(&(dccf[p*dccf_N]), &(image_series[p]), &(image_series[p1]), frames, dccf_t, dccf_N, frame_width*frame_height);
+                            if (job.correlator==CORRELATOR_DIRECT) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(dccf[p*dccf_N]), &(image_series[p]), &(image_series[p1]), frames, dccf_t, dccf_N, frame_width*frame_height);
+                            else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(dccf[p*dccf_N]), &(image_series[p]), &(image_series[p1]), frames, job.S, job.m, job.P, frame_width*frame_height);
                         } else {
                             uint32_t segment_frames=frames/job.segments;
                             double* cftemp=(double*)calloc(dccf_N,sizeof(double));
@@ -1062,7 +1089,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                             }
                             for (int32_t seg=0; seg<job.segments; seg++) {
                                 for (register uint32_t ct=0; ct<dccf_N; ct++) cftemp[ct]=0;
-                                statisticsCrosscorrelateMultiTauSymmetric(&(cftemp[0*dccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p1]), segment_frames, dccf_t, dccf_N, frame_width*frame_height);
+                                if (job.correlator==CORRELATOR_DIRECT) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[0*dccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p1]), segment_frames, dccf_t, dccf_N, frame_width*frame_height);
+                                else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[0*dccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p1]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
                                 for (register uint32_t ct=0; ct<dccf_N; ct++) {
                                     sum[0*dccf_N+ct]  += cftemp[0*dccf_N+ct];
                                     sum2[0*dccf_N+ct] += cftemp[0*dccf_N+ct]*cftemp[0*dccf_N+ct];
@@ -1132,7 +1160,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         dccfframe_width=frame_width-abs(job.DCCFDeltaX);
         dccfframe_height=frame_height-abs(job.DCCFDeltaY);
     }
-    if (job.correlator==1) {
+    if (job.correlator==CORRELATOR_MTAUALLMON) {
         if (job.acf) {
             for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                 acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
@@ -1239,7 +1267,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
         acf_N=0;
         if (job.acf) {
-            if (job.correlator==1) {
+            if (job.correlator==CORRELATOR_MTAUALLMON) {
                 acf_N=acfjk[0]->getSlots();
             } else {
                 acf_N=job.S*job.P;
@@ -1255,7 +1283,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     acf_std[nn]=0.0;
                 }
                 acf_tau=(double*)calloc(acf_N,sizeof(double));
-                if (job.correlator==1) {
+                if (job.correlator==CORRELATOR_MTAUALLMON) {
                     double* tau=acfjk[0]->getCorTau();
                     for (uint64_t tt=0; tt<acf_N; tt++) {
                         acf_tau[tt]=tau[tt];
@@ -1273,7 +1301,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
         ccf_N=0;
         if (job.ccf) {
-            if (job.correlator==1) {
+            if (job.correlator==CORRELATOR_MTAUALLMON) {
                 ccf_N=ccf1jk[0]->getSlots();
             } else {
                 ccf_N=job.S*job.P;
@@ -1301,7 +1329,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     ccf4_std[nn]=0.0;
                 }
                 ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-                if (job.correlator==1) {
+                if (job.correlator==CORRELATOR_MTAUALLMON) {
                     double* tau=ccf1jk[0]->getCorTau();
                     for (uint32_t tt=0; tt<ccf_N; tt++) {
                         ccf_tau[tt]=tau[tt];
@@ -1319,7 +1347,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
         dccf_N=0;
         if (job.distanceCCF) {
-            if (job.correlator==1) {
+            if (job.correlator==CORRELATOR_MTAUALLMON) {
                 dccf_N=dccfjk[0]->getSlots();
             } else {
                 dccf_N=job.S*job.P;
@@ -1335,7 +1363,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     dccf_std[nn]=0.0;
                 }
                 dccf_tau=(double*)calloc(dccf_N,sizeof(double));
-                if (job.correlator==1) {
+                if (job.correlator==CORRELATOR_MTAUALLMON) {
                     double* tau=dccfjk[0]->getCorTau();
                     for (uint32_t tt=0; tt<dccf_N; tt++) {
                         dccf_tau[tt]=tau[tt];
@@ -1445,7 +1473,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
                 // CALCULATE CORRELATIONS, we store the sum in acf and the sum of squares in acf_std
                 if (job.acf && acf_N>0) {
-                    if (job.correlator==1) {
+                    if (job.correlator==CORRELATOR_MTAUALLMON) {
                         for (register uint16 i=0; i<frame_width*frame_height; i++) {
                             register double v=frame_data[i];
                             acfjk[i]->correlate_step(v);
@@ -1485,7 +1513,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     }
                 }
                 if (job.ccf && ccf_N>0) {
-                    if (job.correlator==1) {
+                    if (job.correlator==CORRELATOR_MTAUALLMON) {
                         for (register uint16 i=0; i<frame_width*frame_height; i++) {
                             if ((int32_t)i-1>=0) ccf1jk[i]->crosscorrelate_step(frame_data[i], frame_data[i-1]);
                             if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jk[i]->crosscorrelate_step(frame_data[i], frame_data[i+1]);
@@ -1574,7 +1602,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     }
                 }
                 if (job.distanceCCF && dccf_N>0) {
-                    if (job.correlator==1) {
+                    if (job.correlator==CORRELATOR_MTAUALLMON) {
                         uint16_t i=0;
                         for (register uint16 y=0; y<dccfframe_height; y++) {
                             for (register uint16 x=0; x<dccfframe_width; x++) {

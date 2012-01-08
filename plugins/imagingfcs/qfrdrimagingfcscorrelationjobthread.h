@@ -14,6 +14,11 @@
 class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward
 
+#define CORRELATOR_DIRECT 0
+#define CORRELATOR_DIRECTAVG 1
+#define CORRELATOR_MTAUALLMON 2
+#define CORRELATOR_MTAUONEMON 3
+
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
 

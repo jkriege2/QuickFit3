@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
+    <width>1120</width>
     <height>704</height>
    </rect>
   </property>
@@ -121,7 +121,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,0,1,0,0,2">
            <item>
             <widget class="QLabel" name="label_5">
              <property name="text">
@@ -612,6 +612,9 @@
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
               <property name="sizeHint" stdset="0">
                <size>
                 <width>40</width>
@@ -1030,6 +1033,11 @@
                <item>
                 <property name="text">
                  <string>Direct Correlation</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Direct Correlation, with Averaging</string>
                 </property>
                </item>
                <item>
@@ -1578,7 +1586,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>838</width>
+           <width>1080</width>
            <height>85</height>
           </rect>
          </property>
@@ -1706,8 +1714,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>
-  <include location="qfrdrimagingfcs.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrimagingfcs.qrc"/>
  </resources>
  <connections>
   <connection>
