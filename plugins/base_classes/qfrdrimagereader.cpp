@@ -170,5 +170,5 @@ void QFRDRImageReader::setCropping(int x0, int x1, int y0, int y1) {
     this->y0=y0;
     this->y1=y1;
     crop=true;
-    qDebug()<<"enabled cropping   x = "<<x0<<"..."<<x1<<"   y = "<<y0<<"..."<<y1;
+    //qDebug()<<"enabled cropping   x = "<<x0<<"..."<<x1<<"   y = "<<y0<<"..."<<y1;
 }

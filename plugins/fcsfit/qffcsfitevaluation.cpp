@@ -1,7 +1,7 @@
 #include "qffcsfitevaluation.h"
 #include "qffcsfitevaluationeditor.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
-
+#include "qffitfunction.h"
 
 
 QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
@@ -118,7 +118,7 @@ double* QFFCSFitEvaluation::allocWeights(bool* weightsOKK, QFRawDataRecord* reco
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     //JKQTPdatastore* ds=pltData->getDatastore();
     //JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    //QFFitFunction* ffunc=eval->getFitFunction();
+    //QFFitFunction* ffunc=getFitFunction();
     int run=run_in;
     if (run<=-100) run=getCurrentIndex();
 
@@ -364,6 +364,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                     QString egroup=QString("%1%2__%3__%4").arg(getType()).arg(getID()).arg(falg->id()).arg(ffunc->id());
                     QString egrouplabel=QString("%1%2: %3, %4").arg(getType()).arg(getID()).arg(falg->shortName()).arg(ffunc->shortName());
 
+
                     record->resultsSetEvaluationGroup(evalID, egroup);
                     record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
                     record->resultsSetEvaluationGroupIndex(evalID, run);
@@ -417,6 +418,13 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                         record->resultsSetGroup(evalID, param, group);
                         record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
                     }
+
+
+                    {
+                        QFFitFunction::FitStatistics fit_stat=calcFitStatistics(ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run);
+                        fit_stat.free();
+                    }
+
                     record->enableEmitResultsChanged(false);
                     //emit resultsChanged();
                 } else {
@@ -450,4 +458,62 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
         //dlgFitProgress->done();
         falg->setReporter(NULL);
     }
+}
+
+
+QFFitFunction::FitStatistics QFFCSFitEvaluation::calcFitStatistics(QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
+    QFFitFunction::FitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
+
+    if (record) {
+        if (hasFit(record, run)) {
+            QString param="";
+            QString eid= getEvaluationResultID(run);
+            setFitResultValue(record, eid, param="fitstat_chisquared", result.residSqrSum);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+
+            setFitResultValue(record, eid, param="fitstat_chisquared_weighted", result.residWeightSqrSum);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+
+            setFitResultValue(record, eid, param="fitstat_residavg", result.residAverage);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("residual average"), QString("&lang;E&rang;"));
+
+            setFitResultValue(record, eid, param="fitstat_residavg_weighted", result.residWeightAverage);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+
+            setFitResultValue(record, eid, param="fitstat_residstddev", result.residStdDev);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+
+            setFitResultValue(record, eid, param="fitstat_residstddev_weighted", result.residWeightStdDev);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+
+            setFitResultValue(record, eid, param="fitstat_fitparams", result.fitparamN);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("fit params"));
+
+            setFitResultValue(record, eid, param="fitstat_datapoints", result.dataSize);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("datapoints"));
+
+            setFitResultValue(record, eid, param="fitstat_dof", result.degFreedom);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("degrees of freedom"));
+
+            setFitResultValue(record, eid, param="fitstat_r2", result.Rsquared);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("R squared"), tr("R<sup>2</sup>"));
+
+            setFitResultValue(record, eid, param="fitstat_tss", result.TSS);
+            setFitResultGroup(record, eid, param, tr("fit statistics"));
+            setFitResultLabel(record, eid, param, tr("total sum of squares"));
+
+        }
+    }
+
+    return result;
 }

@@ -1060,6 +1060,8 @@ void QFFCSFitEvaluationEditor::replotData() {
     //setUpdatesEnabled(updEn);
 }
 
+
+
 void QFFCSFitEvaluationEditor::updateFitFunctions() {
     if (!current) return;
     if (!cmbModel) return;
@@ -1105,22 +1107,14 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 //qDebug()<<"    a "<<t.elapsed()<<" ms";
                 t.start();
 
+
                 /////////////////////////////////////////////////////////////////////////////////
                 // retrieve data and tau-values from rawdata record
                 /////////////////////////////////////////////////////////////////////////////////
                 long N=data->getCorrelationN();
                 int runAvgWidth=11;
-                int runAvgStart=-runAvgWidth/2;
-                double* fitfunc=(double*)calloc(N,sizeof(double));
-                double* residuals=(double*)calloc(N,sizeof(double));
-                double* residuals_weighted=(double*)calloc(N,sizeof(double));
                 double* tauvals=data->getCorrelationT();
                 double* corrdata=NULL;
-                int runAvgMaxN=N;
-                int runAvgN=0;
-                double* tau_runavg=(double*)calloc(runAvgMaxN, sizeof(double));
-                double* residuals_runavg=(double*)calloc(runAvgMaxN, sizeof(double));
-                double* residuals_runavg_weighted=(double*)calloc(runAvgMaxN, sizeof(double));
 
                 if (eval->getCurrentIndex()<0) {
                     corrdata=data->getCorrelationMean();
@@ -1133,8 +1127,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
 
                 double* weights=eval->allocWeights(NULL, record, eval->getCurrentIndex(), datacut_min, datacut_max);
-                //qDebug()<<"    b "<<t.elapsed()<<" ms";
-                t.start();
+
 
                 /////////////////////////////////////////////////////////////////////////////////
                 // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -1144,143 +1137,16 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 double* errors=eval->allocFillParameterErrors();
                 bool* paramsFix=eval->allocFillFix(record, eval->getCurrentIndex());
                 ffunc->calcParameter(fullParams, errors);
-                int fitparamN=0;
-                for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (ffunc->isParameterVisible(i, fullParams) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
-                        fitparamN++;
-                    }
-                }
-                int dataSize=datacut_max-datacut_min;
-                int degFreedom=dataSize-fitparamN-1;
-                //qDebug()<<"    c "<<t.elapsed()<<" ms";
-                t.start();
 
                 /////////////////////////////////////////////////////////////////////////////////
-                // calculate model function values, residuals and residual parameters/statistics
+                // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
-                double residSqrSum=0;        // sum of squared residuals
-                double residWeightSqrSum=0;  // sum of squared weighted residuals
-                double residSum=0;           // sum of residuals
-                double residWeightSum=0;     // sum of weightedresiduals
-                double gSum=0;               // sum of measured values
-                double gSqrSum=0;            // sum of squared measured values
+                record->disableEmitResultsChanged();
+                QFFitFunction::FitStatistics fitResults=eval->calcFitStatistics(ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
+                record->enableEmitResultsChanged();
 
 
-                double rmin=0;       // min of residuals
-                double rmax=0;       // max of residuals
-                double rminw=0;      // min of weighted residuals
-                double rmaxw=0;      // max of weighted residuals
-                bool hfirst=true;
-
-                for (int i=0; i<N; i++) {
-                    double value=ffunc->evaluate(tauvals[i], fullParams);
-                    //di_fit->set(0, i, value);
-                    //di_resid->set(0,0,value)
-                    fitfunc[i]=value;
-                    residuals[i]=corrdata[i]-value;
-                    double res=residuals[i];
-                    residuals_weighted[i]=res/weights[i];
-                    if (fabs(weights[i])<1000*DBL_MIN) residuals_weighted[i]=0;
-                    //std::cout<<"weights["<<i<<"]="<<weights[i]<<"\n";
-                    double resw=residuals_weighted[i];
-                    if ((i>=datacut_min)&&(i<=datacut_max)) {
-                        residSqrSum+=res*res;
-                        residWeightSqrSum+=resw*resw;
-                        residSum+=res;
-                        residWeightSum+=resw;
-                        gSum+=corrdata[i];
-                        gSqrSum+=corrdata[i]*corrdata[i];
-
-                        if (hfirst) {
-                            rmin=res;
-                            rmax=res;
-                            rmaxw=resw;
-                            rminw=resw;
-                            hfirst=false;
-                        } else {
-                            if (res>rmax) rmax=res;
-                            if (res<rmin) rmin=res;
-                            if (resw>rmaxw) rmaxw=resw;
-                            if (resw<rminw) rminw=resw;
-                        }
-                        //std::cout<<"res="<<res<<" resw="<<resw<<"    :    rmin="<<rmin<<"  rmax="<<rmax<<"    rminw="<<rminw<<"  rmaxw="<<rmaxw<<std::endl;
-                        if ((i+runAvgStart>=datacut_min) && (i+runAvgStart+runAvgWidth<=datacut_max) /*&& ((i-datacut_min)%runAvgWidth==0)*/) {
-                            double s=0, sw=0;
-                            double tau=0;
-                            for (int j=0; j<runAvgWidth; j++) {
-                                s=s+residuals[i+j+runAvgStart];
-                                sw=sw+residuals_weighted[i+j+runAvgStart];
-                                tau+=tauvals[i+j+runAvgStart];
-                            }
-                            tau_runavg[runAvgN]=tauvals[i];
-                            residuals_runavg[runAvgN]=s/(double)runAvgWidth;
-                            residuals_runavg_weighted[runAvgN]=sw/(double)runAvgWidth;
-                            runAvgN++;
-                        }
-                    }
-                }
-
-                double residAverage=residSum/(double)dataSize;
-                double residWeightAverage=residWeightSum/(double)dataSize;
-                double residStdDev=sqrt(residSqrSum/(double)dataSize-residSum*residSum/(double)dataSize/(double)dataSize);
-                double residWeightStdDev=sqrt(residWeightSqrSum/(double)dataSize-residWeightSum*residWeightSum/(double)dataSize/(double)dataSize);
-                double TSS=gSqrSum-gSum*gSum/(double)dataSize;
-                double Rsquared=1.0-residSqrSum/TSS;
-
-                double residHistBinWidth=(rmax-rmin)/(double)residualHistogramBins;
-                double residHistWBinWidth=(rmaxw-rminw)/(double)residualHistogramBins;
-                //std::cout<<"rmin="<<rmin<<"  rmax="<<rmax<<"    rminw="<<rminw<<"  rmaxw="<<rmaxw<<std::endl;
-                //qDebug()<<"    d "<<t.elapsed()<<" ms";
-                t.start();
-
-                /////////////////////////////////////////////////////////////////////////////////
-                // calculate residual histogram
-                /////////////////////////////////////////////////////////////////////////////////
-                double* resHistogram=(double*)calloc(residualHistogramBins, sizeof(double));
-                double resHistogramCount=0;
-                double* resWHistogram=(double*)calloc(residualHistogramBins, sizeof(double));
-                double resWHistogramCount=0;
-                for (int i=0; i<N; i++) {
-                    if ((i>=datacut_min)&&(i<=datacut_max)) {
-                        if (residHistBinWidth>0) {
-                            int idx=round((residuals[i]-rmin)/residHistBinWidth);
-                            if ((idx>=0) && (idx<residualHistogramBins)) {
-                                resHistogramCount++;
-                                resHistogram[idx]++;
-                            }
-                        }
-                        if (residHistWBinWidth>0) {
-                            int idx=round((residuals_weighted[i]-rminw)/residHistWBinWidth);
-                            if ((idx>=0) && (idx<residualHistogramBins)) {
-                                resWHistogramCount++;
-                                resWHistogram[idx]++;
-                            }
-                        }
-                    }
-                }
-                if (resHistogramCount>0) for (int i=0; i<residualHistogramBins; i++) {
-                    resHistogram[i]=resHistogram[i]/resHistogramCount;
-                }
-                if (resWHistogramCount>0) for (int i=0; i<residualHistogramBins; i++) {
-                    resWHistogram[i]=resWHistogram[i]/resWHistogramCount;
-                }
-                //qDebug()<<"    e "<<t.elapsed()<<" ms";
-                t.start();
-
-
-                /////////////////////////////////////////////////////////////////////////////////
-                // calculate residual correlation
-                /////////////////////////////////////////////////////////////////////////////////
-                double* resCorrelation=statisticsAllocAutocorrelate(&(residuals[datacut_min]), datacut_max-datacut_min);
-                double* resWCorrelation=statisticsAllocAutocorrelate(&(residuals_weighted[datacut_min]), datacut_max-datacut_min);
-                int resN=ceil((double)(datacut_max-datacut_min)/2.0);
-                for (register int i=0; i<resN; i++) {
-                    resCorrelation[i]/=(residStdDev*residStdDev);
-                    resWCorrelation[i]/=(residWeightStdDev*residWeightStdDev);
-                }
-
-
-                size_t c_fit = ds->addCopiedColumn(fitfunc, N, "fit_model");
+                size_t c_fit = ds->addCopiedColumn(fitResults.fitfunc, N, "fit_model");
                 //qDebug()<<"    f "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1325,10 +1191,10 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residuals=0;
                 JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals->get_plotter());
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residuals=dsres->addCopiedColumn(residuals_weighted, N, "residuals_weighted");
+                    c_residuals=dsres->addCopiedColumn(fitResults.residuals_weighted, N, "residuals_weighted");
                     g_residuals->set_title("weighted residuals");
                 } else {
-                    c_residuals=dsres->addCopiedColumn(residuals, N, "residuals");
+                    c_residuals=dsres->addCopiedColumn(fitResults.residuals, N, "residuals");
                     g_residuals->set_title("residuals");
                 }
                 g_residuals->set_xColumn(c_taures);
@@ -1352,32 +1218,33 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals running average
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_tauresra=dsres->addCopiedColumn(tau_runavg, runAvgN, "tau_resid_runavg");
+                size_t c_tauresra=dsres->addCopiedColumn(fitResults.tau_runavg, fitResults.runAvgN, "tau_resid_runavg");
                 size_t c_residualsra=0;
                 JKQTPxyLineGraph* g_residualsra=new JKQTPxyLineGraph(pltResiduals->get_plotter());
 
 
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualsra=dsres->addCopiedColumn(residuals_runavg_weighted, runAvgN, "residuals_runavg_weighted");
+                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg_weighted, fitResults.runAvgN, "residuals_runavg_weighted");
                     g_residualsra->set_title("weighted residuals, movAvg");
                 } else {
-                    c_residualsra=dsres->addCopiedColumn(residuals_runavg, runAvgN, "residuals_runavg");
+                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg, fitResults.runAvgN, "residuals_runavg");
                     g_residualsra->set_title("residuals, movAvg");
                 }
                 g_residualsra->set_xColumn(c_tauresra);
                 g_residualsra->set_yColumn(c_residualsra);
+                g_residualsra->set_symbol(JKQTPnoSymbol);
                 g_residualsra->set_symbolSize(6);
                 g_residualsra->set_symbolWidth(1);
                 g_residualsra->set_color(g_residuals->get_color().darker());
                 //g_residuals->set_datarange_start(datacut->get_userMin());
                 //g_residuals->set_datarange_end(datacut->get_userMax());
                 g_residualsra->set_drawLine(true);
-                if (residualStyle==0) { // draw points
+                /*if (residualStyle==0) { // draw points
                     // always draw as lines
                     g_residualsra->set_symbol(JKQTPplus);
                 } else if (residualStyle==2) {
                     g_residualsra->set_symbol(JKQTPplus);
-                }
+                }*/
                 pltResiduals->addGraph(g_residualsra);
                 //qDebug()<<"    i "<<t.elapsed()<<" ms";
                 t.start();
@@ -1388,11 +1255,11 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residualHistogramX=0;
                 size_t c_residualHistogramY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, rminw+residHistWBinWidth/2.0, rmaxw-residHistWBinWidth/2.0, "residualhist_weighted_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(resWHistogram, residualHistogramBins, "residualhist_weighted_y");
+                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rminw+fitResults.residHistWBinWidth/2.0, fitResults.rmaxw-fitResults.residHistWBinWidth/2.0, "residualhist_weighted_x");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resWHistogram, residualHistogramBins, "residualhist_weighted_y");
                 } else {
-                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, rmin+residHistBinWidth/2.0, rmax-residHistBinWidth/2.0, "residualhist_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(resHistogram, residualHistogramBins, "residualhist_y");
+                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rmin+fitResults.residHistBinWidth/2.0, fitResults.rmax-fitResults.residHistBinWidth/2.0, "residualhist_x");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resHistogram, residualHistogramBins, "residualhist_y");
                 }
                 JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram->get_plotter());
                 g_residualsHistogram->set_xColumn(c_residualHistogramX);
@@ -1407,12 +1274,12 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals correlations
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_residualCorrelationX=dsresc->addLinearColumn(resN-1, 1, resN-1, "residualcorr_x");
+                size_t c_residualCorrelationX=dsresc->addLinearColumn(fitResults.resN-1, 1, fitResults.resN-1, "residualcorr_x");
                 size_t c_residualCorrelationY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualCorrelationY=dsresc->addCopiedColumn(&(resWCorrelation[1]), resN-1, "residualcorr_weighted_y");
+                    c_residualCorrelationY=dsresc->addCopiedColumn(&(fitResults.resWCorrelation[1]), fitResults.resN-1, "residualcorr_weighted_y");
                 } else {
-                    c_residualCorrelationY=dsresh->addCopiedColumn(&(resCorrelation[1]), resN-1, "residualcorr_y");
+                    c_residualCorrelationY=dsresh->addCopiedColumn(&(fitResults.resCorrelation[1]), fitResults.resN-1, "residualcorr_y");
                 }
                 JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation->get_plotter());
                 g_residualsCorrelation->set_xColumn(c_residualCorrelationX);
@@ -1439,32 +1306,32 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                                 "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
                                 "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(residSqrSum).arg(residWeightSqrSum);
+                                "</tr>").arg(fitResults.residSqrSum).arg(fitResults.residWeightSqrSum);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
                                 "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(residAverage).arg(residWeightAverage);
+                                "</tr>").arg(fitResults.residAverage).arg(fitResults.residWeightAverage);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
                                 "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(residStdDev).arg(residWeightStdDev);
+                                "</tr>").arg(fitResults.residStdDev).arg(fitResults.residWeightStdDev);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td></td>"
                                 "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitparamN).arg(dataSize);
+                                "</tr>").arg(fitResults.fitparamN).arg(fitResults.dataSize);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td></td>"
                                 "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
-                                "</tr>").arg(degFreedom);
+                                "</tr>").arg(fitResults.degFreedom);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">TSS  =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td></td>"
                                 "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(TSS).arg(Rsquared);
+                                "</tr>").arg(fitResults.TSS).arg(fitResults.Rsquared);
                 //qDebug()<<"    l "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1472,66 +1339,6 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 txtFit+=QString("</center></font>");
                 fitStatisticsReport=txtFit;
                 txtFitStatistics->setHtml(txtFit);
-                if (eval->hasFit()) {
-                    QString param="";
-                    record->disableEmitResultsChanged();
-                    QString eid= eval->getEvaluationResultID(run);
-                    eval->setFitResultValue(record, eid, param="fitstat_chisquared", residSqrSum);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_chisquared_weighted", residWeightSqrSum);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_residavg", residAverage);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("residual average"), QString("&lang;E&rang;"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_residavg_weighted", residWeightAverage);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_residstddev", residStdDev);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_residstddev_weighted", residWeightStdDev);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_fitparams", fitparamN);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("fit params"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_datapoints", dataSize);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("datapoints"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_dof", degFreedom);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("degrees of freedom"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_r2", Rsquared);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("R squared"), tr("R<sup>2</sup>"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-
-                    eval->setFitResultValue(record, eid, param="fitstat_tss", TSS);
-                    eval->setFitResultGroup(record, eid, param, tr("fit statistics"));
-                    eval->setFitResultLabel(record, eid, param, tr("total sum of squares"));
-                    //qDebug()<<"       m_presignals "<<t.elapsed()<<" ms";
-                    record->enableEmitResultsChanged();
-                }
 
                 //qDebug()<<"    m_presignals "<<t.elapsed()<<" ms";
                 eval->set_doEmitPropertiesChanged(true);
@@ -1547,18 +1354,10 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 free(fullParams);
                 free(errors);
-                free(fitfunc);
-                free(residuals);
-                free(tau_runavg);
-                free(residuals_runavg);
-                free(residuals_weighted);
                 free(weights);
-                free(resHistogram);
-                free(resWHistogram);
                 free(paramsFix);
-                free(resWCorrelation);
-                free(resCorrelation);
-                free(residuals_runavg_weighted);
+                fitResults.free();
+
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";
                 t.start();
             }

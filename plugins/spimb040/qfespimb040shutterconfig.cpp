@@ -171,7 +171,7 @@ void QFESPIMB040ShutterConfig::disConnect() {
     int shutterID=getShutterID();
 
     if (shutter) {
-        qDebug()<<"connecting "<<conn;
+        //qDebug()<<"connecting "<<conn;
         if (conn) {
             shutter->setShutterLogging(m_log);
             shutter->shutterConnect(shutterID);
@@ -266,7 +266,7 @@ void QFESPIMB040ShutterConfig::shutterActionClicked(bool opened) {
     shutter=getShutter();
     shutterID=getShutterID();
     if (shutter) {
-        qDebug()<<"set shutter state opened="<<opened;
+        //qDebug()<<"set shutter state opened="<<opened;
         shutter->setShutterState(shutterID, opened);
         moving=true;
         QTime started=QTime::currentTime();

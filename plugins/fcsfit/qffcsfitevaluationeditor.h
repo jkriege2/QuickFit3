@@ -326,6 +326,9 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorBase 
 
         using QFFitResultsByIndexEvaluationEditorBase::getUserMin;
         using QFFitResultsByIndexEvaluationEditorBase::getUserMax;
+
+
+
 };
 
 #endif // QFFCSFITEVALUATIONEDITOR_H

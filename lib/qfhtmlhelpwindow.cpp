@@ -546,7 +546,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 //qDebug()<<pos<<list<<filter;
 
                 if (command=="insert") {
-                    qDebug()<<QFileInfo(filename).absoluteDir().absoluteFilePath(file);
+                    //qDebug()<<QFileInfo(filename).absoluteDir().absoluteFilePath(file);
                     QFile f(QFileInfo(filename).absoluteDir().absoluteFilePath(file));
                     QString rep="";
                     if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -554,7 +554,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     }
                     result=result.replace(rxInsert.cap(0), rep);
                 } else if (m_pluginServices&&(command=="insertglobal")) {
-                    qDebug()<<QDir(m_pluginServices->getAssetsDirectory()+"/help/").absoluteFilePath(file);
+                    //qDebug()<<QDir(m_pluginServices->getAssetsDirectory()+"/help/").absoluteFilePath(file);
                     QFile f(QDir(m_pluginServices->getAssetsDirectory()+"/help/").absoluteFilePath(file));
                     QString rep="";
                     if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {

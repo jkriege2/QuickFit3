@@ -92,7 +92,7 @@ void ProgramOptions::writeSettings() {
 
 void ProgramOptions::readSettings() {
     if (!settings) {
-        qDebug()<<"iniFilename="<<iniFilename;
+        //qDebug()<<"iniFilename="<<iniFilename;
         if (iniFilename=="native") { // on windows: registry, on Linux/MacOS: default
             settings= new QSettings(this);
         } else if (iniFilename=="native_inifile") { // ensures a INI file at the default location, even on windows

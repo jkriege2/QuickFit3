@@ -1,0 +1,26 @@
+date/time                   : 2012/01/08 19:12:42
+input file                  : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/beads_0.1YG_1perc_EMCCD_10mWlaser_4.tif
+input description file      : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/beads_0.1YG_1perc_EMCCD_10mWlaser_4.configuration.ini
+overview image file         : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/./results/beads_0.1YG_1perc_EMCCD_10mWlaser_4_seg1_corrmtauallmon__.overview.tif
+background image file       : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/./results/beads_0.1YG_1perc_EMCCD_10mWlaser_4_seg1_corrmtauallmon__.background.tif
+video file                  : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/./results/beads_0.1YG_1perc_EMCCD_10mWlaser_4_seg1_corrmtauallmon__.video.tif
+statistics file             : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/./results/beads_0.1YG_1perc_EMCCD_10mWlaser_4_seg1_corrmtauallmon__.statistics.dat
+autocorrelation file        : D:/dkfz/FCSTOOLS/trunk/QuickFit3/plugins/imagingfcs/assets/imfcs_testdata/./results/beads_0.1YG_1perc_EMCCD_10mWlaser_4_seg1_corrmtauallmon__.autocorrelation.dat
+width                       : 20
+height                      : 20
+binning                     : 1
+frame count in file         : 10000
+frame count                 : 10000
+first frame                 : 0
+last frame                  : 9999
+correlator S                : 10
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : multi-tau with monitors for all channels
+smallest tau [s]            : 0.00206
+baseline                    : 0
+video sum up                : 10
+video frames                : 1000
+statistics over             : 19
+duration [s]                : 7.605

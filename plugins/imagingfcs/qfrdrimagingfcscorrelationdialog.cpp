@@ -347,7 +347,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.descriptionFilename=inputconfigfile;
     job.correlator=ui->cmbCorrelator->currentIndex();
     job.fileFormat=ui->cmbFileformat->currentIndex();
-    qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
+    //qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
     job.backgroundCorrection=ui->cmbBackground->currentIndex();
     job.S=ui->spinS->value();
     job.P=ui->spinP->value();
@@ -358,7 +358,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.postfix=ui->edtPostfix->text();
     job.backgroundOffset=ui->edtOffset->value();
     job.filenameBackground=ui->edtBackgroundFile->text();
-    qDebug()<<job.filenameBackground;
+    //qDebug()<<job.filenameBackground;
     job.range_min=-1;
     if (!ui->chkFirstFrame->isChecked()) {
         job.range_min=ui->spinFirstFrame->value();

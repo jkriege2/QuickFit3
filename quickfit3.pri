@@ -33,4 +33,8 @@ INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
 
 OTHER_FILES +=
 
+QMAKE_CXXFLAGS += -Werror=return-type
+
+
+
 include(quickfit_config.pri)

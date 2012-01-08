@@ -41,6 +41,12 @@
 
     This widget displays a single image + some image statistics (histograms ...). To display a new image, call
     displayImage(). This triggers the display of a new image.
+
+    This class may perform fits to the marginal curves. These functions are availabl:
+      - gaussian: \f[ f(x)=F_0+A\cdot\exp\left(-\frac{(x-x_0)^2}{\sigma^2}\right) \f]
+      - slit: \f[ f(x)=F0+A\cdot\left[\frac{\sin(\pi\cdot(x-x_0)/d)}{\pi\cdot(x-x_0)/d}\right]^2 \f]
+      - sigmoidal: \f[ f(x)=F0+A\cdot\left[\frac{1}{1+\exp\left(-\frac{x-x_0}{d}\right)}\right] \f]
+    .
  */
 class QFESPIMB040CameraView : public QWidget {
         Q_OBJECT

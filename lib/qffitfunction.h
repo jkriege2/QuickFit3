@@ -71,7 +71,7 @@ class QFLIB_EXPORT QFFitFunction {
 
         };
         /** \brief this struct is used to describe the fitting parameters */
-        struct ParameterDescription {
+        struct QFLIB_EXPORT ParameterDescription {
             /** \brief type of the parameter */
             ParameterType type;
             /** \brief short unique id for the parameter, e.g. "n" */
@@ -236,6 +236,77 @@ class QFLIB_EXPORT QFFitFunction {
             for (int i=0; i<m_parameters.size(); i++) sl.append(m_parameters[i].id);
             return sl;
         }
+
+        /** \brief used as result type for the function calcFitStatistics() */
+        struct QFLIB_EXPORT FitStatistics {
+            public:
+                /** \brief default constructor/initializor: initialize all with 0/\c NULL */
+                FitStatistics();
+
+                /** \brief free all heap memory allocated in this struct */
+                void free();
+
+                int runAvgStart;   /**<  */
+                double* fitfunc;   /**<  */
+                double* residuals;   /**<  */
+                double* residuals_weighted;   /**<  */
+                double* tauvals;   /**<  */
+                int runAvgMaxN;   /**<  */
+                int runAvgN;   /**<  */
+                double* tau_runavg;   /**<  */
+                double* residuals_runavg;   /**<  */
+                double* residuals_runavg_weighted;   /**<  */
+                int fitparamN;   /**<  */
+                int dataSize;   /**<  */
+                int degFreedom;   /**<  */
+                double residSqrSum;        /**<  sum of squared residuals */
+                double residWeightSqrSum;  /**<  sum of squared weighted residuals */
+                double residSum;           /**<  sum of residuals */
+                double residWeightSum;     /**<  sum of weightedresiduals */
+                double gSum;               /**<  sum of measured values */
+                double gSqrSum;            /**<  sum of squared measured values */
+
+
+                double rmin;       /**<  min of residuals */
+                double rmax;       /**<  max of residuals */
+                double rminw;      /**<  min of weighted residuals */
+                double rmaxw;      /**<  max of weighted residuals */
+                double residAverage;   /**<  */
+                double residWeightAverage;   /**<  */
+                double residStdDev;   /**<  */
+                double residWeightStdDev;   /**<  */
+                double TSS;   /**<  */
+                double Rsquared;   /**<  */
+
+                double residHistBinWidth;   /**<  */
+                double residHistWBinWidth;   /**<  */
+                double* resHistogram;   /**<  */
+                double resHistogramCount;   /**<  */
+                double* resWHistogram;   /**<  */
+                double resWHistogramCount;   /**<  */
+                double* resCorrelation;   /**<  */
+                double* resWCorrelation;   /**<  */
+                int resN;   /**<  */
+        };
+
+        /*! \brief calculate fit statistics for the given measurement dataset, using this fit function with the given parameters
+
+            \return a wide set of fit statistics in a struct of type FitStatistics
+            \param N number of datapoints in corrdata and weights
+            \param tauvals input data set x (the values f(x) are given in corrdata)
+            \param corrdata input dataset f(x)
+            \param weights weights for the input dataset
+            \param datacut_min first data point to use
+            \param datacut_max last datapoint to use
+            \param fullParams parameter vector
+            \param errors errors of the fit parameters in fullParams
+            \param paramsFix which parameters are fixed
+            \param runAvgWidth width of the averaging in the running averge
+            \param residualHistogramBins bins in the residual histogram
+
+            \note the arrays in the resulting struct are allocated using \c malloc(), so you will have to free them using \c free() !!!
+          */
+        FitStatistics calcFitStatistics(long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins);
     protected:
         /*! \brief add a parameter description
 

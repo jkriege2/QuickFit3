@@ -91,7 +91,8 @@ SOURCES += dlgnewproperty.cpp \
            csvtools.cpp \
     qvisiblehandlesplitter.cpp \
     qfpluginrawdata.cpp \
-    qfhtmldelegate.cpp
+    qfhtmldelegate.cpp \
+    qffitfunction.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui

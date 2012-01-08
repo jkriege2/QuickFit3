@@ -52,13 +52,13 @@ QFESPIMB040CameraConfig::QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, 
 
 
 QFESPIMB040CameraConfig::~QFESPIMB040CameraConfig() {
-    qDebug()<<"destroy";
+    //qDebug()<<"destroy";
     if (camView) {
         camView->close();
         delete camView;
         camView=NULL;
     }
-    qDebug()<<"destroy done";
+    //qDebug()<<"destroy done";
 }
 
 
@@ -75,7 +75,7 @@ void QFESPIMB040CameraConfig::closeEvent ( QCloseEvent * event ) {
         actDisConnect->setChecked(false);
         disconnectDevice();
     }
-    qDebug()<<"closed";
+    //qDebug()<<"closed";
 }
 
 bool QFESPIMB040CameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {

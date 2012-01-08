@@ -1617,7 +1617,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
                                     if ((frame%segment_frames)==(segment_frames-1)) {
                                         dccfjk[i]->crossnormalize();
-                                        qDebug()<<"normalize jk ("<<x<<", "<<y<<": "<<i<<") !";
+                                        //qDebug()<<"normalize jk ("<<x<<", "<<y<<": "<<i<<") !";
                                         double* corr1=dccfjk[i]->getCor();
                                         for (register uint32_t tt=0; tt<dccf_N; tt++) {
                                             register double v=corr1[tt];
@@ -1646,7 +1646,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
                                     if ((frame%segment_frames)==(segment_frames-1)) {
                                         double** corr1=dccfjb[i]->get_array_G();
-                                        qDebug()<<"normalize jb ("<<x<<", "<<y<<": "<<i<<") !";
+                                        //qDebug()<<"normalize jb ("<<x<<", "<<y<<": "<<i<<") !";
                                         for (register uint32_t tt=0; tt<dccf_N; tt++) {
                                             register double v=corr1[1][tt];
                                             dccf[i*dccf_N+tt]=dccf[i*dccf_N+tt]+v;
@@ -1833,7 +1833,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
     // if we should use a background file for correction, we read it and create an averaged frame from it.
     if (job.backgroundCorrection==3) {
-        qDebug()<<job.filenameBackground<<QFile::exists(job.filenameBackground);
+        //qDebug()<<job.filenameBackground<<QFile::exists(job.filenameBackground);
         if (QFile::exists(job.filenameBackground)) {
             QFRDRImageReader* reader=NULL;
             bool OK=false;

@@ -25,7 +25,7 @@ void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
         //qDebug()<<"trying "<<fileName;
-        if (!plugin) qDebug()<<"    error: "<<loader.errorString();
+        //if (!plugin) qDebug()<<"    error: "<<loader.errorString();
         if (plugin) {
             //qDebug()<<"instance OK";
             QFExtension* iRecord = qobject_cast<QFExtension*>(plugin);
