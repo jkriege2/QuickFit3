@@ -17,7 +17,7 @@
  */
 class QFExtensionShutter {
     public:
-        virtual ~QFExtensionShutter() {};
+        virtual ~QFExtensionShutter() {}
 
         /** \brief returns the number of shutters controlable by this plugin */
         virtual unsigned int  getShutterCount()  =0;
