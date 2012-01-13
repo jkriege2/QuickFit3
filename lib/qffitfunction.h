@@ -250,7 +250,6 @@ class QFLIB_EXPORT QFFitFunction {
                 double* fitfunc;   /**<  */
                 double* residuals;   /**<  */
                 double* residuals_weighted;   /**<  */
-                double* tauvals;   /**<  */
                 int runAvgMaxN;   /**<  */
                 int runAvgN;   /**<  */
                 double* tau_runavg;   /**<  */

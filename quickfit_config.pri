@@ -18,6 +18,7 @@ BLAS_LIB =
 BLAS_INCLUDE =
 
 
+QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type
 exists(quickfit.inc):include(quickfit.inc)
 
 !win32 {

@@ -38,7 +38,7 @@ QFFitFunction::FitStatistics QFFitFunction::calcFitStatistics(long N, double* ta
     /////////////////////////////////////////////////////////////////////////////////
     // retrieve data and tau-values from rawdata record
     /////////////////////////////////////////////////////////////////////////////////
-    result.runAvgStart=-runAvgWidth/2;
+    result.runAvgStart=-1*runAvgWidth/2;
     result.fitfunc=(double*)calloc(N,sizeof(double));
     result.residuals=(double*)calloc(N,sizeof(double));
     result.residuals_weighted=(double*)calloc(N,sizeof(double));
@@ -112,9 +112,10 @@ QFFitFunction::FitStatistics QFFitFunction::calcFitStatistics(long N, double* ta
                 double s=0, sw=0;
                 double tau=0;
                 for (int j=0; j<runAvgWidth; j++) {
-                    s=s+result.residuals[i+j+result.runAvgStart];
-                    sw=sw+result.residuals_weighted[i+j+result.runAvgStart];
-                    tau+=result.tauvals[i+j+result.runAvgStart];
+                    int idx=i+j+result.runAvgStart;
+                    s=s+result.residuals[idx];
+                    sw=sw+result.residuals_weighted[idx];
+                    tau+=tauvals[idx];
                 }
                 result.tau_runavg[result.runAvgN]=tauvals[i];
                 result.residuals_runavg[result.runAvgN]=s/(double)runAvgWidth;
@@ -188,7 +189,6 @@ QFFitFunction::FitStatistics::FitStatistics() {
     fitfunc=0;
     residuals=0;
     residuals_weighted=0;
-    tauvals=0;
     runAvgMaxN=0;
     runAvgN=0;
     tau_runavg=0;
@@ -232,7 +232,6 @@ void QFFitFunction::FitStatistics::free() {
     if (fitfunc) { std::free(fitfunc); fitfunc=NULL; }
     if (residuals) { std::free(residuals); residuals=NULL; }
     if (residuals_weighted) { std::free(residuals_weighted); residuals_weighted=NULL; }
-    if (tauvals) { std::free(tauvals); tauvals=NULL; }
     if (tau_runavg) { std::free(tau_runavg); tau_runavg=NULL; }
     if (residuals_runavg) { std::free(residuals_runavg); residuals_runavg=NULL; }
     if (residuals_runavg_weighted) { std::free(residuals_runavg_weighted); residuals_runavg_weighted=NULL; }
