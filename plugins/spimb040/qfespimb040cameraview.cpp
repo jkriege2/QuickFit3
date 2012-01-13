@@ -1117,12 +1117,12 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">center = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundError(pout[2], 2)).arg(roundError(pout[3], 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundError(pout[2]*pixelH, 2)).arg(roundError(pout[3]*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
-                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>sigmoidal</td></tr>").arg(status.fnorm);
 
                 marginalResultsSimple+=tr("left:|center = |%1 px|width = |%2 px\n").arg(roundWithError(pout[2], 2)).arg(roundError(pout[3], 2));
                 marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelH, 2)).arg(roundError(pout[3]*pixelH, 2)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
-                marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit\n").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
+                marginalResultsSimple+=tr("|%2%3 = |%1|func:|sigmoidal\n").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
 
 
                 m_dat=pltDataMarginalBottomN;
@@ -1141,13 +1141,13 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td>%2 px</td></tr>").arg(roundError(pout[2], 2)).arg(roundError((pout[3]), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundError(pout[2]*pixelW, 2)).arg(roundError((pout[3])*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
-                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>slit</td></tr>").arg(status.fnorm);
+                marginalResults+=tr("<tr><td><b></b></td><td>&chi;<sup>2</sub> = </td><td>%1</td><td>&nbsp;&nbsp;func:</td><td>sigmoidal</td></tr>").arg(status.fnorm);
                 marginalResults+=tr("</table></center>");
 
                 marginalResultsSimple+=tr("bottom:|average = |%1 px|1. zero = |%2 px\n").arg(roundError(pout[2],  2)).arg(roundError(((pout[3])), 2));
                 marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundError(pout[2]*pixelW, 2)).arg(roundError(((pout[3]))*pixelW, 2)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
-                marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
+                marginalResultsSimple+=tr("|%2%3 = |%1|func:|sigmoidal").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
             }
         }
     }
