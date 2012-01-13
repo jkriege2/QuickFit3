@@ -9,18 +9,13 @@
 QFExtensionShutterServoArduino::QFExtensionShutterServoArduino(QObject* parent):
     QObject(parent)
 {
-    serial=new QF3SimpleB040SerialProtocolHandler(&com, getName());
+    //serial=new QF3SimpleB040SerialProtocolHandler(&com, getName());
 	logService=NULL;
-    shutter_count=4;
-    COMPort="COM1";
-    COMPortSpeed=9600;
-    shutter_operation_duration=150;
-    lastAction=QTime::currentTime();
 
 }
 
 QFExtensionShutterServoArduino::~QFExtensionShutterServoArduino() {
-
+    shutters.clear();
 }
 
 
@@ -28,10 +23,14 @@ void QFExtensionShutterServoArduino::deinit() {
 	/* add code for cleanup here */
     QSettings inifile(services->getGlobalConfigFileDirectory()+"/shutter_servo_arduino.ini", QSettings::IniFormat);
     if (inifile.isWritable()) {
-        inifile.setValue("driver/port", COMPort);
-        inifile.setValue("driver/port_speed", COMPortSpeed);
-        inifile.setValue("driver/shutter_count", shutter_count);
-        inifile.setValue("driver/shutter_operation_duration", shutter_operation_duration);
+        inifile.setValue("shutter_count", getShutterCount());
+        for (int i=0; i<getShutterCount(); i++) {
+            int p=shutters[i].port;
+            if (ports.getCOMPort(p)) {
+                ports.storeCOMPort(p, inifile, "shutter"+QString::number(i+1)+"/");
+                inifile.setValue("shutter"+QString::number(i+1)+"/shutter_operation_duration", shutters[i].shutter_operation_duration);
+            }
+        }
     }
 }
 
@@ -45,10 +44,16 @@ void QFExtensionShutterServoArduino::initExtension() {
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/shutter_servo_arduino.ini");
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/shutter_servo_arduino.ini");
     QSettings inifile(ini, QSettings::IniFormat);
-    COMPort=inifile.value("driver/port", COMPort).toString();
-    COMPortSpeed=inifile.value("driver/port_speed", COMPortSpeed).toUInt();
-    shutter_count=inifile.value("driver/shutter_count", shutter_count).toUInt();
-    shutter_operation_duration=inifile.value("driver/shutter_operation_duration", shutter_operation_duration).toUInt();
+    int shutter_count=inifile.value("shutter_count", 0).toUInt();
+    for (int i=0; i<shutter_count; i++) {
+        SHUTTER s;
+        s.port=ports.addCOMPort(inifile, "shutter"+QString::number(i+1)+"/");
+        s.infoMessage="";
+        s.lastAction=QTime::currentTime();
+        s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
+        s.shutter_operation_duration=inifile.value("shutter"+QString::number(i+1)+"/shutter_operation_duration", 500).toInt();
+        shutters.append(s);
+    }
 }
 
 void QFExtensionShutterServoArduino::loadSettings(ProgramOptions* settingspo) {
@@ -74,60 +79,71 @@ void QFExtensionShutterServoArduino::storeSettings(ProgramOptions* settingspo) {
 }
 
 unsigned int QFExtensionShutterServoArduino::getShutterCount() {
-    return shutter_count;
+    return shutters.size();
 }
 
 void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
-    com.set_port(COMPort.toStdString());
-    com.set_baudrate(COMPortSpeed);
-    com.set_stopbits(JKSConeStopbit);
-    com.set_parity(JKSCnoParity);
-    com.set_databits(JKSC8databits);
-    com.open();
-    if (com.isConnectionOpen()) {
+    if (shutter<0 || shutter>=shutters.size()) return;
+    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    if (!com) return;
+    com->open();
+    if (com->isConnectionOpen()) {
         QTime t;
         t.start();
         // wait CONNECTION_DELAY_MS ms for connection!
         while (t.elapsed()<CONNECTION_DELAY_MS)  {
             QApplication::processEvents();
         }
-        infoMessage=serial->queryCommand("?");
+        shutters[shutter].infoMessage=shutters[shutter].serial->queryCommand("?");
         //qDebug()<<"infoMessage '"<<infoMessage<<"'";
-        if (!(infoMessage.toLower().contains("servo controller") && infoMessage.toLower().contains("jan krieger"))) {
-            com.close();
-            log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(COMPort).arg(COMPortSpeed));
-            log_error(tr("%1 reason: received wrong ID string from shutter driver: string was '%2'\n").arg(LOG_PREFIX).arg(infoMessage));
+        if (!(shutters[shutter].infoMessage.toLower().contains("servo controller") && shutters[shutter].infoMessage.toLower().contains("jan krieger"))) {
+            com->close();
+            log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
+            log_error(tr("%1 reason: received wrong ID string from shutter driver: string was '%2'\n").arg(LOG_PREFIX).arg(shutters[shutter].infoMessage));
         }
     } else {
-        log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(COMPort).arg(COMPortSpeed));
-        log_error(tr("%1 reason: %2\n").arg(LOG_PREFIX).arg(com.getLastError().c_str()));
+        log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
+        log_error(tr("%1 reason: %2\n").arg(LOG_PREFIX).arg(shutters[shutter].serial->getLastError()));
     }
 }
 
 void QFExtensionShutterServoArduino::shutterDisonnect(unsigned int shutter) {
-    com.close();
+    if (shutter<0 || shutter>=shutters.size()) return;
+    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    if (!com) return;
+    com->close();
 }
 
 bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
-    return com.isConnectionOpen();
+    if (shutter<0 || shutter>=shutters.size()) return false;
+    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    if (!com) return false;
+    return com->isConnectionOpen();
 }
 
 bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
-    if (!isShutterConnected(shutter)) return false;
-    QString result=serial->queryCommand(QString("Q")+QString::number(shutter+1));
+    if (shutter<0 || shutter>=shutters.size()) return false;
+    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    if (!com) return false;
+    if (!com->isConnectionOpen()) return false;
+    QString result=shutters[shutter].serial->queryCommand(QString("Q")+QString::number(shutter+1));
     if (result.startsWith("0")) return false;
     else return true;
 }
 
 void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool opened) {
-    if (!isShutterConnected(shutter)) return ;
-    if (opened) serial->sendCommand(QString("S")+QString::number(shutter+1)+"1");
-    else serial->sendCommand(QString("S")+QString::number(shutter+1)+"0");
-    lastAction=QTime::currentTime();
+    if (shutter<0 || shutter>=shutters.size()) return;
+    JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    if (!com) return ;
+    if (!com->isConnectionOpen()) return ;
+    if (opened) shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutter+1)+"1");
+    else shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutter+1)+"0");
+    shutters[shutter].lastAction=QTime::currentTime();
 }
 
 bool QFExtensionShutterServoArduino::isLastShutterActionFinished(unsigned int shutter) {
-    return lastAction.elapsed()>shutter_operation_duration;
+    if (shutter<0 || shutter>=shutters.size()) return true;
+    return shutters[shutter].lastAction.elapsed()>shutters[shutter].shutter_operation_duration;
 }
 
 QString QFExtensionShutterServoArduino::getShutterDescription(unsigned int shutter)  {
@@ -140,7 +156,7 @@ QString QFExtensionShutterServoArduino::getShutterShortName(unsigned int shutter
 
 
 void QFExtensionShutterServoArduino::showShutterSettingsDialog(unsigned int shutter, QWidget* parent) {
-
+/*
     bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/shutter_servo_arduino.ini", QSettings::IniFormat).isWritable();
 
 
@@ -185,7 +201,11 @@ void QFExtensionShutterServoArduino::showShutterSettingsDialog(unsigned int shut
 
     } else {
         QMessageBox::information(parent, getName(), tr("Your user account is not allowd to write to the global config directory!"));
-    }
+    }*/
+    QString ini1=services->getGlobalConfigFileDirectory()+QString("/shutter_servo_arduino.ini");
+    QString ini2=services->getConfigFileDirectory()+QString("/shutter_servo_arduino.ini");
+    QString ini3=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/shutter_servo_arduino.ini");
+    QMessageBox::information(parent, getName(), tr("There is no configuration dialog for this device. Set all config in the appropriate ini file:\n  %1\n  or: %2\n  or: %3").arg(ini1).arg(ini2).arg(ini3));
 }
 
 

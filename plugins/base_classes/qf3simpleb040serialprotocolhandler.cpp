@@ -14,10 +14,12 @@ void QF3SimpleB040SerialProtocolHandler::setLogging(QFPluginLogService* log, QSt
 }
 
 void QF3SimpleB040SerialProtocolHandler::sendCommand(QString command) {
+    if (!com) return;
     com->write(QString(command+"\n").toStdString());
 }
 
 QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
+    if (!com) return "";
     std::string res="";
     //std::cout<<"\n\ncommand: '"<<command<<"'\n";
     com->clearBuffer();
@@ -37,12 +39,24 @@ QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
 }
 
 void QF3SimpleB040SerialProtocolHandler::checkComError() {
+    if (!com) return;
     if (com->hasErrorOccured()) {
         if (log) log->log_error(QObject::tr("%1 serial port error: %2\n").arg(LOG_PREFIX).arg(com->getLastError().c_str()));
     }
 }
 
+bool QF3SimpleB040SerialProtocolHandler::hasErrorOccured() {
+    if (!com) return true;
+    return com->hasErrorOccured();
+}
+
+QString QF3SimpleB040SerialProtocolHandler::getLastError() {
+    if (!com) return QObject::tr("no COM port given to QF3SimpleB040SerialProtocolHandler");
+    return com->getLastError().c_str();
+}
+
 bool QF3SimpleB040SerialProtocolHandler::checkComConnected() {
+    if (!com) return false;
     bool c=com->isConnectionOpen();
     if (!c) {
         if (log) log->log_error(QObject::tr("%1 Could not connect to %2!!!\n").arg(LOG_PREFIX).arg(name));

@@ -17,11 +17,13 @@ include(../../libquickfitwidgets.pri)
 HEADERS += shutter_servo_arduino.h \
            ../interfaces/qfextensionshutter.h \
            ../../../../../LIB/trunk/jkserialconnection.h \
-    ../base_classes/qf3simpleb040serialprotocolhandler.h
+    ../base_classes/qf3simpleb040serialprotocolhandler.h \
+    ../base_classes/qf3comportmanager.h
 
 SOURCES += shutter_servo_arduino.cpp \
            ../../../../../LIB/trunk/jkserialconnection.cpp \
-    ../base_classes/qf3simpleb040serialprotocolhandler.cpp
+    ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
+    ../base_classes/qf3comportmanager.cpp
 
 FORMS =
 

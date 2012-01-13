@@ -4,9 +4,11 @@
 #include <time.h>
 #include <QObject>
 #include <QVector>
+#include <QList>
 #include "qfextension.h"
 #include "../interfaces/qfextensionshutter.h"
 #include "../base_classes/qf3simpleb040serialprotocolhandler.h"
+#include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
 
 /*!
@@ -49,7 +51,7 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
 
@@ -108,8 +110,21 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
 
 	protected:
         QFPluginLogService* logService;
+        QF3ComPortManager ports;
 
 
+
+
+        struct SHUTTER {
+            QF3SimpleB040SerialProtocolHandler* serial;
+            int port;
+            /** \brief duration of a shutter operation in milliseconds */
+            unsigned int shutter_operation_duration;
+            QString infoMessage;
+            QTime lastAction;
+        };
+
+        QList<SHUTTER> shutters;
 
         /** \brief number of servos/shutters */
         unsigned int shutter_count;
