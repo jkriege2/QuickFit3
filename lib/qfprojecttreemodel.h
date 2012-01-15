@@ -5,6 +5,7 @@
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
 #include "lib_imexport.h"
+#include "qfprojecttreemodelnode.h"
 
 // forward declaration
 class QFProject;
@@ -24,6 +25,18 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
     protected:
         /** \brief the project represented by this data model */
         QFProject* current;
+        QFProjectTreeModelNode* rootItem;
+        QFProjectTreeModelNode* projectItem;
+        QFProjectTreeModelNode* rdrFolderItem;
+        QFProjectTreeModelNode* evalFolderItem;
+
+        void createModelTree();
+        /** \brief returns a QModelIndex which points to the specified record */
+        QModelIndex index ( QFRawDataRecord* record, QFProjectTreeModelNode* folder) const;
+
+        /** \brief returns a QModelIndex which points to the specified record */
+        QModelIndex index ( QFEvaluationItem* record, QFProjectTreeModelNode* folder) const;
+
     public:
         virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
         virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
@@ -40,28 +53,21 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         QFEvaluationItem* getEvaluationByIndex(const QModelIndex& index) const;
 
         /** \brief returns a QModelIndex which points to the specified record */
-        QModelIndex index ( QFRawDataRecord* record, int column=0 ) const;
+        QModelIndex index ( QFRawDataRecord* record) const;
 
         /** \brief returns a QModelIndex which points to the specified record */
-        QModelIndex index ( QFEvaluationItem* record, int column=0 ) const;
+        QModelIndex index ( QFEvaluationItem* record) const;
 
-        enum nodeType {
-            qfpntUnknown=0,
-            qfpntRoot=1,
-            qfpntProject=2,
-            qfpntRawDataDir=3,
-            qfpntRawDataRecord=4,
-            qfpntEvaluationDir=5,
-            qfpntEvaluationRecord=6
-        };
+        QModelIndex index ( QFProjectTreeModelNode* node ) const;
+
         /** \brief returns the type of the supplied index */
-        nodeType classifyIndex(const QModelIndex& index) const;
-        /** \brief convert a nodeType into a string */
-        QString nodeType2String( const nodeType nt) const;
+        QFProjectTreeModelNode::nodeType classifyIndex(const QModelIndex& index) const;
     protected slots:
         /** \brief connected to the propertiesChanged() slot of the owning QFEvaluationItem. Used to
          *         tell the model that something has changed */
-        void projectChanged(bool data=true);
+        void projectStructureChanged();
+
+        void projectDataChanged();
 };
 
 #endif // QFPROJECTTREEMODEL_H

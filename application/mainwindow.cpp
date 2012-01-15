@@ -1015,8 +1015,8 @@ QString MainWindow::strippedName(const QString &fullFileName) {
 void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
     if (project) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        QFProjectTreeModel::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
-        if (nt==QFProjectTreeModel::qfpntRawDataRecord) {
+        QFProjectTreeModelNode::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
+        if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(index);
             if (rec) {
                 QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
@@ -1024,7 +1024,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
                 rawDataPropEditors.append(edt);
                 edt->show();
             }
-        } else if (nt==QFProjectTreeModel::qfpntEvaluationRecord) {
+        } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
                 QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
@@ -1068,14 +1068,14 @@ void MainWindow::readProjectProperties() {
 
 void MainWindow::deleteItem() {
     if (project) {
-        QFProjectTreeModel::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
-        if (nt==QFProjectTreeModel::qfpntRawDataRecord) {
+        QFProjectTreeModelNode::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
+        if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
                 project->deleteRawData(rec->getID());
                 tvMain->expandToDepth(2);
             }
-        } else if (nt==QFProjectTreeModel::qfpntEvaluationRecord) {
+        } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
                 project->deleteEvaluation(rec->getID());

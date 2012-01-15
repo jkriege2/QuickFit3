@@ -73,17 +73,19 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline QFRawDataRecord* getPreviousOfSameType() { return project->getPreviousRawDataOfSameType(this); }
 
         /** \brief return the ID */
-        inline int getID() { return ID; }
+        inline int getID() const { return ID; }
         /** \brief return the name */
-        inline QString getName() { return name; }
+        inline QString getName() const { return name; }
         /** \brief return the description  */
-        inline QString getDescription() { return description; }
+        inline QString getDescription() const { return description; }
         /** \brief return the list of linked files */
-        inline QStringList getFiles() { return files; }
+        inline QStringList getFiles() const { return files; }
         /** \brief return the list of linked files */
-        inline QStringList getFilesTypes() { return files_types; }
+        inline QStringList getFilesTypes() const { return files_types; }
         /** \brief return a pointer to the project that contains this QRawDatarecord */
-        inline QFProject* getProject() { return project; }
+        inline QFProject* getProject() const { return project; }
+        /** \brief return the folder */
+        inline QString getFolder() const { return folder; }
 
 
         /** \brief returns \c true if an error occured */
@@ -95,15 +97,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
     public slots:
         /** \brief set the name */
-        inline void setName(const QString n) {
-            name=n;
-            emitPropertiesChanged();
-        }
+        void setName(const QString n);
+        /** \brief set the folder */
+        void setFolder(const QString n);
         /** \brief set the description  */
-        inline void setDescription(const QString& d) {
-            description=d;
-            emitPropertiesChanged();
-        };
+        void setDescription(const QString& d);
         /** \brief returns a model which may be used to access and edit the properties in this object  */
         QFRDRPropertyModel* getPropertyModel();
     signals:
@@ -113,6 +111,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsChanged();
         /** \brief emitted whenever the data in this object changes */
         void rawDataChanged();
+        /** \brief emitted whenever the folder changes */
+        void folderChanged();
     public:
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged();
@@ -140,6 +140,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QString name;
         /** \brief description of the raw data record */
         QString description;
+        /** \brief folder for grouing in prject tree */
+        QString folder;
         /** \brief list of files connected with this record */
         QStringList files;
         /** \brief list of the types of the files connected with this record (see files) */

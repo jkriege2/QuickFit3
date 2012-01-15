@@ -14,6 +14,7 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     errorOcc=false;
     errorDesc="";
     name="";
+    folder="";
     description="";
     resultsmodel=NULL;
     propModel=NULL;
@@ -76,6 +77,22 @@ QFRawDataRecord::~QFRawDataRecord() {
     //std::cout<<"deleting QFRawDataRecord ... OK\n";
 }
 
+void QFRawDataRecord::setName(const QString n) {
+    name=n;
+    emitPropertiesChanged();
+}
+/** \brief set the folder */
+void QFRawDataRecord::setFolder(const QString n) {
+    folder=n;
+    emitPropertiesChanged();
+    if (project) project->setStructureChanged();
+}
+/** \brief set the description  */
+void QFRawDataRecord::setDescription(const QString& d) {
+    description=d;
+    emitPropertiesChanged();
+};
+
 void QFRawDataRecord::readXML(QDomElement& e) {
     bool ok=true;
     name=e.attribute("name", "rawdatarecord");
@@ -85,6 +102,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
         setError(tr("ID %1 in <rawdatarecord name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
         return;
     }
+    folder=e.attribute("folder", "");
     QDomElement te=e.firstChildElement("description");
     if (te.isNull()) { description=""; } else { description=te.text(); }
     //std::cout<<"    reading XML: properties\n";
@@ -118,21 +136,21 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                 r.sortPriority=QVariant(re.attribute("sortprior", "false")).toBool();
                 //r.name=n;
                 r.type=qfrdreInvalid;
-                if (t=="boolean") {
+                if (t=="boolean"  || t=="bool") {
                     r.type=qfrdreBoolean;
                     r.bvalue=QVariant(re.attribute("value", "false")).toBool();
-                } else if (t=="integer") {
+                } else if (t=="integer" || t=="int") {
                     r.type=qfrdreInteger;
                     r.ivalue=loc.toInt(re.attribute("value", "0"));
                     r.unit=re.attribute("unit", "");
-                } else if (t=="string") {
+                } else if (t=="string" || t=="str") {
                     r.type=qfrdreString;
                     r.svalue=re.attribute("value", "");
-                } else if (t=="number") {
+                } else if (t=="number" || t=="num") {
                     r.type=qfrdreNumber;
                     r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
                     r.unit=re.attribute("unit", "");
-                } else if (t=="numberlist") {
+                } else if (t=="numberlist" || t=="numlst") {
                     r.type=qfrdreNumberVector;
                     r.dvec.clear();
                     QStringList s=re.attribute("value", "0.0").split(";");
@@ -143,7 +161,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                         else { r.dvec.append(0); }
                     }
                     r.unit=re.attribute("unit", "");
-                } else if (t=="numbermatrix") {
+                } else if (t=="numbermatrix" || t=="nummtrx") {
                     r.type=qfrdreNumberVector;
                     r.dvec.clear();
                     QStringList s=re.attribute("value", "0.0").split(";");
@@ -155,7 +173,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     }
                     r.unit=re.attribute("unit", "");
                     r.columns=loc.toInt(re.attribute("columns", "0"));
-                } else if (t=="numbererror") {
+                } else if (t=="numbererror" || t=="numerr") {
                     r.type=qfrdreNumberError;
                     r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
                     r.derror=loc.toDouble(re.attribute("error", "0.0"));
@@ -213,8 +231,9 @@ void QFRawDataRecord::readXML(QDomElement& e) {
 void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
     w.writeStartElement("rawdataelement");
     w.writeAttribute("type", getType());
-    w.writeAttribute("name", name);
     w.writeAttribute("id", QString::number(ID));
+    w.writeAttribute("name", name);
+    w.writeAttribute("folder", folder);
     w.writeStartElement("description");
     w.writeCDATA(description);
     w.writeEndElement();

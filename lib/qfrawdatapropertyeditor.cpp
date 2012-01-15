@@ -129,24 +129,31 @@ void QFRawDataPropertyEditor::createWidgets() {
     fl->addWidget(edtName, 2, 1);
     fl->setRowStretch(2,1);
 
+    edtFolder=new QLineEdit(w);
+    fl->addWidget((l=new QLabel(tr("&Folder:"), w)), 3, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setBuddy(edtFolder);
+    fl->addWidget(edtFolder, 3, 1);
+    fl->setRowStretch(3,1);
+
     pteDescription=new QPlainTextEdit(w);
     pteDescription->setSizePolicy( pteDescription->sizePolicy().horizontalPolicy(),QSizePolicy::Preferred);
 
     //fl->addRow(tr("&Description:"), pteDescription);
-    fl->addWidget((l=new QLabel(tr("&Description:"), w)), 3, 0);
+    fl->addWidget((l=new QLabel(tr("&Description:"), w)), 4, 0);
     l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
     l->setBuddy(pteDescription);
-    fl->addWidget(pteDescription, 3, 1);
-    fl->setRowStretch(3,1);
+    fl->addWidget(pteDescription, 4, 1);
+    fl->setRowStretch(4,1);
     //fl->setRowStretch(flcounter-1, 2);
     lstFiles=new QListWidget(w);
     lstFiles->setSizePolicy(lstFiles->sizePolicy().verticalPolicy(), QSizePolicy::Preferred);
     //fl->addRow(tr("&Files:"), lstFiles);
-    fl->addWidget((l=new QLabel(tr("&Files:"), w)), 4, 0);
+    fl->addWidget((l=new QLabel(tr("&Files:"), w)), 5, 0);
     l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
     l->setBuddy(lstFiles);
-    fl->addWidget(lstFiles, 4, 1);
-    fl->setRowStretch(4,1);
+    fl->addWidget(lstFiles, 5, 1);
+    fl->setRowStretch(5,1);
     //fl->setRowStretch(flcounter-1, 1);
     tvProperties=new QTableView(w);
     QFontMetrics fm(font());
@@ -171,10 +178,10 @@ void QFRawDataPropertyEditor::createWidgets() {
     pl2->addWidget(btnDeleteProperty);
     pl2->addStretch();
     //fl->addRow(tr("Properties:"), widProperties);
-    fl->addWidget((l=new QLabel(tr("Properties:"), w)), 5, 0);
+    fl->addWidget((l=new QLabel(tr("Properties:"), w)), 6, 0);
     l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
-    fl->addWidget(widProperties, 5, 1);
-    fl->setRowStretch(5,3);
+    fl->addWidget(widProperties, 6, 1);
+    fl->setRowStretch(6,3);
     //fl->setRowStretch(flcounter-1, 5);
 
     widResults=new QWidget(this);
@@ -241,11 +248,12 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         oldEditorCount=current->getEditorCount();
         disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         disconnect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        disconnect(edtFolder, SIGNAL(textChanged(const QString&)), this, SLOT(folderChanged(const QString&)));
         disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         disconnect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesTable()));
         disconnect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
-        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
         if (c) {
             if (c->getType()!=oldType) {
                 for (int i=editorList.size()-1; i>=0; i--) {
@@ -294,6 +302,9 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         }
         edtName->setText(current->getName());
         edtName->setEnabled(true);
+        edtFolder->setText(current->getFolder());
+        edtFolder->setEnabled(true);
+
         pteDescription->setPlainText(current->getDescription());
         pteDescription->setEnabled(true);
         labID->setText(QString::number(current->getID()));
@@ -314,8 +325,10 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         tvProperties->setModel(current->getPropertyModel());
         tvProperties->setEnabled(true);
         tvResults->setModel(current->resultsGetModel());
-        connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
         connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
+        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        connect(edtFolder, SIGNAL(textChanged(const QString&)), this, SLOT(folderChanged(const QString&)));
         connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
         connect(current->getPropertyModel(), SIGNAL(modelReset()), tvProperties, SLOT(resizeColumnsToContents()));
@@ -342,6 +355,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
     } else {
         edtName->setText("");
         edtName->setEnabled(false);
+        edtFolder->setText("");
+        edtFolder->setEnabled(false);
         pteDescription->setPlainText("");
         pteDescription->setEnabled(false);
         labTopIcon->setText("");
@@ -370,6 +385,12 @@ void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
 void QFRawDataPropertyEditor::nameChanged(const QString& text) {
     if (current) {
         current->setName(text);
+    }
+}
+
+void QFRawDataPropertyEditor::folderChanged(const QString& text) {
+    if (current) {
+        current->setFolder(text);
     }
 }
 
@@ -427,6 +448,9 @@ void QFRawDataPropertyEditor::propsChanged() {
     if (current) {
         if (current->getName()!=edtName->text()) {
             edtName->setText(current->getName());
+        }
+        if (current->getFolder()!=edtFolder->text()) {
+            edtFolder->setText(current->getFolder());
         }
         if (current->getDescription()!=pteDescription->toPlainText()) {
             pteDescription->setPlainText(current->getDescription());

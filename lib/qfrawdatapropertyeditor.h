@@ -47,6 +47,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);
+        /** \brief called when the folder editor changes its contents */
+        void folderChanged(const QString& text);
         /** \brief called when the description editor changes its contents */
         void descriptionChanged();
         /** \brief this will be connected to the project to indicate when  the currently
@@ -78,8 +80,10 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
-        /** \brief QLineEdit for the Name */
+        /** \brief QLineEdit for the name */
         QLineEdit* edtName;
+        /** \brief QLineEdit for the folder */
+        QLineEdit* edtFolder;
         /** \brief QPlainTextEdit for the description */
         QPlainTextEdit* pteDescription;
         /** \brief list of files associated with this rawdatarecord */
