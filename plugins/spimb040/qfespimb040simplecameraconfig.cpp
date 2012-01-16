@@ -70,10 +70,8 @@ void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* plugin
     if (pluginServices) m_extManager=pluginServices->getExtensionManager();
     cmbAcquisitionDevice->init(m_extManager);
     cmbPreviewConfiguration->init(configDirectory);
-    cmbAcquisitionConfiguration->init(configDirectory);
     if (m_pluginServices) {
         cmbPreviewConfiguration->init(m_pluginServices->getConfigFileDirectory());
-        cmbAcquisitionConfiguration->init(m_pluginServices->getConfigFileDirectory());
     }
     camView->init(camViewID, this);
     setTitle(tr(" Camera %1: ").arg(camViewID+1));
@@ -113,7 +111,7 @@ void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
     //qDebug()<<"closed";
 }
 
-bool QFESPIMB040SimpleCameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {
+bool QFESPIMB040SimpleCameraConfig::lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
     if (locked || (!actDisConnect->isChecked()) || (!viewData.camera) || (!viewData.extension)) {
         *camera=-1;
         *extension=NULL;
@@ -130,8 +128,6 @@ bool QFESPIMB040SimpleCameraConfig::lockCamera(QFExtension** extension, QFExtens
 
     QString filename="";
     *previewSettingsFilename="";
-    *acquisitionSettingsFilename="";
-    *acquisitionSettingsFilename=cmbAcquisitionConfiguration->currentConfigFilename();
     //if (cmbPreviewConfiguration->currentIndex()>=0) *previewSettingsFilename=cmbPreviewConfiguration->itemData(cmbPreviewConfiguration->currentIndex()).toString();
     *previewSettingsFilename=cmbPreviewConfiguration->currentConfigFilename();
     *extension=viewData.extension;
@@ -161,7 +157,6 @@ void QFESPIMB040SimpleCameraConfig::loadSettings(QSettings& settings, QString pr
     cmbAcquisitionDevice->loadSettings(settings, prefix+"device/");
     spinAcquisitionDelay->setValue(settings.value(prefix+"acquisition_delay", 0).toDouble());
     cmbPreviewConfiguration->setCurrentConfig(settings.value(prefix+"preview_config", "default").toString());
-    cmbAcquisitionConfiguration->setCurrentConfig(settings.value(prefix+"acquisition_config", "default").toString());
 }
 
 void QFESPIMB040SimpleCameraConfig::storeSettings(QSettings& settings, QString prefix) {
@@ -170,7 +165,6 @@ void QFESPIMB040SimpleCameraConfig::storeSettings(QSettings& settings, QString p
     settings.setValue(prefix+"enabled", isChecked());
     //settings.setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings.setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings.setValue(prefix+"acquisition_config", cmbAcquisitionConfiguration->currentConfigName());//currentConfigFilename());
     settings.setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
     cmbAcquisitionDevice->storeSettings(settings, prefix+"device/");
 
@@ -246,11 +240,6 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     hbl->addWidget(btnPreviewContinuous);
     hbl->addStretch();
     camlayout->addRow("", hbl);
-
-
-    cmbAcquisitionConfiguration=new QFCameraConfigEditorWidget(this);
-    cmbAcquisitionConfiguration->connectTo(cmbAcquisitionDevice);
-    camlayout->addRow(tr("<b>Acquisition:</b>"), cmbAcquisitionConfiguration);
 }
 
 
@@ -294,7 +283,6 @@ void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig:
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(true);
-        cmbAcquisitionConfiguration->setEnabled(true);
         spinAcquisitionDelay->setEnabled(true);
 
 
@@ -313,7 +301,6 @@ void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig:
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(true);
-        cmbAcquisitionConfiguration->setEnabled(true);
         spinAcquisitionDelay->setEnabled(true);
 
 
@@ -332,7 +319,6 @@ void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig:
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(false);
-        cmbAcquisitionConfiguration->setEnabled(false);
         spinAcquisitionDelay->setEnabled(false);
 
 
@@ -351,7 +337,6 @@ void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig:
 
         cmbAcquisitionDevice->setEnabled(false);
         cmbPreviewConfiguration->setEnabled(false);
-        cmbAcquisitionConfiguration->setEnabled(false);
         spinAcquisitionDelay->setEnabled(false);
     } else { // Disconnected
         setEnabled(true);
@@ -368,7 +353,6 @@ void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig:
 
         cmbAcquisitionDevice->setEnabled(true);
         cmbPreviewConfiguration->setEnabled(false);
-        cmbAcquisitionConfiguration->setEnabled(false);
         spinAcquisitionDelay->setEnabled(false);
     }
 }

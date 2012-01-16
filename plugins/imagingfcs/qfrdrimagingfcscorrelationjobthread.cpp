@@ -225,7 +225,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     video_count=floor(frames/job.video_frames);
                     real_video_count=video_count;
                     video=(float*)calloc(frame_width*frame_height*video_count, sizeof(float));
-
+                    bleachOffset=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    bleachAmplitude=(float*)calloc(frame_width*frame_height, sizeof(float));
 
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     // CREATE FILENAMES FOR RESULTS AND MAKE SURE THE DIRECTORY FOR THE FILES EXISTS (mkpath() )
@@ -577,6 +578,18 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"DCCF frame height           : "<<outLocale.toString(dccfframe_height) << "\n";
 
                                 }
+                                text<<"bleach correction           : ";
+                                if (job.bleach==2) {
+                                    text<<"remove exponential\n";
+                                    text<<"bleach decay constant [pix] : "<<outLocale.toString(job.bleachDecay) << "\n";
+                                    text<<"bleach decay constant [s]   : "<<outLocale.toString((double)job.bleachDecay*job.frameTime) << "\n";
+
+                                } else if (job.bleach==1) {
+                                        text<<"remove frame average\n";
+
+                                } else {
+                                    text<<"none";
+                                }
                                 text<<"duration [s]                : "<<ptime.elapsed()/1000.0 << "\n";
 
                                 f.close();
@@ -594,6 +607,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     }
 
                     if (video) free(video);
+                    if (bleachOffset) free(bleachOffset);
+                    if (bleachAmplitude) free(bleachAmplitude);
                     if (average_frame) free(average_frame);
                     if (acf_tau) free(acf_tau);
                     if (acf) free(acf);

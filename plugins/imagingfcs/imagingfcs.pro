@@ -36,7 +36,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/frame.h \
     ../../../../../LIB/trunk/crc_ccitt.h \
     ../../../../../LIB/trunk/crc.h \
-    ../base_classes/qfhistogramview.h
+    ../base_classes/qfhistogramview.h \
+    qfrdrimagingfcsdataexplorer.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -54,11 +55,13 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../../../../../LIB/trunk/statistics_tools.cpp \
     ../base_classes/qfrdrimagereaderrh.cpp \
     ../base_classes/qfrdrimagereader.cpp \
-    ../base_classes/qfhistogramview.cpp
+    ../base_classes/qfhistogramview.cpp \
+    qfrdrimagingfcsdataexplorer.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
-    qfrdrimagingfcsthreadprogress.ui
+    qfrdrimagingfcsthreadprogress.ui \
+    qfrdrimagingfcsdataexplorer.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 

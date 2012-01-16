@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1120</width>
-    <height>704</height>
+    <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,14 +85,14 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="labDetails">
         <property name="text">
          <string>&lt;b&gt;Details:&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QFrame" name="widDetails">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -104,13 +104,46 @@
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
-         <property name="leftMargin">
+         <property name="horizontalSpacing">
+          <number>6</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>2</number>
+         </property>
+         <property name="margin">
           <number>0</number>
          </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item row="0" column="0">
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
+           <item>
+            <widget class="QPushButton" name="btnDataExplorer">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>&amp;Data Explorer</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_25">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
           <widget class="QLabel" name="label_21">
            <property name="text">
             <string>&amp;output:</string>
@@ -120,7 +153,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,0,1,0,0,2">
            <item>
             <widget class="QLabel" name="label_5">
@@ -220,7 +253,7 @@
            </item>
           </layout>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_18">
            <property name="text">
             <string>frame &amp;range:</string>
@@ -230,7 +263,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
             <widget class="QLabel" name="label_19">
@@ -350,16 +383,13 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_27">
+            <spacer name="horizontalSpacer_21">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
+               <width>40</width>
                <height>20</height>
               </size>
              </property>
@@ -375,22 +405,9 @@
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_21">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>frame &amp;timing:</string>
@@ -400,7 +417,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="QLabel" name="label_15">
@@ -473,16 +490,13 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_28">
+            <spacer name="horizontalSpacer_3">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
+               <width>40</width>
                <height>20</height>
               </size>
              </property>
@@ -498,33 +512,136 @@
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_32">
+         <item row="4" column="0">
+          <widget class="QCheckBox" name="chkCrop">
            <property name="text">
-            <string>&amp;binning</string>
-           </property>
-           <property name="buddy">
-            <cstring>spinBinning</cstring>
+            <string>&amp;cropping</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <item>
+            <widget class="QWidget" name="widSubregion" native="true">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_34">
+                <property name="text">
+                 <string>x = </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinXFirst">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_35">
+                <property name="text">
+                 <string> ... </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinXLast">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_30">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>10</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_36">
+                <property name="text">
+                 <string>y = </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinYFirst">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_37">
+                <property name="text">
+                 <string> ... </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinYLast">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_32">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>&amp;binning</string>
+             </property>
+             <property name="buddy">
+              <cstring>spinBinning</cstring>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QSpinBox" name="spinBinning">
              <property name="suffix">
@@ -559,116 +676,6 @@
             </widget>
            </item>
           </layout>
-         </item>
-         <item row="4" column="0">
-          <widget class="QCheckBox" name="chkCrop">
-           <property name="text">
-            <string>&amp;cropping</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QWidget" name="widSubregion" native="true">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_18">
-            <property name="margin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_34">
-              <property name="text">
-               <string>x = </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinXFirst">
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_35">
-              <property name="text">
-               <string> ... </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinXLast">
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_30">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_36">
-              <property name="text">
-               <string>y = </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinYFirst">
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_37">
-              <property name="text">
-               <string> ... </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinYLast">
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_32">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_12">
@@ -799,6 +806,126 @@
           </layout>
          </item>
          <item row="7" column="0">
+          <widget class="QLabel" name="label_39">
+           <property name="text">
+            <string>&amp;bleach correction:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cmbBleachType</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
+           <item>
+            <widget class="QComboBox" name="cmbBleachType">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+             <item>
+              <property name="text">
+               <string>none</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>subtract average</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>subtract exponential</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_26">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QWidget" name="widBleach" native="true">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="labDecayLabel">
+                <property name="text">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;decay time τ [pixels] =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinDecay</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="spinDecay">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>100.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_15">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="labDecay">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="8" column="0">
           <widget class="QLabel" name="label_26">
            <property name="text">
             <string>correlation &amp;functions:</string>
@@ -808,7 +935,7 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QCheckBox" name="chkACF">
@@ -886,16 +1013,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labSegments">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::RichText</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="horizontalSpacer_20">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -908,9 +1025,19 @@
              </property>
             </spacer>
            </item>
+           <item>
+            <widget class="QLabel" name="labSegments">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
-         <item row="8" column="1">
+         <item row="9" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_16">
            <item>
             <widget class="QCheckBox" name="chkDistanceCCD">
@@ -1005,7 +1132,7 @@
            </item>
           </layout>
          </item>
-         <item row="9" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -1015,7 +1142,7 @@
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="10" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1142,7 +1269,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QLabel" name="label_11">
+              <widget class="QLabel" name="labM">
                <property name="text">
                 <string># lag factor (&amp;m):</string>
                </property>
@@ -1159,29 +1286,6 @@
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_15">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>6</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="labCorrelator">
-               <property name="text">
-                <string>&amp;tau;&lt;sub&gt;min&lt;/sub&gt;=1</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -1194,11 +1298,18 @@
                </property>
               </spacer>
              </item>
+             <item>
+              <widget class="QLabel" name="labCorrelator">
+               <property name="text">
+                <string>&amp;tau;&lt;sub&gt;min&lt;/sub&gt;=1</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
           </layout>
          </item>
-         <item row="10" column="0">
+         <item row="11" column="0">
           <widget class="QLabel" name="label_27">
            <property name="text">
             <string>&amp;statistics:</string>
@@ -1208,7 +1319,7 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="1">
+         <item row="11" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="QLabel" name="label_29">
@@ -1244,16 +1355,13 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_25">
+            <spacer name="horizontalSpacer_23">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>6</width>
+               <width>40</width>
                <height>20</height>
               </size>
              </property>
@@ -1269,22 +1377,9 @@
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_23">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </item>
-         <item row="11" column="0">
+         <item row="12" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
             <string>&amp;video:</string>
@@ -1294,7 +1389,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="1">
+         <item row="12" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QCheckBox" name="chkVideo">
@@ -1353,16 +1448,13 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_26">
+            <spacer name="horizontalSpacer_10">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
+               <width>40</width>
                <height>20</height>
               </size>
              </property>
@@ -1378,29 +1470,16 @@
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_10">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </item>
-         <item row="12" column="1">
+         <item row="13" column="1">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="13" column="0">
+         <item row="14" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -1410,7 +1489,7 @@
            </property>
           </widget>
          </item>
-         <item row="13" column="1">
+         <item row="14" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -1586,7 +1665,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>1080</width>
-           <height>105</height>
+           <height>69</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1677,6 +1756,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>edtImageFile</tabstop>
   <tabstop>btnSelectImageFile</tabstop>
   <tabstop>btnLoad</tabstop>
+  <tabstop>btnDataExplorer</tabstop>
   <tabstop>cmbFileformat</tabstop>
   <tabstop>edtPrefix</tabstop>
   <tabstop>edtPostfix</tabstop>
@@ -1686,18 +1766,24 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinLastFrame</tabstop>
   <tabstop>edtFrameTime</tabstop>
   <tabstop>edtFrameRate</tabstop>
-  <tabstop>spinBinning</tabstop>
+  <tabstop>chkCrop</tabstop>
   <tabstop>spinXFirst</tabstop>
   <tabstop>spinXLast</tabstop>
   <tabstop>spinYFirst</tabstop>
   <tabstop>spinYLast</tabstop>
+  <tabstop>spinBinning</tabstop>
   <tabstop>cmbBackground</tabstop>
   <tabstop>edtOffset</tabstop>
   <tabstop>edtBackgroundFile</tabstop>
   <tabstop>btnSelectBackgroundFile</tabstop>
+  <tabstop>cmbBleachType</tabstop>
+  <tabstop>spinDecay</tabstop>
   <tabstop>chkACF</tabstop>
   <tabstop>chkCCF</tabstop>
   <tabstop>spinSegments</tabstop>
+  <tabstop>chkDistanceCCD</tabstop>
+  <tabstop>spinDistanceCCFDeltaX</tabstop>
+  <tabstop>spinDistanceCCFDeltaY</tabstop>
   <tabstop>cmbCorrelator</tabstop>
   <tabstop>spinS</tabstop>
   <tabstop>spinP</tabstop>
@@ -1708,6 +1794,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>chkAddToProject</tabstop>
   <tabstop>btnAddJob</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>spinProcesses</tabstop>
   <tabstop>btnHelp</tabstop>
   <tabstop>pushButton</tabstop>
  </tabstops>
@@ -1723,8 +1810,8 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>867</x>
-     <y>692</y>
+     <x>1109</x>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
      <x>719</x>
@@ -1740,11 +1827,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>265</x>
-     <y>418</y>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>437</x>
-     <y>420</y>
+     <y>407</y>
     </hint>
    </hints>
   </connection>
@@ -1756,11 +1843,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>265</x>
-     <y>418</y>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>506</x>
-     <y>420</y>
+     <y>407</y>
     </hint>
    </hints>
   </connection>
@@ -1772,11 +1859,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>150</x>
-     <y>190</y>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
-     <x>583</x>
-     <y>193</y>
+     <x>621</x>
+     <y>185</y>
     </hint>
    </hints>
   </connection>
@@ -1787,12 +1874,12 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>241</x>
-     <y>158</y>
+     <x>730</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
-     <y>698</y>
+     <y>616</y>
     </hint>
    </hints>
   </connection>
@@ -1803,12 +1890,12 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>182</y>
+     <x>278</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
-     <y>680</y>
+     <y>616</y>
     </hint>
    </hints>
   </connection>
@@ -1819,12 +1906,12 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>329</x>
+     <x>353</x>
      <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>275</x>
-     <y>682</y>
+     <y>616</y>
     </hint>
    </hints>
   </connection>
@@ -1835,12 +1922,12 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>570</x>
-     <y>186</y>
+     <x>443</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>365</x>
-     <y>681</y>
+     <y>616</y>
     </hint>
    </hints>
   </connection>
@@ -1851,12 +1938,12 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>642</x>
-     <y>186</y>
+     <x>518</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
-     <y>692</y>
+     <y>616</y>
     </hint>
    </hints>
   </connection>
@@ -1867,12 +1954,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>298</x>
-     <y>299</y>
+     <x>321</x>
+     <y>303</y>
     </hint>
     <hint type="destinationlabel">
-     <x>363</x>
-     <y>296</y>
+     <x>374</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>
@@ -1883,12 +1970,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>298</y>
+     <x>321</x>
+     <y>303</y>
     </hint>
     <hint type="destinationlabel">
-     <x>409</x>
-     <y>294</y>
+     <x>435</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>
@@ -1899,12 +1986,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>224</x>
-     <y>295</y>
+     <x>321</x>
+     <y>303</y>
     </hint>
     <hint type="destinationlabel">
-     <x>437</x>
-     <y>299</y>
+     <x>462</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>
@@ -1915,12 +2002,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>217</x>
-     <y>293</y>
+     <x>321</x>
+     <y>303</y>
     </hint>
     <hint type="destinationlabel">
-     <x>480</x>
-     <y>295</y>
+     <x>523</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>

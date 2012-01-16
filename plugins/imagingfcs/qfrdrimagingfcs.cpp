@@ -303,6 +303,15 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="crop y1") {
                             initParams["CROP_Y1"]=value.toInt();
                             paramsReadonly<<"CROP_Y1";
+                        } else if (name=="bleach correction") {
+                            initParams["BLEACH_CORRECTION"]=value;
+                            paramsReadonly<<"BLEACH_CORRECTION";
+                        } else if (name=="bleach decay constant [s]") {
+                            initParams["BLEACH_CORRECTION_DECAY_SECS"]=value.toDouble();
+                            paramsReadonly<<"BLEACH_CORRECTION_DECAY_SECS";
+                        } else if (name=="bleach decay constant [pix]") {
+                            initParams["BLEACH_CORRECTION_DECAY_PIX"]=value.toDouble();
+                            paramsReadonly<<"BLEACH_CORRECTION_DECAY_PIX";
                         /*} else if (name=="") {
                             initParams[""]=value.toInt();
                             paramsReadonly<<"";*/

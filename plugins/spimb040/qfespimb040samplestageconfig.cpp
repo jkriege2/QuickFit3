@@ -177,6 +177,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     setLayout(stagelayout);
 
 
+    QLabel* l;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
@@ -229,7 +230,8 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     connect(chkJoystick, SIGNAL(clicked(bool)), this, SLOT(updateJoystick()));
     hbl->addWidget(chkJoystick);
     hbl->addSpacing(24);
-    hbl->addWidget(new QLabel("max. speed [micron/sec]: ", this));
+    hbl->addWidget(l=new QLabel("max. speed [&mu;m/s]: ", this));
+    l->setTextFormat(Qt::RichText);
     spinJoystickMaxSpeed=new QDoubleSpinBox(this);
     spinJoystickMaxSpeed->setMinimum(1);
     spinJoystickMaxSpeed->setMaximum(10000);
@@ -237,6 +239,18 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinJoystickMaxSpeed->setDecimals(0);
     connect(spinJoystickMaxSpeed, SIGNAL(valueChanged(double)), this, SLOT(updateJoystick()));
     hbl->addWidget(spinJoystickMaxSpeed);
+    btnX2=new QPushButton(tr("x2"), this);
+    hbl->addWidget(btnX2);
+    connect(btnX2, SIGNAL(clicked()), this, SLOT(speedX2()));
+    btnX10=new QPushButton(tr("x10"), this);
+    hbl->addWidget(btnX10);
+    connect(btnX10, SIGNAL(clicked()), this, SLOT(speedX10()));
+    btnD2=new QPushButton(tr(":2"), this);
+    hbl->addWidget(btnD2);
+    connect(btnD2, SIGNAL(clicked()), this, SLOT(speedD2()));
+    btnD10=new QPushButton(tr(":10"), this);
+    hbl->addWidget(btnD10);
+    connect(btnD10, SIGNAL(clicked()), this, SLOT(speedD10()));
     hbl->addStretch();
     stagelayout->addRow(tr("<b>joystick:</b>"), hbl);
 
@@ -278,7 +292,6 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 
 
     gl=new QGridLayout(this);
-    QLabel* l;
     l=new QLabel(tr("<b><i>x</i>-axis</b>"));
     l->setStyleSheet("background-color: darkgrey;");
     l->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);
@@ -497,6 +510,10 @@ void QFESPIMB040SampleStageConfig::updateStates() {
 
         chkJoystick->setEnabled(anyconn);
         spinJoystickMaxSpeed->setEnabled(anyconn);
+        btnX2->setEnabled(anyconn);
+        btnX10->setEnabled(anyconn);
+        btnD2->setEnabled(anyconn);
+        btnD10->setEnabled(anyconn);
         if (anyconn) {
             if (anyjoy || chkJoystick->isChecked()) labJoystick->setPixmap(iconJoystick);
             else labJoystick->setPixmap(iconNoJoystick);
@@ -690,6 +707,10 @@ void QFESPIMB040SampleStageConfig::updateJoystick() {
     } else {
 
         spinJoystickMaxSpeed->setEnabled(enabled);
+        btnX2->setEnabled(enabled);
+        btnX10->setEnabled(enabled);
+        btnD2->setEnabled(enabled);
+        btnD10->setEnabled(enabled);
         QFExtensionLinearStage* stage;
         int axis;
 
@@ -941,6 +962,10 @@ void QFESPIMB040SampleStageConfig::joystickStateChanged(bool enabled) {
     bool anyconn=stageThread->anyConnected();
     //chkJoystick->setEnabled(anyconn);
     spinJoystickMaxSpeed->setEnabled(anyconn && enabled);
+    btnX2->setEnabled(anyconn && enabled);
+    btnX10->setEnabled(anyconn && enabled);
+    btnD2->setEnabled(anyconn && enabled);
+    btnD10->setEnabled(anyconn && enabled);
     if (anyconn) {
         if (enabled!=chkJoystick->isChecked()) chkJoystick->setChecked(enabled);
         if (enabled) labJoystick->setPixmap(iconJoystick);
@@ -1036,3 +1061,19 @@ bool QFESPIMB040SampleStageConfig::isJoystickChecked() const {
 double QFESPIMB040SampleStageConfig::joystickMaxSpeed() {
     return spinJoystickMaxSpeed->value();
 }
+void QFESPIMB040SampleStageConfig::speedX2() {
+    spinJoystickMaxSpeed->setValue(spinJoystickMaxSpeed->value()*2);
+}
+
+void QFESPIMB040SampleStageConfig::speedX10() {
+    spinJoystickMaxSpeed->setValue(spinJoystickMaxSpeed->value()*10);
+}
+
+void QFESPIMB040SampleStageConfig::speedD2() {
+    spinJoystickMaxSpeed->setValue(spinJoystickMaxSpeed->value()/2);
+}
+
+void QFESPIMB040SampleStageConfig::speedD10() {
+    spinJoystickMaxSpeed->setValue(spinJoystickMaxSpeed->value()/10);
+}
+

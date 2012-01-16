@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QDebug>
 #include "qmodernprogresswidget.h"
+#include "qfrdrimagingfcsdataexplorer.h"
 
 #define UPDATE_TIMEOUT 250
 
@@ -56,6 +57,15 @@ void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
     ui->labDetails->setEnabled(enabled);
     ui->spinFirstFrame->setEnabled(enabled && !ui->chkFirstFrame->isChecked());
     ui->spinLastFrame->setEnabled(enabled && !ui->chkLastFrame->isChecked());
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
+    QFRDRImagingFCSDataExplorer* explorer=new QFRDRImagingFCSDataExplorer(this);
+    explorer->setBleachDecay(ui->spinDecay->value());
+    if (explorer->exec()==QDialog::Accepted) {
+        ui->spinDecay->setValue(explorer->getBleachDecay());
+    }
+    delete explorer;
 }
 
 bool QFRDRImagingFCSCorrelationDialog::allThreadsDone() const  {
@@ -163,6 +173,10 @@ void QFRDRImagingFCSCorrelationDialog::on_spinM_valueChanged(int val) {
     updateCorrelator();
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_spinDecay_valueChanged(double val) {
+    updateBleach();
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int idx) {
     updateCorrelator();
 }
@@ -173,6 +187,10 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int 
     ui->edtBackgroundFile->setEnabled(idx>2);
     ui->label_31->setEnabled(idx>2);
     ui->btnSelectBackgroundFile->setEnabled(idx>2);
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_cmbBleachType_currentIndexChanged(int idx) {
+    ui->widBleach->setEnabled(ui->cmbBleachType->currentIndex()==2);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
@@ -253,6 +271,8 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -284,6 +304,8 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinDistanceCCFDeltaX->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value()).toInt());
     ui->spinDistanceCCFDeltaY->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value()).toInt());
     ui->chkDistanceCCD->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked()).toBool());
+    ui->cmbBleachType->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex()).toInt());
+    ui->spinDecay->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value()).toDouble());
 
 }
 
@@ -383,6 +405,8 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.distanceCCF=ui->chkDistanceCCD->isChecked();
     job.DCCFDeltaX=ui->spinDistanceCCFDeltaX->value();
     job.DCCFDeltaY=ui->spinDistanceCCFDeltaY->value();
+    job.bleach=ui->cmbBleachType->currentIndex();
+    job.bleachDecay=ui->spinDecay->value();
     writeSettings();
 
     setEditControlsEnabled(false);
@@ -401,6 +425,7 @@ void QFRDRImagingFCSCorrelationDialog::frameTimeChanged(double value) {
     }
     updateCorrelator();
     updateFrameCount();
+    updateBleach();
 }
 
 void QFRDRImagingFCSCorrelationDialog::frameRateChanged(double value) {
@@ -411,6 +436,7 @@ void QFRDRImagingFCSCorrelationDialog::frameRateChanged(double value) {
     }
     updateCorrelator();
     updateFrameCount();
+    updateBleach();
 }
 
 void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
@@ -462,13 +488,20 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
 
 }
 
+void QFRDRImagingFCSCorrelationDialog::updateBleach() {
+    ui->labDecay->setTextFormat(Qt::RichText);
+    ui->labDecay->setText(tr("&tau;<sub>Bleach</sub> = %1 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6));
+}
+
 void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     int corrType=ui->cmbCorrelator->currentIndex();
     if (corrType==2) {
         ui->spinM->setEnabled(false);
+        ui->labM->setEnabled(false);
         ui->spinM->setValue(2);
     } else {
         ui->spinM->setEnabled(true);
+        ui->labM->setEnabled(true);
     }
 
     int S=ui->spinS->value();

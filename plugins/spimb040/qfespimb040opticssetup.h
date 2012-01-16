@@ -80,7 +80,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
             \param[out] acquisitionSettingsFilename filename of the acquisition settings selected by the suer
             \param[out] previewSettingsFilename filename of the preview settings selected by the suer
         */
-        bool lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename);
+        bool lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename);
 
         /*! \brief release a locked camera n, for more details see lockCamera() */
         void releaseCamera(int setup_cam);

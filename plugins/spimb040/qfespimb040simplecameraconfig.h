@@ -78,7 +78,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
             \param[out] acquisitionSettingsFilename filename of the acquisition settings selected by the suer
             \param[out] previewSettingsFilename filename of the preview settings selected by the suer
         */
-        bool lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename);
+        bool lockCamera(QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename);
 
         /*! \brief release a locked camera, for more details see lockCamera() */
         void releaseCamera();

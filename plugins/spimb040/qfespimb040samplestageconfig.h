@@ -163,6 +163,10 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief label to display joystick status */
         QLabel* labJoystick;
         QLabel* labThread;
+        QPushButton* btnX2;
+        QPushButton* btnX10;
+        QPushButton* btnD2;
+        QPushButton* btnD10;
 
 
         /** \brief action to connect to stage for axis x */
@@ -246,6 +250,11 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void displayAxisStates();
         void moveAbsolute();
         void moveRelative();
+
+        void speedX2();
+        void speedX10();
+        void speedD2();
+        void speedD10();
 };
 
 #endif // QFESPIMB040SAMPLESTAGECONFIG_H

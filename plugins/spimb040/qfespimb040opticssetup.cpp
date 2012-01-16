@@ -179,10 +179,10 @@ void QFESPIMB040OpticsSetup::setLogging(QFPluginLogService* log) {
     ui->shutterMainIllumination->setLog(m_log);
 }
 
-bool QFESPIMB040OpticsSetup::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* acquisitionSettingsFilename, QString* previewSettingsFilename) {
+bool QFESPIMB040OpticsSetup::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
     switch(setup_cam) {
-        case 0: return ui->camConfig1->lockCamera(extension, ecamera, camera, acquisitionSettingsFilename, previewSettingsFilename);
-        case 1: return ui->camConfig2->lockCamera(extension, ecamera, camera, acquisitionSettingsFilename, previewSettingsFilename);
+        case 0: return ui->camConfig1->lockCamera(extension, ecamera, camera,  previewSettingsFilename);
+        case 1: return ui->camConfig2->lockCamera(extension, ecamera, camera,  previewSettingsFilename);
     }
     return false;
 }

@@ -47,8 +47,11 @@ protected slots:
     void on_spinP_valueChanged(int val);
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
+    void on_spinDecay_valueChanged(double val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
     void on_cmbBackground_currentIndexChanged(int idx);
+    void on_cmbBleachType_currentIndexChanged(int idx);
+
     void frameTimeChanged(double value);
     void frameRateChanged(double value);
     void updateProgress();
@@ -56,10 +59,12 @@ protected slots:
     void updateCorrelator();
     void updateFrameCount();
     void updateImageSize();
+    void updateBleach();
     void startNextWaitingThread();
     void on_chkFirstFrame_clicked(bool checked);
     void on_chkLastFrame_clicked(bool checked);
     void setEditControlsEnabled(bool enabled);
+    void on_btnDataExplorer_clicked();
 protected:
     void done(int status);
     bool allThreadsDone() const;

@@ -100,6 +100,10 @@ struct Job {
     int DCCFDeltaX;
     /** \brief distanceCCF Delta y */
     int DCCFDeltaY;
+    /** \brief bleach correction, 0: none, 1: remove frame average, 2: remove mono-exponential */
+    int bleach;
+    /** \brief bleach correction decay constant */
+    int bleachDecay;
 };
 
 /*! \brief this thread does all the correlation work
@@ -132,7 +136,7 @@ struct Job {
         - \b (3.2) min/max grey value over all frames (used e.g. for background correction and video color range correction)
         - \b (3.3) average/standard deviation/min/max grey value over Job:statistics_frames frames for each datapoint
       .
-      - \b (4) \em [100] set background correction value (possibly as calculated in (3))
+      - \b (4) \em [100] set background correction value (possibly as calculated in (3)) and also apply the bleaching correction
       - \b (5) \em [1000] calculate ACFs
       - \b (6) \em [1000] calculate the CCFs
       - \b (7) \em [1000] calculate the distance CCF
@@ -146,6 +150,14 @@ struct Job {
         - \b (8.7) \em [10] settings (\c basename.evalsettings.txt ) in the format \verbatim    settings_name   : value  \endverbatim
       .
     .
+
+    The \b bleaching \b correction subtracts a simple exponential model \f[ f(t)=A+B\cdot\exp\left(-t/\tau\right) \f] from every pixel's timeseries \f$ I(x,y,t) \f$.
+    The decay time \f$ \tau \f$ is given by the user and the paramaters \f$ A \f$ and \f$ B \f$  are extracted from  \f$ I(x,y,t) \f$.
+    The first few frames in  \f$ I(x,y,t) \f$ are averaged to yield \f$ I_0 \f$ and the last few frames yield \f$ I_1 \f$ respectively.
+    From these the parameters \f$ A \f$ and \f$ B \f$ may be deduced:
+    \f[ B=\frac{I_1-I_0}{1-\exp\left(-t/\tau\right)} \f]
+    \f[ A=I_1-B \f]
+
 
 */
 class QFRDRImagingFCSCorrelationJobThread : public QThread
@@ -244,6 +256,8 @@ protected:
     QString outputFilenameBase;
 
     float* backgroundImage;
+    float* bleachOffset;
+    float* bleachAmplitude;
 
     static QMutex* mutexFilename;
 

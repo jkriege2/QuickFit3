@@ -251,7 +251,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         QString TIFFFIlename1=acquisitionPrefix1+".tif";
         TIFF* tiff1=NULL;
         if (widImageStack->use1()) {
-            if (!(useCam1=optSetup->lockCamera(0, &extension1, &ecamera1, &camera1, &acquisitionSettingsFilename1, &previewSettingsFilename1))) {
+            if (!(useCam1=optSetup->lockCamera(0, &extension1, &ecamera1, &camera1, &previewSettingsFilename1))) {
                 IMAGESTACK_ERROR(tr("error locking camer 1!\n"));
             }
         }
@@ -269,7 +269,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         TIFF* tiff2=NULL;
         int camera2=0;
         if (widImageStack->use2()) {
-            if(!(useCam2=optSetup->lockCamera(1, &extension2, &ecamera2, &camera2, &acquisitionSettingsFilename2, &previewSettingsFilename2))) {
+            if(!(useCam2=optSetup->lockCamera(1, &extension2, &ecamera2, &camera2, &previewSettingsFilename2))) {
                 IMAGESTACK_ERROR(tr("error locking camer 2!\n"));
             }
         }
@@ -883,7 +883,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     QString acquisitionPrefix2=widAcquisition->prefix2();
     int backgroundFrames1=1;
     if (widAcquisition->use1()) {
-        useCam1=optSetup->lockCamera(0,&extension1, &ecamera1, &camera1, &acquisitionSettingsFilename1, &previewSettingsFilename1);
+        useCam1=optSetup->lockCamera(0,&extension1, &ecamera1, &camera1, &previewSettingsFilename1);
         if (QFile::exists(widAcquisition->currentConfigFilename(0))) acquisitionSettingsFilename1=widAcquisition->currentConfigFilename(0);
         if (QFile::exists(widAcquisition->currentPreviewConfigFilename(0))) previewSettingsFilename1=widAcquisition->currentPreviewConfigFilename(0);
         backgroundFrames1=widAcquisition->currentBackgroundFrames(0);
@@ -896,7 +896,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     int camera2=0;
     int backgroundFrames2=1;
     if (widAcquisition->use2()) {
-        useCam2=optSetup->lockCamera(1,&extension2, &ecamera2, &camera2, &acquisitionSettingsFilename2, &previewSettingsFilename2);
+        useCam2=optSetup->lockCamera(1,&extension2, &ecamera2, &camera2, &previewSettingsFilename2);
         if (QFile::exists(widAcquisition->currentConfigFilename(1))) acquisitionSettingsFilename2=widAcquisition->currentConfigFilename(1);
         if (QFile::exists(widAcquisition->currentPreviewConfigFilename(1))) previewSettingsFilename2=widAcquisition->currentPreviewConfigFilename(1);
         backgroundFrames2=widAcquisition->currentBackgroundFrames(1);
