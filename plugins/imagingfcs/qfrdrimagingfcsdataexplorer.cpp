@@ -35,6 +35,8 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     ui->pltIntensity->addGraph(avgFit);
     ui->pltImage->get_plotter()->set_maintainAspectRatio(true);
     ui->pltImageRaw->get_plotter()->set_maintainAspectRatio(true);
+    ui->pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
+    ui->pltImageRaw->get_plotter()->set_maintainAxisAspectRatio(true);
 }
 
 QFRDRImagingFCSDataExplorer::~QFRDRImagingFCSDataExplorer()
@@ -195,8 +197,12 @@ void QFRDRImagingFCSDataExplorer::readFrames(bool next) {
     reader->setCropping(ui->spinX0->value(), ui->spinX1->value(), ui->spinY0->value(), ui->spinY1->value());
     if (!ui->chkCropping->isChecked()) reader->unsetCropping();
 
+
     imgWidth=reader->frameWidth();
     imgHeight=reader->frameHeight();
+
+    imgRawWidth=readerRaw->frameWidth();
+    imgRawHeight=readerRaw->frameHeight();
     reallocFrames();
 
     reader->readFrameFloat(frame);
@@ -213,6 +219,8 @@ void QFRDRImagingFCSDataExplorer::readFrames(bool next) {
 
     ui->pltImage->setAbsoluteXY(0,imgWidth,0, imgHeight);
     ui->pltImageRaw->setAbsoluteXY(0,imgRawWidth,0, imgRawHeight);
+    ui->pltImage->get_plotter()->set_aspectRatio((double)imgWidth/(double)imgHeight);
+    ui->pltImageRaw->get_plotter()->set_aspectRatio((double)imgRawWidth/(double)imgRawHeight);
 
 
     ui->pltImage->update_plot();
@@ -264,6 +272,8 @@ void QFRDRImagingFCSDataExplorer::on_btnFirst_clicked() {
 
 void QFRDRImagingFCSDataExplorer::rereadFrame() {
     readFrames(false);
+    ui->pltImage->zoomToFit();
+    ui->pltImageRaw->zoomToFit();
 
 }
 
