@@ -61,9 +61,30 @@ void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
 
 void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     QFRDRImagingFCSDataExplorer* explorer=new QFRDRImagingFCSDataExplorer(this);
-    explorer->setBleachDecay(ui->spinDecay->value());
-    if (explorer->exec()==QDialog::Accepted) {
-        ui->spinDecay->setValue(explorer->getBleachDecay());
+    QFRDRImageReader* reader=NULL;
+    QFRDRImageReader* readerRaw=NULL;
+    if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount()) {
+        reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex());
+        readerRaw=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex());
+    }
+    if (reader) {
+        explorer->setBleachDecay(ui->spinDecay->value());
+        explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value());
+        if (explorer->exec()==QDialog::Accepted) {
+            ui->spinDecay->setValue(explorer->getBleachDecay());
+            ui->chkCrop->setChecked(explorer->getUseCropping());
+            ui->spinXFirst->setValue(explorer->getCropX0());
+            ui->spinXLast->setValue(explorer->getCropX1());
+            ui->spinYFirst->setValue(explorer->getCropY0());
+            ui->spinYLast->setValue(explorer->getCropY1());
+            ui->spinBinning->setValue(explorer->getBinning());
+        }
+        reader->close();
+        readerRaw->close();
+        delete reader;
+        delete readerRaw;
+    } else {
+        QMessageBox::critical(this, explorer->windowTitle(), tr("Could not read input file!"));
     }
     delete explorer;
 }

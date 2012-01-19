@@ -117,7 +117,16 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     if (!label.isEmpty()) {
         labLabel=new QLabel(label, parent);
         layout->addWidget(labLabel, row, COL_LABEL);
-        if (widget==Header) labLabel->setText("<b>"+label+"</b>");
+        QString labelHeader="<b>"+label+"</b>";
+        QString labelFitParam="<font color=\"darkred\">"+label+"</font>";
+        QString labelCalcParam="<font color=\"#0F0F0F\"><i>"+label+"</i></font>";
+        QString labelEditParam="<font color=\"black\">"+label+"</font>";
+        if (widget==Header) labLabel->setText(labelHeader);
+        else {
+            if (displayFix && editable) labLabel->setText(labelFitParam);
+            else if (!displayFix && editable) labLabel->setText(labelEditParam);
+            else labLabel->setText(labelCalcParam);
+        }
         labLabel->setAlignment(Qt::AlignLeft);
         height=qMax(height, labLabel->minimumSizeHint().height());
     }
@@ -231,7 +240,7 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
         } else if (displayError==QFFitFunction::EditError) {
             neditError=new JKDoubleEdit(parent);
             neditError->setCheckBounds(false, false);
-            neditValue->setShowUpDown(false);
+            neditError->setShowUpDown(false);
             layout->addWidget(neditError, row, COL_ERROR);
             height=qMax(height, neditError->minimumSizeHint().height());
             connect(neditError, SIGNAL(valueChanged(double)), this, SLOT(doubleErrorChanged(double)));
@@ -683,7 +692,7 @@ void QFFitParameterWidgetWrapper::setToolTip(QString paramDescription) {
     if (spinIntMin) spinIntMin->setToolTip(ttMin);
     if (neditMax) neditMax->setToolTip(ttMin);
     if (spinIntMax) spinIntMax->setToolTip(ttMax);
-    if (chkFix) chkFix->setToolTip(ttMax);
+    if (chkFix) chkFix->setToolTip(ttFix);
     if (labError) labError->setToolTip(ttError);
     if (neditError) neditError->setToolTip(ttError);
     if (labLabel) labLabel->setToolTip(ttLabel);
