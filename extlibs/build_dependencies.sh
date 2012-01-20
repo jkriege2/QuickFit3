@@ -435,10 +435,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir include/Eigen
 	tar xvf ./eigen-3.0.4.tar.bz2 -C ./build/
 	cd build/eigen-eigen-13a11181fc5a/
-	cp ./Eigen/* ../../include/Eigen
+	cp -r ./Eigen/* ../../include/Eigen
 	libOK=$?
-	cp ./doc/* ../../doc
-	if [ $libOK -ne 1 ] ; then		
+	cp -r ./doc/* ../../doc
+	if [ $libOK -ne 0 ] ; then		
 		libOK=-4
 	else
 		libOK=0
