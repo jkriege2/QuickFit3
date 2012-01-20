@@ -416,6 +416,43 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	fi
 fi
 
+
+
+
+
+eigenOK=-1
+read -p "Do you want to build 'eigen' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "------------------------------------------------------------------------\n"\
+	"-- BUILDING: eigen                                                    --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd eigen
+	mkdir build
+	mkdir doc
+	mkdir include
+	mkdir include/Eigen
+	tar xvf ./eigen-3.0.4.tar.bz2 -C ./build/
+	cd build/eigen-eigen-13a11181fc5a/
+	cp ./Eigen/* ../../include/Eigen
+	libOK=$?
+	cp ./doc/* ../../doc
+	if [ $libOK -ne 1 ] ; then		
+		libOK=-4
+	else
+		libOK=0
+	fi
+	cd ../../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	
+	eigenOK=$libOK
+
+fi
+
 echo -e  "\n------------------------------------------------------------------------\n"\
 "-- BUILD RESULTS                                                       --\n"\
 "------------------------------------------------------------------------\n\n"\
@@ -427,3 +464,4 @@ print_result "libpng" $libpngOK
 print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK
+print_result "eigen" $eigenOK
