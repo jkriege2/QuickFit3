@@ -75,6 +75,7 @@ protected:
         void on_btnNext_clicked();
         void on_btnFirst_clicked();
         void rereadFrame();
+        void on_btnFit_clicked();
 };
 
 #endif // QFRDRIMAGINGFCSDATAEXPLORER_H

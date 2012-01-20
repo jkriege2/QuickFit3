@@ -3,6 +3,7 @@
 #include "qmodernprogresswidget.h"
 #include "statistics_tools.h"
 #include <cmath>
+#include <QDebug>
 
 QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     QDialog(parent),
@@ -37,6 +38,10 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     ui->pltImageRaw->get_plotter()->set_maintainAspectRatio(true);
     ui->pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
     ui->pltImageRaw->get_plotter()->set_maintainAxisAspectRatio(true);
+    ui->pltImage->get_xAxis()->set_minTicks(5);
+    ui->pltImage->get_yAxis()->set_minTicks(5);
+    ui->pltImageRaw->get_xAxis()->set_minTicks(5);
+    ui->pltImageRaw->get_yAxis()->set_minTicks(5);
 }
 
 QFRDRImagingFCSDataExplorer::~QFRDRImagingFCSDataExplorer()
@@ -95,17 +100,20 @@ bool QFRDRImagingFCSDataExplorer::init(QFRDRImageReader* reader, QFRDRImageReade
     QModernProgressDialog* prg=new QModernProgressDialog(msg.arg(""), tr("Cancel"), this);
     prg->setMode(true, true);
     prg->setRange(0,100);
+    prg->setValue(0);
     prg->setLabelText(msg.arg(QString("opening '%1' ...").arg(filename)));
     prg->show();
     QApplication::processEvents();
     QApplication::processEvents();
     ok=ok && readerRaw->open(filename);
+    prg->setValue(10);
 
     if (ok) {
         prg->setLabelText(msg.arg(QString("counting frames ...")));
         QApplication::processEvents();
         QApplication::processEvents();
         this->frames=readerRaw->countFrames();
+        prg->setValue(20);
         QApplication::processEvents();
 
         prg->setLabelText(msg.arg(QString("calculating image statistics ...")));
@@ -219,12 +227,29 @@ void QFRDRImagingFCSDataExplorer::readFrames(bool next) {
 
     ui->pltImage->setAbsoluteXY(0,imgWidth,0, imgHeight);
     ui->pltImageRaw->setAbsoluteXY(0,imgRawWidth,0, imgRawHeight);
-    ui->pltImage->get_plotter()->set_aspectRatio((double)imgWidth/(double)imgHeight);
-    ui->pltImageRaw->get_plotter()->set_aspectRatio((double)imgRawWidth/(double)imgRawHeight);
+   // qDebug()<<imgWidth<<imgHeight<<imgRawWidth<<imgRawHeight;
+    double imgAspect=(double)imgWidth/(double)imgHeight;
+    double imgRawAspect=(double)imgRawWidth/(double)imgRawHeight;
+    if (imgAspect<0.05 || imgAspect>20) {
+        ui->pltImage->get_plotter()->set_axisAspectRatio(1);
+        ui->pltImage->get_plotter()->set_aspectRatio(1);
+    } else {
+        ui->pltImage->get_plotter()->set_axisAspectRatio(imgAspect);
+        ui->pltImage->get_plotter()->set_aspectRatio(imgAspect);
+    }
+    if (imgRawAspect<0.05 || imgRawAspect>20) {
+        ui->pltImageRaw->get_plotter()->set_axisAspectRatio(1);
+        ui->pltImageRaw->get_plotter()->set_aspectRatio(1);
+    } else {
+        ui->pltImageRaw->get_plotter()->set_axisAspectRatio(imgRawAspect);
+        ui->pltImageRaw->get_plotter()->set_aspectRatio(imgRawAspect);
+    }
+
 
 
     ui->pltImage->update_plot();
     ui->pltImageRaw->update_plot();
+    ui->pltImageRaw->zoomToFit();
     ui->labImageStatus->setText(tr("frame %1/%2<br>raw size: %3&times;%4&nbsp;&nbsp;&nbsp;&nbsp;size: %5&times;%6").arg(currentFrame+1).arg(frames).arg(imgRawWidth).arg(imgRawHeight).arg(imgWidth).arg(imgHeight));
 }
 
@@ -241,7 +266,7 @@ bool QFRDRImagingFCSDataExplorer::readStatistics(QModernProgressDialog *prg) {
         avg[cnt]=statisticsAverageVariance(var, frame, imgWidth*imgHeight);
         stddev[cnt]=sqrt(var);
         cnt++;
-        if (prg && (this->frames/120>0)) {
+        if (prg && (this->frames>120)) {
             if (cnt%(this->frames/120)==0) {
                 prg->setValue(cnt);
                 QApplication::processEvents();
@@ -275,6 +300,9 @@ void QFRDRImagingFCSDataExplorer::rereadFrame() {
     ui->pltImage->zoomToFit();
     ui->pltImageRaw->zoomToFit();
 
+}
+
+void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
 }
 
 

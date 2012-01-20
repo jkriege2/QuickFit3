@@ -7,6 +7,7 @@ DEPENDPATH += ./
 include(../plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
+include(../../extlibs/lmfit.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 

@@ -83,8 +83,8 @@ bool QFRDRImageReader::readFrameFloat(float* data) {
 
     uint16_t w=frameWidth();
     uint16_t h=frameHeight();
-    int hh=abs(yy1-yy0);
-    int ww=abs(xx1-xx0);
+    int hh=abs(yy1-yy0)+1;
+    int ww=abs(xx1-xx0)+1;
 
     for (register int y=0; y<hh; y++) {
         for (register int x=0; x<ww; x++) {
