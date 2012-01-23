@@ -103,7 +103,11 @@ struct Job {
     /** \brief bleach correction, 0: none, 1: remove frame average, 2: remove mono-exponential */
     int bleach;
     /** \brief bleach correction decay constant */
-    int bleachDecay;
+    double bleachDecay;
+    /** \brief bleach correction offset */
+    double bleachA;
+    /** \brief bleach correction amplitude */
+    double bleachB;
 };
 
 /*! \brief this thread does all the correlation work

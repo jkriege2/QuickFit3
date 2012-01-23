@@ -583,6 +583,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"remove exponential\n";
                                     text<<"bleach decay constant [pix] : "<<outLocale.toString(job.bleachDecay) << "\n";
                                     text<<"bleach decay constant [s]   : "<<outLocale.toString((double)job.bleachDecay*job.frameTime) << "\n";
+                                    text<<"bleach offset B             : "<<outLocale.toString((double)job.bleachB) << "\n";
+                                    text<<"bleach amplitude A          : "<<outLocale.toString((double)job.bleachA) << "\n";
 
                                 } else if (job.bleach==1) {
                                         text<<"remove frame average\n";

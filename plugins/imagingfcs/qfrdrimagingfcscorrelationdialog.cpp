@@ -24,6 +24,12 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->edtFrameRate->setValue(100);
     ui->edtOffset->setRange(-1e10,1e10);
     ui->edtOffset->setValue(0);
+    ui->edtDecayA->setCheckBounds(false, false);
+    ui->edtDecayB->setCheckBounds(false, false);
+    ui->spinDecay->setCheckBounds(false, false);
+    ui->edtDecayA->setValue(1000);
+    ui->edtDecayB->setValue(1000);
+    ui->spinDecay->setValue(10000);
 
     imageFilters.clear();
     ui->cmbFileformat->clear();
@@ -46,6 +52,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     filesToAdd.clear();
     setEditControlsEnabled(false);
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
+
+
 }
 
 QFRDRImagingFCSCorrelationDialog::~QFRDRImagingFCSCorrelationDialog() {
@@ -61,6 +69,7 @@ void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
 
 void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     QFRDRImagingFCSDataExplorer* explorer=new QFRDRImagingFCSDataExplorer(this);
+    explorer->readSettings(*(pluginServices->getOptions()->getQSettings()), "imFCS/dataExplorer/");
     QFRDRImageReader* reader=NULL;
     QFRDRImageReader* readerRaw=NULL;
     if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount()) {
@@ -69,7 +78,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     }
     if (reader) {
         explorer->setBleachDecay(ui->spinDecay->value());
-        explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value());
+        explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkFirstFrame->isChecked(), ui->spinFirstFrame->value(), ui->chkLastFrame->isChecked(), ui->spinLastFrame->value(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value());
         if (explorer->exec()==QDialog::Accepted) {
             ui->spinDecay->setValue(explorer->getBleachDecay());
             ui->chkCrop->setChecked(explorer->getUseCropping());
@@ -78,7 +87,14 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
             ui->spinYFirst->setValue(explorer->getCropY0());
             ui->spinYLast->setValue(explorer->getCropY1());
             ui->spinBinning->setValue(explorer->getBinning());
+            ui->edtDecayA->setValue(explorer->getBleachA());
+            ui->edtDecayB->setValue(explorer->getBleachB());
+            ui->chkFirstFrame->setChecked(explorer->getUseFirst());
+            ui->chkLastFrame->setChecked(explorer->getUseLast());
+            ui->spinFirstFrame->setValue(explorer->getFirst());
+            ui->spinLastFrame->setValue(explorer->getLast());
         }
+        explorer->writeSettings(*(pluginServices->getOptions()->getQSettings()), "imFCS/dataExplorer/");
         reader->close();
         readerRaw->close();
         delete reader;
@@ -428,6 +444,8 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.DCCFDeltaY=ui->spinDistanceCCFDeltaY->value();
     job.bleach=ui->cmbBleachType->currentIndex();
     job.bleachDecay=ui->spinDecay->value();
+    job.bleachA=ui->edtDecayA->value();
+    job.bleachB=ui->edtDecayB->value();
     writeSettings();
 
     setEditControlsEnabled(false);

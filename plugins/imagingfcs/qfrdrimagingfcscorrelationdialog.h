@@ -86,6 +86,8 @@ private:
     int32_t frame_count;
     QString inputconfigfile;
 
+
+
     int image_width;
     int image_height;
 

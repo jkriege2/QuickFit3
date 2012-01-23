@@ -29,5 +29,6 @@
         <file alias="preview_savedata.png">icons/preview_savedata.png</file>
         <file alias="report_print.png">icons/report_print.png</file>
         <file alias="report_save.png">icons/report_save.png</file>
+        <file alias="dataexplorer.png">icons/dataexplorer.png</file>
     </qresource>
 </RCC>
