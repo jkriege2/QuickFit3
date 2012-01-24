@@ -30,6 +30,23 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->edtDecayA->setValue(1000);
     ui->edtDecayB->setValue(1000);
     ui->spinDecay->setValue(10000);
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %counter%"), QString("%counter%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %s%"), QString("%s%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %p%"), QString("%p%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %m%"), QString("%m%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %framerate%"), QString("%framerate%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %frametime%"), QString("%frametime%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %first%"), QString("%first%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %last%"), QString("%last%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %backoffset%"), QString("%backoffset%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %segments%"), QString("%segments%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %backcorrectionid%"), QString("%backcorrectionid%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %correlatorid%"), QString("%correlatorid%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %binning%"), QString("%binning%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %backcorrection%"), QString("%backcorrection%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %correlator%"), QString("%correlator%"));
+    ui->edtPostfix->addInsertContextMenuEntry(tr("insert %bleach%"), QString("%bleach%"));
+    //ui->edtPostfix->addInsertContextMenuEntry(tr("insert %%"), QString("%%"));
 
     imageFilters.clear();
     ui->cmbFileformat->clear();

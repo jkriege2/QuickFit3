@@ -137,9 +137,13 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     if (job.correlator==CORRELATOR_DIRECTAVG) corr="directavg";
     if (job.correlator==CORRELATOR_MTAUALLMON) corr="mtauallmon";
     if (job.correlator==CORRELATOR_MTAUONEMON) corr="mtauonemon";
+    QString bleach="none";
+    if (job.bleach==BLEACH_REMOVEAVG) bleach="delavg";
+    if (job.bleach==BLEACH_EXP) bleach="exp";
 
     result=result.replace("%backcorrection%", back, Qt::CaseInsensitive);
     result=result.replace("%correlator%", corr, Qt::CaseInsensitive);
+    result=result.replace("%bleach%", bleach, Qt::CaseInsensitive);
     return result;
 }
 

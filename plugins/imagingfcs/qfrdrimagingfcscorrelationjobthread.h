@@ -19,6 +19,10 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define CORRELATOR_MTAUALLMON 2
 #define CORRELATOR_MTAUONEMON 3
 
+#define BLEACH_NONE 0
+#define BLEACH_REMOVEAVG 1
+#define BLEACH_EXP 2
+
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
 
