@@ -2,8 +2,6 @@
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagereadertiff.h"
 #include "qfrdrimagereaderrh.h"
-#include "multitau-correlator.h"
-#include "correlator_multitau.h"
 #include "libtiff_tools.h"
 #include "image_tools.h"
 #include "statistics_tools.h"
@@ -384,7 +382,16 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 emit messageChanged(tr("saving statistics ..."));
                                 int count=statistics_time.size();//qMin(statistics_time.size(), statistics_mean.size());
                                 for (int i=0; i<count; i++) {
-                                    text<<statistics_time[i]<<", "<<statistics_mean[i]<<", "<<statistics_std[i]<<", "<<statistics_min[i]<<", "<<statistics_max[i]<<"\n";
+                                    text<<statistics_time[i];
+                                    if (i<statistics_mean.size()) text<<", "<<statistics_mean[i];
+                                    else text<<", 0";
+                                    if (i<statistics_std.size()) text<<", "<<statistics_std[i];
+                                    else text<<", 0";
+                                    if (i<statistics_min.size()) text<<", "<<statistics_min[i];
+                                    else text<<", 0";
+                                    if (i<statistics_max.size()) text<<", "<<statistics_max[i];
+                                    else text<<", 0";
+                                    text<<"\n";
                                 }
                                 f.close();
                             } else {
@@ -659,16 +666,105 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
         }
     }
 
-    /*if (m_status==2) {
-        job.processingOK=true;
-        job.filesToAdd=addFiles;
-    } else {
-        job.processingOK=false;
-        job.filesToAdd.clear();
-    }*/
 
     duration=ptime.elapsed();
 }
+
+
+void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double **ccf_tau_io, double **ccf_io, double **ccf_std_io, uint32_t &ccf_N, const QString& message, uint32_t increment_progress) {
+    ccf_N=job.S*job.P;
+    double* ccf=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+    double* ccf_std=NULL;
+    double* ccf_tau=(double*)calloc(ccf_N,sizeof(double));
+    long* ccf_t=(long*)calloc(ccf_N,sizeof(long));
+
+    statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
+
+    for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
+        ccf[nn]=1.0;
+    }
+    if (job.segments>1) {
+        ccf_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+    }
+
+    for (int32_t y=0; y<(int32_t)frame_height; y++) {
+        for (int32_t x=0; x<(int32_t)frame_width; x++) {
+            int32_t p=y*(int32_t)frame_width+x;
+            int32_t x1=x+shiftX;
+            int32_t y1=y+shiftY;
+            int32_t p2=x1+y1*(int32_t)frame_width;
+
+
+            if (job.segments<=1) {
+                if (x1>=0 && x1<(int32_t)frame_width && y1>=0 && y1<(int32_t)frame_height) {
+                    if (job.correlator==CORRELATOR_DIRECT) {
+                        statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    } else if (job.correlator==CORRELATOR_DIRECTAVG) {
+                        statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                    }
+                }
+            } else {
+                uint32_t segment_frames=frames/job.segments;
+                double* cftemp=(double*)calloc(ccf_N,sizeof(double));
+                double* sum=(double*)calloc(ccf_N,sizeof(double));
+                double* sum2=(double*)calloc(ccf_N,sizeof(double));
+                for (register uint32_t ct=0; ct<ccf_N; ct++) {
+                    sum[ct]=0;
+                    sum2[ct]=0;
+                }
+                for (int32_t seg=0; seg<job.segments; seg++) {
+                    for (register uint32_t ct=0; ct<ccf_N; ct++) cftemp[ct]=0;
+                    if (x1>=0 && x1<(int32_t)frame_width && y1>=0 && y1<(int32_t)frame_height) {
+                        if (job.correlator==CORRELATOR_DIRECT) {
+                            statisticsCrosscorrelateMultiTauSymmetricMemOptimized(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        } else if (job.correlator==CORRELATOR_DIRECTAVG) {
+                            statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                        }
+                        for (register uint32_t ct=0; ct<ccf_N; ct++) {
+                            sum[ct]  += cftemp[ct];
+                            sum2[ct] += cftemp[ct]*cftemp[ct];
+                        }
+                    } else {
+                        for (register uint32_t ct=0; ct<ccf_N; ct++) {
+                            sum[ct]  += 1.0;
+                            sum2[ct] += 1.0*1.0;
+                        }
+                    }
+                }
+                free(cftemp);
+                double segs=job.segments;
+                for (register uint32_t ct=0; ct<ccf_N; ct++) {
+                    ccf[p*ccf_N+ct]=sum[0*ccf_N+ct]/segs;
+                    ccf_std[p*ccf_N+ct]=sqrt((sum2[0*ccf_N+ct]-sum[0*ccf_N+ct]*sum[0*ccf_N+ct]/segs)/(segs-1.0));
+                }
+                free(sum);
+                free(sum2);
+            }
+
+            if (m_status==1 && !was_canceled) {
+                if (frame_width*frame_height<increment_progress) {
+                    emit messageChanged(tr("%3 (%1/%2)...").arg(p+1).arg(frame_width*frame_height).arg(message)); emit progressIncrement(increment_progress/(frame_width*frame_height));
+                } else if (p%(frame_width*frame_height/increment_progress)==0) {
+                    emit messageChanged(tr("%3 (%1/%2)...").arg(p+1).arg(frame_width*frame_height).arg(message)); emit progressIncrement(1);
+                }
+
+            } else {
+                break;
+            }
+        }
+    }
+    for (uint32_t i=0; i<ccf_N; i++) {
+        ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
+    }
+    free(ccf_t);
+
+
+    *ccf_tau_io=ccf_tau;
+    *ccf_io=ccf;
+    *ccf_std_io=ccf_std;
+
+}
+
 
 
 
@@ -738,11 +834,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         frames_min=(frame_min<frames_min)?frame_min:frames_min;
                         frames_max=(frame_max>frames_max)?frame_max:frames_max;
                     }
-                    /*if (frames<1000) {
-                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1000/frames);
-                    } else if ((frames/1000==0) || (frame%(frames/1000)==0)) {
-                        emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(1);
-                    }*/
+
                     if ((frames/500>0) && (frame%(frames/500)==0)) {
                         emit messageChanged(tr("reading frames (%1/%2)...").arg(frame).arg(frames));
                         emit progressIncrement(1);
@@ -777,74 +869,28 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
         emit messageChanged(tr("calculating statistics/video ..."));
-        float sum=0;
-        float sum2=0;
-        float sframe_min=0;
-        float sframe_max=0;
-        float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-        for (register uint16 i=0; i<frame_width*frame_height; i++) {
-            video_frame[i]=0;
-            average_frame[i]=0;
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state;
+        stat_state.sum=0;
+        stat_state.sum2=0;
+        stat_state.sframe_min=0;
+        stat_state.sframe_max=0;
+        stat_state.statFirst=true;
+        stat_state.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (int64_t i=0; i<frame_width*frame_height; i++)  {
+            stat_state.video_frame[i]=0;
         }
-        uint16_t video_frame_num=0;
-
         statistics_mean.clear();
         statistics_std.clear();
         statistics_min.clear();
         statistics_max.clear();
         statistics_time.clear();
+        uint16_t video_frame_num=0;
 
-        bool statFirst=true;
+        //bool statFirst=true;
         for(register uint32_t frame=0; frame<frames; frame++) {
-            const float* frame_data=&(image_series[frame*frame_width*frame_height]);
-            float frame_min=frame_data[0];
-            float frame_max=frame_data[0];
+            float* frame_data=&(image_series[frame*frame_width*frame_height]);
+            contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
 
-            for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                float v=frame_data[i];
-                frame_min=(v<frame_min)?v:frame_min;
-                frame_max=(v>frame_max)?v:frame_max;
-                average_frame[i]=average_frame[i]+(float)v/(float)frames;
-                sum=sum+v;
-                sum2=sum2+(v*v);
-                video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
-            }
-            if (frame==0) {
-                frames_min=frame_min;
-                frames_max=frame_max;
-            } else {
-                frames_min=(frame_min<frames_min)?frame_min:frames_min;
-                frames_max=(frame_max>frames_max)?frame_max:frames_max;
-            }
-            if (statFirst) {
-                sframe_min=frame_min;
-                sframe_max=frame_max;
-                statFirst=false;
-            } else {
-                sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
-                sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
-            }
-            if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
-                float N=frame_width*frame_height*job.statistics_frames;
-                //qDebug()<<"stat "<<frame<<sum<<sum2<<N;
-                statistics_time.append((float)frame*job.frameTime);
-                statistics_mean.append(sum/N);
-                statistics_min.append(sframe_min);
-                statistics_max.append(sframe_max);
-                if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
-                sum=0;
-                sum2=0;
-                sframe_min=0;
-                sframe_max=0;
-                statFirst=true;
-            }
-            if (job.video && video && ((frame+1)%job.video_frames==0)){
-                for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                    video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
-                    video_frame[i]=0;
-                }
-                video_frame_num++;
-            }
             if (frames<500) {
                 emit messageChanged(tr("calculating statistics/video (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
             } else if ((frames/500==0) || (frame%(frames/500)==0)) {
@@ -858,7 +904,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         }
 
 
-        free(video_frame);
+        free(stat_state.video_frame);
 
     }
 
@@ -868,63 +914,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (job.acf && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
             emit messageChanged(tr("calculating autocorrelations ..."));
-            acf_N=job.S*job.P;
-            acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-            for (uint32_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
-                acf[nn]=1.0;
-            }
-            if (job.segments>1) {
-                acf_std=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-            }
-            acf_tau=(double*)calloc(acf_N,sizeof(double));
-            long* acf_t=(long*)calloc(acf_N,sizeof(long));
-            statisticsAutocorrelateCreateMultiTau(acf_t, job.S, job.m, job.P);
-            for (uint32_t p=0; p<frame_width*frame_height; p++) {
-                if (job.segments<=1) {
-                    if (job.correlator==CORRELATOR_DIRECT) statisticsAutocorrelateMultiTauSymmetricMemOptimized(&(acf[p*acf_N]), &(image_series[p]), frames, acf_t, acf_N, frame_width*frame_height);
-                    else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsAutocorrelateMultiTauAvgSymmetric<float, float>(&(acf[p*acf_N]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
-                } else {
-                    uint32_t segment_frames=frames/job.segments;
-                    double* cftemp=(double*)calloc(acf_N,sizeof(double));
-                    double* sum=(double*)calloc(acf_N,sizeof(double));
-                    double* sum2=(double*)calloc(acf_N,sizeof(double));
-                    for (register uint32_t ct=0; ct<acf_N; ct++) {
-                        sum[ct]=0;
-                        sum2[ct]=0;
-                    }
-                    for (int32_t seg=0; seg<job.segments; seg++) {
-                        for (register uint32_t ct=0; ct<acf_N; ct++) cftemp[ct]=0;
-                        if (job.correlator==CORRELATOR_DIRECT) statisticsAutocorrelateMultiTauSymmetricMemOptimized(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, acf_t, acf_N, frame_width*frame_height);
-                        else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsAutocorrelateMultiTauAvgSymmetric<float, float>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
-                        for (register uint32_t ct=0; ct<acf_N; ct++) {
-                            sum[ct]=sum[ct]+cftemp[ct];
-                            sum2[ct]=sum2[ct]+cftemp[ct]*cftemp[ct];
-                        }
-                    }
-                    free(cftemp);
-                    double segs=job.segments;
-                    for (register uint32_t ct=0; ct<acf_N; ct++) {
-                        acf[p*acf_N+ct]=sum[ct]/segs;
-                        acf_std[p*acf_N+ct]=sqrt((sum2[ct]-sum[ct]*sum[ct]/segs)/(segs-1.0));
-                    }
-                    free(sum);
-                    free(sum2);
-                }
-                if (m_status==1 && !was_canceled) {
-                    if (frame_width*frame_height<1000) {
-                        emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1000/(frame_width*frame_height));
-                    } else if (p%(frame_width*frame_height/1000)==0) {
-                        emit messageChanged(tr("calculating autocorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1);
-                    }
 
-                } else {
-                    break;
-                }
-            }
-            for (uint32_t i=0; i<acf_N; i++) {
-                acf_tau[i]=(double)acf_t[i]*job.frameTime;
-            }
-            free(acf_t);
+            correlate_series(image_series, frame_width, frame_height, 0,0, frames, &acf_tau, &acf, &acf_std, acf_N, tr("calculating autocorrelation"), 1000);
+
         } else {
             emit progressIncrement(1000);
         }
@@ -937,128 +929,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (job.ccf && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
             emit messageChanged(tr("calculating crosscorrelations ..."));
-            ccf_N=job.S*job.P;
-            ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf2=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf3=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            ccf4=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
-                ccf1[nn]=1.0;
-                ccf2[nn]=1.0;
-                ccf3[nn]=1.0;
-                ccf4[nn]=1.0;
-            }
-            if (job.segments>1) {
-                ccf1_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf2_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf3_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf4_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-            }
-            ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-            long* ccf_t=(long*)calloc(ccf_N,sizeof(long));
-            statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
-            for (uint32_t p=0; p<frame_width*frame_height; p++) {
 
+            correlate_series(image_series, frame_width, frame_height, -1,0, frames, &ccf_tau, &ccf1, &ccf1_std, ccf_N, tr("calculating left crosscorrelation"), 250);
+            correlate_series(image_series, frame_width, frame_height, +1,0, frames, &ccf_tau, &ccf2, &ccf2_std, ccf_N, tr("calculating right crosscorrelation"), 250);
+            correlate_series(image_series, frame_width, frame_height, 0,-1, frames, &ccf_tau, &ccf3, &ccf3_std, ccf_N, tr("calculating up crosscorrelation"), 250);
+            correlate_series(image_series, frame_width, frame_height, 0,+1, frames, &ccf_tau, &ccf4, &ccf4_std, ccf_N, tr("calculating down crosscorrelation"), 250);
 
-                if (job.segments<=1) {
-                    if (job.correlator==CORRELATOR_DIRECT) {
-                        if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                        if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, ccf_t, ccf_N, frame_width*frame_height);
-                    } else if (job.correlator==CORRELATOR_DIRECTAVG) {
-                        if ((int32_t)p-1>=0) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf1[p*ccf_N]), &(image_series[p-1]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
-                        if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf2[p*ccf_N]), &(image_series[p+1]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
-                        if ((int32_t)p-(int32_t)frame_width>=0) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf3[p*ccf_N]), &(image_series[p-frame_width]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
-                        if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf4[p*ccf_N]), &(image_series[p+frame_width]), &(image_series[p]), frames, job.S, job.m, job.P, frame_width*frame_height);
-                    }
-                } else {
-                    uint32_t segment_frames=frames/job.segments;
-                    double* cftemp=(double*)calloc(4*ccf_N,sizeof(double));
-                    double* sum=(double*)calloc(4*ccf_N,sizeof(double));
-                    double* sum2=(double*)calloc(4*ccf_N,sizeof(double));
-                    for (register uint32_t ct=0; ct<4*ccf_N; ct++) {
-                        sum[ct]=0;
-                        sum2[ct]=0;
-                    }
-                    for (int32_t seg=0; seg<job.segments; seg++) {
-                        for (register uint32_t ct=0; ct<4*ccf_N; ct++) cftemp[ct]=0;
-                        if (job.correlator==CORRELATOR_DIRECT) {
-                            if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                            if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                            if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
-                        } else if (job.correlator==CORRELATOR_DIRECTAVG) {
-                            if ((int32_t)p-1>=0)                                                     statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[0*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
-                            if ((int32_t)p+1<(int32_t)(frame_width*frame_height))                    statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[1*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+1]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
-                            if ((int32_t)p-(int32_t)frame_width>=0)                                  statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[2*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p-frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
-                            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[3*ccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p+frame_width]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
-                        }
-                        for (register uint32_t ct=0; ct<ccf_N; ct++) {
-                            if ((int32_t)p-1>=0) {
-                                sum[0*ccf_N+ct]  += cftemp[0*ccf_N+ct];
-                                sum2[0*ccf_N+ct] += cftemp[0*ccf_N+ct]*cftemp[0*ccf_N+ct];
-                            } else {
-                                sum[0*ccf_N+ct] += 1.0;
-                                sum2[0*ccf_N+ct] += 1.0*1.0;
-                            }
-                            if ((int32_t)p+1<(int32_t)(frame_width*frame_height)) {
-                                sum[1*ccf_N+ct]  += cftemp[1*ccf_N+ct];
-                                sum2[1*ccf_N+ct] += cftemp[1*ccf_N+ct]*cftemp[1*ccf_N+ct];
-                            } else {
-                                sum[1*ccf_N+ct] += 1.0;
-                                sum2[1*ccf_N+ct] += 1.0*1.0;
-                            }
-                            if ((int32_t)p-(int32_t)frame_width>=0) {
-                                sum[2*ccf_N+ct]  += cftemp[2*ccf_N+ct];
-                                sum2[2*ccf_N+ct] += cftemp[2*ccf_N+ct]*cftemp[2*ccf_N+ct];
-                            } else {
-                                sum[2*ccf_N+ct] += 1.0;
-                                sum2[2*ccf_N+ct] += 1.0*1.0;
-                            }
-                            if ((int32_t)p+(int32_t)frame_width<(int32_t)(frame_width*frame_height)) {
-                                sum[3*ccf_N+ct]  += cftemp[3*ccf_N+ct];
-                                sum2[3*ccf_N+ct] += cftemp[3*ccf_N+ct]*cftemp[3*ccf_N+ct];
-                            } else {
-                                sum[3*ccf_N+ct] += 1.0;
-                                sum2[3*ccf_N+ct] += 1.0*1.0;
-                            }
-                        }
-                    }
-                    free(cftemp);
-                    double segs=job.segments;
-                    for (register uint32_t ct=0; ct<ccf_N; ct++) {
-                        ccf1[p*ccf_N+ct]=sum[0*ccf_N+ct]/segs;
-                        ccf1_std[p*ccf_N+ct]=sqrt((sum2[0*ccf_N+ct]-sum[0*ccf_N+ct]*sum[0*ccf_N+ct]/segs)/(segs-1.0));
-
-                        ccf2[p*ccf_N+ct]=sum[1*ccf_N+ct]/segs;
-                        ccf2_std[p*ccf_N+ct]=sqrt((sum2[1*ccf_N+ct]-sum[1*ccf_N+ct]*sum[1*ccf_N+ct]/segs)/(segs-1.0));
-
-                        ccf3[p*ccf_N+ct]=sum[2*ccf_N+ct]/segs;
-                        ccf3_std[p*ccf_N+ct]=sqrt((sum2[2*ccf_N+ct]-sum[2*ccf_N+ct]*sum[2*ccf_N+ct]/segs)/(segs-1.0));
-
-                        ccf4[p*ccf_N+ct]=sum[3*ccf_N+ct]/segs;
-                        ccf4_std[p*ccf_N+ct]=sqrt((sum2[3*ccf_N+ct]-sum[3*ccf_N+ct]*sum[3*ccf_N+ct]/segs)/(segs-1.0));
-                    }
-                    free(sum);
-                    free(sum2);
-                }
-
-                if (m_status==1 && !was_canceled) {
-                    if (frame_width*frame_height<1000) {
-                        emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1000/(frame_width*frame_height));
-                    } else if (p%(frame_width*frame_height/1000)==0) {
-                        emit messageChanged(tr("calculating crosscorrelations (%1/%2)...").arg(p+1).arg(frame_width*frame_height)); emit progressIncrement(1);
-                    }
-
-                } else {
-                    break;
-                }
-            }
-            for (uint32_t i=0; i<ccf_N; i++) {
-                ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
-            }
-            free(ccf_t);
         } else {
             emit progressIncrement(1000);
         }
@@ -1074,78 +950,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         if (job.distanceCCF && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
             emit messageChanged(tr("calculating distance crosscorrelations ..."));
 
-            dccfframe_width=frame_width-abs(job.DCCFDeltaX);
-            dccfframe_height=frame_height-abs(job.DCCFDeltaY);
 
-            dccf_N=job.S*job.P;
-            dccf=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
-            for (uint32_t nn=0; nn<dccf_N*dccfframe_width*dccfframe_height; nn++) {
-                dccf[nn]=1.0;
-            }
-            if (job.segments>1) {
-                dccf_std=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
-            }
-            dccf_tau=(double*)calloc(dccf_N,sizeof(double));
-            long* dccf_t=(long*)calloc(dccf_N,sizeof(long));
-            statisticsAutocorrelateCreateMultiTau(dccf_t, job.S, job.m, job.P);
-            int32_t corrcount=0;
-            for (uint32_t x=0; x<dccfframe_width; x++) {
-                for (uint32_t y=0; y<dccfframe_height; y++) {
-                    const int32_t p=y*frame_width+x;
-                    const int32_t x1=x+job.DCCFDeltaX;
-                    const int32_t y1=y+job.DCCFDeltaY;
-                    const int32_t p1=y1*frame_width+x1;
-                    if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
-                        if (job.segments<=1) {
-                            if (job.correlator==CORRELATOR_DIRECT) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(dccf[p*dccf_N]), &(image_series[p]), &(image_series[p1]), frames, dccf_t, dccf_N, frame_width*frame_height);
-                            else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(dccf[p*dccf_N]), &(image_series[p]), &(image_series[p1]), frames, job.S, job.m, job.P, frame_width*frame_height);
-                        } else {
-                            uint32_t segment_frames=frames/job.segments;
-                            double* cftemp=(double*)calloc(dccf_N,sizeof(double));
-                            double* sum=(double*)calloc(dccf_N,sizeof(double));
-                            double* sum2=(double*)calloc(dccf_N,sizeof(double));
-                            for (register uint32_t ct=0; ct<dccf_N; ct++) {
-                                sum[ct]=0;
-                                sum2[ct]=0;
-                            }
-                            for (int32_t seg=0; seg<job.segments; seg++) {
-                                for (register uint32_t ct=0; ct<dccf_N; ct++) cftemp[ct]=0;
-                                if (job.correlator==CORRELATOR_DIRECT) statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(cftemp[0*dccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p1]), segment_frames, dccf_t, dccf_N, frame_width*frame_height);
-                                else if (job.correlator==CORRELATOR_DIRECTAVG) statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(cftemp[0*dccf_N]), &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p1]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
-                                for (register uint32_t ct=0; ct<dccf_N; ct++) {
-                                    sum[0*dccf_N+ct]  += cftemp[0*dccf_N+ct];
-                                    sum2[0*dccf_N+ct] += cftemp[0*dccf_N+ct]*cftemp[0*dccf_N+ct];
-                                }
-                            }
-                            free(cftemp);
-                            double segs=job.segments;
-                            for (register uint32_t ct=0; ct<dccf_N; ct++) {
-                                dccf[p*dccf_N+ct]=sum[0*dccf_N+ct]/segs;
-                                dccf_std[p*dccf_N+ct]=sqrt((sum2[0*dccf_N+ct]-sum[0*dccf_N+ct]*sum[0*dccf_N+ct]/segs)/(segs-1.0));
-                            }
-                            free(sum);
-                            free(sum2);
-                        }
+            dccfframe_width=frame_width;//-abs(job.DCCFDeltaX);
+            dccfframe_height=frame_height;//-abs(job.DCCFDeltaY);
 
-                        if (m_status==1 && !was_canceled) {
-                            if (frame_width*frame_height<1000) {
-                                emit messageChanged(tr("calculating distance crosscorrelations (%1/%2)...").arg(corrcount+1).arg(dccfframe_width*dccfframe_height)); emit progressIncrement(1000/(dccfframe_width*dccfframe_height));
-                            } else if (corrcount%(frame_width*frame_height/1000)==0) {
-                                emit messageChanged(tr("calculating distance crosscorrelations (%1/%2)...").arg(corrcount+1).arg(dccfframe_width*dccfframe_height)); emit progressIncrement(1);
-                            }
-                            corrcount++;
+            correlate_series(image_series, frame_width, frame_height, job.DCCFDeltaX, job.DCCFDeltaY, frames, &dccf_tau, &dccf, &dccf_std, dccf_N, tr("calculating left crosscorrelation"), 1000);
 
-                        } else {
-                            break;
-                        }
-                    }
-
-                }
-            }
-            for (uint32_t i=0; i<dccf_N; i++) {
-                dccf_tau[i]=(double)dccf_t[i]*job.frameTime;
-            }
-            free(dccf_t);
         } else {
             emit progressIncrement(1000);
         }
@@ -1155,6 +965,181 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     if (image_series) free(image_series);
     image_series=NULL;
 }
+
+
+
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<MultiTauCorrelator<double, double>* >& ccfjk, QList<correlatorjb<double, double>* >& ccfjb, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N) {
+    if (job.correlator==CORRELATOR_MTAUALLMON) {
+        uint16_t i=0;
+        for (register uint16 y=0; y<frame_height; y++) {
+            for (register uint16 x=0; x<frame_width; x++) {
+
+                const int32_t p=y*frame_width+x;
+                const int32_t x1=x+shiftX;
+                const int32_t y1=y+shiftY;
+                const int32_t p1=y1*frame_width+x1;
+                if ((x1>=0) && (x1<(int32_t)frame_width) && (y1>=0) && (y1<(int32_t)frame_height)) {
+
+                    ccfjk[i]->crosscorrelate_step(frame_data[p], frame_data[p1]);
+
+                    if ((frame%segment_frames)==(segment_frames-1)) {
+                        ccfjk[i]->crossnormalize();
+                        //qDebug()<<"normalize jk ("<<x<<", "<<y<<": "<<i<<") !";
+                        double* corr1=ccfjk[i]->getCor();
+                        for (register uint32_t tt=0; tt<ccf_N; tt++) {
+                            register double v=corr1[tt];
+                            ccf[i*ccf_N+tt]=ccf[i*ccf_N+tt]+v;
+                            ccf_std[i*ccf_N+tt]=ccf_std[i*ccf_N+tt]+v*v;
+                        }
+                        delete ccfjk[i];
+                        ccfjk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
+                    }
+                }
+                i++;
+            }
+        }
+    } else {
+        uint16_t i=0;
+        for (register uint16 y=0; y<frame_height; y++) {
+            for (register uint16 x=0; x<frame_width; x++) {
+
+                const int32_t p=y*frame_width+x;
+                const int32_t x1=x+shiftX;
+                const int32_t y1=y+shiftY;
+                const int32_t p1=y1*frame_width+x1;
+                if ((x1>=0) && (x1<(int32_t)frame_width) && (y1>=0) && (y1<(int32_t)frame_height)) {
+
+                    ccfjb[i]->run(frame_data[p], frame_data[p1]);
+
+                    if ((frame%segment_frames)==(segment_frames-1)) {
+                        double** corr1=ccfjb[i]->get_array_G();
+                        //qDebug()<<"normalize jb ("<<x<<", "<<y<<": "<<i<<") !";
+                        for (register uint32_t tt=0; tt<ccf_N; tt++) {
+                            register double v=corr1[1][tt];
+                            ccf[i*ccf_N+tt]=ccf[i*ccf_N+tt]+v;
+                            ccf_std[i*ccf_N+tt]=ccf_std[i*ccf_N+tt]+v*v;
+                        }
+                        delete ccfjb[i];
+                        ccfjb[i]=new correlatorjb<double, double>(job.S, job.P);
+                        free(corr1[0]);
+                        free(corr1[1]);
+                    }
+                }
+                i++;
+            }
+        }
+    }
+
+}
+
+void QFRDRImagingFCSCorrelationJobThread::average_ccfs(double** acf, double** acf_std, uint32_t acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments) {
+    for (register uint64_t tt=0; tt<acf_N*frame_width*frame_height; tt++) {
+        double sum=(*acf)[tt];
+        double sum2=(*acf_std)[tt];
+        (*acf)[tt]=sum/(double)segments;
+        if (segments>1) {
+            (*acf_std)[tt]=sqrt((sum2-sum*sum/(double)segments)/(double)(segments-1));
+        } else {
+            (*acf_std)[tt]=0;
+        }
+        if (was_canceled) break;
+    }
+    if (segments<=1) {
+        free(*acf_std);
+        *acf_std=NULL;
+    }
+}
+
+void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double **acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments) {
+    if (job.correlator==CORRELATOR_MTAUALLMON) {
+        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+            acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
+        }
+        acf_N=acfjk[0]->getSlots();
+    } else {
+        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+            acfjb.append(new correlatorjb<double, double>(job.S, job.P));
+        }
+        acf_N=job.S*job.P;
+    }
+
+    if (acf_N>0) {
+        (*acf)=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+        for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
+            (*acf)[nn]=1.0;
+        }
+        (*acf_std)=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+        for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
+            (*acf_std)[nn]=1.0;
+        }
+        (*acf_t)=(double*)calloc(acf_N,sizeof(double));
+        if (job.correlator==CORRELATOR_MTAUALLMON) {
+            double* tau=acfjk[0]->getCorTau();
+            for (uint64_t tt=0; tt<acf_N; tt++) {
+                (*acf_t)[tt]=tau[tt];
+            }
+        } else {
+            double** corr1=acfjb[0]->get_array_G();
+            for (uint64_t tt=0; tt<acf_N; tt++) {
+                (*acf_t)[tt]=job.frameTime*corr1[0][tt];
+            }
+            free(corr1[0]);
+            free(corr1[1]);
+        }
+    }
+}
+
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max) {
+
+    float frame_min=frame_data[0];
+    float frame_max=frame_data[0];
+    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+        register float v=frame_data[i];
+        frame_min=(v<frame_min)?v:frame_min;
+        frame_max=(v>frame_max)?v:frame_max;
+        (*average_frame)[i]=(*average_frame)[i]+(float)v/(float)frames;
+        state.sum+=v;
+        state.sum2+=(v*v);
+        state.video_frame[i]=state.video_frame[i]+(float)v/(float)job.video_frames;
+    }
+    if (frame==0) {
+        frames_min=frame_min;
+        frames_max=frame_max;
+    } else {
+        frames_min=(frame_min<frames_min)?frame_min:frames_min;
+        frames_max=(frame_max>frames_max)?frame_max:frames_max;
+    }
+    if (state.statFirst) {
+        state.sframe_min=frame_min;
+        state.sframe_max=frame_max;
+        state.statFirst=false;
+    } else {
+        state.sframe_min=(frame_min<state.sframe_min)?frame_min:state.sframe_min;
+        state.sframe_max=(frame_max>state.sframe_max)?frame_max:state.sframe_max;
+    }
+    if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
+        float N=frame_width*frame_height*job.statistics_frames;
+        statistics_time.append((float)frame*job.frameTime);
+        statistics_mean.append(state.sum/N);
+        statistics_min.append(state.sframe_min);
+        statistics_max.append(state.sframe_max);
+        if (job.statistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
+        state.sum=0;
+        state.sum2=0;
+        state.sframe_min=0;
+        state.sframe_max=0;
+        state.statFirst=true;
+    }
+    if (job.video && ((frame+1)%job.video_frames==0) && video){
+        for (register uint32_t i=0; i<(uint32_t)frame_width*(uint32_t)frame_height; i++) {
+            (*video)[video_frame_num*frame_width*frame_height+i]=state.video_frame[i];
+            state.video_frame[i]=0;
+        }
+        video_frame_num++;
+    }
+
+}
+
 
 void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     QList<MultiTauCorrelator<double, double>* > acfjk;
@@ -1178,51 +1163,13 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     frames_min=0;
     frames_max=0;
     if (job.distanceCCF) {
-        dccfframe_width=frame_width-abs(job.DCCFDeltaX);
-        dccfframe_height=frame_height-abs(job.DCCFDeltaY);
-    }
-    if (job.correlator==CORRELATOR_MTAUALLMON) {
-        if (job.acf) {
-            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            }
-        }
-        if (job.ccf) {
-            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                ccf1jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-                ccf2jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-                ccf3jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-                ccf4jk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            }
-        }
-        if (job.distanceCCF) {
-            for (register uint32_t i=0; i<dccfframe_width*dccfframe_height; i++) {
-                dccfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
-            }
-        }
-    } else {
-        if (job.acf) {
-            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                acfjb.append(new correlatorjb<double, double>(job.S, job.P));
-            }
-        }
-        if (job.ccf) {
-            for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                ccf1jb.append(new correlatorjb<double, double>(job.S, job.P));
-                ccf2jb.append(new correlatorjb<double, double>(job.S, job.P));
-                ccf3jb.append(new correlatorjb<double, double>(job.S, job.P));
-                ccf4jb.append(new correlatorjb<double, double>(job.S, job.P));
-            }
-        }
-        if (job.distanceCCF) {
-            for (register uint32_t i=0; i<dccfframe_width*dccfframe_height; i++) {
-                dccfjb.append(new correlatorjb<double, double>(job.S, job.P));
-            }
-        }
+        dccfframe_width=frame_width;//-abs(job.DCCFDeltaX);
+        dccfframe_height=frame_height;//-abs(job.DCCFDeltaY);
     }
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // NOW WE READ ALL FRAMES IN THE TIFF FILE INTO THE flot* ARRAY ALLOCATED BEFORE
+    // NOW WE READ ALL FRAMES IN THE TIFF FILE TO EXTRACT SOME BASIC STATISTICS INFORMATION ABOUT THE FRAMES (used for background correction)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
@@ -1288,116 +1235,21 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
         acf_N=0;
         if (job.acf) {
-            if (job.correlator==CORRELATOR_MTAUALLMON) {
-                acf_N=acfjk[0]->getSlots();
-            } else {
-                acf_N=job.S*job.P;
-            }
-
-            if (acf_N>0) {
-                acf=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-                for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
-                    acf[nn]=0.0;
-                }
-                acf_std=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
-                for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
-                    acf_std[nn]=0.0;
-                }
-                acf_tau=(double*)calloc(acf_N,sizeof(double));
-                if (job.correlator==CORRELATOR_MTAUALLMON) {
-                    double* tau=acfjk[0]->getCorTau();
-                    for (uint64_t tt=0; tt<acf_N; tt++) {
-                        acf_tau[tt]=tau[tt];
-                    }
-                } else {
-                    double** corr1=acfjb[0]->get_array_G();
-                    for (uint64_t tt=0; tt<acf_N; tt++) {
-                        acf_tau[tt]=job.frameTime*corr1[0][tt];
-                    }
-                    free(corr1[0]);
-                    free(corr1[1]);
-                }
-            }
+            prepare_ccfs(acfjk, acfjb, &acf, &acf_std, &acf_tau, acf_N, frame_width, frame_height, job.segments);
         }
 
         ccf_N=0;
         if (job.ccf) {
-            if (job.correlator==CORRELATOR_MTAUALLMON) {
-                ccf_N=ccf1jk[0]->getSlots();
-            } else {
-                ccf_N=job.S*job.P;
-            }
+            prepare_ccfs(ccf1jk, ccf1jb, &ccf1, &ccf1_std, &ccf_tau, ccf_N, frame_width, frame_height, job.segments);
+            prepare_ccfs(ccf2jk, ccf2jb, &ccf2, &ccf2_std, &ccf_tau, ccf_N, frame_width, frame_height, job.segments);
+            prepare_ccfs(ccf3jk, ccf3jb, &ccf3, &ccf3_std, &ccf_tau, ccf_N, frame_width, frame_height, job.segments);
+            prepare_ccfs(ccf4jk, ccf4jb, &ccf4, &ccf4_std, &ccf_tau, ccf_N, frame_width, frame_height, job.segments);
 
-            if (ccf_N>0) {
-                ccf1=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf2=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf3=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf4=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
-                    ccf1[nn]=0.0;
-                    ccf2[nn]=0.0;
-                    ccf3[nn]=0.0;
-                    ccf4[nn]=0.0;
-                }
-                ccf1_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf2_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf3_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                ccf4_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
-                for (uint32_t nn=0; nn<ccf_N*frame_width*frame_height; nn++) {
-                    ccf1_std[nn]=0.0;
-                    ccf2_std[nn]=0.0;
-                    ccf3_std[nn]=0.0;
-                    ccf4_std[nn]=0.0;
-                }
-                ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-                if (job.correlator==CORRELATOR_MTAUALLMON) {
-                    double* tau=ccf1jk[0]->getCorTau();
-                    for (uint32_t tt=0; tt<ccf_N; tt++) {
-                        ccf_tau[tt]=tau[tt];
-                    }
-                } else {
-                    double** corr1=ccf1jb[0]->get_array_G();
-                    for (uint32_t tt=0; tt<ccf_N; tt++) {
-                        ccf_tau[tt]=job.frameTime*corr1[0][tt];
-                    }
-                    free(corr1[0]);
-                    free(corr1[1]);
-                }
-            }
         }
 
         dccf_N=0;
         if (job.distanceCCF) {
-            if (job.correlator==CORRELATOR_MTAUALLMON) {
-                dccf_N=dccfjk[0]->getSlots();
-            } else {
-                dccf_N=job.S*job.P;
-            }
-
-            if (dccf_N>0) {
-                dccf=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
-                for (uint32_t nn=0; nn<dccf_N*dccfframe_width*dccfframe_height; nn++) {
-                    dccf[nn]=0.0;
-                }
-                dccf_std=(double*)calloc(dccf_N*dccfframe_width*dccfframe_height,sizeof(double));
-                for (uint32_t nn=0; nn<dccf_N*dccfframe_width*dccfframe_height; nn++) {
-                    dccf_std[nn]=0.0;
-                }
-                dccf_tau=(double*)calloc(dccf_N,sizeof(double));
-                if (job.correlator==CORRELATOR_MTAUALLMON) {
-                    double* tau=dccfjk[0]->getCorTau();
-                    for (uint32_t tt=0; tt<dccf_N; tt++) {
-                        dccf_tau[tt]=tau[tt];
-                    }
-                } else {
-                    double** corr1=dccfjb[0]->get_array_G();
-                    for (uint32_t tt=0; tt<dccf_N; tt++) {
-                        dccf_tau[tt]=job.frameTime*corr1[0][tt];
-                    }
-                    free(corr1[0]);
-                    free(corr1[1]);
-                }
-            }
+            prepare_ccfs(dccfjk, dccfjb, &dccf, &dccf_std, &dccf_tau, dccf_N, dccfframe_width, dccfframe_height, job.segments);
         }
 
         reader->reset();
@@ -1409,21 +1261,25 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         }
         frame=0;
 
-        float sum=0;
-        float sum2=0;
-        float sframe_min=0;
-        float sframe_max=0;
-        float* video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-        for (int64_t i=0; i<frame_width*frame_height; i++)  {
-            video_frame[i]=0;
-        }
         uint16_t video_frame_num=0;
+
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state;
+        stat_state.sum=0;
+        stat_state.sum2=0;
+        stat_state.sframe_min=0;
+        stat_state.sframe_max=0;
+        stat_state.statFirst=true;
+        stat_state.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (int64_t i=0; i<frame_width*frame_height; i++)  {
+            stat_state.video_frame[i]=0;
+        }
         statistics_mean.clear();
         statistics_std.clear();
         statistics_min.clear();
         statistics_max.clear();
         statistics_time.clear();
-        bool statFirst=true;
+
+
         //bool videoFirst=true;
 
         uint32_t segment_frames=frames/job.segments;
@@ -1437,252 +1293,25 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     frame_data[i]=frame_data[i]-baseline-backgroundImage[i];
                 }
 
-
-
-
-                float frame_min=frame_data[0];
-                float frame_max=frame_data[0];
-                for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                    register float v=frame_data[i];
-                    frame_min=(v<frame_min)?v:frame_min;
-                    frame_max=(v>frame_max)?v:frame_max;
-                    average_frame[i]=average_frame[i]+(float)v/(float)frames;
-                    sum+=v;
-                    sum2+=(v*v);
-                    video_frame[i]=video_frame[i]+(float)v/(float)job.video_frames;
-                }
-                if (frame==0) {
-                    frames_min=frame_min;
-                    frames_max=frame_max;
-                } else {
-                    frames_min=(frame_min<frames_min)?frame_min:frames_min;
-                    frames_max=(frame_max>frames_max)?frame_max:frames_max;
-                }
-                if (statFirst) {
-                    sframe_min=frame_min;
-                    sframe_max=frame_max;
-                    statFirst=false;
-                } else {
-                    sframe_min=(frame_min<sframe_min)?frame_min:sframe_min;
-                    sframe_max=(frame_max>sframe_max)?frame_max:sframe_max;
-                }
-                if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
-                    float N=frame_width*frame_height*job.statistics_frames;
-                    statistics_time.append((float)frame*job.frameTime);
-                    statistics_mean.append(sum/N);
-                    statistics_min.append(sframe_min);
-                    statistics_max.append(sframe_max);
-                    if (job.statistics_frames>1) statistics_std.append(sqrt((sum2-sum*sum/N)/(N-1.0)));
-                    sum=0;
-                    sum2=0;
-                    sframe_min=0;
-                    sframe_max=0;
-                    statFirst=true;
-                }
-                if (job.video && ((frame+1)%job.video_frames==0) && video){
-                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-                        video[video_frame_num*frame_width*frame_height+i]=video_frame[i];
-                        video_frame[i]=0;
-                    }
-                    video_frame_num++;
-                }
-
-
+                // CALCULATE STATISTICS AND VIDEO
+                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
 
 
 
 
                 // CALCULATE CORRELATIONS, we store the sum in acf and the sum of squares in acf_std
                 if (job.acf && acf_N>0) {
-                    if (job.correlator==CORRELATOR_MTAUALLMON) {
-                        for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                            register double v=frame_data[i];
-                            acfjk[i]->correlate_step(v);
-                        }
-                        if ((frame%segment_frames)==(segment_frames-1)) {
-                            for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                                acfjk[i]->normalize();
-                                double* corr=acfjk[i]->getCor();
-                                for (register uint32_t tt=0; tt<acf_N; tt++) {
-                                    register double v=corr[tt];
-                                    acf[i*acf_N+tt]=acf[i*acf_N+tt]+v;
-                                    acf_std[i*acf_N+tt]=acf_std[i*acf_N+tt]+v*v;
-                                }
-                                delete acfjk[i];
-                                acfjk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
-                            }
-                        }
-                    } else {
-                        for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                            register double v=frame_data[i];
-                            acfjb[i]->run(v, v);
-                        }
-                        if ((frame%segment_frames)==(segment_frames-1)) {
-                            for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                                double** corr=acfjb[i]->get_array_G();
-                                for (register uint32_t tt=0; tt<acf_N; tt++) {
-                                    register double v=corr[1][tt];
-                                    acf[i*acf_N+tt]=acf[i*acf_N+tt]+v;
-                                    acf_std[i*acf_N+tt]=acf_std[i*acf_N+tt]+v*v;
-                                }
-                                delete acfjb[i];
-                                acfjb[i]=new correlatorjb<double, double>(job.S, job.P);
-                                free(corr[0]);
-                                free(corr[1]);
-                            }
-                        }
-                    }
+                    contribute_to_correlations(acfjk, acfjb, frame_data, frame_width, frame_height, 0, 0, frame, segment_frames, acf_tau, acf, acf_std, acf_N);
                 }
                 if (job.ccf && ccf_N>0) {
-                    if (job.correlator==CORRELATOR_MTAUALLMON) {
-                        for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                            if ((int32_t)i-1>=0) ccf1jk[i]->crosscorrelate_step(frame_data[i], frame_data[i-1]);
-                            if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jk[i]->crosscorrelate_step(frame_data[i], frame_data[i+1]);
-                            if ((int32_t)i-(int32_t)frame_width>=0)  ccf3jk[i]->crosscorrelate_step(frame_data[i], frame_data[i-frame_width]);
-                            if ((int32_t)i+(int32_t)frame_width<(int32_t)(frame_width*frame_height))  ccf4jk[i]->crosscorrelate_step(frame_data[i], frame_data[i+frame_width]);
+                    contribute_to_correlations(ccf1jk, ccf1jb, frame_data, frame_width, frame_height, -1, 0, frame, segment_frames, ccf_tau, ccf1, ccf1_std, ccf_N);
+                    contribute_to_correlations(ccf2jk, ccf2jb, frame_data, frame_width, frame_height, +1, 0, frame, segment_frames, ccf_tau, ccf2, ccf2_std, ccf_N);
+                    contribute_to_correlations(ccf3jk, ccf3jb, frame_data, frame_width, frame_height, 0, -1, frame, segment_frames, ccf_tau, ccf3, ccf3_std, ccf_N);
+                    contribute_to_correlations(ccf4jk, ccf4jb, frame_data, frame_width, frame_height, 0, +1, frame, segment_frames, ccf_tau, ccf4, ccf4_std, ccf_N);
 
-
-
-
-                            if ((frame%segment_frames)==(segment_frames-1)) {
-                                ccf1jk[i]->crossnormalize();
-                                ccf2jk[i]->crossnormalize();
-                                ccf3jk[i]->crossnormalize();
-                                ccf4jk[i]->crossnormalize();
-                                double* corr1=ccf1jk[i]->getCor();
-                                double* corr2=ccf2jk[i]->getCor();
-                                double* corr3=ccf3jk[i]->getCor();
-                                double* corr4=ccf4jk[i]->getCor();
-                                for (register uint32_t tt=0; tt<acf_N; tt++) {
-                                    register double v=corr1[tt];
-                                    ccf1[i*acf_N+tt]=ccf1[i*acf_N+tt]+v;
-                                    ccf1_std[i*acf_N+tt]=ccf1_std[i*acf_N+tt]+v*v;
-                                    v=corr2[tt];
-                                    ccf2[i*acf_N+tt]=ccf2[i*acf_N+tt]+v;
-                                    ccf2_std[i*acf_N+tt]=ccf2_std[i*acf_N+tt]+v*v;
-                                    v=corr3[tt];
-                                    ccf3[i*acf_N+tt]=ccf3[i*acf_N+tt]+v;
-                                    ccf3_std[i*acf_N+tt]=ccf3_std[i*acf_N+tt]+v*v;
-                                    v=corr4[tt];
-                                    ccf4[i*acf_N+tt]=ccf4[i*acf_N+tt]+v;
-                                    ccf4_std[i*acf_N+tt]=ccf4_std[i*acf_N+tt]+v*v;
-                                }
-                                delete ccf1jk[i];
-                                ccf1jk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
-                                delete ccf2jk[i];
-                                ccf2jk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
-                                delete ccf3jk[i];
-                                ccf3jk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
-                                delete ccf4jk[i];
-                                ccf4jk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
-                            }
-                        }
-                    } else {
-                        for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                            if ((int32_t)i-1>=0) ccf1jb[i]->run(frame_data[i], frame_data[i-1]);
-                            if ((int32_t)i+1<(int32_t)(frame_width*frame_height))  ccf2jb[i]->run(frame_data[i], frame_data[i+1]);
-                            if ((int32_t)i-(int32_t)frame_width>=0)  ccf3jb[i]->run(frame_data[i], frame_data[i-frame_width]);
-                            if ((int32_t)i+(int32_t)frame_width<(int32_t)(frame_width*frame_height))  ccf4jb[i]->run(frame_data[i], frame_data[i+frame_width]);
-
-
-
-
-                            if ((frame%segment_frames)==(segment_frames-1)) {
-                                double** corr1=ccf1jb[i]->get_array_G();
-                                double** corr2=ccf2jb[i]->get_array_G();
-                                double** corr3=ccf3jb[i]->get_array_G();
-                                double** corr4=ccf4jb[i]->get_array_G();
-                                for (register uint32_t tt=0; tt<ccf_N; tt++) {
-                                    register double v=corr1[1][tt];
-                                    ccf1[i*ccf_N+tt]=ccf1[i*ccf_N+tt]+v;
-                                    ccf1_std[i*ccf_N+tt]=ccf1_std[i*ccf_N+tt]+v*v;
-                                    v=corr2[1][tt];
-                                    ccf2[i*ccf_N+tt]=ccf2[i*ccf_N+tt]+v;
-                                    ccf2_std[i*ccf_N+tt]=ccf2_std[i*ccf_N+tt]+v*v;
-                                    v=corr3[1][tt];
-                                    ccf3[i*ccf_N+tt]=ccf3[i*ccf_N+tt]+v;
-                                    ccf3_std[i*ccf_N+tt]=ccf3_std[i*ccf_N+tt]+v*v;
-                                    v=corr4[1][tt];
-                                    ccf4[i*ccf_N+tt]=ccf4[i*ccf_N+tt]+v;
-                                    ccf4_std[i*ccf_N+tt]=ccf4_std[i*ccf_N+tt]+v*v;
-                                }
-                                delete ccf1jb[i];
-                                ccf1jb[i]=new correlatorjb<double, double>(job.S, job.P);
-                                delete ccf2jb[i];
-                                ccf2jb[i]=new correlatorjb<double, double>(job.S, job.P);
-                                delete ccf3jb[i];
-                                ccf3jb[i]=new correlatorjb<double, double>(job.S, job.P);
-                                delete ccf4jb[i];
-                                ccf4jb[i]=new correlatorjb<double, double>(job.S, job.P);
-                                free(corr1[0]); free(corr1[1]);
-                                free(corr2[0]); free(corr2[1]);
-                                free(corr3[0]); free(corr3[1]);
-                                free(corr4[0]); free(corr4[1]);
-                            }
-                        }
-                    }
                 }
                 if (job.distanceCCF && dccf_N>0) {
-                    if (job.correlator==CORRELATOR_MTAUALLMON) {
-                        uint16_t i=0;
-                        for (register uint16 y=0; y<dccfframe_height; y++) {
-                            for (register uint16 x=0; x<dccfframe_width; x++) {
-
-                                const int32_t p=y*frame_width+x;
-                                const int32_t x1=x+job.DCCFDeltaX;
-                                const int32_t y1=y+job.DCCFDeltaY;
-                                const int32_t p1=y1*frame_width+x1;
-                                if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
-
-                                    dccfjk[i]->crosscorrelate_step(frame_data[p], frame_data[p1]);
-
-                                    if ((frame%segment_frames)==(segment_frames-1)) {
-                                        dccfjk[i]->crossnormalize();
-                                        //qDebug()<<"normalize jk ("<<x<<", "<<y<<": "<<i<<") !";
-                                        double* corr1=dccfjk[i]->getCor();
-                                        for (register uint32_t tt=0; tt<dccf_N; tt++) {
-                                            register double v=corr1[tt];
-                                            dccf[i*dccf_N+tt]=dccf[i*dccf_N+tt]+v;
-                                            dccf_std[i*dccf_N+tt]=dccf_std[i*dccf_N+tt]+v*v;
-                                        }
-                                        delete dccfjk[i];
-                                        dccfjk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
-                                    }
-                                }
-                                i++;
-                            }
-                        }
-                    } else {
-                        uint16_t i=0;
-                        for (register uint16 y=0; y<dccfframe_height; y++) {
-                            for (register uint16 x=0; x<dccfframe_width; x++) {
-
-                                const int32_t p=y*frame_width+x;
-                                const int32_t x1=x+job.DCCFDeltaX;
-                                const int32_t y1=y+job.DCCFDeltaY;
-                                const int32_t p1=y1*frame_width+x1;
-                                if ((x1>=0) && (x1<frame_width) && (y1>=0) && (y1<frame_height)) {
-
-                                    dccfjb[i]->run(frame_data[p], frame_data[p1]);
-
-                                    if ((frame%segment_frames)==(segment_frames-1)) {
-                                        double** corr1=dccfjb[i]->get_array_G();
-                                        //qDebug()<<"normalize jb ("<<x<<", "<<y<<": "<<i<<") !";
-                                        for (register uint32_t tt=0; tt<dccf_N; tt++) {
-                                            register double v=corr1[1][tt];
-                                            dccf[i*dccf_N+tt]=dccf[i*dccf_N+tt]+v;
-                                            dccf_std[i*dccf_N+tt]=dccf_std[i*dccf_N+tt]+v*v;
-                                        }
-                                        delete dccfjb[i];
-                                        dccfjb[i]=new correlatorjb<double, double>(job.S, job.P);
-                                        free(corr1[0]);
-                                        free(corr1[1]);
-                                    }
-                                }
-                                i++;
-                            }
-                        }
-                    }
+                    contribute_to_correlations(dccfjk, dccfjb, frame_data, frame_width, frame_height, job.DCCFDeltaX, job.DCCFDeltaY, frame, segment_frames, dccf_tau, dccf, dccf_std, dccf_N);
                 }
             }
 
@@ -1700,129 +1329,38 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         // calculate avg + stddev from sum and square-sum, as calculated above
         if (job.acf && acf_N>0 && (m_status==1) && (!was_canceled) ) {
             emit messageChanged(tr("averaging ACF segments ..."));
-            for (register uint64_t tt=0; tt<acf_N*frame_width*frame_height; tt++) {
-                double sum=acf[tt];
-                double sum2=acf_std[tt];
-                acf[tt]=sum/(double)job.segments;
-                if (job.segments>1) {
-                    acf_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
-                } else {
-                    acf_std[tt]=0;
-                }
-                if (was_canceled) break;
-            }
-            if (job.segments<=1) {
-                free(acf_std);
-                acf_std=NULL;
-            }
+            average_ccfs(&acf, &acf_std, acf_N, frame_width, frame_height, job.segments);
         }
         if (job.ccf && ccf_N>0 && (m_status==1) && (!was_canceled)) {
             emit messageChanged(tr("averaging CCF segments ..."));
-            for (register uint64_t tt=0; tt<ccf_N*frame_width*frame_height; tt++) {
-                double sum=ccf1[tt];
-                double sum2=ccf1_std[tt];
-                ccf1[tt]=sum/(double)job.segments;
-                if (job.segments>1) {
-                    ccf1_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
-                } else {
-                    ccf1_std[tt]=0;
-                }
+            average_ccfs(&ccf1, &ccf1_std, ccf_N, frame_width, frame_height, job.segments);
+            average_ccfs(&ccf2, &ccf2_std, ccf_N, frame_width, frame_height, job.segments);
+            average_ccfs(&ccf3, &ccf3_std, ccf_N, frame_width, frame_height, job.segments);
+            average_ccfs(&ccf4, &ccf4_std, ccf_N, frame_width, frame_height, job.segments);
 
-                sum=ccf2[tt];
-                sum2=ccf2_std[tt];
-                ccf2[tt]=sum/(double)job.segments;
-                if (job.segments>1) {
-                    ccf2_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
-                } else {
-                    ccf2_std[tt]=0;
-                }
-
-                sum=ccf3[tt];
-                sum2=ccf3_std[tt];
-                ccf3[tt]=sum/(double)job.segments;
-                if (job.segments>1) {
-                    ccf3_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
-                } else {
-                    ccf3_std[tt]=0;
-                }
-
-                sum=ccf4[tt];
-                sum2=ccf4_std[tt];
-                ccf4[tt]=sum/(double)job.segments;
-                if (job.segments>1) {
-                    ccf4_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
-                } else {
-                    ccf4_std[tt]=0;
-                }
-            }
-            if (job.segments<=1) {
-                free(ccf1_std);
-                ccf1_std=NULL;
-                free(ccf2_std);
-                ccf2_std=NULL;
-                free(ccf3_std);
-                ccf3_std=NULL;
-                free(ccf4_std);
-                ccf4_std=NULL;
-            }
         }
         if (job.distanceCCF && dccf_N>0 && (m_status==1) && (!was_canceled)) {
             emit messageChanged(tr("averaging distance CCF segments ..."));
-            for (register uint64_t tt=0; tt<dccf_N*dccfframe_width*dccfframe_height; tt++) {
-                double sum=dccf[tt];
-                double sum2=dccf_std[tt];
-                dccf[tt]=sum/(double)job.segments;
-                if (job.segments>1) {
-                    dccf_std[tt]=sqrt((sum2-sum*sum/(double)job.segments)/(double)(job.segments-1));
-                } else {
-                    dccf_std[tt]=0;
-                }
-            }
-            if (job.segments<=1) {
-                free(dccf_std);
-                dccf_std=NULL;
-            }
+            average_ccfs(&dccf, &dccf_std, dccf_N, dccfframe_width, dccfframe_height, job.segments);
         }
         free(frame_data);
+        free(stat_state.video_frame);
     }
 
-    for (register int i=0; i<acfjk.size(); i++) {
-        if (acfjk[i]) delete acfjk[i];
-    }
-    for (register int i=0; i<ccf1jk.size(); i++) {
-        if (ccf1jk[i]) delete ccf1jk[i];
-    }
-    for (register int i=0; i<ccf2jk.size(); i++) {
-        if (ccf2jk[i]) delete ccf2jk[i];
-    }
-    for (register int i=0; i<ccf3jk.size(); i++) {
-        if (ccf3jk[i]) delete ccf3jk[i];
-    }
-    for (register int i=0; i<ccf4jk.size(); i++) {
-        if (ccf4jk[i]) delete ccf4jk[i];
-    }
-    for (register int i=0; i<dccfjk.size(); i++) {
-        if (dccfjk[i]) delete dccfjk[i];
-    }
+    qDeleteAll(acfjk);
+    qDeleteAll(ccf1jk);
+    qDeleteAll(ccf2jk);
+    qDeleteAll(ccf3jk);
+    qDeleteAll(ccf4jk);
+    qDeleteAll(dccfjk);
 
-    for (register int i=0; i<acfjb.size(); i++) {
-        if (acfjb[i]) delete acfjb[i];
-    }
-    for (register int i=0; i<ccf1jb.size(); i++) {
-        if (ccf1jb[i]) delete ccf1jb[i];
-    }
-    for (register int i=0; i<ccf2jb.size(); i++) {
-        if (ccf2jb[i]) delete ccf2jb[i];
-    }
-    for (register int i=0; i<ccf3jb.size(); i++) {
-        if (ccf3jb[i]) delete ccf3jb[i];
-    }
-    for (register int i=0; i<ccf4jb.size(); i++) {
-        if (ccf4jb[i]) delete ccf4jb[i];
-    }
-    for (register int i=0; i<dccfjb.size(); i++) {
-        if (dccfjb[i]) delete dccfjb[i];
-    }
+    qDeleteAll(acfjb);
+    qDeleteAll(ccf1jb);
+    qDeleteAll(ccf2jb);
+    qDeleteAll(ccf3jb);
+    qDeleteAll(ccf4jb);
+    qDeleteAll(dccfjb);
+
 
 }
 
@@ -1924,6 +1462,4 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     emit progressIncrement(100);
 
 }
-
-
 

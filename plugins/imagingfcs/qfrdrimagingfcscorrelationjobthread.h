@@ -10,6 +10,8 @@
 #include <QStringList>
 #include <QMutex>
 #include "qftools.h"
+#include "multitau-correlator.h"
+#include "correlator_multitau.h"
 
 class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward
@@ -210,18 +212,58 @@ protected:
           - \c %segments% segments the image series is cut into
           - \c %correlator% correlator type used
           - \c %correlatorid% correlator type used as number
+          - \c %bleach% bleach correction type
         .
       */
     QString replacePostfixSpecials(const QString& input, int counter=-1) const;
+
+
+    /** \brief the run method of the thread */
     void run();
+
+    /** \brief calculate correlation functions, statistics, video, ... by loading the whole sequence into memory */
     void correlate_loadall();
+    /** \brief calculate correlation functions, statistics, video, ... by loading the whole sequence into memory */
     void correlate_loadsingle();
+    /** \brief calculate the background correction from the data gathered from a first run through the data */
     void calcBackgroundCorrection();
+
+    /*! \brief calculate the CCF between the given timeseries
+
+        This function calculates the CCF between the two positions in the given image series that are shifted by (shiftX, shiftY).
+        A CCF for every pixel is calculated and stored in ccf, ccf_tau and ccf_std, if the pixels and its shifted counterpart are
+        both inside the image area.
+     */
+    void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250);
+
+
+    /*! \brief contribute the data in the given image to the given correlators
+
+    */
+    void contribute_to_correlations(QList<MultiTauCorrelator<double, double> *> &ccfjk, QList<correlatorjb<double, double> *> &ccfjb, float *frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N);
+    void average_ccfs(double **acf, double **acf_std, uint32_t acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
+    void prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double** acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
+
+    struct contribute_to_statistics_state {
+        float sum;
+        float sum2;
+        bool statFirst;
+        float* video_frame;
+        float sframe_max;
+        float sframe_min;
+    };
+
+    void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max);
+
+
     int m_status;
     bool was_canceled;
+
+    /** \brief the Job object to work on */
     Job job;
     double duration;
 
+    /** \brief this reader object is used to read the frames from the file */
     QFRDRImageReader* reader;
     uint32_t frames;
     uint32_t first_frame;
@@ -239,6 +281,12 @@ protected:
     QVector<float> statistics_std;
     QVector<float> statistics_min;
     QVector<float> statistics_max;
+
+    QVector<float> statistics_after_time;
+    QVector<float> statistics_after_mean;
+    QVector<float> statistics_after_std;
+    QVector<float> statistics_after_min;
+    QVector<float> statistics_after_max;
     double* acf_tau;
     double* acf;
     double* acf_std;

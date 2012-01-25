@@ -95,6 +95,8 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     }
     if (reader) {
         explorer->setBleachDecay(ui->spinDecay->value());
+        explorer->setBleachA(ui->edtDecayA->value());
+        explorer->setBleachB(ui->edtDecayB->value());
         explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkFirstFrame->isChecked(), ui->spinFirstFrame->value(), ui->chkLastFrame->isChecked(), ui->spinLastFrame->value(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value());
         if (explorer->exec()==QDialog::Accepted) {
             ui->spinDecay->setValue(explorer->getBleachDecay());
