@@ -329,6 +329,8 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachA", ui->edtDecayA->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -362,6 +364,8 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkDistanceCCD->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked()).toBool());
     ui->cmbBleachType->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex()).toInt());
     ui->spinDecay->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value()).toDouble());
+    ui->edtDecayA->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachA", ui->edtDecayA->value()).toDouble());
+    ui->edtDecayB->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value()).toDouble());
 
 }
 
@@ -465,6 +469,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.bleachDecay=ui->spinDecay->value();
     job.bleachA=ui->edtDecayA->value();
     job.bleachB=ui->edtDecayB->value();
+    job.bleachAvgFrames=100;
     writeSettings();
 
     setEditControlsEnabled(false);

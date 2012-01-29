@@ -24,6 +24,7 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_NONE 0
 #define BLEACH_REMOVEAVG 1
 #define BLEACH_EXP 2
+#define BLEACH_2EXP 3
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -114,6 +115,9 @@ struct Job {
     double bleachA;
     /** \brief bleach correction amplitude */
     double bleachB;
+    /** \brief number of frames to average over when determining the bleach correction parameters */
+    uint32_t bleachAvgFrames;
+
 };
 
 /*! \brief this thread does all the correlation work
@@ -227,6 +231,7 @@ protected:
     void correlate_loadsingle();
     /** \brief calculate the background correction from the data gathered from a first run through the data */
     void calcBackgroundCorrection();
+    void calcBleachCorrection(float* avgStart, float* avgEnd);
 
     /*! \brief calculate the CCF between the given timeseries
 
@@ -314,6 +319,8 @@ protected:
     float* backgroundImage;
     float* bleachOffset;
     float* bleachAmplitude;
+    float* firstFrames;
+    float* lastFrames;
 
     static QMutex* mutexFilename;
 

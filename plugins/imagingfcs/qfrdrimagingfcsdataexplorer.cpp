@@ -234,6 +234,12 @@ bool QFRDRImagingFCSDataExplorer::init(QFRDRImageReader* reader, QFRDRImageReade
 
 void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     JKQTPdatastore* ds=ui->pltIntensity->get_plotter()->getDatastore();
+    avgGraph->set_xColumn(-1);
+    avgGraph->set_yColumn(-1);
+    avgGraph->set_yErrorColumn(-1);
+    avgFit->set_xColumn(-1);
+    avgFit->set_yColumn(-1);
+
     ds->clear();
     double* oldAvg=avg;
     double* oldStd=stddev;
@@ -263,7 +269,7 @@ void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     if (oldAvg) free(oldAvg);
     if (oldStd) free(oldStd);
     if (oldFit) free(oldFit);
-    ui->pltIntensity->zoomToFit();
+
 }
 
 void QFRDRImagingFCSDataExplorer::reallocFrames() {
@@ -380,6 +386,8 @@ bool QFRDRImagingFCSDataExplorer::readStatistics(QModernProgressDialog *prg) {
     reader->reset();
     updateRange(false);
     readFrames(false);
+    calcFit();
+    ui->pltIntensity->zoomToFit();
 
     ui->labIntensityInfo->setText(tr(""));
 
@@ -533,14 +541,16 @@ void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
     lm_status_struct status;
     double dataI[500];
     double dataT[500];
-    srand(time(0));
+    srand(123456);
     for (int64_t i=0; i<500; i++) {
-        int64_t idx=start+rand()*(int64_t)(end-start+1)/RAND_MAX;
+        //int64_t idx=start+rand()*(int64_t)(end-start+1)/RAND_MAX;
+        int64_t idx=(int64_t)floor((double)start+(double)i/500*(double)(end-start+1));
         if (idx<0) idx=0;
         if (idx>=N) idx=N-1;
-        dataT[i]=idx;
+        dataT[i]=idx-start;
         dataI[i]=avg[idx];
     }
+    srand(time(0));
     double par[3]={ui->spinDecay->value(), ui->edtAmplitude->value(), ui->edtOffset->value()};
     //lmmin( 3, par, end-start+1, (const void*) &avg[start], fExpC, &control, &status, NULL );
     lmcurve_fit(3, par, 500, dataT, dataI, fExp, &control, &status);
