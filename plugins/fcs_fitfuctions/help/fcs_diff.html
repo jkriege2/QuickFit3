@@ -19,6 +19,9 @@ The parameters are:
 <li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_850.png"/>: aspect ratio of the gaussian used to approximate the focus</li>
 <li><img alt="$ w_{xy} $" src="./pic/form_300.png"/>: lateral half axis of the focus gaussian</li>
 <li><img alt="$ z_0 $" src="./pic/form_860.png"/>: longitudinal half axis of the focus gaussian</li>
+<li><i>b</i>: background intensity, as measured in a sample without fluorescing molecules (e.g. dark counts of the detector and scattering in the buffer contributes to this) </li>
+<li><i>cps</i>: average intensityduring the measurement </li>
+
 </ul>
 This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_300.png"/> of the laser focus (xy plane) is known, as: 
 <blockquote><img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_400.png"/></blockquote>
@@ -27,12 +30,16 @@ where <img alt="$ \tau_D $" src="./pic/form_500.png"/> is the diffusion time. Al
 
 Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
 <blockquote><img alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_870.png"/></blockquote>
+Given the count rate cps and the background count rate <i>b</i>, we can calculate the counts per molecule:
+<blockquote><img  src="./pic/form_416.png"></blockquote>
+
 The plugin also calculates some parameter errors: 
 <blockquote>
 	<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_900.png"/><br>
 	<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_100.png"/><br>
 	<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_110.png"/><br>
 	<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_120.png"/>
+    <img  src="./pic/form_417.png">
 </blockquote>
 
 Here are some example sketches of correlation functions together with their interpretation:

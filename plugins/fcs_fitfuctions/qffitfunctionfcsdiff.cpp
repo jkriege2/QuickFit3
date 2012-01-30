@@ -56,8 +56,10 @@ QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
     #define FCSDiff_diff_coeff3 21
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    0,            0,        1e50,     1    );
     #define FCSDiff_count_rate 22
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,    0,            0,        1e50,     1    );
+    #define FCSDiff_background 23
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, 0,            0,        1e50,     1    );
-    #define FCSDiff_cpm 23
+    #define FCSDiff_cpm 24
 }
 
 double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
@@ -73,6 +75,9 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
     const double tauD2=data[FCSDiff_diff_tau2]/1.0e6;
     const double rho3=data[FCSDiff_diff_rho3];
     const double tauD3=data[FCSDiff_diff_tau3]/1.0e6;
+    const double background=data[FCSDiff_background];
+    const double cr=data[FCSDiff_count_rate];
+    double backfactor=1.0/sqr(1.0+background/cr);
     double gamma=data[FCSDiff_focus_struct_fac];
     if (gamma==0) gamma=1;
     const double gamma2=sqr(gamma);
@@ -103,7 +108,7 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
     } else if (nonfl_comp==2) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
     }
-    return offset+pre/N*(rho1*d1+d2+d3);
+    return offset+pre/N*(rho1*d1+d2+d3)*backfactor;
 }
 
 
@@ -143,6 +148,8 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
     double eoffset=0;
     double cps=data[FCSDiff_count_rate];
     double ecps=0;
+    double background=data[FCSDiff_background];
+    double ebackground=0;
     //double cpm=data[FCSDiff_cpm];
     double ecpm=0;
 
@@ -163,6 +170,7 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         eoffset=error[FCSDiff_offset];
         ecps=error[FCSDiff_count_rate];
         ecpm=error[FCSDiff_cpm];
+        ebackground=error[FCSDiff_background];
     }
 
     // correct for invalid fractions
@@ -279,10 +287,11 @@ void QFFitFunctionFCSDiff::calcParameter(double* data, double* error) const {
         else error[FCSDiff_diff_coeff3]=0;
     }
 
-    // calculate CPM = CPS/N
-    data[FCSDiff_cpm]=cps/N;
-    error[FCSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
-}
+
+    // calculate CPM = (CPS-background)/N
+    data[FCSDiff_cpm]=(cps-background)/N;
+    error[FCSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
+ }
 
 bool QFFitFunctionFCSDiff::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSDiff_n_components];

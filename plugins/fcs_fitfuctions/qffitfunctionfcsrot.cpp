@@ -47,6 +47,12 @@ QFFitFunctionFCSRot::QFFitFunctionFCSRot() {
     #define FCSSDiff_diff_coeff1 14
     addParameter(FloatNumber,  "diff_rot",                "rotation diffusion coefficient",                        "&Theta;<sub>rot</sub>",    "1/s",        "s<sup>-1</sup>",         false,    false,        false,              QFFitFunction::DisplayError, 500,          0,        1e50,     1    );
     #define FCSSDiff_rot_diff 15
+    addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    0,            0,        1e50,     1    );
+    #define FCSSDiff_count_rate 16
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,    0,            0,        1e50,     1    );
+    #define FCSSDiff_background 17
+    addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, 0,            0,        1e50,     1    );
+    #define FCSSDiff_cpm 18
 }
 
 double QFFitFunctionFCSRot::evaluate(double t, const double* data) const {
@@ -61,6 +67,9 @@ double QFFitFunctionFCSRot::evaluate(double t, const double* data) const {
     double gamma=data[FCSSDiff_focus_struct_fac];
     if (gamma==0) gamma=1;
     const double gamma2=sqr(gamma);
+    const double background=data[FCSSDiff_background];
+    const double cr=data[FCSSDiff_count_rate];
+    double backfactor=1.0/sqr(1.0+background/cr);
 
     const double offset=data[FCSSDiff_offset];
 
@@ -69,7 +78,7 @@ double QFFitFunctionFCSRot::evaluate(double t, const double* data) const {
     double d1=1.0/(1.0+reltau1)/sqrt(1.0+reltau1/gamma2);
     double rot=(1.0-Fr)+Fr*(c1*exp(-t/taur)+c2*exp(-20.0*t/6.0/taur));
     double pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1))/(1.0-nf_theta1);
-    return offset+pre/N*d1*rot;
+    return offset+pre/N*d1*rot*backfactor;
 }
 
 
@@ -94,6 +103,10 @@ void QFFitFunctionFCSRot::calcParameter(double* data, double* error) const {
     double ewxy=0;
     //double offset=data[FCSSDiff_offset];
     double eoffset=0;
+    double cps=data[FCSSDiff_count_rate];
+    double ecps=0;
+    double background=data[FCSSDiff_background];
+    double ebackground=0;
 
     if (error) {
         eN=error[FCSSDiff_n_particle];
@@ -103,6 +116,8 @@ void QFFitFunctionFCSRot::calcParameter(double* data, double* error) const {
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
         eoffset=error[FCSSDiff_offset];
         etaur=error[FCSSDiff_rot_tau]/1.0e9;
+        ecps=error[FCSSDiff_count_rate];
+        ebackground=error[FCSSDiff_background];
     }
 
     data[FCSSDiff_nonfl_theta1]=nf_theta1;
@@ -139,6 +154,11 @@ void QFFitFunctionFCSRot::calcParameter(double* data, double* error) const {
         if (taur!=0) error[FCSSDiff_rot_diff]=fabs(etaur/6.0/sqr(taur));
         else error[FCSSDiff_rot_diff]=0;
     }
+
+    // calculate CPM = (CPS-background)/N
+    data[FCSSDiff_cpm]=(cps-background)/N;
+    error[FCSSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
+
 }
 
 bool QFFitFunctionFCSRot::isParameterVisible(int parameter, const double* data) const {

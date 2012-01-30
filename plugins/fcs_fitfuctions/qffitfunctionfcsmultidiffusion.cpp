@@ -71,8 +71,10 @@ QFFitFunctionFCSMultiDiffusion::QFFitFunctionFCSMultiDiffusion() {
     #define FCSMULTI_concentration 24
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    0,            0,        1e50,     1    );
     #define FCSMULTI_count_rate 25
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,    0,            0,        1e50,     1    );
+    #define FCSMULTI_background 26
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, 0,            0,        1e50,     1    );
-    #define FCSMULTI_cpm 26
+    #define FCSMULTI_cpm 27
 }
 
 double QFFitFunctionFCSMultiDiffusion::evaluate(double t, const double* data) const {
@@ -91,6 +93,9 @@ double QFFitFunctionFCSMultiDiffusion::evaluate(double t, const double* data) co
     const double alpha1=data[FCSMULTI_diff_alpha1];
     const double alpha2=data[FCSMULTI_diff_alpha2];
     const double alpha3=data[FCSMULTI_diff_alpha3];
+    const double background=data[FCSMULTI_background];
+    const double cr=data[FCSMULTI_count_rate];
+    double backfactor=1.0/sqr(1.0+background/cr);
 
     const int type1=data[FCSMULTI_diff_type1];
     const int type2=data[FCSMULTI_diff_type2];
@@ -147,7 +152,7 @@ double QFFitFunctionFCSMultiDiffusion::evaluate(double t, const double* data) co
     } else if (nonfl_comp==2) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
     }
-    return offset+pre/N*(rho1*d1+d2+d3);
+    return offset+pre/N*(rho1*d1+d2+d3)*backfactor;
 }
 
 
@@ -191,6 +196,8 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
     double ealpha3=0;
     double cps=data[FCSMULTI_count_rate];
     double ecps=0;
+    double background=data[FCSMULTI_background];
+    double ebackground=0;
     //double cpm=data[FCSMULTI_cpm];
     double ecpm=0;
 
@@ -214,6 +221,7 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
         ealpha3=error[FCSMULTI_diff_alpha3];
         ecps=error[FCSMULTI_count_rate];
         ecpm=error[FCSMULTI_cpm];
+        ebackground=error[FCSMULTI_background];
     }
 
     // correct for invalid fractions
@@ -302,9 +310,9 @@ void QFFitFunctionFCSMultiDiffusion::calcParameter(double* data, double* error) 
         else error[FCSMULTI_concentration]=0;
     }
 
-    // calculate CPM = CPS/N
-    data[FCSMULTI_cpm]=cps/N;
-    error[FCSMULTI_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
+    // calculate CPM = (CPS-background)/N
+    data[FCSMULTI_cpm]=(cps-background)/N;
+    error[FCSMULTI_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
 
 }
 

@@ -25,6 +25,9 @@ diffusion term and a triplett term. The model may be denoted as:
 <li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
 <li><img alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
 <li><img alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
+<li><i>b</i>: background intensity, as measured in a sample without fluorescing molecules (e.g. dark counts of the detector and scattering in the buffer contributes to this) </li>
+<li><i>cps</i>: average intensityduring the measurement </li>
+
 </ul>
 <p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
 <p>
@@ -41,6 +44,8 @@ diffusion term and a triplett term. The model may be denoted as:
  <p> The rotational diffusion coefficient is defined as
 <img src="./pic/form_407.png">
 </p>
+<p>Given the count rate cps and the background count rate <i>b</i>, we can calculate the counts per molecule:</p>
+<p><img  src="./pic/form_416.png"></p>
 
 <p>The plugin also calculates some parameter errors: </p>
 <p>
@@ -58,6 +63,7 @@ diffusion term and a triplett term. The model may be denoted as:
  <p>
 <img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_18.png">
 </p>
+<p><img  src="./pic/form_417.png"></p>
 
 
 

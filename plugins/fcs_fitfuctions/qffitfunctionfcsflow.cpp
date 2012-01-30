@@ -41,6 +41,13 @@ QFFitFunctionFCSFlow::QFFitFunctionFCSFlow() {
     #define FCSSDiff_diff_coeff1 11
     addParameter(FloatNumber,  "vflow",                   "flow speed of species 1",                               "v<sub>flow</sub>",         "micron/s", "&mu;m/s",                  false,    false,        false,              QFFitFunction::DisplayError, 500,          0,        1e50,     1    );
     #define FCSSDiff_vflow 12
+    addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    0,            0,        1e50,     1    );
+    #define FCSSDiff_count_rate 13
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,    0,            0,        1e50,     1    );
+    #define FCSSDiff_background 14
+    addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, 0,            0,        1e50,     1    );
+    #define FCSSDiff_cpm 15
+
 }
 
 double QFFitFunctionFCSFlow::evaluate(double t, const double* data) const {
@@ -49,6 +56,9 @@ double QFFitFunctionFCSFlow::evaluate(double t, const double* data) const {
     const double nf_theta1=data[FCSSDiff_nonfl_theta1];
     const double tauD1=data[FCSSDiff_diff_tau1]/1.0e6;
     const double tauf=data[FCSSDiff_diff_tauf]/1.0e6;
+    const double background=data[FCSSDiff_background];
+    const double cr=data[FCSSDiff_count_rate];
+    double backfactor=1.0/sqr(1.0+background/cr);
     double gamma=data[FCSSDiff_focus_struct_fac];
     if (gamma==0) gamma=1;
     const double gamma2=sqr(gamma);
@@ -60,7 +70,7 @@ double QFFitFunctionFCSFlow::evaluate(double t, const double* data) const {
     double d1=1.0/(1.0+reltau1)/sqrt(1.0+reltau1/gamma2);
     double flow=exp(-sqr(t/tauf)/(1.0+reltau1));
     double pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1))/(1.0-nf_theta1);
-    return offset+pre/N*d1*flow;
+    return offset+pre/N*d1*flow*backfactor;
 }
 
 
@@ -85,6 +95,10 @@ void QFFitFunctionFCSFlow::calcParameter(double* data, double* error) const {
     double ewxy=0;
     //double offset=data[FCSSDiff_offset];
     double eoffset=0;
+    double cps=data[FCSSDiff_count_rate];
+    double ecps=0;
+    double background=data[FCSSDiff_background];
+    double ebackground=0;
 
     if (error) {
         eN=error[FCSSDiff_n_particle];
@@ -94,6 +108,8 @@ void QFFitFunctionFCSFlow::calcParameter(double* data, double* error) const {
         ewxy=error[FCSSDiff_focus_width]/1.0e3;
         eoffset=error[FCSSDiff_offset];
         etauf=error[FCSSDiff_diff_tauf]/1.0e6;
+        ecps=error[FCSSDiff_count_rate];
+        ebackground=error[FCSSDiff_background];
     }
 
     data[FCSSDiff_nonfl_theta1]=nf_theta1;
@@ -130,6 +146,12 @@ void QFFitFunctionFCSFlow::calcParameter(double* data, double* error) const {
         if (tauD1!=0) error[FCSSDiff_vflow]=sqrt( sqr(etauf*wxy/sqr(tauf)) + sqr(ewxy/tauf) );
         else error[FCSSDiff_vflow]=0;
     }
+
+
+    // calculate CPM = (CPS-background)/N
+    data[FCSSDiff_cpm]=(cps-background)/N;
+    error[FCSSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
+
 }
 
 bool QFFitFunctionFCSFlow::isParameterVisible(int parameter, const double* data) const {

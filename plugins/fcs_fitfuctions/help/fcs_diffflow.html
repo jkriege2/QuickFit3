@@ -22,6 +22,9 @@ This file implement a one-component 3D diffusion model which also includes a flo
 <li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
 <li><img alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
 <li><img alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
+<li><i>b</i>: background intensity, as measured in a sample without fluorescing molecules (e.g. dark counts of the detector and scattering in the buffer contributes to this) </li>
+<li><i>cps</i>: average intensityduring the measurement </li>
+
 </ul>
 <p>This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
 <p>
@@ -35,6 +38,9 @@ This file implement a one-component 3D diffusion model which also includes a flo
 <p>
 <img alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_15.png">
 </p>
+<p>Given the count rate cps and the background count rate <i>b</i>, we can calculate the counts per molecule:</p>
+<p><img  src="./pic/form_416.png"></p>
+
 <p>
 In this model the flow velocity may be calculated from the characterstic flow time <i>&tau;<sub>f</sub></i> via:
 <center><img src="./pic/vflow.png"></center>
@@ -55,6 +61,8 @@ In this model the flow velocity may be calculated from the characterstic flow ti
  <p>
 <img src="./pic/form_402.png">
 </p>
+<p><img  src="./pic/form_417.png"></p>
+
 <p>This model was taken from the paper:<ul><li>Kohler, R.H., P. Schwille, W.W. Webb, and M.R. Hanson. 2000. Active protein transport through plastid tubules: velocity quantified by fluorescence correlation spectroscopy. J Cell Sci 113(22):3921–3930</li></ul></p>
 
 </body></html>
