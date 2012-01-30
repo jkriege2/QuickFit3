@@ -852,6 +852,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     firstFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
     lastFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
+
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
         register uint32_t frame=0;
@@ -1272,6 +1273,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         dccfframe_width=frame_width;//-abs(job.DCCFDeltaX);
         dccfframe_height=frame_height;//-abs(job.DCCFDeltaY);
     }
+    firstFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
+    lastFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1309,6 +1312,15 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     frames_min=(frame_min<frames_min)?frame_min:frames_min;
                     frames_max=(frame_max>frames_max)?frame_max:frames_max;
                 }
+                if (frame<job.bleachAvgFrames) {
+                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        firstFrames[i]=firstFrames[i]+(float)frame_data[i]/(float)job.bleachAvgFrames;
+                    }
+                } else if (frame>frames-job.bleachAvgFrames) {
+                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        lastFrames[i]=lastFrames[i]+(float)frame_data[i]/(float)job.bleachAvgFrames;
+                    }
+                }
             }
 
             if (frames<1000) {
@@ -1327,7 +1339,18 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // NOW WE CALCULATE THE IMAGE BASELINE (ACCORDING TO THE USER SETTINGS). IT WILL BE APPLIED LATER!
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!was_canceled && m_status==1) calcBackgroundCorrection();
+    if (!was_canceled && m_status==1) {
+        emit messageChanged(tr("calculating background & bleach correction ..."));
+        QApplication::processEvents();
+        QApplication::processEvents();
+        calcBackgroundCorrection();
+        calcBleachCorrection(firstFrames, lastFrames);
+        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+            firstFrames[i]=firstFrames[i]-baseline-backgroundImage[i%(frame_width*frame_height)];
+            lastFrames[i]=lastFrames[i]-baseline-backgroundImage[i%(frame_width*frame_height)];
+        }
+    }
+
 
 
 
@@ -1395,8 +1418,20 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
             } else {
                 // APPLY BACKGROUND CORRECTION TO FRAME
+                double avg=0;
                 for (register uint16 i=0; i<frame_width*frame_height; i++) {
                     frame_data[i]=frame_data[i]-baseline-backgroundImage[i];
+                    avg=avg+frame_data[i]/ ((double)(frame_width*frame_height));
+                }
+
+                if (job.bleach==BLEACH_EXP) {
+                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        frame_data[i]=frame_data[i]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)frame/job.bleachDecay));
+                    }
+                } else if (job.bleach==BLEACH_REMOVEAVG) {
+                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        frame_data[i]=frame_data[i]*firstFrames[i]/avg;
+                    }
                 }
 
                 // CALCULATE STATISTICS AND VIDEO

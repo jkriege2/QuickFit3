@@ -108,13 +108,14 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
     QFProjectTreeModelNode *item = static_cast<QFProjectTreeModelNode*>(index.internalPointer());
     QFProjectTreeModelNode::nodeType nt=classifyIndex(index);
 
-
-    if (role == Qt::DisplayRole || role == Qt::EditRole) {
-        return item->title();
-    } else if (role == Qt::DecorationRole) {
-        return item->icon();
-    } else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole) {
-        return item->toolHelp();
+    if (item) {
+        if (role == Qt::DisplayRole || role == Qt::EditRole) {
+            return item->title();
+        } else if (role == Qt::DecorationRole) {
+            return item->icon();
+        } else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole) {
+            return item->toolHelp();
+        }
     }
     return QVariant();
 }
@@ -171,20 +172,24 @@ QFEvaluationItem* QFProjectTreeModel::getEvaluationByIndex(const QModelIndex& in
 
 QModelIndex QFProjectTreeModel::index ( QFRawDataRecord* record, QFProjectTreeModelNode* folder) const {
     QModelIndex idx;
-    if (folder->rawDataRecord()==record) return createIndex(folder->row(), 0, folder);
-    for (int i=0; i<folder->childCount(); i++) {
-        idx=index(record, folder->child(i));
-        if (idx.isValid()) break;
+    if (folder) {
+        if (folder->rawDataRecord()==record) return createIndex(folder->row(), 0, folder);
+        for (int i=0; i<folder->childCount(); i++) {
+            idx=index(record, folder->child(i));
+            if (idx.isValid()) break;
+        }
     }
     return idx;
 }
 
 QModelIndex QFProjectTreeModel::index ( QFEvaluationItem* record, QFProjectTreeModelNode* folder) const {
     QModelIndex idx;
-    if (folder->evaluationItem()==record) return createIndex(folder->row(), 0, folder);
-    for (int i=0; i<folder->childCount(); i++) {
-        idx=index(record, folder->child(i));
-        if (idx.isValid()) break;
+    if (folder) {
+        if (folder->evaluationItem()==record) return createIndex(folder->row(), 0, folder);
+        for (int i=0; i<folder->childCount(); i++) {
+            idx=index(record, folder->child(i));
+            if (idx.isValid()) break;
+        }
     }
     return idx;
 }

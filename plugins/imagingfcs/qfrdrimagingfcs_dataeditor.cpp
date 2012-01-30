@@ -229,7 +229,10 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
 };
 
 void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
-    if (old) disconnect(old, 0, this, 0);
+    if (old) {
+        disconnect(old, 0, this, 0);
+        disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+    }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));

@@ -33,6 +33,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     timUpdateAfterClick=new QTimer(this);
     timUpdateAfterClick->setSingleShot(true);
     timUpdateAfterClick->setInterval(CLICK_UPDATE_TIMEOUT);
+    timUpdateAfterClick->stop();
     connect(timUpdateAfterClick, SIGNAL(timeout()), this, SLOT(updateAfterClick()));
     createWidgets();
     //QTimer::singleShot(500, this, SLOT(debugInfo()));
@@ -886,7 +887,6 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
 }
 
 void QFRDRImagingFCSImageEditor::histogramSettingsChanged() {
-
     histogram->histogramSettingsChanged(false);
     updateHistogram();
     saveImageSettings();
@@ -922,8 +922,8 @@ void QFRDRImagingFCSImageEditor::includeRuns() {
 
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
-        disconnect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
-        disconnect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        disconnect(old, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+        disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
