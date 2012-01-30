@@ -210,10 +210,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         int height=0;
         if (QFile::exists(evalFilename)) {
             QFile file(evalFilename);
+            QDir d=QFileInfo(evalFilename).absoluteDir();
             if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 QTextStream stream(&file);
                 QString line;
-                QRegExp reg("(.*)(:\\s*)(\\d+)");
+                QRegExp reg("(.*)(:\\s*)([+-]?\\d*\\.?\\d+([eE][+-]?\\d+)?)");
                 do {
                     line = stream.readLine();
                     if (reg.indexIn(line)>-1) {
@@ -312,6 +313,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="bleach decay constant [pix]") {
                             initParams["BLEACH_CORRECTION_DECAY_PIX"]=value.toDouble();
                             paramsReadonly<<"BLEACH_CORRECTION_DECAY_PIX";
+                        } else if (name=="bleach offset B") {
+                            initParams["BLEACH_CORRECTION_FIT_OFFSET"]=value.toInt();
+                            paramsReadonly<<"BLEACH_CORRECTION_FIT_OFFSET";
+                        } else if (name=="bleach amplitude A") {
+                            initParams["BLEACH_CORRECTION_FIT_AMPLITUDE"]=value.toInt();
+                            paramsReadonly<<"BLEACH_CORRECTION_FIT_AMPLITUDE";
                         /*} else if (name=="") {
                             initParams[""]=value.toInt();
                             paramsReadonly<<"";*/
@@ -323,17 +330,17 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         QString value=line.mid(colon_idx+1).trimmed();
                         //qDebug()<<name<<value;
                         if (name=="overview image file") {
-                            filename_overview=QFileInfo(value).canonicalFilePath();
+                            filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="background image file") {
-                            filename_background=QFileInfo(value).canonicalFilePath();
+                            filename_background=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="video file") {
-                            filename_video=QFileInfo(value).canonicalFilePath();
+                            filename_video=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="statistics file") {
-                            filename_statistics=QFileInfo(value).canonicalFilePath();
+                            filename_statistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="input description file") {
-                            filename_settings=QFileInfo(value).canonicalFilePath();
+                            filename_settings=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="input file") {
-                            filename_acquisition=QFileInfo(value).canonicalFilePath();
+                            filename_acquisition=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="date/time") {
                             initParams["CORRELATION_DATE"]=value;
                             paramsReadonly<<"CORRELATION_DATE";

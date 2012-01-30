@@ -161,6 +161,12 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvProperties->horizontalHeader()->setStretchLastSection(true);
     //tvProperties->setSizePolicy(tvProperties->sizePolicy().horizontalPolicy(), QSizePolicy::Expanding);
     tvProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    paramFilterProxy=new QSortFilterProxyModel(this);
+    paramFilterProxy->setDynamicSortFilter(false);
+    paramFilterProxy->setFilterKeyColumn(0);
+    paramFilterProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+    paramFilterProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    tvProperties->setModel(paramFilterProxy);
 
     QWidget* widProperties=new QWidget(this);
     QHBoxLayout* pl1=new QHBoxLayout(this);
@@ -322,7 +328,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         }
         lstFiles->addItems(f);
         lstFiles->setEnabled(true);
-        tvProperties->setModel(current->getPropertyModel());
+        paramFilterProxy->setSourceModel(current->getPropertyModel());
+        paramFilterProxy->sort(0);
         tvProperties->setEnabled(true);
         tvResults->setModel(current->resultsGetModel());
         connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
@@ -366,7 +373,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         labTypeIcon->setText("");
         lstFiles->clear();
         lstFiles->setEnabled(false);
-        tvProperties->setModel(NULL);
+        paramFilterProxy->setSourceModel(NULL);
         tvProperties->setEnabled(false);
     }
     //std::cout<<"creating new editors ... DONE!\n";
@@ -469,6 +476,7 @@ void QFRawDataPropertyEditor::propsChanged() {
             }
         }
         lstFiles->addItems(f);
+        paramFilterProxy->sort(0);
     }
 }
 

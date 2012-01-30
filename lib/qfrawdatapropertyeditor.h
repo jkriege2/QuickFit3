@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QPointer>
 #include <QMap>
+#include <QSortFilterProxyModel>
 #include "qfproject.h"
 #include "qfrawdatarecord.h"
 #include "programoptions.h"
@@ -132,6 +133,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QFHTMLHelpWindow* helpWidget;
         /** \brief button to display help */
         QPushButton* btnHelp;
+
+        QSortFilterProxyModel* paramFilterProxy;
 
         QList<QPointer<QFRawDataEditor> > editorList;
         int id;

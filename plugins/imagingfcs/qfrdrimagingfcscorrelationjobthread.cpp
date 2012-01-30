@@ -584,20 +584,21 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             emit messageChanged(tr("saving settings ..."));
                             QString& localFilename=configFilename;
                             QFile f(localFilename);
+                            QDir d=QFileInfo(localFilename).absoluteDir();
                             if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
                                 QTextStream text(&f);
                                 text.setLocale(outLocale);
 
                                 text<<"date/time                   : "<<QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss") << "\n";
-                                text<<"input file                  : "<<job.filename << "\n";
-                                if (!job.descriptionFilename.isEmpty()) text<<"input description file      : "<<job.descriptionFilename << "\n";
-                                if (!averageFilename.isEmpty())         text<<"overview image file         : " << averageFilename << "\n";
-                                if (!backgroundFilename.isEmpty())      text<<"background image file       : " << backgroundFilename << "\n";
-                                if (!videoFilename.isEmpty())           text<<"video file                  : " << videoFilename << "\n";
-                                if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << statisticsFilename << "\n";
-                                if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << acfFilename << "\n";
-                                if (!ccfFilename.isEmpty())             text<<"crosscorrelation file       : " << ccfFilename << "\n";
-                                if (!ccfFilename.isEmpty())             text<<"distance ccf file           : " << dccfFilename << "\n";
+                                text<<"input file                  : "<<d.relativeFilePath(job.filename) << "\n";
+                                if (!job.descriptionFilename.isEmpty()) text<<"input description file      : " << d.relativeFilePath(job.descriptionFilename) << "\n";
+                                if (!averageFilename.isEmpty())         text<<"overview image file         : " << d.relativeFilePath(averageFilename) << "\n";
+                                if (!backgroundFilename.isEmpty())      text<<"background image file       : " << d.relativeFilePath(backgroundFilename) << "\n";
+                                if (!videoFilename.isEmpty())           text<<"video file                  : " << d.relativeFilePath(videoFilename) << "\n";
+                                if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << d.relativeFilePath(statisticsFilename) << "\n";
+                                if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << d.relativeFilePath(acfFilename) << "\n";
+                                if (!ccfFilename.isEmpty())             text<<"crosscorrelation file       : " << d.relativeFilePath(ccfFilename) << "\n";
+                                if (!ccfFilename.isEmpty())             text<<"distance ccf file           : " << d.relativeFilePath(dccfFilename) << "\n";
                                 text<<"width                       : "<<outLocale.toString(frame_width) << "\n";
                                 text<<"height                      : "<<outLocale.toString(frame_height) << "\n";
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
@@ -647,10 +648,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"bleach decay constant [s]   : "<<outLocale.toString((double)job.bleachDecay*job.frameTime) << "\n";
                                     text<<"bleach offset B             : "<<outLocale.toString((double)job.bleachB) << "\n";
                                     text<<"bleach amplitude A          : "<<outLocale.toString((double)job.bleachA) << "\n";
-                                    text<<"bleach amplitude file       : "<<bleachAmplitudeFilename << "\n";
-                                    text<<"bleach offset file          : "<<bleachOffsetFilename << "\n";
-                                    text<<"bleach: first frames        : "<<firstFramesFilename << "\n";
-                                    text<<"bleach: last frames         : "<<lastFramesFilename << "\n";
+                                    text<<"bleach amplitude file       : "<<d.relativeFilePath(bleachAmplitudeFilename) << "\n";
+                                    text<<"bleach offset file          : "<<d.relativeFilePath(bleachOffsetFilename) << "\n";
+                                    text<<"bleach: first frames        : "<<d.relativeFilePath(firstFramesFilename) << "\n";
+                                    text<<"bleach: last frames         : "<<d.relativeFilePath(lastFramesFilename) << "\n";
 
                                 } else if (job.bleach==1) {
                                         text<<"remove frame average\n";
