@@ -246,12 +246,18 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGridLayout* glmask=new QGridLayout(this);
     wmask->setLayout(glmask);
 
-    btnDontUse=new QPushButton(tr("exclude sel."), w);
+    btnDontUse=new QPushButton(tr("&unmask selected"), w);
     connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
     glmask->addWidget(btnDontUse, 0, 0);
-    btnUse=new QPushButton(tr("include sel."), w);
+    btnUse=new QPushButton(tr("&mask selected"), w);
     connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, 0, 1);
+    btnMaskByIntensity=new QPushButton(tr("mask by &intensity"), w);
+    glmask->addWidget(btnMaskByIntensity, 1, 1);
+    connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
+    btnUseAll=new QPushButton(tr("&clear mask"), w);
+    glmask->addWidget(btnUseAll, 1, 0);
+    connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
 
 
 
@@ -918,6 +924,22 @@ void QFRDRImagingFCSImageEditor::includeRuns() {
         m->recalcCorrelations();
     }
     rawDataChanged();
+}
+
+void QFRDRImagingFCSImageEditor::excludeByIntensity() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        /*QSetIterator<int32_t> i(selected);
+        while (i.hasNext()) {
+             int32_t run=i.next();
+             m->leaveoutAddRun(run);
+        }
+        */
+        // TODO: DIALOG AND CODE!!!
+        m->recalcCorrelations();
+        rawDataChanged();
+    }
 }
 
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -2501,4 +2523,14 @@ void QFRDRImagingFCSImageEditor::showHidePlots()  {
             splitterTop->setSizes(list);
         }
     }
+}
+
+void QFRDRImagingFCSImageEditor::includeAll() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        m->leaveoutClear();
+        m->recalcCorrelations();
+    }
+    rawDataChanged();
 }

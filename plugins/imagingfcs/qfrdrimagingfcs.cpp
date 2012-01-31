@@ -170,6 +170,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     QString filename_statistics="";
     QString filename_settings="";
     QString filename_acquisition="";
+    QString filename_mask="";
     QString filename_video="";
 
     // add all properties in initParams that will be readonly
@@ -191,11 +192,22 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename=evalFilename.replace(".autocorrelation.dat", ".evalsettings.txt");
         evalFilename1=filename;
         evalFilename1=evalFilename1.replace(".autocorrelation.dat", ".configuration.ini");
+    } else if (filename.endsWith(".acf.dat")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".acf.dat", ".evalsettings.txt");
+        evalFilename1=filename;
+        evalFilename1=evalFilename1.replace(".acf.dat", ".configuration.ini");
     } else if (filename.endsWith(".crosscorrelation.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".crosscorrelation.dat", ".evalsettings.txt");
         evalFilename1=filename;
         evalFilename1=evalFilename1.replace(".crosscorrelation.dat", ".configuration.ini");
+        isCross=true;
+    } else if (filename.endsWith(".ccf.dat")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".ccf.dat", ".evalsettings.txt");
+        evalFilename1=filename;
+        evalFilename1=evalFilename1.replace(".ccf.dat", ".configuration.ini");
         isCross=true;
     } else if (filename.endsWith(".dccf.dat")) {
         evalFilename=filename;
@@ -341,6 +353,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                             filename_settings=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="input file") {
                             filename_acquisition=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        } else if (name=="mask file") {
+                            filename_mask=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="date/time") {
                             initParams["CORRELATION_DATE"]=value;
                             paramsReadonly<<"CORRELATION_DATE";
@@ -363,44 +377,56 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             if (okk) { height=wwidth; ok=false; }
         }
         if (ok) {
+            QStringList files, files_types;
+            if (QFile::exists(filename_overview)) {
+                files<<filename_overview;
+                files_types<<"overview";
+            }
+            if (QFile::exists(filename_video)) {
+                files<<filename_video;
+                files_types<<"video";
+            }
+            if (QFile::exists(filename_statistics)) {
+                files<<filename_statistics;
+                files_types<<"statistics";
+            }
+            if (QFile::exists(filename_mask)) {
+                files<<filename_mask;
+                files_types<<"mask";
+            }
+            if (QFile::exists(filename_settings)) {
+                files<<filename_settings;
+                files_types<<"acquisition_settings";
+            }
+            if (QFile::exists(filename_acquisition)) {
+                files<<filename_acquisition;
+                files_types<<"input";
+            }
+            if (QFile::exists(filename_background)) {
+                files<<filename_background;
+                files_types<<"background";
+            }
+
+
+
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;
             initParams["TAU_COLUMN"]=0;
             int columns=checkColumns(filename);
             if (!isCross && !isDCCF) {
                 initParams["CORRELATION_COLUMN"]=1;
-                QStringList files, files_types;
-                files<<filename;
-                files_types<<"acf";
+                files.prepend(filename);
+                files_types.prepend("acf");
                 //qDebug()<<"filename_overview: "<<filename_overview;
-                if (QFile::exists(filename_overview)) {
-                    if (!filename_overview.isEmpty()) {
-                        files<<filename_overview;
-                        files_types<<"overview";
-                    }
-                    if (!filename_video.isEmpty()) {
-                        files<<filename_video;
-                        files_types<<"video";
-                    }
-                    if (!filename_video.isEmpty()) {
-                        files<<filename_settings;
-                        files_types<<"acquisition_settings";
-                    }
-                    if (!filename_video.isEmpty()) {
-                        files<<filename_statistics;
-                        files_types<<"statistics";
-                    }
-                    if (!filename_video.isEmpty()) {
-                        files<<filename_acquisition;
-                        files_types<<"input";
-                    }
 
-                }
                 if (columns>2){
                     initParams["CORRELATION_ERROR_COLUMN"]=2;
                 }
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
                 QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files, initParams, paramsReadonly, files_types);
+                if (!filename_acquisition.isEmpty()) {
+                    e->setFolder(QFileInfo(filename_acquisition).baseName());
+                }
                 if (e->error()) { // when an error occured: remove record and output an error message
                     QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -410,16 +436,15 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                 for (int c=1; c<=qMin(4,columns); c++) {
                     initParams["CORRELATION_COLUMN"]=c;
-                    QStringList files, files_types;
-                    files<<filename;
-                    files_types<<"ccf";
-                    if (QFile::exists(filename_overview)) {
-                        files<<filename_overview;
-                        files_types<<"overview";
-                    }
+                    files.prepend(filename);
+                    files_types.prepend("ccf");
+
                     if (columns>4) initParams["CORRELATION_ERROR_COLUMN"]=c+4;
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
                     QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types);
+                    if (!filename_acquisition.isEmpty()) {
+                        e->setFolder(QFileInfo(filename_acquisition).baseName());
+                    }
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -429,16 +454,15 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             } else if (isDCCF) {
 
                 initParams["CORRELATION_COLUMN"]=1;
-                QStringList files, files_types;
-                files<<filename;
-                files_types<<"dccf";
-                if (QFile::exists(filename_overview)) {
-                    files<<filename_overview;
-                    files_types<<"overview";
-                }
+                files.prepend(filename);
+                files_types.prepend("dccf");
+
                 if (columns>2) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
                 QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - DCCF"), files, initParams, paramsReadonly, files_types);
+                if (!filename_acquisition.isEmpty()) {
+                    e->setFolder(QFileInfo(filename_acquisition).baseName());
+                }
                 if (e->error()) { // when an error occured: remove record and output an error message
                     QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));

@@ -92,26 +92,41 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     // now also load the data file(s) this record is linked to
     // an error is reported when no file is given!
     if (files.size()<=0) {
-            setError(tr("there are no files in the %1 record!").arg(getName()));
-            return;
+        setError(tr("there are no files in the %1 record!").arg(getName()));
+        return;
     }
-    if (filetype.toUpper()=="VIDEO_CORRELATOR") {
-        loadVideoCorrelatorFile(files[0]);
-    } else if (filetype.toUpper()=="RADHARD2") {
-        loadRadhard2File(files[0]);
-        width=getProperty("WIDTH", 0).toInt();
-        height=getProperty("HEIGHT", 0).toInt();
-    } else {
-        setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[0]));
-    }
-    if (files.size()>1) {
-        for (int i=1; i<files.size(); i++) {
+    bool dataLoaded=false;
+    if (files.size()>0) {
+        for (int i=0; i<files.size(); i++) {
             if (i<files_types.size()) {
-                if (files_types[i].toLower().trimmed()=="overview") {
+                QString ft=files_types[i].toLower().trimmed();
+                if (ft=="overview") {
                     loadOverview(files[i]);
+                } else if (ft=="acf" || ft=="ccf" || ft=="dccf"){
+                    if (!dataLoaded) {
+                        if (filetype.toUpper()=="VIDEO_CORRELATOR") {
+                            loadVideoCorrelatorFile(files[i]);
+                            //qDebug()<<"loading Video correlator file '"<<files[i]<<"'\n";
+                            dataLoaded=true;
+                        } else if (filetype.toUpper()=="RADHARD2") {
+                            loadRadhard2File(files[i]);
+                            width=getProperty("WIDTH", 0).toInt();
+                            height=getProperty("HEIGHT", 0).toInt();
+                            dataLoaded=true;
+                        } else {
+                          setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[i]));
+                          break;
+                        }
+                    } else {
+                        setError(tr("correlation data has already been loaded for Imaging FCS (2nd data file is '%2')").arg(filetype).arg(files[i]));
+                        break;
+                    }
                 }
             }
         }
+    }
+    if (!dataLoaded) {
+        setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
     }
 }
 

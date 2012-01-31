@@ -122,6 +122,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void excludeRuns();
         /** \brief includes the currently selected items from the evaluation and recalculates the average */
         void includeRuns();
+        /** \brief exclude runs by intensity in the overview image */
+        void excludeByIntensity();
+        /** \brief delete mask */
+        void includeAll();
         void slidersChanged(int userMin, int userMax, int min, int max);
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
 
@@ -219,6 +223,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QPushButton* btnDontUse;
         /** \brief a button which includes the selected runs to the evaluation */
         QPushButton* btnUse;
+        /** \brief a button which includes all runs to the evaluation */
+        QPushButton* btnUseAll;
+        /** \brief button to mask pixels by intensity */
+        QPushButton* btnMaskByIntensity;
         /** \brief checkbox to select log tau-axis */
         QCheckBox* chkLogTauAxis;
         /** \brief label for the run options */
