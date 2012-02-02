@@ -24,7 +24,7 @@ void QFExtensionShutterServoArduino::deinit() {
     QSettings inifile(services->getGlobalConfigFileDirectory()+"/shutter_servo_arduino.ini", QSettings::IniFormat);
     if (inifile.isWritable()) {
         inifile.setValue("shutter_count", getShutterCount());
-        for (int i=0; i<getShutterCount(); i++) {
+        for (unsigned int i=0; i<getShutterCount(); i++) {
             int p=shutters[i].port;
             if (ports.getCOMPort(p)) {
                 ports.storeCOMPort(p, inifile, "shutter"+QString::number(i+1)+"/");
@@ -83,7 +83,7 @@ unsigned int QFExtensionShutterServoArduino::getShutterCount() {
 }
 
 void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
-    if (shutter<0 || shutter>=shutters.size()) return;
+    if (shutter<0 || shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     com->open();
@@ -108,21 +108,21 @@ void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
 }
 
 void QFExtensionShutterServoArduino::shutterDisonnect(unsigned int shutter) {
-    if (shutter<0 || shutter>=shutters.size()) return;
+    if (shutter<0 || shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
     com->close();
 }
 
 bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
-    if (shutter<0 || shutter>=shutters.size()) return false;
+    if (shutter<0 || shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     return com->isConnectionOpen();
 }
 
 bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
-    if (shutter<0 || shutter>=shutters.size()) return false;
+    if (shutter<0 || shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     if (!com->isConnectionOpen()) return false;
@@ -132,7 +132,7 @@ bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
 }
 
 void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool opened) {
-    if (shutter<0 || shutter>=shutters.size()) return;
+    if (shutter<0 || shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     if (!com->isConnectionOpen()) return ;
@@ -142,7 +142,7 @@ void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool 
 }
 
 bool QFExtensionShutterServoArduino::isLastShutterActionFinished(unsigned int shutter) {
-    if (shutter<0 || shutter>=shutters.size()) return true;
+    if (shutter<0 || shutter>=getShutterCount()) return true;
     return shutters[shutter].lastAction.elapsed()>shutters[shutter].shutter_operation_duration;
 }
 
