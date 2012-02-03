@@ -27,6 +27,7 @@
 #include "../base_classes/qftablemodel.h"
 #include "qfhistogramview.h"
 #include "jkqtptools.h"
+#include <QFrame>
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -124,8 +125,15 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void includeRuns();
         /** \brief exclude runs by intensity in the overview image */
         void excludeByIntensity();
+        /** \brief exclude runs by intensity in the parameter image */
+        void excludeByParamIntensity();
+        /** \brief exclude runs by intensity in the gof image */
+        void excludeByGOFIntensity();
+
         /** \brief delete mask */
         void includeAll();
+        /** \brief invert mask */
+        void invertMask();
         void slidersChanged(int userMin, int userMax, int min, int max);
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
 
@@ -225,8 +233,16 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QPushButton* btnUse;
         /** \brief a button which includes all runs to the evaluation */
         QPushButton* btnUseAll;
+        /** \brief a button which inverts the mask */
+        QPushButton* btnInvertMask;
         /** \brief button to mask pixels by intensity */
         QPushButton* btnMaskByIntensity;
+        /** \brief button to mask pixels by gof image */
+        QPushButton* btnMaskByGofIntensity;
+        /** \brief button to mask pixels by parameter image */
+        QPushButton* btnMaskByParamIntensity;
+        /** \brief combobox to select how the mask is changed by Mask By ... */
+        QComboBox* cmbMaskMode;
         /** \brief checkbox to select log tau-axis */
         QCheckBox* chkLogTauAxis;
         /** \brief label for the run options */
@@ -362,6 +378,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QTimer* timUpdateAfterClick;
 
 
+        void excludeByImage(double *imageIn);
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */

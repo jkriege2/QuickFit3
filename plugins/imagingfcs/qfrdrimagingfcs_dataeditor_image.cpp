@@ -10,7 +10,7 @@
 #include "qmoretextobject.h"
 #include "statistics_tools.h"
 #include "jkqtpelements.h"
-
+#include "qfrdrimagingfcsmaskbyintensity.h"
 
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -252,12 +252,32 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     btnUse=new QPushButton(tr("&mask selected"), w);
     connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, 0, 1);
-    btnMaskByIntensity=new QPushButton(tr("mask by &intensity"), w);
-    glmask->addWidget(btnMaskByIntensity, 1, 1);
-    connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
     btnUseAll=new QPushButton(tr("&clear mask"), w);
     glmask->addWidget(btnUseAll, 1, 0);
     connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
+    btnInvertMask=new QPushButton(tr("&invert mask"), w);
+    glmask->addWidget(btnInvertMask, 1, 1);
+    connect(btnInvertMask, SIGNAL(clicked()), this, SLOT(invertMask()));
+
+
+    QFrame* frame=new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    glmask->addWidget(frame, 2, 0, 1, 2);
+    glmask->addWidget(new QLabel(tr("mask edit mode:"), this), 3, 0);
+    cmbMaskMode=new QComboBox(this);
+    cmbMaskMode->addItem(tr("replace"));
+    cmbMaskMode->addItem(tr("add"));
+    cmbMaskMode->addItem(tr("remove"));
+    glmask->addWidget(cmbMaskMode, 3,1);
+    btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
+    glmask->addWidget(btnMaskByIntensity, 4, 0);
+    connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
+    btnMaskByGofIntensity=new QPushButton(tr("mask by &goodnes-of-fit"), w);
+    glmask->addWidget(btnMaskByGofIntensity, 4, 1);
+    connect(btnMaskByGofIntensity, SIGNAL(clicked()), this, SLOT(excludeByGOFIntensity()));
+    btnMaskByParamIntensity=new QPushButton(tr("mask by &param image"), w);
+    glmask->addWidget(btnMaskByParamIntensity, 5, 0);
+    connect(btnMaskByParamIntensity, SIGNAL(clicked()), this, SLOT(excludeByParamIntensity()));
 
 
 
@@ -926,19 +946,63 @@ void QFRDRImagingFCSImageEditor::includeRuns() {
     rawDataChanged();
 }
 
+
+
+void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
+        bool* mask=(bool*)malloc(m->getDataImageWidth()*m->getDataImageHeight()*sizeof(bool));
+        double* image=(double*)malloc(m->getDataImageWidth()*m->getDataImageHeight()*sizeof(double));
+        for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+            mask[i]=false;
+            image[i]=imageIn[i];
+        }
+        dialog->init(mask, image, m->getDataImageWidth(), m->getDataImageHeight());
+        if (dialog->exec()==QDialog::Accepted) {
+            if (cmbMaskMode->currentIndex()==2) {
+                bool* newMask=m->maskGet();
+                for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+                    newMask[i]=newMask[i] && (!mask[i]);
+                }
+            } else if (cmbMaskMode->currentIndex()==1) {
+                bool* newMask=m->maskGet();
+                for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+                    newMask[i]=newMask[i]||mask[i];
+                }
+            } else {
+                memcpy(m->maskGet(), mask, m->getDataImageWidth()*m->getDataImageHeight()*sizeof(bool));
+            }
+            m->recalcCorrelations();
+            rawDataChanged();
+        }
+        free(mask);
+        free(image);
+    }
+}
+
+void QFRDRImagingFCSImageEditor::excludeByParamIntensity() {
+    excludeByImage(plteImageData);
+}
+
+void QFRDRImagingFCSImageEditor::excludeByGOFIntensity() {
+    excludeByImage(plteGofImageData);
+}
+
+
 void QFRDRImagingFCSImageEditor::excludeByIntensity() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
-        /*QSetIterator<int32_t> i(selected);
-        while (i.hasNext()) {
-             int32_t run=i.next();
-             m->leaveoutAddRun(run);
+        QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
+        double* image=(double*)malloc(m->getDataImageWidth()*m->getDataImageHeight()*sizeof(double));
+        uint16_t* imageIn=m->getDataImagePreview();
+        for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+            image[i]=imageIn[i];
         }
-        */
-        // TODO: DIALOG AND CODE!!!
-        m->recalcCorrelations();
-        rawDataChanged();
+        excludeByImage(image);
+        free(image);
     }
 }
 
@@ -2530,6 +2594,16 @@ void QFRDRImagingFCSImageEditor::includeAll() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         m->leaveoutClear();
+        m->recalcCorrelations();
+    }
+    rawDataChanged();
+}
+
+void QFRDRImagingFCSImageEditor::invertMask() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        m->maskInvert();
         m->recalcCorrelations();
     }
     rawDataChanged();

@@ -58,9 +58,11 @@ QFProjectTreeModelNode* QFProjectTreeModelNode::addChildFolder(const QString& ti
     }
     QFProjectTreeModelNode* nn=NULL;
     for (int i=0; i<childItems.count(); i++) {
-        if (childItems[i]->type()==QFProjectTreeModelNode::qfpntDirectory && childItems[i]->title()==newfld) {
-            nn=childItems[i];
-            break;
+        if (childItems[i]) {
+            if (childItems[i]->type()==QFProjectTreeModelNode::qfpntDirectory && childItems[i]->title()==newfld) {
+                nn=childItems[i];
+                break;
+            }
         }
     }
     if (!nn) {

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFRDRImagingFCSMaskByIntensity</class>
+ <widget class="QDialog" name="QFRDRImagingFCSMaskByIntensity">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>502</width>
+    <height>421</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+     <item>
+      <widget class="JKQtPlotter" name="pltMain" native="true"/>
+     </item>
+     <item>
+      <layout class="QFormLayout" name="formLayout_2">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Level: </string>
+         </property>
+         <property name="buddy">
+          <cstring>edtLevel</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="JKDoubleEdit" name="edtLevel"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Mode:</string>
+         </property>
+         <property name="buddy">
+          <cstring>radMaskSmaller</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QRadioButton" name="radMaskSmaller">
+           <property name="text">
+            <string>mask smaller pixels</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radMaskLarger">
+           <property name="text">
+            <string>mask larger pixels</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Range:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="labRange">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>&amp;update mask</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>JKQtPlotter</class>
+   <extends>QWidget</extends>
+   <header>jkqtplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JKDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>jkdoubleedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radMaskLarger</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>143</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radMaskSmaller</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>405</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>379</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel</sender>
+   <signal>returnPressed()</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>462</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>408</x>
+     <y>185</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>477</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateMask()</slot>
+ </slots>
+</ui>

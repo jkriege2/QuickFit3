@@ -103,7 +103,7 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
     labelTitle->setVisible(!title.isEmpty());
     descriptionBrowser->setOpenLinks(false);
     descriptionBrowser->setOpenExternalLinks(true);
-    descriptionBrowser->setSearchPaths(QStringList(searchPath));
+    descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
     descriptionBrowser->setFrameShape(QFrame::Box);
     descriptionBrowser->setReadOnly(true);
     descriptionBrowser->clearHistory();
@@ -135,12 +135,12 @@ void QFHTMLHelpWindow::updateHelp(QString filename1) {
     //qDebug()<<filename<<fragment;
 
     m_home=filename;
-    searchPath=QFileInfo(filename).canonicalPath();
+    searchPath=QFileInfo(filename).canonicalPath()+"/";
     //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
     disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
     descriptionBrowser->setOpenLinks(false);
     descriptionBrowser->setOpenExternalLinks(true);
-    descriptionBrowser->setSearchPaths(QStringList(searchPath));
+    descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
     descriptionBrowser->setFrameShape(QFrame::Box);
     descriptionBrowser->setReadOnly(true);
     //descriptionBrowser->setSource(QFileInfo(filename).fileName());
@@ -204,7 +204,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
         //qDebug()<<filename<<fragment;
 
         //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
-        descriptionBrowser->setSearchPaths(QStringList(searchPath));
+        descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
         //descriptionBrowser->setSource(QFileInfo(s).fileName());
         //descriptionBrowser->reload();
         descriptionBrowser->setHtml(loadHTML(QFileInfo(s).absoluteFilePath()));
@@ -238,7 +238,7 @@ void QFHTMLHelpWindow::showFile(QString filename1) {
     searchPath=QFileInfo(s).absolutePath();
 
     //std::cout<<"showFile("<<filename.toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
-    descriptionBrowser->setSearchPaths(QStringList(searchPath));
+    descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
     //descriptionBrowser->setSource(QFileInfo(s).fileName());
     //descriptionBrowser->reload();
     descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
@@ -579,6 +579,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         rxSpecials.setMinimal(true);
         result=result.remove(rxSpecials);
     }
+    //qDebug()<<result;
     return result;
 }
 

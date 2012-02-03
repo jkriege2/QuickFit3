@@ -91,13 +91,20 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \brief returns whether to leave out a run */
-        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); }
+        virtual bool leaveoutRun(int run);
         /** \brief add a run to the leaveouts */
-        inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
+        virtual void leaveoutAddRun(int run);
         /** \brief remove a run from the leaveouts */
-        inline virtual void leaveoutRemoveRun(int run) { leaveout.removeAll(run); }
+        virtual void leaveoutRemoveRun(int run);
         /** \brief clear all leaveouts */
-        inline virtual void leaveoutClear() { leaveout.clear(); }
+        virtual void leaveoutClear();
+
+        void maskClear();
+        void maskSet(uint16_t x, uint16_t y);
+        void maskUnset(uint16_t x, uint16_t y, bool value=true);
+        void maskInvert();
+        bool maskGet(uint16_t x, uint16_t y);
+        bool* maskGet();
 
         /** \brief recalculate the averages/std. deviations */
         void recalcCorrelations();
@@ -141,7 +148,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         uint16_t* overview;
 
 		/** \brief the leaveout list */
-        QList<int> leaveout;
+        bool* leaveout;
+        //QList<int> leaveout;
     protected:
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
         virtual void allocateContents(int x, int y, int N);

@@ -246,12 +246,14 @@ void QFProjectTreeModel::projectDataChanged() {
             if (rec->getName()!=idx.data().toString()) emit dataChanged(idx, idx);
         }
     }
-    evalFolderItem=projectItem->addChildFolder(tr("Evaluation Items"));
-    for (int i=0; i<current->getEvaluationCount(); i++) {
-        QFEvaluationItem* item=current->getEvaluationByNum(i);
-        QModelIndex idx=index(item);
-        if (item) {
-            if (item->getName()!=idx.data().toString()) emit dataChanged(idx, idx);
+    if (projectItem) {
+        evalFolderItem=projectItem->addChildFolder(tr("Evaluation Items"));
+        for (int i=0; i<current->getEvaluationCount(); i++) {
+            QFEvaluationItem* item=current->getEvaluationByNum(i);
+            QModelIndex idx=index(item);
+            if (item) {
+                if (item->getName()!=idx.data().toString()) emit dataChanged(idx, idx);
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     width=0;
     height=0;
     overview=NULL;
+    leaveout=NULL;
     setResultsInitSize(1000);
     setEvaluationIDMetadataInitSize(1000);
 }
@@ -58,7 +59,7 @@ void QFRDRImagingFCSData::exportData(const QString& format, const QString& filen
 
 void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
 	// write data to the project XML file using the QXmlStreamWriter
-    if (leaveout.size()>0) {
+    /*if (leaveout.size()>0) {
         QString l="";
         for (int i=0; i<leaveout.size(); i++) {
             if (!l.isEmpty()) l=l+",";
@@ -67,23 +68,26 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
         w.writeStartElement("leaveout");
         w.writeAttribute("list", l);
         w.writeEndElement();
+    }*/
+    QString l="";
+    for (int i=0; i<getCorrelationRuns(); i++) {
+        if (leaveout[i]!=0) {
+            if (!l.isEmpty()) l=l+",";
+            l=l+QString::number(i);
+        }
+    }
+    if (l.size()>0) {
+        w.writeStartElement("leaveout");
+        w.writeAttribute("list", l);
+        w.writeEndElement();
     }
 }
 
 void QFRDRImagingFCSData::intReadData(QDomElement* e) {
-    leaveout.clear();
+    leaveoutClear();
 	// read data from the project XML file
-    leaveout.clear();
-    if (e) {
-        QDomElement te=e->firstChildElement("leaveout");
-        QString l=te.attribute("list");
-        QStringList li=l.split(",");
-        for (int i=0; i<li.size(); i++) {
-            bool ok=false;
-            int lo=li[i].toUInt(&ok);
-            if (ok) leaveout.append(lo);
-        }
-    }
+
+
 
     width=getProperty("WIDTH", 0).toInt();
     height=getProperty("HEIGHT", 0).toInt();
@@ -125,6 +129,21 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             }
         }
     }
+
+    if (e) {
+        QDomElement te=e->firstChildElement("leaveout");
+        QString l=te.attribute("list");
+        QStringList li=l.split(",");
+        qDebug()<<li;
+        for (int i=0; i<li.size(); i++) {
+            bool ok=false;
+            int lo=li[i].toUInt(&ok);
+            if (ok) leaveoutAddRun(lo);
+            qDebug()<<lo<<ok;
+        }
+        recalcCorrelations();
+    }
+
     if (!dataLoaded) {
         setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
     }
@@ -411,6 +430,10 @@ double* QFRDRImagingFCSData::getCorrelationRunErrors() {
     return sigmas;
 }
 
+bool QFRDRImagingFCSData::leaveoutRun(int run) {
+    return maskGet(runToX(run), runToY(run));
+}
+
 double* QFRDRImagingFCSData::getCorrelationRun(int run) {
     return &(correlations[run*N]);
 }
@@ -444,18 +467,21 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (sigmas) free(sigmas);
     if (tau) free(tau);
     if (overview) free(overview);
+    if (leaveout) free(leaveout);
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
     overview=NULL;
+    leaveout=NULL;
     if ((x>0) && (y>0) && (N>0)) {
         correlations=(double*)calloc(x*y*N,sizeof(double));
         sigmas=(double*)calloc(x*y*N,sizeof(double));
         correlationMean=(double*)calloc(N,sizeof(double));
         correlationStdDev=(double*)calloc(N,sizeof(double));
         overview=(uint16_t*)calloc(x*y,sizeof(uint16_t));
+        leaveout=(bool*)calloc(x*y,sizeof(bool));
         tau=(double*)calloc(N,sizeof(double));
         width=x;
         height=y;
@@ -473,7 +499,7 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             double sum2=0;
             for (int j=0; j<width*height; j++) {
                 const double& v=correlations[j*N+i];
-                if (QFFloatIsOK(v) && !leaveout.contains(j)) {
+                if (QFFloatIsOK(v) && !leaveout[j]) {
                     sum+=v;
                     sum2+=v*v;
                     norm++;
@@ -535,3 +561,48 @@ int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
 uint16_t* QFRDRImagingFCSData::getDataImagePreview() const {
     return overview;
 }
+
+void QFRDRImagingFCSData::leaveoutClear() {
+    maskClear();
+}
+
+void QFRDRImagingFCSData::maskClear() {
+    if (!leaveout) return;
+    for (uint16_t i=0; i<width*height; i++) {
+        leaveout[i]=false;
+    }
+}
+
+void QFRDRImagingFCSData::leaveoutRemoveRun(int run) {
+    if (run>=0 && run<getCorrelationRuns()) leaveout[run]=false;
+}
+
+void QFRDRImagingFCSData::leaveoutAddRun(int run) {
+    if (run>=0 && run<getCorrelationRuns()) leaveout[run]=true;
+}
+
+bool *QFRDRImagingFCSData::maskGet() {
+    return leaveout;
+}
+
+bool QFRDRImagingFCSData::maskGet(uint16_t x, uint16_t y) {
+    return leaveout[y*width+x];
+}
+
+void QFRDRImagingFCSData::maskUnset(uint16_t x, uint16_t y, bool value) {
+    if (!leaveout) return;
+    leaveout[y*width+x]=value;
+}
+
+void QFRDRImagingFCSData::maskInvert() {
+    if (!leaveout) return;
+    for (uint16_t i=0; i<width*height; i++) {
+        leaveout[i]=!leaveout[i];
+    }
+}
+
+void QFRDRImagingFCSData::maskSet(uint16_t x, uint16_t y) {
+    if (!leaveout) return;
+    leaveout[y*width+x]=false;
+}
+
