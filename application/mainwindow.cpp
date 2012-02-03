@@ -587,6 +587,7 @@ void MainWindow::createWidgets() {
     //helpWindow->setHtmlReplacementList(&htmlReplaceList);
     helpWindow->initFromPluginServices(this);
     helpWindow->close();
+    helpWindow->setParent(NULL, Qt::Tool);
 
 }
 

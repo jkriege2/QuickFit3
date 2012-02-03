@@ -135,7 +135,8 @@ void QFHTMLHelpWindow::updateHelp(QString filename1) {
     //qDebug()<<filename<<fragment;
 
     m_home=filename;
-    searchPath=QFileInfo(filename).canonicalPath()+"/";
+    searchPath=QFileInfo(filename).canonicalPath();
+    //qDebug()<<searchPath;
     //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
     disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
     descriptionBrowser->setOpenLinks(false);
@@ -200,11 +201,12 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
         QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
         QString s=spd.absoluteFilePath(cl); //absoluteFilePath
         searchPath=QFileInfo(s).absolutePath();
-
+        //qDebug()<<QFileInfo(s).absoluteFilePath()<<searchPath;
         //qDebug()<<filename<<fragment;
 
         //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
         descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
+        //qDebug()<<QFileInfo(s).absoluteFilePath()<<searchPath;
         //descriptionBrowser->setSource(QFileInfo(s).fileName());
         //descriptionBrowser->reload();
         descriptionBrowser->setHtml(loadHTML(QFileInfo(s).absoluteFilePath()));
@@ -236,6 +238,7 @@ void QFHTMLHelpWindow::showFile(QString filename1) {
     QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
     QString s=spd.absoluteFilePath(cl); //absoluteFilePath
     searchPath=QFileInfo(s).absolutePath();
+    //qDebug()<<QFileInfo(filename).absoluteFilePath()<<searchPath;
 
     //std::cout<<"showFile("<<filename.toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
     descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
@@ -291,6 +294,8 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QString result;
     // read HTML file
     QFile file(QFileInfo(filename).absoluteFilePath());
+    QString fileDir=QFileInfo(filename).absolutePath();
+    if (!fileDir.endsWith("/")) fileDir.append("/");
     fromHTML_replaces.clear();
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&file);
@@ -578,6 +583,22 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         QRegExp rxSpecials("\\$\\$.+\\$\\$");
         rxSpecials.setMinimal(true);
         result=result.remove(rxSpecials);
+
+        // make all image pathes absolute, WORKAROUND FOR PROBLEM IN Qt4.8.0
+        QRegExp rxImages("<img\\s.*src\\s*=\\s*\\\"([^\\\"]*)\\\".*>");
+        rxImages.setMinimal(true);
+        rxImages.setCaseSensitivity(Qt::CaseInsensitive);
+        pos = 0;
+        while ((pos = rxImages.indexIn(result, pos)) != -1) {
+            QString file=rxImages.cap(1).trimmed();
+            QString old=QString("\"%1\"").arg(file);
+            QString news=QString("\"%1%2\"").arg(fileDir).arg(file);
+            if (QFileInfo(file).isRelative()) {
+                result.replace(old, news);
+            }
+            pos += rxImages.matchedLength()+(news.size()-old.size());
+        }
+
     }
     //qDebug()<<result;
     return result;
