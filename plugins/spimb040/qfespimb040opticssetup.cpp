@@ -195,8 +195,10 @@ void QFESPIMB040OpticsSetup::releaseCamera(int setup_cam) {
 }
 
 void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
-    ui->stageSetup->connectStages();
     ui->shutterMainIllumination->connectShutter();
+    qDebug()<<"shutter connected";
+    ui->stageSetup->connectStages();
+    qDebug()<<"stages connected";
 }
 
 void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {

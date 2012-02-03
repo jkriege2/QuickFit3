@@ -393,17 +393,17 @@ void QFESPIMB040SampleStageConfig::createActions() {
     std::cout<<">>>> createActions()\n";
     actConnectX=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect x-axis ..."), this);
     actConnectX->setCheckable(true);
-    connect(actConnectX, SIGNAL(toggled(bool)), this, SLOT(disConnectX()));
+    connect(actConnectX, SIGNAL(triggered()), this, SLOT(disConnectX()));
     btnConnectX->setDefaultAction(actConnectX);
 
     actConnectY=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect y-axis ..."), this);
     actConnectY->setCheckable(true);
-    connect(actConnectY, SIGNAL(toggled(bool)), this, SLOT(disConnectY()));
+    connect(actConnectY, SIGNAL(triggered()), this, SLOT(disConnectY()));
     btnConnectY->setDefaultAction(actConnectY);
 
     actConnectZ=new QAction(QIcon(":/spimb040/stageconnect.png"), tr("Connect z-axis ..."), this);
     actConnectZ->setCheckable(true);
-    connect(actConnectZ, SIGNAL(toggled(bool)), this, SLOT(disConnectZ()));
+    connect(actConnectZ, SIGNAL(triggered()), this, SLOT(disConnectZ()));
     btnConnectZ->setDefaultAction(actConnectZ);
 
 
@@ -907,15 +907,33 @@ void QFESPIMB040SampleStageConfig::moveRelative() {
 }
 
 void QFESPIMB040SampleStageConfig::connectStages() {
-    actConnectX->setChecked(true);
-    actConnectY->setChecked(true);
-    actConnectZ->setChecked(true);
+    if (!actConnectX->isChecked()) {
+        actConnectX->setChecked(false);
+        actConnectX->trigger();
+    }
+    if (!actConnectY->isChecked()) {
+        actConnectY->setChecked(false);
+        actConnectY->trigger();
+    }
+    if (!actConnectZ->isChecked()) {
+        actConnectZ->setChecked(false);
+        actConnectZ->trigger();
+    }
 }
 
 void QFESPIMB040SampleStageConfig::disconnectStages() {
-    actConnectX->setChecked(false);
-    actConnectY->setChecked(false);
-    actConnectZ->setChecked(false);
+    if (actConnectX->isChecked()) {
+        actConnectX->setChecked(true);
+        actConnectX->trigger();
+    }
+    if (actConnectY->isChecked()) {
+        actConnectY->setChecked(true);
+        actConnectY->trigger();
+    }
+    if (actConnectZ->isChecked()) {
+        actConnectZ->setChecked(true);
+        actConnectZ->trigger();
+    }
 }
 
 void QFESPIMB040SampleStageConfig::setReadOnly(bool readonly) {
