@@ -29,6 +29,7 @@ void QFExtensionShutterServoArduino::deinit() {
             if (ports.getCOMPort(p)) {
                 ports.storeCOMPort(p, inifile, "shutter"+QString::number(i+1)+"/");
                 inifile.setValue("shutter"+QString::number(i+1)+"/shutter_operation_duration", shutters[i].shutter_operation_duration);
+                inifile.setValue("shutter"+QString::number(i+1)+"/id", shutters[i].id);
             }
         }
     }
@@ -48,6 +49,7 @@ void QFExtensionShutterServoArduino::initExtension() {
     for (int i=0; i<shutter_count; i++) {
         SHUTTER s;
         s.port=ports.addCOMPort(inifile, "shutter"+QString::number(i+1)+"/");
+        s.id=inifile.value("shutter"+QString::number(i+1)+"/id", i+1).toInt();
         s.infoMessage="";
         s.lastAction=QTime::currentTime();
         s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
@@ -126,7 +128,7 @@ bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
     if (!com->isConnectionOpen()) return false;
-    QString result=shutters[shutter].serial->queryCommand(QString("Q")+QString::number(shutter+1));
+    QString result=shutters[shutter].serial->queryCommand(QString("Q")+QString::number(shutters[shutter].id));
     if (result.startsWith("0")) return false;
     else return true;
 }
@@ -136,8 +138,8 @@ void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool 
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
     if (!com->isConnectionOpen()) return ;
-    if (opened) shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutter+1)+"1");
-    else shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutter+1)+"0");
+    if (opened) shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutters[shutter].id)+"1");
+    else shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutters[shutter].id)+"0");
     shutters[shutter].lastAction=QTime::currentTime();
 }
 

@@ -30,5 +30,6 @@
         <file alias="report_print.png">icons/report_print.png</file>
         <file alias="report_save.png">icons/report_save.png</file>
         <file alias="dataexplorer.png">icons/dataexplorer.png</file>
+        <file alias="copydatatomatlab.png">icons/copydatatomatlab.png</file>
     </qresource>
 </RCC>

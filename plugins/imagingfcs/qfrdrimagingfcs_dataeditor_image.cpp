@@ -247,15 +247,19 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wmask->setLayout(glmask);
 
     btnDontUse=new QPushButton(tr("&unmask selected"), w);
+    btnDontUse->setToolTip(tr("remove the selected pixels from the current mask\nand recalculate the average correlation curve accordingly"));
     connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
     glmask->addWidget(btnDontUse, 0, 0);
     btnUse=new QPushButton(tr("&mask selected"), w);
+    btnUse->setToolTip(tr("add the selected pixels from the current mask\nand recalculate the average correlation curve accordingly"));
     connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, 0, 1);
     btnUseAll=new QPushButton(tr("&clear mask"), w);
+    btnUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnUseAll, 1, 0);
     connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
     btnInvertMask=new QPushButton(tr("&invert mask"), w);
+    btnInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnInvertMask, 1, 1);
     connect(btnInvertMask, SIGNAL(clicked()), this, SLOT(invertMask()));
 
@@ -270,12 +274,24 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbMaskMode->addItem(tr("remove"));
     glmask->addWidget(cmbMaskMode, 3,1);
     btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
+    btnMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByIntensity, 4, 0);
     connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
     btnMaskByGofIntensity=new QPushButton(tr("mask by &goodnes-of-fit"), w);
+    btnMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByGofIntensity, 4, 1);
     connect(btnMaskByGofIntensity, SIGNAL(clicked()), this, SLOT(excludeByGOFIntensity()));
     btnMaskByParamIntensity=new QPushButton(tr("mask by &param image"), w);
+    btnMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByParamIntensity, 5, 0);
     connect(btnMaskByParamIntensity, SIGNAL(clicked()), this, SLOT(excludeByParamIntensity()));
 
@@ -653,15 +669,33 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     QGridLayout* grdTop=new QGridLayout(this);
     btnPrintReport = new QPushButton(QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
+    btnPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
+                                  "<li>all images (parameter, mask, goodnes-of-fit, overview</li>"
+                                  "<li>correlation curves and fit parameters</li>"
+                                  "<li>histpgram and statistics</li>"
+                                  "<li>additional data (files, description configuration ...)</li>"
+                                  "</ul>"));
+
     connect(btnPrintReport, SIGNAL(clicked()), this, SLOT(printReport()));
     btnSaveReport = new QPushButton(QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
+    btnSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
+                                  "<li>all images (parameter, mask, goodnes-of-fit, overview)</li>"
+                                  "<li>correlation curves and fit parameters</li>"
+                                  "<li>histpgram and statistics</li>"
+                                  "<li>additional data (files, description configuration ...)</li>"
+                                  "</ul>"));
     connect(btnSaveReport, SIGNAL(clicked()), this, SLOT(saveReport()));
     btnSaveData = new QPushButton(QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
+    btnSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, goodnes-of-fit, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
     connect(btnSaveData, SIGNAL(clicked()), this, SLOT(saveData()));
-    grdTop->addWidget(grpTop, 0, 1, 3, 1);
+    btnCopyDataToMatlab = new QPushButton(QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy to &Matlab"), this);
+    btnCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as a Matlab script."));
+    connect(btnCopyDataToMatlab, SIGNAL(clicked()), this, SLOT(copyToMatlab()));
+    grdTop->addWidget(grpTop, 0, 2, 3, 1);
     grdTop->addWidget(btnSaveData, 0, 0);
-    grdTop->addWidget(btnSaveReport, 1, 0);
-    grdTop->addWidget(btnPrintReport, 2, 0);
+    grdTop->addWidget(btnCopyDataToMatlab, 1, 0);
+    grdTop->addWidget(btnSaveReport, 0, 1);
+    grdTop->addWidget(btnPrintReport, 1, 1);
     grdTop->setColumnStretch(1,0);
 
 
@@ -2206,6 +2240,33 @@ void QFRDRImagingFCSImageEditor::printReport() {
     QApplication::restoreOverrideCursor();
 }
 
+void QFRDRImagingFCSImageEditor::copyToMatlab() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        JKImage<double> image(m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<double> gof_image(m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<uint16_t> mask_image(m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<uint16_t> overview_image(m->getDataImageWidth(), m->getDataImageHeight());
+        readParameterImage(image.data(), gof_image.data(), m->getDataImageWidth(), m->getDataImageHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+        overview_image.assign(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight());
+        //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        for (int32_t i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+            mask_image(i)=(plteOverviewExcludedData[i])?1:0;
+        }
+
+        QString data="";
+        data.append(image.to_matlab("parameterImage").c_str());
+        data.append(gof_image.to_matlab("goodnesOfFit").c_str());
+        data.append(overview_image.to_matlab("overview").c_str());
+        data.append(mask_image.to_matlab("mask").c_str());
+
+        QClipboard *clipboard = QApplication::clipboard();
+
+        clipboard->setText(data);
+    }
+}
+
 void QFRDRImagingFCSImageEditor::saveData() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
@@ -2217,6 +2278,9 @@ void QFRDRImagingFCSImageEditor::saveData() {
         filters<< tr("float-TIFF (*.tif)");
         filters<< tr("16-bit-TIFF (*.tif *.tif16)");
         filters<< tr("color-coded PNG image (*.png)");
+        filters<< tr("Matlab Script (*.m)");
+        filters<< tr("TAB-Separated value (*.dat *.csv)");
+        filters<< tr("Semicolon-Separated value [decimal point] (*.dat *.csv)");
 
         QString selFilter=filters[0];
 
@@ -2234,38 +2298,98 @@ void QFRDRImagingFCSImageEditor::saveData() {
 
         QString fileNameParam=path+base+".param."+ext;
         QString fileNameGof=path+base+".gof."+ext;
+        QString fileNameMask=path+base+".mask."+ext;
+        QString fileNameOverview=path+base+".overview."+ext;
+        QString fileNameMatlab=path+base+".m";
 
         bool saveParam=true;
         bool saveGof=true;
-        if (QFile::exists(fileNameParam)) {
-            saveParam=(QMessageBox::question(this, tr("imFCS: Save Parameter Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameParam), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
-        }
-        if (QFile::exists(fileNameGof)) {
-            saveGof=(QMessageBox::question(this, tr("imFCS: Save Parameter Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameGof), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+        bool saveMask=true;
+        bool saveOverview=true;
+        bool saveMatlab=true;
+        if (selFilter!=filters[6]) {
+            if (QFile::exists(fileNameParam)) {
+                saveParam=(QMessageBox::question(this, tr("imFCS: Save Parameter Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameParam), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
+            if (QFile::exists(fileNameGof)) {
+                saveGof=(QMessageBox::question(this, tr("imFCS: Save Goodnes-of-Fit Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameGof), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
+            if (QFile::exists(fileNameMask)) {
+                saveMask=(QMessageBox::question(this, tr("imFCS: Save Mask Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameMask), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
+            if (QFile::exists(fileNameOverview)) {
+                saveOverview=(QMessageBox::question(this, tr("imFCS: Save Overview Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameOverview), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
+        } else {
+            if (QFile::exists(fileNameMatlab)) {
+                saveMatlab=(QMessageBox::question(this, tr("imFCS: Save Images to Matlab script"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameMatlab), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
         }
 
         JKImage<double> image(m->getDataImageWidth(), m->getDataImageHeight());
         JKImage<double> gof_image(m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<uint16_t> mask_image(m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<uint16_t> overview_image(m->getDataImageWidth(), m->getDataImageHeight());
         readParameterImage(image.data(), gof_image.data(), m->getDataImageWidth(), m->getDataImageHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
-
+        //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        overview_image.assign(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight());
+        for (int32_t i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+            mask_image(i)=(plteOverviewExcludedData[i])?1:0;
+        }
         if (selFilter==filters[0]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), ", ", '.');
             if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), ", ", '.');
+            if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), ", ", '.');
+            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), ", ", '.');
         } else if (selFilter==filters[1]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", ',');
             if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", ',');
+            if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", ',');
+            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), "; ", ',');
+        } else if (selFilter==filters[7]) {
+            if (saveParam) image.save_csv(fileNameParam.toStdString(), "\t", '.');
+            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "\t", '.');
+            if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "\t", '.');
+            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), "\t", '.');
+        } else if (selFilter==filters[8]) {
+            if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", '.');
+            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", '.');
+            if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", '.');
+            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), "; ", '.');
         } else if (selFilter==filters[2]) {
             if (saveParam)  image.save_sylk(fileNameParam.toStdString());
             if (saveGof) gof_image.save_sylk(fileNameGof.toStdString());
+            if (saveMask) mask_image.save_sylk(fileNameMask.toStdString());
+            if (saveOverview) overview_image.save_sylk(fileNameOverview.toStdString());
         } else if (selFilter==filters[3]) {
             if (saveParam) image.save_tifffloat(fileNameParam.toStdString());
             if (saveGof) gof_image.save_tifffloat(fileNameGof.toStdString());
+            if (saveMask) mask_image.save_tifffloat(fileNameMask.toStdString());
+            if (saveOverview) overview_image.save_tifffloat(fileNameOverview.toStdString());
         } else if (selFilter==filters[4]) {
             if (saveParam) image.save_tiffuint16(fileNameParam.toStdString());
             if (saveGof) gof_image.save_tiffuint16(fileNameGof.toStdString());
-        } else {
+            if (saveMask) mask_image.save_tiffuint16(fileNameMask.toStdString());
+            if (saveOverview) overview_image.save_tiffuint16(fileNameOverview.toStdString());
+        } else if (selFilter==filters[6]) {
+            if (saveMatlab) {
+                QString data="";
+                data.append(image.to_matlab("parameterImage").c_str());
+                data.append(gof_image.to_matlab("goodnesOfFit").c_str());
+                data.append(mask_image.to_matlab("mask").c_str());
+                data.append(overview_image.to_matlab("overview").c_str());
+                QFile file(fileNameMatlab);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&file);
+                    out<<data;
+                    file.close();
+                }
+            }
+        } else if (selFilter==filters[5]) {
             if (saveParam) plteImage->drawImage().save(fileNameParam, "PNG");
             if (saveGof) plteGofImage->drawImage().save(fileNameGof, "PNG");
+            if (saveMask) plteMask->drawImage().save(fileNameMask, "PNG");
+            if (saveOverview) plteOverview->drawImage().save(fileNameOverview, "PNG");
         }
 
 

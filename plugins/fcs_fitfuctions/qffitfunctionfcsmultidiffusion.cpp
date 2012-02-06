@@ -96,6 +96,7 @@ double QFFitFunctionFCSMultiDiffusion::evaluate(double t, const double* data) co
     const double background=data[FCSMULTI_background];
     const double cr=data[FCSMULTI_count_rate];
     double backfactor=1.0/sqr(1.0+background/cr);
+    if (fabs(cr)<1e-15) backfactor=1;
 
     const int type1=data[FCSMULTI_diff_type1];
     const int type2=data[FCSMULTI_diff_type2];

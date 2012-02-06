@@ -37,7 +37,7 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint16_t wi
         }
         ui->labRange->setText(tr("%1 ... %2").arg(min).arg(max));
         ui->edtLevel->setRange(min, max);
-        ui->edtLevel->setValue(min+0.1*(max-min));
+        ui->edtLevel->setValue(min+0.2*(max-min));
     }
     plteImage->set_data(m_image, m_width, m_height, JKQTPMathImageBase::DoubleArray);
     plteImage->set_width(m_width);
@@ -56,7 +56,7 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint16_t wi
     ui->pltMain->get_plotter()->set_maintainAspectRatio(true);
     ui->pltMain->get_plotter()->set_aspectRatio(1);
     ui->pltMain->get_plotter()->set_maintainAxisAspectRatio(true);
-    ui->pltMain->get_plotter()->set_axisAspectRatio(1);
+    ui->pltMain->get_plotter()->set_axisAspectRatio((double)m_width/(double)m_height);
 
     ui->pltMain->setAbsoluteXY(0,m_width,0,m_height);
     ui->pltMain->zoom(0,m_width,0,m_height);

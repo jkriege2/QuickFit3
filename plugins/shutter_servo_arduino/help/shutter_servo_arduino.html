@@ -11,21 +11,39 @@
 	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>shutter_servo_arduino.ini</tt> either in
 	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/shutter_servo_arduino/</tt>) for the plugin.
 	 </p>
-	 <p>In the <tt>shutter_servo_arduino.ini</tt> you will have to tell the plugin which stages are available:
+	 <p>In the <tt>shutter_servo_arduino.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>shutter</b><i>N</i>]</tt> block for each shutter <i>N</i> (default values are <u>underlined</u>):
 	 <blockquote><tt>
-[<b>driver</b>]<br>
+[<b>shutter</b><i>N</i>]<br>
 <b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
-<b>port_speed</b> = <i>port speed (9600 | 19200 | 38400)</i><br>
-<b>shuttetr_count</b> = <i>number of connected servos</i><br>
+<b>id</b> = <i>id of the shutter in the driver connected to the given port (0 | 1 | 2 | 3)</i><br>
+<b>port_speed</b> = <i>port speed (<u>9600</u> | 19200 | 38400 | ...)</i><br>
+<b>port_databits</b> = <i>data bits used for the communication (5 | 6 | 7 | <u>8</u> | 9)</i><br>
+<b>port_parity</b> = <i>parity bit (<u>none</u> | odd | even)</i><br>
+<b>port_handshaking</b> = <i>handshaking mode (<u>none</u> | xonxoff | hardware)</i><br>
+<b>port_stopbits</b> = <i>port speed (<u>1</u> | 1.5 | 2)</i><br>
+<b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
+<b>shutter_operation_duration</b> = <i>time for switching the shutter in milliseconds (default: <u>500</u>)</i><br>
 <br>
-	 </tt></blockquote
+	 </tt></blockquote> 
+	 The number of shutters is stored in the variable <tt>shutter_count</tt>.
 	 </p>
-	 <p>Here is an example configuration file for windows and two servos:
+	 <p>Here is an example configuration file for windows and three servos on two controllers connected to COM1 and COM5:
 	 <blockquote><tt>
-[driver]<br>
+shutter_count=3<br><br>
+[shutter1]<br>
 port=COM1<br>
-port_speed=38400<br>
-shuttetr_count=2
+id=1<br>
+port_speed=9600<br>
+shutter_operation_duration=250<br><br>
+[shutter2]<br>
+port=COM1<br>
+id=2<br>
+shutter_operation_duration=500<br><br>
+[shutter3]<br>
+port=COM5<br>
+port_speed=19200
+id=1<br>
+shutter_operation_duration=750
 	 </tt></blockquote></p>
   </body>
 </html>

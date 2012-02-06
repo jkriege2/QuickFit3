@@ -28,6 +28,7 @@
 #include "qfhistogramview.h"
 #include "jkqtptools.h"
 #include <QFrame>
+#include <QFile>
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -176,8 +177,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief save a report of the evaluation results */
         void saveReport();
-        /** \brief save the marginals and histogram data */
+        /** \brief save the displayed images as data files (TIFF, CSV, ...) */
         void saveData();
+        /** \brief copy displayed images to Matlab */
+        void copyToMatlab();
         /** \brief print a report of the evaluation results */
         void printReport();
     protected:
@@ -344,8 +347,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         /** \brief action to save a report */
         QPushButton* btnSaveReport;
-        /** \brief action to save marginal+histogram data */
+        /** \brief action to save image data */
         QPushButton* btnSaveData;
+        /** \brief action to copy image data to Matlab */
+        QPushButton* btnCopyDataToMatlab;
 
 
         /** \brief plotter widget for the parameter histogram */

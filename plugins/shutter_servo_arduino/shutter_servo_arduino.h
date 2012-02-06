@@ -118,6 +118,7 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
         struct SHUTTER {
             QF3SimpleB040SerialProtocolHandler* serial;
             int port;
+            int id;
             /** \brief duration of a shutter operation in milliseconds */
             int shutter_operation_duration;
             QString infoMessage;

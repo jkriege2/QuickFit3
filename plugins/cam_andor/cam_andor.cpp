@@ -227,11 +227,13 @@ void QFExtensionCameraAndor::initExtension() {
     dlgGlobalSettings->setWindowTitle(tr("Andor: Global Settings"));
 
     QAction* actShowGlobal=new QAction(tr("show global settings ..."), this);
+    actShowGlobal->setIcon(QIcon(":/cam_andor/show_global.png"));
     connect(actShowGlobal, SIGNAL(triggered()), dlgGlobalSettings, SLOT(show()));
     QMenu* extm=services->getMenu("extensions");
     if (extm) {
-        QMenu* andorMenu=extm->addMenu(QIcon(getIconFilename()), tr("Andor Cameras"));
-        andorMenu->addAction(actShowGlobal);
+        //QMenu* andorMenu=extm->addMenu(QIcon(getIconFilename()), tr("Andor Cameras"));
+        //andorMenu->addAction(actShowGlobal);
+        extm->addAction(actShowGlobal);
     }
 
 /*

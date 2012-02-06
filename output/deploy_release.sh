@@ -7,7 +7,7 @@ SVNVER=`svnversion`
 #	SVNVER=newest
 #fi
 ZIPFILE=quickfit3_${SVNVER}.zip
-REMOVEPLUGINS="cam_radhard2 cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino"
+REMOVEPLUGINS="cam_radhard2 cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test"
 
 rm -rf deploy
 cp ${ZIPFILE} "${ZIPFILE}.backup"

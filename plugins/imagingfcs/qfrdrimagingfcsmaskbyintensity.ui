@@ -27,7 +27,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Level: </string>
+          <string>Threshold:</string>
          </property>
          <property name="buddy">
           <cstring>edtLevel</cstring>
@@ -71,7 +71,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Range:</string>
+          <string>Data Range:</string>
          </property>
         </widget>
        </item>
@@ -229,6 +229,22 @@
     <hint type="destinationlabel">
      <x>397</x>
      <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>289</y>
     </hint>
    </hints>
   </connection>
