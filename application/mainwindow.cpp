@@ -225,6 +225,7 @@ void MainWindow::closeProject() {
 
 void MainWindow::newProject() {
     if (maybeSave()) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
         setCurrentProject("");
         closeProject();
         tvMain->setModel(NULL);
@@ -245,6 +246,7 @@ void MainWindow::newProject() {
         extensionManager->distribute(project);
 
         newProjectTimer.start();
+        QApplication::restoreOverrideCursor();
     }
 }
 
@@ -253,7 +255,9 @@ void MainWindow::openProject() {
         QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project ..."), currentProjectDir, tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave)"));
         if (!fileName.isEmpty()) {
             currentProjectDir=QFileInfo(fileName).dir().absolutePath();
+            QApplication::setOverrideCursor(Qt::WaitCursor);
             loadProject(fileName);
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -270,6 +274,14 @@ void MainWindow::openRecentProject() {
     }
 }
 
+void MainWindow::openRecentProject(const QString& filename) {
+    if (maybeSave()) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        currentProjectDir=QFileInfo(filename).dir().absolutePath();
+        loadProject(filename);
+        QApplication::restoreOverrideCursor();
+    }
+}
 
 bool MainWindow::saveProject() {
     if (curFile.isEmpty()) {
@@ -284,8 +296,11 @@ bool MainWindow::saveProjectAs() {
     if (fileName.isEmpty())
         return false;
     currentProjectDir=QFileInfo(fileName).dir().absolutePath();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    return saveProject(fileName);
+    bool res=saveProject(fileName);
+    QApplication::restoreOverrideCursor();
+    return res;
 }
 
 
@@ -604,11 +619,11 @@ void MainWindow::createActions() {
     openProjectAct->setStatusTip(tr("Open an existing project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
-    for (int i = 0; i < MaxRecentFiles; ++i) {
+    /*for (int i = 0; i < MaxRecentFiles; ++i) {
         recentFileActs[i] = new QAction(this);
         recentFileActs[i]->setVisible(false);
         connect(recentFileActs[i], SIGNAL(triggered()), this, SLOT(openRecentProject()));
-    }
+    }*/
 
 
     saveProjectAct = new QAction(QIcon(":/project_save.png"), tr("&Save Project"), this);
@@ -621,13 +636,15 @@ void MainWindow::createActions() {
     saveProjectAsAct->setStatusTip(tr("Save the project under a new name"));
     connect(saveProjectAsAct, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 
-    optionsAct = new QAction(QIcon(":/configure.png"), tr("&Settings"), this);
+    optionsAct = new QAction(QIcon(":/configure.png"), tr("&Preferences ..."), this);
     optionsAct->setStatusTip(tr("Application settings dialog"));
+    optionsAct->setMenuRole(QAction::PreferencesRole);
     connect(optionsAct, SIGNAL(triggered()), this, SLOT(openSettingsDialog()));
 
     exitAct = new QAction(QIcon(":/exit.png"), tr("E&xit"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
     exitAct->setStatusTip(tr("Exit the application"));
+    exitAct->setMenuRole(QAction::QuitRole);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
 
@@ -637,6 +654,7 @@ void MainWindow::createActions() {
 
     aboutAct = new QAction(QIcon(":/about.png"), tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
+    aboutAct->setMenuRole(QAction::AboutRole);
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     aboutPluginsAct = new QAction(QIcon(":/about.png"), tr("About &Plugins"), this);
@@ -646,6 +664,7 @@ void MainWindow::createActions() {
 
     aboutQtAct = new QAction(QIcon(":/aboutqt.png"), tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+    aboutQtAct->setMenuRole(QAction::AboutQtRole);
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 
@@ -664,10 +683,20 @@ void MainWindow::createMenus() {
 
     fileMenu->addAction(openProjectAct);
 
-    recentMenu=fileMenu->addMenu(QIcon(":/project_open_recent.png"), tr("&Recent Files"));
+    /*recentMenu=fileMenu->addMenu(QIcon(":/project_open_recent.png"), tr("&Recent Files"));
     for (int i = 0; i < MaxRecentFiles; ++i)
         recentMenu->addAction(recentFileActs[i]);
-    updateRecentFileActions();
+    updateRecentFileActions();*/
+    recentMenu=new QRecentFilesMenu(fileMenu);
+    recentMenu->setDefaultIcon(QIcon(":/qf3fileicon.png"));
+    recentMenu->setUseSystemFileIcons(false);
+    recentMenu->setIcon(QIcon(":/project_open_recent.png"));
+    recentMenu->setTitle(tr("&Recent Files"));
+    recentMenu->setMaxRecentFilesCount(10);
+    QSettings* s=settings->getQSettings();
+    recentMenu->readSettings(*s, "mainwindow/recentfilelist");
+    connect(recentMenu, SIGNAL(openRecentFile(QString)), this, SLOT(openRecentProject(QString)));
+    fileMenu->addMenu(recentMenu);
 
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
@@ -780,6 +809,8 @@ void MainWindow::readSettings() {
     loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(5,5), QSize(800,600), "mainwindow/");
     loadSplitter(*(settings->getQSettings()), spMain, "mainwindow/splitterSizesMain/");
     loadSplitter(*(settings->getQSettings()), spCenter, "mainwindow/splitterSizesCenter/");
+    recentMenu->readSettings(*(settings->getQSettings()), "mainwindow/recentfilelist");
+
 
     currentProjectDir=settings->getQSettings()->value("mainwindow/currentProjectDir", currentProjectDir).toString();
     currentRawDataDir=settings->getQSettings()->value("mainwindow/currentRawDataDir", currentRawDataDir).toString();
@@ -819,6 +850,7 @@ void MainWindow::writeSettings() {
     saveWidgetGeometry(*(settings->getQSettings()), this, "mainwindow/");
     saveSplitter(*(settings->getQSettings()), spMain, "mainwindow/splitterSizesMain/");
     saveSplitter(*(settings->getQSettings()), spCenter, "mainwindow/splitterSizesCenter/");
+    recentMenu->storeSettings(*(settings->getQSettings()), "mainwindow/recentfilelist");
 
     logFileMainWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logMain");
     logFileProjectWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logProject");
@@ -970,8 +1002,10 @@ void MainWindow::setCurrentProject(const QString &fileName) {
     setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("QuickFit %1").arg(VERSION_FULL)));
 
     // update recent files list in ini file
+    recentMenu->addRecentFile(fileName);
     QSettings* s=settings->getQSettings();
-    QStringList files = s->value("mainwindow/recentfilelist").toStringList();
+    recentMenu->storeSettings(*s, "mainwindow/recentfilelist");
+    /*QStringList files = s->value("mainwindow/recentfilelist").toStringList();
     files.removeAll(fileName);
     files.prepend(fileName);
     while (files.size() > MaxRecentFiles)
@@ -985,10 +1019,10 @@ void MainWindow::setCurrentProject(const QString &fileName) {
         }
     }
     s->setValue("mainwindow/recentfilelist", files);
-    updateRecentFileActions();
+    updateRecentFileActions();*/
 }
 
-void MainWindow::updateRecentFileActions(){
+/*void MainWindow::updateRecentFileActions(){
     QSettings* s=settings->getQSettings();
     QStringList files = s->value("mainwindow/recentfilelist").toStringList();
     files.removeDuplicates();
@@ -1007,7 +1041,7 @@ void MainWindow::updateRecentFileActions(){
         recentFileActs[i]->setVisible(true);
     }
     if (recentMenu) recentMenu->setEnabled(numRecentFiles > 0);
-}
+}*/
 
 QString MainWindow::strippedName(const QString &fullFileName) {
     return QFileInfo(fullFileName).fileName();
@@ -1198,6 +1232,7 @@ ProgramOptions* MainWindow::getOptions() {
 
 void MainWindow::autosaveProject() {
     if (!project->hasChanged()) return;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     QString autosaveFilename=curFile;
     if (autosaveFilename.isEmpty()) autosaveFilename="untitled.qfp";
     autosaveFilename=autosaveFilename+".autosave";
@@ -1206,6 +1241,7 @@ void MainWindow::autosaveProject() {
     statusBar()->showMessage(tr("autosaving project file '%1' ...").arg(autosaveFilename), 500);
     logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
     project->writeXML(autosaveFilename, false);
+    QApplication::restoreOverrideCursor();
 
 }
 

@@ -2292,6 +2292,8 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     fText.setFontPointSize(8);
     QTextCharFormat fTextSmall=fText;
     fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fTextSmaller=fText;
+    fTextSmaller.setFontPointSize(0.7*fText.fontPointSize());
     QTextCharFormat fTextBold=fText;
     fTextBold.setFontWeight(QFont::Bold);
     QTextCharFormat fTextBoldSmall=fTextBold;
@@ -2407,14 +2409,25 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         QPainter* painter=new QPainter(&pic);
         plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->height()+plotterResid->height()));
         delete painter;
-        double scale=0.6;//document->textWidth()*(double)plotter->width()/allwidth/pic.boundingRect().width();
+        double scale=0.7*document->textWidth()/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 
         tabCursor=table->cellAt(1,0).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-6\">%1</font></center>").arg(tvParams->toHtml())));
+        int tfsize=8;
+        QString htmltable=tvParams->toHtml(0, true);
+        int colcnt=htmltable.count("<th ",Qt::CaseInsensitive);
+        if (colcnt>=24) tfsize=7;
+        if (colcnt>=27) tfsize=6;
+        if (colcnt>=30) tfsize=5;
+        if (colcnt>=36) tfsize=4;
+        if (colcnt>=42) tfsize=3;
+        if (colcnt>=48) tfsize=2;
+        if (colcnt>=54) tfsize=1;
+        qDebug()<<colcnt<<tfsize;
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: %2pt;\">%1</span></nobr></center>").arg(htmltable).arg(tfsize)));
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);
@@ -2430,7 +2443,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     cursor.insertBlock();
     cursor.insertText(tr("Data Source:\n").arg(m->getName()), fHeading2);
     cursor.movePosition(QTextCursor::End);
-    cursor.insertText(tr("files:\n"), fTextBoldSmall);
+    cursor.insertText(tr("files:\n"), fTextSmall);
     QStringList f=m->getFiles();
     QStringList t=m->getFilesTypes();
     for (int i=0; i<f.size(); i++) {
@@ -2440,7 +2453,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
                 typ=QString("[%1]").arg(t[i]);
             }
         }
-        cursor.insertText(tr("%1 %2\n").arg(f[i]).arg(typ), fTextSmall);
+        cursor.insertText(tr("%1 %2\n").arg(f[i]).arg(typ), fTextSmaller);
 
     }
 

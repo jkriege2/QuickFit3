@@ -62,5 +62,6 @@
         <file alias="lightpath.png">icons/lightpath.png</file>
         <file alias="lightpath_delete.png">icons/lightpath_delete.png</file>
         <file alias="lightpath_save.png">icons/lightpath_save.png</file>
+        <file alias="maskfileicon.png">icons/maskfileicon.png</file>
     </qresource>
 </RCC>

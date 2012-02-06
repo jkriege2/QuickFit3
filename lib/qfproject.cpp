@@ -235,6 +235,8 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     w.writeStartDocument();
     w.writeStartElement("quickfitproject");
     w.writeAttribute("quickfit_version", VERSION_FULL);
+    w.writeAttribute("quickfit_svn", SVNVERSION);
+    w.writeAttribute("quickfit_compiledate", COMPILEDATE);
     w.writeAttribute("name", name);
     w.writeAttribute("creator", creator);
     w.writeStartElement("description");

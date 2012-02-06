@@ -460,13 +460,13 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         QPainter* painter=new QPainter(&pic);
         pltParamHistogram->get_plotter()->draw(*painter, QRect(0,0,pltParamHistogram->width(),pltParamHistogram->height()));
         delete painter;
-        double scale=0.5;//document->textWidth()*w1/allwidth/pic.boundingRect().width();
+        double scale=0.5*document->textWidth()/pic.boundingRect().width();
         if (scale<=0) scale=1;
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 
         tabCursor=table->cellAt(0, 1).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><font size=\"-4\">%1</font></center>").arg(tvHistogramParameters->toHtml())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: 7pt;\">%1</span></nobr></center>").arg(tvHistogramParameters->toHtml(1,true))));
     }
     cursor.movePosition(QTextCursor::End);
 }

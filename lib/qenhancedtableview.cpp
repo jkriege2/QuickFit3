@@ -109,34 +109,38 @@ void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
 }
 
 
-QString QEnhancedTableView::toHtml() const {
+QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontSizePt) const {
     if (!model()) return "";
-    QString html="<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">";
+    QString fsstyle="";
+    if (fontSizePt>0) {
+        fsstyle=QString(" font-size: %1pt;").arg(fontSizePt);
+    }
+    QString html=QString("<table border=\"%1\" cellspacing=\"0\" cellpadding=\"0\">").arg(borderWidth);
     for (int row=-1; row<model()->rowCount(); row++) {
         html+="<tr>";
         if (row==-1) {
             for (int col=-1; col<model()->columnCount(); col++) {
-                html+="<th>";
+                html+=QString("<th style=\"white-space: nowrap;%1\"><nobr>").arg(fsstyle);
                 if (col>=0) {
                     html+=model()->headerData(col, Qt::Horizontal).toString();
                 }
-                html+="</th>";
+                html+="</nobr></th>";
             }
         } else {
             for (int col=-1; col<model()->columnCount(); col++) {
                 if (col==-1) {
-                    html+="<th>";
+                    html+=QString("<th style=\"white-space: nowrap;%1\"><nobr>").arg(fsstyle);
                     html+=model()->headerData(row, Qt::Vertical).toString();
-                    html+="</th>";
+                    html+="</nobr></th>";
                 } else {
                     QModelIndex index=model()->index(row, col);
                     QVariant check=index.data(Qt::CheckStateRole);
                     QBrush back=index.data(Qt::BackgroundRole).value<QBrush>();
-                    QString style="";
+                    QString style=fsstyle+"white-space: nowrap; ";
                     //qDebug()<<"r="<<row<<"\tc="<<col<<"\tcolor="<<back.color().name();
                     if (back.color()!=QColor(0,0,0) && index.data(Qt::BackgroundRole).isValid()) style=QString("background: %1;").arg(back.color().name());
-                    if (style.isEmpty()) html+=QString("<td>");
-                    else html+=QString("<td style=\"%1\">").arg(style);
+                    if (style.isEmpty()) html+=QString("<td style=\"%1\"><nobr>").arg(fsstyle);
+                    else html+=QString("<td style=\"%1\"><nobr>").arg(style);
                     if (check.isValid()) {
                         if (check.toInt()!=0) {
                             html+= QString("|&times;|&nbsp;&nbsp;");
@@ -145,7 +149,7 @@ QString QEnhancedTableView::toHtml() const {
                         }
                     }
                     html+=index.data().toString();
-                    html+="</td>";
+                    html+="</nobr></td>";
                 }
             }
         }

@@ -19,7 +19,7 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         virtual ~QEnhancedTableView();
 
         /** \brief return the contents of the table view as HTML fragment */
-        QString toHtml() const;
+        QString toHtml(int borderWidth=1, bool non_breaking=false, int fontSizePt=-1) const;
     signals:
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:

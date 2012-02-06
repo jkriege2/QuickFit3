@@ -461,6 +461,12 @@ void QFESPIMB040CameraView::createActions() {
 
     actMaskLoad = new QAction(QIcon(":/spimb040/maskload.png"), tr("&Load mask (broken pixels)"), this);
     connect(actMaskLoad, SIGNAL(triggered()), this, SLOT(loadMask()));
+    recentMaskFiles=new QRecentFilesMenu(this);
+    recentMaskFiles->setUseSystemFileIcons(false);
+    recentMaskFiles->setDefaultIcon(QIcon(":/spimb040/maskfileicon.png"));
+    recentMaskFiles->setAlwaysEnabled(true);
+    connect(recentMaskFiles, SIGNAL(openRecentFile(QString)), this, SLOT(loadMask(QString)));
+    actMaskLoad->setMenu(recentMaskFiles);
 
     actMaskHisto = new QAction(QIcon(":/spimb040/maskhisto.png"), tr("&Create mask by histogram"), this);
     connect(actMaskHisto, SIGNAL(triggered()), this, SLOT(histogramMask()));
@@ -509,6 +515,7 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     jkloadWidgetGeometry(settings, this, prefix+"geometry/");
     //jkloadSplitter(settings, splitHor,  prefix+"split_hor/");
     jkloadSplitter(settings, splitVert, prefix+"split_vert/");
+    recentMaskFiles->readSettings(settings, prefix+"recent_mask_files/");
 
     spinCountsLower->setValue(settings.value(prefix+"histogram.min", 0).toInt());
     spinCountsUpper->setValue(settings.value(prefix+"histogram.max", 255).toInt());
@@ -557,6 +564,7 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
     jksaveWidgetGeometry(settings, this, prefix+"geometry/");
     //jksaveSplitter(settings, splitHor,  prefix+"split_hor/");
     jksaveSplitter(settings, splitVert, prefix+"split_vert/");
+    recentMaskFiles->storeSettings(settings, prefix+"recent_mask_files/");
 
     settings.setValue(prefix+"last_imagepath", lastImagepath);
     settings.setValue(prefix+"last_maskpath", lastMaskpath);
@@ -1307,11 +1315,7 @@ void QFESPIMB040CameraView::saveMask() {
     if (m_stopresume) m_stopresume->resume();
 }
 
-void QFESPIMB040CameraView::loadMask() {
-    if (m_stopresume) m_stopresume->stop();
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Mask Data"),
-                            lastMaskpath,
-                            tr("Image Mask (*.msk)"));
+void QFESPIMB040CameraView::loadMask(const QString& fileName) {
     if (fileName.isEmpty()) return;
     lastMaskpath=QFileInfo(fileName).absolutePath();
     if (QMessageBox::question(this, tr("QuickFit SPIM Control"), tr("Do your really want to replace the mask with the file contents?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes )==QMessageBox::No ) return;
@@ -1321,11 +1325,21 @@ void QFESPIMB040CameraView::loadMask() {
         QMessageBox::warning(this, tr("QuickFit SPIM Control"),
                           tr("Cannot open file %1")
                           .arg(fileName));
+    } else {
+        recentMaskFiles->addRecentFile(fileName);
     }
     maskEmpty=false;
     redrawFrameRecalc();
     QApplication::restoreOverrideCursor();
     if (m_stopresume) m_stopresume->resume();
+}
+
+void QFESPIMB040CameraView::loadMask() {
+    if (m_stopresume) m_stopresume->stop();
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Mask Data"),
+                            lastMaskpath,
+                            tr("Image Mask (*.msk)"));
+    loadMask(fileName);
 }
 
 

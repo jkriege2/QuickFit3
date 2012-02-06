@@ -446,6 +446,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addSeparator();
     toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsfit/plot_savedata.png"));
     toolbar->addAction(pltData->get_plotter()->get_actCopyData());
+    toolbar->addAction(pltData->get_plotter()->get_actCopyMatlab());
     toolbar->addSeparator();
     toolbar->addAction(pltData->get_plotter()->get_actZoomAll()); pltData->get_plotter()->get_actZoomAll()->setIcon(QIcon(":/fcsfit/plot_zoomall.png"));
     connect(pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), pltResiduals, SLOT(zoomToFit()));
@@ -2074,10 +2075,16 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     QTextCharFormat fHeading1=fText;
     QTextBlockFormat bfLeft;
     bfLeft.setAlignment(Qt::AlignLeft);
+    QTextBlockFormat bfLeftNB=bfLeft;
+    bfLeftNB.setNonBreakableLines(true);
     QTextBlockFormat bfRight;
     bfRight.setAlignment(Qt::AlignRight);
+    QTextBlockFormat bfRightNB=bfRight;
+    bfRightNB.setNonBreakableLines(true);
     QTextBlockFormat bfCenter;
     bfCenter.setAlignment(Qt::AlignHCenter);
+    QTextBlockFormat bfCenterNB=bfCenter;
+    bfCenterNB.setNonBreakableLines(true);
 
     fHeading1.setFontPointSize(2*fText.fontPointSize());
     fHeading1.setFontWeight(QFont::Bold);
@@ -2208,12 +2215,13 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
             }
 
             tableCursor=table->cellAt(rowStart, colStart).firstCursorPosition();
-            tableCursor.setBlockFormat(bfRight);
+            tableCursor.setBlockFormat(bfRightNB);
             tableCursor.setBlockCharFormat(fTextSmall);
             tableCursor.insertFragment(QTextDocumentFragment::fromHtml(d.label));
             tableCursor.insertText(" = ", fTextSmall);
 
             tableCursor=table->cellAt(rowStart, colStart+1).firstCursorPosition();
+            tableCursor.setBlockFormat(bfLeftNB);
             tableCursor.setBlockCharFormat(fTextSmall);
             if (d.fit) {
                 tableCursor.insertText(tr("F"), fTextSmall);
@@ -2227,22 +2235,25 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 
 
             tableCursor=table->cellAt(rowStart, colStart+2).firstCursorPosition();
-            tableCursor.setBlockFormat(bfRight);
+            tableCursor.setBlockFormat(bfRightNB);
             tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(value_string));
+            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(value_string)));
 
             tableCursor=table->cellAt(rowStart, colStart+3).firstCursorPosition();
+            tableCursor.setBlockFormat(bfLeftNB);
             tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(err));
+            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(err)));
 
             tableCursor=table->cellAt(rowStart, colStart+4).firstCursorPosition();
+            tableCursor.setBlockFormat(bfLeftNB);
             tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(d.unitLabel));
+            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(d.unitLabel)));
 
             if (algorithm->get_supportsBoxConstraints()) {
                 tableCursor=table->cellAt(rowStart, colStart+5).firstCursorPosition();
+                tableCursor.setBlockFormat(bfLeftNB);
                 tableCursor.setBlockCharFormat(fTextSmall);
-                tableCursor.insertFragment(QTextDocumentFragment::fromHtml(range));
+                tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(range)));
             }
             rowStart++;
         };
@@ -2253,7 +2264,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     }
     cursor.movePosition(QTextCursor::End);
     cursor.insertBlock();
-    cursor.setBlockFormat(bfCenter);
+    cursor.setBlockFormat(bfCenterNB);
     cursor.setBlockCharFormat(fTextSmall);
     cursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<i><u>legend:</u> <b>F</b>: fit parameter, <b>X</b>: fixed parameter, <b>C</b>: calculated parameter</i>")));
     QApplication::processEvents();

@@ -96,7 +96,7 @@ void QFProjectTreeModelNode::setProject(QFProject* project) {
 
 QIcon QFProjectTreeModelNode::icon() const {
     if (m_type==QFProjectTreeModelNode::qfpntProject) {
-        return QIcon(":/lib/projecttree_folderopen.png");
+        return QIcon(":/lib/projecttree_project.png");
     } else if (m_type==QFProjectTreeModelNode::qfpntDirectory) {
         return QIcon(":/lib/projecttree_folderopen.png");
     } else if (m_type==QFProjectTreeModelNode::qfpntRawDataRecord) {

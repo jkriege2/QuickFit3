@@ -29,7 +29,7 @@
 #include "qfcameraconfigcombobox.h"
 #include "qfespimb00histogrammaskdialog.h"
 #include "qfasttablelabel.h"
-
+#include "qrecentfilesmenu.h"
 
 
 /** \brief defines the type of the internal image representation of QFESPIMB040CameraView::image, may be uint32_t OR double OR float (nothing else!!!)  */
@@ -268,6 +268,8 @@ class QFESPIMB040CameraView : public QWidget {
         QAction* actSaveTransformed;
         /** \brief action to activate/disactivate mask editing mode */
         QAction* actMaskEdit;
+        /** \brief recent mask files menu */
+        QRecentFilesMenu* recentMaskFiles;
         /** \brief create a mask based on the current histogram */
         QAction* actMaskHisto;
         /** \brief action to clear mask */
@@ -409,6 +411,7 @@ class QFESPIMB040CameraView : public QWidget {
         void saveMask();
         /** \brief load mask */
         void loadMask();
+        void loadMask(const QString &filename);
         /** \brief save the current raw image (rawImage) */
         void saveRaw();
         /** \brief save the current transformed image (image) */

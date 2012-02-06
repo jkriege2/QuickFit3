@@ -22,6 +22,7 @@
 #include "../lib/qfextension.h"
 #include "../version.h"
 #include "qvisiblehandlesplitter.h"
+#include "qrecentfilesmenu.h"
 
 
 
@@ -118,7 +119,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief QFPluginServices::getPluginHelpDirectory() */
         virtual QString getPluginHelpDirectory(const QString& pluginID);
-    protected:
+protected:
         void closeEvent(QCloseEvent *event);
 
     private slots:
@@ -130,6 +131,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         void openProject();
         /** \brief load project from recent projects menu */
         void openRecentProject();
+        void openRecentProject(const QString &filename);
         /** \brief save current project */
         bool saveProject();
         /** \brief save current project with a new filename */
@@ -193,7 +195,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         void readSettings();
         void writeSettings();
         bool maybeSave();
-        void updateRecentFileActions();
+        //void updateRecentFileActions();
         QString createPluginDoc(bool docLinks=false);
         QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocCopyrights(QString mainitem_before=QObject::tr("<h2>%1 Copyrights:</h2><ul>"), QString mainitem_after=QString("</ul>"));
@@ -235,9 +237,10 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */
-        enum { MaxRecentFiles = 5 };
+        QRecentFilesMenu* recentMenu;
+        /*enum { MaxRecentFiles = 5 };
         QAction *recentFileActs[MaxRecentFiles];
-        QMenu* recentMenu;
+        QMenu* recentMenu;*/
 
 
         QAction* delItemAct;
