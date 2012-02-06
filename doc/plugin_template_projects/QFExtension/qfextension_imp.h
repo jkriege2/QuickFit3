@@ -13,7 +13,7 @@
 /*! \brief QFExtension implementation
     \ingroup qf3ext_GROUPNAME
  */
-class QFExtensionImplementation : public QObject, public QFExtensionBase, public QFExtensionCamera {
+class QFExtensionImplementation : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera)
     public:
