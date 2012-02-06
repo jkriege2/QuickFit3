@@ -46,7 +46,7 @@ class QFPFitFunctionFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2010-2011 by Jan Krieger");
+            return tr("(c) 2010-2012 by Jan Krieger");
         };
 
         /** \brief weblink for the plugin */

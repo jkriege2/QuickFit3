@@ -9,6 +9,12 @@ QFExtensionTestFilterChanger::QFExtensionTestFilterChanger(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
+    connected[0]=false;
+    connected[1]=false;
+    filter[0]=0;
+    filter[1]=0;
+    lastAction[0].start();
+    lastAction[1].start();
 }
 
 QFExtensionTestFilterChanger::~QFExtensionTestFilterChanger() {
@@ -75,12 +81,15 @@ void QFExtensionTestFilterChanger::deinit() {
 }
 
 unsigned int QFExtensionTestFilterChanger::getFilterChangerCount() {
+    return 2;
 }
 
 void QFExtensionTestFilterChanger::filterChangerConnect(unsigned int filterChanger) {
+    if (filterChanger<=1) connected[filterChanger]=true;
 }
 
 void QFExtensionTestFilterChanger::filterChangerDisonnect(unsigned int filterChanger) {
+    if (filterChanger<=1) connected[filterChanger]=false;
 }
 
 void QFExtensionTestFilterChanger::setFilterChangerLogging(QFPluginLogService *logService) {
@@ -89,27 +98,48 @@ void QFExtensionTestFilterChanger::setFilterChangerLogging(QFPluginLogService *l
 
 
 bool QFExtensionTestFilterChanger::isFilterChangerConnected(unsigned int filterChanger) {
+    if (filterChanger>1) return false;
+    return connected[filterChanger];
 }
 
 unsigned int QFExtensionTestFilterChanger::getFilterChangerFilterCount(unsigned int filterChanger) {
+    if (filterChanger==0) return 4;
+    if (filterChanger==1) return 2;
+    return 0;
 }
 
 void QFExtensionTestFilterChanger::setFilterChangerFilter(unsigned int filterChanger, unsigned int filter) {
+    if (filterChanger>1) return;
+    this->filter[filterChanger]=filter;
+    if (this->filter[filterChanger]>=getFilterChangerFilterCount(filterChanger)) this->filter[filterChanger]=getFilterChangerFilterCount(filterChanger)-1;
+    lastAction[filterChanger].start();
 }
 
 unsigned int QFExtensionTestFilterChanger::getFilterChangerCurrentFilter(unsigned int filterChanger) {
+    if (filterChanger>1) return 0;
+    return filter[filterChanger];
 }
 
 bool QFExtensionTestFilterChanger::isLastFilterChangerActionFinished(unsigned int filterChanger) {
+    if (filterChanger>1) return true;
+    if (filterChanger==0) return lastAction[filterChanger].elapsed()>500;
+    return lastAction[filterChanger].elapsed()>100;
 }
 
 QString QFExtensionTestFilterChanger::getFilterChangerDescription(unsigned int filterChanger) {
+    if (filterChanger>1) return "";
+    if (filterChanger==0) return tr("CHANGER 1");
+    return tr("CHANGER 2");
 }
 
 QString QFExtensionTestFilterChanger::getFilterChangerShortName(unsigned int filterChanger) {
+    if (filterChanger>1) return "";
+    if (filterChanger==0) return tr("CH1");
+    return tr("CH2");
 }
 
 void QFExtensionTestFilterChanger::showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget *parent) {
+    if (filterChanger>1) return;
 }
 
 

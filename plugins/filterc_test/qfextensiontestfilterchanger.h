@@ -118,9 +118,9 @@ class QFExtensionTestFilterChanger : public QObject, public QFExtensionBase, pub
 
 	protected:
         QFPluginLogService* logService;
-		
-	protected slots:
-
+        bool connected[2];
+        int filter[2];
+        QTime lastAction[2];
 
 };
 

@@ -49,7 +49,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getAuthor() const  { return tr("Jan W. Krieger, Jan Buchholz"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan W. Krieger, Jan Buchholz"); };
+        virtual QString getCopyright() const  { return tr("(c) 2011-2012 by Jan W. Krieger, Jan Buchholz"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };

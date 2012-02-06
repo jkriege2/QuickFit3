@@ -86,6 +86,10 @@ plg_fitalgorithm_fit_lmfit.depends = lib libqf3widgets
     plg_shutter_servo_arduino.subdir=./plugins/shutter_servo_arduino
     plg_shutter_servo_arduino.depends = lib libqf3widgets
 
+    SUBDIRS += plg_filterc_test
+    plg_filterc_test.subdir=./plugins/filterc_test
+    plg_filterc_test.depends = lib libqf3widgets
+
 }
 
 

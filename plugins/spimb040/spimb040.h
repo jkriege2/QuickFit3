@@ -36,7 +36,7 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         virtual QString getAuthor() const  { return tr("Jan Krieger"); };
 
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2011-2012 by Jan Krieger"); };
 
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); };

@@ -15,7 +15,7 @@
  */
 class QFExtensionImplementation : public QObject, public QFExtensionBase {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionCamera)
+        Q_INTERFACES(QFExtension)
     public:
         /** Default constructor */
         QFExtensionImplementation(QObject* parent=NULL);

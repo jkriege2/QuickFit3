@@ -10,7 +10,7 @@
 
 #define QF_THANKS_TO "Dr. Nicolas Dross, Dr. György Vámosi, Prof. Jörg Langowski, Dr. Katalin Tòth, Vera Böhm, Tabea Elbel, Jan Buchholz"
 
-#define QF_COPYRIGHT "&copy; 2010-2011 by Jan Krieger"
+#define QF_COPYRIGHT "&copy; 2010-2012 by Jan Krieger"
 
 #define QF_AUTHOR "Jan Krieger"
 
