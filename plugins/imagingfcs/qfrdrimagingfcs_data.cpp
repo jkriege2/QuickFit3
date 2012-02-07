@@ -201,6 +201,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
 		ok=false;
 	} else {
         int taucolumn=getProperty("TAU_COLUMN", 0).toInt();
+        double taufactor=getProperty("TAU_FACTOR", 1).toDouble();
+        double corroffset=getProperty("CORR_OFFSET", 0).toDouble();
         if (taucolumn<0) taucolumn=0;
         int corrcolumn=getProperty("CORRELATION_COLUMN", 1).toInt();
         if (corrcolumn<0) corrcolumn=1;
@@ -218,9 +220,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
             last_empty=empty;
             empty=data.isEmpty();
             if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size()) && (correrrcolumn<data.size()) && (correrrcolumn>=0)) {
-                current_set.append(qMakeTriple(data[taucolumn], data[corrcolumn],  data[correrrcolumn]));
+                current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset,  data[correrrcolumn]));
             } else if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size())) {
-                current_set.append(qMakeTriple(data[taucolumn], data[corrcolumn], 0.0));
+                current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset, 0.0));
                 //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
             }
             if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {

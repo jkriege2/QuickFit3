@@ -85,7 +85,7 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
 void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
         // file format to import
-        QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat *.crosscorrelation.dat *.dccf.dat)");
+        QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat *.acf.dat *.crosscorrelation.dat *.ccf.dat *.dccf.dat *.qf.dat)");
         QString format_Radhard2=tr("SPAD array Correlations (*.dat)");
         QStringList formats;
         formats<<format_videoCorrelator<<format_Radhard2;
@@ -95,7 +95,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         QStringList files = QFileDialog::getOpenFileNames(parentWidget,
                               tr("Select Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              formats.join(";;"), &current_format_name);
+                              formats.join(";;"), &current_format_name, QFileDialog::DontUseNativeDialog|QFileDialog::ReadOnly);
         // store the format we just used
         settings->getQSettings()->setValue("imaging_fcs/current_format_filter", current_format_name);
 
@@ -109,6 +109,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         progress.setWindowModality(Qt::WindowModal);
         progress.setHasCancel(false);
         progress.open();
+        qDebug()<<current_format_name;
         while(it != list.end()) {
             i++;
             services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name));
@@ -180,6 +181,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     paramsReadonly<<"FILETYPE";
 
     bool ok=true;
+    bool isJanBFile=false;
 
 
 
@@ -211,6 +213,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename1=filename;
         evalFilename1=evalFilename1.replace(".ccf.dat", ".configuration.ini");
         isCross=true;
+    } else if (filename.endsWith(".qf.dat")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".qf.dat", ".evalsettings.txt");
+        evalFilename1=filename;
+        evalFilename1=evalFilename1.replace(".qf.dat", ".configuration.ini");
+        isJanBFile=true;
     } else if (filename.endsWith(".dccf.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".dccf.dat", ".evalsettings.txt");
@@ -218,6 +226,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename1=evalFilename1.replace(".dccf.dat", ".configuration.ini");
         isDCCF=true;
     }
+    qDebug()<<filename<<isJanBFile;
 
     if (QFile::exists(filename)) {
         int width=0;
@@ -366,17 +375,17 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             }
         }
         if (QFile::exists(evalFilename1)) {
-
+            //TODO: WHat's this?
         }
         if (width<=0) {
             bool okk=true;
             int wwidth=QInputDialog::getInt ( NULL, tr("Import Video Correlator Data"), tr("width = "), 0, 1, 2147483647, 1, &okk);
-            if (okk) { width=wwidth; ok=false; }
+            if (okk) { width=wwidth;  } else ok=false;
         }
         if (ok && (height<=0)) {
             bool okk=true;
             int wwidth=QInputDialog::getInt ( NULL, tr("Import Video Correlator Data"), tr("height = "), 0, 1, 2147483647, 1, &okk);
-            if (okk) { height=wwidth; ok=false; }
+            if (okk) { height=wwidth; } else ok=false;
         }
         if (ok) {
             QStringList files, files_types;
@@ -414,6 +423,17 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;
             initParams["TAU_COLUMN"]=0;
+            if (isJanBFile) {
+                bool okk=true;
+                double tf=QInputDialog::getDouble ( NULL, tr("Import Video Correlator Data"), tr("tau divider = "), 0, 1e-60, 1e60, 6, &okk);
+                if (okk) {
+                    initParams["TAU_FACTOR"]=1.0/tf;
+                    paramsReadonly<<"TAU_FACTOR";
+                    initParams["CORR_OFFSET"]=1.0;
+                    paramsReadonly<<"CORR_OFFSET";
+                } else ok=false;
+
+            }
             int columns=checkColumns(filename);
             if (!isCross && !isDCCF) {
                 initParams["CORRELATION_COLUMN"]=1;
