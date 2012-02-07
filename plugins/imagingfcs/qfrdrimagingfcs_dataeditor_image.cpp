@@ -806,7 +806,7 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
                 edtColMin->setValue(current->getProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), mi).toDouble());
                 edtColMax->setValue(current->getProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), ma).toDouble());
             }
-            histogram->setBins(current->getProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), 25).toInt());
+            histogram->setBins(current->getProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), 100).toInt());
             histogram->setNormalized(current->getProperty(QString("imfcs_imed_histnorm_%1_%2").arg(egroup).arg(param), true).toBool());
             histogram->setLog(current->getProperty(QString("imfcs_imed_histlog_%1_%2").arg(egroup).arg(param), false).toBool());
             chkExcludeExcludedRunsFromHistogram->setChecked(current->getProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), true).toBool());
@@ -2550,7 +2550,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         if (colcnt>=42) tfsize=3;
         if (colcnt>=48) tfsize=2;
         if (colcnt>=54) tfsize=1;
-        qDebug()<<colcnt<<tfsize;
+        //qDebug()<<colcnt<<tfsize;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: %2pt;\">%1</span></nobr></center>").arg(htmltable).arg(tfsize)));
     }
     QApplication::processEvents();

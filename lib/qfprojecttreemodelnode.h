@@ -5,6 +5,7 @@
 #include <QList>
 #include <QVariant>
 #include <QIcon>
+#include <QPointer>
 #include "lib_imexport.h"
 
 
@@ -74,13 +75,13 @@ class QFLIB_EXPORT QFProjectTreeModelNode : public QObject {
 
     private:
         QList<QFProjectTreeModelNode*> childItems;
-        QFProjectTreeModelNode *parentItem;
+        QPointer<QFProjectTreeModelNode> parentItem;
         nodeType m_type;
-        QFEvaluationItem* evalItem;
-        QFRawDataRecord* rdr;
+        QPointer<QFEvaluationItem> evalItem;
+        QPointer<QFRawDataRecord> rdr;
         QString m_title;
         QString m_toolHelp;
-        QFProject* m_project;
+        QPointer<QFProject> m_project;
 };
 
 #endif // QFPROJECTTREEMODELNODE_H

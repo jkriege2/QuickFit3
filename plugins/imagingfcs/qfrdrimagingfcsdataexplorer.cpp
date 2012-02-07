@@ -534,7 +534,7 @@ void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
 
     uint32_t start, end;
     getDataRange(start, end);
-    qDebug()<<start<<end;
+    //qDebug()<<start<<end;
 
 
     lm_control_struct control=lm_control_double;
@@ -555,7 +555,7 @@ void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
     //lmmin( 3, par, end-start+1, (const void*) &avg[start], fExpC, &control, &status, NULL );
     lmcurve_fit(3, par, 500, dataT, dataI, fExp, &control, &status);
 
-    qDebug()<<par[0]<<par[1]<<par[2];
+    //qDebug()<<par[0]<<par[1]<<par[2];
     ui->spinDecay->setValue(par[0]);
     ui->edtAmplitude->setValue(par[1]);
     ui->edtOffset->setValue(par[2]);

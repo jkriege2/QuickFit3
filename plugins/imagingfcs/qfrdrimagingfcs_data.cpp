@@ -134,12 +134,12 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         QDomElement te=e->firstChildElement("leaveout");
         QString l=te.attribute("list");
         QStringList li=l.split(",");
-        qDebug()<<li;
+        //qDebug()<<li;
         for (int i=0; i<li.size(); i++) {
             bool ok=false;
             int lo=li[i].toUInt(&ok);
             if (ok) leaveoutAddRun(lo);
-            qDebug()<<lo<<ok;
+            //qDebug()<<lo<<ok;
         }
         recalcCorrelations();
     }
@@ -209,7 +209,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
         int correrrcolumn=getProperty("CORRELATION_ERROR_COLUMN", -1).toInt();
         //int maxCol=qMax(corrcolumn, taucolumn);
 
-        QTextStream stream(&file);
+        QByteArray dataFromFile=file.readAll();
+        //QTextStream stream(&file);
+        QTextStream stream(&dataFromFile);
         bool last_empty, empty=true;
         QVector<QVector<QTriple<double, double, double> > > data_matrix;
         QVector<QTriple<double, double, double> > current_set;

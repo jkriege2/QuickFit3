@@ -41,7 +41,7 @@ void QFHistogramView::createWidgets() {
     grpHistogramSettings->setLayout(flHistSet);
     spinHistogramBins=new QSpinBox(this);
     spinHistogramBins->setRange(5,99999);
-    spinHistogramBins->setValue(25);
+    spinHistogramBins->setValue(100);
     flHistSet->addRow(tr("# bins:"), spinHistogramBins);
     chkLogHistogram=new QCheckBox("", grpHistogramSettings);
     flHistSet->addRow(tr("log-scale:"), chkLogHistogram);

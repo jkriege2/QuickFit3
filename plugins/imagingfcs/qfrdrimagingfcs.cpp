@@ -109,7 +109,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         progress.setWindowModality(Qt::WindowModal);
         progress.setHasCancel(false);
         progress.open();
-        qDebug()<<current_format_name;
+        //qDebug()<<current_format_name;
         while(it != list.end()) {
             i++;
             services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name));
@@ -226,7 +226,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename1=evalFilename1.replace(".dccf.dat", ".configuration.ini");
         isDCCF=true;
     }
-    qDebug()<<filename<<isJanBFile;
+    //qDebug()<<filename<<isJanBFile;
 
     if (QFile::exists(filename)) {
         int width=0;
