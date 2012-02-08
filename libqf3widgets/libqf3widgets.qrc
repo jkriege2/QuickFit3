@@ -17,6 +17,7 @@
         <file alias="filter_bandpass.png">icons/filter_bandpass.png</file>
         <file alias="filter_longpass.png">icons/filter_longpass.png</file>
         <file alias="filter_none.png">icons/filter_none.png</file>
+        <file alias="filter_mirror.png">icons/filter_mirror.png</file>
         <file alias="filter_pol_circ.png">icons/filter_pol_circ.png</file>
         <file alias="filter_pol_lin.png">icons/filter_pol_lin.png</file>
         <file alias="filter_shortpass.png">icons/filter_shortpass.png</file>

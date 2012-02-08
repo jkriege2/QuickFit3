@@ -92,6 +92,9 @@ public:
 
     void loadSettings(QSettings& settings, QString property);
     void saveSettings(QSettings& settings, QString property);
+
+    static QList<FilterDescription> getFilterList(QString globalfilters, QString localfilters=QString(""));
+    static QIcon getFilterIcon(const FilterDescription& description);
 public slots:
     void loadFilters();
     void storeFilters();

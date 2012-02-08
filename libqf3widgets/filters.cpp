@@ -112,9 +112,24 @@ void QF3FilterCombobox::currentFilterChanged(int idx) {
 
 
 void QF3FilterCombobox::loadFilters() {
-    filters.clear();
+    filters=getFilterList(globalfilters, localfilters);
     QString currentO=cmbFilters->currentText();
     cmbFilters->clear();
+    cmbFilters->addItem(QIcon(":/libqf3widgets/filter_none.png"), tr("--- none ---"));
+    for (int i=0; i<filters.size(); i++) {
+        FilterDescription o=filters[i];
+        cmbFilters->addItem(getFilterIcon(o), o.name);
+    }
+
+    int i=cmbFilters->findText(currentO);
+    if (i<0) i=0;
+    cmbFilters->setCurrentIndex(i);
+    hbl->update();
+}
+
+QList<FilterDescription> QF3FilterCombobox::getFilterList(QString globalfilters, QString localfilters) {
+    QList<FilterDescription> filterList;
+
     QSettings inifileg(globalfilters, QSettings::IniFormat);
     QSettings inifile(localfilters, QSettings::IniFormat);
     // first read global config
@@ -123,7 +138,6 @@ void QF3FilterCombobox::loadFilters() {
     for (int i=0; i<groupsg.size(); i++) {
         if (!groups.contains(groupsg[i])) groups.append(groupsg[i]);
     }
-    cmbFilters->addItem(QIcon(":/libqf3widgets/filter_none.png"), tr("--- none ---"));
     for (int i=0; i<groups.size(); i++) {
         QString g=groups[i];
         FilterDescription o;
@@ -131,26 +145,30 @@ void QF3FilterCombobox::loadFilters() {
         o.manufacturer=inifile.value(g+"/manufacturer", inifileg.value(g+"/manufacturer", "")).toString();
         o.type=inifile.value(g+"/type", inifileg.value(g+"/type", "")).toString();
         o.isValid=true;
-        filters.append(o);
-        if (o.type.contains("dichro")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_dichroic.png"), o.name);
-        else if (o.type.contains("polar")) {
-            if (o.type.contains("split")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_splitterpol.png"), o.name);
-            else cmbFilters->addItem(QIcon(":/libqf3widgets/filter_pol_lin.png"), o.name);
-        } else if (o.type.contains("bandpass")||o.type.contains("band pass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_bandpass.png"), o.name);
-        else if (o.type.contains("longpass")||o.type.contains("long pass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_longpass.png"), o.name);
-        else if (o.type.contains("shortpass")||o.type.contains("short pass")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_shortpass.png"), o.name);
-        else if (o.type.contains("notch")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_notch.png"), o.name);
-        else if (o.type.contains("neutral density") || o.type.contains("neutral") || o.type.contains("grey")) {
-            if (o.type.contains("split")) cmbFilters->addItem(QIcon(":/libqf3widgets/filter_splitterneutral.png"), o.name);
-            else cmbFilters->addItem(QIcon(":/libqf3widgets/filter_neutraldensity.png"), o.name);
-        } else cmbFilters->addItem(QIcon(":/libqf3widgets/filter.png"), o.name);
+        filterList.append(o);
     }
 
-    int i=cmbFilters->findText(currentO);
-    if (i<0) i=0;
-    cmbFilters->setCurrentIndex(i);
-    hbl->update();
+    return filterList;
 }
+
+QIcon QF3FilterCombobox::getFilterIcon(const FilterDescription &o) {
+    if (o.type.contains("dichro")) return QIcon(":/libqf3widgets/filter_dichroic.png");
+    else if (o.type.contains("polar")) {
+        if (o.type.contains("split")) return QIcon(":/libqf3widgets/filter_splitterpol.png");
+        else if (o.type.contains("circular") || o.type.contains("lambda") || o.type.contains("waveplate")) return QIcon(":/libqf3widgets/filter_pol_circ.png");
+        else return QIcon(":/libqf3widgets/filter_pol_lin.png");
+    } else if (o.type.contains("bandpass")||o.type.contains("band pass")) return QIcon(":/libqf3widgets/filter_bandpass.png");
+    else if (o.type.contains("longpass")||o.type.contains("long pass")) return QIcon(":/libqf3widgets/filter_longpass.png");
+    else if (o.type.contains("shortpass")||o.type.contains("short pass")) return QIcon(":/libqf3widgets/filter_shortpass.png");
+    else if (o.type.contains("notch")) return QIcon(":/libqf3widgets/filter_notch.png");
+    else if (o.type.contains("neutral density") || o.type.contains("neutral") || o.type.contains("grey")) {
+        if (o.type.contains("split")) return QIcon(":/libqf3widgets/filter_splitterneutral.png");
+        else return QIcon(":/libqf3widgets/filter_neutraldensity.png");
+    } else if (o.type.contains("mirror")) return QIcon(":/libqf3widgets/filter_mirror.png");
+    else return QIcon(":/libqf3widgets/filter.png");
+    return QIcon(":/libqf3widgets/filter.png");
+}
+
 
 void QF3FilterCombobox::setFilterINI(QString globalfilters, QString localfilters) {
     this->globalfilters=globalfilters;
@@ -253,6 +271,8 @@ void QF3FilterCombobox::loadSettings(QSettings& settings, QString property) {
 void QF3FilterCombobox::saveSettings(QSettings& settings, QString property) {
     settings.setValue(property, cmbFilters->currentText());
 }
+
+
 void QF3FilterCombobox::setReadOnly(bool readonly) {
     cmbFilters->setReadOnly(readonly);
     btnAddFilter->setEnabled(!readonly);
