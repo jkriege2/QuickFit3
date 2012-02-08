@@ -1184,8 +1184,8 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
     if (getAcquisitionSettings) ecamera->getAcquisitionDescription(camera, &files, &parameters);
 
     // WRITE ACQUISITION SETTINGS
-    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)*cam->objective().magnification*cam->tubelens().magnification);
-    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)*cam->objective().magnification*cam->tubelens().magnification);
+    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)/cam->objective().magnification/cam->tubelens().magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)/cam->objective().magnification/cam->tubelens().magnification);
     settings.setValue("acquisition/camera_pixel_width", ecamera->getPixelWidth(camera));
     settings.setValue("acquisition/camera_pixel_height", ecamera->getPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));

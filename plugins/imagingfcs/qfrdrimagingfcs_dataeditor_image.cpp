@@ -246,12 +246,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGridLayout* glmask=new QGridLayout(this);
     wmask->setLayout(glmask);
 
-    btnDontUse=new QPushButton(tr("&unmask selected"), w);
-    btnDontUse->setToolTip(tr("remove the selected pixels from the current mask\nand recalculate the average correlation curve accordingly"));
+    btnDontUse=new QPushButton(tr("&mask selected"), w);
+    btnDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
     connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
     glmask->addWidget(btnDontUse, 0, 0);
-    btnUse=new QPushButton(tr("&mask selected"), w);
-    btnUse->setToolTip(tr("add the selected pixels from the current mask\nand recalculate the average correlation curve accordingly"));
+    btnUse=new QPushButton(tr("&unmask selected"), w);
+    btnUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
     connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, 0, 1);
     btnUseAll=new QPushButton(tr("&clear mask"), w);

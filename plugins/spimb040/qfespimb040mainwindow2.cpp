@@ -881,8 +881,18 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     QString acquisitionSettingsFilename1="", previewSettingsFilename1="";
     QString acquisitionPrefix1=widAcquisition->prefix1();
     QString acquisitionPrefix2=widAcquisition->prefix2();
+
+
+
+
     int backgroundFrames1=1;
     if (widAcquisition->use1()) {
+        if (!QDir().mkpath(QFileInfo(acquisitionPrefix1+".txt").absolutePath())) {
+            ok=false;
+            ACQUISITION_ERROR(tr("  - could not create directory '%1'!\n").arg(QFileInfo(acquisitionPrefix1+".txt").absolutePath()));
+        }
+
+
         useCam1=optSetup->lockCamera(0,&extension1, &ecamera1, &camera1, &previewSettingsFilename1);
         if (QFile::exists(widAcquisition->currentConfigFilename(0))) acquisitionSettingsFilename1=widAcquisition->currentConfigFilename(0);
         if (QFile::exists(widAcquisition->currentPreviewConfigFilename(0))) previewSettingsFilename1=widAcquisition->currentPreviewConfigFilename(0);
@@ -895,7 +905,11 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     QString acquisitionSettingsFilename2="", previewSettingsFilename2="";
     int camera2=0;
     int backgroundFrames2=1;
-    if (widAcquisition->use2()) {
+    if (ok && widAcquisition->use2()) {
+        if (!QDir().mkpath(QFileInfo(acquisitionPrefix2+".txt").absolutePath())) {
+            ok=false;
+            ACQUISITION_ERROR(tr("  - could not create directory '%1'!\n").arg(QFileInfo(acquisitionPrefix2+".txt").absolutePath()));
+        }
         useCam2=optSetup->lockCamera(1,&extension2, &ecamera2, &camera2, &previewSettingsFilename2);
         if (QFile::exists(widAcquisition->currentConfigFilename(1))) acquisitionSettingsFilename2=widAcquisition->currentConfigFilename(1);
         if (QFile::exists(widAcquisition->currentPreviewConfigFilename(1))) previewSettingsFilename2=widAcquisition->currentPreviewConfigFilename(1);
@@ -913,7 +927,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     // acquire background images
     //////////////////////////////////////////////////////////////////////////////////////
-    if (widAcquisition->saveBackground()) {
+    if (ok && widAcquisition->saveBackground()) {
         QDateTime time=QDateTime::currentDateTime();
         progress.setLabelText(tr("acquiring background frames from cameras ..."));
         QApplication::processEvents();
@@ -1061,7 +1075,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     // acquire overview images
     //////////////////////////////////////////////////////////////////////////////////////
-    if (widAcquisition->overview()) {
+    if (ok && widAcquisition->overview()) {
         if (ok && useCam1) {
             progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
             QApplication::processEvents();
@@ -1205,7 +1219,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     // acquire second set of overview images
     //////////////////////////////////////////////////////////////////////////////////////
-    if (widAcquisition->overview()) {
+    if (ok && widAcquisition->overview()) {
         if (ok && useCam1) {
             progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
             QApplication::processEvents();
@@ -1333,8 +1347,8 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
     if (getAcquisitionSettings) ecamera->getAcquisitionDescription(camera, &files, &parameters);
 
     // WRITE ACQUISITION SETTINGS
-    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)*magnification);
-    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)*magnification);
+    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)/magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)/magnification);
     settings.setValue("acquisition/camera_pixel_width", ecamera->getPixelWidth(camera));
     settings.setValue("acquisition/camera_pixel_height", ecamera->getPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
