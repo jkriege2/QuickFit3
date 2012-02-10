@@ -1038,11 +1038,12 @@ QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const 
 
         QString egrp=i.value()->group;
         if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
-                if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(rn))) {
-                    if (resultsGetSortPriority(en, rn)) lp.append(rn);
+            QFRawDataRecordPrivate::ResultsResultsIterator j(i.value()->results);
+            while (j.hasNext()) {
+                j.next();
+                QString rn=j.key();
+                if ((group.isEmpty() || (group==j.value().group)) && (!l.contains(rn))) {
+                    if (j.value().sortPriority) lp.append(rn);
                     else l.append(rn);
                 }
             }
@@ -1062,10 +1063,11 @@ QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const
         i.next();
         QString en=i.key();
         if (evalName.isEmpty() || (en==evalName)) {
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
-                QString g=resultsGetGroup(en, rn);
+            QFRawDataRecordPrivate::ResultsResultsIterator j(i.value()->results);
+            while (j.hasNext()) {
+                j.next();
+                QString rn=j.key();
+                QString g=j.value().group;
                 if (!l.contains(g)) {
                     l.append(g);
                 }
@@ -1086,12 +1088,13 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const
         QString en=i.key();
         QString egrp=i.value()->group;
         if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
+            QFRawDataRecordPrivate::ResultsResultsIterator j(i.value()->results);
+            while (j.hasNext()) {
+                j.next();
+                QString rn=j.key();
+                QString g=j.value().group;
                 QString lab=resultsGetLabel(en, rn);
-                QString g=resultsGetGroup(en, rn);
-                if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(lab))) {
+                if ((group.isEmpty() || (group==g)) && (!l.contains(lab))) {
                     l.append(lab);
                     if (resultsGetSortPriority(en, rn)) {
                         if (g.isEmpty()) listp.append(qMakePair(lab, rn));
@@ -1132,9 +1135,10 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
         QString en=i.key();
         QString egrp=i.value()->group;
         if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
+            QFRawDataRecordPrivate::ResultsResultsIterator j(i.value()->results);
+            while (j.hasNext()) {
+                j.next();
+                QString rn=j.key();
                 QString lab=resultsGetLabel(en, rn);
                 QString labrt=resultsGetLabelRichtext(en, rn);
                 if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(lab))) {

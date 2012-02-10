@@ -140,6 +140,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
         void imageMouseMoved(double x, double y);
         void imageRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers);
+        void imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers);
+        void imageCircleFinished(double x, double y, double radius, Qt::KeyboardModifiers modifiers);
+        void imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers);
         void setImageEditMode();
 
         /** \brief activated when the user selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
@@ -332,6 +335,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QActionGroup* agImageSelectionActions;
         QAction* actImagesZoom;
         QAction* actImagesDrawRectangle;
+        QAction* actImagesDrawCircle;
+        QAction* actImagesDrawEllipse;
+        QAction* actImagesDrawLine;
         QAction* actImagesScribble;
         QComboBox* cmbMaskEditMode;
 

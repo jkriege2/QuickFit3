@@ -12,10 +12,12 @@
 #include "jkqtpelements.h"
 #include "qfrdrimagingfcsmaskbyintensity.h"
 
+#define sqr(x) ((x)*(x))
 
 #define CLICK_UPDATE_TIMEOUT 500
 
-#define DEBUG_TIMIMNG
+//#define DEBUG_TIMIMNG
+#undef DEBUG_TIMIMNG
 
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent):
     QFRawDataEditor(services, parent)
@@ -398,6 +400,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltOverview, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltOverview, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImage::GRAY, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverview);
@@ -451,6 +456,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltMask, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltMask, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltMask, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltMask, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
+    connect(pltMask, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltMask, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteMask=new JKQTPOverlayImage(0,0,1,1,NULL, 0,0, QColor("black"), pltMask->get_plotter());
     plteMask->set_falseColor(QColor("white"));
@@ -504,6 +512,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltImage->get_plotter());
     pltImage->addGraph(plteImage);
@@ -561,6 +572,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltGofImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltGofImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
 
     plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
@@ -741,6 +755,37 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
+
+    actImagesDrawCircle=new QAction(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
+    actImagesDrawCircle->setToolTip(tr("in this mode the user may draw a circle.<br>"
+                                 "All pixels inside the cirle will be selected<br>"
+                                 "when the user releases the left mouse key. The point of first<br>"
+                                 "click will be the center of the circle. You may<br>"
+                                 "alter this function by pressing one of these keys:<ul>"
+                                 "<li>CTRL: selection will be added to current selection</li>"
+                                 "<li>SHIFT: selection will be removed from current selection</li>"
+                                 "</ul>"));
+    actImagesDrawCircle->setCheckable(true);
+    actImagesDrawEllipse=new QAction(QIcon(":/imaging_fcs/draw_ellipse.png"), tr("elliptical selection"), this);
+    actImagesDrawEllipse->setToolTip(tr("in this mode the user may draw a ellipse.<br>"
+                                 "All pixels inside the ellipse will be selected<br>"
+                                "when the user releases the left mouse key. The point of first<br>"
+                                "click will be the center of the ellipse. You may<br>"
+                                 "alter this function by pressing one of these keys:<ul>"
+                                 "<li>CTRL: selection will be added to current selection</li>"
+                                 "<li>SHIFT: selection will be removed from current selection</li>"
+                                 "</ul>"));
+    actImagesDrawEllipse->setCheckable(true);
+    actImagesDrawLine=new QAction(QIcon(":/imaging_fcs/draw_line.png"), tr("line selection"), this);
+    actImagesDrawLine->setToolTip(tr("in this mode the user may draw a line.<br>"
+                                 "All pixels on the line will be selected<br>"
+                                 "when the user releases the left mouse key. You may<br>"
+                                 "alter this function by pressing one of these keys:<ul>"
+                                 "<li>CTRL: selection will be added to current selection</li>"
+                                 "<li>SHIFT: selection will be removed from current selection</li>"
+                                 "</ul>"));
+    actImagesDrawLine->setCheckable(true);
+
     actImagesScribble=new QAction(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
     actImagesScribble->setToolTip(tr("in this mode the user may select/deselect pixels by.<br>"
                                  "keeping the left mouse button pressed and moving the mouse<br>"
@@ -755,6 +800,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     agImageSelectionActions->addAction(actImagesZoom);
     agImageSelectionActions->addAction(actImagesDrawRectangle);
     agImageSelectionActions->addAction(actImagesScribble);
+    agImageSelectionActions->addAction(actImagesDrawLine);
+    agImageSelectionActions->addAction(actImagesDrawCircle);
+    agImageSelectionActions->addAction(actImagesDrawEllipse);
     actImagesZoom->setChecked(true);
     tbParameterImage=new QToolBar(this);
     tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomAll());
@@ -772,6 +820,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     tbParameterImage->addAction(actImagesZoom);
     tbParameterImage->addAction(actImagesDrawRectangle);
     tbParameterImage->addAction(actImagesScribble);
+    tbParameterImage->addAction(actImagesDrawLine);
+    tbParameterImage->addAction(actImagesDrawCircle);
+    tbParameterImage->addAction(actImagesDrawEllipse);
     labImagePositionDisplay=new QLabel(this);
     tbParameterImage->addSeparator();
     spacer=new QWidget(this);
@@ -1222,7 +1273,7 @@ void QFRDRImagingFCSImageEditor::imageRectangleFinished(double x, double y, doub
     int xx1=qBound(0,(int)floor(x), m->getDataImageWidth()-1);
     int yy1=qBound(0,(int)floor(y), m->getDataImageHeight()-1);
     int xx2=qBound(0,(int)floor(x+width), m->getDataImageWidth()-1);
-    int yy2=qBound(0,(int)floor(y-height), m->getDataImageHeight()-1);
+    int yy2=qBound(0,(int)floor(y+height), m->getDataImageHeight()-1);
 
     if (xx1>xx2) qSwap(xx1, xx2);
     if (yy1>yy2) qSwap(yy1, yy2);
@@ -1283,6 +1334,228 @@ void QFRDRImagingFCSImageEditor::imageRectangleFinished(double x, double y, doub
     timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
 }
 
+
+void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+
+
+
+    int xx1=qBound(0,(int)floor(x-radiusX), m->getDataImageWidth()-1);
+    int yy1=qBound(0,(int)floor(y-radiusY), m->getDataImageHeight()-1);
+    int xx2=qBound(0,(int)floor(x+radiusX), m->getDataImageWidth()-1);
+    int yy2=qBound(0,(int)floor(y+radiusY), m->getDataImageHeight()-1);
+
+    if (xx1>xx2) qSwap(xx1, xx2);
+    if (yy1>yy2) qSwap(yy1, yy2);
+
+    //qDebug()<<"rect: "<<xx1<<yy1<<xx2<<yy2;
+    //qDebug()<<selected;
+
+    if (cmbMaskEditMode->currentIndex()==0) {
+        if (modifiers==Qt::ControlModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) {
+                        int idx=m->xyToRun(xx, yy);
+                        selected.insert(idx);
+                    }
+                }
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) {
+                        int idx=m->xyToRun(xx, yy);
+                        selected.remove(idx);
+                    }
+                }
+            }
+        } else {
+            selected.clear();
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) {
+                        int idx=m->xyToRun(xx, yy);
+                        selected.insert(idx);
+                    }
+                }
+            }
+        }
+    } else {
+        if (modifiers==Qt::ControlModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
+                }
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) m->maskSet(xx,yy);
+                }
+            }
+        } else {
+            m->maskClear();
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
+                }
+            }
+        }
+    }
+    //qDebug()<<selected;
+    replotSelection(true);
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->stop();
+    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+}
+
+void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double radius, Qt::KeyboardModifiers modifiers) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+
+
+
+    int xx1=qBound(0,(int)floor(x-radius), m->getDataImageWidth()-1);
+    int yy1=qBound(0,(int)floor(y-radius), m->getDataImageHeight()-1);
+    int xx2=qBound(0,(int)floor(x+radius), m->getDataImageWidth()-1);
+    int yy2=qBound(0,(int)floor(y+radius), m->getDataImageHeight()-1);
+
+
+    if (xx1>xx2) qSwap(xx1, xx2);
+    if (yy1>yy2) qSwap(yy1, yy2);
+
+    //qDebug()<<"rect: "<<xx1<<yy1<<xx2<<yy2;
+    //qDebug()<<selected;
+
+    if (cmbMaskEditMode->currentIndex()==0) {
+        if (modifiers==Qt::ControlModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) {
+                        int idx=m->xyToRun(xx, yy);
+                        selected.insert(idx);
+                    }
+                }
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) {
+                        int idx=m->xyToRun(xx, yy);
+                        selected.remove(idx);
+                    }
+                }
+            }
+        } else {
+            selected.clear();
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) {
+                        int idx=m->xyToRun(xx, yy);
+                        selected.insert(idx);
+                    }
+                }
+            }
+        }
+    } else {
+        if (modifiers==Qt::ControlModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) m->maskUnset(xx,yy);
+                }
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) m->maskSet(xx,yy);
+                }
+            }
+        } else {
+            m->maskClear();
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) m->maskUnset(xx,yy);
+                }
+            }
+        }
+    }
+    //qDebug()<<selected;
+    replotSelection(true);
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->stop();
+    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+}
+
+void QFRDRImagingFCSImageEditor::imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+
+    QLineF line(x1, y1, x2, y2);
+
+    //qDebug()<<"rect: "<<xx1<<yy1<<xx2<<yy2;
+    //qDebug()<<selected;
+
+    if (cmbMaskEditMode->currentIndex()==0) {
+        if (modifiers==Qt::ControlModifier) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+                QPointF p=line.pointAt(i);
+                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int idx=m->xyToRun(xx, yy);
+                selected.insert(idx);
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+        for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+                QPointF p=line.pointAt(i);
+                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int idx=m->xyToRun(xx, yy);
+                selected.remove(idx);
+            }
+        } else {
+            selected.clear();
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+                QPointF p=line.pointAt(i);
+                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int idx=m->xyToRun(xx, yy);
+                selected.insert(idx);
+            }
+        }
+    } else {
+        if (modifiers==Qt::ControlModifier) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+                QPointF p=line.pointAt(i);
+                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                m->maskUnset(xx,yy);
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+                QPointF p=line.pointAt(i);
+                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                m->maskSet(xx,yy);
+            }
+        } else {
+            m->maskClear();
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+                QPointF p=line.pointAt(i);
+                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                m->maskUnset(xx,yy);
+            }
+        }
+    }
+    //qDebug()<<selected;
+    replotSelection(true);
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->stop();
+    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+}
+
 void QFRDRImagingFCSImageEditor::setImageEditMode() {
     if (actImagesZoom->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
@@ -1294,6 +1567,21 @@ void QFRDRImagingFCSImageEditor::setImageEditMode() {
         pltOverview->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltGofImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+    } else if (actImagesDrawLine->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::LineEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::LineEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::LineEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::LineEvents);
+    } else if (actImagesDrawCircle->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::CircleEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::CircleEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::CircleEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::CircleEvents);
+    } else if (actImagesDrawEllipse->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::EllipseEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::EllipseEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::EllipseEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::EllipseEvents);
     } else if (actImagesScribble->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::ClickEvents);
@@ -2099,13 +2387,30 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbParameter->clear();
         cmbGofParameter->clear();
         for (int i=0; i<params.size(); i++) {
-            cmbParameter->addItem(tr("fit result: %1").arg(params[i].first), params[i].second);
-            cmbGofParameter->addItem(tr("fit result: %1").arg(params[i].first), params[i].second);
+            if (!params[i].second.endsWith("_fix")) {
+                cmbParameter->addItem(params[i].first, params[i].second);
+                cmbGofParameter->addItem(params[i].first, params[i].second);
+            }
         }
+        for (int i=0; i<params.size(); i++) {
+            if (params[i].second.endsWith("_fix")) {
+                cmbParameter->addItem(params[i].first, params[i].second);
+                cmbGofParameter->addItem(params[i].first, params[i].second);
+            }
+        }
+
         params=m->resultsCalcNamesAndLabels("", "fit properties", egroup);
         for (int i=0; i<params.size(); i++) {
-            cmbParameter->addItem(tr("fit prop.: %1").arg(params[i].first), params[i].second);
-            cmbGofParameter->insertItem(0, tr("fit prop.: %1").arg(params[i].first), params[i].second);
+            if (!params[i].second.endsWith("_fix")) {
+                cmbParameter->addItem(params[i].first, params[i].second);
+                cmbGofParameter->insertItem(0, params[i].first, params[i].second);
+            }
+        }
+        for (int i=0; i<params.size(); i++) {
+            if (params[i].second.endsWith("_fix")) {
+                cmbParameter->addItem(params[i].first, params[i].second);
+                cmbGofParameter->insertItem(0, params[i].first, params[i].second);
+            }
         }
         int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), ""));
         if (d>=0) cmbParameter->setCurrentIndex(d);
@@ -3025,3 +3330,4 @@ void QFRDRImagingFCSImageEditor::invertMask() {
     }
     rawDataChanged();
 }
+
