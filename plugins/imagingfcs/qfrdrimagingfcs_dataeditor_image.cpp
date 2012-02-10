@@ -717,36 +717,53 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     // TOOLBAR & ACTIONS: edit image plots
     ///////////////////////////////////////////////////////////////
     actImagesZoom=new QAction(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
-    actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)"));
+    actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)\nA click toggles the current selection/mask position."));
     actImagesZoom->setCheckable(true);
     actImagesDrawRectangle=new QAction(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
-    actImagesDrawRectangle->setToolTip(tr("in this mode the user may drawing a rectangle.<br>"
+    actImagesDrawRectangle->setToolTip(tr("in this mode the user may draw a rectangle.<br>"
                                  "All pixels inside the rectangle will be selected<br>"
-                                 "when the user releases the left mouse key. YOu may<br>"
+                                 "when the user releases the left mouse key. You may<br>"
                                  "alter this function by pressing one of these keys:<ul>"
                                  "<li>CTRL: selection will be added to current selection</li>"
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
+    actImagesScribble=new QAction(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
+    actImagesScribble->setToolTip(tr("in this mode the user may select/deselect pixels by.<br>"
+                                 "keeping the left mouse button pressed and moving the mouse<br>"
+                                 "over the image. Depending on the key pressed on the keyboard,<br>"
+                                 "different actions are executed:<ul>"
+                                 "<li>NO KEY: the current position is added to the selection</li>"
+                                 "<li>SHIFT: selection will be removed from current selection</li>"
+                                 "</ul>"));
+    actImagesScribble->setCheckable(true);
     agImageSelectionActions=new QActionGroup(this);
     agImageSelectionActions->setExclusive(true);
     agImageSelectionActions->addAction(actImagesZoom);
     agImageSelectionActions->addAction(actImagesDrawRectangle);
+    agImageSelectionActions->addAction(actImagesScribble);
     actImagesZoom->setChecked(true);
     tbParameterImage=new QToolBar(this);
     tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomAll());
     tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomIn());
     tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomOut());
     tbParameterImage->addSeparator();
-    tbParameterImage->addWidget(new QLabel(tr("  edit "), this));
+    tbParameterImage->addWidget(new QLabel(tr("    edit "), this));
     cmbMaskEditMode=new QComboBox(this);
     cmbMaskEditMode->addItem("selection");
     cmbMaskEditMode->addItem("mask");
+    QWidget* spacer=new QWidget(this);
+    spacer->setMinimumWidth(20);
     tbParameterImage->addWidget(cmbMaskEditMode);
+    tbParameterImage->addWidget(spacer);
     tbParameterImage->addAction(actImagesZoom);
     tbParameterImage->addAction(actImagesDrawRectangle);
+    tbParameterImage->addAction(actImagesScribble);
     labImagePositionDisplay=new QLabel(this);
     tbParameterImage->addSeparator();
+    spacer=new QWidget(this);
+    spacer->setMinimumWidth(20);
+    tbParameterImage->addWidget(spacer);
     tbParameterImage->addWidget(labImagePositionDisplay);
     connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
 
@@ -1124,31 +1141,33 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
     int yy=(int)floor(y);
 
     int idx=m->xyToRun(xx, yy);
+    if (xx>=0 && xx<m->getDataImageWidth() && yy>=0 && yy<m->getDataImageHeight()) {
 
-    if (cmbMaskEditMode->currentIndex()==0) {
-        if (modifiers==Qt::ControlModifier) {
-            if (selected.contains(idx)) selected.remove(idx);
-            else selected.insert(idx);
-        } else if (modifiers==Qt::ShiftModifier) {
-            selected.remove(idx);
+        if (cmbMaskEditMode->currentIndex()==0) {
+            if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
+                if (selected.contains(idx)) selected.remove(idx);
+                else selected.insert(idx);
+            } else if (modifiers==Qt::ShiftModifier) {
+                selected.remove(idx);
+            } else {
+                if (!actImagesScribble->isChecked()) selected.clear();
+                selected.insert(idx);
+            }
         } else {
-            selected.clear();
-            selected.insert(idx);
+            if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
+                m->maskToggle(xx,yy);
+            } else if (modifiers==Qt::ShiftModifier) {
+                m->maskSet(xx,yy);
+            } else {
+                if (!actImagesScribble->isChecked()) m->maskClear();
+                m->maskUnset(xx,yy);
+            }
         }
-    } else {
-        if (modifiers==Qt::ControlModifier) {
-            m->maskToggle(xx,yy);
-        } else if (modifiers==Qt::ShiftModifier) {
-            m->maskUnset(xx,yy);
-        } else {
-            m->maskClear();
-            m->maskSet(xx,yy);
-        }
+        replotSelection(true);
+        timUpdateAfterClick->setSingleShot(true);
+        timUpdateAfterClick->stop();
+        timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
     }
-    replotSelection(true);
-    timUpdateAfterClick->setSingleShot(true);
-    timUpdateAfterClick->stop();
-    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
 }
 
 void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
@@ -1262,6 +1281,11 @@ void QFRDRImagingFCSImageEditor::setImageEditMode() {
         pltOverview->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltGofImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+    } else if (actImagesScribble->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
     }
 
 }

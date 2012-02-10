@@ -442,9 +442,10 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     toolbar->addAction(actPrintReport);
     toolbar->addSeparator();
     toolbar->addAction(pltData->get_plotter()->get_actSavePlot()); pltData->get_plotter()->get_actSavePlot()->setIcon(QIcon(":/fcsfit/plot_saveplot.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsfit/plot_savedata.png"));
     toolbar->addAction(pltData->get_plotter()->get_actPrint()); pltData->get_plotter()->get_actPrint()->setIcon(QIcon(":/fcsfit/plot_print.png"));
     toolbar->addSeparator();
-    toolbar->addAction(pltData->get_plotter()->get_actSaveData()); pltData->get_plotter()->get_actSaveData()->setIcon(QIcon(":/fcsfit/plot_savedata.png"));
+    toolbar->addAction(pltData->get_plotter()->get_actCopyPixelImage());
     toolbar->addAction(pltData->get_plotter()->get_actCopyData());
     toolbar->addAction(pltData->get_plotter()->get_actCopyMatlab());
     toolbar->addSeparator();

@@ -17,8 +17,8 @@
    id="svg1307"
    style="enable-background:new"
    inkscape:version="0.48.1 "
-   sodipodi:docname="draw_rectangle.svg"
-   inkscape:export-filename="draw_rectangle.png"
+   sodipodi:docname="draw_scribble.svg"
+   inkscape:export-filename="draw_scribble.png"
    inkscape:export-xdpi="15.46875"
    inkscape:export-ydpi="15.46875">
   <metadata
@@ -47,7 +47,7 @@
      id="namedview667"
      showgrid="false"
      inkscape:zoom="1.1367188"
-     inkscape:cx="-148.12564"
+     inkscape:cx="20.341707"
      inkscape:cy="8.9585335"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -3688,11 +3688,9 @@
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(-0.1118988,0.9937197,-2.1232294,-0.2390883,117.04784,20.16757)" />
   </defs>
-  <rect
-     style="fill:#afdde9;fill-opacity:1;stroke:#002255;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:8,8;stroke-dashoffset:0"
-     id="rect3646"
-     width="110.40549"
-     height="74.776634"
-     x="9.6769762"
-     y="25.072165" />
+  <path
+     style="fill:none;stroke:#002255;stroke-width:5.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:11.6,5.8;stroke-dashoffset:0"
+     d="M 114.36426,10.996564 12.316151,119.20275 60.701028,108.64605 74.776629,124.4811 108.20618,84.013748 77.415804,72.577322 98.529205,54.103096 28.151202,38.268045 23.752576,72.577322 7.9175254,18.914094 l 54.5429526,0"
+     id="path4418"
+     inkscape:connector-curvature="0" />
 </svg>

@@ -332,6 +332,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QActionGroup* agImageSelectionActions;
         QAction* actImagesZoom;
         QAction* actImagesDrawRectangle;
+        QAction* actImagesScribble;
         QComboBox* cmbMaskEditMode;
 
         /** \brief combobox to select a result group */
