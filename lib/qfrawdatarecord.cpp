@@ -3,7 +3,46 @@
 #include <QtXml>
 #include "qtriple.h"
 
-QFRawDataRecord::evaluationIDMetadata::evaluationIDMetadata(int initsize) {
+
+class QFRawDataRecordPrivate {
+    public:
+        QFRawDataRecordPrivate() {
+
+        }
+        ~QFRawDataRecordPrivate() {
+
+        }
+
+        typedef QHash<QString, QFRawDataRecord::evaluationResult> ResultsResultsType;
+        typedef QHashIterator<QString, QFRawDataRecord::evaluationResult> ResultsResultsIterator;
+
+
+        /*! \brief this struct holds the metadata and also the data about an evaluationID */
+        struct evaluationIDMetadata {
+            evaluationIDMetadata(int initsize);
+            QString group; /**< group this evaluationID belongs to \b (optional), translated to a human-readable version, using evalGroupLabels */
+            int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
+            QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
+            ResultsResultsType results; /**< the real results */
+        };
+
+        typedef QMap<QString, evaluationIDMetadata* > ResultsType;
+        typedef QMapIterator<QString, evaluationIDMetadata* > ResultsIterator;
+
+        /** \brief evaluation results are stored in this QHash which maps an evaluation name to
+         *         to a list of evaluation results (which is indexed by result names! */
+        ResultsType results;
+
+        typedef QMap<QString, QString > GroupLabelsType;
+        typedef QMapIterator<QString, QString > GroupLabelsIterator;
+
+
+        /** \brief maps evaluationIDMetadata.group to a human-readable version */
+        GroupLabelsType evalGroupLabels;
+
+};
+
+QFRawDataRecordPrivate::evaluationIDMetadata::evaluationIDMetadata(int initsize) {
     results.reserve(initsize);
 }
 
@@ -20,11 +59,12 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     propModel=NULL;
     doEmitResultsChanged=true;
     evaluationIDMetadataInitSize=100;
+    dstore=new QFRawDataRecordPrivate();
     setResultsInitSize(100);
 }
 
 void QFRawDataRecord::setResultsInitSize(int initSize) {
-    if (initSize>results.capacity()) results.reserve(initSize);
+    //if (initSize>dstore->results.capacity()) dstore->results.reserve(initSize);
 }
 
 void QFRawDataRecord::setEvaluationIDMetadataInitSize(int initSize) {
@@ -73,6 +113,7 @@ void QFRawDataRecord::init(QDomElement& e) {
 }
 
 QFRawDataRecord::~QFRawDataRecord() {
+    delete dstore;
     //std::cout<<"deleting QFRawDataRecord\n";
     //std::cout<<"deleting QFRawDataRecord ... OK\n";
 }
@@ -120,10 +161,10 @@ void QFRawDataRecord::readXML(QDomElement& e) {
             int groupIndex=te.attribute("groupindex", "0").toInt();
             QString description=te.attribute("description");
             QDomElement re=te.firstChildElement("result");
-            results[en]=new evaluationIDMetadata(evaluationIDMetadataInitSize);
-            results[en]->group=group;
-            results[en]->groupIndex=groupIndex;
-            results[en]->description=description;
+            dstore->results[en]=new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+            dstore->results[en]->group=group;
+            dstore->results[en]->groupIndex=groupIndex;
+            dstore->results[en]->description=description;
             QLocale loc=QLocale::c();
             loc.setNumberOptions(QLocale::OmitGroupSeparator);
             while (!re.isNull()) {
@@ -179,7 +220,7 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     r.derror=loc.toDouble(re.attribute("error", "0.0"));
                     r.unit=re.attribute("unit", "");
                 }
-                if (!n.isEmpty() && !en.isEmpty()) results[en]->results.insert(n, r);
+                if (!n.isEmpty() && !en.isEmpty()) dstore->results[en]->results.insert(n, r);
                 re=re.nextSiblingElement("result");
             }
 
@@ -189,11 +230,11 @@ void QFRawDataRecord::readXML(QDomElement& e) {
 
     //std::cout<<"    reading XML: files\n";
     te=e.firstChildElement("evalgrouplabels");
-    evalGroupLabels.clear();
+    dstore->evalGroupLabels.clear();
     if (!te.isNull()) {
         QDomElement fe=te.firstChildElement("group");
         while (!fe.isNull()) {
-            evalGroupLabels[fe.attribute("id")]=fe.attribute("label");
+            dstore->evalGroupLabels[fe.attribute("id")]=fe.attribute("label");
             fe=fe.nextSiblingElement("group");
         }
     }
@@ -241,7 +282,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
     storeProperties(w);
     w.writeEndElement();
     w.writeStartElement("results");
-    QHashIterator<QString, evaluationIDMetadata* > i(results);
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
     while (i.hasNext()) {
     //for (int i=0; i<results.keys().size(); i++) {
         i.next();
@@ -251,7 +292,7 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
         w.writeAttribute("group", i.value()->group);
         w.writeAttribute("groupindex", QString::number(i.value()->groupIndex));
         w.writeAttribute("description", i.value()->description);
-        QHashIterator<QString, evaluationResult> j(i.value()->results);
+        QFRawDataRecordPrivate::ResultsResultsIterator  j(i.value()->results);
         //for (int j=0; j<i.value().size(); j++) {
         while (j.hasNext()) {
             j.next();
@@ -326,9 +367,9 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
     }
     w.writeEndElement();
 
-    if (evalGroupLabels.size()>0) {
+    if (dstore->evalGroupLabels.size()>0) {
         w.writeStartElement("evalgrouplabels");
-        QHashIterator<QString, QString> i(evalGroupLabels);
+        QFRawDataRecordPrivate::GroupLabelsIterator i(dstore->evalGroupLabels);
         while (i.hasNext()) {
             i.next();
             w.writeStartElement("group");
@@ -364,35 +405,35 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
 
 
 void QFRawDataRecord::resultsClearAll() {
-    QHashIterator<QString, evaluationIDMetadata*> j(results);
+    QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
     while (j.hasNext()) {
         j.next();
         delete j.value();
     }
-    results.clear();
+    dstore->results.clear();
     emitResultsChanged();
 }
 
 void QFRawDataRecord::resultsClear(QString name) {
-    if (results.contains(name)) {
-        results[name]->results.clear();
-        delete results[name];
-        results.remove(name);
+    if (dstore->results.contains(name)) {
+        dstore->results[name]->results.clear();
+        delete dstore->results[name];
+        dstore->results.remove(name);
         emitResultsChanged();
     }
 };
 
 int QFRawDataRecord::resultsGetCount(QString evalName) const {
-    if (results.contains(evalName)) return results[evalName]->results.size();
+    if (dstore->results.contains(evalName)) return dstore->results[evalName]->results.size();
     return 0;
 };
 
 int QFRawDataRecord::resultsGetEvaluationCount() const {
-    return results.size();
+    return dstore->results.size();
 };
 
 QString QFRawDataRecord::resultsGetEvaluationName(int i) const {
-    if ((long)i<results.size()) return results.keys().at(i);
+    if ((long)i<dstore->results.size()) return dstore->results.keys().at(i);
     return QString("");
 };
 
@@ -401,16 +442,16 @@ void QFRawDataRecord::resultsSetNumber(QString evaluationName, QString resultNam
     r.type=qfrdreNumber;
     r.dvalue=value;
     r.unit=unit;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool emitChangedSignal) {
-    if (results.contains(evalName)) {
+    if (dstore->results.contains(evalName)) {
         bool changed=false;
-        if (results[evalName]->results.remove(resultName)>0) changed=true;
-        if (results[evalName]->results.isEmpty()) {
+        if (dstore->results[evalName]->results.remove(resultName)>0) changed=true;
+        if (dstore->results[evalName]->results.isEmpty()) {
             resultsClear(evalName);
             changed=true;
         }
@@ -419,15 +460,26 @@ void QFRawDataRecord::resultsRemove(QString evalName, QString resultName, bool e
 }
 
 void QFRawDataRecord::resultsClear(QString name, QString postfix) {
-    if (results.contains(name)) {
-        QHashIterator<QString, evaluationResult> i(results[name]->results);
+    if (dstore->results.contains(name)) {
+        QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[name]->results);
         while (i.hasNext()) {
             i.next();
             //cout << i.key() << ": " << i.value() << endl;
-            if (i.key().endsWith(postfix)) results[name]->results.remove(i.key());
+            if (i.key().endsWith(postfix)) dstore->results[name]->results.remove(i.key());
         }
         emitResultsChanged();
     }
+}
+
+bool QFRawDataRecord::resultsExists(QString evalName, QString resultName) const {
+    if (dstore->results.contains(evalName)) {
+        return dstore->results[evalName]->results.contains(resultName);
+    }
+    return false;
+}
+
+bool QFRawDataRecord::resultsExistsFromEvaluation(QString evalName) const {
+    return dstore->results.contains(evalName);
 };
 
 void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resultName, QVector<double>& value, QString unit) {
@@ -435,8 +487,8 @@ void QFRawDataRecord::resultsSetNumberList(QString evaluationName, QString resul
     r.type=qfrdreNumberVector;
     r.dvec=value;
     r.unit=unit;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
@@ -446,8 +498,8 @@ void QFRawDataRecord::resultsSetNumberMatrix(QString evaluationName, QString res
     r.dvec=value;
     r.unit=unit;
     r.columns=columns;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
@@ -475,8 +527,8 @@ void QFRawDataRecord::resultsSetNumberError(QString evaluationName, QString resu
     r.dvalue=value;
     r.derror=error;
     r.unit=unit;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
@@ -485,8 +537,8 @@ void QFRawDataRecord::resultsSetInteger(QString evaluationName, QString resultNa
     r.type=qfrdreInteger;
     r.ivalue=value;
     r.unit=unit;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
@@ -494,8 +546,8 @@ void QFRawDataRecord::resultsSetString(QString evaluationName, QString resultNam
     evaluationResult r;
     r.type=qfrdreString;
     r.svalue=value;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
@@ -504,8 +556,8 @@ void QFRawDataRecord::resultsSetLabel(QString evaluationName, QString resultName
     evaluationResult r=resultsGet(evaluationName, resultName);
     r.label=label;
     r.label_rich=label_rich;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results[resultName]=r;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results[resultName]=r;
     emitResultsChanged();
 }
 
@@ -513,8 +565,8 @@ void QFRawDataRecord::resultsSetGroup(QString evaluationName, QString resultName
     if (!resultsExists(evaluationName, resultName)) return;
     evaluationResult r=resultsGet(evaluationName, resultName);
     r.group=group;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results[resultName]=r;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results[resultName]=r;
     emitResultsChanged();
 }
 
@@ -522,8 +574,8 @@ void QFRawDataRecord::resultsSetSortPriority(QString evaluationName, QString res
     if (!resultsExists(evaluationName, resultName)) return;
     evaluationResult r=resultsGet(evaluationName, resultName);
     r.sortPriority=pr;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results[resultName]=r;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results[resultName]=r;
     emitResultsChanged();
 }
 
@@ -533,57 +585,56 @@ bool QFRawDataRecord::resultsGetSortPriority(QString evaluationName, QString res
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroupIndex(QString evaluationName, int64_t groupIndex) {
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->groupIndex=groupIndex;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->groupIndex=groupIndex;
 }
 
 int64_t QFRawDataRecord::resultsGetEvaluationGroupIndex(QString evaluationName) const {
-    if (results.contains(evaluationName)) {
-        return results[evaluationName]->groupIndex;
+    if (dstore->results.contains(evaluationName)) {
+        return dstore->results[evaluationName]->groupIndex;
     }
     return -1;
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroupLabel(QString evalGroup, QString label) {
-    evalGroupLabels[evalGroup]=label;
+    dstore->evalGroupLabels[evalGroup]=label;
 }
 
 QString QFRawDataRecord::resultsGetLabelForEvaluationGroup(QString evalGroup) const {
-    if (evalGroupLabels.contains(evalGroup)) {
-        return evalGroupLabels[evalGroup];
+    if (dstore->evalGroupLabels.contains(evalGroup)) {
+        return dstore->evalGroupLabels[evalGroup];
     } else {
         return evalGroup;
     }
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroup(QString evaluationName, QString group) {
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->group=group;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->group=group;
 }
 
 QString QFRawDataRecord::resultsGetEvaluationGroup(QString evaluationName) const {
-    if (results.contains(evaluationName)) {
-        QString g=results[evaluationName]->group;
-        return g;
+    if (dstore->results.contains(evaluationName)) {
+        return dstore->results[evaluationName]->group;
     }
     return "";
 }
 
 QString QFRawDataRecord::resultsGetEvaluationGroupLabel(QString evaluationName) const {
-    if (results.contains(evaluationName)) {
-        return resultsGetLabelForEvaluationGroup(results[evaluationName]->group);
+    if (dstore->results.contains(evaluationName)) {
+        return resultsGetLabelForEvaluationGroup(dstore->results[evaluationName]->group);
     }
     return "";
 }
 
 void QFRawDataRecord::resultsSetEvaluationDescription(QString evaluationName, QString description) {
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->description=description;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->description=description;
 }
 
 QString QFRawDataRecord::resultsGetEvaluationDescription(QString evaluationName) const {
-    if (results.contains(evaluationName)) {
-        QString g=results[evaluationName]->description;
+    if (dstore->results.contains(evaluationName)) {
+        QString g=dstore->results[evaluationName]->description;
         if (g.isEmpty()) return evaluationName;
         else return g;
     }
@@ -594,15 +645,31 @@ void QFRawDataRecord::resultsSetBoolean(QString evaluationName, QString resultNa
     evaluationResult r;
     r.type=qfrdreBoolean;
     r.bvalue=value;
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, r);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
     emitResultsChanged();
 };
 
 void QFRawDataRecord::resultsSet(QString evaluationName, QString resultName, const evaluationResult& result) {
-    if (!results.contains(evaluationName)) results[evaluationName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-    results[evaluationName]->results.insert(resultName, result);
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, result);
     emitResultsChanged();
+}
+
+QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(QString evalName, QString resultName) const
+{
+    evaluationResult r;
+    if (resultsExists(evalName, resultName)) {
+        return dstore->results[evalName]->results.value(resultName);
+    }
+    return r;
+}
+
+QFRawDataRecord::evaluationResultType QFRawDataRecord::resultsGetType(QString evalName, QString resultName) const {
+    if (resultsExists(evalName, resultName)) {
+        return dstore->results[evalName]->results.value(resultName).type;
+    }
+    return qfrdreInvalid;
 }
 
 QVariant QFRawDataRecord::resultsGetAsQVariant(QString evalName, QString resultName) const {
@@ -786,8 +853,8 @@ QString QFRawDataRecord::resultsGetLabelRichtext(QString evaluationName, QString
 
 
 QString QFRawDataRecord::resultsGetResultName(QString evaluationName, int i) const {
-    if (results.contains(evaluationName)) {
-        QList<QString> r=results[evaluationName]->results.keys();
+    if (dstore->results.contains(evaluationName)) {
+        QList<QString> r=dstore->results[evaluationName]->results.keys();
         if (i<r.size()) {
             return r.at(i);
         }
@@ -797,11 +864,11 @@ QString QFRawDataRecord::resultsGetResultName(QString evaluationName, int i) con
 
 void QFRawDataRecord::resultsCopy(QString oldEvalName, QString newEvalName) {
     if (resultsExistsFromEvaluation(oldEvalName)) {
-        QHashIterator<QString, evaluationResult> i(results[oldEvalName]->results);
+        QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[oldEvalName]->results);
         while (i.hasNext()) {
             i.next();
-            if (!results.contains(newEvalName)) results[newEvalName] = new evaluationIDMetadata(evaluationIDMetadataInitSize);
-            results[newEvalName]->results.insert(i.key(), i.value());
+            if (!dstore->results.contains(newEvalName)) dstore->results[newEvalName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+            dstore->results[newEvalName]->results.insert(i.key(), i.value());
         }
         emitResultsChanged();
     }
@@ -955,111 +1022,6 @@ bool QFRawDataRecord_StringTripleCaseInsensitiveCompareThird(const QTriple<QStri
 }
 
 
-/*QList<QString> QFRawDataRecord::resultsCalcNames() const {
-    QStringList l;
-    //if (record) {
-        int evalCount=resultsGetEvaluationCount();
-        for (int i=0; i<evalCount; i++) {
-            QString en=resultsGetEvaluationName(i);
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
-                if (!l.contains(rn)) {
-                    l.append(rn);
-                }
-            }
-        }
-    //}
-    if (l.size()>0) l.sort();
-    return l;
-}
-
-QList<QString> QFRawDataRecord::resultsCalcGroups() const {
-    QStringList l;
-    //if (record) {
-        int evalCount=resultsGetEvaluationCount();
-        for (int i=0; i<evalCount; i++) {
-            QString en=resultsGetEvaluationName(i);
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
-                QString g=resultsGetGroup(en, rn);
-                if (!l.contains(g)) {
-                    l.append(g);
-                }
-            }
-        }
-    //}
-    if (l.size()>0) l.sort();
-    return l;
-}
-
-
-QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels() const {
-    QStringList l;
-    QList<QPair<QString, QString> > list;
-    //if (record) {
-        int evalCount=resultsGetEvaluationCount();
-        for (int i=0; i<evalCount; i++) {
-            QString en=resultsGetEvaluationName(i);
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
-                QString lab=resultsGetLabel(en, rn);
-                if (!l.contains(lab)) {
-                    l.append(rn);
-                    list.append(qMakePair(lab, rn));
-                }
-            }
-        }
-    //}
-    if (list.size()>0) {
-        qSort(list.begin(), list.end(), QFRawDataRecord_StringPairCaseInsensitiveCompare);
-    }
-
-    return list;
-}
-
-
-
-QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichtext() const {
-    QStringList l;
-    QList<QTriple<QString, QString, QString> > list;
-    QList<QPair<QString, QString> > list1;
-    //if (record) {
-        int evalCount=resultsGetEvaluationCount();
-        for (int i=0; i<evalCount; i++) {
-            QString en=resultsGetEvaluationName(i);
-            int jmax=resultsGetCount(en);
-            for (int j=0; j<jmax; j++) {
-                QString rn=resultsGetResultName(en, j);
-                QString lab=resultsGetLabel(en, rn);
-                QString labrt=resultsGetLabelRichtext(en, rn);
-                if (!l.contains(lab)) {
-                    l.append(rn);
-                    list.append(qMakeTriple(lab, labrt, rn));
-                }
-            }
-        }
-    //}
-    if (list.size()>0) {
-        qSort(list.begin(), list.end(), QFRawDataRecord_StringTripleCaseInsensitiveCompare);
-        for (int i=0; i<list.size(); i++) {
-            list1.append(qMakePair(list[i].second, list[i].third));
-        }
-    }
-
-    return list1;
-}*/
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1068,10 +1030,13 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
 
 QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const QString& group, const QString& evalgroup) const {
     QStringList l, lp;
-    int evalCount=resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=resultsGetEvaluationName(i);
-        QString egrp=resultsGetEvaluationGroup(en);
+
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
+
+        QString egrp=i.value()->group;
         if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
@@ -1092,9 +1057,10 @@ QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const 
 
 QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const {
     QStringList l;
-    int evalCount=resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=resultsGetEvaluationName(i);
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
         if (evalName.isEmpty() || (en==evalName)) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
@@ -1114,10 +1080,11 @@ QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const QString& evalName, const QString& group, const QString& evalgroup) const {
     QStringList l;
     QList<QPair<QString, QString> > list, listp;
-    int evalCount=resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=resultsGetEvaluationName(i);
-        QString egrp=resultsGetEvaluationGroup(en);
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
+        QString egrp=i.value()->group;
         if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
@@ -1159,10 +1126,11 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
       */
     QList<QTriple<QString, QString, QString> > list ,listp;
     QList<QPair<QString, QString> > list1;
-    int evalCount=resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=resultsGetEvaluationName(i);
-        QString egrp=resultsGetEvaluationGroup(en);
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
+        QString egrp=i.value()->group;
         if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
             int jmax=resultsGetCount(en);
             for (int j=0; j<jmax; j++) {
@@ -1196,11 +1164,14 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
 QList<QString> QFRawDataRecord::resultsCalcEvaluationsInGroup(const QString& evalGroup) const {
     QStringList l;
 
-    int evalCount=resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=resultsGetEvaluationName(i);
-        if (resultsGetEvaluationGroup(en)==evalGroup) l.append(en);
+
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
+        if (i.value()->group==evalGroup) l.append(en);
     }
+
 
     return l;
 }
@@ -1209,10 +1180,11 @@ QList<QString> QFRawDataRecord::resultsCalcEvaluationsInGroup(const QString& eva
 QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup) const {
     QStringList l;
 
-    int evalCount=resultsGetEvaluationCount();
-    for (int i=0; i<evalCount; i++) {
-        QString en=resultsGetEvaluationName(i);
-        QString grp=resultsGetEvaluationGroup(en);
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
+        QString grp=i.value()->group;
         if (!l.contains(grp)) {
             if (paramgroup.isEmpty()) {
                 l.append(grp);

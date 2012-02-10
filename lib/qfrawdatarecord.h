@@ -17,6 +17,7 @@
 
 
 class QDomElement; // forward
+class QFRawDataRecordPrivate; // forward
 
 /*! \brief this class manages one raw data record in the project
     \ingroup qf3lib_project
@@ -236,23 +237,13 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         int evaluationIDMetadataInitSize;
 
 
-        /*! \brief this struct holds the metadata and also the data about an evaluationID */
-        struct evaluationIDMetadata {
-            evaluationIDMetadata(int initsize);
-            QString group; /**< group this evaluationID belongs to \b (optional), translated to a human-readable version, using evalGroupLabels */
-            int64_t groupIndex; /**< index of the results inside the evaluationID group set by \a group \b (optional) */
-            QString description; /**< description of the metadata (human-readable version of the actual ID, \b optional )  */
-            QHash<QString, evaluationResult> results; /**< the real results */
-        };
 
-        /** \brief evaluation results are stored in this QHash which maps an evaluation name to
-         *         to a list of evaluation results (which is indexed by result names! */
-        QHash<QString, evaluationIDMetadata* > results;
+
+        QFRawDataRecordPrivate* dstore;
+
         /** \brief table used to display the results */
         QFRDRResultsModel* resultsmodel;
 
-        /** \brief maps evaluationIDMetadata.group to a human-readable version */
-        QHash<QString, QString> evalGroupLabels;
         /** \brief is this is \c false, the signal resultsChanged() is NOT emited */
         bool doEmitResultsChanged;
         bool doEmitPropertiesChanged;
@@ -264,16 +255,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */
         void resultsClear(QString name, QString postfix);
         /** \brief check whether a result exists */
-        inline bool resultsExists(QString evalName, QString resultName) const {
-            if (results.contains(evalName)) {
-                return results[evalName]->results.contains(resultName);
-            }
-            return false;
-        }
+        bool resultsExists(QString evalName, QString resultName) const;
         /** \brief check whether there are any results from a given evauation */
-        inline bool resultsExistsFromEvaluation(QString evalName) const {
-            return results.contains(evalName);
-        };
+        bool resultsExistsFromEvaluation(QString evalName) const;
         /** \brief set a result of type number */
         void resultsSetNumber(QString evaluationName, QString resultName, double value, QString unit=QString(""));
         /** \brief set a result of type number vector */
@@ -297,20 +281,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief set result from evaluationResult */
         void resultsSet(QString evaluationName, QString resultName, const evaluationResult& result);
         /** \brief return a specified result as variant */
-        inline evaluationResult resultsGet(QString evalName, QString resultName) const {
-            evaluationResult r;
-            if (resultsExists(evalName, resultName)) {
-                return results[evalName]->results.value(resultName);
-            }
-            return r;
-        };
+        evaluationResult resultsGet(QString evalName, QString resultName) const;
         /** \brief return the type of a specified result, or qfrdreInvalid if an error occured (eval does not exist ...) */
-        inline evaluationResultType resultsGetType(QString evalName, QString resultName) const {
-            if (resultsExists(evalName, resultName)) {
-                return results[evalName]->results.value(resultName).type;
-            }
-            return qfrdreInvalid;
-        };
+        evaluationResultType resultsGetType(QString evalName, QString resultName) const;
         /** \brief return a specified result as string */
         QString  resultsGetAsString(QString evalName, QString resultName) const;
         /** \brief return a specified result as string, but returns as a QVariant. If the result is invalid, a QVariant() will be returned. */

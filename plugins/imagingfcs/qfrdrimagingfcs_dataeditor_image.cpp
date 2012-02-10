@@ -15,6 +15,8 @@
 
 #define CLICK_UPDATE_TIMEOUT 500
 
+#define DEBUG_TIMIMNG
+
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent):
     QFRawDataEditor(services, parent)
 {
@@ -370,6 +372,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltOverview=new QVBoxLayout();
     wpltOverview->setLayout(lpltOverview);
     pltOverview=new JKQtPlotter(wpltOverview);
+    pltOverview->setObjectName("pltOverview");
     lpltOverview->addWidget(new QLabel(tr("Overview:")));
     lpltOverview->addWidget(pltOverview, 1);
     pltOverview->set_zoomByDoubleAndRightMouseClick(false);
@@ -421,6 +424,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltMask=new QVBoxLayout();
     wpltMask->setLayout(lpltMask);
     pltMask=new JKQtPlotter(wpltMask);
+    pltMask->setObjectName("pltMask");
+
     lpltMask->addWidget(new QLabel(tr("Mask/Selected:")));
     lpltMask->addWidget(pltMask, 1);
     pltMask->set_zoomByDoubleAndRightMouseClick(false);
@@ -471,6 +476,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltImage=new QVBoxLayout();
     wpltImage->setLayout(lpltImage);
     pltImage=new JKQtPlotter(wpltImage);
+    pltImage->setObjectName("pltImage");
+
     lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
     lpltImage->addWidget(pltImage, 1);
 
@@ -526,6 +533,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltGofImage=new QVBoxLayout();
     wpltGofImage->setLayout(lpltGofImage);
     pltGofImage=new JKQtPlotter(wpltGofImage);
+    pltGofImage->setObjectName("pltGofImage");
+
     lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
     lpltGofImage->addWidget(pltGofImage, 1);
 
@@ -577,8 +586,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
 
     plotter = new JKQtPlotter(true, this);
+    plotter->setObjectName("plotter");
+
     plotter->get_plotter()->set_showKey(true);
     plotterResid = new JKQtPlotter(true, this);
+    plotterResid->setObjectName("plotterResid");
+
     plotterResid->get_plotter()->set_showKey(true);
 
 
@@ -1514,7 +1527,11 @@ void QFRDRImagingFCSImageEditor::setSelectedOverlayStyle(JKQTPOverlayImageEnhanc
 void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    //qDebug()<<"replotSelection";
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection";
+    QElapsedTimer time;
+    time.start();
+#endif
     pltOverview->set_doDrawing(false);
     pltImage->set_doDrawing(false);
     pltGofImage->set_doDrawing(false);
@@ -1591,11 +1608,18 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         pltMask->update_plot();
     }
     QApplication::restoreOverrideCursor();
-    //qDebug()<<"replotSelection ... end";
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 }
 
 void QFRDRImagingFCSImageEditor::replotOverview() {
-    //qDebug()<<"replotOverview";
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotOverview";
+    QElapsedTimer time;
+    time.start();
+#endif
+
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     pltOverview->set_doDrawing(false);
@@ -1639,10 +1663,17 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
     pltOverview->set_doDrawing(true);
     pltOverview->update_plot();
     QApplication::restoreOverrideCursor();
-    //qDebug()<<"replotOverview ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotOverview ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 }
 
 void QFRDRImagingFCSImageEditor::replotMask() {
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotMask";
+    QElapsedTimer time;
+    time.start();
+#endif
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     pltMask->set_doDrawing(false);
@@ -1674,11 +1705,18 @@ void QFRDRImagingFCSImageEditor::replotMask() {
     pltMask->set_doDrawing(true);
     pltMask->update_plot();
     QApplication::restoreOverrideCursor();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotMask ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 }
 
 void QFRDRImagingFCSImageEditor::replotData() {
-     //qDebug()<<"replotData";
-    QTime t;
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData";
+    QElapsedTimer time;
+    time.start();
+#endif
+    QElapsedTimer t;
     t.start();
 
     JKQTPdatastore* ds=plotter->getDatastore();
@@ -1701,15 +1739,23 @@ void QFRDRImagingFCSImageEditor::replotData() {
     plotterResid->set_emitSignals(false);
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
-     //qDebug()<<"replotData   settings sliders: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData   settings sliders: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
     plotter->clearGraphs();
     plotterResid->clearGraphs();
-     //qDebug()<<"replotData   clearing graphs: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData   clearing graphs: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
     plotter->get_plotter()->set_showKey(chkKeys->isChecked());
     plotterResid->get_plotter()->set_showKey(chkKeys->isChecked());
-     //qDebug()<<"replotData   setting show_key: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData   setting show_key: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
     ds->clear();
-     //qDebug()<<"replotData   ds->clear: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData   ds->clear: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
 
     if (m->getCorrelationN()>0) {
@@ -1766,7 +1812,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
             g->set_symbol(avgSymbol);
             plotter->addGraph(g);
         }
-         //qDebug()<<"replotData   add avg: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+        qDebug()<<"replotData   add avg: "<<t.elapsed(); t.start();
+#endif
 
        //////////////////////////////////////////////////////////////////////////////////
        // Plot ALL RUNS (left out runs in gray)
@@ -1801,7 +1849,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 g->set_errorColor(g->get_color().lighter());
                 plotter->addGraph(g);
 
-                 //qDebug()<<"replotData   add graph "<<i<<": "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+                 qDebug()<<"replotData   add graph "<<i<<": "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
                 double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
                 double* resid=(double*)calloc(m->getCorrelationN(), sizeof(double));
@@ -1810,7 +1860,15 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 QList<bool> fix;
 
                 // search for the evaluationID that matches the current group(has to be in evals)  and run (i)
+#ifdef DEBUG_TIMIMNG
+                QElapsedTimer t1;
+                t1.start();
+#endif
                 QStringList evals=current->resultsCalcEvaluationsInGroup(currentEvalGroup());
+#ifdef DEBUG_TIMIMNG
+                double resultsCalcEvaluationsInGroupElapsed=t1.nsecsElapsed()/1000;
+#endif
+
                 QString en="";
                 for (register int ev=0; ev<evals.size(); ev++) {
                     //en=evals[i];
@@ -1819,7 +1877,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                         break;
                     }
                 }
-                 //qDebug()<<"replotData   search eval "<<i<<": "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+                qDebug()<<"replotData   search eval "<<i<<" (evals.size()="<<evals.size()<< "   resultsCalcEvaluationsInGroup="<<resultsCalcEvaluationsInGroupElapsed<<" nsecs): "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
                 // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
                 if (evaluateFitFunction(m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, en)) {
@@ -1842,7 +1902,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     gfit->set_symbolSize(5);
                     gfit->set_color(g->get_color());
                     plotter->addGraph(gfit);
-                     //qDebug()<<"replotData   add fit graph "<<i<<": "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+                    qDebug()<<"replotData   add fit graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
                     JKQTPxyLineGraph* gr=new JKQTPxyLineGraph();
                     gr->set_lineWidth(1.5);
                     gr->set_xColumn(c_tau);
@@ -1856,7 +1918,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     gr->set_symbolSize(5);
                     gr->set_color(g->get_color());
                     plotterResid->addGraph(gr);
-                     //qDebug()<<"replotData   add resid graph "<<i<<": "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+                    qDebug()<<"replotData   add resid graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
                     tabFitvals->appendColumn();
                     tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
@@ -1879,7 +1943,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                         if (fix[ii]) tabFitvals->setCellCheckedRole(row, col, Qt::Checked);
                         else tabFitvals->setCellCheckedRole(row, col, Qt::Unchecked);
                     }
-                     //qDebug()<<"replotData   set table cells "<<i<<": "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+                    qDebug()<<"replotData   set table cells "<<i<<": "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
                 }
 
@@ -1892,7 +1958,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
         tvParams->resizeColumnsToContents();
 
 
-         //qDebug()<<"replotData   add plots: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+        qDebug()<<"replotData   add plots: "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
 
 
@@ -1901,21 +1969,29 @@ void QFRDRImagingFCSImageEditor::replotData() {
         plotterResid->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotterResid->setX(plotter->getXMin(), plotter->getXMax());
         plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
-         //qDebug()<<"replotData   zoom: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+        qDebug()<<"replotData   zoom: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
 
     }
     plotter->set_doDrawing(true);
     plotter->set_emitSignals(true);
     plotterResid->set_doDrawing(true);
     plotterResid->set_emitSignals(true);
-     //qDebug()<<"replotData   emit signals: "<<t.elapsed(); t.start();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData   emit signals: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
     //QTime t;
     //t.start();
     plotter->update_plot();
-     //qDebug()<<"replotData   update plots: "<<t.elapsed(); t.start();
-    //qDebug()<<"plotting in "<<t.elapsed()<<" ms";
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData   update plots: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotData ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 };
 
 
