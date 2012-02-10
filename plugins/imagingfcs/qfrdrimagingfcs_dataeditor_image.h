@@ -29,6 +29,7 @@
 #include "jkqtptools.h"
 #include <QFrame>
 #include <QFile>
+#include <QToolBar>
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -137,6 +138,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void invertMask();
         void slidersChanged(int userMin, int userMax, int min, int max);
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
+        void imageMouseMoved(double x, double y);
+        void imageRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers);
+        void setImageEditMode();
 
         /** \brief activated when the user selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
         void parameterSetChanged();
@@ -321,6 +325,14 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
 
         JKDoubleEdit* edtColMin;
         JKDoubleEdit* edtColMax;
+
+        /** \brief toolbar to work with parameter images */
+        QToolBar* tbParameterImage;
+        QLabel* labImagePositionDisplay;
+        QActionGroup* agImageSelectionActions;
+        QAction* actImagesZoom;
+        QAction* actImagesDrawRectangle;
+        QComboBox* cmbMaskEditMode;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

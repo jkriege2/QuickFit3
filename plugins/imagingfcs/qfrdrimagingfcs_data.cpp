@@ -577,6 +577,13 @@ void QFRDRImagingFCSData::maskClear() {
     }
 }
 
+void QFRDRImagingFCSData::maskSetAll() {
+    if (!leaveout) return;
+    for (uint16_t i=0; i<width*height; i++) {
+        leaveout[i]=true;
+    }
+}
+
 void QFRDRImagingFCSData::leaveoutRemoveRun(int run) {
     if (run>=0 && run<getCorrelationRuns()) leaveout[run]=false;
 }
@@ -596,6 +603,10 @@ bool QFRDRImagingFCSData::maskGet(uint16_t x, uint16_t y) {
 void QFRDRImagingFCSData::maskUnset(uint16_t x, uint16_t y, bool value) {
     if (!leaveout) return;
     leaveout[y*width+x]=value;
+}
+
+void QFRDRImagingFCSData::maskToggle(uint16_t x, uint16_t y) {
+    leaveout[y*width+x]=!leaveout[y*width+x];
 }
 
 void QFRDRImagingFCSData::maskInvert() {

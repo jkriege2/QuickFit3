@@ -31,5 +31,10 @@
         <file alias="report_save.png">icons/report_save.png</file>
         <file alias="dataexplorer.png">icons/dataexplorer.png</file>
         <file alias="copydatatomatlab.png">icons/copydatatomatlab.png</file>
+        <file alias="draw_circle.png">icons/draw_circle.png</file>
+        <file alias="draw_ellipse.png">icons/draw_ellipse.png</file>
+        <file alias="draw_line.png">icons/draw_line.png</file>
+        <file alias="draw_rectangle.png">icons/draw_rectangle.png</file>
+        <file alias="zoom.png">icons/zoom.png</file>
     </qresource>
 </RCC>

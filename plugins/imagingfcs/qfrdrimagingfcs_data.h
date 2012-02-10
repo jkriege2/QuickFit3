@@ -100,8 +100,10 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void leaveoutClear();
 
         void maskClear();
+        void maskSetAll();
         void maskSet(uint16_t x, uint16_t y);
         void maskUnset(uint16_t x, uint16_t y, bool value=true);
+        void maskToggle(uint16_t x, uint16_t y);
         void maskInvert();
         bool maskGet(uint16_t x, uint16_t y);
         bool* maskGet();

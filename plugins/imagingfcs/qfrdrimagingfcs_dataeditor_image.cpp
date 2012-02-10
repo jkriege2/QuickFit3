@@ -363,7 +363,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: overview image plot
     ///////////////////////////////////////////////////////////////
@@ -394,6 +393,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltOverview->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltOverview, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
+    connect(pltOverview, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImage::GRAY, pltOverview->get_plotter());
     pltOverview->addGraph(plteOverview);
@@ -443,6 +444,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltMask->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltMask, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltMask, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltMask, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
+    connect(pltMask, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteMask=new JKQTPOverlayImage(0,0,1,1,NULL, 0,0, QColor("black"), pltMask->get_plotter());
     plteMask->set_falseColor(QColor("white"));
@@ -492,6 +495,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
+    connect(pltImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltImage->get_plotter());
     pltImage->addGraph(plteImage);
@@ -545,6 +550,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltGofImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
+    connect(pltGofImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
 
     plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
@@ -702,15 +709,63 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // TOOLBAR & ACTIONS: edit image plots
+    ///////////////////////////////////////////////////////////////
+    actImagesZoom=new QAction(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
+    actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)"));
+    actImagesZoom->setCheckable(true);
+    actImagesDrawRectangle=new QAction(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
+    actImagesDrawRectangle->setToolTip(tr("in this mode the user may drawing a rectangle.<br>"
+                                 "All pixels inside the rectangle will be selected<br>"
+                                 "when the user releases the left mouse key. YOu may<br>"
+                                 "alter this function by pressing one of these keys:<ul>"
+                                 "<li>CTRL: selection will be added to current selection</li>"
+                                 "<li>SHIFT: selection will be removed from current selection</li>"
+                                 "</ul>"));
+    actImagesDrawRectangle->setCheckable(true);
+    agImageSelectionActions=new QActionGroup(this);
+    agImageSelectionActions->setExclusive(true);
+    agImageSelectionActions->addAction(actImagesZoom);
+    agImageSelectionActions->addAction(actImagesDrawRectangle);
+    actImagesZoom->setChecked(true);
+    tbParameterImage=new QToolBar(this);
+    tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomAll());
+    tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomIn());
+    tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomOut());
+    tbParameterImage->addSeparator();
+    tbParameterImage->addWidget(new QLabel(tr("  edit "), this));
+    cmbMaskEditMode=new QComboBox(this);
+    cmbMaskEditMode->addItem("selection");
+    cmbMaskEditMode->addItem("mask");
+    tbParameterImage->addWidget(cmbMaskEditMode);
+    tbParameterImage->addAction(actImagesZoom);
+    tbParameterImage->addAction(actImagesDrawRectangle);
+    labImagePositionDisplay=new QLabel(this);
+    tbParameterImage->addSeparator();
+    tbParameterImage->addWidget(labImagePositionDisplay);
+    connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
+
+
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
-    // ACF TAB
+    // CORRELATION FUNCTION TAB
     //////////////////////////////////////////////////////////////////////////////////////////
     QWidget* widACFs=new QWidget(this);
     QGridLayout* layACFs=new QGridLayout();
     widACFs->setLayout(layACFs);
-    layACFs->addWidget(splitterTopBot, 0, 0);
-    layACFs->addWidget(w, 0, 1);
+    layACFs->addWidget(tbParameterImage, 0, 0, 1, 2);
+    layACFs->addWidget(splitterTopBot, 1, 0);
+    layACFs->addWidget(w, 1, 1);
     layACFs->setColumnStretch(0,5);
+    layACFs->setRowStretch(1,0);
     layACFs->setContentsMargins(0,0,0,0);
 
 
@@ -723,9 +778,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkExcludeExcludedRunsFromHistogram=new QCheckBox("", this);
     chkExcludeExcludedRunsFromHistogram->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
     histogram->addSettingsWidget(tr("mind excluded runs:"), chkExcludeExcludedRunsFromHistogram);
-
-
-
 
 
 
@@ -1073,17 +1125,145 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
 
     int idx=m->xyToRun(xx, yy);
 
-    if (modifiers==Qt::ControlModifier) {
-        if (selected.contains(idx)) selected.remove(idx);
-        else selected.insert(idx);
+    if (cmbMaskEditMode->currentIndex()==0) {
+        if (modifiers==Qt::ControlModifier) {
+            if (selected.contains(idx)) selected.remove(idx);
+            else selected.insert(idx);
+        } else if (modifiers==Qt::ShiftModifier) {
+            selected.remove(idx);
+        } else {
+            selected.clear();
+            selected.insert(idx);
+        }
     } else {
-        selected.clear();
-        selected.insert(idx);
+        if (modifiers==Qt::ControlModifier) {
+            m->maskToggle(xx,yy);
+        } else if (modifiers==Qt::ShiftModifier) {
+            m->maskUnset(xx,yy);
+        } else {
+            m->maskClear();
+            m->maskSet(xx,yy);
+        }
     }
     replotSelection(true);
     timUpdateAfterClick->setSingleShot(true);
     timUpdateAfterClick->stop();
     timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+}
+
+void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    int xx=(int)floor(x);
+    int yy=(int)floor(y);
+
+    int idx=m->xyToRun(xx, yy);
+
+    QString name="";
+    double value=0;
+    if (sender()==pltOverview) {
+        name=tr("overview");
+        uint16_t* ovr=m->getDataImagePreview();
+        if (ovr) value =ovr[idx];
+    }
+    if (sender()==pltImage) {
+        name=tr("paramImg");
+        if (plteImageData) value=plteImageData[idx];
+    }
+    if (sender()==pltGofImage) {
+        name=tr("GOF");
+        if (plteGofImageData) value=plteGofImageData[idx];
+    }
+    if (sender()==pltMask) {
+        name=tr("mask");
+        if (plteOverviewExcludedData) value=(plteOverviewExcludedData[idx])?0:1;
+    }
+    labImagePositionDisplay->setText(tr("%3(%1, %2) = %4").arg(xx).arg(yy).arg(name).arg(value));
+}
+
+void QFRDRImagingFCSImageEditor::imageRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+
+
+
+    int xx1=qBound(0,(int)floor(x), m->getDataImageWidth()-1);
+    int yy1=qBound(0,(int)floor(y), m->getDataImageHeight()-1);
+    int xx2=qBound(0,(int)floor(x+width), m->getDataImageWidth()-1);
+    int yy2=qBound(0,(int)floor(y-height), m->getDataImageHeight()-1);
+
+    if (xx1>xx2) qSwap(xx1, xx2);
+    if (yy1>yy2) qSwap(yy1, yy2);
+
+    //qDebug()<<"rect: "<<xx1<<yy1<<xx2<<yy2;
+    //qDebug()<<selected;
+
+    if (cmbMaskEditMode->currentIndex()==0) {
+        if (modifiers==Qt::ControlModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    int idx=m->xyToRun(xx, yy);
+                    selected.insert(idx);
+                }
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    int idx=m->xyToRun(xx, yy);
+                    selected.remove(idx);
+                }
+            }
+        } else {
+            selected.clear();
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    int idx=m->xyToRun(xx, yy);
+                    selected.insert(idx);
+                }
+            }
+        }
+    } else {
+        if (modifiers==Qt::ControlModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    m->maskUnset(xx,yy);
+                }
+            }
+        } else if (modifiers==Qt::ShiftModifier) {
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    m->maskSet(xx,yy);
+                }
+            }
+        } else {
+            m->maskClear();
+            for (int yy=yy1; yy<=yy2; yy++) {
+                for (int xx=xx1; xx<=xx2; xx++) {
+                    m->maskUnset(xx,yy);
+                }
+            }
+        }
+    }
+    //qDebug()<<selected;
+    replotSelection(true);
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->stop();
+    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+}
+
+void QFRDRImagingFCSImageEditor::setImageEditMode() {
+    if (actImagesZoom->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
+        pltOverview->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
+        pltMask->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
+    } else if (actImagesDrawRectangle->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+    }
+
 }
 
 void QFRDRImagingFCSImageEditor::updateAfterClick() {
