@@ -333,7 +333,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QToolBar* tbParameterImage;
         QLabel* labImagePositionDisplay;
         QActionGroup* agImageSelectionActions;
+
         QAction* actImagesZoom;
+        QAction* actImagesDrawPoints;
         QAction* actImagesDrawRectangle;
         QAction* actImagesDrawCircle;
         QAction* actImagesDrawEllipse;

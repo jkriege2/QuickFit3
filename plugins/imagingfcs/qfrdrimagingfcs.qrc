@@ -36,6 +36,7 @@
         <file alias="draw_line.png">icons/draw_line.png</file>
         <file alias="draw_rectangle.png">icons/draw_rectangle.png</file>
         <file alias="draw_scribble.png">icons/draw_scribble.png</file>
+        <file alias="draw_point.png">icons/draw_point.png</file>
         <file alias="zoom.png">icons/zoom.png</file>
     </qresource>
 </RCC>

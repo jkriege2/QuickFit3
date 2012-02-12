@@ -397,7 +397,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltOverview->get_plotter()->set_useAntiAliasingForSystem(true);
     pltOverview->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltOverview, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-    connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltOverview, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltOverview, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltOverview, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -453,7 +453,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltMask->get_plotter()->set_useAntiAliasingForSystem(true);
     pltMask->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltMask, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-    connect(pltMask, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltMask, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltMask, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltMask, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltMask, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -509,7 +509,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-    connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -569,7 +569,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-    connect(pltGofImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltGofImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -756,6 +756,15 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
 
+    actImagesDrawPoints=new QAction(QIcon(":/imaging_fcs/draw_point.png"), tr("point-wise selection"), this);
+    actImagesDrawPoints->setToolTip(tr("in this mode the user may click on single points.<br>"
+                                 "to add and remove them to/from the mask/selection. A click<br>"
+                                 "will toggle the state of the clicked pixel<ul>"
+                                 "<li>CTRL: selection will be added to current selection</li>"
+                                 "<li>SHIFT: selection will be removed from current selection</li>"
+                                 "</ul>"));
+    actImagesDrawPoints->setCheckable(true);
+
     actImagesDrawCircle=new QAction(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
     actImagesDrawCircle->setToolTip(tr("in this mode the user may draw a circle.<br>"
                                  "All pixels inside the cirle will be selected<br>"
@@ -798,12 +807,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     agImageSelectionActions=new QActionGroup(this);
     agImageSelectionActions->setExclusive(true);
     agImageSelectionActions->addAction(actImagesZoom);
+    agImageSelectionActions->addAction(actImagesDrawPoints);
     agImageSelectionActions->addAction(actImagesDrawRectangle);
     agImageSelectionActions->addAction(actImagesScribble);
     agImageSelectionActions->addAction(actImagesDrawLine);
     agImageSelectionActions->addAction(actImagesDrawCircle);
     agImageSelectionActions->addAction(actImagesDrawEllipse);
-    actImagesZoom->setChecked(true);
     tbParameterImage=new QToolBar(this);
     tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomAll());
     tbParameterImage->addAction(pltImage->get_plotter()->get_actZoomIn());
@@ -818,6 +827,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     tbParameterImage->addWidget(cmbMaskEditMode);
     tbParameterImage->addWidget(spacer);
     tbParameterImage->addAction(actImagesZoom);
+    tbParameterImage->addAction(actImagesDrawPoints);
     tbParameterImage->addAction(actImagesDrawRectangle);
     tbParameterImage->addAction(actImagesScribble);
     tbParameterImage->addAction(actImagesDrawLine);
@@ -830,6 +840,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     tbParameterImage->addWidget(spacer);
     tbParameterImage->addWidget(labImagePositionDisplay);
     connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
+    actImagesDrawPoints->setChecked(true);
+    actImagesZoom->setChecked(true);
+    actImagesDrawPoints->setChecked(true);
 
 
 
@@ -1562,6 +1575,11 @@ void QFRDRImagingFCSImageEditor::setImageEditMode() {
         pltOverview->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
         pltMask->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
         pltGofImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
+    } else if (actImagesDrawPoints->isChecked()) {
+        pltImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
     } else if (actImagesDrawRectangle->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::RectangleEvents);
@@ -1583,10 +1601,10 @@ void QFRDRImagingFCSImageEditor::setImageEditMode() {
         pltMask->set_mouseActionMode(JKQtPlotter::EllipseEvents);
         pltGofImage->set_mouseActionMode(JKQtPlotter::EllipseEvents);
     } else if (actImagesScribble->isChecked()) {
-        pltImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
-        pltOverview->set_mouseActionMode(JKQtPlotter::ClickEvents);
-        pltMask->set_mouseActionMode(JKQtPlotter::ClickEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltImage->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
+        pltOverview->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
+        pltMask->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
+        pltGofImage->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
     }
 
 }
