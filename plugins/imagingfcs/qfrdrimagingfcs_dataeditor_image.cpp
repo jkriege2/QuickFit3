@@ -396,8 +396,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltOverview->get_plotter()->setGrid(false);
     pltOverview->get_plotter()->set_useAntiAliasingForSystem(true);
     pltOverview->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltOverview->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
     connect(pltOverview, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltOverview, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltOverview, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
     connect(pltOverview, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltOverview, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltOverview, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -452,8 +454,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltMask->get_plotter()->setGrid(false);
     pltMask->get_plotter()->set_useAntiAliasingForSystem(true);
     pltMask->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltMask->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
     connect(pltMask, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltMask, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltMask, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
     connect(pltMask, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltMask, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltMask, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -508,8 +512,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltImage->get_plotter()->setGrid(false);
     pltImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
     connect(pltImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltImage, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
     connect(pltImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -568,8 +574,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage->get_plotter()->setGrid(false);
     pltGofImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltGofImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
     connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltGofImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
     connect(pltGofImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
     connect(pltGofImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
@@ -800,7 +808,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                  "keeping the left mouse button pressed and moving the mouse<br>"
                                  "over the image. Depending on the key pressed on the keyboard,<br>"
                                  "different actions are executed:<ul>"
-                                 "<li>NO KEY: the current position is added to the selection</li>"
+                                 "<li>CTRL: the old selection/mask is not deleted, so the result is appended to it.</li>"
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesScribble->setCheckable(true);
@@ -843,6 +851,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actImagesDrawPoints->setChecked(true);
     actImagesZoom->setChecked(true);
     actImagesDrawPoints->setChecked(true);
+    setImageEditMode();
 
 
 
@@ -1217,6 +1226,8 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
     int xx=(int)floor(x);
     int yy=(int)floor(y);
 
+    //qDebug()<<"imageClicked("<<x<<y<<modifiers<<")";
+
     int idx=m->xyToRun(xx, yy);
     if (xx>=0 && xx<m->getDataImageWidth() && yy>=0 && yy<m->getDataImageHeight()) {
 
@@ -1237,6 +1248,37 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
                 m->maskSet(xx,yy);
             } else {
                 if (!actImagesScribble->isChecked()) m->maskClear();
+                m->maskUnset(xx,yy);
+            }
+        }
+        replotSelection(true);
+        timUpdateAfterClick->setSingleShot(true);
+        timUpdateAfterClick->stop();
+        timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+    }
+}
+
+void QFRDRImagingFCSImageEditor::imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool /*last*/) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    int xx=(int)floor(x);
+    int yy=(int)floor(y);
+
+    int idx=m->xyToRun(xx, yy);
+    if (xx>=0 && xx<m->getDataImageWidth() && yy>=0 && yy<m->getDataImageHeight()) {
+
+        if (cmbMaskEditMode->currentIndex()==0) {
+            if (first && modifiers==Qt::NoModifier) selected.clear();
+            if (modifiers==Qt::ShiftModifier) {
+                selected.remove(idx);
+            } else {
+                selected.insert(idx);
+            }
+        } else {
+            if (first && modifiers==Qt::NoModifier) m->maskClear();
+            if (modifiers==Qt::ShiftModifier) {
+                m->maskSet(xx,yy);
+            } else {
                 m->maskUnset(xx,yy);
             }
         }
@@ -1369,7 +1411,7 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) {
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) {
                         int idx=m->xyToRun(xx, yy);
                         selected.insert(idx);
                     }
@@ -1378,7 +1420,7 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) {
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) {
                         int idx=m->xyToRun(xx, yy);
                         selected.remove(idx);
                     }
@@ -1388,7 +1430,7 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
             selected.clear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) {
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) {
                         int idx=m->xyToRun(xx, yy);
                         selected.insert(idx);
                     }
@@ -1399,20 +1441,20 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
                 }
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) m->maskSet(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskSet(xx,yy);
                 }
             }
         } else {
             m->maskClear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)/sqr(radiusX)+sqr(double(yy)-y)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
                 }
             }
         }
@@ -1446,7 +1488,7 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) {
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) {
                         int idx=m->xyToRun(xx, yy);
                         selected.insert(idx);
                     }
@@ -1455,7 +1497,7 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) {
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) {
                         int idx=m->xyToRun(xx, yy);
                         selected.remove(idx);
                     }
@@ -1465,7 +1507,7 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
             selected.clear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) {
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) {
                         int idx=m->xyToRun(xx, yy);
                         selected.insert(idx);
                     }
@@ -1476,20 +1518,20 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskUnset(xx,yy);
                 }
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) m->maskSet(xx,yy);
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskSet(xx,yy);
                 }
             }
         } else {
             m->maskClear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x)+sqr(double(yy)-y)<sqr(radius)) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskUnset(xx,yy);
                 }
             }
         }

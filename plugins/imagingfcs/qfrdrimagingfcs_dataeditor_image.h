@@ -138,6 +138,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         void invertMask();
         void slidersChanged(int userMin, int userMax, int min, int max);
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
+        void imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool last);
         void imageMouseMoved(double x, double y);
         void imageRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers);
         void imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers);
