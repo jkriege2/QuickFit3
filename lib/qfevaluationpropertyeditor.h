@@ -9,7 +9,6 @@
 #include "programoptions.h"
 #include "qfpluginservices.h"
 #include "qftools.h"
-#include "qfhtmlhelpwindow.h"
 #include "qfhtmldelegate.h"
 #include "qfevaluationresultsmodel.h"
 #include "qenhancedtableview.h"
@@ -84,10 +83,6 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         int getID() { return id; };
         /** \brief set the current record */
         void setCurrent(QFEvaluationItem* c);
-        /** \brief set a pointer to an external (global) replacement list */
-        void setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
-            helpWidget->setHtmlReplacementList(list);
-        }
         /** \brief deselect the currently highlighted record and choose another one from the available records! */
         void deselectCurrent();
     private slots:
@@ -192,8 +187,6 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         int id;
         /** \brief pointer that allows for access to central QuickFit services */
         QFPluginServices* services;
-        /** \brief help widget for evaluation */
-        QFHTMLHelpWindow* helpWidget;
         /** \brief button to diaply online-help */
         QPushButton* btnHelp;
 

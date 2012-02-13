@@ -408,9 +408,6 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
-    /*helpWidget=new QFHTMLHelpWindow(this);
-    helpWidget->initFromPluginServices(services);
-    tabMain->addTab(helpWidget, QIcon(":/lib/help.png"), tr("&Online-Help"));*/
     btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("&Help"), this);
     btnHelp->setToolTip(tr("display online help dialog"));
     tabMain->setCornerWidget(btnHelp, Qt::TopRightCorner);

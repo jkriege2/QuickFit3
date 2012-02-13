@@ -48,7 +48,6 @@ HEADERS += dlgnewproperty.h \
            qfpluginfitfunction.h \
            qfpluginfitalgorithm.h \
            qftools.h \
-           qfhtmlhelpwindow.h \
            qffitalgorithmthreaddedfit.h \
            qfextension.h \
            qfextensionmanager.h \
@@ -85,7 +84,6 @@ SOURCES += dlgnewproperty.cpp \
            qffitfunctionmanager.cpp \
            qffitalgorithmmanager.cpp \
            qftools.cpp \
-           qfhtmlhelpwindow.cpp \
            qffitalgorithmthreaddedfit.cpp \
            qfextensionmanager.cpp \
            qfevaluationresultsmodel.cpp \

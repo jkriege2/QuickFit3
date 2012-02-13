@@ -83,6 +83,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline QStringList getFiles() const { return files; }
         /** \brief return the list of linked files */
         inline QStringList getFilesTypes() const { return files_types; }
+        /** \brief return the filename associated with a given type, returns an empty string if no file was found */
+        QString getFileForType(const QString& type);
+        /** \brief return a list of filenames associated with a given type, returns an empty list if no files were found */
+        QStringList getFilesForType(const QString& type);
         /** \brief return a pointer to the project that contains this QRawDatarecord */
         inline QFProject* getProject() const { return project; }
         /** \brief return the folder */

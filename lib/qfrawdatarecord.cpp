@@ -112,6 +112,20 @@ void QFRawDataRecord::init(QDomElement& e) {
     //std::cout<<"created QFRawDataRecord\n";
 }
 
+QString QFRawDataRecord::getFileForType(const QString &type) {
+    QStringList sl=getFilesForType(type);
+    if (sl.size()>0) return sl[0];
+    return "";
+}
+
+QStringList QFRawDataRecord::getFilesForType(const QString &type) {
+    QStringList result;
+    for (int i=0; i<qMin(files_types.size(), files.size()); i++) {
+        if (files_types[i].toLower()==type) result.append(files[i]);
+    }
+    return result;
+}
+
 QFRawDataRecord::~QFRawDataRecord() {
     delete dstore;
     //std::cout<<"deleting QFRawDataRecord\n";

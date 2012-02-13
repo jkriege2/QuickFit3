@@ -25,7 +25,6 @@
 #include <QGridLayout>
 #include <QTabBar>
 #include <QTextDocument>
-#include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"

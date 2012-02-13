@@ -2,6 +2,12 @@
 #include <QtXml>
 #include "libtiff_tools.h"
 #include "qfrdrimagereaderrh.h"
+#include "csvtools.h"
+#include <QTextStream>
+#include "tools.h"
+
+#define DEBUG_SIZES
+//#undef DEBUG_SIZES
 
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
@@ -17,23 +23,32 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     height=0;
     overview=NULL;
     leaveout=NULL;
+    statAvg=NULL;
+    statStdDev=NULL;
+    statMin=NULL;
+    statMax=NULL;
+    statT=NULL;
+    statN=0;
     setResultsInitSize(1000);
     setEvaluationIDMetadataInitSize(1000);
 }
 
 QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateContents(0,0,0);
+     allocateStatistics(0);
 }
 
 QString QFRDRImagingFCSData::getEditorName(int i) {
     if (i==0) return tr("Parameter Image");
     if (i==1) return tr("Correlation Curves");
+    if (i==2) return tr("Images, Videos & Timetrace");
     return QString("");
 };
 
 QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services, int i, QWidget* parent) {
     if (i==0) return new QFRDRImagingFCSImageEditor(services, parent);
     if (i==1) return new QFRDRImagingFCSDataEditor(services, parent);
+    if (i==2) return new QFRDRImagingFCSCountrateDisplay(services, parent);
     return NULL;
 };
 
@@ -106,6 +121,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 QString ft=files_types[i].toLower().trimmed();
                 if (ft=="overview") {
                     loadOverview(files[i]);
+                } else if (ft=="statistics") {
+                    loadStatistics(files[i]);
                 } else if (ft=="acf" || ft=="ccf" || ft=="dccf"){
                     if (!dataLoaded) {
                         if (filetype.toUpper()=="VIDEO_CORRELATOR") {
@@ -149,7 +166,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     }
 }
 
-bool QFRDRImagingFCSData::loadOverview(QString filename) {
+bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
     bool ok=false;
 
     if (!overview) return false;
@@ -189,7 +206,7 @@ bool QFRDRImagingFCSData::loadOverview(QString filename) {
     return ok;
 }
 
-bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
+bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 	bool ok=true;
 	QString errorDescription="";
 
@@ -293,7 +310,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(QString filename) {
 
 
 
-bool QFRDRImagingFCSData::loadRadhard2File(QString filename) {
+bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     bool ok=true;
 
     QString errorDescription="";
@@ -493,6 +510,34 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
         setQFProperty("WIDTH", x, false, true);
         setQFProperty("HEIGHT", y, false, true);
     }
+#ifdef DEBUG_SIZES
+    qDebug()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
+#endif
+}
+
+void QFRDRImagingFCSData::allocateStatistics(uint32_t N) {
+    if (statAvg) free(statAvg);
+    if (statStdDev) free(statStdDev);
+    if (statT) free(statT);
+    if (statMin) free(statMin);
+    if (statMax) free(statMax);
+    statN=N;
+    statAvg=NULL;
+    statT=NULL;
+    statStdDev=NULL;
+    statMin=NULL;
+    statMax=NULL;
+    if (statN>0) {
+        statAvg=(double*)calloc(statN, sizeof(double));
+        statStdDev=(double*)calloc(statN, sizeof(double));
+        statMin=(double*)calloc(statN, sizeof(double));
+        statMax=(double*)calloc(statN, sizeof(double));
+        statT=(double*)calloc(statN, sizeof(double));
+    }
+#ifdef DEBUG_SIZES
+    qDebug()<<"allocateStatistics( N="<<N<<"):  "<<bytestostr(statN*5*sizeof(double)).c_str();
+#endif
+
 }
 
 void QFRDRImagingFCSData::recalcCorrelations() {
@@ -518,6 +563,59 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             }
         }
     }
+}
+
+uint32_t QFRDRImagingFCSData::getStatisticsN() const {
+    return statN;
+}
+
+double *QFRDRImagingFCSData::getStatisticsMean() const {
+    return statAvg;
+}
+
+double *QFRDRImagingFCSData::getStatisticsT() const {
+    return statT;
+}
+
+double *QFRDRImagingFCSData::getStatisticsStdDev() const {
+    return statStdDev;
+}
+
+double *QFRDRImagingFCSData::getStatisticsMin() const {
+    return statMin;
+}
+
+bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QTextStream txt(&f);
+        QVector<double> mean, stddev, min, max, time;
+        while (!txt.atEnd()) {
+            QVector<double> line=csvReadline(txt, ',', '#');
+            if (line.size()>1) {
+                time.append(line[0]);
+                mean.append(line[1]);
+                stddev.append(line.value(2, 0));
+                min.append(line.value(3, 0));
+                max.append(line.value(4, 0));
+            }
+        }
+        //qDebug()<<"line read: "<<time.size();
+        allocateStatistics(time.size());
+
+        for (uint32_t i=0; i<statN; i++) {
+            statT[i]=time[i];
+            statAvg[i]=mean[i];
+            statStdDev[i]=stddev[i];
+            statMin[i]=min[i];
+            statMax[i]=max[i];
+        }
+
+
+        f.close();
+        return true;
+    }
+    return false;
 }
 
 
@@ -620,4 +718,9 @@ void QFRDRImagingFCSData::maskSet(uint16_t x, uint16_t y) {
     if (!leaveout) return;
     leaveout[y*width+x]=false;
 }
+
+double *QFRDRImagingFCSData::getStatisticsMax() const {
+    return statMax;
+}
+
 

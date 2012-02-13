@@ -39,7 +39,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/crc.h \
     ../base_classes/qfhistogramview.h \
     qfrdrimagingfcsdataexplorer.h \
-    qfrdrimagingfcsmaskbyintensity.h
+    qfrdrimagingfcsmaskbyintensity.h \
+    qfrdrimagingfcscountratedisplay.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -59,13 +60,15 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfrdrimagereader.cpp \
     ../base_classes/qfhistogramview.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
-    qfrdrimagingfcsmaskbyintensity.cpp
+    qfrdrimagingfcsmaskbyintensity.cpp \
+    qfrdrimagingfcscountratedisplay.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
     qfrdrimagingfcsthreadprogress.ui \
     qfrdrimagingfcsdataexplorer.ui \
-    qfrdrimagingfcsmaskbyintensity.ui
+    qfrdrimagingfcsmaskbyintensity.ui \
+    qfrdrimagingfcscountratedisplay.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 

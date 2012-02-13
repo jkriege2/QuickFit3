@@ -10,6 +10,7 @@
 #include "qfextensionmanager.h"
 #include "qffitalgorithm.h"
 #include "qffitfunction.h"
+#include "jkqtmathtext.h"
 
 QString removeHTMLComments(const QString& data) {
      QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
@@ -292,6 +293,8 @@ void QFHTMLHelpWindow::print() {
 
 QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QString result;
+
+    JKQTmathText mathParser(this);
     // read HTML file
     QFile file(QFileInfo(filename).absoluteFilePath());
     QString fileDir=QFileInfo(filename).absolutePath();
@@ -573,6 +576,36 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
             }
 
 
+            // interpret $$math:<latex>$$ items
+            QRegExp rxLaTeX("\\$\\$(math)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            rxLaTeX.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
+                QString command=rxLaTeX.cap(1).toLower().trimmed();
+                QString latex=rxLaTeX.cap(2).trimmed();
+
+                if (command=="math") {
+                    QPixmap pix(300,100);
+                    QPainter p(&pix);
+                    mathParser.parse(latex);
+                    QSizeF size=mathParser.getSize(p);
+                    p.end();
+                    pix=QPixmap(size.width(), size.height());
+                    pix.fill(Qt::transparent);
+                    p.begin(&pix);
+                    mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
+                    p.end();
+                    QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
+                    //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
+                    pix.save(texfilename);
+
+                    result=result.replace(rxLaTeX.cap(0), QString("<img alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                }
+
+                ++count;
+                pos += rxLaTeX.matchedLength();
+            }
 
             cnt++;
         }

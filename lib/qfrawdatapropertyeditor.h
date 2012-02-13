@@ -11,7 +11,6 @@
 #include "qfpluginservices.h"
 #include "qftools.h"
 #include "qenhancedtableview.h"
-#include "qfhtmlhelpwindow.h"
 #include "lib_imexport.h"
 
 /*! \brief editor widget (window) for raw data items
@@ -34,10 +33,6 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void setSettings(ProgramOptions* settings);
         /** \brief write the settings */
         void writeSettings();
-        /** \brief set a pointer to an external (global) replacement list */
-        void setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
-            helpWidget->setHtmlReplacementList(list);
-        }
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFRawDataRecord> current;
@@ -129,8 +124,6 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actDeleteResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
-        /** \brief help widget for evaluation */
-        QFHTMLHelpWindow* helpWidget;
         /** \brief button to display help */
         QPushButton* btnHelp;
 

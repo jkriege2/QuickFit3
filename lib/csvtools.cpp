@@ -1,10 +1,10 @@
 #include "csvtools.h"
 #include <iostream>
 #include <math.h>
-
+#include <QDebug>
 QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value) {
     QString line=f.readLine();
-    //std::cout<<"line='"<<line.toStdString()<<"'\n";
+    //qDebug()<<"line='"<<line;
     QVector<double> result;
     bool done=false;
     QString num="";

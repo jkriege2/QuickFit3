@@ -42,8 +42,8 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     avgGraph->set_symbol(JKQTPnoSymbol);
     avgFit=new JKQTPxyLineGraph(ui->pltIntensity->get_plotter());
     avgFit->set_title(tr("fit"));
-    avgGraph->set_drawLine(true);
-    avgGraph->set_symbol(JKQTPnoSymbol);
+    avgFit->set_drawLine(true);
+    avgFit->set_symbol(JKQTPnoSymbol);
     ui->pltIntensity->addGraph(fitRange);
     ui->pltIntensity->addGraph(avgGraph);
     ui->pltIntensity->addGraph(avgFit);

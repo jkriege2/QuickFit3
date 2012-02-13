@@ -2,7 +2,7 @@
 #define QFHTMLHelpWindow_H
 
 #include <QTextBrowser>
-#include "lib_imexport.h"
+#include "libwid_imexport.h"
 #include <QLabel>
 #include <QFont>
 #include <QString>
@@ -26,7 +26,7 @@
     The mechanism replace every occurence of \c $$key by the according \c replaceBy string.
  */
 
-class QFLIB_EXPORT QFHTMLHelpWindow : public QWidget {
+class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
         Q_OBJECT
 
     public:

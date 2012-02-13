@@ -19,6 +19,7 @@
 #include "../interfaces/qfevaluationimagetoruninterface.h"
 #include "csvtools.h"
 #include "qtriple.h"
+#include "qfrdrimagingfcscountratedisplay.h"
 
 
 
@@ -46,7 +47,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief return a large icon (32x32) */
         virtual QIcon getLargeIcon() const { return QIcon(":/imaging_fcs/qfrdrimagingfcs.png"); }
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 2; }
+        virtual int getEditorCount() { return 3; }
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i);
         /** \brief create an object for the i-th editor pane */
@@ -110,6 +111,19 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         /** \brief recalculate the averages/std. deviations */
         void recalcCorrelations();
+
+
+        /** \brief return the number of datapoints in the statistics dataset */
+        uint32_t getStatisticsN() const;
+        /** \brief return the array of average values of the statsitics */
+        double* getStatisticsMean() const;
+        /** \brief return the array of standard deviation values of the statsitics */
+        double* getStatisticsStdDev() const;
+        double* getStatisticsMin() const;
+        double* getStatisticsMax() const;
+        /** \brief return the array of time points [seconds] for the statsitics */
+        double *getStatisticsT() const;
+
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);
@@ -120,13 +134,16 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void intReadData(QDomElement* e=NULL);
 
         /** \brief load data file */
-        bool loadVideoCorrelatorFile(QString filename);
+        bool loadVideoCorrelatorFile(const QString& filename);
 
         /** \brief load data file */
-        bool loadRadhard2File(QString filename);
+        bool loadRadhard2File(const QString& filename);
 
         /** \brief load overview image file */
-        bool loadOverview(QString filename);
+        bool loadOverview(const QString& filename);
+
+        /** \brief load the statistics file */
+        bool loadStatistics(const QString& filename);
 
     private:
         /** \brief width of the image */
@@ -146,6 +163,17 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief time axis [seconds] */
         double* tau;
 
+        /** \brief number of data points in the statistics  */
+        uint32_t statN;
+        /** \brief statistics: average vector */
+        double* statAvg;
+        /** \brief statistics: standard deviation vector */
+        double* statStdDev;
+        /** \brief statistics: time [seconds] vector */
+        double* statT;
+        double* statMin;
+        double* statMax;
+
         /** \brief overview image */
         uint16_t* overview;
 
@@ -155,6 +183,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
     protected:
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
         virtual void allocateContents(int x, int y, int N);
+        void allocateStatistics(uint32_t N);
 
 
     public:
