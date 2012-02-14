@@ -67,7 +67,42 @@
     <p></p>
     <p></p>
 	
+	
+	<a name="#bleach"><h2>Bleaching Correction</h2>
+    <p>This plugin offers also a possibility to correct for bleaching of the sample before the correlation. This might help to get rid of artefacts caused by this. Currently these methods are supported:
+	<ul>
+	  <li><b>cut data into segments:</b> This is the easiest way of reducing bleaching artefacts. Now the correlator cuts the input time series into few pieces of equal size and calculates a correlation function for each of them. The resulting correlation function is then the average over all the segment functions. This methods works, as the influence of bleaching on a shorter segment is smaller than on the whole series.</li>
+	  <li><b>subtract average:</b> This option normalizes the overall intensity of each frame to the average intensity of that pixel in the first 100 frames $$math:\langle I(x,y,t)\rangle_{t=0..100}$$:
+	  <blockquote>
+	    $$math:I(x,y,t)=I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\langle I(x,y,t)\rangle_{x,y}}=I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\overline{I}(t)}$$
+	  </blockquote>
+	  </li>
+	  <li><b>subtract exponential:</b> This method assumes that the intensity of every pixel decays with a mono-exponential function:
+	  <blockquote>
+	    $$math:I(t)=I_0+A\cdot\exp(-t/\tau_{bleach}) $$
+	  </blockquote>
+	  It is further assumed that the decay time $$math:\tau_{bleach}$$ of everypixel is the same, so it may be deduced from a fit to the average intensity trace of the whole image series (which can be done in the Data Explorer window!!!). So after fitting $$math:\tau_{bleach}$$ each pixel may be corrected:
+	  <blockquote>
+	    $$math:I(x,y,t)=I(x,y,t)\cdot\frac{1}{I_0(x,y)+A(x,y)\cdot\exp(-t/\tau_{bleach})}$$
+	  </blockquote>
+	  Where the offset $$math:I_0(x,y)$$ and the amplitude $$math:A(x,y)$$ are determined for each pixel, using the averages over the first 100 frames $$math:S(x,y)$$ and last 100 frames $$math::E(x,y)$$:
+	  <blockquote>
+	    $$math:A(x,y)=\frac{E(x,y)-S(x,y)}{\exp(-T/\tau_{bleach})-1}$$<br>
+	    $$math:I_0(x,y)=S(x,y)-A(x,y)$$
+	  </blockquote>
+	  where <i>T</i> is the overall number of frames.
+	  
+	  </li>
+	</ul>
+	Subtracting this background, improves the visibility of the correlation, But care must be taken to <u>not</u> remove part of the signal itself, as this may change the measured ACF/CCF amplitude and therefore the estimate of particle number.
+	</p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	
 	<a name="#correlators"><h2>Correlators</h2>
+	<h3>Correlator Types</h3>
     <p>In the last section only the definition of the ACFs/CCFs was given (in terms of integrals, i.e. continuous imae series). But the image series <i>I(t)</i> (omitting the pixel-specifier) are not continuous, but discrete in time:
 	 <blockquote>
 	   <img src="./pic/discrete_timeseries.png">
@@ -86,6 +121,25 @@
 	  This recursive formula leads to <i>S</i> blocks of <i>P</i> linearly spaces lags. The difference between two subsequent lags increases exponentially (<i>m<sup>s</sup></i>) from block to block.
 	  The normalization is explained in more detail below.
 	  </li>
+
+	  <li><b>Direct Correlation, with Averaging:</b><br>This correlator yields the same results as the <b>Direct Estimation</b>, but intrinsically averages the calculated correlation function (with a triangular kernel, see below). The width of the averaging increases from decade to decade of the quasi-logarithmically spaced &tau;-values at which the correlation function is evaluated. The correlation works like this:
+	  <ol>
+	    <li>calculate $$math:g(\tau_i)$$ at <i>P</i> linearly spaced lags $$math:\tau_{i}=i$$, using the same estimation as above:
+	     <blockquote>
+		   <img src="./pic/acf_direct.png">
+		 </blockquote>		
+		</li>
+	    <li>average the input signal series <i>J<sub>n</sub></i> and <i>I<sub>n</sub></i> by summing up <i>m</i> subsequent values. The new series <i>J<sub>n</sub>'</i> and <i>I<sub>n</sub>'</i> will then hold only <i>N/m</i> values.
+		</li>
+	    <li>return <i>S</i> times to step 1 with the new input signals</li>
+	  </ol>
+	  This can be illustrated:
+	     <blockquote>
+		   <img src="./pic/acf_directavg.png">
+		 </blockquote>		
+
+	  </li>
+
 	  <li><b>Multi-&tau; Correlator:</b><br>
 	  This correlation scheme was introduced by K. Schätzel [1,2] for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
 	     <blockquote>
@@ -106,7 +160,9 @@
 	  Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. 
 	  </li>
 	</ul>
-	Both types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in [2]. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
+	
+	<h3>Normalization</h3>
+	All types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in [2]. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
 	     <blockquote>
 		   <img src="./pic/symm_normalization.png">
 		 </blockquote>
@@ -116,6 +172,20 @@
 		 </blockquote>
 	from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see [3] for a detailed discussion).
 	</p>
+	<h3>Comparison of the correlators</h3>
+	<p>
+	  In general the results of all correlation scheme are the same. Those with intrinsic averaging will decrease the noise on the correlation curve at larger lag times, where the statistics tends to get worse due to the fewer summands in the average. This is beneficial, when the correlation curves decay to zero/one in this regime, as then the estimation error is decreased. If the correlation curves do not decay, using a correlator with averaging will introduce an additional systematic error. This can be illustrated in these examples:
+	     <blockquote>
+		   <b>autocorrelation of a sine signal:</b><br>
+		   <img src="./pic/corr_examples_sine.png">
+		 </blockquote>		
+	     <blockquote>
+		   <b>autocorrelation which decays to one for different decay times:</b><br>
+		   <img src="./pic/corr_examples.png">
+		 </blockquote>	
+      In addition to these discussed errors there are other differences in the implementations: The <i>direct correlators</i> need the whole image series to reside in memory, so if your image series is very long (longer than ~1,000,000 frames and with many pixels) it is usually better to use the multi-&tau; correlators, as these are fed frame by frame, so only few frames reside in memory at every time. 
+    </p>
+	
     <p><b>References:</b><blockquote>
 	  [1]: K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.<br>
 	  [2]: K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305<br>

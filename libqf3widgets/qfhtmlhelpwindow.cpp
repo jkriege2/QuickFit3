@@ -295,6 +295,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QString result;
 
     JKQTmathText mathParser(this);
+    mathParser.set_fontSize(11);
     // read HTML file
     QFile file(QFileInfo(filename).absoluteFilePath());
     QString fileDir=QFileInfo(filename).absolutePath();
@@ -577,7 +578,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
@@ -591,7 +592,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     mathParser.parse(latex);
                     QSizeF size=mathParser.getSize(p);
                     p.end();
-                    pix=QPixmap(size.width(), size.height());
+                    pix=QPixmap(size.width()*1.1, size.height()*1.1);
                     pix.fill(Qt::transparent);
                     p.begin(&pix);
                     mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
@@ -600,7 +601,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
                     pix.save(texfilename);
 
-                    result=result.replace(rxLaTeX.cap(0), QString("<img alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                    result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: top; \" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
                 }
 
                 ++count;
