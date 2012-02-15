@@ -1,40 +1,36 @@
-#ifndef QFRDRIMAGINGFCSCOUNTRATEDISPLAY_H
-#define QFRDRIMAGINGFCSCOUNTRATEDISPLAY_H
+#ifndef QFRDRIMAGINGFCSOVERVIEWIMAGEDISPLAY_H
+#define QFRDRIMAGINGFCSOVERVIEWIMAGEDISPLAY_H
 
 #include <QWidget>
+#include <QComboBox>
+#include <QLabel>
+#include <QToolBar>
 #include "qfrawdatarecord.h"
 #include "qfrawdataeditor.h"
 #include "jkqtplotter.h"
 #include "jkqtpelements.h"
 #include "jkqtpimageelements.h"
 #include "jkqttools.h"
+#include "qfplayercontrols.h"
 
-namespace Ui {
-    class QFRDRImagingFCSCountrateDisplay;
-}
-
-/*! \brief editor for count rate and overview images
-    \ingroup qf3rdrdp_imaging_fcs
-
-*/
-class QFRDRImagingFCSCountrateDisplay : public QWidget {
+class QFRDRImagingFCSOverviewImageDisplay : public QWidget
+{
         Q_OBJECT
-
     public:
-        explicit QFRDRImagingFCSCountrateDisplay(QWidget *parent = 0);
-        ~QFRDRImagingFCSCountrateDisplay();
+        explicit QFRDRImagingFCSOverviewImageDisplay(QWidget *parent = 0);
 
         /** \brief connect widgets to current data record */
         void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) ;
-    public slots:
-        void showFrameIndicator1(double pos);
+
+    signals:
+        void displayedFrame(double time);
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
         void rawDataChanged() ;
 
-        void displayData();
+        void showFrame(int frame);
 
-
+        void displayImage();
 
         void calcExpFit();
     public slots:
@@ -44,14 +40,19 @@ class QFRDRImagingFCSCountrateDisplay : public QWidget {
         virtual void writeSettings(QSettings &settings, const QString &prefix=QString("")) ;
 
     private:
-        Ui::QFRDRImagingFCSCountrateDisplay *ui;
-        JKQTPxyLineErrorGraph* avgGraph;
-        JKQTPxyLineGraph* minGraph;
-        JKQTPxyLineGraph* maxGraph;
-        JKQTPxyLineGraph* avgFit;
-        JKQTPgeoInfiniteLine* avgIndicator;
+        QLabel* labDescription;
+        QComboBox* cmbImage;
+        JKQtPlotter* pltImage;
+        QToolBar* toolbar;
 
-         QFRawDataRecord* current;
+        QFPLayerControls* player;
+
+        JKQTPMathImage* image;
+
+        QFRawDataRecord* current;
+
+        void createWidgets();
+        
 };
 
-#endif // QFRDRIMAGINGFCSCOUNTRATEDISPLAY_H
+#endif // QFRDRIMAGINGFCSOVERVIEWIMAGEDISPLAY_H

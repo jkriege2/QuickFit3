@@ -1,5 +1,5 @@
-#ifndef QFEVALUATIONIMAGETORUNINTERFACE_H
-#define QFEVALUATIONIMAGETORUNINTERFACE_H
+#ifndef QFRDRIMAGETORUNINTERFACE_H
+#define QFRDRIMAGETORUNINTERFACE_H
 
 #include <QtPlugin>
 #include <stdint.h>
@@ -8,14 +8,14 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFEvaluationImageToRunInterface {
+class QFRDRImageToRunInterface {
     public:
-        virtual ~QFEvaluationImageToRunInterface() {}
+        virtual ~QFRDRImageToRunInterface() {}
 
         /** \brief return width of the image */
-        virtual int getDataImageWidth() const=0;
+        virtual int getImageFromRunsWidth() const=0;
         /** \brief return height of the image */
-        virtual int getDataImageHeight() const=0;
+        virtual int getImageFromRunsHeight() const=0;
 
         /*! \brief return a pointer to a uint16_t image of size getDataImageWidth() * getDataImageHeight()
 
@@ -24,7 +24,7 @@ class QFEvaluationImageToRunInterface {
 
             \return  a uint16_t image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
          */
-        virtual uint16_t* getDataImagePreview() const=0;
+        virtual uint16_t* getImageFromRunsPreview() const=0;
         /** \brief convert a pixel coordinate to a rund index */
         virtual int xyToRun(int x, int y) const=0;
         /** \brief convert a run to a pixel x-coordinate */
@@ -36,7 +36,7 @@ class QFEvaluationImageToRunInterface {
 
 };
 
-Q_DECLARE_INTERFACE( QFEvaluationImageToRunInterface,
-                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFEvaluationImageToRunInterface/1.0")
+Q_DECLARE_INTERFACE( QFRDRImageToRunInterface,
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRImageToRunInterface/1.0")
 
-#endif // QFEVALUATIONIMAGETORUNINTERFACE_H
+#endif // QFRDRIMAGETORUNINTERFACE_H

@@ -18,7 +18,6 @@ HEADERS += qfrdrimagingfcs.h \
            qfrdrimagingfcs_data.h \
 		   qfrdrimagingfcs_dataeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
-    ../interfaces/qfevaluationimagetoruninterface.h \
     qfrdrimagingfcs_dataeditor_image.h \
     qfrdrimagingfcsrunsmodel.h \
     ../base_classes/qftablemodel.h \
@@ -40,7 +39,11 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qfhistogramview.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
-    qfrdrimagingfcscountratedisplay.h
+    qfrdrimagingfcscountratedisplay.h \
+    ../interfaces/qfrdrimagetoruninterface.h \
+    ../interfaces/qfrdroverviewimageinterface.h \
+    qfrdrimagingfcsoverviewimagedisplay.h \
+    qfrdrimagingfcsoverviewrateeditor.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -61,7 +64,9 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfhistogramview.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
-    qfrdrimagingfcscountratedisplay.cpp
+    qfrdrimagingfcscountratedisplay.cpp \
+    qfrdrimagingfcsoverviewimagedisplay.cpp \
+    qfrdrimagingfcsoverviewrateeditor.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

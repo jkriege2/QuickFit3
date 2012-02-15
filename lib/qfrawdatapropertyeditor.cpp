@@ -3,6 +3,7 @@
 #include "qfrawdatarecordfactory.h"
 #include "../version.h"
 #include "qfhtmldelegate.h"
+#include "qfstyleditemdelegate.h"
 
 
 // TODO: add some more options to the fit results display: store column under different name
@@ -155,12 +156,13 @@ void QFRawDataPropertyEditor::createWidgets() {
     fl->addWidget(lstFiles, 5, 1);
     fl->setRowStretch(5,1);
     //fl->setRowStretch(flcounter-1, 1);
-    tvProperties=new QTableView(w);
+    tvProperties=new QEnhancedTableView(w);
     QFontMetrics fm(font());
     tvProperties->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.1));
     tvProperties->horizontalHeader()->setStretchLastSection(true);
     //tvProperties->setSizePolicy(tvProperties->sizePolicy().horizontalPolicy(), QSizePolicy::Expanding);
     tvProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    tvProperties->setItemDelegate(new QFItemDelegate(tvProperties));
     paramFilterProxy=new QSortFilterProxyModel(this);
     paramFilterProxy->setDynamicSortFilter(false);
     paramFilterProxy->setFilterKeyColumn(0);

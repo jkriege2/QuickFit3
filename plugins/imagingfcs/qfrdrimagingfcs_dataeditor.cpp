@@ -327,9 +327,9 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         plteOverview->set_image(NULL, JKQTFP_uint16, 1, 1);
         plteOverviewSelected->set_data(NULL, 1, 1);
     } else {
-        uint16_t* ov=m->getDataImagePreview();
-        double w=m->getDataImageWidth();
-        double h=m->getDataImageHeight();
+        uint16_t* ov=m->getImageFromRunsPreview();
+        double w=m->getImageFromRunsWidth();
+        double h=m->getImageFromRunsHeight();
         double dx=1;
         if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
         double dy=1;
@@ -347,13 +347,13 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
             plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
         }
 
-        plteOverviewSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteOverviewSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverviewSelected->set_xmax(w);
         plteOverviewSelected->set_ymax(h);
-        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverviewExcluded->set_xmax(w);
         plteOverviewExcluded->set_ymax(h);
-        plteOverview->set_image(ov, JKQTFP_uint16, m->getDataImageWidth(), m->getDataImageHeight());
+        plteOverview->set_image(ov, JKQTFP_uint16, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
         if (plteOverviewSelectedData) {
@@ -361,7 +361,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
                     int x=m->runToX(i);
                     int y=m->runToY(i);
-                    int idx=y*m->getDataImageWidth()+x;
+                    int idx=y*m->getImageFromRunsWidth()+x;
                     plteOverviewSelectedData[idx]=false;
                     plteOverviewExcludedData[idx]=m->leaveoutRun(i);
                 }
@@ -369,7 +369,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
                     int x=m->runToX(i);
                     int y=m->runToY(i);
-                    int idx=y*m->getDataImageWidth()+x;
+                    int idx=y*m->getImageFromRunsWidth()+x;
                     plteOverviewSelectedData[idx]=lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0));
                     plteOverviewExcludedData[idx]=m->leaveoutRun(i);
                 }

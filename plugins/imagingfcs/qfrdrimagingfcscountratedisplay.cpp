@@ -1,12 +1,13 @@
 #include "qfrdrimagingfcscountratedisplay.h"
 #include "ui_qfrdrimagingfcscountratedisplay.h"
+#include "qfrdrimagingfcs_data.h"
 
-QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QFPluginServices *services, QWidget *parent) :
-    QFRawDataEditor(services, parent),
+QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QWidget *parent) :
+    QWidget(parent),
     ui(new Ui::QFRDRImagingFCSCountrateDisplay)
 {
+    current=NULL;
     avgGraph=NULL;
-    image=NULL;
     ui->setupUi(this);
 
     avgGraph=new JKQTPxyLineErrorGraph(ui->pltIntensity->get_plotter());
@@ -36,10 +37,6 @@ QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QFPluginService
     avgIndicator=new JKQTPgeoInfiniteLine(ui->pltIntensity->get_plotter(), 0,0,0,1,QColor("red"));
 
 
-    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::FloatArray, NULL, 0, 0, JKQTPMathImage::GRAY, ui->pltImage->get_plotter());
-    cropRegion=new JKQTPgeoRectangle(ui->pltImage->get_plotter(), 0,0,0,0,QColor("red"),1);
-    imageRegion=new JKQTPgeoRectangle(ui->pltImage->get_plotter(), 0,0,0,0,QColor("magenta"),1);
-
     ui->pltIntensity->addGraph(avgGraph);
     ui->pltIntensity->addGraph(minGraph);
     ui->pltIntensity->addGraph(maxGraph);
@@ -48,12 +45,7 @@ QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QFPluginService
     ui->pltIntensity->getXAxis()->set_axisLabel(tr("time [seconds]"));
     ui->pltIntensity->getYAxis()->set_axisLabel(tr("intensity [A.U.]"));
 
-    ui->pltImage->addGraph(image);
-    ui->pltImage->addGraph(image);
-    ui->pltImage->addGraph(imageRegion);
 
-
-    ui->player->setSingleShot(true);
 
     ui->cmbGraph->addItem(tr("average +/- stddev."));
     ui->cmbGraph->addItem(tr("average +/- stddev., min, max"));
@@ -61,8 +53,6 @@ QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QFPluginService
     ui->cmbGraph->addItem(tr("standard deviation"));
     ui->cmbGraph->addItem(tr("minimum"));
     ui->cmbGraph->addItem(tr("maximum"));
-
-    connect(ui->player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
 
 }
 
@@ -73,13 +63,29 @@ QFRDRImagingFCSCountrateDisplay::~QFRDRImagingFCSCountrateDisplay()
 
 void QFRDRImagingFCSCountrateDisplay::connectWidgets(QFRawDataRecord *current, QFRawDataRecord *old) {
     if (old) {
+        this->current=NULL;
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
+        this->current=current;
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
     displayData();
+}
+
+void QFRDRImagingFCSCountrateDisplay::showFrameIndicator1(double pos) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (m && frame>0 && frame<m->getStatisticsN() && m->getStatisticsN()>0 && cmbImage->currentIndex()==1) {
+        ui->pltIntensity->set_doDrawing(false);
+        //const double* T=m->getStatisticsMean();
+        //double Tmin=T[0];
+        //double Tmax=T[m->getStatisticsN()-1];
+        //avgIndicator->set_x(Tmin+(Tmax-Tmin)*player->getRelativeValue());
+        avgIndicator->set_x(pos);
+        ui->pltIntensity->set_doDrawing(true);
+        ui->pltIntensity->update_plot();
+    //}
 }
 
 void QFRDRImagingFCSCountrateDisplay::rawDataChanged() {
@@ -101,9 +107,6 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         ui->pltIntensity->set_doDrawing(true);
         ui->pltIntensity->zoomToFit();
     } else {
-        ui->cmbImage->clear();
-        ui->cmbImage->addItem(tr("average during measurement"));
-        displayImage();
 
         JKQTPdatastore* ds=ui->pltIntensity->get_plotter()->getDatastore();
         ds->clear();
@@ -185,81 +188,17 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
     }
 }
 
-void QFRDRImagingFCSCountrateDisplay::displayImage() {
-    if (!image) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    ui->player->setEnabled(false);
-    ui->player->pause();
-    ui->pltImage->set_doDrawing(false);
-    if (m && ui->cmbImage->currentIndex()==0) {
-        image->set_data(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::UInt16Array);
-        image->set_width(m->getDataImageWidth());
-        image->set_height(m->getDataImageHeight());
-        ui->pltImage->get_plotter()->setAbsoluteXY(0,m->getDataImageWidth(),0,m->getDataImageHeight());
-        ui->pltImage->get_plotter()->set_aspectRatio(1);
-        ui->pltImage->get_plotter()->set_axisAspectRatio(double(m->getDataImageWidth())/double(m->getDataImageHeight()));
-        ui->pltImage->get_plotter()->set_maintainAspectRatio(true);
-        ui->pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
-        cropRegion->set_x(0);
-        cropRegion->set_y(0);
-        cropRegion->set_width(0);
-        cropRegion->set_height(0);
-        imageRegion->set_x(0);
-        imageRegion->set_y(0);
-        imageRegion->set_width(0);
-        imageRegion->set_height(0);
-    } else if (m && ui->cmbImage->currentIndex()==1) {
-        image->set_data(NULL, 0, 0, JKQTPMathImageBase::UInt16Array);
-        cropRegion->set_x(0);
-        cropRegion->set_y(0);
-        cropRegion->set_width(0);
-        cropRegion->set_height(0);
-        imageRegion->set_x(0);
-        imageRegion->set_y(0);
-        imageRegion->set_width(0);
-        imageRegion->set_height(0);
-        ui->player->setEnabled(true);
-        ui->player->setRange(0,100);
-    } else {
 
-    }
-    ui->pltImage->set_doDrawing(true);
-    ui->pltImage->zoomToFit();
-}
 
-void QFRDRImagingFCSCountrateDisplay::showFrame(int frame) {
-    ui->pltImage->set_doDrawing(false);
 
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (m && frame>0 && frame<m->getStatisticsN() && m->getStatisticsN()>0 && ui->cmbImage->currentIndex()==1) {
-        ui->pltIntensity->set_doDrawing(false);
-        const double* T=m->getStatisticsMean();
-        double Tmin=T[0];
-        double Tmax=T[m->getStatisticsN()-1];
-        avgIndicator->set_x(Tmin+(Tmax-Tmin)*ui->player->getRelativeValue());
-
-        ui->pltIntensity->set_doDrawing(true);
-        ui->pltIntensity->update_plot();
-    }
-
-    ui->pltImage->set_doDrawing(true);
-    ui->pltImage->zoomToFit();
-}
-
-void QFRDRImagingFCSCountrateDisplay::calcFit()
+void QFRDRImagingFCSCountrateDisplay::calcExpFit()
 {
 }
 
-void QFRDRImagingFCSCountrateDisplay::readSettings() {
-    if (!settings) return;
-    ui->player->readSettings(*(settings->getQSettings()), QString("imfcscountseditor/"));
-    jkloadSplitter(*(settings->getQSettings()), ui->splitter, QString("imfcscountseditor/splitter"));
-    jkloadSplitter(*(settings->getQSettings()), ui->splitterH, QString("imfcscountseditor/splitter_h"));
+void QFRDRImagingFCSCountrateDisplay::readSettings(QSettings& settings, const QString& prefix) {
+    jkloadSplitter(settings, ui->splitter, prefix+QString("splitter/"));
 }
 
-void QFRDRImagingFCSCountrateDisplay::writeSettings() {
-    if (!settings) return;
-    ui->player->storeSettings(*(settings->getQSettings()), QString("imfcscountseditor/"));
-    jksaveSplitter(*(settings->getQSettings()), ui->splitter, QString("imfcscountseditor/splitter"));
-    jksaveSplitter(*(settings->getQSettings()), ui->splitterH, QString("imfcscountseditor/splitter_h"));
+void QFRDRImagingFCSCountrateDisplay::writeSettings(QSettings &settings, const QString &prefix) {
+    jksaveSplitter(settings, ui->splitter, prefix+QString("splitter/"));
 }

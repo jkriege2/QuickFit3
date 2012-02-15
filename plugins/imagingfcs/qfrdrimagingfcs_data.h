@@ -16,10 +16,11 @@
 #include "qfrdrimagingfcs_dataeditor_image.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
-#include "../interfaces/qfevaluationimagetoruninterface.h"
+#include "../interfaces/qfrdrimagetoruninterface.h"
+#include "../interfaces/qfrdroverviewimageinterface.h"
 #include "csvtools.h"
 #include "qtriple.h"
-#include "qfrdrimagingfcscountratedisplay.h"
+#include "qfrdrimagingfcsoverviewrateeditor.h"
 
 
 
@@ -27,9 +28,9 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFEvaluationImageToRunInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFEvaluationImageToRunInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface)
     public:
         /** Default constructor */
         QFRDRImagingFCSData(QFProject* parent);
@@ -142,6 +143,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief load overview image file */
         bool loadOverview(const QString& filename);
 
+        /** \brief load an image file into the given arrays */
+        bool loadImage(const QString &filename, double **data, int *width, int *height);
+
         /** \brief load the statistics file */
         bool loadStatistics(const QString& filename);
 
@@ -176,8 +180,20 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         /** \brief overview image */
         uint16_t* overview;
+        double* overviewF;
 
-		/** \brief the leaveout list */
+        struct ovrImageData {
+            double* image;
+            QString name;
+            int width;
+            int height;
+        };
+
+        QList<ovrImageData> ovrImages;
+
+        void clearOvrImages();
+
+        /** \brief the leaveout list */
         bool* leaveout;
         //QList<int> leaveout;
     protected:
@@ -187,21 +203,34 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
     public:
-        /** \copydoc QFEvaluationImageToRunInterface::getDataImageWidth() */
-        virtual int getDataImageWidth() const;
-        /** \copydoc QFEvaluationImageToRunInterface::getDataImageHeight() */
-        virtual int getDataImageHeight() const;
-        /** \copydoc QFEvaluationImageToRunInterface::xyToRun() */
+        /** \copydoc QFRDRImageToRunInterface::getImageFromRunsWidth() */
+        virtual int getImageFromRunsWidth() const;
+        /** \copydoc QFRDRImageToRunInterface::getImageFromRunsHeight() */
+        virtual int getImageFromRunsHeight() const;
+        /** \copydoc QFRDRImageToRunInterface::xyToRun() */
         virtual int xyToRun(int x, int y) const;
-        /** \copydoc QFEvaluationImageToRunInterface::runToX() */
+        /** \copydoc QFRDRImageToRunInterface::runToX() */
         virtual int runToX(int run) const;
-        /** \copydoc QFEvaluationImageToRunInterface::runToY() */
+        /** \copydoc QFRDRImageToRunInterface::runToY() */
         virtual int runToY(int run) const;
-        /** \copydoc QFEvaluationImageToRunInterface::xyToIndex() */
+        /** \copydoc QFRDRImageToRunInterface::xyToIndex() */
         virtual int xyToIndex(int x, int y) const;
-        /** \copydoc QFEvaluationImageToRunInterface::getDataImagePreview() */
-        virtual uint16_t* getDataImagePreview() const;
+        /** \copydoc QFRDRImageToRunInterface::getImageFromRunsPreview() */
+        virtual uint16_t* getImageFromRunsPreview() const;
 
+
+        /** \copydoc QFRDROverviewImageInterface::getPreviewImageCount() */
+        virtual int getPreviewImageCount() const;
+        /** \copydoc QFRDROverviewImageInterface::getPreviewImageWidth() */
+        virtual int getPreviewImageWidth(int image) const;
+        /** \copydoc QFRDROverviewImageInterface::getPreviewImageHeight() */
+        virtual int getPreviewImageHeight(int image) const;
+        /** \copydoc QFRDROverviewImageInterface::getPreviewImageName() */
+        virtual QString getPreviewImageName(int image) const;
+        /** \copydoc QFRDROverviewImageInterface::getPreviewImage() */
+        virtual double* getPreviewImage(int image) const;
+        /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */
+        virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getPreviewImageGeoElements(int image) const;
 };
 
 

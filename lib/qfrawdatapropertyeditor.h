@@ -97,7 +97,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief Tab to change between property editor and data view */
         QTabWidget* tabMain;
         /** \brief tabel view for the properties */
-        QTableView* tvProperties;
+        QEnhancedTableView* tvProperties;
         /** \brief button to switch to next record */
         QPushButton* btnNext;
         /** \brief button to insert a new property */

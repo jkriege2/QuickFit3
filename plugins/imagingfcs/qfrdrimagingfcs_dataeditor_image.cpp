@@ -1142,26 +1142,26 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
-        bool* mask=(bool*)malloc(m->getDataImageWidth()*m->getDataImageHeight()*sizeof(bool));
-        double* image=(double*)malloc(m->getDataImageWidth()*m->getDataImageHeight()*sizeof(double));
-        for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+        bool* mask=(bool*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask[i]=false;
             image[i]=imageIn[i];
         }
-        dialog->init(mask, image, m->getDataImageWidth(), m->getDataImageHeight());
+        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         if (dialog->exec()==QDialog::Accepted) {
             if (cmbMaskMode->currentIndex()==2) {
                 bool* newMask=m->maskGet();
-                for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
                     newMask[i]=newMask[i] && (!mask[i]);
                 }
             } else if (cmbMaskMode->currentIndex()==1) {
                 bool* newMask=m->maskGet();
-                for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
                     newMask[i]=newMask[i]||mask[i];
                 }
             } else {
-                memcpy(m->maskGet(), mask, m->getDataImageWidth()*m->getDataImageHeight()*sizeof(bool));
+                memcpy(m->maskGet(), mask, m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
             }
             m->recalcCorrelations();
             rawDataChanged();
@@ -1185,9 +1185,9 @@ void QFRDRImagingFCSImageEditor::excludeByIntensity() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
-        double* image=(double*)malloc(m->getDataImageWidth()*m->getDataImageHeight()*sizeof(double));
-        uint16_t* imageIn=m->getDataImagePreview();
-        for (int i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        uint16_t* imageIn=m->getImageFromRunsPreview();
+        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             image[i]=imageIn[i];
         }
         excludeByImage(image);
@@ -1229,7 +1229,7 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
     //qDebug()<<"imageClicked("<<x<<y<<modifiers<<")";
 
     int idx=m->xyToRun(xx, yy);
-    if (xx>=0 && xx<m->getDataImageWidth() && yy>=0 && yy<m->getDataImageHeight()) {
+    if (xx>=0 && xx<m->getImageFromRunsWidth() && yy>=0 && yy<m->getImageFromRunsHeight()) {
 
         if (cmbMaskEditMode->currentIndex()==0) {
             if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
@@ -1265,7 +1265,7 @@ void QFRDRImagingFCSImageEditor::imageScribbled(double x, double y, Qt::Keyboard
     int yy=(int)floor(y);
 
     int idx=m->xyToRun(xx, yy);
-    if (xx>=0 && xx<m->getDataImageWidth() && yy>=0 && yy<m->getDataImageHeight()) {
+    if (xx>=0 && xx<m->getImageFromRunsWidth() && yy>=0 && yy<m->getImageFromRunsHeight()) {
 
         if (cmbMaskEditMode->currentIndex()==0) {
             if (first && modifiers==Qt::NoModifier) selected.clear();
@@ -1301,7 +1301,7 @@ void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
     double value=0;
     if (sender()==pltOverview) {
         name=tr("overview");
-        uint16_t* ovr=m->getDataImagePreview();
+        uint16_t* ovr=m->getImageFromRunsPreview();
         if (ovr) value =ovr[idx];
     }
     if (sender()==pltImage) {
@@ -1325,10 +1325,10 @@ void QFRDRImagingFCSImageEditor::imageRectangleFinished(double x, double y, doub
 
 
 
-    int xx1=qBound(0,(int)floor(x), m->getDataImageWidth()-1);
-    int yy1=qBound(0,(int)floor(y), m->getDataImageHeight()-1);
-    int xx2=qBound(0,(int)floor(x+width), m->getDataImageWidth()-1);
-    int yy2=qBound(0,(int)floor(y+height), m->getDataImageHeight()-1);
+    int xx1=qBound(0,(int)floor(x), m->getImageFromRunsWidth()-1);
+    int yy1=qBound(0,(int)floor(y), m->getImageFromRunsHeight()-1);
+    int xx2=qBound(0,(int)floor(x+width), m->getImageFromRunsWidth()-1);
+    int yy2=qBound(0,(int)floor(y+height), m->getImageFromRunsHeight()-1);
 
     if (xx1>xx2) qSwap(xx1, xx2);
     if (yy1>yy2) qSwap(yy1, yy2);
@@ -1396,10 +1396,10 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
 
 
 
-    int xx1=qBound(0,(int)floor(x-radiusX), m->getDataImageWidth()-1);
-    int yy1=qBound(0,(int)floor(y-radiusY), m->getDataImageHeight()-1);
-    int xx2=qBound(0,(int)floor(x+radiusX), m->getDataImageWidth()-1);
-    int yy2=qBound(0,(int)floor(y+radiusY), m->getDataImageHeight()-1);
+    int xx1=qBound(0,(int)floor(x-radiusX), m->getImageFromRunsWidth()-1);
+    int yy1=qBound(0,(int)floor(y-radiusY), m->getImageFromRunsHeight()-1);
+    int xx2=qBound(0,(int)floor(x+radiusX), m->getImageFromRunsWidth()-1);
+    int yy2=qBound(0,(int)floor(y+radiusY), m->getImageFromRunsHeight()-1);
 
     if (xx1>xx2) qSwap(xx1, xx2);
     if (yy1>yy2) qSwap(yy1, yy2);
@@ -1472,10 +1472,10 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
 
 
 
-    int xx1=qBound(0,(int)floor(x-radius), m->getDataImageWidth()-1);
-    int yy1=qBound(0,(int)floor(y-radius), m->getDataImageHeight()-1);
-    int xx2=qBound(0,(int)floor(x+radius), m->getDataImageWidth()-1);
-    int yy2=qBound(0,(int)floor(y+radius), m->getDataImageHeight()-1);
+    int xx1=qBound(0,(int)floor(x-radius), m->getImageFromRunsWidth()-1);
+    int yy1=qBound(0,(int)floor(y-radius), m->getImageFromRunsHeight()-1);
+    int xx2=qBound(0,(int)floor(x+radius), m->getImageFromRunsWidth()-1);
+    int yy2=qBound(0,(int)floor(y+radius), m->getImageFromRunsHeight()-1);
 
 
     if (xx1>xx2) qSwap(xx1, xx2);
@@ -1554,52 +1554,52 @@ void QFRDRImagingFCSImageEditor::imageLineFinished(double x1, double y1, double 
 
     if (cmbMaskEditMode->currentIndex()==0) {
         if (modifiers==Qt::ControlModifier) {
-            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
                 int idx=m->xyToRun(xx, yy);
                 selected.insert(idx);
             }
         } else if (modifiers==Qt::ShiftModifier) {
-        for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+        for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
                 int idx=m->xyToRun(xx, yy);
                 selected.remove(idx);
             }
         } else {
             selected.clear();
-            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
                 int idx=m->xyToRun(xx, yy);
                 selected.insert(idx);
             }
         }
     } else {
         if (modifiers==Qt::ControlModifier) {
-            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
                 m->maskUnset(xx,yy);
             }
         } else if (modifiers==Qt::ShiftModifier) {
-            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
                 m->maskSet(xx,yy);
             }
         } else {
             m->maskClear();
-            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getDataImageWidth(), m->getDataImageHeight()))) {
+            for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), m->getDataImageWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), m->getDataImageHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
                 m->maskUnset(xx,yy);
             }
         }
@@ -1752,8 +1752,8 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
         //qDebug()<<"replotImage !m";
     } else {
-        double w=m->getDataImageWidth();
-        double h=m->getDataImageHeight();
+        double w=m->getImageFromRunsWidth();
+        double h=m->getImageFromRunsHeight();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
@@ -1792,20 +1792,20 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         pltImage->setXY(0, w, 0, h);
         pltGofImage->setXY(0, w, 0, h);
 
-        if (plteImageSize<m->getDataImageWidth()*m->getDataImageHeight()) {
-            plteImageSize=m->getDataImageWidth()*m->getDataImageHeight();
+        if (plteImageSize<m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
+            plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
             plteImageData=(double*)realloc(plteImageData, plteImageSize*sizeof(double));
             plteGofImageData=(double*)realloc(plteGofImageData, plteImageSize*sizeof(double));
         }
 
-        readParameterImage(plteImageData, plteGofImageData, m->getDataImageWidth(), m->getDataImageHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom(), currentGofParameter(), currentGofParameterTransfrom());
+        readParameterImage(plteImageData, plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom(), currentGofParameter(), currentGofParameterTransfrom());
 
-        plteImage->set_data(plteImageData, m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::DoubleArray);
+        plteImage->set_data(plteImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
         plteImage->set_width(w);
         plteImage->set_height(h);
         plteImage->set_palette(cmbColorbar->currentIndex());
 
-        plteGofImage->set_data(plteGofImageData, m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::DoubleArray);
+        plteGofImage->set_data(plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
         plteGofImage->set_width(w);
         plteGofImage->set_height(h);
 
@@ -1826,16 +1826,16 @@ void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
 
 
     if (m) {
-        int siz=m->getDataImageWidth()*m->getDataImageHeight();
-        if (plteOverviewSize<m->getDataImageWidth()*m->getDataImageHeight()) {
-            plteOverviewSize=m->getDataImageWidth()*m->getDataImageHeight();
+        int siz=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
+        if (plteOverviewSize<m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
+            plteOverviewSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
             plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
             plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
         }
         for (register int i=0; i<siz; i++) {
             int x=m->runToX(i);
             int y=m->runToY(i);
-            int idx=y*m->getDataImageWidth()+x;
+            int idx=y*m->getImageFromRunsWidth()+x;
             plteOverviewSelectedData[idx]=selected.contains(i);
             plteOverviewExcludedData[idx]=m->leaveoutRun(i);
         }
@@ -1902,45 +1902,45 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteMaskSelected->set_data(NULL, 1, 1);
     } else {
         //uint16_t* ov=m->getDataImagePreview();
-        double w=m->getDataImageWidth();
-        double h=m->getDataImageHeight();
+        double w=m->getImageFromRunsWidth();
+        double h=m->getImageFromRunsHeight();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
 
         plteOverviewSelected->set_width(w);
         plteOverviewSelected->set_height(h);
-        plteOverviewSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteOverviewSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
 
         plteOverviewExcluded->set_width(w);
         plteOverviewExcluded->set_height(h);
-        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
         plteImageSelected->set_width(w);
         plteImageSelected->set_height(h);
-        plteImageSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteImageSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
 
         plteImageExcluded->set_width(w);
         plteImageExcluded->set_height(h);
-        plteImageExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteImageExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
         plteGofImageSelected->set_width(w);
         plteGofImageSelected->set_height(h);
-        plteGofImageSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteGofImageSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
         plteGofImageExcluded->set_width(w);
         plteGofImageExcluded->set_height(h);
-        plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
         plteMaskSelected->set_width(w);
         plteMaskSelected->set_height(h);
-        plteMaskSelected->set_data(plteOverviewSelectedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteMaskSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
         plteMask->set_width(w);
         plteMask->set_height(h);
-        plteMask->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+        plteMask->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
 
     }
@@ -1978,8 +1978,8 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         plteOverviewExcluded->set_data(NULL, 1, 1);
     } else {
         //uint16_t* ov=m->getDataImagePreview();
-        double w=m->getDataImageWidth();
-        double h=m->getDataImageHeight();
+        double w=m->getImageFromRunsWidth();
+        double h=m->getImageFromRunsHeight();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
@@ -2002,8 +2002,8 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         }
         pltOverview->setXY(0, w, 0, h);
 
-        if (m->getDataImagePreview()) plteOverview->set_data(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::UInt16Array);
-        else plteOverview->set_data(NULL, m->getDataImageWidth(), m->getDataImageHeight(), JKQTPMathImageBase::UInt16Array);
+        if (m->getImageFromRunsPreview()) plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+        else plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
         plteOverview->set_width(w);
         plteOverview->set_height(h);
     }
@@ -2030,8 +2030,8 @@ void QFRDRImagingFCSImageEditor::replotMask() {
         plteMask->set_data(NULL, 1, 1);
         plteMaskSelected->set_data(NULL, 1, 1);
     } else {
-        double w=m->getDataImageWidth();
-        double h=m->getDataImageHeight();
+        double w=m->getImageFromRunsWidth();
+        double h=m->getImageFromRunsHeight();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
@@ -2044,8 +2044,8 @@ void QFRDRImagingFCSImageEditor::replotMask() {
 
         pltMask->setXY(0, w, 0, h);
 
-        if (plteOverviewExcludedData) plteMask->set_data(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
-        else plteMask->set_data(NULL, m->getDataImageWidth(), m->getDataImageHeight());
+        if (plteOverviewExcludedData) plteMask->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        else plteMask->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteMask->set_width(w);
         plteMask->set_height(h);
     }
@@ -2889,14 +2889,14 @@ void QFRDRImagingFCSImageEditor::copyToMatlab() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
-        JKImage<double> image(m->getDataImageWidth(), m->getDataImageHeight());
-        JKImage<double> gof_image(m->getDataImageWidth(), m->getDataImageHeight());
-        JKImage<uint16_t> mask_image(m->getDataImageWidth(), m->getDataImageHeight());
-        JKImage<uint16_t> overview_image(m->getDataImageWidth(), m->getDataImageHeight());
-        readParameterImage(image.data(), gof_image.data(), m->getDataImageWidth(), m->getDataImageHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
-        overview_image.assign(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight());
+        JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<uint16_t> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+        overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
-        for (int32_t i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+        for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask_image(i)=(plteOverviewExcludedData[i])?1:0;
         }
 
@@ -2971,14 +2971,14 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         }
 
-        JKImage<double> image(m->getDataImageWidth(), m->getDataImageHeight());
-        JKImage<double> gof_image(m->getDataImageWidth(), m->getDataImageHeight());
-        JKImage<uint16_t> mask_image(m->getDataImageWidth(), m->getDataImageHeight());
-        JKImage<uint16_t> overview_image(m->getDataImageWidth(), m->getDataImageHeight());
-        readParameterImage(image.data(), gof_image.data(), m->getDataImageWidth(), m->getDataImageHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+        JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<uint16_t> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
-        overview_image.assign(m->getDataImagePreview(), m->getDataImageWidth(), m->getDataImageHeight());
-        for (int32_t i=0; i<m->getDataImageWidth()*m->getDataImageHeight(); i++) {
+        overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask_image(i)=(plteOverviewExcludedData[i])?1:0;
         }
         if (selFilter==filters[0]) {
@@ -3247,8 +3247,8 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
 
     histogram->clear();
 
-    if (plteImageData && (plteImageSize>=m->getDataImageWidth()*m->getDataImageHeight())) {
-        int imageSize=m->getDataImageWidth()*m->getDataImageHeight();
+    if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
+        int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
         datahist=(double*)malloc(imageSize*sizeof(double));
         datasize=0;
         if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
@@ -3281,8 +3281,8 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
 
 
 
-    if (plteImageData && (plteImageSize>=m->getDataImageWidth()*m->getDataImageHeight())) {
-        int imageSize=m->getDataImageWidth()*m->getDataImageHeight();
+    if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
+        int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
         datahistsel=(double*)malloc(imageSize*sizeof(double));
         datasizesel=0;
         int32_t ii=0;

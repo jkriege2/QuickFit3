@@ -60,7 +60,8 @@ HEADERS += dlgnewproperty.h \
     ../version.h \
     lib_imexport.h \
     qfhtmldelegate.h \
-    qfprojecttreemodelnode.h
+    qfprojecttreemodelnode.h \
+    qfstyleditemdelegate.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -92,7 +93,8 @@ SOURCES += dlgnewproperty.cpp \
     qfpluginrawdata.cpp \
     qfhtmldelegate.cpp \
     qffitfunction.cpp \
-    qfprojecttreemodelnode.cpp
+    qfprojecttreemodelnode.cpp \
+    qfstyleditemdelegate.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui

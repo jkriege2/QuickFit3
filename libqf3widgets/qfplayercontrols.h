@@ -38,6 +38,8 @@ class QFWIDLIB_EXPORT QFPLayerControls : public QWidget {
 
         double getRelativeValue() const;
 
+        int getPosition() const;
+
     signals:
         void showFrame(int frame);
     public slots:

@@ -197,3 +197,7 @@ double QFPLayerControls::getRelativeValue() const {
     return double(slider->value()-slider->minimum())/double(slider->maximum()-slider->minimum());
 }
 
+int QFPLayerControls::getPosition() const {
+    return slider->value();
+}
+
