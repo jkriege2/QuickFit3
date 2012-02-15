@@ -5,6 +5,7 @@
 #include "csvtools.h"
 #include <QTextStream>
 #include "tools.h"
+#include "qfrdrimagingfcstools.h"
 
 //#define DEBUG_SIZES
 #undef DEBUG_SIZES
@@ -30,6 +31,10 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     statMax=NULL;
     statT=NULL;
     statN=0;
+    video=NULL;
+    video_width=0;
+    video_height=0;
+    video_frames=0;
     setResultsInitSize(1000);
     setEvaluationIDMetadataInitSize(1000);
 }
@@ -38,6 +43,9 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateContents(0,0,0);
      allocateStatistics(0);
      clearOvrImages();
+     if (video) free(video);
+     video=NULL;
+     video_width=video_height=video_frames=0;
 }
 
 QString QFRDRImagingFCSData::getEditorName(int i) {
@@ -117,7 +125,39 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         return;
     }
     bool dataLoaded=false;
+    QString acquisitionSettingsFile=getFileForType("acquisition_settings");
     if (files.size()>0) {
+        // now we check whether the experiment config file contains additional files, that may be useful for this object and load them
+        // (more overview images ...)
+        //qDebug()<<"opening qcquisition settings "<<acquisitionSettingsFile;
+        if (QFile::exists(acquisitionSettingsFile)) {
+            QSettings settings(acquisitionSettingsFile, QSettings::IniFormat);
+            //qDebug()<<"  ... success!!!";
+            loadQFPropertiesFromB040SPIMSettingsFile(settings);
+
+            QStringList lfiles, lfiles_types, lfiles_descriptions;
+            appendCategorizedFilesFromB040SPIMConfig(settings, lfiles, lfiles_types, lfiles_descriptions);
+            //qDebug()<<lfiles<<"\n"<<lfiles_types;
+            for (int i=0; i<lfiles.size(); i++) {
+                // now we have to do a really thorough check of all files in files, as the file pathes may be a bit
+                // different although they point to the same file.
+                bool found=false;
+                for (int j=0; j<files.size(); j++) {
+                    if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(lfiles[i]).canonicalFilePath()) {
+                        found=true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    files<<QFileInfo(lfiles[i]).canonicalFilePath();
+                    files_types<<lfiles_types[i];
+                }
+
+
+            }
+        }
+
+        // finally we load all known and useful associated files into memory:
         for (int i=0; i<files.size(); i++) {
             if (i<files_types.size()) {
                 QString ft=files_types[i].toLower().trimmed();
@@ -125,10 +165,72 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadOverview(files[i]);
                 } else if (ft=="statistics") {
                     loadStatistics(files[i]);
+                } else if (ft=="video") {
+                    loadVideo(files[i], &video, &video_width, &video_height, &video_frames);
                 } else if (ft=="background") {
                     QFRDRImagingFCSData::ovrImageData img;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("background frame");
+                    ovrImages.append(img);
+                } else if (ft=="overview_before") {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=tr("overview before acquisition");
+                    if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
+                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        rect.title=tr("ROI");
+                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        img.geoElements.append(rect);;
+                    }
+                    ovrImages.append(img);
+                } else if (ft=="overview_after") {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=tr("overview after acquisition");
+                    if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
+                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        rect.title=tr("ROI");
+                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        img.geoElements.append(rect);;
+                    }
+                    ovrImages.append(img);
+                } else if (ft=="overview_before_transmission") {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=tr("overview before acquisition (transm. illumination)");
+                    if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
+                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        rect.title=tr("ROI");
+                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        img.geoElements.append(rect);;
+                    }
+                    ovrImages.append(img);
+                } else if (ft=="overview_after_transmission") {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=tr("overview after acquisition (transm. illumination)");
+                    if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
+                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        rect.title=tr("ROI");
+                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        img.geoElements.append(rect);;
+                    }
                     ovrImages.append(img);
                 } else if (ft=="acf" || ft=="ccf" || ft=="dccf"){
                     if (!dataLoaded) {
@@ -152,6 +254,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 }
             }
         }
+
+
     }
 
     if (e) {
@@ -240,6 +344,36 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
     return ok;
 }
 
+bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int* width, int* height, uint32_t* frames) {
+    bool ok=false;
+
+    if (*data) free(*data);
+    *data=NULL;
+    *width=0;
+    *height=0;
+    *frames=0;
+
+    if (QFile::exists(filename)) {
+        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        if (tif) {
+            *frames=TIFFCountDirectories(tif);
+            uint32 nx,ny;
+            TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
+            TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+            *width=nx;
+            *height=ny;
+            *data=(double*)malloc(nx*ny*(*frames)*sizeof(double));
+            uint32_t i=0;
+            do {
+                ok=ok & TIFFReadFrame<double>(tif, &((*data)[i*nx*ny]));
+                i++;
+            } while (TIFFReadDirectory(tif) && i<=(*frames));
+            TIFFClose(tif);
+        }
+    }
+    return ok;
+}
+
 bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 	bool ok=true;
 	QString errorDescription="";
@@ -261,6 +395,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
         //int maxCol=qMax(corrcolumn, taucolumn);
 
         QByteArray dataFromFile=file.readAll();
+        file.close();
         //QTextStream stream(&file);
         QTextStream stream(&dataFromFile);
         bool last_empty, empty=true;
@@ -299,6 +434,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
             //if (stream.atEnd()) //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
         }
+        dataFromFile.clear();
         width=getProperty("WIDTH").toInt();
         height=getProperty("HEIGHT").toInt();
         //std::cout<<"width="<<width<<"   height="<<height<<"   NN="<<NN<<std::endl;
@@ -655,6 +791,53 @@ bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
     return false;
 }
 
+void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) {
+        setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration_milliseconds").toDouble(), true, true);
+    }
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration")) {
+        setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration").toDouble()*1000.0, true, true);
+    }
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/frame_time")) {
+        setQFProperty("FRAMETIME_MS", settings.value("acquisition/frame_time").toDouble()*1000.0, true, true);
+    }
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/frame_rate")) {
+        setQFProperty("FRAMETIME_MS", 1.0/settings.value("acquisition/frame_rate").toDouble()*1000.0, true, true);
+    }
+    if (!propertyExists("MAGNIFICATION") && settings.contains("acquisition/magnification")) {
+        setQFProperty("MAGNIFICATION", settings.value("acquisition/magnification").toDouble(), true, true);
+    }
+    if (!propertyExists("ROI_X_START") && settings.contains("acquisition/roi_xstart")) {
+        setQFProperty("ROI_X_START", settings.value("acquisition/roi_xstart").toInt(), true, true);
+    }
+    if (!propertyExists("ROI_X_END") && settings.contains("acquisition/roi_xend")) {
+        setQFProperty("ROI_X_END", settings.value("acquisition/roi_xend").toInt(), true, true);
+    }
+    if (!propertyExists("ROI_Y_START") && settings.contains("acquisition/roi_ystart")) {
+        setQFProperty("ROI_Y_START", settings.value("acquisition/roi_ystart").toInt(), true, true);
+    }
+    if (!propertyExists("ROI_Y_END") && settings.contains("acquisition/roi_yend")) {
+        setQFProperty("ROI_Y_END", settings.value("acquisition/roi_yend").toInt(), true, true);
+    }
+    if (!propertyExists("PIXEL_WIDTH") && settings.contains("acquisition/pixel_width")) {
+        double mag=settings.value("acquisition/magnification", 1.0).toDouble();
+        double cpw=settings.value("acquisition/camera_pixel_width", settings.value("acquisition/pixel_width").toDouble()).toDouble();
+        double pw=settings.value("acquisition/pixel_width").toDouble();
+        if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_WIDTH", cpw/mag, true, true);
+        else setQFProperty("PIXEL_WIDTH", pw, true, true);
+
+    }
+    if (!propertyExists("PIXEL_HEIGHT") && settings.contains("acquisition/pixel_height")) {
+        double mag=settings.value("acquisition/magnification", 1.0).toDouble();
+        double cpw=settings.value("acquisition/camera_pixel_height", settings.value("acquisition/pixel_height").toDouble()).toDouble();
+        double pw=settings.value("acquisition/pixel_height").toDouble();
+        if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_HEIGHT", cpw/mag, true, true);
+        else setQFProperty("PIXEL_HEIGHT", pw, true, true);
+
+    }
+
+}
+
 void QFRDRImagingFCSData::clearOvrImages() {
     for (int i=0; i<ovrImages.size(); i++) {
         free(ovrImages[i].image);
@@ -803,6 +986,77 @@ QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData:
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
 
     return result;
+}
+
+int QFRDRImagingFCSData::getImageStackCount() const {
+    return 1;
+}
+
+uint32_t QFRDRImagingFCSData::getImageStackFrames(int stack) const {
+    if (stack==0) return video_frames;
+    return 0;
+}
+
+int QFRDRImagingFCSData::getImageStackWidth(int stack) const {
+    if (stack==0) return video_width;
+    return 0;
+}
+
+int QFRDRImagingFCSData::getImageStackHeight(int stack) const {
+    if (stack==0) return video_height;
+    return 0;
+}
+
+int QFRDRImagingFCSData::getImageStackChannels(int stack) const {
+    if (stack==0) return 1;
+    return 0;
+}
+
+double *QFRDRImagingFCSData::getImageStack(int stack, uint32_t frame, uint32_t channel) const {
+    if (stack==0) return &(video[frame*video_width*video_height]);
+    return NULL;
+}
+
+double QFRDRImagingFCSData::getImageStackXUnitFactor(int stack) const {
+    return getProperty("PIXEL_WIDTH", 1.0).toDouble();
+}
+
+QString QFRDRImagingFCSData::getImageStackXUnitName(int stack) const {
+    return QString("micrometer");
+}
+
+double QFRDRImagingFCSData::getImageStackYUnitFactor(int stack) const {
+    return getProperty("PIXEL_HEIGHT", 1.0).toDouble();
+}
+
+QString QFRDRImagingFCSData::getImageStackYUnitName(int stack) const {
+    return QString("micrometer");
+}
+
+double QFRDRImagingFCSData::getImageStackTUnitFactor(int stack) const {
+    if (video_frames<=0) return 1;
+    double stat=1;
+    if (statT) stat=(statT[statN]-statT[0]);
+    return getProperty("MEASUREMENT_DURATION_MS", stat*1000.0).toDouble()/1000.0/double(video_frames);
+    return 1;
+}
+
+QString QFRDRImagingFCSData::getImageStackTUnitName(int stack) const {
+    if (stack==0) return tr("time [seconds]");
+    return QString("");
+}
+
+double QFRDRImagingFCSData::getImageStackCUnitFactor(int stack) const {
+    return 1;
+}
+
+QString QFRDRImagingFCSData::getImageStackCUnitName(int stack) const {
+    return QString("");
+}
+
+QString QFRDRImagingFCSData::getImageStackDescription(int stack) const {
+    if (stack==0) return tr("averaged video");
+    return QString("");
 }
 
 

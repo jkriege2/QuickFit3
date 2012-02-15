@@ -39,6 +39,8 @@ class QFWIDLIB_EXPORT QFPLayerControls : public QWidget {
         double getRelativeValue() const;
 
         int getPosition() const;
+        bool getReplay() const;
+        double getFPS() const;
 
     signals:
         void showFrame(int frame);

@@ -657,7 +657,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                         text<<"remove frame average\n";
 
                                 } else {
-                                    text<<"none";
+                                    text<<"none\n";
                                 }
                                 text<<"duration [s]                : "<<ptime.elapsed()/1000.0 << "\n";
 

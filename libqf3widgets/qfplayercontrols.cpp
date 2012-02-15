@@ -61,13 +61,15 @@ void QFPLayerControls::updateWidgets() {
 }
 
 void QFPLayerControls::timerTriggered() {
-    if (slider->value()<slider->maximum()) {
-        slider->setValue(slider->value()+1);
-    } else {
-        if (chkReplay->isChecked()) {
-            slider->setValue(slider->minimum());
+    if (actPlayPause->isChecked()) {
+        if (slider->value()<slider->maximum()) {
+            slider->setValue(slider->value()+1);
         } else {
-            timer->stop();
+            if (chkReplay->isChecked()) {
+                slider->setValue(slider->minimum());
+            } else {
+                timer->stop();
+            }
         }
     }
     updateWidgets();
@@ -199,5 +201,13 @@ double QFPLayerControls::getRelativeValue() const {
 
 int QFPLayerControls::getPosition() const {
     return slider->value();
+}
+
+bool QFPLayerControls::getReplay() const {
+    return chkReplay->isChecked();
+}
+
+double QFPLayerControls::getFPS() const {
+    return spinFPS->value();
 }
 

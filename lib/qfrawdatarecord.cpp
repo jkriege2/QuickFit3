@@ -9,9 +9,6 @@ class QFRawDataRecordPrivate {
         QFRawDataRecordPrivate() {
 
         }
-        ~QFRawDataRecordPrivate() {
-
-        }
 
         typedef QHash<QString, QFRawDataRecord::evaluationResult> ResultsResultsType;
         typedef QHashIterator<QString, QFRawDataRecord::evaluationResult> ResultsResultsIterator;
@@ -39,6 +36,16 @@ class QFRawDataRecordPrivate {
 
         /** \brief maps evaluationIDMetadata.group to a human-readable version */
         GroupLabelsType evalGroupLabels;
+
+        ~QFRawDataRecordPrivate() {
+            ResultsIterator it(results);
+            while (it.hasNext()) {
+                it.next();
+                delete it.value();
+            }
+            results.clear();
+            evalGroupLabels.clear();
+        }
 
 };
 

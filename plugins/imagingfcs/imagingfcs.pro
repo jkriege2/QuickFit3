@@ -43,7 +43,9 @@ HEADERS += qfrdrimagingfcs.h \
     ../interfaces/qfrdrimagetoruninterface.h \
     ../interfaces/qfrdroverviewimageinterface.h \
     qfrdrimagingfcsoverviewimagedisplay.h \
-    qfrdrimagingfcsoverviewrateeditor.h
+    qfrdrimagingfcsoverviewrateeditor.h \
+    qfrdrimagingfcstools.h \
+    ../interfaces/qfrdrimagestackinterface.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -66,7 +68,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
     qfrdrimagingfcscountratedisplay.cpp \
     qfrdrimagingfcsoverviewimagedisplay.cpp \
-    qfrdrimagingfcsoverviewrateeditor.cpp
+    qfrdrimagingfcsoverviewrateeditor.cpp \
+    qfrdrimagingfcstools.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

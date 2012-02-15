@@ -25,29 +25,29 @@ class QFLIB_EXPORT QFProperties {
         /** \brief clear all properties */
         inline void clearProperties() { props.clear(); emitPropertiesChanged(); }
         /** \brief return the value of the specified property */
-        inline QVariant getProperty( const QString& p) { if (props.contains(p)) return props[p].data; else return QVariant(); };
+        inline QVariant getProperty( const QString& p) const { if (props.contains(p)) return props[p].data; else return QVariant(); };
         /** \brief return the value of the specified property or the supplied default value */
-        inline QVariant getProperty(const QString& p, const QVariant& defaultValue) {
+        inline QVariant getProperty(const QString& p, const QVariant& defaultValue) const {
             if (props.contains(p)) return props.value(p).data;
             return defaultValue;
         };
         /** \brief return the number of properties in the object */
-        inline unsigned int getPropertyCount() { return props.size(); };
+        inline unsigned int getPropertyCount() const { return props.size(); };
         /** \brief return the number of visible properties in the object */
-        unsigned int getVisiblePropertyCount();
+        unsigned int getVisiblePropertyCount() const;
         /** \brief get the name of the i-th visible property */
-        QString getVisibleProperty(unsigned int i);
+        QString getVisibleProperty(unsigned int i) const;
         /** \brief returns a QStringList which contains the names of all properties */
-        inline QStringList getPropertyNames() { return props.keys(); };
+        inline QStringList getPropertyNames() const { return props.keys(); };
         /** \brief returns the name of the i-th property */
-        inline QString getPropertyName(int i) { return props.keys().at(i); };
+        inline QString getPropertyName(int i) const { return props.keys().at(i); };
         /** \brief returns whether the given property is visible */
-        inline bool isPropertyVisible(QString property) {
+        inline bool isPropertyVisible(QString property) const {
             if (!props.contains(property)) return false;
             return props[property].visible;
         };
         /** \brief returns whether the given property is user editable */
-        inline bool isPropertyUserEditable(QString property) {
+        inline bool isPropertyUserEditable(QString property) const {
             if (!props.contains(property)) return false;
             return props[property].usereditable;
         };
@@ -55,7 +55,7 @@ class QFLIB_EXPORT QFProperties {
         inline void deleteProperty(const QString& n) { props.remove(n); emitPropertiesChanged(); };
 
         /** \brief returns true if the specified property exists */
-        inline bool propertyExists(const QString& p) { return props.contains(p); };
+        inline bool propertyExists(const QString& p) const { return props.contains(p); };
 
 /** \brief set property to the specified value */
         inline void setQFProperty(const QString& p, QVariant value, bool usereditable=true, bool visible=true) {
@@ -120,7 +120,7 @@ class QFLIB_EXPORT QFProperties {
             w.writeEndElement();
             \endcode
         */
-        void storeProperties(QXmlStreamWriter& w);
+        void storeProperties(QXmlStreamWriter& w) const;
 
         /*! \brief read properties from a given QDomElement, which were written using storeProperties before */
         void readProperties(QDomElement& e);

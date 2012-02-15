@@ -1,0 +1,26 @@
+#ifndef QFRDRIMAGINGFCSTOOLS_H
+#define QFRDRIMAGINGFCSTOOLS_H
+
+#include <QSettings>
+#include <QString>
+#include <QVariant>
+#include <QStringList>
+#include <QList>
+
+/** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin
+ *  \ingroup qf3rdrdp_imaging_fcs
+ */
+void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height);
+
+/** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin
+ *  \ingroup qf3rdrdp_imaging_fcs
+ */
+void readB040SPIMExperimentConfigFileAssociatedFiles(QSettings& set, QStringList& files, QStringList& description,  QStringList& type);
+
+
+/** \brief scans the given config file for associated files and appends them, together with an appropriate categorization, to files and file_types
+ *         The category in file_types may be directly used by QFRDRImagingFCSData in its associated files list!
+ *  \ingroup qf3rdrdp_imaging_fcs
+ */
+void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& files, QStringList& files_types, QStringList &files_descriptions);
+#endif // QFRDRIMAGINGFCSTOOLS_H

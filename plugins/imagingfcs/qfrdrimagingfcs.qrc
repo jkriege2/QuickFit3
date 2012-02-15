@@ -45,5 +45,7 @@
         <file alias="player_rw.png">icons/player_rew.png</file>
         <file alias="player_start.png">icons/player_start.png</file>
         <file alias="player_stop.png">icons/player_stop.png</file>
+        <file alias="image.png">icons/image.png</file>
+        <file alias="video.png">icons/video.png</file>
     </qresource>
 </RCC>

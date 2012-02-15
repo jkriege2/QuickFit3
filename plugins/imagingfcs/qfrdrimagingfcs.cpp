@@ -2,6 +2,7 @@
 #include "qfrdrimagingfcs_data.h"
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qmodernprogresswidget.h"
+#include "qfrdrimagingfcstools.h"
 
 QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
     QObject(parent), QFPluginRawDataRecordBase()
@@ -188,42 +189,29 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     // set whatever you want (FILETYPE is just an example)!
     initParams["FILETYPE"]="VIDEO_CORRELATOR";
     QString evalFilename="";
-    QString evalFilename1="";
     bool isCross=false;
     bool isDCCF=false;
     if (filename.endsWith(".autocorrelation.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".autocorrelation.dat", ".evalsettings.txt");
-        evalFilename1=filename;
-        evalFilename1=evalFilename1.replace(".autocorrelation.dat", ".configuration.ini");
     } else if (filename.endsWith(".acf.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".acf.dat", ".evalsettings.txt");
-        evalFilename1=filename;
-        evalFilename1=evalFilename1.replace(".acf.dat", ".configuration.ini");
     } else if (filename.endsWith(".crosscorrelation.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".crosscorrelation.dat", ".evalsettings.txt");
-        evalFilename1=filename;
-        evalFilename1=evalFilename1.replace(".crosscorrelation.dat", ".configuration.ini");
         isCross=true;
     } else if (filename.endsWith(".ccf.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".ccf.dat", ".evalsettings.txt");
-        evalFilename1=filename;
-        evalFilename1=evalFilename1.replace(".ccf.dat", ".configuration.ini");
         isCross=true;
     } else if (filename.endsWith(".qf.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".qf.dat", ".evalsettings.txt");
-        evalFilename1=filename;
-        evalFilename1=evalFilename1.replace(".qf.dat", ".configuration.ini");
         isJanBFile=true;
     } else if (filename.endsWith(".dccf.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".dccf.dat", ".evalsettings.txt");
-        evalFilename1=filename;
-        evalFilename1=evalFilename1.replace(".dccf.dat", ".configuration.ini");
         isDCCF=true;
     }
     //qDebug()<<filename<<isJanBFile;
@@ -374,9 +362,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 } while (!line.isNull());
             }
         }
-        if (QFile::exists(evalFilename1)) {
-            //TODO: WHat's this?
-        }
+
         if (width<=0) {
             bool okk=true;
             int wwidth=QInputDialog::getInt ( NULL, tr("Import Video Correlator Data"), tr("width = "), 0, 1, 2147483647, 1, &okk);
@@ -388,7 +374,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             if (okk) { height=wwidth; } else ok=false;
         }
         if (ok) {
-            QStringList files, files_types;
+            QStringList files, files_types, files_descriptions;
             if (QFile::exists(filename_overview)) {
                 files<<filename_overview;
                 files_types<<"overview";
@@ -418,7 +404,10 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 files_types<<"background";
             }
 
-
+            if (QFile::exists(filename_settings)) {
+                QSettings settings(filename_settings, QSettings::IniFormat);
+                appendCategorizedFilesFromB040SPIMConfig(settings, files, files_types, files_descriptions);
+            }
 
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;

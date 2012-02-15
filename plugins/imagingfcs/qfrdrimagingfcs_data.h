@@ -21,6 +21,7 @@
 #include "csvtools.h"
 #include "qtriple.h"
 #include "qfrdrimagingfcsoverviewrateeditor.h"
+#include "qfrdrimagestackinterface.h"
 
 
 
@@ -28,9 +29,9 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface)
     public:
         /** Default constructor */
         QFRDRImagingFCSData(QFProject* parent);
@@ -146,8 +147,13 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief load an image file into the given arrays */
         bool loadImage(const QString &filename, double **data, int *width, int *height);
 
+        /** \brief load a TIFF video file into the given arrays */
+        bool loadVideo(const QString &filename, double **data, int *width, int *height, uint32_t *frames);
+
         /** \brief load the statistics file */
         bool loadStatistics(const QString& filename);
+
+        void loadQFPropertiesFromB040SPIMSettingsFile(QSettings& settings);
 
     private:
         /** \brief width of the image */
@@ -187,7 +193,20 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
             QString name;
             int width;
             int height;
+            QList<QFRDROverviewImageInterface::OverviewImageGeoElement> geoElements;
+
+            ovrImageData() {
+                image=NULL;
+                name=QString("");
+                width=0;
+                height=0;
+            }
         };
+
+        double* video;
+        int video_width;
+        int video_height;
+        uint32_t video_frames;
 
         QList<ovrImageData> ovrImages;
 
@@ -231,6 +250,40 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double* getPreviewImage(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */
         virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getPreviewImageGeoElements(int image) const;
+
+
+
+
+        /** \copydoc QFRDRImageStackInterface::getImageStackCount() */
+        virtual int getImageStackCount() const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackFrames() */
+        virtual uint32_t getImageStackFrames(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackWidth() */
+        virtual int getImageStackWidth(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackHeight() */
+        virtual int getImageStackHeight(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackChannels() */
+        virtual int getImageStackChannels(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStack() */
+        virtual double* getImageStack(int stack, uint32_t frame=0, uint32_t channel=0) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackXUnitFactor() */
+        virtual double getImageStackXUnitFactor(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackXUnitName() */
+        virtual QString getImageStackXUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackYUnitFactor() */
+        virtual double getImageStackYUnitFactor(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackYUnitName() */
+        virtual QString getImageStackYUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackTUnitFactor() */
+        virtual double getImageStackTUnitFactor(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackTUnitName() */
+        virtual QString getImageStackTUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackCUnitFactor() */
+        virtual double getImageStackCUnitFactor(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackCUnitName() */
+        virtual QString getImageStackCUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackDescription() */
+        virtual QString getImageStackDescription(int stack) const;
 };
 
 

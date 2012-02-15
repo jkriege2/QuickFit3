@@ -18,21 +18,26 @@ void QFRDRImagingFCSOverviewImageDisplay::connectWidgets(QFRawDataRecord *curren
     }
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
     cmbImage->clear();
+    this->current=current;
+    connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     if (m) {
-        this->current=current;
-        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         for (int i=0; i<m->getPreviewImageCount(); i++) {
-            cmbImage->addItem(m->getPreviewImageName(i));
+            cmbImage->addItem(QIcon(":/imaging_fcs/image.png"), m->getPreviewImageName(i));
         }
-        cmbImage->setCurrentIndex(current->getProperty("imfcs_invrimgdisp_image", 0).toInt());
-        player->setPosition(current->getProperty("imfcs_invrimgdisp_playpos", 0).toInt());
-        connect(cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-        connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
-        displayImage();
-
     }
 
+    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+    if (mv) {
+        for (int i=0; i<mv->getImageStackCount(); i++) {
+            cmbImage->addItem(QIcon(":/imaging_fcs/video.png"), mv->getImageStackDescription(i));
+        }
+    }
 
+    cmbImage->setCurrentIndex(current->getProperty("imfcs_invrimgdisp_image", 0).toInt());
+    player->setPosition(current->getProperty("imfcs_invrimgdisp_playpos", 0).toInt());
+    connect(cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
+    displayImage();
 
 }
 
@@ -45,17 +50,28 @@ void QFRDRImagingFCSOverviewImageDisplay::showFrame(int frame) {
     current->setQFProperty("imfcs_invrimgdisp_playpos", player->getPosition(), false, false);
 
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
+    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+    if (m && mv && cmbImage->currentIndex()-m->getPreviewImageCount()<mv->getImageStackCount()) {
+        int idx=cmbImage->currentIndex()-m->getPreviewImageCount();
+        int width=mv->getImageStackWidth(idx);
+        int height=mv->getImageStackHeight(idx);
+        image->set_data(mv->getImageStack(idx, frame), width, height, JKQTPMathImageBase::DoubleArray);
+        emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
+    }
 
-    emit displayedFrame(frame);
+
     pltImage->set_doDrawing(true);
-    pltImage->zoomToFit();
+    pltImage->update_plot();
+    player->singleShotTimerStart();
 }
 
 void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
     if (!image) return;
+    player->pause();
     current->setQFProperty("imfcs_invrimgdisp_image", cmbImage->currentIndex(), false, false);
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
-    player->setEnabled(false);
+    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+    player->setVisible(false);
     player->pause();
     pltImage->set_doDrawing(false);
     if (m && cmbImage->currentIndex()<m->getPreviewImageCount()) {
@@ -65,15 +81,36 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
         image->set_width(width);
         image->set_height(height);
         pltImage->get_plotter()->setAbsoluteXY(0,width,0,height);
-        pltImage->get_plotter()->set_aspectRatio(1);
+        pltImage->get_plotter()->set_aspectRatio(double(width)/double(height));
         pltImage->get_plotter()->set_axisAspectRatio(double(width)/double(height));
         pltImage->get_plotter()->set_maintainAspectRatio(true);
         pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
-        player->setEnabled(false);
+        player->setVisible(false);
         labDescription->setText(tr("<b>image size:</b> %1 &times; %2").arg(width).arg(height));
+    } else if (mv && cmbImage->currentIndex()-m->getPreviewImageCount()<mv->getImageStackCount()) {
+        int idx=cmbImage->currentIndex()-m->getPreviewImageCount();
+        int width=mv->getImageStackWidth(idx);
+        double rwidth=(double)width*mv->getImageStackXUnitFactor(idx);
+        int height=mv->getImageStackHeight(idx);
+        double rheight=(double)height*mv->getImageStackYUnitFactor(idx);
+        int frames=mv->getImageStackFrames(idx);
+        player->setRange(0, frames-1);
+        player->setPosition(0);
+        player->setSingleShot(true);
+        player->setVisible(true);
+        image->set_data(mv->getImageStack(idx, 0), width, height, JKQTPMathImageBase::DoubleArray);
+        image->set_width(rwidth);
+        image->set_height(rheight);
+        pltImage->get_plotter()->setAbsoluteXY(0,rwidth,0,rheight);
+        pltImage->get_plotter()->set_aspectRatio(double(width)/double(height));
+        pltImage->get_plotter()->set_axisAspectRatio(double(width)/double(height));
+        pltImage->get_plotter()->set_maintainAspectRatio(true);
+        pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
+        labDescription->setText(tr("<b>image size:</b> %1 &times; %2 pixels = %3 &times; %4 %5&times;%6").arg(width).arg(height).arg(rwidth).arg(rheight).arg(mv->getImageStackXUnitName(idx)).arg(mv->getImageStackYUnitName(idx)));
+        player->play();
     } else  {
         image->set_data(NULL, 0, 0, JKQTPMathImageBase::UInt16Array);
-        player->setEnabled(false);
+        player->setVisible(false);
         player->setRange(0,100);
     }
     pltImage->set_doDrawing(true);
@@ -85,9 +122,13 @@ void QFRDRImagingFCSOverviewImageDisplay::calcExpFit() {
 }
 
 void QFRDRImagingFCSOverviewImageDisplay::readSettings(QSettings &settings, const QString &prefix) {
+    player->setFPS(settings.value(prefix+"player_fps", player->getFPS()).toDouble());
+    player->setReplay(settings.value(prefix+"player_replay", player->getReplay()).toBool());
 }
 
 void QFRDRImagingFCSOverviewImageDisplay::writeSettings(QSettings &settings, const QString &prefix) {
+    settings.setValue(prefix+"player_fps", player->getFPS());
+    settings.setValue(prefix+"player_replay", player->getReplay());
 }
 
 void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
@@ -133,8 +174,9 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
     mainLay->addWidget(labDescription);
 
     player=new QFPLayerControls(this);
-    player->setEnabled(false);
+    player->setVisible(false);
     mainLay->addWidget(player);
+    mainLay->addStretch();
 
 
     image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImage::GRAY, pltImage->get_plotter());

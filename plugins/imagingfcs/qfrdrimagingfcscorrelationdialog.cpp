@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcsdataexplorer.h"
+#include "qfrdrimagingfcstools.h"
 
 #define UPDATE_TIMEOUT 250
 
@@ -591,23 +592,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     ui->labCorrelator->setText(tr("<i>spanned correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 
-void readConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height) {
-    if (set.contains("acquisition/image_width")) image_width=set.value("acquisition/image_width", image_width).toInt();
-    if (set.contains("acquisition/image_height")) image_height=set.value("acquisition/image_height", image_height).toInt();
-    if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
-    else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
-    baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
-    //backgroundfile="";
-    int fcnt=set.value("files/count", 0).toInt();
-    for (int f=0; f<fcnt; f++) {
-        QString fn=QFileInfo(set.fileName()).dir().absoluteFilePath(set.value("files/name"+QString::number(f), "").toString());
-        //QString ft=set.value("files/type"+QString::number(f), "").toString();
-        QString fd=set.value("files/description"+QString::number(f), "").toString();
-        if (fd.toLower().simplified().contains("background")) {
-            backgroundfile=fn;
-        }
-    }
-}
+
 
 void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     QModernProgressDialog prg(this);
@@ -667,10 +652,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             }
 
             if (hasFirst) {
-                readConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height);
+                readB040SPIMExperimentConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height);
                 //qDebug()<<"read first  "<<frametime<<baseline_offset<<backgroundF<<image_width<<image_height;
             } else if (foundSecond) {
-                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
                 //qDebug()<<"read second  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 hasSecond=true;
             }
@@ -695,7 +680,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             cfgname=filename.left(filename.size()-suffix.size())+newsuffix[i];
             if (QFile::exists(cfgname)) {
                 QSettings set(cfgname, QSettings::IniFormat);
-                readConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
                 //qDebug()<<"read third  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 break;
             }
