@@ -257,7 +257,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
         size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
     //std::cout<<"repainting ... 2\n";
 
-        QVector<JKQTPgraph*> topGraphs;
+        QList<JKQTPgraph*> topGraphs;
 
         //////////////////////////////////////////////////////////////////////////////////
         // Plot average + error markers

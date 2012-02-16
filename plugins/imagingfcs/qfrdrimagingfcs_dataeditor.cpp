@@ -435,7 +435,7 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
         //QTime t;
         //t.start();
 
-        QVector<JKQTPgraph*> topGraphs;
+        QList<JKQTPgraph*> topGraphs;
 
 
        //////////////////////////////////////////////////////////////////////////////////

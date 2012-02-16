@@ -8,6 +8,7 @@
 #include "jkqtpelements.h"
 #include "jkqtpimageelements.h"
 #include "jkqttools.h"
+#include "jkqtpoverlayelements.h"
 
 namespace Ui {
     class QFRDRImagingFCSCountrateDisplay;
@@ -49,7 +50,7 @@ class QFRDRImagingFCSCountrateDisplay : public QWidget {
         JKQTPxyLineGraph* minGraph;
         JKQTPxyLineGraph* maxGraph;
         JKQTPxyLineGraph* avgFit;
-        JKQTPgeoInfiniteLine* avgIndicator;
+        JKQTPoverlayVerticalLine* avgIndicator;
 
          QFRawDataRecord* current;
 };

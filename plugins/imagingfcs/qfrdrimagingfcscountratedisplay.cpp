@@ -34,14 +34,14 @@ QFRDRImagingFCSCountrateDisplay::QFRDRImagingFCSCountrateDisplay(QWidget *parent
     avgFit->set_title(tr("fit"));
     avgFit->set_drawLine(true);
     avgFit->set_symbol(JKQTPnoSymbol);
-    avgIndicator=new JKQTPgeoInfiniteLine(ui->pltIntensity->get_plotter(), 0,0,0,1,QColor("red"));
+    avgIndicator=new JKQTPoverlayVerticalLine(0, ui->pltIntensity->get_plotter());
 
 
     ui->pltIntensity->addGraph(avgGraph);
     ui->pltIntensity->addGraph(minGraph);
     ui->pltIntensity->addGraph(maxGraph);
     ui->pltIntensity->addGraph(avgFit);
-    ui->pltIntensity->addGraph(avgIndicator);
+    ui->pltIntensity->get_plotter()->addOverlayElement(avgIndicator);
     ui->pltIntensity->getXAxis()->set_axisLabel(tr("time [seconds]"));
     ui->pltIntensity->getYAxis()->set_axisLabel(tr("intensity [A.U.]"));
 
@@ -76,16 +76,11 @@ void QFRDRImagingFCSCountrateDisplay::connectWidgets(QFRawDataRecord *current, Q
 
 void QFRDRImagingFCSCountrateDisplay::showFrameIndicator1(double pos) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    //if (m && frame>0 && frame<m->getStatisticsN() && m->getStatisticsN()>0 && cmbImage->currentIndex()==1) {
-        ui->pltIntensity->set_doDrawing(false);
-        //const double* T=m->getStatisticsMean();
-        //double Tmin=T[0];
-        //double Tmax=T[m->getStatisticsN()-1];
-        //avgIndicator->set_x(Tmin+(Tmax-Tmin)*player->getRelativeValue());
-        avgIndicator->set_x(pos);
-        ui->pltIntensity->set_doDrawing(true);
-        ui->pltIntensity->update_plot();
-    //}
+    ui->pltIntensity->set_doDrawing(false);
+
+    avgIndicator->set_position(pos);
+    ui->pltIntensity->set_doDrawing(true);
+    ui->pltIntensity->update_plot();
 }
 
 void QFRDRImagingFCSCountrateDisplay::rawDataChanged() {
