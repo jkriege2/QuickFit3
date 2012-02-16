@@ -6,7 +6,6 @@
 #include <QVector>
 #include <QTextStream>
 #include "lib_imexport.h"
-#include <math.h>
 
 /*! \brief Reads in one line of text from the specified file and interpret it as Comma-Separated-Values file.
            Returns its contents as a vector of doubles.
