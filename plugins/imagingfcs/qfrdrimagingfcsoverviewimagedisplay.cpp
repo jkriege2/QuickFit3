@@ -8,6 +8,10 @@ QFRDRImagingFCSOverviewImageDisplay::QFRDRImagingFCSOverviewImageDisplay(QWidget
     createWidgets();
 }
 
+QFRDRImagingFCSOverviewImageDisplay::~QFRDRImagingFCSOverviewImageDisplay() {
+    clearOverlays();
+}
+
 void QFRDRImagingFCSOverviewImageDisplay::connectWidgets(QFRawDataRecord *current, QFRawDataRecord *old) {
     disconnect(cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
@@ -74,12 +78,29 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
     player->setVisible(false);
     player->pause();
     pltImage->set_doDrawing(false);
+    clearOverlays();
     if (m && cmbImage->currentIndex()<m->getPreviewImageCount()) {
         int width=m->getPreviewImageWidth(cmbImage->currentIndex());
         int height=m->getPreviewImageHeight(cmbImage->currentIndex());
+        QList<QFRDROverviewImageInterface::OverviewImageGeoElement> overlayElements=m->getPreviewImageGeoElements(cmbImage->currentIndex());
         image->set_data(m->getPreviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
         image->set_width(width);
         image->set_height(height);
+
+        QList<QColor> cols;
+        cols<<QColor("red")<<QColor("orange")<<QColor("green")<<QColor("deeppink");
+        cols<<QColor("dodgerblue")<<QColor("mediumpurple")<<QColor("brown")<<QColor("salmon");
+
+        for (int i=0; i<overlayElements.size(); i++) {
+            if (overlayElements[i].type==QFRDROverviewImageInterface::PIGErectangle) {
+                JKQTPgeoRectangle* elem=new JKQTPgeoRectangle(pltImage->get_plotter(), overlayElements[i].x, overlayElements[i].y, overlayElements[i].width, overlayElements[i].height, cols[i%8]);
+                elem->set_bottomleftrectangle(overlayElements[i].x, overlayElements[i].y, overlayElements[i].width, overlayElements[i].height);
+                elem->set_title(overlayElements[i].title);
+                overlayGraphs.append(elem);
+                pltImage->addGraph(elem);
+            }
+        }
+
         pltImage->get_plotter()->setAbsoluteXY(0,width,0,height);
         pltImage->get_plotter()->set_aspectRatio(double(width)/double(height));
         pltImage->get_plotter()->set_axisAspectRatio(double(width)/double(height));
@@ -157,6 +178,14 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
     pltImage->setAbsoluteXY(0,1,0,1);
     pltImage->get_plotter()->getXAxis()->set_axisMinWidth(1);
     pltImage->get_plotter()->getYAxis()->set_axisMinWidth(1);
+    pltImage->get_plotter()->getXAxis()->set_labelType(JKQTPCALTdefault);
+    pltImage->get_plotter()->getYAxis()->set_labelType(JKQTPCALTdefault);
+    pltImage->get_plotter()->getXAxis()->set_labelDigits(2);
+    pltImage->get_plotter()->getYAxis()->set_labelDigits(2);
+    pltImage->get_plotter()->getXAxis()->set_minTicks(5);
+    pltImage->get_plotter()->getXAxis()->addAxisTickLabel(0,"0");
+    pltImage->get_plotter()->getYAxis()->set_minTicks(5);
+    pltImage->get_plotter()->getYAxis()->addAxisTickLabel(0,"0");
 
     pltImage->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
     pltImage->get_plotter()->getYAxis()->set_tickLabelFontSize(8);
@@ -180,6 +209,9 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
 
 
     image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImage::GRAY, pltImage->get_plotter());
+    image->get_colorBarRightAxis()->set_labelType(JKQTPCALTdefault);
+    image->get_colorBarRightAxis()->set_labelDigits(2);
+    image->get_colorBarRightAxis()->set_minTicks(3);
     pltImage->addGraph(image);
 
 
@@ -193,4 +225,11 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
     toolbar->addAction(pltImage->get_plotter()->get_actZoomIn());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomOut());
 
+}
+
+void QFRDRImagingFCSOverviewImageDisplay::clearOverlays() {
+    for (int i=0; i<overlayGraphs.size(); i++) {
+        pltImage->deleteGraph(overlayGraphs[i], true);
+    }
+    overlayGraphs.clear();
 }

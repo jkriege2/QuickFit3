@@ -414,23 +414,26 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             initParams["TAU_COLUMN"]=0;
             if (isJanBFile) {
                 bool okk=true;
-                double tf=QInputDialog::getDouble ( NULL, tr("Import Video Correlator Data"), tr("tau divider = "), 0, 1e-60, 1e60, 6, &okk);
+                double tf=QInputDialog::getDouble ( NULL, tr("Import Video Correlator Data"), tr("tau factor = "), 0, 1e-60, 1e60, 6, &okk);
                 if (okk) {
-                    initParams["TAU_FACTOR"]=1.0/tf;
+                    initParams["TAU_FACTOR"]=tf;
                     paramsReadonly<<"TAU_FACTOR";
                     initParams["CORR_OFFSET"]=1.0;
                     paramsReadonly<<"CORR_OFFSET";
+                    initParams["TAU_COLUMN"]=5;
+
                 } else ok=false;
 
             }
             int columns=checkColumns(filename);
             if (!isCross && !isDCCF) {
                 initParams["CORRELATION_COLUMN"]=1;
+                if (isJanBFile) initParams["CORRELATION_COLUMN"]=7;
                 files.prepend(filename);
                 files_types.prepend("acf");
                 //qDebug()<<"filename_overview: "<<filename_overview;
 
-                if (columns>2){
+                if (columns>2 && !isJanBFile){
                     initParams["CORRELATION_ERROR_COLUMN"]=2;
                 }
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?

@@ -26,8 +26,8 @@ class QFRDRImagingFCSCountrateDisplay : public QWidget {
         ~QFRDRImagingFCSCountrateDisplay();
 
         /** \brief connect widgets to current data record */
-        void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) ;
-    public slots:
+    void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) ;
+public slots:
         void showFrameIndicator1(double pos);
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
@@ -37,6 +37,7 @@ class QFRDRImagingFCSCountrateDisplay : public QWidget {
 
 
 
+        void calc2ExpFit();
         void calcExpFit();
     public slots:
         /** \brief read the settings */
@@ -49,10 +50,19 @@ class QFRDRImagingFCSCountrateDisplay : public QWidget {
         JKQTPxyLineErrorGraph* avgGraph;
         JKQTPxyLineGraph* minGraph;
         JKQTPxyLineGraph* maxGraph;
-        JKQTPxyLineGraph* avgFit;
+        JKQTPxFunctionLineGraph* avgFit;
         JKQTPoverlayVerticalLine* avgIndicator;
+        JKQTPhorizontalRange* rangeGraph;
 
-         QFRawDataRecord* current;
+        QFRawDataRecord* current;
+
+        double* data;
+        double* dataT;
+        int32_t dataN;
+        double expParam[3];
+        double exp2Param[5];
+
+        void updateFitFuncPlot();
 };
 
 #endif // QFRDRIMAGINGFCSCOUNTRATEDISPLAY_H

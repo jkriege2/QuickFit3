@@ -11,6 +11,7 @@
 #include "jkqtpelements.h"
 #include "jkqtpimageelements.h"
 #include "jkqttools.h"
+#include "jkqtpgeoelements.h"
 #include "qfplayercontrols.h"
 
 class QFRDRImagingFCSOverviewImageDisplay : public QWidget
@@ -18,7 +19,7 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
         Q_OBJECT
     public:
         explicit QFRDRImagingFCSOverviewImageDisplay(QWidget *parent = 0);
-
+        ~QFRDRImagingFCSOverviewImageDisplay();
         /** \brief connect widgets to current data record */
         void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) ;
 
@@ -39,7 +40,7 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
         /** \brief write the settings */
         virtual void writeSettings(QSettings &settings, const QString &prefix=QString("")) ;
 
-    private:
+    protected:
         QLabel* labDescription;
         QComboBox* cmbImage;
         JKQtPlotter* pltImage;
@@ -48,10 +49,13 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
         QFPLayerControls* player;
 
         JKQTPMathImage* image;
+        QList<JKQTPgraph*> overlayGraphs;
 
         QFRawDataRecord* current;
 
         void createWidgets();
+
+        void clearOverlays();
         
 };
 

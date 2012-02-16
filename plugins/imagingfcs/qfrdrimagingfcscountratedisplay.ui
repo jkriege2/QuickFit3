@@ -86,14 +86,17 @@ p, li { white-space: pre-wrap; }
         <number>0</number>
        </property>
        <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="labIntensityInfo">
+        <widget class="QLabel" name="labInfo">
          <property name="text">
           <string/>
          </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPlainTextEdit" name="edtData"/>
        </item>
        <item row="1" column="1">
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -101,6 +104,13 @@ p, li { white-space: pre-wrap; }
           <widget class="QPushButton" name="btnFit">
            <property name="text">
             <string>&amp;Fit Exponential</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnFit2Exp">
+           <property name="text">
+            <string>Fit &amp;Double- Exponential</string>
            </property>
           </widget>
          </item>
@@ -118,6 +128,16 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
         </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QTextEdit" name="edtData">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -177,10 +197,27 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnFit2Exp</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImagingFCSCountrateDisplay</receiver>
+   <slot>calc2ExpFit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>899</x>
+     <y>282</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>966</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>calcExpFit()</slot>
   <slot>displayImage()</slot>
   <slot>displayData()</slot>
+  <slot>calc2ExpFit()</slot>
  </slots>
 </ui>

@@ -9,7 +9,7 @@
 
 //#define DEBUG_SIZES
 #undef DEBUG_SIZES
-
+#define DEBUG_TIMING
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -378,6 +378,11 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 	bool ok=true;
 	QString errorDescription="";
 
+#ifdef DEBUG_TIMING
+    QElapsedTimer time;
+    time.start();
+#endif
+
 	// LOAD YOUR DATAFILE
 	//      and set ok=false, if an error occured
 	// example:
@@ -396,15 +401,23 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 
         QByteArray dataFromFile=file.readAll();
         file.close();
+#ifdef DEBUG_TIMING
+        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+#endif
         //QTextStream stream(&file);
         QTextStream stream(&dataFromFile);
+#ifdef DEBUG_TIMING
+        qDebug()<<"read file contents into memory buffer     "<<time.elapsed()<<"ms"; time.start();
+#endif
         bool last_empty, empty=true;
-        QVector<QVector<QTriple<double, double, double> > > data_matrix;
-        QVector<QTriple<double, double, double> > current_set;
+        QList<QList<QTriple<double, double, double> > > data_matrix;
+        QList<QTriple<double, double, double> > current_set;
         int NN=0;
         int runs=0;
         while ((!stream.atEnd()) && (runs<=width*height)) {
-            QVector<double> data=csvReadline(stream, ',', '#', 0);
+            QVector<double> data;
+            if (filename.toLower().endsWith(".qf.dat")) data=csvReadline(stream, ' ', '#', 0);
+            else data=csvReadline(stream, ',', '#', 0);
             last_empty=empty;
             empty=data.isEmpty();
             if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size()) && (correrrcolumn<data.size()) && (correrrcolumn>=0)) {
@@ -434,6 +447,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
             //if (stream.atEnd()) //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
         }
+#ifdef DEBUG_TIMING
+        qDebug()<<"parsed CSV     "<<time.elapsed()<<"ms"; time.start();
+#endif
         dataFromFile.clear();
         width=getProperty("WIDTH").toInt();
         height=getProperty("HEIGHT").toInt();
@@ -473,6 +489,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
             errorDescription=tr("no records found in file");
         }
 	}
+#ifdef DEBUG_TIMING
+        qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
+#endif
 
 	if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
     return ok;
@@ -984,7 +1003,7 @@ double *QFRDRImagingFCSData::getPreviewImage(int image) const {
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getPreviewImageGeoElements(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-
+    if (image>0 && image<=ovrImages.size()) return ovrImages[image-1].geoElements;
     return result;
 }
 

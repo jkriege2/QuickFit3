@@ -10,7 +10,9 @@
 #include <QSlider>
 #include <QSettings>
 #include <QCheckBox>
+#include <QElapsedTimer>
 #include "libwid_imexport.h"
+#include <QResizeEvent>
 
 
 
@@ -71,6 +73,9 @@ class QFWIDLIB_EXPORT QFPLayerControls : public QWidget {
         void createWidgets();
         void createActions();
 
+        void hideEvent(QHideEvent* event);
+        void showEvent(QShowEvent* event);
+
         QTimer* timer;
 
         QSlider* slider;
@@ -83,6 +88,10 @@ class QFWIDLIB_EXPORT QFPLayerControls : public QWidget {
         QAction* actPrevFrame;
         QAction* actPrevMoreFrame;
         QAction* actRewind;
+        QElapsedTimer fpsTimer;
+        int fpsCounter;
+        double realFPS;
+        bool lastPlaying;
 };
 
 #endif // QFPLAYERCONTROLS_H

@@ -10,6 +10,10 @@ QFPLayerControls::QFPLayerControls(QWidget *parent) :
     timer->setSingleShot(true);
     timer->stop();
 
+    realFPS=0;
+    fpsCounter=0;
+    lastPlaying=false;
+
     createActions();
     createWidgets();
 
@@ -62,6 +66,12 @@ void QFPLayerControls::updateWidgets() {
 
 void QFPLayerControls::timerTriggered() {
     if (actPlayPause->isChecked()) {
+        fpsCounter++;
+        if (fpsCounter>2) realFPS=double(fpsCounter)/(double(fpsTimer.elapsed())/1000.0);
+        if (fpsCounter>30) {
+            fpsCounter=0;
+            fpsTimer.start();
+        }
         if (slider->value()<slider->maximum()) {
             slider->setValue(slider->value()+1);
         } else {
@@ -79,6 +89,9 @@ void QFPLayerControls::playPauseTriggered(bool checked) {
     timer->setInterval(qMax(5,(int)round(1000.0/spinFPS->value())));
     if (checked) {
         timer->start();
+        realFPS=0;
+        fpsCounter=0;
+        fpsTimer.start();
     } else {
         timer->stop();
     }
@@ -122,7 +135,9 @@ void QFPLayerControls::createWidgets() {
     lay->addWidget(chkReplay, 0, 8);
     lay->addItem(new QSpacerItem(5,5, QSizePolicy::Expanding), 0, 9);
     label=new QLabel("", this);
-    lay->addWidget(label, 0, 10, 2, 1);
+    label->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+    label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    lay->addWidget(label, 0, 10, 1, 2);
 
     slider=new QSlider(this);
     slider->setOrientation(Qt::Horizontal);
@@ -141,6 +156,8 @@ void QFPLayerControls::createWidgets() {
 
 void QFPLayerControls::createActions() {
     actPlayPause=new QAction(QIcon(":/libqf3widgets/player_play.png"), tr("play"), this);
+    actPlayPause->setCheckable(true);
+    actPlayPause->setChecked(false);
     connect(actPlayPause, SIGNAL(triggered(bool)), this, SLOT(playPauseTriggered(bool)));
     actRewind=new QAction(QIcon(":/libqf3widgets/player_start.png"), tr("back to first frame"), this);
     connect(actRewind, SIGNAL(triggered()), this, SLOT(rewind()));
@@ -152,6 +169,15 @@ void QFPLayerControls::createActions() {
     connect(actPrevFrame, SIGNAL(triggered()), this, SLOT(prevTriggered()));
     actPrevMoreFrame=new QAction(QIcon(":/libqf3widgets/player_rrew.png"), tr("some frames backward"), this);
     connect(actPrevMoreFrame, SIGNAL(triggered()), this, SLOT(prevMoreTriggered()));
+}
+
+void QFPLayerControls::hideEvent(QHideEvent *event) {
+    lastPlaying=actPlayPause->isChecked();
+    pause();
+}
+
+void QFPLayerControls::showEvent(QShowEvent *event) {
+    if (lastPlaying) play();
 }
 
 void QFPLayerControls::play() {
@@ -176,7 +202,7 @@ void QFPLayerControls::setReplay(bool replay) {
 
 void QFPLayerControls::sliderMoved(int value) {
     emit showFrame(value);
-    label->setText(tr("frame %1/%2").arg(value-slider->minimum()+1).arg(slider->maximum()-slider->minimum()+1));
+    label->setText(tr("frame %1/%2 (%3fps)").arg(value-slider->minimum()+1).arg(slider->maximum()-slider->minimum()+1).arg(realFPS, 0, 'f', 1));
 }
 
 void QFPLayerControls::prevMoreTriggered() {

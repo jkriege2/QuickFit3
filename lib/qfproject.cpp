@@ -9,7 +9,8 @@
 #include "../version.h"
 
 #include <QTemporaryFile>
-
+#include <QElapsedTimer>
+#define DEBUG_TIMING
 
 QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent), QFProperties()
@@ -295,6 +296,12 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 void QFProject::readXML(const QString& file) {
     bool namechanged=(file!=this->file);
     this->file=file;
+
+#ifdef DEBUG_TIMING
+    QElapsedTimer time;
+    time.start();
+#endif
+
     QFile f(file);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
@@ -302,8 +309,14 @@ void QFProject::readXML(const QString& file) {
     }
     QDomDocument d("quickfitproject");
     QString errorm="";
+#ifdef DEBUG_TIMING
+        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+#endif
     if (d.setContent(&f, &errorm)) {
         QDomElement e=d.documentElement();
+#ifdef DEBUG_TIMING
+        qDebug()<<"parsed XML      "<<time.elapsed()<<"ms"; time.start();
+#endif
         if (e.tagName()=="quickfitproject") {
             QString v=e.attribute("quickfit_version");
             if (v.toDouble()>3.0) {
@@ -325,6 +338,10 @@ void QFProject::readXML(const QString& file) {
                 }
                 QDomElement rd=e.firstChildElement("rawdata");
                 if (!rd.isNull()) {
+#ifdef DEBUG_TIMING
+        time.start();
+#endif
+
                     rd=rd.firstChildElement("rawdataelement");
                     while (!rd.isNull()) {
                         if (services) {
@@ -340,11 +357,18 @@ void QFProject::readXML(const QString& file) {
                             setError(tr("Error while opening raw data element: %2").arg(E.what()));
                         }
                         rd=rd.nextSiblingElement("rawdataelement");
+#ifdef DEBUG_TIMING
+        qDebug()<<"read rdr     "<<time.elapsed()<<"ms"; time.start();
+#endif
+
                     }
                 }
                 rd=e.firstChildElement("evaluations");
                 if (!rd.isNull()) {
                     rd=rd.firstChildElement("evaluationelement");
+#ifdef DEBUG_TIMING
+        time.start();
+#endif
                     while (!rd.isNull()) {
                         if (services) {
                             services->incProgress();
@@ -358,15 +382,11 @@ void QFProject::readXML(const QString& file) {
                         } catch(std::exception& E) {
                             setError(tr("Error while opening raw data element: %2").arg(E.what()));
                         }
-                        //std::cout<<t.toStdString()<<std::endl;
-                        /*if (t=="plot") {
 
-                        } else if (t=="unknown") {
-                            //new QFRawDataRecord(rd, this);
-                            QFEvaluationItem* e=new QFEvaluationItem(this, true, true);
-                            e->init(rd);
-                        }*/
                         rd=rd.nextSiblingElement("evaluationelement");
+#ifdef DEBUG_TIMING
+        qDebug()<<"read eval     "<<time.elapsed()<<"ms"; time.start();
+#endif
                     }
                 }
                 if (services) {
@@ -383,11 +403,17 @@ void QFProject::readXML(const QString& file) {
     }
     if (!errorOcc) {
         dataChange=false;
+#ifdef DEBUG_TIMING
+        time.start();
+#endif
         //qDebug()<<"QFProject emits wasChanged("<<dataChange<<")";
         emit wasChanged(dataChange);
         //qDebug()<<"QFProject emits structureChanged";
         emit structureChanged();
         if (namechanged) emitPropertiesChanged();
+#ifdef DEBUG_TIMING
+        qDebug()<<"emited changed events     "<<time.elapsed()<<"ms"; time.start();
+#endif
     }
 
 }
