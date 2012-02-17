@@ -12,6 +12,7 @@
 #include "qftools.h"
 #include "multitau-correlator.h"
 #include "correlator_multitau.h"
+#include <QtGlobal>
 
 class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward

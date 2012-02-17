@@ -18,6 +18,7 @@
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "../interfaces/qfrdrimagetoruninterface.h"
 #include "../interfaces/qfrdroverviewimageinterface.h"
+#include "../interfaces/qfrdrsimplecountrateinterface.h"
 #include "csvtools.h"
 #include "qtriple.h"
 #include "qfrdrimagingfcsoverviewrateeditor.h"
@@ -29,9 +30,9 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface)
     public:
         /** Default constructor */
         QFRDRImagingFCSData(QFProject* parent);
@@ -102,6 +103,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief clear all leaveouts */
         virtual void leaveoutClear();
 
+        void maskLoad(const QString& filename);
+        void maskSave(const QString& filename);
         void maskClear();
         void maskSetAll();
         void maskSet(uint16_t x, uint16_t y);
@@ -155,6 +158,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         void loadQFPropertiesFromB040SPIMSettingsFile(QSettings& settings);
 
+        double getTauMin() const;
+
     private:
         /** \brief width of the image */
         int width;
@@ -173,6 +178,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief time axis [seconds] */
         double* tau;
 
+
         /** \brief number of data points in the statistics  */
         uint32_t statN;
         /** \brief statistics: average vector */
@@ -183,6 +189,10 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double* statT;
         double* statMin;
         double* statMax;
+
+        bool hasStatistics;
+        double statAvgCnt;
+        double statSigmaCnt;
 
         /** \brief overview image */
         uint16_t* overview;
@@ -284,6 +294,12 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual QString getImageStackCUnitName(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackDescription() */
         virtual QString getImageStackDescription(int stack) const;
+
+        /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateAverage() */
+        virtual double getSimpleCountrateAverage(int run=-1);
+        /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateVariance() */
+        virtual double getSimpleCountrateVariance(int run=-1);
+
 };
 
 

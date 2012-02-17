@@ -54,11 +54,21 @@ bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
 
 bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) {
     int run=getIndexFromEvaluationResultID(id);
-    QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
-    if (crintf && (paramid=="count_rate")) {
-        error=crintf->getRateStdDev(run)*1000;
-        value=crintf->getRateMean(run)*1000;
+    if (paramid=="count_rate") {
+        QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
+        value=0;
+        error=0;
+        if (crintf) {
+            error=crintf->getRateStdDev(run)*1000;
+            value=crintf->getRateMean(run)*1000;
+        }
+        QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        if (scrintf && value==0) {
+            value=scrintf->getSimpleCountrateAverage(run);
+            error=scrintf->getSimpleCountrateVariance(run);
+        }
         return true;
+
     }
     return false;
 }

@@ -6,6 +6,7 @@
 
 #include "qfevaluationitem.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
+#include "../interfaces/qfrdrsimplecountrateinterface.h"
 #include "../interfaces/qfrdrcountratesinterface.h"
 #include "qfevaluationitemfactory.h"
 #include "qffitfunction.h"

@@ -45,7 +45,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsoverviewimagedisplay.h \
     qfrdrimagingfcsoverviewrateeditor.h \
     qfrdrimagingfcstools.h \
-    ../interfaces/qfrdrimagestackinterface.h
+    ../interfaces/qfrdrimagestackinterface.h \
+    ../interfaces/qfrdrsimplecountrateinterface.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \

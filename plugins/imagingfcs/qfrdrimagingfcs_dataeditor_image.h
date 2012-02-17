@@ -132,6 +132,15 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief exclude runs by intensity in the gof image */
         void excludeByGOFIntensity();
 
+        /** \brief load a mask file as a selection from hard disk */
+        void loadMask();
+        /** \brief save mask to harddisk */
+        void saveMask();
+        /** \brief save selection to harddisk */
+        void saveSelection();
+        /** \brief load a selection from harddisk */
+        void loadSelection();
+
         /** \brief delete mask */
         void includeAll();
         /** \brief invert mask */
@@ -260,6 +269,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QLabel* labRunOptions;
         /** \brief checkbox to select whether to display key in the graphs */
         QCheckBox* chkKeys;
+        QPushButton* btnLoadSelection;
+        QPushButton* btnLoadMask;
+        QPushButton* btnSaveSelection;
+        QPushButton* btnSaveMask;
 
         /** \brief label over the parameter image plot */
         QLabel* labParamImage;
@@ -403,6 +416,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QString lastSavePath;
 
         QTimer* timUpdateAfterClick;
+
+        QString lastMaskDir;
 
 
         void excludeByImage(double *imageIn);

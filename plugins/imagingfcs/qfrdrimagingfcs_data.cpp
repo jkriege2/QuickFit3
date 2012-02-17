@@ -6,6 +6,8 @@
 #include <QTextStream>
 #include "tools.h"
 #include "qfrdrimagingfcstools.h"
+#include "statistics_tools.h"
+#include "csvtools.h"
 
 //#define DEBUG_SIZES
 #undef DEBUG_SIZES
@@ -35,6 +37,9 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     video_width=0;
     video_height=0;
     video_frames=0;
+    hasStatistics=false;
+    statAvgCnt=0;
+    statSigmaCnt=0;
     setResultsInitSize(1000);
     setEvaluationIDMetadataInitSize(1000);
 }
@@ -95,7 +100,7 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
         w.writeEndElement();
     }*/
     QString l="";
-    for (int i=0; i<getCorrelationRuns(); i++) {
+    for (int i=0; i<width*height; i++) {
         if (leaveout[i]!=0) {
             if (!l.isEmpty()) l=l+",";
             l=l+QString::number(i);
@@ -158,6 +163,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         }
 
         // finally we load all known and useful associated files into memory:
+        hasStatistics=false;
         for (int i=0; i<files.size(); i++) {
             if (i<files_types.size()) {
                 QString ft=files_types[i].toLower().trimmed();
@@ -165,6 +171,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadOverview(files[i]);
                 } else if (ft=="statistics") {
                     loadStatistics(files[i]);
+                    hasStatistics=true;
+                    statAvgCnt=statisticsAverageVariance(statSigmaCnt, statAvg, statN);
                 } else if (ft=="video") {
                     loadVideo(files[i], &video, &video_width, &video_height, &video_frames);
                 } else if (ft=="background") {
@@ -414,17 +422,22 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
         QList<QTriple<double, double, double> > current_set;
         int NN=0;
         int runs=0;
+        bool isJanBFile=filename.toLower().endsWith(".qf.dat");
         while ((!stream.atEnd()) && (runs<=width*height)) {
             QVector<double> data;
-            if (filename.toLower().endsWith(".qf.dat")) data=csvReadline(stream, ' ', '#', 0);
+            if (isJanBFile) data=csvReadline(stream, ' ', '#', 0);
             else data=csvReadline(stream, ',', '#', 0);
             last_empty=empty;
             empty=data.isEmpty();
-            if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size()) && (correrrcolumn<data.size()) && (correrrcolumn>=0)) {
-                current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset,  data[correrrcolumn]));
-            } else if ((!empty) && (corrcolumn<data.size()) && (taucolumn<data.size())) {
-                current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset, 0.0));
-                //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
+            if (!empty && (corrcolumn<data.size()) && (taucolumn<data.size())) {
+                if ((correrrcolumn<data.size()) && (correrrcolumn>=0)) {
+                    if (current_set.size()>0 || (current_set.size()<=0 && data[taucolumn]>0))
+                        current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset,  data[correrrcolumn]));
+                } else  {
+                    if (current_set.size()>0 || (current_set.size()<=0 && data[taucolumn]>0))
+                        current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset, 0.0));
+                    //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
+                }
             }
             if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {
                 // this cuts all lines from current_set which are equal to the lastval (if this is 0.0 or 1.0)
@@ -857,6 +870,13 @@ void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &se
 
 }
 
+double QFRDRImagingFCSData::getTauMin() const {
+    if (!tau|| N<=0) return 1;
+    int i=0;
+    while (i<N-1 && tau[i]==0) i++;
+    return tau[i];
+}
+
 void QFRDRImagingFCSData::clearOvrImages() {
     for (int i=0; i<ovrImages.size(); i++) {
         free(ovrImages[i].image);
@@ -914,6 +934,39 @@ void QFRDRImagingFCSData::leaveoutClear() {
     maskClear();
 }
 
+void QFRDRImagingFCSData::maskLoad(const QString &filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly)) {
+        maskClear();
+        QTextStream str(&f);
+        while (!str.atEnd())  {
+            QVector<double> d=csvReadline(str, ',', '#', -1);
+            if (d.size()==2) {
+                int idx=xyToRun(d[0], d[1]);
+                if (idx>=0 && idx<height*width) leaveout[idx]=true;
+            }
+        }
+
+        f.close();
+    }
+}
+
+void QFRDRImagingFCSData::maskSave(const QString &filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly)) {
+        QTextStream str(&f);
+        for (uint16_t y=0; y<height; y++) {
+            for (uint16_t x=0; x<width; x++) {
+                if (leaveout[y*width+x]) {
+                    str<<x<<", "<<y<<"\n";
+                }
+            }
+        }
+
+        f.close();
+    }
+}
+
 void QFRDRImagingFCSData::maskClear() {
     if (!leaveout) return;
     for (uint16_t i=0; i<width*height; i++) {
@@ -929,11 +982,11 @@ void QFRDRImagingFCSData::maskSetAll() {
 }
 
 void QFRDRImagingFCSData::leaveoutRemoveRun(int run) {
-    if (run>=0 && run<getCorrelationRuns()) leaveout[run]=false;
+    if (run>=0 && run<width*height) leaveout[run]=false;
 }
 
 void QFRDRImagingFCSData::leaveoutAddRun(int run) {
-    if (run>=0 && run<getCorrelationRuns()) leaveout[run]=true;
+    if (run>=0 && run<width*height) leaveout[run]=true;
 }
 
 bool *QFRDRImagingFCSData::maskGet() {
@@ -1076,6 +1129,16 @@ QString QFRDRImagingFCSData::getImageStackCUnitName(int stack) const {
 QString QFRDRImagingFCSData::getImageStackDescription(int stack) const {
     if (stack==0) return tr("averaged video");
     return QString("");
+}
+
+double QFRDRImagingFCSData::getSimpleCountrateAverage(int /*run*/) {
+    if (hasStatistics) return statAvgCnt/getTauMin()/1000.0;
+    return 0;
+}
+
+double QFRDRImagingFCSData::getSimpleCountrateVariance(int /*run*/) {
+    if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
+    return 0;
 }
 
 

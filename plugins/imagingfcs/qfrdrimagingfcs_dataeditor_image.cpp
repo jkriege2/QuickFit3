@@ -250,53 +250,79 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGridLayout* glmask=new QGridLayout(this);
     wmask->setLayout(glmask);
 
+    int mskgrpRow=0;
     btnDontUse=new QPushButton(tr("&mask selected"), w);
     btnDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
     connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
-    glmask->addWidget(btnDontUse, 0, 0);
+    glmask->addWidget(btnDontUse, mskgrpRow, 0);
     btnUse=new QPushButton(tr("&unmask selected"), w);
     btnUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
     connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
-    glmask->addWidget(btnUse, 0, 1);
+    glmask->addWidget(btnUse, mskgrpRow, 1);
+
+    mskgrpRow++;
     btnUseAll=new QPushButton(tr("&clear mask"), w);
     btnUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
-    glmask->addWidget(btnUseAll, 1, 0);
+    glmask->addWidget(btnUseAll, mskgrpRow, 0);
     connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
     btnInvertMask=new QPushButton(tr("&invert mask"), w);
     btnInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
-    glmask->addWidget(btnInvertMask, 1, 1);
+    glmask->addWidget(btnInvertMask, mskgrpRow, 1);
     connect(btnInvertMask, SIGNAL(clicked()), this, SLOT(invertMask()));
 
+    mskgrpRow++;
+    btnSaveMask=new QPushButton(tr("&save mask"), w);
+    btnSaveMask->setToolTip(tr("save the mask to harddisk"));
+    glmask->addWidget(btnSaveMask, mskgrpRow, 0);
+    connect(btnSaveMask, SIGNAL(clicked()), this, SLOT(saveMask()));
+    btnLoadMask=new QPushButton(tr("&load mask"), w);
+    btnLoadMask->setToolTip(tr("load a mask from harddisk"));
+    glmask->addWidget(btnLoadMask, mskgrpRow, 1);
+    connect(btnLoadMask, SIGNAL(clicked()), this, SLOT(loadMask()));
+    mskgrpRow++;
+    btnSaveSelection=new QPushButton(tr("&save selection"), w);
+    btnSaveSelection->setToolTip(tr("save the selection to harddisk"));
+    glmask->addWidget(btnSaveSelection, mskgrpRow, 0);
+    connect(btnSaveSelection, SIGNAL(clicked()), this, SLOT(saveSelection()));
+    btnLoadSelection=new QPushButton(tr("&load selection"), w);
+    btnLoadSelection->setToolTip(tr("load a selection from harddisk"));
+    glmask->addWidget(btnLoadSelection, mskgrpRow, 1);
+    connect(btnLoadSelection, SIGNAL(clicked()), this, SLOT(loadSelection()));
 
+
+    mskgrpRow++;
     QFrame* frame=new QFrame(this);
     frame->setFrameShape(QFrame::HLine);
-    glmask->addWidget(frame, 2, 0, 1, 2);
-    glmask->addWidget(new QLabel(tr("mask edit mode:"), this), 3, 0);
+    glmask->addWidget(frame, mskgrpRow, 0, 1, 2);
+    mskgrpRow++;
+    glmask->addWidget(new QLabel(tr("mask edit mode:"), this), mskgrpRow, 0);
     cmbMaskMode=new QComboBox(this);
     cmbMaskMode->addItem(tr("replace"));
     cmbMaskMode->addItem(tr("add"));
     cmbMaskMode->addItem(tr("remove"));
-    glmask->addWidget(cmbMaskMode, 3,1);
+    glmask->addWidget(cmbMaskMode, mskgrpRow,1);
     btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
     btnMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByIntensity, 4, 0);
+    mskgrpRow++;
+    glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
     connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
     btnMaskByGofIntensity=new QPushButton(tr("mask by &goodnes-of-fit"), w);
     btnMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByGofIntensity, 4, 1);
+    glmask->addWidget(btnMaskByGofIntensity, mskgrpRow, 1);
+    mskgrpRow++;
     connect(btnMaskByGofIntensity, SIGNAL(clicked()), this, SLOT(excludeByGOFIntensity()));
     btnMaskByParamIntensity=new QPushButton(tr("mask by &param image"), w);
     btnMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByParamIntensity, 5, 0);
+    glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 0);
     connect(btnMaskByParamIntensity, SIGNAL(clicked()), this, SLOT(excludeByParamIntensity()));
 
 
@@ -1177,6 +1203,79 @@ void QFRDRImagingFCSImageEditor::excludeByParamIntensity() {
 
 void QFRDRImagingFCSImageEditor::excludeByGOFIntensity() {
     excludeByImage(plteGofImageData);
+}
+
+void QFRDRImagingFCSImageEditor::loadMask() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    QString filename= QFileDialog::getOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
+    if (QFile::exists(filename)) {
+        if (m) {
+            m->maskLoad(filename);
+            m->recalcCorrelations();
+        }
+    }
+
+    rawDataChanged();
+}
+
+void QFRDRImagingFCSImageEditor::saveMask() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    QString filename= QFileDialog::getSaveFileName(this, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
+    if (!filename.isEmpty()) {
+        m->maskSave(filename);
+    }
+}
+
+void QFRDRImagingFCSImageEditor::saveSelection() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    QString filename= QFileDialog::getSaveFileName(this, tr("save selection as ..."), lastMaskDir, tr("mask files (*.msk)"));
+    if (!filename.isEmpty()) {
+        QFile f(filename);
+        if (f.open(QIODevice::WriteOnly)) {
+            QTextStream str(&f);
+            QSet<int32_t>::iterator i = selected.begin();
+            while (i != selected.end()) {
+                int x=m->runToX(*i);
+                int y=m->runToY(*i);
+                str<<x<<", "<<y<<"\n";
+                ++i;
+            }
+
+            f.close();
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::loadSelection() {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    QString filename= QFileDialog::getOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
+    if (QFile::exists(filename)) {
+        QFile f(filename);
+        if (f.open(QIODevice::ReadOnly)) {
+            selected.clear();
+            QTextStream str(&f);
+            while (!str.atEnd())  {
+                QVector<double> d=csvReadline(str, ',', '#', -1);
+                if (d.size()==2) {
+                    int idx=m->xyToRun(d[0], d[1]);
+                    if (idx>=0 && idx<m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) selected.insert(idx);
+                }
+            }
+
+            f.close();
+        }
+    }
+
+    replotSelection(true);
+
 }
 
 
@@ -2348,6 +2447,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     connectParameterWidgets(false);
     connectImageWidgets(false);
     lastSavePath=settings->getQSettings()->value(QString("imfcsimageeditor/last_save_path"), lastSavePath).toString();
+    lastMaskDir=settings->getQSettings()->value(QString("imfcsimageeditor/last_mask_path"), lastMaskDir).toString();
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsimageeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_tau_axis"), true).toBool());
     chkOverviewVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), true).toBool());
@@ -2383,6 +2483,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
 void QFRDRImagingFCSImageEditor::writeSettings() {
     if (!settings) return;
     settings->getQSettings()->setValue(QString("imfcsimageeditor/last_save_path"), lastSavePath);
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/last_mask_path"), lastMaskDir);
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/autoscale"), chkImageAutoScale->isChecked());
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/colmin"), edtColMin->value());
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/colmax"), edtColMax->value());

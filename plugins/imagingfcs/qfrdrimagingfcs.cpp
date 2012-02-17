@@ -414,7 +414,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             initParams["TAU_COLUMN"]=0;
             if (isJanBFile) {
                 bool okk=true;
-                double tf=QInputDialog::getDouble ( NULL, tr("Import Video Correlator Data"), tr("tau factor = "), 0, 1e-60, 1e60, 6, &okk);
+                double tf=QInputDialog::getDouble ( NULL, tr("Import Video Correlator Data"), tr("tau factor = "), 1, 1e-60, 1e60, 6, &okk);
                 if (okk) {
                     initParams["TAU_FACTOR"]=tf;
                     paramsReadonly<<"TAU_FACTOR";

@@ -21,7 +21,8 @@ HEADERS += ../base_classes/qffitresultsevaluation.h \
            dlgestimatefocalvolume.h \
     ../base_classes/qffitresultsbyindexevaluation.h \
     ../base_classes/qffitresultsevaluationeditorbase.h \
-    ../base_classes/qffitresultsbyindexevaluationeditorbase.h
+    ../base_classes/qffitresultsbyindexevaluationeditorbase.h \
+    ../interfaces/qfrdrsimplecountrateinterface.h
 
 
 SOURCES += ../base_classes/qffitresultsevaluation.cpp \
