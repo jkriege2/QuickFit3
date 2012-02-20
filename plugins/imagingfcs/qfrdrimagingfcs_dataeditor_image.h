@@ -325,6 +325,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         JKQTPOverlayImageEnhanced* plteGofImageExcluded;
 
 
+        /** \brief combobox for the color bar of overview image */
+        QComboBox* cmbColorbarOverview;
+
+        /** \brief combobox for the color bar of gof image */
+        QComboBox* cmbColorbarGof;
+
         /** \brief combobox for the color bar of plteImage */
         QComboBox* cmbColorbar;
         /** \brief combobox for the display style of plteImage */

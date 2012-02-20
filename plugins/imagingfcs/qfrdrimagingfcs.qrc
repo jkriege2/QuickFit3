@@ -47,5 +47,11 @@
         <file alias="player_stop.png">icons/player_stop.png</file>
         <file alias="image.png">icons/image.png</file>
         <file alias="video.png">icons/video.png</file>
+        <file alias="clearmask.png">icons/clearmask.png</file>
+        <file alias="invertmask.png">icons/invertmask.png</file>
+        <file alias="loadmask.png">icons/load_mask.png</file>
+        <file alias="mask.png">icons/mask.png</file>
+        <file alias="savemask.png">icons/savemask.png</file>
+        <file alias="unmask.png">icons/unmask.png</file>
     </qresource>
 </RCC>

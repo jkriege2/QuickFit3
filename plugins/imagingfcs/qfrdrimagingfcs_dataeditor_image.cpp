@@ -19,6 +19,8 @@
 //#define DEBUG_TIMIMNG
 #undef DEBUG_TIMIMNG
 
+#define OverlayRectanglesAsImageOverlay true
+
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent):
     QFRawDataEditor(services, parent)
 {
@@ -157,13 +159,98 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkOverviewVisible->setChecked(true);
     chkGofVisible=new QCheckBox(tr("goodnes of fit"), grpVisiblePlots);
     chkGofVisible->setChecked(true);
-    chkMaskVisible=new QCheckBox(tr("mask/selected"), grpVisiblePlots);
+    chkMaskVisible=new QCheckBox(tr("mask"), grpVisiblePlots);
     chkMaskVisible->setChecked(false);
     glVisPlots->addWidget(chkOverviewVisible, 0,0);
     glVisPlots->addWidget(chkGofVisible, 0,1);
-    glVisPlots->addWidget(chkMaskVisible, 1,0);
+    glVisPlots->addWidget(chkMaskVisible, 0,2);
     vbl->addWidget(grpVisiblePlots);
 
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: mask options
+    ///////////////////////////////////////////////////////////////
+    QGroupBox* wmask=new QGroupBox(tr(" mask options "), this);
+    vbl->addWidget(wmask);
+    QGridLayout* glmask=new QGridLayout(this);
+    wmask->setLayout(glmask);
+
+    int mskgrpRow=0;
+    btnDontUse=new QPushButton(QIcon(":/imaging_fcs/mask.png"), tr("&mask selected"), w);
+    btnDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
+    connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
+    glmask->addWidget(btnDontUse, mskgrpRow, 0);
+    btnUse=new QPushButton(QIcon(":/imaging_fcs/unmask.png"), tr("&unmask selected"), w);
+    btnUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
+    connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
+    glmask->addWidget(btnUse, mskgrpRow, 1);
+
+    btnUseAll=new QPushButton(QIcon(":/imaging_fcs/clearmask.png"), tr("&clear mask"), w);
+    btnUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
+    glmask->addWidget(btnUseAll, mskgrpRow, 2);
+    connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
+    mskgrpRow++;
+    btnInvertMask=new QPushButton(QIcon(":/imaging_fcs/invertmask.png"), tr("&invert mask"), w);
+    btnInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
+    glmask->addWidget(btnInvertMask, mskgrpRow, 0);
+    connect(btnInvertMask, SIGNAL(clicked()), this, SLOT(invertMask()));
+
+    btnSaveMask=new QPushButton(QIcon(":/imaging_fcs/savemask.png"), tr("&save mask"), w);
+    btnSaveMask->setToolTip(tr("save the mask to harddisk"));
+    glmask->addWidget(btnSaveMask, mskgrpRow, 1);
+    connect(btnSaveMask, SIGNAL(clicked()), this, SLOT(saveMask()));
+    btnLoadMask=new QPushButton(QIcon(":/imaging_fcs/loadmask.png"), tr("&load mask"), w);
+    btnLoadMask->setToolTip(tr("load a mask from harddisk"));
+    glmask->addWidget(btnLoadMask, mskgrpRow, 2);
+    connect(btnLoadMask, SIGNAL(clicked()), this, SLOT(loadMask()));
+    mskgrpRow++;
+    btnSaveSelection=new QPushButton(QIcon(":/imaging_fcs/saveselection.png"), tr("&save selection"), w);
+    btnSaveSelection->setToolTip(tr("save the selection to harddisk"));
+    glmask->addWidget(btnSaveSelection, mskgrpRow, 0);
+    connect(btnSaveSelection, SIGNAL(clicked()), this, SLOT(saveSelection()));
+    btnLoadSelection=new QPushButton(QIcon(":/imaging_fcs/loadselection.png"), tr("&load selection"), w);
+    btnLoadSelection->setToolTip(tr("load a selection from harddisk"));
+    glmask->addWidget(btnLoadSelection, mskgrpRow, 1);
+    connect(btnLoadSelection, SIGNAL(clicked()), this, SLOT(loadSelection()));
+
+
+    mskgrpRow++;
+    QFrame* frame=new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    glmask->addWidget(frame, mskgrpRow, 0, 1, 3);
+    mskgrpRow++;
+    glmask->addWidget(new QLabel(tr("mask edit mode:"), this), mskgrpRow, 0);
+    cmbMaskMode=new QComboBox(this);
+    cmbMaskMode->addItem(tr("replace"));
+    cmbMaskMode->addItem(tr("add"));
+    cmbMaskMode->addItem(tr("remove"));
+    glmask->addWidget(cmbMaskMode, mskgrpRow,1);
+    btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
+    btnMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    mskgrpRow++;
+    glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
+    connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
+    btnMaskByGofIntensity=new QPushButton(tr("mask by &GOF"), w);
+    btnMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    glmask->addWidget(btnMaskByGofIntensity, mskgrpRow, 1);
+    connect(btnMaskByGofIntensity, SIGNAL(clicked()), this, SLOT(excludeByGOFIntensity()));
+    btnMaskByParamIntensity=new QPushButton(tr("mask by &param img"), w);
+    btnMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 2);
+    connect(btnMaskByParamIntensity, SIGNAL(clicked()), this, SLOT(excludeByParamIntensity()));
 
 
 
@@ -241,96 +328,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-
-    ///////////////////////////////////////////////////////////////
-    // GROUPBOX: mask options
-    ///////////////////////////////////////////////////////////////
-    QGroupBox* wmask=new QGroupBox(tr(" mask options "), this);
-    vbl->addWidget(wmask);
-    QGridLayout* glmask=new QGridLayout(this);
-    wmask->setLayout(glmask);
-
-    int mskgrpRow=0;
-    btnDontUse=new QPushButton(tr("&mask selected"), w);
-    btnDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
-    connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
-    glmask->addWidget(btnDontUse, mskgrpRow, 0);
-    btnUse=new QPushButton(tr("&unmask selected"), w);
-    btnUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
-    connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
-    glmask->addWidget(btnUse, mskgrpRow, 1);
-
-    mskgrpRow++;
-    btnUseAll=new QPushButton(tr("&clear mask"), w);
-    btnUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
-    glmask->addWidget(btnUseAll, mskgrpRow, 0);
-    connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
-    btnInvertMask=new QPushButton(tr("&invert mask"), w);
-    btnInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
-    glmask->addWidget(btnInvertMask, mskgrpRow, 1);
-    connect(btnInvertMask, SIGNAL(clicked()), this, SLOT(invertMask()));
-
-    mskgrpRow++;
-    btnSaveMask=new QPushButton(tr("&save mask"), w);
-    btnSaveMask->setToolTip(tr("save the mask to harddisk"));
-    glmask->addWidget(btnSaveMask, mskgrpRow, 0);
-    connect(btnSaveMask, SIGNAL(clicked()), this, SLOT(saveMask()));
-    btnLoadMask=new QPushButton(tr("&load mask"), w);
-    btnLoadMask->setToolTip(tr("load a mask from harddisk"));
-    glmask->addWidget(btnLoadMask, mskgrpRow, 1);
-    connect(btnLoadMask, SIGNAL(clicked()), this, SLOT(loadMask()));
-    mskgrpRow++;
-    btnSaveSelection=new QPushButton(tr("&save selection"), w);
-    btnSaveSelection->setToolTip(tr("save the selection to harddisk"));
-    glmask->addWidget(btnSaveSelection, mskgrpRow, 0);
-    connect(btnSaveSelection, SIGNAL(clicked()), this, SLOT(saveSelection()));
-    btnLoadSelection=new QPushButton(tr("&load selection"), w);
-    btnLoadSelection->setToolTip(tr("load a selection from harddisk"));
-    glmask->addWidget(btnLoadSelection, mskgrpRow, 1);
-    connect(btnLoadSelection, SIGNAL(clicked()), this, SLOT(loadSelection()));
-
-
-    mskgrpRow++;
-    QFrame* frame=new QFrame(this);
-    frame->setFrameShape(QFrame::HLine);
-    glmask->addWidget(frame, mskgrpRow, 0, 1, 2);
-    mskgrpRow++;
-    glmask->addWidget(new QLabel(tr("mask edit mode:"), this), mskgrpRow, 0);
-    cmbMaskMode=new QComboBox(this);
-    cmbMaskMode->addItem(tr("replace"));
-    cmbMaskMode->addItem(tr("add"));
-    cmbMaskMode->addItem(tr("remove"));
-    glmask->addWidget(cmbMaskMode, mskgrpRow,1);
-    btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
-    btnMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
-                                      "A dialog will open up, which allows to mask some pixels\n"
-                                      "according to a given threshold. The mask created by this\n"
-                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
-    mskgrpRow++;
-    glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
-    connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
-    btnMaskByGofIntensity=new QPushButton(tr("mask by &goodnes-of-fit"), w);
-    btnMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
-                                      "A dialog will open up, which allows to mask some pixels\n"
-                                      "according to a given threshold. The mask created by this\n"
-                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByGofIntensity, mskgrpRow, 1);
-    mskgrpRow++;
-    connect(btnMaskByGofIntensity, SIGNAL(clicked()), this, SLOT(excludeByGOFIntensity()));
-    btnMaskByParamIntensity=new QPushButton(tr("mask by &param image"), w);
-    btnMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
-                                      "A dialog will open up, which allows to mask some pixels\n"
-                                      "according to a given threshold. The mask created by this\n"
-                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 0);
-    connect(btnMaskByParamIntensity, SIGNAL(clicked()), this, SLOT(excludeByParamIntensity()));
-
-
-
-
-
-
-
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: correlation plot styles
     ///////////////////////////////////////////////////////////////
@@ -338,9 +335,21 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     vbl->addWidget(wcp);
     QFormLayout* gl=new QFormLayout(this);
     wcp->setLayout(gl);
+
+    QHBoxLayout* cpsHBox=new QHBoxLayout(this);
+    cpsHBox->setContentsMargins(0,0,0,0);
+    chkLogTauAxis=new QCheckBox("", w);
+
     chkDisplayAverage=new QCheckBox(w);
     chkDisplayAverage->setChecked(true);
-    gl->addRow(tr("display &average:"), chkDisplayAverage);
+    cpsHBox->addWidget(chkDisplayAverage);
+    cpsHBox->addWidget((l=new QLabel(tr("log &tau;-axis:"))));
+    cpsHBox->addWidget(chkLogTauAxis);
+    l->setTextFormat(Qt::RichText);
+    l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    l->setBuddy(chkLogTauAxis);
+
+    gl->addRow(tr("display &average:"), cpsHBox);
 
     cmbAverageStyle=new QComboBox(w);
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
@@ -352,9 +361,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
-
-    gl->addRow((l=new QLabel(tr("average opt&ions:"))), cmbAverageStyle);
-    gl->addRow("", cmbAverageErrorStyle);
+    cpsHBox=new QHBoxLayout(this);
+    cpsHBox->setContentsMargins(0,0,0,0);
+    cpsHBox->addWidget(cmbAverageStyle);
+    cpsHBox->addWidget(cmbAverageErrorStyle);
+    gl->addRow((l=new QLabel(tr("average options:"))), cpsHBox);
+    l->setBuddy(cmbAverageStyle);
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageStyle, SLOT(setEnabled(bool)));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageErrorStyle, SLOT(setEnabled(bool)));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
@@ -369,22 +381,29 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
-
-    gl->addRow((labRunOptions=new QLabel(tr("pixel &options:"), w)), cmbRunStyle);
+    cpsHBox=new QHBoxLayout(this);
+    cpsHBox->setContentsMargins(0,0,0,0);
+    cpsHBox->addWidget(cmbRunStyle);
+    cpsHBox->addWidget(cmbRunErrorStyle);
+    gl->addRow((labRunOptions=new QLabel(tr("pixel options:"))), cpsHBox);
     labRunOptions->setBuddy(cmbRunStyle);
-    gl->addRow("", cmbRunErrorStyle);
 
-    chkLogTauAxis=new QCheckBox("", w);
-    gl->addRow((l=new QLabel(tr("log &tau;-axis:"))), chkLogTauAxis);
-    l->setTextFormat(Qt::RichText);
 
+    cpsHBox=new QHBoxLayout(this);
+    cpsHBox->setContentsMargins(0,0,0,0);
     chkDisplayResiduals=new QCheckBox(w);
     chkDisplayResiduals->setChecked(true);
-    gl->addRow(tr("display &residuals:"), chkDisplayResiduals);
 
     chkKeys=new QCheckBox(w);
     chkKeys->setChecked(true);
-    gl->addRow(tr("display &keys:"), chkKeys);
+
+    cpsHBox->addWidget(chkDisplayResiduals);
+    cpsHBox->addWidget((l=new QLabel(tr("display &keys:"))));
+    cpsHBox->addWidget(chkKeys);
+    l->setTextFormat(Qt::RichText);
+    l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    l->setBuddy(chkKeys);
+    gl->addRow(tr("display &residuals:"), cpsHBox);
 
     connectImageWidgets(true);
 
@@ -436,10 +455,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltOverview->addGraph(plteOverview);
 
     plteOverviewSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltOverview->get_plotter());
+    plteOverviewSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     pltOverview->addGraph(plteOverviewSelected);
 
 
     plteOverviewExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltOverview->get_plotter());
+    plteOverviewExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     pltOverview->addGraph(plteOverviewExcluded);
 
     plteImageData=NULL;
@@ -495,6 +516,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltMask->addGraph(plteMask);
 
     plteMaskSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltMask->get_plotter());
+    plteMaskSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
+
     pltMask->addGraph(plteMaskSelected);
 
 
@@ -553,10 +576,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     plteImageSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltImage->get_plotter());
+    plteImageSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     //pltImage->addGraph(plteImageSelected);
 
 
     plteImageExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltImage->get_plotter());
+    plteImageExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     //pltImage->addGraph(plteImageExcluded);
 
     plteImageData=NULL;
@@ -616,7 +641,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     plteGofImageSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltGofImage->get_plotter());
+    plteGofImageSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     plteGofImageExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltGofImage->get_plotter());
+    plteGofImageExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
 
     plteImageData=NULL;
 
@@ -903,10 +930,16 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     // HISTOGRAM TAB
     //////////////////////////////////////////////////////////////////////////////////////////
     histogram=new QFHistogramView(this);
-    QWidget* widHist=histogram;
+    histogram->setMinimumHeight(200);
     chkExcludeExcludedRunsFromHistogram=new QCheckBox("", this);
     chkExcludeExcludedRunsFromHistogram->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
     histogram->addSettingsWidget(tr("mind excluded runs:"), chkExcludeExcludedRunsFromHistogram);
+
+    QWidget* widHist=new QWidget(this); //=histogram;
+    QVBoxLayout* histLay=new QVBoxLayout(this);
+    widHist->setLayout(histLay);
+    histLay->addWidget(histogram, 5);
+    histLay->addStretch(3);
 
 
 
@@ -1068,8 +1101,18 @@ void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
 }
 
 void QFRDRImagingFCSImageEditor::paletteChanged() {
+    bool oldDoDraw=pltImage->get_doDrawing();
+    pltImage->set_doDrawing(false);
+
     plteImage->set_palette(cmbColorbar->currentIndex());
-    plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
+    //plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
+    plteImage->set_autoImageRange(false);
+    if (chkImageAutoScale->isChecked() && plteImageData!=NULL && plteOverviewExcludedData!=NULL) {
+        double mi, ma;
+        statisticsMaskedMinMax(plteImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
+        plteImage->set_imageMin(mi);
+        plteImage->set_imageMax(ma);
+    }
     switch(cmbOutOfRangeMode->currentIndex()) {
         case 0:
             plteImage->set_rangeMinFailAction(JKQTPMathImage::LastPaletteColor);
@@ -1124,7 +1167,8 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
         edtColMax->setValue(ma);
     }
     saveImageSettings();
-    pltImage->update_plot();
+    pltImage->set_doDrawing(oldDoDraw);
+    if (oldDoDraw) pltImage->update_plot();
 }
 
 void QFRDRImagingFCSImageEditor::histogramSettingsChanged() {
@@ -1766,6 +1810,7 @@ void QFRDRImagingFCSImageEditor::rawDataChanged() {
     replotImage();
     replotData();
     replotMask();
+    if (chkImageAutoScale->isChecked()) paletteChanged();
     updateHistogram();
     QApplication::restoreOverrideCursor();
 };
@@ -1907,6 +1952,11 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         plteGofImage->set_data(plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
         plteGofImage->set_width(w);
         plteGofImage->set_height(h);
+        plteGofImage->set_autoImageRange(false);
+        double mi, ma;
+        statisticsMaskedMinMax(plteGofImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
+        plteGofImage->set_imageMin(mi);
+        plteGofImage->set_imageMax(ma);
 
     }
 
@@ -2101,10 +2151,18 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         }
         pltOverview->setXY(0, w, 0, h);
 
-        if (m->getImageFromRunsPreview()) plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
-        else plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+        if (m->getImageFromRunsPreview()) {
+            plteOverview->set_autoImageRange(false);
+            uint16_t mi, ma;
+            statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, plteImageSize, mi, ma, false);
+            plteOverview->set_imageMin(mi);
+            plteOverview->set_imageMax(ma);
+            plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+
+        } else plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
         plteOverview->set_width(w);
         plteOverview->set_height(h);
+
     }
 
     pltOverview->set_doDrawing(true);
@@ -2809,6 +2867,11 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if ( (!m) || evalGroup.isEmpty() || fitParam.isEmpty() ) return;
 
+#ifdef DEBUG_TIMING
+    QElapsedTimer time;
+    time.start();
+#endif
+
     QStringList evals=current->resultsCalcEvaluationsInGroup(evalGroup);
     for (register int i=0; i<evals.size(); i++) {
         const QString& en=evals[i];
@@ -2862,6 +2925,9 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
             }
         }
     }
+#ifdef DEBUG_TIMING
+    qDebug()<<"QFRDRImagingFCSImageEditor::readParameterImage("<<evalGroup<<fitParam<<") finished after "<<time.elapsed()<<"ms";
+#endif
 
 }
 

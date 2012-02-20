@@ -279,6 +279,11 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
     //qDebug()<<"***** updateHistogram()   "<<plteImageData<<plteImageSize;
 
+    QList<size_t> barYs;
+    QList<int> barHistID;
+    QList<JKQTPboxplotHorizontalGraph*> bars;
+    double allhist_max=0;
+
     int histStart=0;
     int histEnd=histograms.size();
     if (which>=0) {
@@ -349,12 +354,15 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
                 if (hh==0) mainHistogramMax=statisticsMax(histY, histBins);
                 double barY=mainHistogramMax*1.1;
+                if (mainHistogramMax>allhist_max) allhist_max=mainHistogramMax;
 
                 QString prefix=QString("hist%1_").arg(hh);
 
                 size_t pltcPHHistogramX=ds->addCopiedColumn(histX, histBins, prefix+"histX");
                 size_t pltcPHHistogramY=ds->addCopiedColumn(histY, histBins, prefix+"histY");
                 size_t pltcPHBarY=ds->addCopiedColumn(&barY, 1, prefix+"barY");
+                barYs.append(pltcPHBarY);
+                barHistID.append(hh);
                 size_t pltcPHBarMean=ds->addCopiedColumn(&dmean, 1, prefix+"mean");;
                 /*size_t pltcPHBarStd=*/ds->addCopiedColumn(&dstd, 1, prefix+"stddev");;
                 size_t pltcPHBarMedian=ds->addCopiedColumn(&dmedian, 1, prefix+"median");;
@@ -364,7 +372,11 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 size_t pltcPHBarQ75=ds->addCopiedColumn(&dq75, 1, prefix+"quant75");;
 
                 JKQTPboxplotHorizontalGraph* plteParamHistogramBoxplot=new JKQTPboxplotHorizontalGraph(pltParamHistogram->get_plotter());
+                bars.append(plteParamHistogramBoxplot);
                 plteParamHistogramBoxplot->set_boxWidth(mainHistogramMax*0.08);
+                if (chkLogHistogram->isChecked()) {
+                    plteParamHistogramBoxplot->set_boxWidth(mainHistogramMax*0.08*double(hh+1));
+                }
                 plteParamHistogramBoxplot->set_maxColumn(pltcPHBarMax);
                 plteParamHistogramBoxplot->set_minColumn(pltcPHBarMin);
                 plteParamHistogramBoxplot->set_medianColumn(pltcPHBarMedian);
@@ -394,6 +406,18 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 free(histY);
                 free(datahist);
             }
+        }
+    }
+
+    if (!chkLogHistogram->isChecked()) {
+        for (int i=0; i<barYs.size(); i++) {
+            ds->set(barYs[i], 0, allhist_max*(1.0+double(barHistID[i]+1)*0.1));
+            bars[i]->set_boxWidth(allhist_max*0.08);
+        }
+    } else {
+        for (int i=0; i<barYs.size(); i++) {
+            ds->set(barYs[i], 0, allhist_max+pow(10.0, (double(barHistID[i]+floor(log(allhist_max)/log(10.0)))*0.1)));
+            bars[i]->set_boxWidth(pow(10.0, floor(allhist_max)/*+double(i)/double(barYs.size())*/));
         }
     }
 
