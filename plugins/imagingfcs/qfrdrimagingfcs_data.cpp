@@ -240,23 +240,29 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         img.geoElements.append(rect);;
                     }
                     ovrImages.append(img);
-                } else if (ft=="acf" || ft=="ccf" || ft=="dccf"){
+                } else if (ft=="acf" || ft=="ccf" || ft=="dccf") {
                     if (!dataLoaded) {
-                        if (filetype.toUpper()=="VIDEO_CORRELATOR") {
+                        if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
+                            loadVideoCorrelatorFileBin(files[i]);
+                            //qDebug()<<i<<ft<<"loading binary Video correlator file '"<<files[i]<<"'\n";
+                            dataLoaded=true;
+                        } else if (filetype.toUpper()=="VIDEO_CORRELATOR") {
                             loadVideoCorrelatorFile(files[i]);
-                            //qDebug()<<"loading Video correlator file '"<<files[i]<<"'\n";
+                            //qDebug()<<i<<ft<<"loading Video correlator file '"<<files[i]<<"'\n";
                             dataLoaded=true;
                         } else if (filetype.toUpper()=="RADHARD2") {
                             loadRadhard2File(files[i]);
                             width=getProperty("WIDTH", 0).toInt();
                             height=getProperty("HEIGHT", 0).toInt();
+                            //qDebug()<<i<<ft<<"loading Radhard2 file '"<<files[i]<<"'\n";
                             dataLoaded=true;
                         } else {
                           setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[i]));
                           break;
                         }
                     } else {
-                        setError(tr("correlation data has already been loaded for Imaging FCS (2nd data file is '%2')").arg(filetype).arg(files[i]));
+                        //qDebug()<<i<<ft<<tr("correlation data has already been loaded for Imaging FCS (filetype: %2, this data file is '%1')").arg(files[i]).arg(ft);
+                        setError(tr("correlation data has already been loaded for Imaging FCS (filetype: %2, this data file is '%1')").arg(files[i]).arg(ft));
                         break;
                     }
                 }
@@ -509,6 +515,101 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 	if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
     return ok;
 }
+
+
+
+
+
+
+
+
+
+
+
+bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
+    bool ok=true;
+    QString errorDescription="";
+
+#ifdef DEBUG_TIMING
+    QElapsedTimer time;
+    time.start();
+#endif
+
+    // LOAD YOUR DATAFILE
+    //      and set ok=false, if an error occured
+    // example:
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        ok=false;
+    } else {
+        uint32_t corr_set=getProperty("CORRELATION_SET", 0).toUInt();
+        double taufactor=getProperty("TAU_FACTOR", 1).toDouble();
+        double corroffset=getProperty("CORR_OFFSET", 0).toDouble();
+#ifdef DEBUG_TIMING
+        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+#endif
+        QByteArray file_id=file.read(10);
+        if (file_id=="QF3.0imFCS") {
+            uint32_t fwidth=binfileReadUint32(file);
+            uint32_t fheight=binfileReadUint32(file);
+            uint32_t fcorrN=binfileReadUint32(file);
+            uint32_t fN=binfileReadUint32(file);
+            uint32_t fsets=binfileReadUint32(file);
+
+            setQFProperty("WIDTH", fwidth, false, true);
+            setQFProperty("HEIGHT", fwidth, false, true);
+            allocateContents(fwidth, fheight, fN);
+
+            binfileReadDoubleArray(file, tau, N);
+            if (taufactor!=1) for (int i=0; i<N; i++) { tau[i]=tau[i]*taufactor; }
+            if (corr_set==0 && fcorrN==1) {
+                for (long long p=0; p<width*height; p++) {
+                    binfileReadDoubleArray(file, &(correlations[p*N]), N);
+                    if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
+                    if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
+                }
+                QApplication::processEvents();
+            } else {
+                for (uint32_t cf=0; cf<fcorrN; cf++) {
+                    if (cf==corr_set) {
+                        for (long long p=0; p<width*height; p++) {
+                            binfileReadDoubleArray(file, &(correlations[p*N]), N);
+                            if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
+                            if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
+                        }
+                    } else {
+                        file.seek(file.pos()+width*height*N*sizeof(double));
+                        if (fsets>1) file.seek(file.pos()+width*height*N*sizeof(double));
+                    }
+                    QApplication::processEvents();
+                }
+            }
+            QApplication::processEvents();
+            recalcCorrelations();
+            QApplication::processEvents();
+            ok=(file.error()==QFile::NoError);
+            if (!ok) {
+                errorDescription=tr("error reading data from binary file '%1': %2").arg(filename).arg(file.errorString());
+            }
+        } else {
+            ok=false;
+            errorDescription=tr("binary file '%3' did not start with the correct file id: found '%1' but expected '%2'").arg(QString(file_id)).arg(QString("QF3.0imFCS")).arg(filename);
+        }
+        file.close();
+
+    }
+#ifdef DEBUG_TIMING
+    qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
+#endif
+
+    if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
+    return ok;
+}
+
+
+
+
+
 
 
 

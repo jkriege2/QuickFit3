@@ -138,10 +138,13 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
          */
         virtual void intReadData(QDomElement* e=NULL);
 
-        /** \brief load data file */
+        /** \brief load data file from videocorrelator CSV file */
         bool loadVideoCorrelatorFile(const QString& filename);
 
-        /** \brief load data file */
+        /** \brief load data file in binary format*/
+        bool loadVideoCorrelatorFileBin(const QString &filename);
+
+        /** \brief load data file from Radhard2 array */
         bool loadRadhard2File(const QString& filename);
 
         /** \brief load overview image file */

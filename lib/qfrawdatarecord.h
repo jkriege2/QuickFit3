@@ -59,7 +59,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual ~QFRawDataRecord();
 
         /** \brief initialize the object with the given data */
-        void init(QString name=QString(""), QStringList inputFiles=QStringList(), QStringList inputFilesTypes=QStringList());
+        void init(const QString& name=QString(""), QStringList inputFiles=QStringList(), QStringList inputFilesTypes=QStringList());
         /** \brief initialize from QDomElement */
         void init(QDomElement& e);
 
@@ -102,9 +102,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
     public slots:
         /** \brief set the name */
-        void setName(const QString n);
+        void setName(const QString& n);
         /** \brief set the folder */
-        void setFolder(const QString n);
+        void setFolder(const QString& n);
         /** \brief set the description  */
         void setDescription(const QString& d);
         /** \brief returns a model which may be used to access and edit the properties in this object  */
@@ -135,7 +135,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void enableEmitPropertiesChanged(bool emitnow=true);
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
-        virtual void setPropertiesError(QString message) { setError(message); }
+        virtual void setPropertiesError(const QString& message) { setError(message); }
 
         /** \brief a model used to access the properties */
         QFRDRPropertyModel* propModel;
@@ -170,7 +170,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          */
         virtual void intReadData(QDomElement* e=NULL) {}
         /** \brief set the internal error flag and description */
-        void setError(QString description) { errorOcc=true; errorDesc=description; }
+        void setError(const QString& description) { errorOcc=true; errorDesc=description; }
 
 
     public:
@@ -215,6 +215,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             QString svalue;  /**< value as string */
             QString unit; /**< unit name of the stored values */
             QVector<double> dvec;  /**< data as double vector */
+            QVector<double> evec;  /**< errors as double vector */
             int columns;  /**< number of columns if matrix is stored in dvec (\c type \c == evaluationResultType::qfrdreNumberMatrix) */
             QString label;  /**< a label describing the result (no richtext markup!) */
             QString label_rich; /**< a label describing the result (with richtext markup!) */
@@ -255,43 +256,52 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief clear all evaluation results */
         void resultsClearAll();
         /** \brief clear all evaluation results of a specific evaluation name */
-        void resultsClear(QString name);
+        void resultsClear(const QString& name);
         /** \brief clear all evaluation results of a specific evaluation name which contain a given \a postfix */
-        void resultsClear(QString name, QString postfix);
+        void resultsClear(const QString& name, const QString& postfix);
         /** \brief check whether a result exists */
-        bool resultsExists(QString evalName, QString resultName) const;
+        bool resultsExists(const QString& evalName, const QString& resultName) const;
         /** \brief check whether there are any results from a given evauation */
-        bool resultsExistsFromEvaluation(QString evalName) const;
+        bool resultsExistsFromEvaluation(const QString& evalName) const;
         /** \brief set a result of type number */
-        void resultsSetNumber(QString evaluationName, QString resultName, double value, QString unit=QString(""));
+        void resultsSetNumber(const QString& evaluationName, const QString& resultName, double value, const QString& unit=QString(""));
         /** \brief set a result of type number vector */
-        void resultsSetNumberList(QString evaluationName, QString resultName, QVector<double>& value, QString unit=QString(""));
+        void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit=QString(""));
         /** \brief set a result of type number matrix */
-        void resultsSetNumberMatrix(QString evaluationName, QString resultName, QVector<double>& value, int columns, QString unit=QString(""));
+        void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, const QVector<double>& value, int columns, const QString& unit=QString(""));
         /** \brief set a result of type number vector */
-        void resultsSetNumberList(QString evaluationName, QString resultName, double* value, int items, QString unit=QString(""));
+        void resultsSetNumberList(const QString& evaluationName, const QString& resultName, double* value, int items, const QString& unit=QString(""));
         /** \brief set a result of type number matrix */
-        void resultsSetNumberMatrix(QString evaluationName, QString resultName, double* value, int columns, int rows, QString unit=QString(""));
+        void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, double* value, int columns, int rows, const QString& unit=QString(""));
+
+        /** \brief set a result of type number vector */
+        void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QVector<double>& error, const QString& unit=QString(""));
+        /** \brief set a result of type number matrix */
+        void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QVector<double>& error, int columns, const QString& unit=QString(""));
+        /** \brief set a result of type number vector */
+        void resultsSetNumberList(const QString& evaluationName, const QString& resultName, double* value, double* error, int items, const QString& unit=QString(""));
+        /** \brief set a result of type number matrix */
+        void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, double* value, double* error, int columns, int rows, const QString& unit=QString(""));
 
 
         /** \brief set a result of type number+error */
-        void resultsSetNumberError(QString evaluationName, QString resultName, double value, double error, QString unit=QString(""));
+        void resultsSetNumberError(const QString& evaluationName, const QString& resultName, double value, double error, const QString& unit=QString(""));
         /** \brief set a result of type integer */
-        void resultsSetInteger(QString evaluationName, QString resultName, int64_t value, QString unit=QString(""));
+        void resultsSetInteger(const QString& evaluationName, const QString& resultName, int64_t value, const QString& unit=QString(""));
         /** \brief set a result of type string */
-        void resultsSetString(QString evaluationName, QString resultName, QString value);
+        void resultsSetString(const QString& evaluationName, const QString& resultName, const QString& value);
         /** \brief set a result of type boolean */
-        void resultsSetBoolean(QString evaluationName, QString resultName, bool value);
+        void resultsSetBoolean(const QString& evaluationName, const QString& resultName, bool value);
         /** \brief set result from evaluationResult */
-        void resultsSet(QString evaluationName, QString resultName, const evaluationResult& result);
+        void resultsSet(const QString& evaluationName, const QString& resultName, const evaluationResult& result);
         /** \brief return a specified result as variant */
-        evaluationResult resultsGet(QString evalName, QString resultName) const;
+        evaluationResult resultsGet(const QString& evalName, const QString& resultName) const;
         /** \brief return the type of a specified result, or qfrdreInvalid if an error occured (eval does not exist ...) */
-        evaluationResultType resultsGetType(QString evalName, QString resultName) const;
+        evaluationResultType resultsGetType(const QString& evalName, const QString& resultName) const;
         /** \brief return a specified result as string */
-        QString  resultsGetAsString(QString evalName, QString resultName) const;
+        QString  resultsGetAsString(const QString& evalName, const QString& resultName) const;
         /** \brief return a specified result as string, but returns as a QVariant. If the result is invalid, a QVariant() will be returned. */
-        QVariant  resultsGetAsStringVariant(QString evalName, QString resultName) const;
+        QVariant  resultsGetAsStringVariant(const QString& evalName, const QString& resultName) const;
         /** \brief remove the value stored in the given position
          *
          *  If the results for the given \a evalName are empty after the delete, the entry for the
@@ -301,82 +311,84 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          *  \param resultName the name of the result to be deleted in the evaluation result set \a evalName
          *  \param emitChangedSignal if set \c false (default is \c true ) this function will NOT emit a resultsChanged() signal.
          */
-        void resultsRemove(QString evalName, QString resultName, bool emitChangedSignal=true);
+        void resultsRemove(const QString& evalName, const QString& resultName, bool emitChangedSignal=true);
         /*! \brief return a specified result as a QVariant
 
             The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
             a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberVector).
         */
-        QVariant resultsGetAsQVariant(QString evalName, QString resultName) const;
+        QVariant resultsGetAsQVariant(const QString& evalName, const QString& resultName) const;
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
-        double resultsGetAsDouble(QString evalName, QString resultName, bool* ok=NULL) const;
+        double resultsGetAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result as boolean (or \c false if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
-        bool resultsGetAsBoolean(QString evalName, QString resultName, bool* ok=NULL) const;
+        bool resultsGetAsBoolean(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result as integer (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        int64_t resultsGetAsInteger(QString evalName, QString resultName, bool* ok=NULL) const;
+        int64_t resultsGetAsInteger(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        QVector<double> resultsGetAsDoubleList(QString evalName, QString resultName, bool* ok=NULL) const;
+        QVector<double> resultsGetAsDoubleList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        double resultsGetErrorAsDouble(QString evalName, QString resultName, bool* ok=NULL) const;
+        double resultsGetErrorAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
+        /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        QVector<double> resultsGetErrorAsDoubleList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
 
         /** \brief set the label of a result (the result already has to exist!) */
-        void resultsSetLabel(QString evaluationName, QString resultName, QString label, QString label_rich=QString(""));
+        void resultsSetLabel(const QString& evaluationName, const QString& resultName, const QString& label, const QString& label_rich=QString(""));
         /** \brief return the label of a result (the non-richtext version!) */
-        QString resultsGetLabel(QString evaluationName, QString resultName) const;
+        QString resultsGetLabel(const QString& evaluationName, const QString& resultName) const;
         /** \brief return the label of a result, potentially with richtext markup! */
-        QString resultsGetLabelRichtext(QString evaluationName, QString resultName) const;
+        QString resultsGetLabelRichtext(const QString& evaluationName, const QString& resultName) const;
 
         /** \brief set the group of a result (the result already has to exist!) */
-        void resultsSetGroup(QString evaluationName, QString resultName, QString group);
+        void resultsSetGroup(const QString& evaluationName, const QString& resultName, const QString& group);
         /** \brief return the group of a result  */
-        QString resultsGetGroup(QString evaluationName, QString resultName) const;
+        QString resultsGetGroup(const QString& evaluationName, const QString& resultName) const;
 
         /** \brief set the sort priority of a result (the result already has to exist!) */
-        void resultsSetSortPriority(QString evaluationName, QString resultName, bool pr);
+        void resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr);
         /** \brief return the sort priority of a result  */
-        bool resultsGetSortPriority(QString evaluationName, QString resultName) const;
+        bool resultsGetSortPriority(const QString& evaluationName, const QString& resultName) const;
 
         /** \brief set the human-readable label for a group name used as evalGroup  */
-        void resultsSetEvaluationGroupLabel(QString evalGroup, QString label);
+        void resultsSetEvaluationGroupLabel(const QString& evalGroup, const QString& label);
         /** \brief return the human-readable label of an evaluation group
          *
          *  This function returns the argument \a evalGroup if a label is not saved!
          */
-        QString resultsGetLabelForEvaluationGroup(QString evalGroup) const;
+        QString resultsGetLabelForEvaluationGroup(const QString& evalGroup) const;
         /** \brief return the group of an evaluation ID, returns an empty string, if the evaluationName does not exist  */
-        QString resultsGetEvaluationGroup(QString evaluationName) const;
+        QString resultsGetEvaluationGroup(const QString& evaluationName) const;
         /** \brief return the group of an evaluation ID as human-readable label
          *
          *   returns an empty string, if the evaluationName does not exist and the group itself, if no label exists.
          */
-        QString resultsGetEvaluationGroupLabel(QString evaluationName) const;
+        QString resultsGetEvaluationGroupLabel(const QString& evaluationName) const;
         /** \brief set the group of an evaluation ID */
-        void resultsSetEvaluationGroup(QString evaluationName, QString group);
+        void resultsSetEvaluationGroup(const QString& evaluationName, const QString& group);
         /** \brief set the group index of an evaluation ID */
-        void resultsSetEvaluationGroupIndex(QString evaluationName, int64_t groupIndex);
+        void resultsSetEvaluationGroupIndex(const QString& evaluationName, int64_t groupIndex);
         /** \brief return the group index of an evaluation ID, returns \c -1, if the evaluationName does not exist  */
-        int64_t resultsGetEvaluationGroupIndex(QString evaluationName) const;
+        int64_t resultsGetEvaluationGroupIndex(const QString& evaluationName) const;
         /** \brief set the description of an evaluation ID */
-        void resultsSetEvaluationDescription(QString evaluationName, QString description);
+        void resultsSetEvaluationDescription(const QString& evaluationName, const QString& description);
         /** \brief return the description of an evaluation ID, returns evaluationName, if no description is set, if the evaluationName does not exist  */
-        QString resultsGetEvaluationDescription(QString evaluationName) const;
+        QString resultsGetEvaluationDescription(const QString& evaluationName) const;
 
 
         /** \brief get number of results for a specified evaluation */
-        int resultsGetCount(QString evalName) const;
+        int resultsGetCount(const QString& evalName) const;
         /** \brief get number of evaluations in this object */
         int resultsGetEvaluationCount() const;
         /** \brief get the i-th evaluation name */
         QString resultsGetEvaluationName(int i) const;
         /** \brief get the i-th result name */
-        QString resultsGetResultName(QString evaluationName, int i) const;
+        QString resultsGetResultName(const QString& evaluationName, int i) const;
 
         /*! \brief save a copy of all results with the given \a oldEvalName to the given \a newEvalName
             \param oldEvalName name of the evaluation results section to copy
             \param newEvalName name of the target evaluation results section
             \note if \a newEvalName already exists, the additional results will be added to \a newEvalName
          */
-        void resultsCopy(QString oldEvalName, QString newEvalName);
+        void resultsCopy(const QString& oldEvalName, const QString& newEvalName);
 
         /*! \brief save the results to a CSV file
 
@@ -391,7 +403,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             \param stringDelimiter strings are surrounded by this character (one in front,one behind)
             \return \c true on success
         */
-        bool resultsSaveToCSV(QString filename, QString separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"');
+        bool resultsSaveToCSV(const QString& filename, const QString& separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"');
 
         /*! \brief save the results to a SYLK file
 
@@ -403,7 +415,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             \param filename the file to create
             \return \c true on success
         */
-        bool resultsSaveToSYLK(QString filename);
+        bool resultsSaveToSYLK(const QString& filename);
 
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel();

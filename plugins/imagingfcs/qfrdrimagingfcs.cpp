@@ -70,7 +70,7 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
             QString filename=*it;
             QString overview="";
             QApplication::processEvents();
-            insertVideoCorrelatorFile(filename, overview);
+            insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
             settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
             services->setProgress(i);
             QApplication::processEvents();
@@ -86,10 +86,15 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
 void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
         // file format to import
-        QString format_videoCorrelator=tr("VideoCorrelator Autocorrelations (*.autocorrelation.dat *.acf.dat *.crosscorrelation.dat *.ccf.dat *.dccf.dat *.qf.dat)");
+        QString format_binVideoCorrelator=tr("binary imFCS Correlations (*.autocorrelation.bin *.acf.bin *.crosscorrelation.bin *.ccf.bin *.dccf.bin)");
+        QString format_binVideoCorrelator_short=tr("binary imFCS correlation data");
+        QString format_videoCorrelator=tr("CSV imFCS Correlations (*.autocorrelation.dat *.acf.dat *.crosscorrelation.dat *.ccf.dat *.dccf.dat *.qf.dat)");
+        QString format_videoCorrelator_short=tr("CSV imFCS correlation data");
         QString format_Radhard2=tr("SPAD array Correlations (*.dat)");
-        QStringList formats;
-        formats<<format_videoCorrelator<<format_Radhard2;
+        QString format_Radhard2_short=tr("SPAD array data");
+        QStringList formats, formats_short;
+        formats<<format_binVideoCorrelator<<format_videoCorrelator<<format_Radhard2;
+        formats_short<<format_binVideoCorrelator_short<<format_videoCorrelator_short<<format_Radhard2_short;
         // look into INI which was the last used format
         QString current_format_name=settings->getQSettings()->value("imaging_fcs/current_format_filter", format_videoCorrelator).toString();
         // let the user select some files to import
@@ -99,6 +104,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                               formats.join(";;"), &current_format_name, QFileDialog::DontUseNativeDialog|QFileDialog::ReadOnly);
         // store the format we just used
         settings->getQSettings()->setValue("imaging_fcs/current_format_filter", current_format_name);
+        QString current_format_name_short=formats_short.value(formats.indexOf(current_format_name), "???");
 
         // now we iterate over all files and use QuickFit's progress bar interface (see plugin services)
         QStringList list = files;
@@ -113,8 +119,8 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         //qDebug()<<current_format_name;
         while(it != list.end()) {
             i++;
-            services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name));
-            progress.setLabelText(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name));
+            services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name_short));
+            progress.setLabelText(tr("loading [%2] '%1' ...\n").arg(*it).arg(current_format_name_short));
             QApplication::processEvents();
             if (current_format_name==format_videoCorrelator) {
                 QString filename=*it;
@@ -137,7 +143,29 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                     overview=overview.replace(".acf.dat", ".overview.tif");
                 }
                 if (!QFile::exists(overview)) overview="";
-                insertVideoCorrelatorFile(filename, overview);
+                insertVideoCorrelatorFile(filename, overview, false);
+            } else if (current_format_name==format_binVideoCorrelator) {
+                QString filename=*it;
+                QString overview=filename;
+                overview=overview.replace(".autocorrelation.bin", ".overview.tif");
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".crosscorrelation.bin", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".dccf.bin", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".ccf.bin", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) {
+                    overview=filename;
+                    overview=overview.replace(".acf.bin", ".overview.tif");
+                }
+                if (!QFile::exists(overview)) overview="";
+                insertVideoCorrelatorFile(filename, overview, true);
             } else if (current_format_name==format_Radhard2) {
                 QString filename=*it;
                 insertRadhard2File(filename);
@@ -166,7 +194,7 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     return result;
 }
 
-void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww) {
+void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, bool binary) {
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
     QString filename_overview=filename_overvieww;
@@ -187,7 +215,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
 
     // set whatever you want (FILETYPE is just an example)!
-    initParams["FILETYPE"]="VIDEO_CORRELATOR";
+    if (binary) initParams["FILETYPE"]="VIDEO_CORRELATOR_BIN";
+    else initParams["FILETYPE"]="VIDEO_CORRELATOR";
     QString evalFilename="";
     bool isCross=false;
     bool isDCCF=false;
@@ -212,6 +241,24 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     } else if (filename.endsWith(".dccf.dat")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".dccf.dat", ".evalsettings.txt");
+        isDCCF=true;
+    } else if (filename.endsWith(".autocorrelation.bin")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".autocorrelation.bin", ".evalsettings.txt");
+    } else if (filename.endsWith(".acf.bin")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".acf.bin", ".evalsettings.txt");
+    } else if (filename.endsWith(".crosscorrelation.bin")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".crosscorrelation.bin", ".evalsettings.txt");
+        isCross=true;
+    } else if (filename.endsWith(".ccf.bin")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".ccf.bin", ".evalsettings.txt");
+        isCross=true;
+    } else if (filename.endsWith(".dccf.bin")) {
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".dccf.bin", ".evalsettings.txt");
         isDCCF=true;
     }
     //qDebug()<<filename<<isJanBFile;
@@ -411,29 +458,20 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;
-            initParams["TAU_COLUMN"]=0;
-            if (isJanBFile) {
-                bool okk=true;
-                double tf=QInputDialog::getDouble ( NULL, tr("Import Video Correlator Data"), tr("tau factor = "), 1, 1e-60, 1e60, 6, &okk);
-                if (okk) {
-                    initParams["TAU_FACTOR"]=tf;
-                    paramsReadonly<<"TAU_FACTOR";
-                    initParams["CORR_OFFSET"]=1.0;
-                    paramsReadonly<<"CORR_OFFSET";
-                    initParams["TAU_COLUMN"]=5;
 
-                } else ok=false;
 
-            }
-            int columns=checkColumns(filename);
+            int columns=1;
+            if (!binary) columns=checkColumns(filename);
             if (!isCross && !isDCCF) {
-                initParams["CORRELATION_COLUMN"]=1;
-                if (isJanBFile) initParams["CORRELATION_COLUMN"]=7;
+                if (!binary) {
+                    initParams["CORRELATION_COLUMN"]=1;
+                    if (isJanBFile) initParams["CORRELATION_COLUMN"]=7;
+                }
                 files.prepend(filename);
                 files_types.prepend("acf");
                 //qDebug()<<"filename_overview: "<<filename_overview;
 
-                if (columns>2 && !isJanBFile){
+                if (columns>2 && !isJanBFile && !binary){
                     initParams["CORRELATION_ERROR_COLUMN"]=2;
                 }
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
@@ -446,12 +484,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
                     project->deleteRawData(e->getID());
                 }
-            } else if (isCross) {
+            } else if (isCross && !binary) {
 
+                files.prepend(filename);
+                files_types.prepend("ccf");
                 for (int c=1; c<=qMin(4,columns); c++) {
                     initParams["CORRELATION_COLUMN"]=c;
-                    files.prepend(filename);
-                    files_types.prepend("ccf");
 
                     if (columns>4) initParams["CORRELATION_ERROR_COLUMN"]=c+4;
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
@@ -465,13 +503,31 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         project->deleteRawData(e->getID());
                     }
                 }
+            } else if (isCross && binary) {
+
+                files.prepend(filename);
+                files_types.prepend("ccf");
+                for (int c=1; c<=4; c++) {
+                    initParams["CORRELATION_SET"]=c-1;
+
+                    // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
+                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types);
+                    if (!filename_acquisition.isEmpty()) {
+                        e->setFolder(QFileInfo(filename_acquisition).baseName());
+                    }
+                    if (e->error()) { // when an error occured: remove record and output an error message
+                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+                        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+                        project->deleteRawData(e->getID());
+                    }
+                }
             } else if (isDCCF) {
 
-                initParams["CORRELATION_COLUMN"]=1;
+                if (!binary) initParams["CORRELATION_COLUMN"]=1;
                 files.prepend(filename);
                 files_types.prepend("dccf");
 
-                if (columns>2) initParams["CORRELATION_ERROR_COLUMN"]=2;
+                if (columns>2 && !binary) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
                 QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - DCCF"), files, initParams, paramsReadonly, files_types);
                 if (!filename_acquisition.isEmpty()) {

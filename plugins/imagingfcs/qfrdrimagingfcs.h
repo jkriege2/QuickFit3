@@ -72,7 +72,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
             \param filename filename of the input file
             \param filename_overview filename of a file containing an overview image
         */
-        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""));
+        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), bool binary=false);
         /*! \brief add a Radhard2 file to the current project
 
             \param filename filename of the input file

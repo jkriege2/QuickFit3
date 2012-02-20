@@ -183,9 +183,9 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
     pltImage->get_plotter()->getXAxis()->set_labelDigits(2);
     pltImage->get_plotter()->getYAxis()->set_labelDigits(2);
     pltImage->get_plotter()->getXAxis()->set_minTicks(5);
-    pltImage->get_plotter()->getXAxis()->addAxisTickLabel(0,"0");
+    //pltImage->get_plotter()->getXAxis()->addAxisTickLabel(0,"0");
     pltImage->get_plotter()->getYAxis()->set_minTicks(5);
-    pltImage->get_plotter()->getYAxis()->addAxisTickLabel(0,"0");
+    //pltImage->get_plotter()->getYAxis()->addAxisTickLabel(0,"0");
 
     pltImage->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
     pltImage->get_plotter()->getYAxis()->set_tickLabelFontSize(8);

@@ -13,6 +13,8 @@
 #include "multitau-correlator.h"
 #include "correlator_multitau.h"
 #include <QtGlobal>
+#include <QtEndian>
+#include "qfrdrimagingfcstools.h"
 
 class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward
@@ -240,7 +242,7 @@ protected:
         A CCF for every pixel is calculated and stored in ccf, ccf_tau and ccf_std, if the pixels and its shifted counterpart are
         both inside the image area.
      */
-    void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250);
+    void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250, double **ccf_segments_io=NULL);
 
 
     /*! \brief contribute the data in the given image to the given correlators
@@ -249,6 +251,118 @@ protected:
     void contribute_to_correlations(QList<MultiTauCorrelator<double, double> *> &ccfjk, QList<correlatorjb<double, double> *> &ccfjb, float *frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N);
     void average_ccfs(double **acf, double **acf_std, uint32_t acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
     void prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double** acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
+
+    /*! \brief store a set of correlation functions as a CSV file */
+    bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error) const;
+    /*! \brief store a set of correlation functions as a binary file
+
+        The binary file has this data layout:
+\verbatim
+data                                                   size [bytes]
++---------------------------------------------------+
+| "QF3.0imFCS"                    file id           |  10
++---------------------------------------------------+
+| width                               width of image|  4
+| height                             height of image|  4
+| corrN                 correlation curves per pixel|  4
+| N                        datapoints/lags per curve|  4
+| sets 1: cfs only  2: cfs + errors                 |  4
++---------------------------------------------------+
+| lag times in seconds                              |  8*N
++---------------------------------------------------+
+| cf[0] of pixel[0]                                 |  8*N
+| cf[1] of pixel[0]                                 |  8*N
+| ...                                               |
+| cf[corN-1] of pixel[0]                            |  8*N
++---------------------------------------------------+     --+
+| errcf[0]  of pixel[0]                             |  8*N  |
+| errcf[1]  of pixel[0]                             |  8*N  | only if sets==2
+| ...                                               |       | or sets==4
+| errcf[corN-1]  of pixel[0]                        |  8*N  |
++---------------------------------------------------+     --+
++---------------------------------------------------+
+| cf[0] of pixel[1]                                 |  8*N
+| cf[1] of pixel[1]                                 |  8*N
+| ...                                               |
+| cf[corN-1] of pixel[1]                            |  8*N
++---------------------------------------------------+     --+
+| errcf[0]  of pixel[1]                             |  8*N  |
+| errcf[1]  of pixel[1]                             |  8*N  | only if sets==2
+| ...                                               |       | or sets==4
+| errcf[corN-1]  of pixel[1]                        |  8*N  |
++---------------------------------------------------+     --+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| cf[0] of pixel[width*height-1]                    |  8*N
+| cf[1] of pixel[width*height-1]                    |  8*N
+| ...                                               |
+| cf[corN-1] of pixel[width*height-1]               |  8*N
++---------------------------------------------------+     --+
+| errcf[0]  of pixel[width*height-1]                |  8*N  |
+| errcf[1]  of pixel[width*height-1]                |  8*N  | only if sets==2
+| ...                                               |       | or sets==4
+| errcf[corN-1]  of pixel[width*height-1]           |  8*N  |
++---------------------------------------------------+     --+
+\endverbatim
+        This data format may also store all the intermedate correlation curves that are averaged to yield avg+/-stddev. These are stored after the above
+        described data and their presence is indicatedsimply by an ongoing file.
+
+\verbatim
+data                                                   size [bytes]
+.                                                   .
+. ...   START OF FILE                               .
+.                                                   .
++---------------------------------------------------+
+| segments                   segments/runs per pixel|  4
++---------------------------------------------------+
+| segment[0] cf[0] of pixel[0]                      |  8*N
+| segment[1] cf[0] of pixel[0]                      |  8*N
+| ...                                               |
+| segment[segments-1] cf[0] of pixel[0]             |  8*N
++---------------------------------------------------+
+| segment[0] cf[1] of pixel[0]                      |  8*N
+| segment[1] cf[1] of pixel[0]                      |  8*N
+| ...                                               |
+| segment[segments-1] cf[1] of pixel[0]             |  8*N
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| segment[0] cf[corN-1] of pixel[0]                 |  8*N
+| segment[1] cf[corN-1] of pixel[0]                 |  8*N
+| ...                                               |
+| segment[segments-1] cf[corN-1] of pixel[0]        |  8*N
++---------------------------------------------------+
++---------------------------------------------------+
+| segment[0] cf[0] of pixel[1]                      |  8*N
+| segment[1] cf[0] of pixel[1]                      |  8*N
+| ...                                               |
+| segment[segments-1] cf[0] of pixel[1]             |  8*N
++---------------------------------------------------+
+| segment[0] cf[1] of pixel[1]                      |  8*N
+| segment[1] cf[1] of pixel[1]                      |  8*N
+| ...                                               |
+| segment[segments-1] cf[1] of pixel[1]             |  8*N
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| segment[0] cf[corN-1] of pixel[width*height-1]    |  8*N
+| segment[1] cf[corN-1] of pixel[width*height-1]    |  8*N
+| ...                                               |
+| segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N
++---------------------------------------------------+
+\endverbatim
+        \note All numbers are stored in little-endian form!!! and the pixel order is always row major!
+    */
+    bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error) const;
 
     struct contribute_to_statistics_state {
         float sum;
@@ -295,6 +409,7 @@ protected:
     QVector<float> statistics_after_max;
     double* acf_tau;
     double* acf;
+    double* acf_segments;
     double* acf_std;
     uint32_t acf_N;
     double* ccf_tau;
@@ -302,6 +417,10 @@ protected:
     double* ccf2;
     double* ccf3;
     double* ccf4;
+    double* ccf1_segments;
+    double* ccf2_segments;
+    double* ccf3_segments;
+    double* ccf4_segments;
     double* ccf1_std;
     double* ccf2_std;
     double* ccf3_std;
@@ -309,6 +428,7 @@ protected:
     uint32_t ccf_N;
     double* dccf_tau;
     double* dccf;
+    double* dccf_segments;
     double* dccf_std;
     uint32_t dccf_N;
     uint32_t dccfframe_width;
