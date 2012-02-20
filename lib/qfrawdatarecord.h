@@ -180,9 +180,15 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             qfrdreNumberError,
             qfrdreNumberVector,
             qfrdreNumberMatrix,
+            qfrdreNumberErrorVector,
+            qfrdreNumberErrorMatrix,
             qfrdreInteger,
+            qfrdreIntegerVector,
+            qfrdreIntegerMatrix,
             qfrdreString,
             qfrdreBoolean,
+            qfrdreBooleanVector,
+            qfrdreBooleanMatrix,
             qfrdreInvalid
         };
         /*! \brief this struct is used to store evaluation results associated with this data record
@@ -206,6 +212,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 group="";
                 label="";
                 label_rich="";
+                unit="";
+                dvalue=0;
+                derror=0;
+                ivalue=0;
+                bvalue=false;
+                svalue="";
             }
             evaluationResultType type;  /**< type of data */
             double dvalue;  /**< double data value */
@@ -214,8 +226,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             bool bvalue;  /**< value as boolean */
             QString svalue;  /**< value as string */
             QString unit; /**< unit name of the stored values */
-            QVector<double> dvec;  /**< data as double vector */
-            QVector<double> evec;  /**< errors as double vector */
+            QVector<double> dvec;  /**< data as a double vector */
+            QVector<double> evec;  /**< errors as a double vector */
+            QVector<bool> bvec;  /**< data as boolean vector */
+            QVector<qlonglong> ivec;  /**< data as an integer vector */
             int columns;  /**< number of columns if matrix is stored in dvec (\c type \c == evaluationResultType::qfrdreNumberMatrix) */
             QString label;  /**< a label describing the result (no richtext markup!) */
             QString label_rich; /**< a label describing the result (with richtext markup!) */
@@ -265,6 +279,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         bool resultsExistsFromEvaluation(const QString& evalName) const;
         /** \brief set a result of type number */
         void resultsSetNumber(const QString& evaluationName, const QString& resultName, double value, const QString& unit=QString(""));
+
         /** \brief set a result of type number vector */
         void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit=QString(""));
         /** \brief set a result of type number matrix */
@@ -275,13 +290,48 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, double* value, int columns, int rows, const QString& unit=QString(""));
 
         /** \brief set a result of type number vector */
-        void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QVector<double>& error, const QString& unit=QString(""));
+        void resultsSetNumberErrorList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QVector<double>& error, const QString& unit=QString(""));
         /** \brief set a result of type number matrix */
-        void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QVector<double>& error, int columns, const QString& unit=QString(""));
+        void resultsSetNumberErrorMatrix(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QVector<double>& error, int columns, const QString& unit=QString(""));
         /** \brief set a result of type number vector */
-        void resultsSetNumberList(const QString& evaluationName, const QString& resultName, double* value, double* error, int items, const QString& unit=QString(""));
+        void resultsSetNumberErrorList(const QString& evaluationName, const QString& resultName, double* value, double* error, int items, const QString& unit=QString(""));
         /** \brief set a result of type number matrix */
-        void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, double* value, double* error, int columns, int rows, const QString& unit=QString(""));
+        void resultsSetNumberErrorMatrix(const QString& evaluationName, const QString& resultName, double* value, double* error, int columns, int rows, const QString& unit=QString(""));
+
+        /** \brief set a result element of type number vector. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInNumberList(const QString& evaluationName, const QString& resultName, int position, double value, const QString& unit=QString(""));
+        /** \brief set a result element of type number matrix. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInNumberMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double value, const QString& unit=QString(""));
+        /** \brief set a result element of type number vector. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInNumberErrorList(const QString& evaluationName, const QString& resultName, int position, double value, double error, const QString& unit=QString(""));
+        /** \brief set a result element of type number matrix. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInNumberErrorMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double value, double error, const QString& unit=QString(""));
+        /** \brief set a result element of type integer vector. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInIntegerList(const QString& evaluationName, const QString& resultName, int position, qlonglong value, const QString& unit=QString(""));
+        /** \brief set a result element of type integer matrix. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInIntegerMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, qlonglong value, const QString& unit=QString(""));
+        /** \brief set a result element of type boolean vector. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInBooleanList(const QString& evaluationName, const QString& resultName, int position, bool value, const QString& unit=QString(""));
+        /** \brief set a result element of type boolean matrix. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetInBooleanMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, bool value, const QString& unit=QString(""));
+
+        /** \brief set a result of type integer vector */
+        void resultsSetIntegerList(const QString& evaluationName, const QString& resultName, const QVector<qlonglong>& value, const QString& unit=QString(""));
+        /** \brief set a result of type integer matrix */
+        void resultsSetIntegerMatrix(const QString& evaluationName, const QString& resultName, const QVector<qlonglong>& value, int columns, const QString& unit=QString(""));
+        /** \brief set a result of type integer vector */
+        void resultsSetIntegerList(const QString& evaluationName, const QString& resultName, qlonglong* value, int items, const QString& unit=QString(""));
+        /** \brief set a result of type integer matrix */
+        void resultsSetIntegerMatrix(const QString& evaluationName, const QString& resultName, qlonglong* value, int columns, int rows, const QString& unit=QString(""));
+
+        /** \brief set a result of type bool vector */
+        void resultsSetBooleanList(const QString& evaluationName, const QString& resultName, const QVector<bool>& value, const QString& unit=QString(""));
+        /** \brief set a result of type bool matrix */
+        void resultsSetBooleanMatrix(const QString& evaluationName, const QString& resultName, const QVector<bool>& value, int columns, const QString& unit=QString(""));
+        /** \brief set a result of type bool vector */
+        void resultsSetBooleanList(const QString& evaluationName, const QString& resultName, bool* value, int items, const QString& unit=QString(""));
+        /** \brief set a result of type bool matrix */
+        void resultsSetBooleanMatrix(const QString& evaluationName, const QString& resultName, bool* value, int columns, int rows, const QString& unit=QString(""));
 
 
         /** \brief set a result of type number+error */
@@ -298,10 +348,6 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         evaluationResult resultsGet(const QString& evalName, const QString& resultName) const;
         /** \brief return the type of a specified result, or qfrdreInvalid if an error occured (eval does not exist ...) */
         evaluationResultType resultsGetType(const QString& evalName, const QString& resultName) const;
-        /** \brief return a specified result as string */
-        QString  resultsGetAsString(const QString& evalName, const QString& resultName) const;
-        /** \brief return a specified result as string, but returns as a QVariant. If the result is invalid, a QVariant() will be returned. */
-        QVariant  resultsGetAsStringVariant(const QString& evalName, const QString& resultName) const;
         /** \brief remove the value stored in the given position
          *
          *  If the results for the given \a evalName are empty after the delete, the entry for the
@@ -312,6 +358,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          *  \param emitChangedSignal if set \c false (default is \c true ) this function will NOT emit a resultsChanged() signal.
          */
         void resultsRemove(const QString& evalName, const QString& resultName, bool emitChangedSignal=true);
+        /** \brief return a specified result as string */
+        QString  resultsGetAsString(const QString& evalName, const QString& resultName) const;
+        /** \brief return a specified result as string, but returns as a QVariant. If the result is invalid, a QVariant() will be returned. */
+        QVariant  resultsGetAsStringVariant(const QString& evalName, const QString& resultName) const;
         /*! \brief return a specified result as a QVariant
 
             The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
@@ -320,16 +370,47 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QVariant resultsGetAsQVariant(const QString& evalName, const QString& resultName) const;
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
         double resultsGetAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
+        /** \brief return a specified result's error as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        double resultsGetErrorAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result as boolean (or \c false if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
         bool resultsGetAsBoolean(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result as integer (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         int64_t resultsGetAsInteger(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
-        /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        /** \brief return a specified result as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         QVector<double> resultsGetAsDoubleList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
-        double resultsGetErrorAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
-        /** \brief return a specified result's error as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         QVector<double> resultsGetErrorAsDoubleList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
+        /** \brief return a specified result as integer vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        QVector<qlonglong> resultsGetAsIntegerList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
+        /** \brief return a specified result as bool vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        QVector<bool> resultsGetAsBooleanList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
+
+
+
+
+
+        /** \brief return a specified result as string, given a certain position in a vector/matrix datatype */
+        QString  resultsGetAsString(const QString& evalName, const QString& resultName, int position) const;
+        /** \brief return a specified result as string, but returns as a QVariant, given a certain position in a vector/matrix datatype. If the result is invalid, a QVariant() will be returned. */
+        QVariant  resultsGetAsStringVariant(const QString& evalName, const QString& resultName, int position) const;
+        /*! \brief return a specified result as a QVariant, given a certain position in a vector/matrix datatype
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber), QPointF (qfrdreNumberError and qfrdreNumberErrorVector) or a QList<QVariant> (for all list/matrix data).
+        */
+        QVariant resultsGetAsQVariant(const QString& evalName, const QString& resultName, int position) const;
+        /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
+        double resultsGetAsDouble(const QString& evalName, const QString& resultName, int position, bool* ok=NULL) const;
+        /** \brief return a specified result's error as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        double resultsGetErrorAsDouble(const QString& evalName, const QString& resultName, int position, bool* ok=NULL) const;
+        /** \brief return a specified result as boolean (or \c false if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
+        bool resultsGetAsBoolean(const QString& evalName, const QString& resultName, int position, bool* ok=NULL) const;
+        /** \brief return a specified result as integer (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        int64_t resultsGetAsInteger(const QString& evalName, const QString& resultName, int position, bool* ok=NULL) const;
+
+
+
+
 
         /** \brief set the label of a result (the result already has to exist!) */
         void resultsSetLabel(const QString& evaluationName, const QString& resultName, const QString& label, const QString& label_rich=QString(""));
