@@ -1,3 +1,6 @@
+include(../quickfit3.pri)
+include(../quickfit_config.pri)
+
 INCLUDEPATH += ../../lib/ \
                ../../libqf3widgets/ \
                ../../../../../LIB/trunk/ \
@@ -9,7 +12,7 @@ MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
-QFOUTPUT = ../../output
+QFOUTPUT = ../../$${OUTPUTDIR_NAME}
 DESTDIR = $$QFOUTPUT/plugins
 
 

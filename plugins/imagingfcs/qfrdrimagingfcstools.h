@@ -7,6 +7,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QList>
+#include <stdint.h>
 
 /** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin
  *  \ingroup qf3rdrdp_imaging_fcs

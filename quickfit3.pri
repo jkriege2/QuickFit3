@@ -5,7 +5,11 @@ MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
-QFOUTPUT = ../output
+
+
+
+include(quickfit_config.pri)
+QFOUTPUT = ../$${OUTPUTDIR_NAME}
 
 #release {
 #    QFOUTPUT = ../output_release
@@ -34,7 +38,3 @@ INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS
 OTHER_FILES +=
 
 
-
-
-
-include(quickfit_config.pri)

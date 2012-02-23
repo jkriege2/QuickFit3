@@ -18,6 +18,8 @@ BLAS_LIB =
 BLAS_INCLUDE =
 
 
+OUTPUTDIR_NAME = output
+
 QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type
 exists(quickfit.inc):include(quickfit.inc)
 

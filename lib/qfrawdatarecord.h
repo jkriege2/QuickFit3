@@ -14,6 +14,7 @@
 #include "qfrdrpropertymodel.h"
 #include "qfproperties.h"
 #include "lib_imexport.h"
+#include <stdint.h>
 
 
 class QDomElement; // forward
