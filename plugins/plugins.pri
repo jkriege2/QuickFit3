@@ -1,4 +1,4 @@
-include(../quickfit3.pri)
+
 include(../quickfit_config.pri)
 
 INCLUDEPATH += ../../lib/ \
@@ -81,7 +81,7 @@ DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 
 CONFIG += link_prl
 
-include(../quickfit_config.pri)
+
 include(../libquickfit.pri)
 
 HEADERS +=
