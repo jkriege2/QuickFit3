@@ -247,7 +247,7 @@ void QFRawDataPropertyEditor::resizePropertiesTable() {
 void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
     QString oldType="";
     //std::cout<<"deleting old editors ... \n";
-    int oldEditorCount=0;
+    int oldEditorCount;
     if (current) {
         oldType=current->getType();
         oldEditorCount=current->getEditorCount();

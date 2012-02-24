@@ -66,12 +66,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     int ret=0;
     bool numGrad=false;
     if ((!model->get_implementsJacobian())||(always_num_grad)) {
-            std::cout<<"levmar: numerical gradients\n";
-        ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+            //std::cout<<"levmar: numerical gradients\n";
+        ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, NULL, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
         numGrad=true;
     } else {
-            std::cout<<"levmar: analytical gradients\n";
-        ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+            //std::cout<<"levmar: analytical gradients\n";
+        ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, NULL, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
     }
 
     free(pparamsMin);

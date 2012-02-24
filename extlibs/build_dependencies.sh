@@ -149,8 +149,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	
 	cd levmar
 	mkdir build
-	tar xvf levmar-2.5.tgz -C ./build/
-	cd build/levmar-2.5
+	tar xvf levmar-2.6.tar.gz -C ./build/
+	cd build/levmar-2.6
 
 	
 	
@@ -193,7 +193,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		cp ../../buildscript_tools/levmar.h .
 		echo "LAPACKLIBS=" > Makefile; cat ../../buildscript_tools/Makefile >> Makefile; 
 	else
-		echo "#define HAVE_LAPACK" > Makefile; cat ../../buildscript_tools/levmar.h >> levmar.h; 
+		cp ../../buildscript_tools/levmar.h ./levmar2.h
+		sed 's/\/\/\#define HAVE\_LAPACK/\#define HAVE\_LAPACK/g' levmar2.h >> levmar.h
+		rm ./levmar2.h
+		
 	fi 
 
 	if [ $SKIP == "0" ] ; then
@@ -372,47 +375,84 @@ ISMSYS=`uname -o`
 echo $ISMSYS
 if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	libusbOK=-1
-	read -p "Do you want to build 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
+	read -p "Do you want to build 'libusb-win32' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
 	if [ $INSTALL_ANSWER == "y" ] ; then
-		echo -e  "------------------------------------------------------------------------\n"\
-		"-- BUILDING: libusb (win32)                                           --\n"\
-		"------------------------------------------------------------------------\n\n"\
+		read -p "Do you want to use prebuilt win32 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
+		echo -e  "\n"
+		if [ $INSTALL_ANSWER == "y" ] ; then
+			echo -e  "------------------------------------------------------------------------\n"\
+			"-- INSTALLING: precompiled libusb (win32)                             --\n"\
+			"------------------------------------------------------------------------\n\n"\
 
-		cd libusb
-		mkdir build
-		mkdir lib
-		mkdir bin
-		mkdir include
-		tar xvf ./win32_binary/libusb-win32-bin-1.2.5.0.tar.gz -C ./build/
-		cd build/libusb-win32-bin-1.2.5.0/
-		cp ./include/* ../../include
-		cp ./include/lusb0_usb.h ../../include/usb.h
-		libOK=$?
-		if [ $libOK -ne 0 ] ; then		
-			libOK=-4
-		else 
-			cp ./lib/gcc/* ../../lib
+			cd libusb
+			mkdir build
+			mkdir lib
+			mkdir bin
+			mkdir include
+			tar xvf ./win32_binary/libusb-win32-bin-1.2.5.0.tar.gz -C ./build/
+			cd build/libusb-win32-bin-1.2.5.0/
+			cp ./include/* ../../include
+			cp ./include/lusb0_usb.h ../../include/usb.h
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
 				libOK=-4
-			else
-				cp -r ./bin/* ../../bin
+			else 
+				cp ./lib/gcc/* ../../lib
 				libOK=$?
 				if [ $libOK -ne 0 ] ; then		
 					libOK=-4
+				else
+					cp -r ./bin/* ../../bin
+					libOK=$?
+					if [ $libOK -ne 0 ] ; then		
+						libOK=-4
+					fi
 				fi
 			fi
-		fi
 
-		cd ../../
-		if [ $KEEP_BUILD_DIR == "n" ] ; then
-			rm -rf build
-		fi
-		cd ${CURRENTDIR}
-		
-		libusbOK=$libOK
+			cd ../../
+			if [ $KEEP_BUILD_DIR == "n" ] ; then
+				rm -rf build
+			fi
+			cd ${CURRENTDIR}
+			
+			libusbOK=$libOK
+		else	
+			echo -e  "------------------------------------------------------------------------\n"\
+			"-- BUILDING: libusb (win32)                                           --\n"\
+			"------------------------------------------------------------------------\n\n"\
 
+			cd libusb
+			mkdir build
+			mkdir lib
+			mkdir bin
+			mkdir include
+			tar xvf ./libusb-win32-src-1.2.6.0.tar.gz -C ./build/
+			cd build/libusb-win32-src-1.2.6.0/
+			make -j${MAKE_PARALLEL_BUILDS}
+			
+			libOK=$?
+			if [ $libOK -eq 0 ] ; then		
+				rm ../../include/usb.h
+				echo -e "#include \"lusb0_usb.h\"\n\n" >> ../../include/usb.h
+				cp ./src/lusb0_usb.h ../../include
+				cp *.a ../../lib
+				cp *.dll ../../bin				
+				cp *.def ../../lib				
+				cp *.def ../../bin				
+				cp *.exe ../../bin				
+			else
+				libOK=-3
+			fi
+			cd ../../
+			if [ $KEEP_BUILD_DIR == "n" ] ; then
+				rm -rf build
+			fi
+			cd ${CURRENTDIR}
+			
+			libusbOK=$libOK
+		fi
 	fi
 fi
 
