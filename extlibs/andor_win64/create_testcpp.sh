@@ -1,5 +1,5 @@
 #!/bin/sh
-echo'This script will read ATMCD32D.H and from this create a call to every function, declared in this header
+echo 'This script will read ATMCD32D.H and from this create a call to every function, declared in this header
 in a file test.cpp. This one is then used to create a def file, also containing the @nn part of the dll
 functions. calling dlltool finally working libandor.a is created!'
 
@@ -36,7 +36,7 @@ sed -n '/EXPNETTYPE unsigned int WINAPI/p' atmcd32d.~h > atmcd32d.~hh
 sed '/CALLS_HERE/ {
   r atmcd32d.~hh 
   d
-}' test.~cpp > test1.cpp
+}' test.~cpp > test.cpp
 
 
 echo 'LIBRARY atmcd32d.dll
@@ -67,13 +67,13 @@ sed 's/AT_DDGLiteChannelId[^,^)]*/AT_DDGLite_ChannelA/g' test1.cpp > test1.~cp |
 sed 's/AT_VersionInfoId[^,^)]*/AT_SDKVersion/g' test1.cpp > test1.~cp | cp test1.~cp test1.cpp
 sed 's/INCLUDEMAIN/int main()/g' test1.cpp > test1.~cp | cp test1.~cp test1.cpp
 g++ test1.cpp -o test1.exe -L. -landor 2> err.txt
-sed 's/.*_imp__//g' err.txt > err.~tx | cp err.~tx err.txt
+sed 's/.*__imp_//g' err.txt > err.~tx | cp err.~tx err.txt
 sed 's/.*exit status.*//g' err.txt > err.~tx | cp err.~tx err.txt
 sed 's/'\''//g' err.txt > err.~tx | cp err.~tx err.txt
 sed 's/.*undefined reference.*//g' err.txt > err.~tx | cp err.~tx err.txt
 
 sed '$r err.txt' <atmcd32d.def >atmcd32d.~def
-mv atmcd32d.~def atmcd32d.def
+cp atmcd32d.~def atmcd32d.def
 dlltool -d atmcd32d.def --dllname atmcd32d.dll --output-lib libandor.a -k
 rm -f test.~cpp test1.cpp err.~tx  err.txt test1.exe atmcd32d.~h atmcd32d.~hh
 
