@@ -258,6 +258,25 @@ void QFRawDataRecord::readXML(QDomElement& e) {
                     }
                     r.unit=re.attribute("unit", "");
                     r.columns=loc.toInt(re.attribute("columns", "0"));
+
+
+                } else if (t=="stringlist" || t=="strlst") {
+                    r.type=qfrdreStringVector;
+                    QString data="";
+                    if (re.hasAttribute("value")) data=re.attribute("value", "");
+                    else if (!re.text().isEmpty()) data=re.text();
+                    r.svec=deescapifyList(data);
+                    r.unit=re.attribute("unit", "");
+                } else if (t=="stringmatrix" || t=="strmtrx") {
+                    r.type=qfrdreStringMatrix;
+                    QString data="";
+                    if (re.hasAttribute("value")) data=re.attribute("value", "");
+                    else if (!re.text().isEmpty()) data=re.text();
+                    r.svec=deescapifyList(data);
+                    r.unit=re.attribute("unit", "");
+                    r.columns=loc.toInt(re.attribute("columns", "0"));
+
+
                 } else if (t=="numbererrorlist" || t=="numerrlst") {
                     r.type=qfrdreNumberErrorVector;
                     r.dvec.clear();
@@ -516,24 +535,12 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     break;
                 case qfrdreNumberVector: {
                     w.writeAttribute("type", "numberlist");
-                    /*QString s="";
-                    for (int i=0; i<r.dvec.size(); i++) {
-                        if (i>0) s=s+";";
-                        s=s+loc.toString(r.dvec[i], 'g', 10);
-                    }
-                    w.writeAttribute("value", s);*/
                     w.writeAttribute("storage", "base64");
                     w.writeAttribute("unit", r.unit);
                     w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
                     } break;
                 case qfrdreNumberMatrix: {
                     w.writeAttribute("type", "numbermatrix");
-                    /*QString s="";
-                    for (int i=0; i<r.dvec.size(); i++) {
-                        if (i>0) s=s+";";
-                        s=s+loc.toString(r.dvec[i], 'g', 10);
-                    }
-                    w.writeAttribute("value", s);*/
                     w.writeAttribute("columns", loc.toString(r.columns));
                     w.writeAttribute("storage", "base64");
                     w.writeAttribute("unit", r.unit);
@@ -585,6 +592,17 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
                     w.writeAttribute("storage", "hex");
                     w.writeAttribute("unit", r.unit);
                     w.writeAttribute("value", boolArrayToString(r.bvec));
+                    } break;
+                case qfrdreStringVector: {
+                    w.writeAttribute("type", "stringlist");
+                    w.writeAttribute("unit", r.unit);
+                    w.writeAttribute("value", escapify(r.svec));
+                    } break;
+                case qfrdreStringMatrix: {
+                    w.writeAttribute("type", "stringmatrix");
+                    w.writeAttribute("columns", loc.toString(r.columns));
+                    w.writeAttribute("unit", r.unit);
+                    w.writeAttribute("value", escapify(r.svec));
                     } break;
 
             }
@@ -787,9 +805,10 @@ void QFRawDataRecord::resultsSetNumberErrorMatrix(const QString& evaluationName,
     resultsSetNumberErrorMatrix(evaluationName, resultName, data, datae, columns, unit);
 }
 
+
 void QFRawDataRecord::resultsSetInNumberList(const QString &evaluationName, const QString &resultName, int position, double value, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreNumberVector;
@@ -804,7 +823,7 @@ void QFRawDataRecord::resultsSetInNumberList(const QString &evaluationName, cons
 
 void QFRawDataRecord::resultsSetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreNumberMatrix;
@@ -820,7 +839,7 @@ void QFRawDataRecord::resultsSetInNumberMatrix(const QString &evaluationName, co
 
 void QFRawDataRecord::resultsSetInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double value, double error, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreNumberErrorVector;
@@ -839,7 +858,7 @@ void QFRawDataRecord::resultsSetInNumberErrorList(const QString &evaluationName,
 
 void QFRawDataRecord::resultsSetInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, double error, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreNumberErrorMatrix;
@@ -859,7 +878,7 @@ void QFRawDataRecord::resultsSetInNumberErrorMatrix(const QString &evaluationNam
 
 void QFRawDataRecord::resultsSetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong value, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreIntegerVector;
@@ -874,7 +893,7 @@ void QFRawDataRecord::resultsSetInIntegerList(const QString &evaluationName, con
 
 void QFRawDataRecord::resultsSetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong value, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreNumberMatrix;
@@ -890,7 +909,7 @@ void QFRawDataRecord::resultsSetInIntegerMatrix(const QString &evaluationName, c
 
 void QFRawDataRecord::resultsSetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool value, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreBooleanVector;
@@ -905,7 +924,7 @@ void QFRawDataRecord::resultsSetInBooleanList(const QString &evaluationName, con
 
 void QFRawDataRecord::resultsSetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool value, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
     r.type=qfrdreBooleanMatrix;
@@ -916,6 +935,37 @@ void QFRawDataRecord::resultsSetInBooleanMatrix(const QString &evaluationName, c
         for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(0);
     }
     r.bvec[position]=value;
+    emitResultsChanged();
+}
+
+void QFRawDataRecord::resultsSetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &value, const QString &unit) {
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    r.type=qfrdreStringVector;
+    r.unit=unit;
+
+    if (position>=r.svec.size()) {
+        for (int i=r.svec.size(); i<=position; i++) r.svec.append("");
+    }
+    r.svec[position]=value;
+    emitResultsChanged();
+}
+
+void QFRawDataRecord::resultsSetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &value, const QString &unit) {
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    r.type=qfrdreStringMatrix;
+    r.unit=unit;
+
+    int position=column+row*r.columns;
+    if (position>=r.svec.size()) {
+        for (int i=r.svec.size(); i<=position; i++) r.svec.append(0);
+    }
+    r.svec[position]=value;
     emitResultsChanged();
 }
 
@@ -991,6 +1041,27 @@ void QFRawDataRecord::resultsSetBooleanMatrix(const QString &evaluationName, con
         data.append(value[i]);
     }
     resultsSetBooleanMatrix(evaluationName, resultName, data, columns, unit);
+}
+
+void QFRawDataRecord::resultsSetStringList(const QString &evaluationName, const QString &resultName, const QVector<QString> &value, const QString &unit) {
+    evaluationResult r;
+    r.type=qfrdreStringVector;
+    r.svec=value.toList();
+    r.unit=unit;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
+    emitResultsChanged();
+}
+
+void QFRawDataRecord::resultsSetStringMatrix(const QString &evaluationName, const QString &resultName, const QVector<QString> &value, int columns, const QString &unit) {
+    evaluationResult r;
+    r.type=qfrdreStringMatrix;
+    r.svec=value.toList();
+    r.unit=unit;
+    r.columns=columns;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
+    emitResultsChanged();
 }
 
 
@@ -1163,6 +1234,15 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString& evalName, const QS
             result=data;
             break;
         }
+        case qfrdreStringMatrix:
+        case qfrdreStringVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.svec.size(); i++) {
+                data.append(r.svec[i]);
+            }
+            result=data;
+            break;
+        }
         case qfrdreNumberErrorMatrix:
         case qfrdreNumberErrorVector: {
             QList<QVariant> data;
@@ -1218,6 +1298,25 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
                     else s=s+"; ";
                 }
                 s=s+QString::number(r.dvec[i]);
+            }
+            return s+") "+r.unit;
+        }
+        case qfrdreStringVector: {
+            QString s="(";
+            for (int i=0; i<r.svec.size(); i++) {
+                if (i>0) s=s+"; ";
+                s=s+"\""+r.svec[i]+"\"";
+            }
+            return s+") "+r.unit;
+        }
+        case qfrdreStringMatrix: {
+            QString s="(";
+            for (int i=0; i<r.svec.size(); i++) {
+                if (i>0) {
+                    if (i%r.columns==0) s=s+";; ";
+                    else s=s+"; ";
+                }
+                s=s+"\""+r.svec[i]+"\"";
             }
             return s+") "+r.unit;
         }
@@ -1376,13 +1475,17 @@ QVector<bool> QFRawDataRecord::resultsGetAsBooleanList(const QString& evalName, 
     return QVector<bool>();
 }
 
-QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QString &resultName, int position) const {
+QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreNumberMatrix:
         case qfrdreNumberVector: {
             if (position>= r.dvec.size()) return "0 "+r.unit;
             return QString::number(r.dvec[position])+" "+r.unit;
+        }
+        case qfrdreNumber: {
+            if (alsoGetNonVec) return QString::number(r.dvalue)+" "+r.unit;
+            else return "";
         }
         case qfrdreNumberErrorMatrix:
         case qfrdreNumberErrorVector: {
@@ -1391,11 +1494,29 @@ QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QStri
             else return QString("(%1 +/- %2)").arg(r.dvec[position]).arg(r.evec[position])+" "+r.unit;
         }
 
+        case qfrdreNumberError: {
+            if (alsoGetNonVec) return "("+QString::number(r.dvalue)+" +/- "+QString::number(r.derror)+") "+r.unit;
+            else return "";
+        }
+        case qfrdreStringVector:
+        case qfrdreStringMatrix: {
+                if (position>= r.svec.size()) return r.unit;
+                return r.svec[position]+" "+r.unit;
+        }
+        case qfrdreString: {
+            if (alsoGetNonVec) return r.svalue;
+            else return "";
+        }
+
 
         case qfrdreIntegerVector:
         case qfrdreIntegerMatrix: {
                 if (position>= r.ivec.size()) return "0 "+r.unit;
                 return QString::number(r.ivec[position])+" "+r.unit;
+        }
+        case qfrdreInteger: {
+            if (alsoGetNonVec) return QString::number(r.ivalue)+" "+r.unit;
+            else return "";
         }
         case qfrdreBooleanVector:
         case qfrdreBooleanMatrix: {
@@ -1403,18 +1524,39 @@ QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QStri
                 if (r.bvec[position]) return "true";
                 else return "false";
         }
+        case qfrdreBoolean: {
+            if (alsoGetNonVec) {
+                if (r.bvalue) return "true";
+                else return "false";
+            }
+            else return "";
+        }
         default: return ("");
     }
     return QString("");
 }
 
-QVariant QFRawDataRecord::resultsGetAsStringVariant(const QString &evalName, const QString &resultName, int position) const {
+QVariant QFRawDataRecord::resultsGetAsStringVariant(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
     return QVariant(resultsGetAsString(evalName, resultName, position));
 }
 
-QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QString &resultName, int position) const {
+QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {
+        case qfrdreInteger:
+            if (alsoGetNonVec) return QVariant(r.ivalue);
+            else return QVariant();
+        case qfrdreNumber:
+        case qfrdreNumberError:
+            if (alsoGetNonVec) return QVariant(r.dvalue);
+            else return QVariant();
+        case qfrdreBoolean:
+            if (alsoGetNonVec) return QVariant(r.bvalue);
+            else return QVariant();
+        case qfrdreString:
+            if (alsoGetNonVec) return QVariant(r.svalue);
+            else return QVariant();
+
         case qfrdreNumberMatrix:
         case qfrdreNumberVector: {
             if (position>= r.dvec.size()) return QVariant();
@@ -1427,6 +1569,11 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QS
             else return QVariant(QPointF(r.dvec[position], r.evec[position]));
         }
 
+        case qfrdreStringVector:
+        case qfrdreStringMatrix: {
+                if (position>= r.svec.size()) return QVariant();
+                return QVariant(r.svec[position]);
+        }
 
         case qfrdreIntegerVector:
         case qfrdreIntegerMatrix: {
@@ -1443,9 +1590,19 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QS
     return QVariant();
 }
 
-double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok) const {
+double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {
+        case qfrdreInteger:
+            if (alsoGetNonVec) return r.ivalue;
+            else return 0.0;
+        case qfrdreNumber:
+            if (alsoGetNonVec) return r.dvalue;
+            else return 0.0;
+        case qfrdreBoolean:
+            if (alsoGetNonVec) return r.bvalue?1:0;
+            else return 0.0;
+
         case qfrdreNumberMatrix:
         case qfrdreNumberVector:
         case qfrdreNumberErrorMatrix:
@@ -1453,7 +1610,6 @@ double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QStrin
             if (position>= r.dvec.size()) return 0.0;
             return r.dvec[position];
         }
-
 
         case qfrdreIntegerVector:
         case qfrdreIntegerMatrix: {
@@ -1470,7 +1626,7 @@ double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QStrin
     return 0.0;
 }
 
-double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok) const {
+double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreNumberErrorMatrix:
@@ -1478,12 +1634,16 @@ double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const Q
             if (position>= r.evec.size()) return 0.0;
             return r.evec[position];
         }
+        case qfrdreNumberError:
+            if (alsoGetNonVec) return r.derror;
+            else return 0;
+
         default: return 0.0;
     }
     return 0.0;
 }
 
-bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString &resultName, int position, bool *ok) const {
+bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreBooleanVector:
@@ -1491,14 +1651,23 @@ bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString
                 if (position>= r.bvec.size()) return false;
                 return r.bvec[position];
         }
+        case qfrdreBoolean:
+            if (alsoGetNonVec) return r.bvalue;
+            else return 0;
         default: return false;
     }
     return false;
 }
 
-int64_t QFRawDataRecord::resultsGetAsInteger(const QString &evalName, const QString &resultName, int position, bool *ok) const {
+int64_t QFRawDataRecord::resultsGetAsInteger(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {
+        case qfrdreInteger:
+            if (alsoGetNonVec) return r.ivalue;
+            else return 0;
+        case qfrdreBoolean:
+            if (alsoGetNonVec) return r.bvalue?1:0;
+            else return 0;
         case qfrdreIntegerVector:
         case qfrdreIntegerMatrix: {
                 if (position>= r.ivec.size()) return 0;
@@ -1609,7 +1778,9 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, const QString& s
                     case qfrdreNumberError: dat=doubleToQString(resultsGetAsDouble(evalname, rownames[r].second), 15, 'g', decimalPoint); hasError=true; break;
                     case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r].second)); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r].second))?QString("1"):QString("0"); break;
-                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreString:
+                    case qfrdreStringVector:
+                    case qfrdreStringMatrix:
                     case qfrdreNumberVector:
                     case qfrdreNumberMatrix:
                     case qfrdreNumberErrorVector:
@@ -1691,7 +1862,9 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename) {
                     case qfrdreNumberError: dat=CDoubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); hasError=true; break;
                     case qfrdreInteger: dat=loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r].second)); break;
                     case qfrdreBoolean: dat=(resultsGetAsBoolean(evalname, rownames[r].second))?QString("1"):QString("0"); break;
-                    case qfrdreString: dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace('\"', "_")+stringDelimiter; break;
+                    case qfrdreString:
+                    case qfrdreStringVector:
+                    case qfrdreStringMatrix:
                     case qfrdreNumberVector:
                     case qfrdreNumberMatrix:
                     case qfrdreNumberErrorVector:
@@ -1699,7 +1872,7 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename) {
                     case qfrdreIntegerVector:
                     case qfrdreIntegerMatrix:
                     case qfrdreBooleanVector:
-                    case qfrdreBooleanMatrix:  dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r")+stringDelimiter; break;
+                    case qfrdreBooleanMatrix:  dat=stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter; break;
                     default: break;
                 }
             }
@@ -1970,3 +2143,5 @@ void QFRawDataRecord::enableEmitPropertiesChanged(bool emitnow) {
         emit  propertiesChanged();
     }
 }
+
+

@@ -32,6 +32,10 @@ SUBDIRS += plg_fcsfit
 plg_fcsfit.subdir = ./plugins/fcsfit
 plg_fcsfit.depends = lib libqf3widgets
 
+SUBDIRS += plg_imfcsfit
+plg_imfcsfit.subdir = ./plugins/imfcsfit
+plg_imfcsfit.depends = lib libqf3widgets
+
 SUBDIRS += plg_fcs_fitfuctions
 plg_fcs_fitfuctions.subdir=./plugins/fcs_fitfuctions
 

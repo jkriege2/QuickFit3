@@ -144,4 +144,34 @@ QFLIB_EXPORT bool QStringToBool(const QString& data);
 
 */
 QFLIB_EXPORT bool touchFile(const QString& filename);
+
+
+
+/*! \brief escapify a string
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString escapify(const QString& text);
+
+
+/*! \brief deescapify a string
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString deescapify(const QString& text);
+
+
+
+/*! \brief escapify a string
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString escapify(const QStringList& text);
+
+
+/*! \brief deescapify a string
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QStringList deescapifyList(const QString& text);
 #endif // QFTOOLS_H

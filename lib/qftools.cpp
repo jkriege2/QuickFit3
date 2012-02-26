@@ -193,3 +193,139 @@ bool touchFile(const QString& filename) {
     }
     return false;
 }
+
+
+
+
+
+QString escapify(const QString& text){
+  QString res="";
+  if (text.size()>0) {
+    for (int i=0; i<text.size(); i++)
+      switch((char)text[i].toLatin1()) {
+        case '\0': res+="\\0"; break;
+        case '\n': res+="\\n"; break;
+        case '\r': res+="\\r"; break;
+        case '\t': res+="\\t"; break;
+        case '\\': res+="\\\\"; break;
+        case '"': res+="\\\""; break;
+        case '\'': res+="\\'"; break;
+        case '\a': res+="\\a"; break;
+        case '\b': res+="\\b"; break;
+        case '\v': res+="\\v"; break;
+        case '\f': res+="\\f"; break;
+        case '\e': res+="\\e"; break;
+        case '\?': res+="\\?"; break;
+        default:
+          if ((unsigned char)text[i].toLatin1()<32) {
+              QString n=QString::number((unsigned char)text[i].toLatin1(), 16);
+              if (n.size()<3) n.prepend(QString(3-n.size(), QChar('0')));
+              res+="\\x"+n;
+          } else res+=text[i];
+          break;
+      };
+  }
+  return res;
+}
+
+
+QString deescapify(const QString& text){
+  QString res="";
+  if (text.size()>0) {
+    int i=0;
+    while (i<text.size()) {
+      if (text[i]!='\\') {
+        res+=text[i];
+      } else {
+        if (i+1<text.size()) {
+          char next=text[i+1].toLatin1();
+          switch(next) {
+            case '0': res+='\0'; i++; break;
+            case 'n': res+='\n'; i++; break;
+            case 'r': res+='\r'; i++; break;
+            case 't': res+='\t'; i++; break;
+            case 'a': res+='\a'; i++; break;
+            case 'b': res+='\b'; i++; break;
+            case 'v': res+='\v'; i++; break;
+            case 'f': res+='\f'; i++; break;
+            case 'e': res+='\e'; i++; break;
+            case '\\': res+='\\'; i++; break;
+            case '"': res+='\"'; i++; break;
+            case '?': res+='\?'; i++; break;
+            case '\'': res+='\''; i++; break;
+            case 'x':
+            case 'X':
+              if (i+3<text.size()) {
+                QString num=text.mid(i+2,2);
+                i+=3;
+                res+=QChar(num.toUInt(0, 16));
+              } else i++;
+              break;
+          }
+        }
+      }
+      i++;
+    }
+  }
+  return res;
+}
+
+QString escapify(const QStringList& text) {
+    QString s;
+    for (int si=0; si<text.size(); si++) {
+        if (si>0) s=s+";";
+        s=s+QString("\"%1\"").arg(escapify(text[si]));
+    }
+    return s;
+}
+
+QStringList deescapifyList(const QString& text) {
+    QStringList result;
+    QString res="";
+    bool inString=false;
+    if (text.size()>0) {
+      int i=0;
+      while (i<text.size()) {
+        if (text[i]=='"') {
+            inString=!inString;
+        } else if ((!inString) && (text[i]==';')) {
+            if (!res.isEmpty()) {
+                result.append(res);
+                res="";
+            }
+        } else if (text[i]!='\\') {
+            res+=text[i];
+        } else if (inString) {
+          if (i+1<text.size()) {
+            char next=text[i+1].toLatin1();
+            switch(next) {
+              case '0': res+='\0'; i++; break;
+              case 'n': res+='\n'; i++; break;
+              case 'r': res+='\r'; i++; break;
+              case 't': res+='\t'; i++; break;
+              case 'a': res+='\a'; i++; break;
+              case 'b': res+='\b'; i++; break;
+              case 'v': res+='\v'; i++; break;
+              case 'f': res+='\f'; i++; break;
+              case 'e': res+='\e'; i++; break;
+              case '\\': res+='\\'; i++; break;
+              case '"': res+='\"'; i++; break;
+              case '?': res+='\?'; i++; break;
+              case '\'': res+='\''; i++; break;
+              case 'x':
+              case 'X':
+                if (i+3<text.size()) {
+                  QString num=text.mid(i+2,2);
+                  i+=3;
+                  res+=QChar(num.toUInt(0, 16));
+                } else i++;
+                break;
+            }
+          }
+        }
+        i++;
+      }
+    }
+    if (!res.isEmpty()) result.append(res);
+    return result;
+}

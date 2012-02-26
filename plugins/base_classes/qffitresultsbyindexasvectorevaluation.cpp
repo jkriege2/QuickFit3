@@ -1,329 +1,246 @@
-#include "qffitresultsevaluation.h"
-#include "qftools.h"
-#include "qffitfunctionmanager.h"
-#include "qffitalgorithmmanager.h"
+#include "qffitresultsbyindexasvectorevaluation.h"
 
-
-
-
-
-QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix, QFProject* parent) :
-    QFEvaluationItem(parent, true, false)
+QFFitResultsByIndexAsVectorEvaluation::QFFitResultsByIndexAsVectorEvaluation(const QString &fitFunctionPrefix, QFProject *parent):
+    QFFitResultsByIndexEvaluation(fitFunctionPrefix, parent)
 {
-    // open ini-file to superseede fit parameter defaults from QFFitFunction
-    QString inifn=parent->getServices()->getOptions()->getConfigFileDirectory()+QString("/fitparams_%1.ini").arg(getType());
-    fitParamSettings=new QSettings(inifn, QSettings::IniFormat);
-    QString inifng=parent->getServices()->getOptions()->getGlobalConfigFileDirectory()+QString("/fitparams_%1.ini").arg(getType());
-    fitParamGlobalSettings=new QSettings(inifng, QSettings::IniFormat);
+}
 
-    m_fitAlgorithm="";
-    m_fitFunction="";
-
-    doFitThread=new QFFitAlgorithmThreadedFit(this);
+QFFitResultsByIndexAsVectorEvaluation::~QFFitResultsByIndexAsVectorEvaluation() {
+}
 
 
-    // get list of applicable fit functions
-    if (!fitFunctionPrefix.contains(',')) {
-        m_fitFunctions=parent->getServices()->getFitFunctionManager()->getModels(fitFunctionPrefix, this);
+
+
+
+/*
+
+
+
+
+
+
+
+void QFFitResultsByIndexAsVectorEvaluation::setAllFitValues(const QString& id, double value, double error, bool currentFileOnly) {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    QList<QPointer<QFRawDataRecord> > recs;
+    recs.clear();
+    if (currentFileOnly) {
+        recs.append(getHighlightedRecord());
     } else {
-        QStringList sl=fitFunctionPrefix.split(',');
-        m_fitFunctions.clear();
-        for (int i=0; i<sl.size(); i++) {
-            m_fitFunctions=m_fitFunctions.unite(parent->getServices()->getFitFunctionManager()->getModels(sl[i], this));
-        }
+        recs=getApplicableRecords();
     }
-    // select first fit function
-    if (m_fitFunctions.size()>0) m_fitFunction=m_fitFunctions.keys().at(0);
-
-    // get list of available fit algorithms and store their parameters in the internal algorithm_parameterstore
-    algorithm_parameterstore.clear();
-    QStringList fita=parent->getServices()->getFitAlgorithmManager()->getIDList();
-    for (int i=0; i<fita.size(); i++) {
-        QFFitAlgorithm* falg=parent->getServices()->getFitAlgorithmManager()->createAlgorithm(fita[i], this);
-        m_fitAlgorithms[fita[i]]=falg;
-        storeQFFitAlgorithmParameters(falg);
-    }
-
-    // select first fit algorithm (set as current)
-    if (m_fitAlgorithms.size()>0) m_fitAlgorithm=m_fitAlgorithms.keys().at(0);
-
-    // clear internal parameter store
-    parameterStore.clear();
-
-}
-
-QFFitResultsEvaluation::~QFFitResultsEvaluation() {
-    // the fit algorithm and fit function instances are private to this class, so we have to delete the objects!
-    QMapIterator<QString, QFFitFunction*> i(m_fitFunctions);
-    while (i.hasNext()) {
-        i.next();
-        delete i.value();
-    }
-    m_fitFunctions.clear();
-    QMapIterator<QString, QFFitAlgorithm*> j(m_fitAlgorithms);
-    while (j.hasNext()) {
-        j.next();
-        delete j.value();
-    }
-    m_fitAlgorithms.clear();
-}
-
-
-
-QStringList QFFitResultsEvaluation::getAvailableFitAlgorithms() const {
-    return m_fitAlgorithms.keys();
-}
-
-QFFitAlgorithm* QFFitResultsEvaluation::getFitAlgorithm(const QString& id) const {
-    if (m_fitAlgorithms.contains(id)) return m_fitAlgorithms[id];
-    return NULL;
-}
-
-QStringList QFFitResultsEvaluation::getAvailableFitFunctions() const {
-    return m_fitFunctions.keys();
-}
-
-QFFitFunction* QFFitResultsEvaluation::getFitFunction(const QString& id) const {
-    if (m_fitFunctions.contains(id)) return m_fitFunctions[id];
-    else return NULL;
-}
-
-QFFitAlgorithm* QFFitResultsEvaluation::getFitAlgorithm() const {
-    return getFitAlgorithm(m_fitAlgorithm);
-}
-
-void QFFitResultsEvaluation::setFitAlgorithm(QString fitAlgorithm) {
-    m_fitAlgorithm=fitAlgorithm;
-}
-
-
-QFFitFunction* QFFitResultsEvaluation::getFitFunction() {
-    return getFitFunction(m_fitFunction);
-}
-
-void QFFitResultsEvaluation::setFitFunction(QString fitFunction) {
-    if (!getAvailableFitFunctions().contains(fitFunction)) return;
-    if (m_fitFunction!=fitFunction) {
-        QString oldff=m_fitFunction;
-        QFFitFunction* ffold=getFitFunction(m_fitFunction);
-        QHash<QString, FitParameter> params;
-        if (ffold) {
-            for (int i=0; i<ffold->paramCount(); i++) {
-                QString pid=ffold->getParameterID(i);
-                params[pid].value=getFitValue(pid);
-                params[pid].min=getFitMin(pid);
-                params[pid].max=getFitMax(pid);
-                params[pid].fix=getFitFix(pid);
-            }
-        }
-        m_fitFunction=fitFunction;
-        QFFitFunction* ff=getFitFunction(fitFunction);
-        for (int i=0; i<ff->paramCount(); i++) {
-            QString pid=ff->getParameterID(i);
-            QString newid=getParameterStoreID(fitFunction, ff->getParameterID(i));
-            if (params.contains(pid)) {
-                if (params[pid].value!=getFitValue(pid)) setFitValue(pid, params[pid].value);
-                if (params[pid].fix!=getFitFix(pid)) setFitFix(pid, params[pid].fix);
-                if (params[pid].min!=getFitMin(pid)) setFitMin(pid, params[pid].min);
-                if (params[pid].max!=getFitMax(pid)) setFitMax(pid, params[pid].max);
-            }
-        }
-        emitPropertiesChanged();
-    }
-}
-
-void QFFitResultsEvaluation::storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) {
-    QString aid=algorithm->id();
-    QStringList params=algorithm->getParameterIDs();
-    for (int i=0; i<params.size(); i++) {
-        QString pid=params[i];
-        algorithm_parameterstore[aid].insert(pid, algorithm->getParameter(pid));
-    }
-    emitPropertiesChanged();
-}
-
-void QFFitResultsEvaluation::restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) {
-    QString aid=algorithm->id();
-    QStringList params=algorithm->getParameterIDs();
-    for (int i=0; i<params.size(); i++) {
-        QString pid=params[i];
-        algorithm->setParameter(pid, algorithm_parameterstore[aid].value(pid, algorithm->getParameter(pid)));
-    }
-}
-
-
-void QFFitResultsEvaluation::intWriteData(QXmlStreamWriter& w) {
-    w.writeStartElement("algorithms");
-    w.writeAttribute("current", m_fitAlgorithm);
-    intWriteDataAlgorithm(w);
-    /*if (m_weighting==EqualWeighting) w.writeAttribute("weighting", "equal");
-    if (m_weighting==StdDevWeighting) w.writeAttribute("weighting", "stddev");
-    if (m_weighting==RunErrorWeighting) w.writeAttribute("weighting", "runerror");*/
-
-    QHashIterator<QString, QHash<QString, QVariant> > fapit(algorithm_parameterstore);
-    while (fapit.hasNext()) {
-        fapit.next();
-        w.writeStartElement("algorithm");
-        w.writeAttribute("id", fapit.key());
-        QHashIterator<QString, QVariant> mi(fapit.value());
-        while (mi.hasNext()) {
-            mi.next();
-            w.writeStartElement("parameter");
-            w.writeAttribute("id", mi.key());
-            w.writeAttribute("type", getQVariantType(mi.value()));
-            w.writeAttribute("data", getQVariantData(mi.value()));
-            w.writeEndElement();
-        }
-        w.writeEndElement();
-    }
-
-    w.writeEndElement();
-    w.writeStartElement("functions");
-    w.writeAttribute("current", m_fitFunction);
-    QHashIterator<QString, FitParameter> i(parameterStore);
-    while (i.hasNext()) {
-        i.next();
-        w.writeStartElement("parameter");
-        w.writeAttribute("id", i.key());
-        if (i.value().valueSet) w.writeAttribute("value", CDoubleToQString(i.value().value));
-        if (i.value().errorSet) w.writeAttribute("error", CDoubleToQString(i.value().error));
-        if (i.value().minSet) w.writeAttribute("min", CDoubleToQString(i.value().min));
-        if (i.value().maxSet) w.writeAttribute("max", CDoubleToQString(i.value().max));
-        if (i.value().fixSet) w.writeAttribute("fix", QString((i.value().fix)?QString("1"):QString("0")));
-        intWriteDataFitParam(i.key(), w);
-        w.writeEndElement();
-    }
-    w.writeEndElement();
-}
-
-void QFFitResultsEvaluation::intReadData(QDomElement* e) {
-    /*
-        <algorithms current="..." weighting="equal|stddev">
-          <algorithm id="name1">
-            <parameter id="pname1" type="ptype" data="pdata" />
-            <parameter id="pname2" type="ptype" data="pdata" />
-          </algorithm>
-          <algorithm id="name2">
-            <parameter id="pname1" type="ptype" data="pdata" />
-            <parameter id="pname2" type="ptype" data="pdata" />
-          </algorithm>
-        </algorithms>
-    */
-
-    QDomElement e1=e->firstChildElement("algorithms");
-    if (e1.hasAttribute("current")) {
-        QString a=e1.attribute("current");
-        if (getAvailableFitAlgorithms().contains(a)) {
-            setFitAlgorithm(a);
-        } else {
-            // STOP if unsupported fit algorithm was found
-            setError(tr("found unsupported fitting algorithm with ID '%1', maybe you are missing a plugin").arg(a));
-        }
-    }
-    intReadDataAlgorithm(e1);
-    /*if (e1.hasAttribute("weighting")) {
-        QString a=e1.attribute("weighting").toLower();
-        m_weighting=EqualWeighting;
-        if (a=="stddev") m_weighting=StdDevWeighting;
-        if (a=="runerror") m_weighting=RunErrorWeighting;
-    }*/
-    QDomElement elt=e1.firstChildElement("algorithm");
-    algorithm_parameterstore.clear();
-    for (; !elt.isNull(); elt = elt.nextSiblingElement("algorithm")) {
-        if (elt.hasAttribute("id")) {
-            QString id=elt.attribute("id");
-            //std::cout<<"  fit algorithm "<<id.toStdString()<<std::endl;
-            QDomElement eltt=elt.firstChildElement("parameter");
-            for (; !eltt.isNull(); eltt = eltt.nextSiblingElement("parameter")) {
-                if (eltt.hasAttribute("id") && eltt.hasAttribute("type") && eltt.hasAttribute("data")) {
-                    QString pid=eltt.attribute("id");
-                    QString ptype=eltt.attribute("type");
-                    QString pdata=eltt.attribute("data");
-                    //std::cout<<"    param "<<pid.toStdString()<<" type="<<ptype.toStdString()<<" data="<<pdata.toStdString()<<std::endl;
-                    algorithm_parameterstore[id].insert(pid, getQVariantFromString(ptype, pdata));
+    QString en=getEvaluationResultID();
+    int pid=f->getParameterNum(id);
+    QString unit="";
+    if (pid>-1) unit=f->getDescription(pid).unit;
+    for (int i=0; i<recs.size(); i++) {
+        if (recs[i]) {
+            recs[i]->disableEmitResultsChanged();
+            for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
+                QString en=getEvaluationResultID(idx);
+                if (hasFit(recs[i], idx)) {
+                    if (idx<0) recs[i]->resultsSetNumberError(en, getFitParamID(id), value, error, unit);
+                    else  recs[i]->resultsSetInNumberErrorList(en, getFitParamID(id), idx, value, error, unit);
                 }
             }
-
-            if (m_fitAlgorithms.contains(id)) restoreQFFitAlgorithmParameters(m_fitAlgorithms[id]);
+            recs[i]->enableEmitResultsChanged();
         }
     }
+    emitResultsChanged();
+}
 
 
-
-
-    e1=e->firstChildElement("functions");
-    if (e1.hasAttribute("current")) {
-        QString a=e1.attribute("current");
-        if (getAvailableFitFunctions().contains(a)) {
-            setFitFunction(a);
-        } else {
-            // STOP if unsupported fit algorithm was found
-            setError(tr("found unsupported fitting function with ID '%1', maybe you are missing a plugin").arg(a));
+void QFFitResultsByIndexAsVectorEvaluation::setAllFitFixes(const QString& id, bool fix, bool currentFileOnly) {
+    QFFitFunction* f=getFitFunction();
+    if (f==NULL) return ;
+    QList<QPointer<QFRawDataRecord> > recs;
+    recs.clear();
+    if (currentFileOnly) {
+        recs.append(getHighlightedRecord());
+    } else {
+        recs=getApplicableRecords();
+    }
+    QString en=getEvaluationResultID();
+    int pid=f->getParameterNum(id);
+    QString unit="";
+    if (pid>-1) unit=f->getDescription(pid).unit;
+    for (int i=0; i<recs.size(); i++) {
+        if (recs[i]) {
+            recs[i]->disableEmitResultsChanged();
+            for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
+                QString en=getEvaluationResultID(idx);
+                if (hasFit(recs[i], idx)) {
+                    if (idx<0) recs[i]->resultsSetBoolean(en, getFitParamID(id), fix);
+                    else  recs[i]->resultsSetInBooleanList(en, getFitParamID(id), idx, fix);
+                }
+            }
+            recs[i]->enableEmitResultsChanged();
         }
     }
-
-    // read <parameter> tag
-    elt=e1.firstChildElement("parameter");
-    parameterStore.clear();
-    for (; !elt.isNull(); elt = elt.nextSiblingElement("parameter")) {
-        if (elt.hasAttribute("id") && ( elt.hasAttribute("value") || elt.hasAttribute("fix") || elt.hasAttribute("min") || elt.hasAttribute("max") ) ) {
-            QString a=elt.attribute("id");
-            FitParameter p;
-            if (elt.hasAttribute("fix")) {
-                p.fix=(elt.attribute("fix").toLower()!="0");
-                p.fixSet=true;
-            }
-            if (elt.hasAttribute("value")) {
-                p.value=CQStringToDouble(elt.attribute("value"));
-                p.valueSet=true;
-            }
-            if (elt.hasAttribute("error")) {
-                p.error=CQStringToDouble(elt.attribute("error"));
-                p.errorSet=true;
-            }
-            if (elt.hasAttribute("min")) {
-                p.min=CQStringToDouble(elt.attribute("min"));
-                p.minSet=true;
-            }
-            if (elt.hasAttribute("max")) {
-                p.max=CQStringToDouble(elt.attribute("max"));
-                p.maxSet=true;
-            }
-            parameterStore[a]=p;
-            intReadDataFitParam(a, p, elt);
-        }
-    }
+    emitResultsChanged();
 }
 
-QString QFFitResultsEvaluation::getParameterStoreID(QString parameter) {
-    QString ff="";
-    if (getFitFunction()!=NULL) {
-        ff=getFitFunction()->id();
-    }
-    return getParameterStoreID(ff, parameter);
-};
 
 
-QString QFFitResultsEvaluation::getParameterStoreID(QString fitfunction, QString parameter) {
-    return QString(fitfunction+"___"+parameter).trimmed().toLower();
-};
 
 
-bool QFFitResultsEvaluation::hasFit(QFRawDataRecord* r1, const QString& evalID) {
-    QFRawDataRecord* r=r1;
-    if (getFitFunction()==NULL) return false;
-    if (r==NULL) r=getHighlightedRecord();
-    if (r==NULL) return false;
-    return r->resultsExistsFromEvaluation(evalID);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValue(r, getEvaluationResultID(index), id, value);
+}
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, QString unit) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValue(r, getEvaluationResultID(index), id, value, unit);
 }
 
-bool QFFitResultsEvaluation::hasFit(QFRawDataRecord* r) {
-    return hasFit(r, getEvaluationResultID());
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueString(QFRawDataRecord* r, int index, const QString& id, QString value) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValueString(r, getEvaluationResultID(index), id, value);
 }
 
-bool QFFitResultsEvaluation::hasFit() {
-    return hasFit(getHighlightedRecord(), getEvaluationResultID());
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueBool(QFRawDataRecord* r, int index, const QString& id, bool value) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValueBool(r, getEvaluationResultID(index), id, value);
 }
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValueInt(r, getEvaluationResultID(index), id, value);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value, QString unit) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValueInt(r, getEvaluationResultID(index), id, value, unit);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitValue(QFRawDataRecord* r, int index, const QString& id, double value) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitValue(r, getEvaluationResultID(index), id, value);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitError(QFRawDataRecord* r, int index, const QString& id, double error) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitError(r, getEvaluationResultID(index), id, error);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, double error) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValue(r, getEvaluationResultID(index), id, value, error);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultError(QFRawDataRecord* r, int index, const QString& id, double error) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultError(r, getEvaluationResultID(index), id, error);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValues(QFRawDataRecord* r, int index, double* values, double* errors) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValues(r, getEvaluationResultID(index), values, errors);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int index, double* values, double* errors) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValuesVisible(r, getEvaluationResultID(index),  values, errors);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(index),  values, errors, group, fix, fixGroup, sortPriority);
+}
+
+double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, int index, const QString& id) {
+    if (index<0) return QFFitResultsByIndexEvaluation::getFitValue(r, getEvaluationResultID(index), id);
+}
+
+double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, int index, const QString& id)  {
+    if (index<0) return QFFitResultsByIndexEvaluation::getFitError(r, getEvaluationResultID(index), id);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultGroup(QFRawDataRecord* r, int index, const QString& parameterID, const QString& group) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultGroup(r, getEvaluationResultID(index), parameterID, group);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultLabel(QFRawDataRecord* r, int index, const QString& parameterID, const QString& label, const QString& label_richtext) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultLabel(r, getEvaluationResultID(index), parameterID, label, label_richtext);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, int index, const QString& group) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultEvaluationGroup(r, getEvaluationResultID(index), group);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultEvaluationDescription(QFRawDataRecord* r, int index, const QString& description) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultEvaluationDescription(r, getEvaluationResultID(index), description);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitFix(QFRawDataRecord* r, int index, const QString& id, bool fix) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitFix(r, getEvaluationResultID(index), id, fix);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultFix(QFRawDataRecord* r, int index, const QString& id, bool fix) {
+    if (index<0) QFFitResultsByIndexEvaluation::setFitResultFix(r, getEvaluationResultID(index), id, fix);
+}
+
+bool QFFitResultsByIndexAsVectorEvaluation::getFitFix(QFRawDataRecord* r, int index, const QString& id) {
+    if (index<0) return QFFitResultsByIndexEvaluation::getFitFix(r, getEvaluationResultID(index), id);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::fillParameters(QFRawDataRecord* r, int index, double* param) {
+    if (index<0) QFFitResultsByIndexEvaluation::fillParameters(r, getEvaluationResultID(index), param);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::fillParameterErrors(QFRawDataRecord* r, int index, double* param) {
+    if (index<0) QFFitResultsByIndexEvaluation::fillParameterErrors(r, getEvaluationResultID(index), param);
+}
+
+void QFFitResultsByIndexAsVectorEvaluation::fillFix(QFRawDataRecord* r, int index, bool* param) {
+    if (index<0) QFFitResultsByIndexEvaluation::fillFix(r, getEvaluationResultID(index), param);
+}
+
+double* QFFitResultsByIndexAsVectorEvaluation::allocFillParameters(QFRawDataRecord* r, int index) {
+    if (index<0)return  QFFitResultsByIndexEvaluation::allocFillParameters(r, getEvaluationResultID(index));
+}
+
+double* QFFitResultsByIndexAsVectorEvaluation::allocFillParameterErrors(QFRawDataRecord* r, int index) {
+    if (index<0) return QFFitResultsByIndexEvaluation::allocFillParameterErrors(r, getEvaluationResultID(index));
+}
+
+bool* QFFitResultsByIndexAsVectorEvaluation::allocFillFix(QFRawDataRecord* r, int index) {
+    if (index<0) return QFFitResultsByIndexEvaluation::allocFillFix(r, getEvaluationResultID(index));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -536,7 +453,7 @@ bool QFFitResultsEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, c
     return false;
 }
 
-double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID/*, const QMap<QString, double>& specials*/) {
+double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) {
         return 0;
@@ -565,7 +482,7 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
     return res;
 }
 
-double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID/*, const QMap<QString, double>& specials*/)  {
+double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID)  {
 
     //if (specials.contains(parameterID)) return specials[parameterID];
     double sval=0, serr=0;
@@ -643,9 +560,6 @@ void QFFitResultsEvaluation::setFitResultGroup(QFRawDataRecord* r, const QString
     if (r!=NULL) {
         //QFFitFunction* f=getFitFunction();
         QString unit="";
-        /*if (f) {
-            int pid=f->getParameterNum(parameterID);
-        }*/
         r->resultsSetGroup(resultID, getFitParamID(parameterID), group);
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
@@ -655,9 +569,6 @@ void QFFitResultsEvaluation::setFitResultLabel(QFRawDataRecord* r, const QString
     if (r!=NULL) {
         //QFFitFunction* f=getFitFunction();
         QString unit="";
-        /*if (f) {
-            int pid=f->getParameterNum(parameterID);
-        }*/
         r->resultsSetLabel(resultID, getFitParamID(parameterID), label, label_richtext);
         emitResultsChanged(r, resultID, getFitParamID(parameterID));
     }
@@ -912,7 +823,6 @@ void QFFitResultsEvaluation::fillParametersMax(double* param) {
     }
 }
 
-/*! \brief return the default/initial/global value of a given parameter        */
 double QFFitResultsEvaluation::getDefaultFitValue(const QString& id) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) {
@@ -934,7 +844,6 @@ double QFFitResultsEvaluation::getDefaultFitValue(const QString& id) {
     return res;
 }
 
-/*! \brief return the default/initial/global fix of a given parameter        */
 bool QFFitResultsEvaluation::getDefaultFitFix(const QString& id) {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
@@ -950,7 +859,6 @@ bool QFFitResultsEvaluation::getDefaultFitFix(const QString& id) {
     return res;
 }
 
-/*! \brief reset the given parameter \a id to the initial/global/default value */
 void QFFitResultsEvaluation::resetDefaultFitValue(const QString& id) {
     if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
@@ -960,7 +868,6 @@ void QFFitResultsEvaluation::resetDefaultFitValue(const QString& id) {
     }
 }
 
-/*! \brief reset the given parameter \a id to the initial/global/default fix */
 void QFFitResultsEvaluation::resetDefaultFitFix(const QString& id) {
     if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
@@ -970,7 +877,6 @@ void QFFitResultsEvaluation::resetDefaultFitFix(const QString& id) {
     }
 }
 
-/*! \brief reset the all parameters to the initial/global/default value in current files */
 void QFFitResultsEvaluation::resetAllFitValueCurrent() {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
@@ -987,7 +893,6 @@ void QFFitResultsEvaluation::resetAllFitValueCurrent() {
     }
 }
 
-/*! \brief reset the all parameters to the initial/global/default fix in current files */
 void QFFitResultsEvaluation::resetAllFitFixCurrent() {
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return ;
@@ -1005,146 +910,9 @@ void QFFitResultsEvaluation::resetAllFitFixCurrent() {
 }
 
 
-/*! \brief reset the all fit results to the initial/global/default value in the current file and current run */
 void QFFitResultsEvaluation::resetAllFitResultsCurrent() {
     QFRawDataRecord* re=getHighlightedRecord();
     if (!re) return;
     re->resultsClear(getEvaluationResultID());
 }
-
-void QFFitResultsEvaluation::resetAllFitResultsAllFiles() {
-    QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
-    for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* r=recs[i];
-        if (r) {
-            r->disableEmitResultsChanged();
-            QString en=getEvaluationResultID();
-            r->resultsClear(en);
-            r->enableEmitResultsChanged();
-        }
-    }
-}
-
-void QFFitResultsEvaluation::setInitFitValue(const QString& id, double value, double error) {
-    if (getHighlightedRecord()!=NULL) {
-        QString dsid=getParameterStoreID(id);
-        QFFitFunction* f=getFitFunction();
-        if (f) {
-            QFFitFunction::ParameterDescription d=f->getDescription(id);
-            if (d.userEditable) {
-                parameterStore[getParameterStoreID(id)].value=value;
-                parameterStore[getParameterStoreID(id)].valueSet=true;
-                if ((error!=0)&&(d.displayError==QFFitFunction::EditError)) {
-                    parameterStore[getParameterStoreID(id)].error=error;
-                    parameterStore[getParameterStoreID(id)].errorSet=true;
-                } else {
-                    parameterStore[getParameterStoreID(id)].error=0;
-                    parameterStore[getParameterStoreID(id)].errorSet=false;
-                }
-                emitPropertiesChanged();
-            }
-        }
-    }
-}
-
-void QFFitResultsEvaluation::setInitFitFix(const QString& id, bool fix) {
-    if (getHighlightedRecord()!=NULL) {
-        QString dsid=getParameterStoreID(id);
-        QFFitFunction* f=getFitFunction();
-        if (f) {
-            QFFitFunction::ParameterDescription d=f->getDescription(id);
-            if (d.userEditable) {
-                parameterStore[getParameterStoreID(id)].fix=fix;
-                parameterStore[getParameterStoreID(id)].fixSet=true;
-                emitPropertiesChanged();
-            }
-        }
-    }
-}
-
-
-void QFFitResultsEvaluation::setFitRange(const QString& id, double min, double max) {
-    if (getHighlightedRecord()!=NULL) {
-        QString dsid=getParameterStoreID(id);
-        QFFitFunction* f=getFitFunction();
-        if (f) {
-            QFFitFunction::ParameterDescription d=f->getDescription(id);
-            if (d.userEditable && d.userRangeEditable) {
-                parameterStore[getParameterStoreID(id)].min=min;
-                parameterStore[getParameterStoreID(id)].minSet=true;
-                parameterStore[getParameterStoreID(id)].max=max;
-                parameterStore[getParameterStoreID(id)].maxSet=true;
-                emitPropertiesChanged();
-            }
-        }
-    }
-}
-
-void QFFitResultsEvaluation::setFitMin(const QString& id, double min) {
-    if (getHighlightedRecord()!=NULL) {
-        QString dsid=getParameterStoreID(id);
-        QFFitFunction* f=getFitFunction();
-        if (f) {
-            QFFitFunction::ParameterDescription d=f->getDescription(id);
-            if (d.userEditable && d.userRangeEditable) {
-                parameterStore[getParameterStoreID(id)].min=min;
-                parameterStore[getParameterStoreID(id)].minSet=true;
-                emitPropertiesChanged();
-            }
-        }
-    }
-}
-
-void QFFitResultsEvaluation::setFitMax(const QString& id, double max) {
-    if (getHighlightedRecord()!=NULL) {
-        QString dsid=getParameterStoreID(id);
-        QFFitFunction* f=getFitFunction();
-        if (f) {
-            QFFitFunction::ParameterDescription d=f->getDescription(id);
-            if (d.userEditable && d.userRangeEditable) {
-                parameterStore[getParameterStoreID(id)].max=max;
-                parameterStore[getParameterStoreID(id)].maxSet=true;
-                emitPropertiesChanged();
-            }
-        }
-    }
-}
-
-double QFFitResultsEvaluation::getFitMin(const QString& id)  {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) {
-        //std::cout<<"getFitMin("<<id.toStdString()<<") = 0 [getFitFunction()==NULL]\n";
-        return 0;
-    }
-    double res=f->getDescription(id).minValue;
-    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id+"_min"), res).toDouble();
-    res=fitParamSettings->value(QString(m_fitFunction+"/"+id+"_min"), res).toDouble();
-    QString psID=getParameterStoreID(id);
-    if (parameterStore.contains(psID)) {
-        if (parameterStore[psID].minSet) {
-            res=parameterStore[psID].min;
-        }
-    }
-    //std::cout<<"getFitMin("<<id.toStdString()<<") = "<<res<<"\n";
-    return res;
-}
-
-double QFFitResultsEvaluation::getFitMax(const QString& id) {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) {
-        //std::cout<<"getFitMax("<<id.toStdString()<<") = 0 [getFitFunction()==NULL]\n";
-        return 0;
-    }
-    double res=f->getDescription(id).maxValue;
-    res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id+"_max"), res).toDouble();
-    res=fitParamSettings->value(QString(m_fitFunction+"/"+id+"_max"), res).toDouble();
-    QString psID=getParameterStoreID(id);
-    if (parameterStore.contains(psID)) {
-        if (parameterStore[psID].maxSet) {
-            res=parameterStore[psID].max;
-        }
-    }
-    //std::cout<<"getFitMax("<<id.toStdString()<<") = "<<res<<"\n";
-    return res;
-}
-
+*/

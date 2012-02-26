@@ -525,11 +525,11 @@ public:
     /** \brief determine whether a fit has been carried out for the given record and resultID
      *
      *  \param r the given record, if \c NULL the currently highlighted record is checked
-     *  \param resultID the result ID which to access in the raw data records result store
+     *  \param evalID the evaluation ID which to access in the raw data records result store
      *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
      *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
      */
-    virtual bool hasFit(QFRawDataRecord* r, const QString& resultID);
+    virtual bool hasFit(QFRawDataRecord* r, const QString& evalID);
 
     /** \brief determine whether a fit has been carried out for the given record and the currently selected resultID
      *
