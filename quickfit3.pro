@@ -32,7 +32,8 @@ SUBDIRS += plg_fcsfit
 plg_fcsfit.subdir = ./plugins/fcsfit
 plg_fcsfit.depends = lib libqf3widgets
 
-SUBDIRS += plg_imfcsfit
+# imfcsfit plugin temporarily disabled, as it does not compile in the current version!
+#SUBDIRS += plg_imfcsfit
 plg_imfcsfit.subdir = ./plugins/imfcsfit
 plg_imfcsfit.depends = lib libqf3widgets
 

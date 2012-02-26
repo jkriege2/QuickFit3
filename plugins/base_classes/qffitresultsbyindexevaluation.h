@@ -36,10 +36,10 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
     public:
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(QString fitFunction, int currentIndex)=0;
+        virtual QString getEvaluationResultID(QString fitFunction, int currentIndex);
 
         /** \brief extract the index number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
-        virtual int getIndexFromEvaluationResultID(const QString& resultID)=0;
+        virtual int getIndexFromEvaluationResultID(const QString& resultID);
 
         /** \brief return the smallest available index */
         virtual int getIndexMin(QFRawDataRecord* r)=0;
@@ -330,7 +330,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual QString getEvaluationResultID(int currentIndex);
 
 
-
+        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error);
 
 
         /*! \brief perform a fit for the given \a record and \a run
@@ -381,6 +381,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         using QFFitResultsEvaluation::setFitMin;
         using QFFitResultsEvaluation::setFitMax;
         using QFFitResultsEvaluation::hasFit;
+        using QFFitResultsEvaluation::hasSpecial;
         using QFFitResultsEvaluation::fillParameters;
         using QFFitResultsEvaluation::fillParameterErrors;
         using QFFitResultsEvaluation::fillParametersMin;

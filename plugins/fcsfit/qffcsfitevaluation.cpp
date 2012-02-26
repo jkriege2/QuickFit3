@@ -73,17 +73,6 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
     return false;
 }
 
-int QFFCSFitEvaluation::getIndexFromEvaluationResultID(const QString& resultID) {
-    if (resultID.size()<=0) return -1;
-    if (resultID.endsWith("avg")) return -1;
-    int l=0;
-    while (resultID[resultID.size()-1-l].isDigit()) {
-        l++;
-    }
-    if (l>0) return resultID.right(l).toInt();
-    return -1;
-}
-
 int QFFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) {
     return -1;
 }
@@ -96,10 +85,6 @@ int QFFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) {
 }
 
 
-QString QFFCSFitEvaluation::getEvaluationResultID(QString fitFunction, int currentRun) {
-    if (currentRun<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
-    return QString("%1_%2_%3_run%4").arg(getType()).arg(getID()).arg(fitFunction).arg(currentRun);
-}
 
 
 

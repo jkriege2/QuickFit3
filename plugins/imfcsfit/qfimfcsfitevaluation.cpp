@@ -52,29 +52,27 @@ bool QFImFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
 
 bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) {
     int run=getIndexFromEvaluationResultID(id);
+    return hasSpecial(r, run, paramid, value, error);
+}
+
+bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) {
     if (paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
         if (crintf) {
-            error=crintf->getRateStdDev(run)*1000;
-            value=crintf->getRateMean(run)*1000;
+            error=crintf->getRateStdDev(index)*1000;
+            value=crintf->getRateMean(index)*1000;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
         if (scrintf && value==0) {
-            value=scrintf->getSimpleCountrateAverage(run);
-            error=scrintf->getSimpleCountrateVariance(run);
+            value=scrintf->getSimpleCountrateAverage(index);
+            error=scrintf->getSimpleCountrateVariance(index);
         }
         return true;
 
     }
     return false;
-}
-
-int QFImFCSFitEvaluation::getIndexFromEvaluationResultID(const QString& resultID) {
-    if (resultID.size()<=0) return -1;
-    if (resultID.endsWith("avg")) return -1;
-    return 0;
 }
 
 int QFImFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) {
@@ -88,11 +86,6 @@ int QFImFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) {
     else return fcs->getCorrelationRuns()-1;
 }
 
-
-QString QFImFCSFitEvaluation::getEvaluationResultID(QString fitFunction, int currentRun) {
-    if (currentRun<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
-    return QString("%1_%2_%3").arg(getType()).arg(getID()).arg(fitFunction).arg(currentRun);
-}
 
 
 

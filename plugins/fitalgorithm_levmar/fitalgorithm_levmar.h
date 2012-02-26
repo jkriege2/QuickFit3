@@ -77,11 +77,11 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
         /** \brief class constructor */
         QFFitAlgorithmLevmar();
         /** \copydoc QFFitAlgorithm::name() */
-        virtual QString name() const { return QObject::tr("levmar: Levenberg-Marquardt Fitting Algorithm with box constraints"); };
+        virtual QString name() const { return QObject::tr("levmar: Levenberg-Marquardt Fitting Algorithm with box constraints"); }
         /** \copydoc QFFitAlgorithm::id() */
-        virtual QString id() const { return QString("fit_levmar"); };
+        virtual QString id() const { return QString("fit_levmar"); }
         /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
-        virtual bool get_supportsBoxConstraints() const { return true; };
+        virtual bool get_supportsBoxConstraints() const { return true; }
         /** \copydoc QFFitAlgorithm::displayConfig() */
         virtual bool displayConfig();
 };
@@ -105,33 +105,33 @@ class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
         /** \brief unique id for the plugin */
         virtual QString getID() const {
             return QString("fit_levmar");
-        };
+        }
 
 
         /** \brief name for the plugin */
         virtual QString getName() const {
             return tr("levmar: Levenberg-Marquardt Fitting Algorithm with box constraints");
-        };
+        }
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const {
-            return tr("Levenberg-Marquardt Fitting Algorithm with box constraints using levmar library (v %1) from http://www.ics.forth.gr/~lourakis/levmar/.").arg(LM_VERSION);
-        };
+            return tr("Levenberg-Marquardt Fitting Algorithm with box constraints using levmar library (version %1) from http://www.ics.forth.gr/~lourakis/levmar/.").arg(LM_VERSION);
+        }
 
         /** \brief author the plugin */
         virtual QString getAuthor() const {
             return QString("Jan Krieger");
-        };
+        }
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("plugin: (c) 2011 by Jan Krieger<br/>levmar: (c) 2004  Manolis Lourakis (lourakis at ics forth gr)");
-        };
+            return tr("plugin: (c) 2011 by Jan Krieger<br/>levmar (version %1) : (c) 2004  Manolis Lourakis (lourakis at ics forth gr)").arg(LM_VERSION);
+        }
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const {
             return tr("");
-        };
+        }
 
 
         /** \brief plugin icon  */

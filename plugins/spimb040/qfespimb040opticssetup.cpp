@@ -47,6 +47,7 @@ void QFESPIMB040OpticsSetup::unlockStages() {
 void QFESPIMB040OpticsSetup::closeEvent(QCloseEvent * event) {
     ui->camConfig1->close();
     ui->camConfig2->close();
+    event->accept();
 }
 
 void QFESPIMB040OpticsSetup::showEvent( QShowEvent * event ) {

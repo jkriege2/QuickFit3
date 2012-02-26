@@ -130,10 +130,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void disableEmitResultsChanged();
         /** \brief enable emitting of rawDataChanged() signal and emit one signal */
         void enableEmitResultsChanged(bool emitnow=true);
+        /** \brief returns whether resultsChanged() signals are currently to be emitted */
+        bool isEmitResultsChangedEnabled() const;
         /** \brief disable emitting of propertiesChanged() signal*/
         void disableEmitPropertiesChanged();
         /** \brief enable emitting of propertiesChanged() signal and emit one signal */
         void enableEmitPropertiesChanged(bool emitnow=true);
+        /** \brief returns whether resultsChanged() signals are currently to be emitted */
+        bool isEmitPropertiesChangedEnabled() const;
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(const QString& message) { setError(message); }
@@ -308,6 +312,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetInNumberMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double value, const QString& unit=QString(""));
         /** \brief set a result element of type number vector. If more elements are needed in the vector, as available, these are initialized with 0 */
         void resultsSetInNumberErrorList(const QString& evaluationName, const QString& resultName, int position, double value, double error, const QString& unit=QString(""));
+        /** \brief set a result error element of type number vector. If more elements are needed in the vector, as available, these are initialized with 0 */
+        void resultsSetErrorInNumberErrorList(const QString& evaluationName, const QString& resultName, int position, double error);
         /** \brief set a result element of type number matrix. If more elements are needed in the vector, as available, these are initialized with 0 */
         void resultsSetInNumberErrorMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double value, double error, const QString& unit=QString(""));
         /** \brief set a result element of type integer vector. If more elements are needed in the vector, as available, these are initialized with 0 */
@@ -322,6 +328,41 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetInStringList(const QString& evaluationName, const QString& resultName, int position, const QString& value, const QString& unit=QString(""));
         /** \brief set a result element of type string matrix. If more elements are needed in the vector, as available, these are initialized with 0 */
         void resultsSetInStringMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, const QString& value, const QString& unit=QString(""));
+        /** \brief reset an element any matrix type to a default value */
+        void resultsResetInMatrix(const QString& evaluationName, const QString& resultName,  int row, int column);
+        /** \brief reset an element any list type to a default value */
+        void resultsResetInList(const QString& evaluationName, const QString& resultName,  int position);
+
+
+
+
+
+
+        /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
+        double resultsGetInNumberList(const QString& evaluationName, const QString& resultName, int position, double defaultValue=0);
+        /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
+        double resultsGetInNumberMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double defaultValue=0);
+        /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
+        double resultsGetErrorInNumberErrorList(const QString& evaluationName, const QString& resultName, int position, double defaultValue=0);
+        /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
+        double resultsGetErrorInNumberErrorMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double defaultValue=0);
+        /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
+        qlonglong resultsGetInIntegerList(const QString& evaluationName, const QString& resultName, int position, qlonglong defaultValue=0);
+        /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
+        qlonglong resultsGetInIntegerMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, qlonglong defaultValue=0);
+        /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
+        bool resultsGetInBooleanList(const QString& evaluationName, const QString& resultName, int position, bool defaultValue=false);
+        /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
+        bool resultsGetInBooleanMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, bool defaultValue=false);
+        /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
+        QString resultsGetInStringList(const QString& evaluationName, const QString& resultName, int position, const QString& defaultValue=QString(""));
+        /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
+        QString resultsGetInStringMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, const QString& defaultValue=QString(""));
+
+
+
+
+
 
         /** \brief set a result of type integer vector */
         void resultsSetIntegerList(const QString& evaluationName, const QString& resultName, const QVector<qlonglong>& value, const QString& unit=QString(""));

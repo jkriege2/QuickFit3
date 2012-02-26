@@ -61,12 +61,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         DataWeight getFitDataWeighting() const { return m_weighting; }
 
 
-        /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
-         *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(QString fitFunction, int currentRun);
 
-        /** \brief extract the index number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
-        virtual int getIndexFromEvaluationResultID(const QString& resultID);
         /** \brief return the smallest available index */
         virtual int getIndexMin(QFRawDataRecord* r);
         /** \brief return the largest available index */
@@ -96,6 +91,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         virtual void intReadDataAlgorithm(QDomElement& e);
 
         virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error);
+        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error);
 
 
         /** \brief type of data weighting */
@@ -111,6 +107,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
          */
 
         using QFFitResultsByIndexEvaluation::getEvaluationResultID;
+        using QFFitResultsByIndexEvaluation::hasSpecial;
 
 
 };

@@ -2,7 +2,6 @@
 #define QFFITRESULTSEVALUATIONEDITORBASE_H
 
 #include "qfevaluationeditor.h"
-#include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qt/jkqtplotter.h"
 #include "tools.h"

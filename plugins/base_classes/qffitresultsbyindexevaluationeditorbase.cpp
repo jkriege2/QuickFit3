@@ -173,38 +173,7 @@ int QFFitResultsByIndexEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, in
     return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
     //return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
 }
-/*
-int QFFitResultsByIndexEvaluationEditorBase::getUserMin(int defaultMin) {
-    QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (!data) return defaultMin;
-    QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
 
-    // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rdr->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
-
-    //qDebug()<<"get: "<<QString(resultID+"_datacut_min")<<"   "<<QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType())<<"\n";
-
-    return rdr->getProperty(resultID+"_datacut_min", defaultM).toInt();
-    //return rdr->getProperty(resultID+"_datacut_min", defaultMin).toInt();
-}
-
-int QFFitResultsByIndexEvaluationEditorBase::getUserMax(int defaultMax) {
-    QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (!data) return defaultMax;
-    QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
-
-
-
-    // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rdr->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
-
-    //qDebug()<<"get: "<<QString(resultID+"_datacut_max")<<"   "<<QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType())<<"\n";
-
-    return rdr->getProperty(resultID+"_datacut_max", defaultM).toInt();
-    //return rdr->getProperty(resultID+"_datacut_max", defaultMax).toInt();
-}*/
 
 int QFFitResultsByIndexEvaluationEditorBase::getUserMin(QFRawDataRecord* rec) {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);

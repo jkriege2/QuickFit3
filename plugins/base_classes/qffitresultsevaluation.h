@@ -21,7 +21,7 @@
       - parameter value ranges and fix-indicators are set globally for all records
       - fit parameter values and errors are stored locally in the raw data record after the first fit (hasFit() returns \c true ).
         Before the first fit they are stored globally. So the user first sees the global parameters which are valid as starting
-        point for every fit. Then he  runs a fit and ends up woth the local parameters. This way it is always possible to
+        point for every fit. Then he  runs a fit and ends up with the local parameters. This way it is always possible to
         go back to the initial/global values to reset the fit and set the initial values for a whole bunch of files at once.
       - The \c getFit...() and \c setFit...() functions already care for the structure described in the last topic. They are defined in different flavors:
           -# The most basic versions (which also really contain the implementation) have a QFRawDataRecord, the \c resultID and a \a parameterID
@@ -35,6 +35,8 @@
           -# In addition there are also functions to access the values of the currently selected/highlighted record. These rely on
              an implementtaion of getEvaluationResultID() with no parameters, which means to take the currently selected
              fit function, fit algorithm, ...
+          -# The resultID may be transformed before usage, sugin transformResultID() In the default implementation this is does not do
+             any transformation.
         .
       - the global fit parameters are stored internally in the protected member parameterStore. They are also saved to
         the project file (see intWriteData() and intReadData() ). If you want to save additional data either implement these
@@ -96,8 +98,8 @@ public:
 
 
 
-
-
+    /** \brief may be used to transform a resultID before it is used in any of the \c QFRawDataRecord.results... functions */
+    virtual QString transformResultID(const QString& resultID) const;
 
 
 
@@ -652,7 +654,7 @@ public:
     virtual bool getDefaultFitFix(const QString& id);
     /*! \brief reset the all fit results to the initial/global/default value in the currently displayed curve/data */
     virtual void resetAllFitResultsCurrent();
-    /*! \brief reset the all fit results to the initial/global/default value in all raw data arecords */
+    /*! \brief reset the all fit results to the initial/global/default value in all raw data records */
     virtual void resetAllFitResultsAllFiles();
     /*! \brief reset all parameters to the initial/global/default value in current file and resultID */
     virtual void resetAllFitValueCurrent();
@@ -683,7 +685,7 @@ public:
 
 
 
-    /*! \brief return an resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlighted record and all current settings */
+    /*! \brief return a resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlighted record and all current settings */
     virtual QString getEvaluationResultID()=0;
 signals:
 

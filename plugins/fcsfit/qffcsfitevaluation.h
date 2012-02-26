@@ -67,12 +67,7 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         DataWeight getFitDataWeighting() const { return m_weighting; }
 
 
-        /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
-         *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(QString fitFunction, int currentRun);
 
-        /** \brief extract the index number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
-        virtual int getIndexFromEvaluationResultID(const QString& resultID);
         /** \brief return the smallest available index */
         virtual int getIndexMin(QFRawDataRecord* r);
         /** \brief return the largest available index */

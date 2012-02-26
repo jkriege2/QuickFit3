@@ -11,6 +11,22 @@ QFFitResultsByIndexEvaluation::~QFFitResultsByIndexEvaluation() {
 
 }
 
+QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction, int currentIndex) {
+    if (currentIndex<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
+    return QString("%1_%2_%3_run%4").arg(getType()).arg(getID()).arg(fitFunction).arg(currentIndex);
+}
+
+int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString &resultID) {
+    if (resultID.size()<=0) return -1;
+    if (resultID.endsWith("runavg")) return -1;
+    int l=0;
+    while (resultID[resultID.size()-1-l].isDigit()) {
+        l++;
+    }
+    if (l>0) return resultID.right(l).toInt();
+    return -1;
+}
+
 
 
 
@@ -27,6 +43,10 @@ QString QFFitResultsByIndexEvaluation::getEvaluationResultID(int currentIndex) {
     return getEvaluationResultID(m_fitFunction, currentIndex);
 }
 
+bool QFFitResultsByIndexEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) {
+    return false;
+}
+
 
 
 
@@ -40,7 +60,7 @@ bool QFFitResultsByIndexEvaluation::hasFit(QFRawDataRecord* r1, int index) {
     if (getFitFunction()==NULL) return false;
     if (r==NULL) r=getHighlightedRecord();
     if (r==NULL) return false;
-    QString rsid=getEvaluationResultID(index);
+    QString rsid=transformResultID(getEvaluationResultID(index));
     return r->resultsExistsFromEvaluation(rsid);
 }
 
@@ -190,7 +210,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitResultsCurrentFileAllIndices() {
     if (!r) return;
     r->disableEmitResultsChanged();
     for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-        QString en=getEvaluationResultID(idx);
+        QString en=transformResultID(getEvaluationResultID(idx));
         r->resultsClear(en);
     }
     r->enableEmitResultsChanged();
@@ -207,7 +227,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitResultsAllFilesAllIndices() {
         if (r) {
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString en=getEvaluationResultID(idx);
+                QString en=transformResultID(getEvaluationResultID(idx));
                 r->resultsClear(en);
             }
             r->enableEmitResultsChanged();
@@ -230,7 +250,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitValue()  {
         if (r) {
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString en=getEvaluationResultID(idx);
+                QString en=transformResultID(getEvaluationResultID(idx));
                 for (int j=0; j<f->paramCount(); j++) {
                     QString id=f->getParameterID(j);
                     QString pid=getFitParamID(id);
@@ -255,7 +275,7 @@ void QFFitResultsByIndexEvaluation::resetAllFitFix() {
         if (r) {
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString en=getEvaluationResultID(idx);
+                QString en=transformResultID(getEvaluationResultID(idx));
                 for (int j=0; j<f->paramCount(); j++) {
                     QString id=f->getParameterID(j);
                     QString pid=getFitParamFixID(id);
@@ -286,7 +306,7 @@ void QFFitResultsByIndexEvaluation::setAllFitValues(const QString& id, double va
         if (recs[i]) {
             recs[i]->disableEmitResultsChanged();
             for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
-                QString en=getEvaluationResultID(idx);
+                QString en=transformResultID(getEvaluationResultID(idx));
                 if (hasFit(recs[i], idx)) recs[i]->resultsSetNumberError(en, getFitParamID(id), value, error, unit);
             }
             recs[i]->enableEmitResultsChanged();
@@ -314,7 +334,7 @@ void QFFitResultsByIndexEvaluation::setAllFitFixes(const QString& id, bool fix, 
         if (recs[i]) {
             recs[i]->disableEmitResultsChanged();
             for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
-                QString en=getEvaluationResultID(idx);
+                QString en=transformResultID(getEvaluationResultID(idx));
                 if (hasFit(recs[i], idx)) recs[i]->resultsSetBoolean(en, getFitParamFixID(id), fix);
             }
             recs[i]->enableEmitResultsChanged();

@@ -856,6 +856,20 @@ void QFRawDataRecord::resultsSetInNumberErrorList(const QString &evaluationName,
     emitResultsChanged();
 }
 
+void QFRawDataRecord::resultsSetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double error) {
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    r.type=qfrdreNumberErrorVector;
+
+    if (position>=r.evec.size()) {
+        for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
+    }
+    r.evec[position]=error;
+    emitResultsChanged();
+}
+
 void QFRawDataRecord::resultsSetInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, double error, const QString &unit) {
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
     if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
@@ -967,6 +981,71 @@ void QFRawDataRecord::resultsSetInStringMatrix(const QString &evaluationName, co
     }
     r.svec[position]=value;
     emitResultsChanged();
+}
+
+void QFRawDataRecord::resultsResetInMatrix(const QString &evaluationName, const QString &resultName, int row, int column) {
+    if (!dstore->results.contains(evaluationName)) return;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+
+    resultsResetInList(evaluationName, resultName, column+row*r.columns);
+}
+
+void QFRawDataRecord::resultsResetInList(const QString &evaluationName, const QString &resultName, int position) {
+    if (!dstore->results.contains(evaluationName)) return;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+
+    switch(r.type) {
+        case qfrdreStringVector:
+        case qfrdreStringMatrix:
+            if (position<r.svec.size()) {
+                r.svec[position]="";
+            }
+            break;
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix:
+            if (position<r.ivec.size()) {
+                r.ivec[position]=0;
+            }
+            break;
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix:
+            if (position<r.bvec.size()) {
+                r.bvec[position]=false;
+            }
+            break;
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix:
+            if (position<r.dvec.size()) {
+                r.dvec[position]=0;
+            }
+            break;
+        case qfrdreNumberErrorVector:
+        case qfrdreNumberErrorMatrix:
+            if (position<r.dvec.size()) {
+                r.dvec[position]=0;
+            }
+            if (position<r.evec.size()) {
+                r.evec[position]=0;
+            }
+            break;
+        default: break;
+    }
+
+    emitResultsChanged();
+}
+
+double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    if (position<r.dvec.size()) return r.dvec[position];
+
+    return defaultValue;
 }
 
 void QFRawDataRecord::resultsSetIntegerList(const QString &evaluationName, const QString &resultName, const QVector<qlonglong> &value, const QString &unit) {
@@ -2132,6 +2211,10 @@ void QFRawDataRecord::enableEmitResultsChanged(bool emitnow) {
     }
 }
 
+bool QFRawDataRecord::isEmitResultsChangedEnabled() const {
+    return doEmitResultsChanged;
+}
+
 void QFRawDataRecord::disableEmitPropertiesChanged() {
     doEmitPropertiesChanged=false;
 }
@@ -2142,6 +2225,90 @@ void QFRawDataRecord::enableEmitPropertiesChanged(bool emitnow) {
         //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
         emit  propertiesChanged();
     }
+}
+
+bool QFRawDataRecord::isEmitPropertiesChangedEnabled() const {
+    return doEmitPropertiesChanged;
+}
+
+QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    return resultsGetInStringList(evaluationName, resultName, r.columns*row+column, defaultValue);
+}
+
+bool QFRawDataRecord::resultsGetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    return resultsGetInBooleanList(evaluationName, resultName, r.columns*row+column, defaultValue);
+}
+
+QString QFRawDataRecord::resultsGetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    if (position<r.svec.size()) return r.svec[position];
+
+    return defaultValue;
+}
+
+qlonglong QFRawDataRecord::resultsGetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    return resultsGetInIntegerList(evaluationName, resultName, r.columns*row+column, defaultValue);
+}
+
+bool QFRawDataRecord::resultsGetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    if (position<r.bvec.size()) return r.bvec[position];
+
+    return defaultValue;
+}
+
+double QFRawDataRecord::resultsGetErrorInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    return resultsGetErrorInNumberErrorList(evaluationName, resultName, r.columns*row+column, defaultValue);
+}
+
+qlonglong QFRawDataRecord::resultsGetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    if (position<r.ivec.size()) return r.ivec[position];
+
+    return defaultValue;
+}
+
+double QFRawDataRecord::resultsGetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    return resultsGetInNumberList(evaluationName, resultName, r.columns*row+column, defaultValue);
+}
+
+double QFRawDataRecord::resultsGetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) {
+    if (!dstore->results.contains(evaluationName)) return defaultValue;
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+
+    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    if (position<r.evec.size()) return r.evec[position];
+
+    return defaultValue;
 }
 
 
