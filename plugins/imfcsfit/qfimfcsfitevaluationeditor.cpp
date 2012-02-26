@@ -530,7 +530,7 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         cmbResidualStyle->setCurrentIndex(current->getProperty("plot_residualsstyle", 0).toInt());
         chkWeightedResiduals->setChecked(current->getProperty("weighted_residuals", false).toBool());
-        spinResidualHistogramBins->setValue(current->getProperty("plot_residualshistogrambins", 10).toInt());
+        spinResidualHistogramBins->setValue(current->getProperty("plot_residualshistogrambins", 25).toInt());
 
         QStringList ff=fcs->getAvailableFitFunctions();
         for (int i=0; i<ff.size(); i++) {
@@ -594,7 +594,7 @@ void QFImFCSFitEvaluationEditor::readSettings() {
         m_parameterCheckboxWidth=settings->getQSettings()->value("fcsfitevaleditor/parameterCheckboxWidth", m_parameterCheckboxWidth).toInt();
         //btnEditRanges->setChecked(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", false).toBool());
         tbEditRanges->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/display_range_widgets", 0).toInt());
-        spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 10).toInt());
+        spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsfitevaleditor/residual_histogram_bins", 25).toInt());
         tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/residual_toolbox_current", 0).toInt());
         QFFitResultsEvaluationEditorBase::readSettings();
 
