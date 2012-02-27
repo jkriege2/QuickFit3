@@ -585,7 +585,7 @@ void MainWindow::createWidgets() {
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
     QFileInfo fi(QApplication::applicationFilePath());
     logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
-    logFileMainWidget->log_text(tr("starting up QuickFit %1 ...\n").arg(VERSION_FULL));
+    logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(VERSION_FULL).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()));
     logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));
     logFileMainWidget->log_text(tr("configuration directory: '%1' ...\n").arg(settings->getConfigFileDirectory()));
     logFileMainWidget->log_text(tr("global configuration directory: '%1' ...\n").arg(settings->getGlobalConfigFileDirectory()));

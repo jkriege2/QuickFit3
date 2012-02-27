@@ -240,10 +240,15 @@ void QFFitResultsByIndexAsVectorEvaluation::setAllFitValues(const QString& id, d
             bool doEmit=r->isEmitResultsChangedEnabled();
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString en=transformResultID(getEvaluationResultID(idx));
+                QString resultID=getEvaluationResultID(idx);
+                QString en=transformResultID(resultID);
                 if (hasFit(r, idx)) {
-                    r->resultsSetInNumberErrorList(en, getFitParamID(id), idx, value, error, unit);
-                    r->resultsSetInBooleanList(en, getParamNameLocalStore(getFitParamID(id)), idx, true);
+                    if (idx<0) {
+                        r->resultsSetNumberError(resultID, getFitParamID(id), value, error, unit);
+                    } else {
+                        r->resultsSetInNumberErrorList(en, getFitParamID(id), idx, value, error, unit);
+                        r->resultsSetInBooleanList(en, getParamNameLocalStore(getFitParamID(id)), idx, true);
+                    }
                 }
             }
             if (doEmit) r->enableEmitResultsChanged(true);
@@ -269,10 +274,15 @@ void QFFitResultsByIndexAsVectorEvaluation::setAllFitFixes(const QString& id, bo
             bool doEmit=r->isEmitResultsChangedEnabled();
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
-                QString en=transformResultID(getEvaluationResultID(idx));
+                QString resultID=getEvaluationResultID(idx);
+                QString en=transformResultID(resultID);
                 if (hasFit(r, idx)) {
-                    r->resultsSetInBooleanList(en, getFitParamFixID(id), idx, fix);
-                    r->resultsSetInBooleanList(en, getParamNameLocalStore(getFitParamFixID(id)), idx, true);
+                    if (idx<0) {
+                        r->resultsSetBoolean(resultID, getFitParamFixID(id), fix);
+                    } else {
+                        r->resultsSetInBooleanList(en, getFitParamFixID(id), idx, fix);
+                        r->resultsSetInBooleanList(en, getParamNameLocalStore(getFitParamFixID(id)), idx, true);
+                    }
                 }
             }
             if (doEmit) r->enableEmitResultsChanged(true);
