@@ -79,7 +79,7 @@ void QFPRDRFCS::insertFCS() {
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
-        QStringList files = QFileDialog::getOpenFileNames(parentWidget,
+        QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
                               alvf+";;"+asciif+";;"+albaf, &currentFCSFileFormatFilter);

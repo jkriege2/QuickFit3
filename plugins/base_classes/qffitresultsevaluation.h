@@ -687,6 +687,10 @@ public:
 
     /*! \brief return a resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlighted record and all current settings */
     virtual QString getEvaluationResultID()=0;
+    /*! \brief reset the given parameter value (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
+    virtual void resetDefaultFitValue(QFRawDataRecord *r, const QString &resultID, const QString &id);
+    /*! \brief reset the given parameter fix (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
+    virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
 signals:
 
 public slots:
@@ -760,10 +764,10 @@ protected:
 
 
     /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-    inline QString getParameterStoreID(QString parameter);
+    QString getParameterStoreID(QString parameter);
 
     /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-    inline QString getParameterStoreID(QString fitfunction, QString parameter);
+    QString getParameterStoreID(QString fitfunction, QString parameter);
 
     /** \brief write object contents into XML file
     *
@@ -781,7 +785,7 @@ protected:
      \param e QDomElement to read from
 
     */
-    virtual void intReadDataFitParam(const QString& parameterID, const FitParameter& fitParam, QDomElement& e) {};
+    virtual void intReadDataFitParam(const QString& parameterID, const FitParameter& fitParam, QDomElement& e) {}
     /*! \brief allows to write additional information to a fit parameter node in the project file
 
      \param parameterID id of the current fit parameter

@@ -956,20 +956,46 @@ bool QFFitResultsEvaluation::getDefaultFitFix(const QString& id) {
 
 /*! \brief reset the given parameter \a id to the initial/global/default value */
 void QFFitResultsEvaluation::resetDefaultFitValue(const QString& id) {
-    if (hasFit()) {
+    /*if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
         QString en=transformResultID(getEvaluationResultID());
         QString pid=getFitParamID(id);
         if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
-    }
+    }*/
+    resetDefaultFitValue(getHighlightedRecord(), getEvaluationResultID(), id);
 }
 
 /*! \brief reset the given parameter \a id to the initial/global/default fix */
 void QFFitResultsEvaluation::resetDefaultFitFix(const QString& id) {
-    if (hasFit()) {
+    /*if (hasFit()) {
         QFRawDataRecord* r=getHighlightedRecord();
         QString en=transformResultID(getEvaluationResultID());
         QString pid=getFitParamFixID(id);
+        if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
+    }*/
+    resetDefaultFitFix(getHighlightedRecord(), getEvaluationResultID(), id);
+}
+
+/*! \brief reset the given parameter \a id to the initial/global/default value */
+void QFFitResultsEvaluation::resetDefaultFitValue(QFRawDataRecord* r, const QString& resultID, const QString& id) {
+    if (hasFit()) {
+        QString en=transformResultID(resultID);
+        QString pid=getFitParamID(id);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
+        if (doEmit) r->enableEmitResultsChanged(true);
+    }
+}
+
+/*! \brief reset the given parameter \a id to the initial/global/default fix */
+void QFFitResultsEvaluation::resetDefaultFitFix(QFRawDataRecord* r, const QString& resultID, const QString& id) {
+    if (hasFit()) {
+        QString en=transformResultID(resultID);
+        QString pid=getFitParamFixID(id);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        if (doEmit) r->enableEmitResultsChanged(true);
         if (r->resultsExists(en, pid)) r->resultsRemove(en, pid);
     }
 }
@@ -982,7 +1008,7 @@ void QFFitResultsEvaluation::resetAllFitValueCurrent() {
     r->disableEmitResultsChanged();
     for (int i=0; i<f->paramCount(); i++) {
         QString id=f->getParameterID(i);
-        resetDefaultFitValue(id);
+        resetDefaultFitValue(r, getEvaluationResultID(), id);
     }
     if (doEmit) r->enableEmitResultsChanged(true);
 }
@@ -995,7 +1021,7 @@ void QFFitResultsEvaluation::resetAllFitFixCurrent() {
     r->disableEmitResultsChanged();
     for (int i=0; i<f->paramCount(); i++) {
         QString id=f->getParameterID(i);
-        resetDefaultFitFix(id);
+        resetDefaultFitFix(r, getEvaluationResultID(), id);
     }
     if (doEmit) r->enableEmitResultsChanged(true);
 }

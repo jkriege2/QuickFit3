@@ -45,7 +45,7 @@ void QFPRDRTable::insertTable() {
 
 void QFPRDRTable::insertTableFile() {
     if (project) {
-        QStringList files = QFileDialog::getOpenFileNames(parentWidget, tr("Select Table File(s) to Import ..."), settings->getCurrentRawDataDir(), tr("Comma Separated Value Files (*.txt *.dat *.csv);;All Files (*.*)"));
+        QStringList files = qfGetOpenFileNames(parentWidget, tr("Select Table File(s) to Import ..."), settings->getCurrentRawDataDir(), tr("Comma Separated Value Files (*.txt *.dat *.csv);;All Files (*.*)"));
         QStringList list = files;
         if (list.size()>0) {
 

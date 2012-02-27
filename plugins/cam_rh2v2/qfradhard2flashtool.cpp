@@ -1,6 +1,7 @@
 #include "qfradhard2flashtool.h"
 #include "ui_qfradhard2flashtool.h"
 #include "cam_rh2v2.h"
+#include "qftools.h"
 
 QFRadhard2FlashtoolV2::QFRadhard2FlashtoolV2(QFExtensionCameraRh2v2 *ext, QWidget* parent) :
     QDialog(parent),
@@ -44,14 +45,14 @@ void QFRadhard2FlashtoolV2::on_btnFlash_clicked(){
 }
 
 void QFRadhard2FlashtoolV2::on_btnLoad_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtMasterBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = qfGetOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtMasterBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtMasterBitfile->setText(fileName);
     }
 }
 
 void QFRadhard2FlashtoolV2::on_btnLoad1_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfileMaster->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = qfGetOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfileMaster->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtAutoBitfileMaster->setText(fileName);
     }
@@ -59,14 +60,14 @@ void QFRadhard2FlashtoolV2::on_btnLoad1_clicked(){
 
 
 void QFRadhard2FlashtoolV2::on_btnLoad2_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfileSlave->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = qfGetOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfileSlave->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtAutoBitfileSlave->setText(fileName);
     }
 }
 
 void QFRadhard2FlashtoolV2::on_btnLoad3_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtSlaveBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = qfGetOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtSlaveBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtSlaveBitfile->setText(fileName);
     }

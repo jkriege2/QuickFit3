@@ -274,21 +274,21 @@ QString escapify(const QStringList& text) {
     QString s;
     for (int si=0; si<text.size(); si++) {
         if (si>0) s=s+";";
-        s=s+QString("\"%1\"").arg(escapify(text[si]));
+        s=s+QString("\'%1\'").arg(escapify(text[si]));
     }
     return s;
 }
 
-QStringList deescapifyList(const QString& text) {
+QStringList deescapifyList(const QString& text, char stringDelim, char separator) {
     QStringList result;
     QString res="";
     bool inString=false;
     if (text.size()>0) {
       int i=0;
       while (i<text.size()) {
-        if (text[i]=='"') {
+        if (text[i]==stringDelim) {
             inString=!inString;
-        } else if ((!inString) && (text[i]==';')) {
+        } else if ((!inString) && (text[i]==separator)) {
             if (!res.isEmpty()) {
                 result.append(res);
                 res="";
@@ -328,4 +328,39 @@ QStringList deescapifyList(const QString& text) {
     }
     if (!res.isEmpty()) result.append(res);
     return result;
+}
+
+QStringList deescapifyList(const QString& text) {
+    QStringList result=deescapifyList(text, '\'', ';');
+    if (result.size()<=0) result=deescapifyList(text, '\"', ';');
+    return result;
+}
+
+
+QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
+#ifdef Q_OS_UNIX
+    return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
+#else
+    return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, options);
+#endif
+}
+
+QStringList	qfGetOpenFileNames ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
+#ifdef Q_OS_UNIX
+    return QFileDialog::getOpenFileNames(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
+#else
+    return QFileDialog::getOpenFileNames(parent, caption, dir, filter, selectedFilter, options);
+#endif
+}
+
+QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options )  {
+#ifdef Q_OS_UNIX
+    return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
+#else
+    return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, options);
+#endif
+}
+
+int getApplicationBitDepth() {
+    return 8*sizeof(void*);
 }

@@ -98,10 +98,10 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         // look into INI which was the last used format
         QString current_format_name=settings->getQSettings()->value("imaging_fcs/current_format_filter", format_videoCorrelator).toString();
         // let the user select some files to import
-        QStringList files = QFileDialog::getOpenFileNames(parentWidget,
+        QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              formats.join(";;"), &current_format_name, QFileDialog::DontUseNativeDialog|QFileDialog::ReadOnly);
+                              formats.join(";;"), &current_format_name, QFileDialog::ReadOnly);
         // store the format we just used
         settings->getQSettings()->setValue("imaging_fcs/current_format_filter", current_format_name);
         QString current_format_name_short=formats_short.value(formats.indexOf(current_format_name), "???");

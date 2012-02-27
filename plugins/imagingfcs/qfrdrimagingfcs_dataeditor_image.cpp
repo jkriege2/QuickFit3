@@ -1253,7 +1253,7 @@ void QFRDRImagingFCSImageEditor::loadMask() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
-    QString filename= QFileDialog::getOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
+    QString filename= qfGetOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (QFile::exists(filename)) {
         if (m) {
             m->maskLoad(filename);
@@ -1268,7 +1268,7 @@ void QFRDRImagingFCSImageEditor::saveMask() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
-    QString filename= QFileDialog::getSaveFileName(this, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
+    QString filename= qfGetSaveFileName(this, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (!filename.isEmpty()) {
         m->maskSave(filename);
     }
@@ -1278,7 +1278,7 @@ void QFRDRImagingFCSImageEditor::saveSelection() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
-    QString filename= QFileDialog::getSaveFileName(this, tr("save selection as ..."), lastMaskDir, tr("mask files (*.msk)"));
+    QString filename= qfGetSaveFileName(this, tr("save selection as ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (!filename.isEmpty()) {
         QFile f(filename);
         if (f.open(QIODevice::WriteOnly)) {
@@ -1300,7 +1300,7 @@ void QFRDRImagingFCSImageEditor::loadSelection() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
-    QString filename= QFileDialog::getOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
+    QString filename= qfGetOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (QFile::exists(filename)) {
         QFile f(filename);
         if (f.open(QIODevice::ReadOnly)) {
@@ -2991,7 +2991,7 @@ void QFRDRImagingFCSImageEditor::saveReport() {
     /* it is often a good idea to have a possibility to save or print a report about the fit results.
        This is implemented in a generic way here.    */
 
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+    QString fn = qfGetSaveFileName(this, tr("Save Report"),
                                 lastSavePath,
                                 tr("PDF File (*.pdf);;PostScript File (*.ps)"));
 
@@ -3096,7 +3096,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
 
         QString selFilter=filters[0];
 
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Data"),
+        QString fileName = qfGetSaveFileName(this, tr("Save Data"),
                                 lastSavePath,
                                 filters.join(";;"), &selFilter);
         if (fileName.isEmpty()) return;

@@ -354,7 +354,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     getProject()->getServices()->log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
 
 
-                    QString evalID=getEvaluationResultID(ffunc->id(), run);
+                    QString evalID=transformResultID(getEvaluationResultID(ffunc->id(), run));
                     QString param;
                     QString group="fit properties";
                     QString egroup=QString("%1%2__%3__%4").arg(getType()).arg(getID()).arg(falg->id()).arg(ffunc->id());

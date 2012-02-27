@@ -263,7 +263,7 @@ void QFRDRImagingFCSCorrelationDialog::on_chkLastFrame_clicked(bool checked) {
 
 
 void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFile_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
+    QString fileName = qfGetOpenFileName(this, tr("Select Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
     if (!fileName.isEmpty()) {
         lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
         ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
@@ -275,7 +275,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFile_clicked() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnSelectBackgroundFile_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Background Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
+    QString fileName = qfGetOpenFileName(this, tr("Select Background Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
     if (!fileName.isEmpty()) {
         lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
         ui->edtBackgroundFile->setText(fileName);

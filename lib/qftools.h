@@ -9,6 +9,7 @@
 #include <QSplitter>
 #include <QFile>
 #include "lib_imexport.h"
+#include <QFileDialog>
 
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
     \ingroup qf3lib_mathtools
@@ -172,6 +173,35 @@ QFLIB_EXPORT QString escapify(const QStringList& text);
 /*! \brief deescapify a string
     \ingroup qf3lib_tools
 
+    The string has to be composed of substrings, delimited by \a stringDelim (e.g. an apostrophy) and separated by
+    \a separator (e.g. \c ; ).
+
 */
+QFLIB_EXPORT QStringList deescapifyList(const QString& text, char stringDelim, char separator);
+
+/*! \brief deescapify a string, with the default delimiter \c ' and the separator \c ; If this configuration does not work, double-quotes are used as separator.
+    \ingroup qf3lib_tools
+ */
 QFLIB_EXPORT QStringList deescapifyList(const QString& text);
+
+
+
+
+/*! \brief like QFileDialog::getOpenFileName(), but uses the system dialog on windows and a custom dialog on Linux
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QString qfGetOpenFileName ( QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0 );
+/*! \brief like QFileDialog::getOpenFileNames(), but uses the system dialog on windows and a custom dialog on Linux
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QStringList qfGetOpenFileNames ( QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0 );
+/*! \brief like QFileDialog::getSaveFileName(), but uses the system dialog on windows and a custom dialog on Linux
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QString qfGetSaveFileName ( QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0 );
+/*! \brief determine bit-depth of adressing
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT int getApplicationBitDepth();
+
 #endif // QFTOOLS_H

@@ -30,7 +30,7 @@
 #include "qfespimb00histogrammaskdialog.h"
 #include "qfasttablelabel.h"
 #include "qrecentfilesmenu.h"
-
+#include "qftools.h"
 
 /** \brief defines the type of the internal image representation of QFESPIMB040CameraView::image, may be uint32_t OR double OR float (nothing else!!!)  */
 #define QFESPIMB040CameraView_internalImageType int64_t
@@ -444,7 +444,7 @@ class QFESPIMB040CameraView : public QWidget {
             QString imFilter=lastImagefilter;
 
 
-            QString fileName = QFileDialog::getSaveFileName(this, dialogTitle,
+            QString fileName = qfGetSaveFileName(this, dialogTitle,
                                     lastImagepath,
                                     imageFilters.join(";;"),&imFilter);
 

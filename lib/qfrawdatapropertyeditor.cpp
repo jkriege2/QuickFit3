@@ -694,7 +694,7 @@ void QFRawDataPropertyEditor::saveResults() {
     if (current) {
         QString selectedFilter="";
         QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk)");
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
+        QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
             if (f==1) {

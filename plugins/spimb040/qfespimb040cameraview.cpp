@@ -1298,7 +1298,7 @@ void QFESPIMB040CameraView::clearMask() {
 
 void QFESPIMB040CameraView::saveMask() {
     if (m_stopresume) m_stopresume->stop();
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Mask Data"),
+    QString fileName = qfGetSaveFileName(this, tr("Save Mask Data"),
                             lastMaskpath,
                             tr("Image Mask (*.msk)"));
     if (fileName.isEmpty()) return;
@@ -1336,7 +1336,7 @@ void QFESPIMB040CameraView::loadMask(const QString& fileName) {
 
 void QFESPIMB040CameraView::loadMask() {
     if (m_stopresume) m_stopresume->stop();
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Mask Data"),
+    QString fileName = qfGetOpenFileName(this, tr("Load Mask Data"),
                             lastMaskpath,
                             tr("Image Mask (*.msk)"));
     loadMask(fileName);
@@ -1592,7 +1592,7 @@ void QFESPIMB040CameraView::saveReport() {
     /* it is often a good idea to have a possibility to save or print a report about the fit results.
        This is implemented in a generic way here.    */
 
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+    QString fn = qfGetSaveFileName(this, tr("Save Report"),
                                 lastImagepath,
                                 tr("PDF File (*.pdf);;PostScript File (*.ps)"));
 
@@ -1656,7 +1656,7 @@ void QFESPIMB040CameraView::saveData() {
     QString selFilter=filters[0];
 
     if (m_stopresume) m_stopresume->stop();
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Data"),
+    QString fileName = qfGetSaveFileName(this, tr("Save Data"),
                             lastImagepath,
                             filters.join(";;"), &selFilter);
     if (fileName.isEmpty()) return;

@@ -1441,7 +1441,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
             QString s="(";
             for (int i=0; i<r.bvec.size(); i++) {
                 if (i>0) s=s+"; ";
-                s=s+QString::number(r.bvec[i]);
+                s=s+((r.bvec[i])?tr("t"):tr("f"));
             }
             return s+") "+r.unit;
         }
@@ -1452,7 +1452,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
                     if (i%r.columns==0) s=s+";; ";
                     else s=s+"; ";
                 }
-                s=s+QString::number(r.bvec[i]);
+                s=s+((r.bvec[i])?tr("t"):tr("f"));
             }
             return s+") "+r.unit;
         }
@@ -1661,7 +1661,7 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QS
         }
         case qfrdreBooleanVector:
         case qfrdreBooleanMatrix: {
-                if (position>= r.dvec.size()) return QVariant();
+                if (position>= r.bvec.size()) return QVariant();
                 return QVariant(r.bvec[position]);
         }
         default: return QVariant();

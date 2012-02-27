@@ -1,7 +1,7 @@
 #include "qffitresultsevaluationeditorbase.h"
 #include "qffitresultsevaluation.h"
 #include "qmodernprogresswidget.h"
-
+#include "qftools.h"
 
 /////////////////////////////////////////////////////////////////////
 // CONSTRUCTOR/DESTRUCTOR/INITIALISATION
@@ -106,7 +106,7 @@ void QFFitResultsEvaluationEditorBase::saveCurrentFitResults() {
 
     QString filter= tr("Fit Parameter Set (*.fps)");
     QString selectedFilter=filter;
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fit Parameter Set as ..."), m_currentFPSSaveDir, filter, &selectedFilter);
+    QString fileName = qfGetSaveFileName(this, tr("Save Fit Parameter Set as ..."), m_currentFPSSaveDir, filter, &selectedFilter);
     if ((!fileName.isEmpty())&&(!fileName.isNull())) {
         m_currentFPSSaveDir=QFileInfo(fileName).absolutePath();
         bool ok=true;
@@ -164,7 +164,7 @@ void QFFitResultsEvaluationEditorBase::loadCurrentFitResults() {
 
     QString filter= tr("Fit Parameter Set (*.fps)");
     QString selectedFilter=filter;
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Fit Parameter Set ..."), m_currentFPSSaveDir, filter, &selectedFilter);
+    QString fileName = qfGetOpenFileName(this, tr("Load Fit Parameter Set ..."), m_currentFPSSaveDir, filter, &selectedFilter);
     if ((!fileName.isEmpty())&&(!fileName.isNull())) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         eval->set_doEmitPropertiesChanged(false);
@@ -223,7 +223,7 @@ void QFFitResultsEvaluationEditorBase::createReportDoc(QTextDocument* document) 
 
 
 void QFFitResultsEvaluationEditorBase::saveReport() {
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+    QString fn = qfGetSaveFileName(this, tr("Save Report"),
                                 m_currentSaveDirectory,
                                 tr("PDF File (*.pdf);;PostScript File (*.ps)"));
 

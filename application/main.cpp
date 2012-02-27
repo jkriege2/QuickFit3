@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "../version.h"
 #include "../lib/programoptions.h"
+#include "../lib/qftools.h"
 
 
 #include <QtGui>
@@ -43,7 +44,7 @@ int main(int argc, char * argv[])
     QPixmap pixmap(":/splash.png");
     QPainter* painter=new QPainter(&pixmap);
     painter->setFont(QFont("Arial", 9));
-    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4), %5-bit").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()).arg(getApplicationBitDepth()));
     delete painter;
     painter=NULL;
     QSplashScreen splash(pixmap);//,Qt::WindowStaysOnTopHint);

@@ -158,7 +158,7 @@ void QFRDRTableEditor::slSaveTable() {
         if (m->model()) {
             QString selectedFilter="";
             QString filter= m->getExportDialogFiletypes();
-            QString fileName = QFileDialog::getSaveFileName(this, m->getExportDialogTitle(), currentTableDir, filter, &selectedFilter);
+            QString fileName = qfGetSaveFileName(this, m->getExportDialogTitle(), currentTableDir, filter, &selectedFilter);
             if ((!fileName.isEmpty())&&(!fileName.isNull())) {
                 int f=filter.split(";;").indexOf(selectedFilter);
                 //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<"   "<<m->getExportFiletypes().at(f).toStdString()<<std::endl;
@@ -177,7 +177,7 @@ void QFRDRTableEditor::slLoadTable() {
             filter<<tr("Comma Separated Values, Decimal Dot (*.txt *.csv *.dat)")
                   <<tr("Semicolon Separated Values, Decimal Dot (*.txt *.csv *.dat)")
                   <<tr("Semicolon Separated Values, Decimal Comma (*.txt *.csv *.dat)");
-            QString fileName = QFileDialog::getOpenFileName(this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
+            QString fileName = qfGetOpenFileName(this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
             //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
             if (!fileName.isNull()) {
                 int f=filter.indexOf(selectedFilter);

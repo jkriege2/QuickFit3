@@ -483,7 +483,7 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     connect(btnCopyToAllCurrentRun, SIGNAL(clicked()), this, SLOT(copyToAllCurrentRun()));
     connect(btnLoadParameters, SIGNAL(clicked()), this, SLOT(loadCurrentFitResults()));
     connect(btnSaveParameters, SIGNAL(clicked()), this, SLOT(saveCurrentFitResults()));
-    connect(btnCalibrateFocalVolume, SIGNAL(clicked()), this, SLOT(calibrateFocalVolume()));
+    //connect(btnCalibrateFocalVolume, SIGNAL(clicked()), this, SLOT(calibrateFocalVolume()));
 
     connect(datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
     connect(datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
@@ -737,7 +737,7 @@ void QFImFCSFitEvaluationEditor::displayModel(bool newWidget) {
         /////////////////////////////////////////////////////////////////////////////////////////////
         // create new parameter widgets
         /////////////////////////////////////////////////////////////////////////////////////////////
-        btnCalibrateFocalVolume->setEnabled(false);
+        //btnCalibrateFocalVolume->setEnabled(false);
         bool has_particles=false;
         bool has_wxy=false;
         bool has_tauD=false;
@@ -788,7 +788,7 @@ void QFImFCSFitEvaluationEditor::displayModel(bool newWidget) {
             fpw->setEditRange(tbEditRanges->currentIndex());
             fpw->unsetEditValues(tbEditRanges->currentIndex());
         }
-        btnCalibrateFocalVolume->setEnabled((has_tauD||(has_particles&&has_gamma))&&has_wxy);
+        //btnCalibrateFocalVolume->setEnabled((has_tauD||(has_particles&&has_gamma))&&has_wxy);
         // add stretcher item in bottom row
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
     }

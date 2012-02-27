@@ -1,6 +1,7 @@
 #include "qfradhard2flashtool.h"
 #include "ui_qfradhard2flashtool.h"
 #include "cam_radhard2.h"
+#include "qftools.h"
 
 QFRadhard2Flashtool::QFRadhard2Flashtool(QFExtensionCameraRadhard2 *ext, QWidget* parent) :
     QDialog(parent),
@@ -36,14 +37,14 @@ void QFRadhard2Flashtool::on_btnFlash_clicked(){
 }
 
 void QFRadhard2Flashtool::on_btnLoad_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtFile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = qfGetOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtFile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtFile->setText(fileName);
     }
 }
 
 void QFRadhard2Flashtool::on_btnLoad1_clicked(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
+    QString fileName = qfGetOpenFileName(this, tr("Select Bitfile ..."), QFileInfo(ui->edtAutoBitfile->text()).absolutePath(), tr("FPGA Bitfiles (*.bit)"));
     if (!fileName.isEmpty()) {
         ui->edtAutoBitfile->setText(fileName);
     }

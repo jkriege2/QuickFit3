@@ -252,7 +252,7 @@ void MainWindow::newProject() {
 
 void MainWindow::openProject() {
     if (maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project ..."), currentProjectDir, tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave)"));
+        QString fileName = qfGetOpenFileName(this, tr("Open Project ..."), currentProjectDir, tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave)"));
         if (!fileName.isEmpty()) {
             currentProjectDir=QFileInfo(fileName).dir().absolutePath();
             QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -292,7 +292,7 @@ bool MainWindow::saveProject() {
 }
 
 bool MainWindow::saveProjectAs() {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project As ..."), currentProjectDir, tr("QuickFit Project (*.qfp)"));
+    QString fileName = qfGetSaveFileName(this, tr("Save Project As ..."), currentProjectDir, tr("QuickFit Project (*.qfp)"));
     if (fileName.isEmpty())
         return false;
     currentProjectDir=QFileInfo(fileName).dir().absolutePath();
