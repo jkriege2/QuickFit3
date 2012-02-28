@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="fcs_maxent/qffcsmaxentevaluation.png">./images/qffcsmaxentevaluation.png</file>
+    <file alias="fcs_maxent/qffcsmaxentevaluation_small.png">./images/qffcsmaxentevaluation_small.png</file>
+    <file alias="fcs_maxent/qfeval_savereport.png">./images/qffcsmaxentevaluation_save.png</file>
+    <file alias="fcs_maxent/qfeval_printreport.png">./images/qffcsmaxentevaluation_print.png</file>
+    <file alias="fcs_maxent/qffcsmaxentevaluation_evaluate.png">./images/qffcsmaxentevaluation_evaluate.png</file>
+</qresource>
+</RCC>
