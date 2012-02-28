@@ -2,6 +2,7 @@
 #include <iostream>
 #include <QtXml>
 #include "qftools.h"
+#include <QDebug>
 
 
 QFProperties::QFProperties() {
@@ -10,6 +11,18 @@ QFProperties::QFProperties() {
 
 QFProperties::~QFProperties() {
     props.clear();
+}
+
+QVariant QFProperties::getProperty(const QString &p) const
+{
+    if (props.contains(p)) return props[p].data; else return QVariant();
+}
+
+QVariant QFProperties::getProperty(const QString &p, const QVariant &defaultValue) const
+{
+    if (props.contains(p)) return props[p].data;
+    return defaultValue;
+
 }
 
 

@@ -1139,7 +1139,7 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitFunction::FitStatistics fitResults=eval->calcFitStatistics(ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
+                QFFitStatistics fitResults=eval->calcFitStatistics(ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
                 record->enableEmitResultsChanged();
 
 

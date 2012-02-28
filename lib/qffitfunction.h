@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <cfloat>
 #include <cmath>
+#include "qfmathtools.h"
 #include "lib_imexport.h"
 
 /*! \brief describes a virtual base class fitting functions that are used together with QFFitAlgorithm objects.
@@ -237,56 +238,6 @@ class QFLIB_EXPORT QFFitFunction {
             return sl;
         }
 
-        /** \brief used as result type for the function calcFitStatistics() */
-        struct QFLIB_EXPORT FitStatistics {
-            public:
-                /** \brief default constructor/initializor: initialize all with 0/\c NULL */
-                FitStatistics();
-
-                /** \brief free all heap memory allocated in this struct */
-                void free();
-
-                int runAvgStart;   /**<  */
-                double* fitfunc;   /**<  */
-                double* residuals;   /**<  */
-                double* residuals_weighted;   /**<  */
-                int runAvgMaxN;   /**<  */
-                int runAvgN;   /**<  */
-                double* tau_runavg;   /**<  */
-                double* residuals_runavg;   /**<  */
-                double* residuals_runavg_weighted;   /**<  */
-                int fitparamN;   /**<  */
-                int dataSize;   /**<  */
-                int degFreedom;   /**<  */
-                double residSqrSum;        /**<  sum of squared residuals */
-                double residWeightSqrSum;  /**<  sum of squared weighted residuals */
-                double residSum;           /**<  sum of residuals */
-                double residWeightSum;     /**<  sum of weightedresiduals */
-                double gSum;               /**<  sum of measured values */
-                double gSqrSum;            /**<  sum of squared measured values */
-
-
-                double rmin;       /**<  min of residuals */
-                double rmax;       /**<  max of residuals */
-                double rminw;      /**<  min of weighted residuals */
-                double rmaxw;      /**<  max of weighted residuals */
-                double residAverage;   /**<  */
-                double residWeightAverage;   /**<  */
-                double residStdDev;   /**<  */
-                double residWeightStdDev;   /**<  */
-                double TSS;   /**<  */
-                double Rsquared;   /**<  */
-
-                double residHistBinWidth;   /**<  */
-                double residHistWBinWidth;   /**<  */
-                double* resHistogram;   /**<  */
-                double resHistogramCount;   /**<  */
-                double* resWHistogram;   /**<  */
-                double resWHistogramCount;   /**<  */
-                double* resCorrelation;   /**<  */
-                double* resWCorrelation;   /**<  */
-                int resN;   /**<  */
-        };
 
         /*! \brief calculate fit statistics for the given measurement dataset, using this fit function with the given parameters
 
@@ -305,7 +256,7 @@ class QFLIB_EXPORT QFFitFunction {
 
             \note the arrays in the resulting struct are allocated using \c malloc(), so you will have to free them using \c free() !!!
           */
-        FitStatistics calcFitStatistics(long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins);
+        QFFitStatistics calcFitStatistics(long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins);
     protected:
         /*! \brief add a parameter description
 

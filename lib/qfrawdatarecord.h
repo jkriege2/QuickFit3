@@ -390,6 +390,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
         /** \brief set a result of type number+error */
         void resultsSetNumberError(const QString& evaluationName, const QString& resultName, double value, double error, const QString& unit=QString(""));
+        /** \brief set error of a result of type number+error */
+        void resultsSetNumberErrorError(const QString& evaluationName, const QString& resultName, double error);
         /** \brief set a result of type integer */
         void resultsSetInteger(const QString& evaluationName, const QString& resultName, int64_t value, const QString& unit=QString(""));
         /** \brief set a result of type string */

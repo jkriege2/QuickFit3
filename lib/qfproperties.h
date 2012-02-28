@@ -25,12 +25,9 @@ class QFLIB_EXPORT QFProperties {
         /** \brief clear all properties */
         inline void clearProperties() { props.clear(); emitPropertiesChanged(); }
         /** \brief return the value of the specified property */
-        inline QVariant getProperty( const QString& p) const { if (props.contains(p)) return props[p].data; else return QVariant(); };
+        QVariant getProperty( const QString& p) const ;
         /** \brief return the value of the specified property or the supplied default value */
-        inline QVariant getProperty(const QString& p, const QVariant& defaultValue) const {
-            if (props.contains(p)) return props.value(p).data;
-            return defaultValue;
-        };
+        QVariant getProperty(const QString& p, const QVariant& defaultValue) const;
         /** \brief return the number of properties in the object */
         inline unsigned int getPropertyCount() const { return props.size(); };
         /** \brief return the number of visible properties in the object */

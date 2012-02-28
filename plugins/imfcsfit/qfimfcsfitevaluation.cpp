@@ -462,7 +462,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
                     {
-                        QFFitFunction::FitStatistics fit_stat=calcFitStatistics(ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run);
+                        QFFitStatistics fit_stat=calcFitStatistics(ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run);
                         fit_stat.free();
                     }
 
@@ -502,8 +502,8 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 }
 
 
-QFFitFunction::FitStatistics QFImFCSFitEvaluation::calcFitStatistics(QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
-    QFFitFunction::FitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
+QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
+    QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
 
     if (record) {
         if (hasFit(record, run)) {

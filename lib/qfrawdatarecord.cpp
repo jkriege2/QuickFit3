@@ -1156,6 +1156,15 @@ void QFRawDataRecord::resultsSetNumberError(const QString& evaluationName, const
     emitResultsChanged();
 }
 
+void QFRawDataRecord::resultsSetNumberErrorError(const QString &evaluationName, const QString &resultName, double error) {
+    evaluationResult r;
+    r.type=qfrdreNumberError;
+    r.derror=error;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    dstore->results[evaluationName]->results.insert(resultName, r);
+    emitResultsChanged();
+}
+
 void QFRawDataRecord::resultsSetInteger(const QString& evaluationName, const QString& resultName, int64_t value, const QString& unit) {
     evaluationResult r;
     r.type=qfrdreInteger;

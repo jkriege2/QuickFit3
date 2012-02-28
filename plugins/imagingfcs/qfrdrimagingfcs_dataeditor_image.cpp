@@ -2368,20 +2368,38 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 double resultsCalcEvaluationsInGroupElapsed=t1.nsecsElapsed()/1000;
 #endif
 
-                QString en="";
+                bool evalFound=false;
+                bool listEval=false;
+                QString resultID="";
+
+
                 for (register int ev=0; ev<evals.size(); ev++) {
                     //en=evals[i];
                     if (current->resultsGetEvaluationGroupIndex(evals[ev])==i) {
-                        en=evals[ev];
+                        resultID=evals[ev];
+                        evalFound=true;
                         break;
                     }
                 }
+
+                if (!evalFound) {
+                    if (evals.size()>0 && evals.size()<=2) {
+                        for (register int ev=0; ev<evals.size(); ev++) {
+                            if (current->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
+                                resultID=evals[ev];
+                                listEval=true;
+                                evalFound=true;
+                            }
+                        }
+                    }
+                }
+
 #ifdef DEBUG_TIMIMNG
                 qDebug()<<"replotData   search eval "<<i<<" (evals.size()="<<evals.size()<< "   resultsCalcEvaluationsInGroup="<<resultsCalcEvaluationsInGroupElapsed<<" nsecs): "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
 
                 // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
-                if (evaluateFitFunction(m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, en)) {
+                if (evaluateFitFunction(m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
                     double* acf=m->getCorrelationRun(i);
                     for (int nn=0; nn< m->getCorrelationN(); nn++) {
                         resid[nn]=corr[nn]-acf[nn];
@@ -2992,8 +3010,23 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
 
 }
 
-bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation) {
-    QString fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
+bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index) {
+    QString fitfunc="";
+    bool isMatrixResults=false;
+    if (index<0) {
+        fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
+    } else {
+        switch (current->resultsGetType(evaluation, "fit_model_name")) {
+            case QFRawDataRecord::qfrdreStringVector:
+            case QFRawDataRecord::qfrdreStringMatrix:
+                fitfunc=current->resultsGetInStringList(evaluation, "fit_model_name", index);
+                isMatrixResults=true;
+                break;
+            default:
+                break;
+        }
+    }
+    //qDebug()<<"evaluateFitFunction()  "<<evaluation<<index<<"  => "<<fitfunc<<isMatrixResults;
     QFFitFunction* ff=m_fitFunctions.value(fitfunc, NULL);
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size()<<ff;
     if (!ff) return false;
@@ -3009,18 +3042,29 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* 
     unitlabels.clear();
 
     QStringList pids;
+    //qDebug()<<"ff->paramCount()="<<ff->paramCount();
     for (int i=0; i<ff->paramCount(); i++) {
         QString id=ff->getParameterID(i);
         pids.append(id);
         errs[i]=0;
         fixs[i]=false;
         params[i]=ff->getDescription(id).initialValue;
-        if (current->resultsExists(evaluation, "fitparam_"+id)) {
-            params[i]=current->resultsGetAsDouble(evaluation, "fitparam_"+id);
-            errs[i]=current->resultsGetErrorAsDouble(evaluation, "fitparam_"+id);
-        }
-        if (current->resultsExists(evaluation, "fitparam_"+id+"_fix")) {
-            fixs[i]=current->resultsGetAsBoolean(evaluation, "fitparam_"+id+"_fix");
+        if (!isMatrixResults) {
+            if (current->resultsExists(evaluation, "fitparam_"+id)) {
+                params[i]=current->resultsGetAsDouble(evaluation, "fitparam_"+id);
+                errs[i]=current->resultsGetErrorAsDouble(evaluation, "fitparam_"+id);
+            }
+            if (current->resultsExists(evaluation, "fitparam_"+id+"_fix")) {
+                fixs[i]=current->resultsGetAsBoolean(evaluation, "fitparam_"+id+"_fix");
+            }
+        } else {
+            if (current->resultsExists(evaluation, "fitparam_"+id)) {
+                params[i]=current->resultsGetInNumberList(evaluation, "fitparam_"+id, index);
+                errs[i]=current->resultsGetErrorInNumberErrorList(evaluation, "fitparam_"+id, index);
+            }
+            if (current->resultsExists(evaluation, "fitparam_"+id+"_fix")) {
+                fixs[i]=current->resultsGetInBooleanList(evaluation, "fitparam_"+id+"_fix", index);
+            }
         }
     }
     for (int i=0; i<ff->paramCount(); i++) {

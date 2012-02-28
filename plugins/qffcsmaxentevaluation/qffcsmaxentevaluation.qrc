@@ -1,9 +1,28 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="fcs_maxent/qffcsmaxentevaluation.png">./images/qffcsmaxentevaluation.png</file>
-    <file alias="fcs_maxent/qffcsmaxentevaluation_small.png">./images/qffcsmaxentevaluation_small.png</file>
-    <file alias="fcs_maxent/qfeval_savereport.png">./images/qffcsmaxentevaluation_save.png</file>
-    <file alias="fcs_maxent/qfeval_printreport.png">./images/qffcsmaxentevaluation_print.png</file>
-    <file alias="fcs_maxent/qffcsmaxentevaluation_evaluate.png">./images/qffcsmaxentevaluation_evaluate.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="fcs_maxent/qffcsmaxentevaluation.png">images/qffcsmaxentevaluation.png</file>
+        <file alias="fcs_maxent/qffcsmaxentevaluation_small.png">images/qffcsmaxentevaluation_small.png</file>
+        <file alias="fcs_maxent/qfeval_savereport.png">images/qffcsmaxentevaluation_save.png</file>
+        <file alias="fcs_maxent/qfeval_printreport.png">images/qffcsmaxentevaluation_print.png</file>
+        <file alias="fcs_maxent/qffcsmaxentevaluation_evaluate.png">images/qffcsmaxentevaluation_evaluate.png</file>
+    </qresource>
+    <qresource prefix="/fcs_maxent">
+        <file alias="fit_savereport.png">images/fcs_savereport_22.png</file>
+        <file alias="fit_printreport.png">images/fcs_printreport_22.png</file>
+        <file alias="plot_saveplot.png">images/fcsplot_saveplot.png</file>
+        <file alias="plot_savedata.png">images/fcsplot_savedata.png</file>
+        <file alias="plot_print.png">images/fcsplot_print.png</file>
+        <file alias="plot_zoomall.png">images/fcsplot_zoomall.png</file>
+        <file alias="plot_points.png">images/fcsplot_points.png</file>
+        <file alias="plot_pointslines.png">images/fcsplot_pointslines.png</file>
+        <file alias="plot_lines.png">images/fcsplot_lines.png</file>
+        <file alias="plot_elines.png">images/fcsplot_elines.png</file>
+        <file alias="plot_elinesbars.png">images/fcsplot_elinesbars.png</file>
+        <file alias="plot_ebars.png">images/fcsplot_ebars.png</file>
+        <file alias="plot_enone.png">images/fcsplot_enone.png</file>
+        <file alias="fit_fitcurrent.png">images/fit_fitcurrent.png</file>
+        <file alias="fit_fitallruns.png">images/fit_fitallruns.png</file>
+        <file alias="fit_fitcurrentrunallfiles.png">images/fit_fitcurrentrunallfiles.png</file>
+        <file alias="fit_fitall.png">images/fit_fitall.png</file>
+    </qresource>
 </RCC>

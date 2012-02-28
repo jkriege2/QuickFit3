@@ -3,9 +3,12 @@
 
 #include <QMap>
 #include <QSettings>
+#include "qftools.h"
+#include "qfmathtools.h"
 
 #include "qfevaluationitem.h"
 #include "qfevaluationitemfactory.h"
+#include "../base_classes/qfusesresultsbyindexevaluation.h"
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
@@ -14,7 +17,7 @@
     
     
 */
-class QFFCSMaxEntEvaluationItem : public QFEvaluationItem {
+class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexEvaluation {
         Q_OBJECT
     public:
         /** \brief which data weighting should be applied */
@@ -42,18 +45,52 @@ class QFFCSMaxEntEvaluationItem : public QFEvaluationItem {
          *         list of raw data records presented to the user */
         virtual bool isApplicable(QFRawDataRecord* record);
 
-        
-        /** \breif return \c true if an evaluation has been performed for the given record \a r1 */
-        bool hasEvaluation(QFRawDataRecord* r1);
+        /** \brief do the evaluation */
+        virtual void doEvaluation(QFRawDataRecord* record, int index);
 
 
-        /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
-         *         current fit function for a given fitFunction ID */
-        inline QString getEvaluationResultID() {
-            return QString("%1_%2").arg(getType()).arg(getID());
-        }
+        void setCurrentWeights(int index);
+        int getCurrentWeights() const;
+        void setCurrentIndex(int index);
+        int getCurrentIndex() const;
+        void setCurrentModel(int index);
+        int getCurrentModel() const;
+        void setAlpha(double alpha);
+        double getAlpha() const;
 
 
+        QString getParameterName(int model, int id) const;
+        int getParameterCount(int model) const;
+        QString getParameterID(int model, int param);
+
+        QString getCurrentModelName() const;
+        QString getModelName(int model) const;
+        int getModelCount() const;
+
+        /*! \brief evaluate the model for a given record and index
+
+            this function evaluates the model \f$ f(\tau) \f$ at the given positions \a taus. The results are written into \a output.
+            Both arrays \a taus and \a output have to have the size \a N
+          */
+        void evaluateModel(QFRawDataRecord* record, int index, int model, double* taus, double* output, uint32_t N);
+
+        /*! \brief fills the arrays \A taus and \a dist with the distribution for the given record, index and model
+
+            Afterwards \a N contains the number of elements in taus and dist .
+          */
+        void getDistributionCopy(QFRawDataRecord* record, int index, int model, double* taus, double* dist);
+
+        uint32_t getDistributionN(QFRawDataRecord *record, int index, int model) const;
+
+        /** \brief calculates fit statistics for the given fit function and dataset. */
+        QFFitStatistics calcFitStatistics(QFRawDataRecord* record, int index, int model, double* taus, uint32_t N, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins);
+
+        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
+         *         it with the appropriate values, according to the current settings */
+        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
+
+        virtual QString getEvaluationResultID(int currentIndex);
+        using QFUsesResultsByIndexEvaluation::getEvaluationResultID;
     protected:
         
         /** \brief write object contents into XML file
@@ -64,6 +101,15 @@ class QFFCSMaxEntEvaluationItem : public QFEvaluationItem {
         virtual void intWriteData(QXmlStreamWriter& w);
         /** \brief read back the data stored by intWriteXML() */
         virtual void intReadData(QDomElement* e);
+
+
+        int currentIndex;
+        int currentModel;
+        int currentWeights;
+
+        /** \brief returns default values for a parameter */
+        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue);
+
 
 };
 

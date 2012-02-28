@@ -446,11 +446,12 @@ protected:
             \param[out] units is filled with the units of the parameters
             \param[out] unitlabels is filled with the unit labels of the parameters
             \param evaluation specifies the parameters to use
+            \param index for which run should we print
             \return If not all fit needed parameters are available, this function retuns \c false and does
                     not output data in fit. If the function is well defined it is evaluated for every given
                     tau. The result is saved in fit.
          */
-        bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation);
+        bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index);
 
         void createReportDoc(QTextDocument* document);
 };

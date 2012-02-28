@@ -9,9 +9,10 @@
 #include "statistics_tools.h"
 #include "csvtools.h"
 
-//#define DEBUG_SIZES
 #undef DEBUG_SIZES
-#define DEBUG_TIMING
+//#define DEBUG_SIZES
+#undef DEBUG_TIMING
+//#define DEBUG_TIMING
 
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     QFRawDataRecord(parent)
