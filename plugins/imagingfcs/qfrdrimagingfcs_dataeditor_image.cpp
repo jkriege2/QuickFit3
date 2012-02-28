@@ -222,19 +222,13 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QFrame* frame=new QFrame(this);
     frame->setFrameShape(QFrame::HLine);
     glmask->addWidget(frame, mskgrpRow, 0, 1, 3);
+
     mskgrpRow++;
-    glmask->addWidget(new QLabel(tr("mask edit mode:"), this), mskgrpRow, 0);
-    cmbMaskMode=new QComboBox(this);
-    cmbMaskMode->addItem(tr("replace"));
-    cmbMaskMode->addItem(tr("add"));
-    cmbMaskMode->addItem(tr("remove"));
-    glmask->addWidget(cmbMaskMode, mskgrpRow,1);
     btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
     btnMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    mskgrpRow++;
     glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
     connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
     btnMaskByGofIntensity=new QPushButton(tr("mask by &GOF"), w);
@@ -1220,12 +1214,12 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
         }
         dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         if (dialog->exec()==QDialog::Accepted) {
-            if (cmbMaskMode->currentIndex()==2) {
+            if (dialog->getMaskMode()==2) {
                 bool* newMask=m->maskGet();
                 for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
                     newMask[i]=newMask[i] && (!mask[i]);
                 }
-            } else if (cmbMaskMode->currentIndex()==1) {
+            } else if (dialog->getMaskMode()==1) {
                 bool* newMask=m->maskGet();
                 for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
                     newMask[i]=newMask[i]||mask[i];
@@ -2854,7 +2848,34 @@ QFRDRImagingFCSImageEditor::ImageTransforms QFRDRImagingFCSImageEditor::currentG
 }
 
 
-
+void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, uint16_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam) {
+    switch(tranFitParam) {
+        case QFRDRImagingFCSImageEditor::itAbs: {
+                for (uint32_t i=0; i<width*height; i++) {
+                    image[i]=fabs(image[i]);
+                }
+            } break;
+        case QFRDRImagingFCSImageEditor::itLog: {
+                for (uint32_t i=0; i<width*height; i++) {
+                    if (image[i]>0) image[i]=log(image[i])/log(10.0);
+                    else  image[i]=NAN;
+                }
+            } break;
+        case QFRDRImagingFCSImageEditor::itReciprocal: {
+                for (uint32_t i=0; i<width*height; i++) {
+                    if (image[i]!=0) image[i]=1.0/image[i];
+                    else  image[i]=NAN;
+                }
+            } break;
+        case QFRDRImagingFCSImageEditor::itSqrt: {
+                for (uint32_t i=0; i<width*height; i++) {
+                    if (image[i]>=0) image[i]=sqrt(image[i]);
+                    else  image[i]=NAN;
+                }
+            } break;
+        default: break;
+    }
+}
 
 
 
@@ -2873,58 +2894,98 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
 #endif
 
     QStringList evals=current->resultsCalcEvaluationsInGroup(evalGroup);
-    for (register int i=0; i<evals.size(); i++) {
-        const QString& en=evals[i];
-        int grpIdx=current->resultsGetEvaluationGroupIndex(en);
-        int x=m->runToX(grpIdx);
-        int y=m->runToY(grpIdx);
-        if (x>=0 && x<width && y>=0 && y<height) {
-            if (current->resultsExists(en, fitParam)) {
-                image[y*width+x]=current->resultsGetAsDouble(en, fitParam);
-                switch(tranFitParam) {
-                    case QFRDRImagingFCSImageEditor::itAbs: {
-                            image[y*width+x]=fabs(image[y*width+x]);
-                        } break;
-                    case QFRDRImagingFCSImageEditor::itLog: {
-                            if (image[y*width+x]>0) image[y*width+x]=log(image[y*width+x])/log(10.0);
-                            else  image[y*width+x]=NAN;
+    //qDebug()<<"evals.size() = "<<evals.size()<<"\n   "<<evals;
+    bool readImage=false;
+    bool readGOF=false;
+    if (evals.size()>0  && evals.size()<=2) {
+        QString usedEval="";
+        QString usedGof="";
+        for (int i=0; i<evals.size(); i++) {
+            if (current->resultsExists(evals[i], fitParam)) {
+                QFRawDataRecord::evaluationResultType typ=current->resultsGetType(evals[i], fitParam);
 
-                        } break;
-                    case QFRDRImagingFCSImageEditor::itReciprocal: {
-                            if (image[y*width+x]!=0) image[y*width+x]=1.0/image[y*width+x];
-                            else  image[y*width+x]=NAN;
-                        } break;
-                    case QFRDRImagingFCSImageEditor::itSqrt: {
-                            if (image[y*width+x]>=0) image[y*width+x]=sqrt(image[y*width+x]);
-                            else  image[y*width+x]=NAN;
-                        } break;
-                    default: break;
+                switch (typ) {
+                    case QFRawDataRecord::qfrdreNumberVector:
+                    case QFRawDataRecord::qfrdreNumberMatrix:
+                    case QFRawDataRecord::qfrdreNumberErrorVector:
+                    case QFRawDataRecord::qfrdreNumberErrorMatrix:
+                    case QFRawDataRecord::qfrdreIntegerVector:
+                    case QFRawDataRecord::qfrdreIntegerMatrix:
+                    case QFRawDataRecord::qfrdreBooleanVector:
+                    case QFRawDataRecord::qfrdreBooleanMatrix:
+                        usedEval=evals[i];
+                        break;
+                    default:
+                        break;
+                }
+                typ=current->resultsGetType(evals[i], gofParam);
+
+                switch (typ) {
+                    case QFRawDataRecord::qfrdreNumberVector:
+                    case QFRawDataRecord::qfrdreNumberMatrix:
+                    case QFRawDataRecord::qfrdreNumberErrorVector:
+                    case QFRawDataRecord::qfrdreNumberErrorMatrix:
+                    case QFRawDataRecord::qfrdreIntegerVector:
+                    case QFRawDataRecord::qfrdreIntegerMatrix:
+                    case QFRawDataRecord::qfrdreBooleanVector:
+                    case QFRawDataRecord::qfrdreBooleanMatrix:
+                        usedGof=evals[i];
+                        break;
+                    default:
+                        break;
                 }
             }
-            if (current->resultsExists(en, gofParam)) {
-                gof_image[y*width+x]=current->resultsGetAsDouble(en, gofParam);
-                switch(tranGofParam) {
-                    case QFRDRImagingFCSImageEditor::itAbs: {
-                            gof_image[y*width+x]=fabs(gof_image[y*width+x]);
-                        } break;
-                    case QFRDRImagingFCSImageEditor::itLog: {
-                            if (gof_image[y*width+x]>0) gof_image[y*width+x]=log(gof_image[y*width+x])/log(10.0);
-                            else  gof_image[y*width+x]=NAN;
+        }
+        if (!usedEval.isEmpty()) {
+            readImage=true;
+            QVector<double> dvec=current->resultsGetAsDoubleList(usedEval, fitParam);
+            for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
+                int x=m->runToX(i);
+                int y=m->runToY(i);
+                image[y*width+x]=dvec[i];
+            }
+        }
+        if (!usedGof.isEmpty()) {
+            readGOF=true;
+            QVector<double> dvec=current->resultsGetAsDoubleList(usedEval, gofParam);
+            for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
+                int x=m->runToX(i);
+                int y=m->runToY(i);
+                gof_image[y*width+x]=dvec[i];
+            }
+        }
+    }
 
-                        } break;
-                    case QFRDRImagingFCSImageEditor::itReciprocal: {
-                            if (gof_image[y*width+x]!=0) gof_image[y*width+x]=1.0/gof_image[y*width+x];
-                            else  gof_image[y*width+x]=NAN;
-                        } break;
-                    case QFRDRImagingFCSImageEditor::itSqrt: {
-                            if (gof_image[y*width+x]>=0) gof_image[y*width+x]=sqrt(gof_image[y*width+x]);
-                            else  gof_image[y*width+x]=NAN;
-                        } break;
-                    default: break;
+    if (!readImage) {
+        readImage=true;
+        for (register int i=0; i<evals.size(); i++) {
+            const QString& en=evals[i];
+            int grpIdx=current->resultsGetEvaluationGroupIndex(en);
+            int x=m->runToX(grpIdx);
+            int y=m->runToY(grpIdx);
+            if (x>=0 && x<width && y>=0 && y<height) {
+                if (current->resultsExists(en, fitParam)) {
+                    image[y*width+x]=current->resultsGetAsDouble(en, fitParam);
                 }
             }
         }
     }
+    if (!readGOF) {
+        readGOF=true;
+        for (register int i=0; i<evals.size(); i++) {
+            const QString& en=evals[i];
+            int grpIdx=current->resultsGetEvaluationGroupIndex(en);
+            int x=m->runToX(grpIdx);
+            int y=m->runToY(grpIdx);
+            if (x>=0 && x<width && y>=0 && y<height) {
+                if (current->resultsExists(en, gofParam)) {
+                    gof_image[y*width+x]=current->resultsGetAsDouble(en, gofParam);
+                }
+            }
+        }
+    }
+    transformImage(image, width, height, tranFitParam);
+    transformImage(gof_image, width, height, tranGofParam);
 #ifdef DEBUG_TIMING
     qDebug()<<"QFRDRImagingFCSImageEditor::readParameterImage("<<evalGroup<<fitParam<<") finished after "<<time.elapsed()<<"ms";
 #endif

@@ -49,7 +49,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSImageEditor();
-    protected:
+protected:
         enum ImageTransforms {
             itNone=0,
             itAbs=1,
@@ -261,8 +261,6 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QPushButton* btnMaskByGofIntensity;
         /** \brief button to mask pixels by parameter image */
         QPushButton* btnMaskByParamIntensity;
-        /** \brief combobox to select how the mask is changed by Mask By ... */
-        QComboBox* cmbMaskMode;
         /** \brief checkbox to select log tau-axis */
         QCheckBox* chkLogTauAxis;
         /** \brief label for the run options */
@@ -432,6 +430,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         /** \brief create a parameter image with the given evalGroup and fitParam */
         void readParameterImage(double* image, double* gof_image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, QString gofParam, ImageTransforms tranGofParam);
 
+        /** \brief apply the given transformation to the image */
+        void transformImage(double *image, uint16_t width, uint16_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam);
 
         /*! \brief evaluate the fit function (with parameters) as defined by the pair evalGroup and evaluation
 

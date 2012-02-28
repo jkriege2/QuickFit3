@@ -23,6 +23,8 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
 
         void init(bool* mask, double* image, uint16_t width, uint16_t height);
 
+        int getMaskMode() const;
+
     protected slots:
         void updateMask();
         

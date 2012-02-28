@@ -137,7 +137,7 @@ void QFPLayerControls::createWidgets() {
     label=new QLabel("", this);
     label->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
     label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
-    lay->addWidget(label, 0, 10, 1, 2);
+    lay->addWidget(label, 0, 10, 1, 3);
 
     slider=new QSlider(this);
     slider->setOrientation(Qt::Horizontal);
@@ -151,6 +151,7 @@ void QFPLayerControls::createWidgets() {
     connect(spinFPS, SIGNAL(valueChanged(double)), this, SLOT(updateWidgets()));
     lay->addWidget(new QLabel(tr("FPS:"), this), 1, 10);
     lay->addWidget(spinFPS, 1, 11);
+    lay->addItem(new QSpacerItem(10,5,QSizePolicy::MinimumExpanding,QSizePolicy::Preferred), 1,12);
     updateWidgets();
 }
 
@@ -158,6 +159,7 @@ void QFPLayerControls::createActions() {
     actPlayPause=new QAction(QIcon(":/libqf3widgets/player_play.png"), tr("play"), this);
     actPlayPause->setCheckable(true);
     actPlayPause->setChecked(false);
+    lastPlaying=false;
     connect(actPlayPause, SIGNAL(triggered(bool)), this, SLOT(playPauseTriggered(bool)));
     actRewind=new QAction(QIcon(":/libqf3widgets/player_start.png"), tr("back to first frame"), this);
     connect(actRewind, SIGNAL(triggered()), this, SLOT(rewind()));

@@ -63,6 +63,10 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint16_t wi
 
 }
 
+int QFRDRImagingFCSMaskByIntensity::getMaskMode() const {
+    return ui->cmbMaskMode->currentIndex();
+}
+
 void QFRDRImagingFCSMaskByIntensity::updateMask() {
     double level=ui->edtLevel->value();
     if (ui->radMaskLarger->isChecked()) {

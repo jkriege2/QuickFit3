@@ -1520,7 +1520,27 @@ QVector<double> QFRawDataRecord::resultsGetAsDoubleList(const QString& evalName,
         case qfrdreNumberVector:
         case qfrdreNumberMatrix:
         case qfrdreNumberErrorVector:
-        case qfrdreNumberErrorMatrix: return r.dvec;
+        case qfrdreNumberErrorMatrix:
+            return r.dvec;
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix: {
+                QVector<double> result;
+                result.resize(r.ivec.size());
+                for (int i=0; i<r.ivec.size(); i++) {
+                    result[i]=r.ivec[i];
+                }
+            }
+            break;
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix: {
+                QVector<double> result;
+                result.resize(r.bvec.size());
+                for (int i=0; i<r.bvec.size(); i++) {
+                    result[i]=r.bvec[i];
+                }
+            }
+            break;
+
         default: if (ok) *ok=false;
                  return QVector<double>();
     }
@@ -1533,7 +1553,17 @@ QVector<qlonglong> QFRawDataRecord::resultsGetAsIntegerList(const QString& evalN
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreIntegerVector:
-        case qfrdreIntegerMatrix: return r.ivec;
+        case qfrdreIntegerMatrix:
+            return r.ivec;
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix: {
+                QVector<qlonglong> result;
+                result.resize(r.bvec.size());
+                for (int i=0; i<r.bvec.size(); i++) {
+                    result[i]=r.bvec[i];
+                }
+            }
+            break;
         default: if (ok) *ok=false;
                  return QVector<qlonglong>();
     }
