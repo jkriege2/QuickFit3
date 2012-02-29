@@ -3,6 +3,7 @@
 QFUsesResultsByIndexEvaluation::QFUsesResultsByIndexEvaluation(QFProject *parent, bool showRDRList, bool useSelection) :
     QFUsesResultsEvaluation(parent, showRDRList, useSelection)
 {
+    currentIndex=0;
 }
 
 QFUsesResultsByIndexEvaluation::~QFUsesResultsByIndexEvaluation()
@@ -64,6 +65,22 @@ void QFUsesResultsByIndexEvaluation::setFitResultError(QFRawDataRecord *r, int i
     setFitResultError(r, getEvaluationResultID(index), parameterID, error);
 }
 
+void QFUsesResultsByIndexEvaluation::setFitResultValueNumberArray(QFRawDataRecord *r, int index, const QString &parameterID, double *value, double *error, uint32_t N, const QString &unit) {
+    setFitResultValueNumberArray(r, getEvaluationResultID(index), parameterID, value, error, N, unit);
+}
+
+void QFUsesResultsByIndexEvaluation::setFitResultValueNumberArray(QFRawDataRecord *r, int index, const QString &parameterID, double *value, uint32_t N, const QString &unit) {
+    setFitResultValueNumberArray(r, getEvaluationResultID(index), parameterID, value, N, unit);
+}
+
+QVector<double> QFUsesResultsByIndexEvaluation::getFitValueNumberArray(QFRawDataRecord *r, int index, const QString &parameterID) {
+    return getFitValueNumberArray(r, getEvaluationResultID(index), parameterID);
+}
+
+QVector<double> QFUsesResultsByIndexEvaluation::getFitValueErrorArray(QFRawDataRecord *r, int index, const QString &parameterID) {
+    return getFitValueErrorArray(r, getEvaluationResultID(index), parameterID);
+}
+
 double QFUsesResultsByIndexEvaluation::getFitValue(QFRawDataRecord *r, int index, const QString &parameterID) {
     return getFitValue(r, getEvaluationResultID(index), parameterID);
 }
@@ -90,8 +107,35 @@ bool QFUsesResultsByIndexEvaluation::getFitFix(QFRawDataRecord *r, int index, co
 
 void QFUsesResultsByIndexEvaluation::intWriteData(QXmlStreamWriter &w) {
     QFUsesResultsEvaluation::intWriteData(w);
+    w.writeTextElement("current_index", QString::number(currentIndex));
 }
 
 void QFUsesResultsByIndexEvaluation::intReadData(QDomElement *e) {
     QFUsesResultsEvaluation::intReadData(e);
+    bool OK=false;
+    currentIndex=e->firstChildElement("current_index").text().toInt(&OK);
+    if (!OK) currentIndex=-1;
 }
+
+void QFUsesResultsByIndexEvaluation::setCurrentIndex(int index) {
+    currentIndex=index;
+}
+
+int QFUsesResultsByIndexEvaluation::getCurrentIndex() const {
+    if (currentIndex<getIndexMin(getHighlightedRecord())) return getIndexMin(getHighlightedRecord());
+    if (currentIndex>=getIndexMax(getHighlightedRecord())) return getIndexMax(getHighlightedRecord());
+    return currentIndex;
+}
+
+int QFUsesResultsByIndexEvaluation::getIndexMin(QFRawDataRecord *r) const {
+    return INT_MIN;
+}
+
+int QFUsesResultsByIndexEvaluation::getIndexMax(QFRawDataRecord *r) const {
+    return INT_MAX;
+}
+
+void QFUsesResultsByIndexEvaluation::setFitResultSortPriority(QFRawDataRecord *r, int index, const QString &parameterID, bool sortPriority) {
+    setFitResultSortPriority(r, getEvaluationResultID(index), parameterID, sortPriority);
+}
+

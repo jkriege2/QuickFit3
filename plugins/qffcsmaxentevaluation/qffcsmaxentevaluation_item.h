@@ -9,6 +9,7 @@
 #include "qfevaluationitem.h"
 #include "qfevaluationitemfactory.h"
 #include "../base_classes/qfusesresultsbyindexevaluation.h"
+#include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
@@ -17,7 +18,7 @@
     
     
 */
-class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexEvaluation {
+class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation {
         Q_OBJECT
     public:
         /** \brief which data weighting should be applied */
@@ -46,52 +47,69 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexEvaluation {
         virtual bool isApplicable(QFRawDataRecord* record);
 
         /** \brief do the evaluation */
-        virtual void doEvaluation(QFRawDataRecord* record, int index);
+        virtual void doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, int runAvgWidth=11, int residualHistogramBins=25);
 
+        virtual int getIndexMin(QFRawDataRecord* r) const;
+        virtual int getIndexMax(QFRawDataRecord* r) const;
+        virtual int getModelMin(QFRawDataRecord* r, int index) const;
+        virtual int getModelMax(QFRawDataRecord* r, int index) const;
 
         void setCurrentWeights(int index);
         int getCurrentWeights() const;
-        void setCurrentIndex(int index);
-        int getCurrentIndex() const;
-        void setCurrentModel(int index);
-        int getCurrentModel() const;
+        /** \brief set the current alpha value */
         void setAlpha(double alpha);
+        /** \brief return the current alpha value */
         double getAlpha() const;
 
+        /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */
+        virtual QString getParameterName(int model, int id, bool html=false) const;
+        /** \brief return the unit for the given parameter in the given model in either HTML richtext or plain text */
+        virtual QString getParameterUnit(int model, int id, bool html) const;
+        /** \brief return the number of parameters in the given model */
+        virtual int getParameterCount(int model) const;
+        /** \brief return the ID for the given parameter in the given model  */
+        virtual QString getParameterID(int model, int param);
 
-        QString getParameterName(int model, int id) const;
-        int getParameterCount(int model) const;
-        QString getParameterID(int model, int param);
-
+        /** \brief return the name for current model */
         QString getCurrentModelName() const;
+        /** \brief return the name for given model */
         QString getModelName(int model) const;
+        /** \brief return the number of models in this object */
         int getModelCount() const;
 
         /*! \brief evaluate the model for a given record and index
 
             this function evaluates the model \f$ f(\tau) \f$ at the given positions \a taus. The results are written into \a output.
-            Both arrays \a taus and \a output have to have the size \a N
+            Both arrays \a taus and \a output have to have the size \a N . The model is evaluated for a given maxent distribution \f$ p(T) = (T_i, p_{T_i}=p_i)_{i=1..N_D} \f$
+            stored in \a distribution_tau and  \a distribution which both habe \a distributionN elements.
+
+            For \c model==0 this function outputs this model:
+              \f[ g(\tau)=\frac{1}{N}\cdot\left(\frac{1-\theta+\theta\cdot\exp(-\tau/\tau_T)}{1-\theta}\right)\cdot\sum\limits_{i=1}^{N_D}p_{T_i}\cdot\left(1+\frac{\tau}{T_i}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\cdot T_i}\right)^{-1} \f]
           */
-        void evaluateModel(QFRawDataRecord* record, int index, int model, double* taus, double* output, uint32_t N);
+        void evaluateModel(QFRawDataRecord* record, int index, int model, double* taus, double* output, uint32_t N, double* distribution_tau, double* distribution, uint32_t distributionN);
 
-        /*! \brief fills the arrays \A taus and \a dist with the distribution for the given record, index and model
-
-            Afterwards \a N contains the number of elements in taus and dist .
+        /*! \brief returns an array representing the distribution for the given record, index, model combination
           */
-        void getDistributionCopy(QFRawDataRecord* record, int index, int model, double* taus, double* dist);
+        QVector<double> getDistribution(QFRawDataRecord* record, int index, int model);
+        /*! \brief returns an array representing the distribution tau values (lag time axis) for the given record, index, model combination
+          */
+        QVector<double> getDistributionTaus(QFRawDataRecord* record, int index, int model);
 
-        uint32_t getDistributionN(QFRawDataRecord *record, int index, int model) const;
 
-        /** \brief calculates fit statistics for the given fit function and dataset. */
-        QFFitStatistics calcFitStatistics(QFRawDataRecord* record, int index, int model, double* taus, uint32_t N, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins);
+        /*! \brief calculates fit statistics for the given fit function and dataset.
+
+            \note If \a modelVals is \c NULL this function will evaluate the model for the given parameters, retrieving the stored
+                  distribution with getDistribution() and getDistributionTaus()
+         */
+        QFFitStatistics calcFitStatistics(QFRawDataRecord* record, int index, int model, double* taus, double* modelVals, uint32_t N, uint32_t MaxEntParams, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins);
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
         virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
 
-        virtual QString getEvaluationResultID(int currentIndex);
-        using QFUsesResultsByIndexEvaluation::getEvaluationResultID;
-    protected:
+        virtual QString getEvaluationResultID(int currentIndex, int model);
+        using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
+protected:
         
         /** \brief write object contents into XML file
          *
@@ -103,8 +121,6 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexEvaluation {
         virtual void intReadData(QDomElement* e);
 
 
-        int currentIndex;
-        int currentModel;
         int currentWeights;
 
         /** \brief returns default values for a parameter */

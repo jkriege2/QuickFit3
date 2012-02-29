@@ -6,7 +6,7 @@
 #define sqr(x) ((x)*(x))
 
 QFFCSMaxEntEvaluationItem::QFFCSMaxEntEvaluationItem(QFProject* parent):
-    QFUsesResultsByIndexEvaluation(parent, true, false)
+    QFUsesResultsByIndexAndModelEvaluation(parent, true, false)
 {
     currentIndex=-1;
     currentModel=0;
@@ -17,54 +17,29 @@ QFFCSMaxEntEvaluationItem::~QFFCSMaxEntEvaluationItem() {
 
 }
 
-QString QFFCSMaxEntEvaluationItem::getEvaluationResultID(int currentIndex) {
-    if (currentIndex<0) return QString("%1_%2_m%3_runavg").arg(getType()).arg(getID()).arg(getCurrentModelName());
-    return QString("%1_%2_m%3_run%4").arg(getType()).arg(getID()).arg(getCurrentModelName()).arg(currentIndex);
+QString QFFCSMaxEntEvaluationItem::getEvaluationResultID(int currentIndex, int model) {
+    if (currentIndex<0) return QString("%1_%2_m%3_runavg").arg(getType()).arg(getID()).arg(model);
+    return QString("%1_%2_m%3_run%4").arg(getType()).arg(getID()).arg(model).arg(currentIndex);
 }
 
 
+
 void QFFCSMaxEntEvaluationItem::intWriteData(QXmlStreamWriter& w) {
-    QFUsesResultsByIndexEvaluation::intWriteData(w);
+    QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("maxent_config");
-    w.writeAttribute("current_index", QString::number(currentIndex));
-    w.writeAttribute("current_model", QString::number(currentModel));
     w.writeAttribute("current_weights", QString::number(currentWeights));
 
 }
 
 void QFFCSMaxEntEvaluationItem::intReadData(QDomElement* e) {
-    QFUsesResultsByIndexEvaluation::intReadData(e);
+    QFUsesResultsByIndexAndModelEvaluation::intReadData(e);
 
     QDomElement e1=e->firstChildElement("maxent_config");
-    currentIndex=e1.attribute("current_index", "0").toInt();
-    currentModel=e1.attribute("current_model", "0").toInt();
     currentWeights=e1.attribute("current_weights", "0").toInt();
 
 
 }
 
-bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) {
-    if (currentModel==0) {
-        if (parameterID=="trip_tau") {
-            defaultValue.value=3;
-            return true;
-        }
-        if (parameterID=="trip_theta") {
-            defaultValue.value=0.2;
-            return true;
-        }
-        if (parameterID=="focus_struct_fac") {
-            defaultValue.value=6;
-            return true;
-        }
-    }
-
-    if (parameterID=="alpha") {
-        defaultValue.value=0.001;
-        return true;
-    }
-    return false;
-}
 
 
 QFEvaluationEditor* QFFCSMaxEntEvaluationItem::createEditor(QFPluginServices* services, QWidget* parent) {
@@ -75,12 +50,29 @@ bool QFFCSMaxEntEvaluationItem::isApplicable(QFRawDataRecord* record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
-void QFFCSMaxEntEvaluationItem::doEvaluation(QFRawDataRecord* record, int index) {
-    record->disableEmitResultsChanged();
 
-    setFitResultValueBool(record, index, "evaluation_completed", true);
+int QFFCSMaxEntEvaluationItem::getIndexMin(QFRawDataRecord *r) const {
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(r);
+    if (data) {
+        return -1;
+    }
+    return QFUsesResultsByIndexAndModelEvaluation::getIndexMin(r);
+}
 
-    record->enableEmitResultsChanged(true);
+int QFFCSMaxEntEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(r);
+    if (data) {
+        return data->getCorrelationRuns()-1;
+    }
+    return QFUsesResultsByIndexAndModelEvaluation::getIndexMin(r);
+}
+
+int QFFCSMaxEntEvaluationItem::getModelMin(QFRawDataRecord *r, int index) const {
+    return 0;
+}
+
+int QFFCSMaxEntEvaluationItem::getModelMax(QFRawDataRecord *r, int index) const {
+    return getModelCount()-1;
 }
 
 void QFFCSMaxEntEvaluationItem::setCurrentWeights(int index)
@@ -88,69 +80,16 @@ void QFFCSMaxEntEvaluationItem::setCurrentWeights(int index)
     currentWeights=index;
 }
 
-void QFFCSMaxEntEvaluationItem::setCurrentIndex(int index) {
-    currentIndex=index;
-}
-
-int QFFCSMaxEntEvaluationItem::getCurrentIndex() const {
-    if (currentIndex<-1) return -1;
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(getHighlightedRecord());
-    if (data) {
-        if (currentIndex>=data->getCorrelationRuns()) return data->getCorrelationRuns()-1;
-    }
-    return currentIndex;
-}
-
-
-void QFFCSMaxEntEvaluationItem::setCurrentModel(int index)
-{
-    currentModel=index;
-}
-
-int QFFCSMaxEntEvaluationItem::getCurrentModel() const
-{
-    return currentModel;
-}
 
 
 
-QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id) const {
-    if (model==0) {
-        if (id==0) return tr("triplet decay time [&mu;s]");
-        if (id==1) return tr("triplet fraction [0..1]");
-        if (id==1) return tr("axial ratio");
-    }
-    return QString();
-}
-
-int QFFCSMaxEntEvaluationItem::getParameterCount(int model) const {
-    if (model==0) return 3;
-    return 0;
-}
-
-QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) {
-    if (model==0) {
-        if (id==0) return tr("trip_tau");
-        if (id==1) return tr("trip_theta");
-        if (id==1) return tr("focus_struct_fac");
-    }
-    return QString("m%1_p%2").arg(model).arg(id);
-}
 
 QString QFFCSMaxEntEvaluationItem::getCurrentModelName() const
 {
     return getModelName(getCurrentModel());
 }
 
-QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
-    if (model==0) return tr("FCS: 3D diffusion");
-    return "";
-}
 
-int QFFCSMaxEntEvaluationItem::getModelCount() const
-{
-    return 1;
-}
 
 int QFFCSMaxEntEvaluationItem::getCurrentWeights() const
 {
@@ -260,99 +199,101 @@ double* QFFCSMaxEntEvaluationItem::allocWeights(bool* weightsOKK, QFRawDataRecor
     return weights;
 }
 
-void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, int model, double *taus, double *output, uint32_t N)
-{
-    for (int i=0; i<N; i++) {
-        output[i]=1.0/8.0/(1+taus[i]/100e-6)/sqrt(1+taus[i]/100e-6/sqr(6.0));
-    }
-}
 
-void QFFCSMaxEntEvaluationItem::getDistributionCopy(QFRawDataRecord *record, int index, int model, double *taus, double *dist) {
+QVector<double> QFFCSMaxEntEvaluationItem::getDistribution(QFRawDataRecord *record, int index, int model) {
+    QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
-        uint32_t N=getDistributionN(record, index, model);
-        memcpy(taus, data->getCorrelationT(), N*sizeof(double));
-        double T0=taus[N/5];
-        double sigma=2*T0;
-        for (int i=0; i<N; i++) {
-            const double t=taus[i];
-            dist[i]=exp(-0.5*sqr(t-T0)/sqr(sigma))/sigma/sqrt(2.0*M_PI);
-        }
+        res=getFitValueNumberArray(record, index, "maxent_distribution");
     }
+    return res;
 }
 
-uint32_t QFFCSMaxEntEvaluationItem::getDistributionN(QFRawDataRecord *record, int index, int model) const {
+QVector<double> QFFCSMaxEntEvaluationItem::getDistributionTaus(QFRawDataRecord *record, int index, int model) {
+    QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
-        return data->getCorrelationN();
+        res=getFitValueNumberArray(record, index, "maxent_tau");
     }
-    return 0;
+    return res;
 }
 
 
 
-QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *record, int index, int model, double *taus, uint32_t N, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins) {
+
+QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *record, int index, int model, double *taus, double* modelValsIn, uint32_t N, uint32_t MaxEntParams, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
 
         double* corrdata=data->getCorrelationMean();
         if (index>=0) corrdata=data->getCorrelationRun(index);
 
-        double* modelVals=(double*)malloc(N*sizeof(double));
-        evaluateModel(record, index, model, taus, modelVals, N);
+        double* modelVals=modelValsIn;
+        bool freeModelVals=false;
+        if (!modelVals) {
+            modelVals=(double*)malloc(N*sizeof(double));
+            QVector<double> dist=getDistribution(record, index, model);
+            QVector<double> distTau=getDistributionTaus(record, index, model);
+            evaluateModel(record, index, model, taus, modelVals, N, distTau.data(), dist.data(), dist.size());
+            freeModelVals=true;
+        }
+        //double* modelVals=(double*)malloc(N*sizeof(double));
+        //evaluateModel(record, index, model, taus, modelVals, N);
         double* weights=allocWeights(NULL, record, index);
 
-        QFFitStatistics result= calculateFitStatistics(N, taus, modelVals, corrdata, weights, datacut_min, datacut_max, getDistributionN(record, index, model), runAvgWidth, residualHistogramBins);
+        QFFitStatistics result= calculateFitStatistics(N, taus, modelVals, corrdata, weights, datacut_min, datacut_max, MaxEntParams, runAvgWidth, residualHistogramBins);
 
         if (record) {
             if (hasResults(record, index)) {
                 QString param="";
-                setFitResultValue(record, index, param="fitstat_chisquared", result.residSqrSum);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+                setFitResultValue(record, index, model, param="fitstat_chisquared", result.residSqrSum);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
 
-                setFitResultValue(record, index, param="fitstat_chisquared_weighted", result.residWeightSqrSum);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+                setFitResultValue(record, index,model,  param="fitstat_chisquared_weighted", result.residWeightSqrSum);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
 
-                setFitResultValue(record, index, param="fitstat_residavg", result.residAverage);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("residual average"), QString("&lang;E&rang;"));
+                setFitResultValue(record, index, model, param="fitstat_residavg", result.residAverage);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("residual average"), QString("&lang;E&rang;"));
 
-                setFitResultValue(record, index, param="fitstat_residavg_weighted", result.residWeightAverage);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+                setFitResultValue(record, index, model, param="fitstat_residavg_weighted", result.residWeightAverage);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
 
-                setFitResultValue(record, index, param="fitstat_residstddev", result.residStdDev);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+                setFitResultValue(record, index, model, param="fitstat_residstddev", result.residStdDev);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
 
-                setFitResultValue(record, index, param="fitstat_residstddev_weighted", result.residWeightStdDev);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+                setFitResultValue(record, index, model, param="fitstat_residstddev_weighted", result.residWeightStdDev);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
 
-                setFitResultValue(record, index, param="fitstat_fitparams", result.fitparamN);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("fit params"));
+                setFitResultValue(record, index, model, param="fitstat_fitparams", result.fitparamN);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("fit params"));
 
-                setFitResultValue(record, index, param="fitstat_datapoints", result.dataSize);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("datapoints"));
+                setFitResultValue(record, index, model, param="fitstat_datapoints", result.dataSize);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("datapoints"));
 
-                setFitResultValue(record, index, param="fitstat_dof", result.degFreedom);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("degrees of freedom"));
+                setFitResultValue(record, index, model, param="fitstat_dof", result.degFreedom);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("degrees of freedom"));
 
-                setFitResultValue(record, index, param="fitstat_r2", result.Rsquared);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("R squared"), tr("R<sup>2</sup>"));
+                setFitResultValue(record, index, model, param="fitstat_r2", result.Rsquared);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("R squared"), tr("R<sup>2</sup>"));
 
-                setFitResultValue(record, index, param="fitstat_tss", result.TSS);
-                setFitResultGroup(record, index, param, tr("fit statistics"));
-                setFitResultLabel(record, index, param, tr("total sum of squares"));
+                setFitResultValue(record, index, model, param="fitstat_tss", result.TSS);
+                setFitResultGroup(record, index, model, param, tr("fit statistics"));
+                setFitResultLabel(record, index, model, param, tr("total sum of squares"));
 
             }
         }
+
+        if (freeModelVals) free(modelVals);
 
         return result;
     }
@@ -363,3 +304,223 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IMPLEMENT THE FIT MODEL, THE FIT AND ALL THE PARAMETERS REQUIRED FOR THOSE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, int model, double *taus, double *output, uint32_t N, double* distribution_tau, double* distribution, uint32_t distributionN) {
+    if (!taus || !output) return;
+    if (model==0) { // 3D diffusion model
+
+        // first we read the stored fit parameters:
+        double gamma=getFitValue(record, index, model, "focus_struct_fac");
+        double trip_tau=getFitValue(record, index, model, "trip_tau")*1e-6; // stored in microseconds!!!
+        double trip_theta=getFitValue(record, index, model, "trip_theta");
+        double N=1;
+
+        // now we evaluate the model
+        for (uint32_t i=0; i<N; i++) {
+            double trip_factor=(1.0-trip_theta+trip_theta*exp(-taus[i]/trip_tau))/(1.0-trip_theta);
+            //output[i]=trip_factor*1.0/N/(1+taus[i]/100e-6)/sqrt(1+taus[i]/100e-6/sqr(gamma));
+            register double sum=0;
+            if (distribution_tau && distribution) {
+                for (register uint32_t j=0; j<distributionN; j++) {
+                    sum=sum+distribution[j]*(1+taus[i]/distribution_tau[j])/sqrt(1+taus[i]/distribution_tau[j]/sqr(gamma));
+                }
+            } else {
+                sum=1.0/N;
+            }
+            output[i]=sum/N*trip_factor;
+        }
+    }
+}
+
+QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
+    if (model==0) return tr("FCS: 3D diffusion");
+    return "";
+}
+
+bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) {
+    if (currentModel==0) {
+        if (parameterID=="trip_tau") {
+            defaultValue.value=3;
+            return true;
+        }
+        if (parameterID=="trip_theta") {
+            defaultValue.value=0.2;
+            return true;
+        }
+        if (parameterID=="focus_struct_fac") {
+            defaultValue.value=6;
+            return true;
+        }
+       /* if (parameterID=="n_particle") {
+            defaultValue.value=8;
+            return true;
+        }*/
+    }
+
+    if (parameterID=="alpha") {
+        defaultValue.value=0.001;
+        return true;
+    }
+
+    return false;
+}
+
+
+void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange, int defaultMaxDatarange, int runAvgWidth, int residualHistogramBins) {
+    bool doEmit=record->isEmitResultsChangedEnabled();
+    record->disableEmitResultsChanged();
+
+
+    /* IMPLEMENT THIS
+
+      Ergebnisse können einfach mit einer der setFitResult... Methoden gespeichert werden:
+
+        //                                          PARAMETERNAME           WERT
+        setFitResultValueBool(record, index, model, "evaluation_completed", true);
+        //                                      PARAMETERNAME   WERT   FEHLER und EINHEIT (z.B. "ms") dazu
+        setFitResultValue(record, index, model, "my_parameter", value, error, unit);
+
+    */
+
+    // HERE IS A DUMMY IMPLEMENTATION THAT OUTPUTS A SIMPLE GAUSSIAN
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    if (data) {
+        // which datapoints should we actually use?
+        int rangeMinDatarange=0;
+        int rangeMaxDatarange=data->getCorrelationN();
+        if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
+        if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
+
+        uint32_t N=data->getCorrelationN();
+        double* taus=data->getCorrelationT();
+        double* dist=(double*)malloc(N*sizeof(double));
+        double* modelEval=(double*)malloc(N*sizeof(double));
+        bool weightsOK=false;
+        double* corrdata=data->getCorrelationMean();
+        if (index>=0) corrdata=data->getCorrelationRun(index);
+        double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, defaultMaxDatarange);
+        if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
+
+
+        // REPLACE THIS WITH THE ACTUAL MAXENT FIT!!!
+        double T0=taus[N/5];
+        double sigma=2*T0;
+        for (int i=rangeMinDatarange; i<rangeMaxDatarange; i++) {
+            const double t=taus[i];
+            dist[i]=exp(-0.5*sqr(t-T0)/sqr(sigma))/sigma/sqrt(2.0*M_PI);
+        }
+
+        // now store the results:
+        QString param;
+        setFitResultValueNumberArray(record, index, model, param="maxent_tau", &(taus[rangeMinDatarange]), rangeMaxDatarange-rangeMinDatarange, QString("seconds"));
+        setFitResultGroup(record, index, model, param, tr("fit results"));
+        setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: lag times"), QString("MaxEnt distribution: lag times <i>&tau;</i>"));
+        setFitResultSortPriority(record, index, model, param, true);
+
+        setFitResultValueNumberArray(record, index, model, param="maxent_distribution", &(dist[rangeMinDatarange]), rangeMaxDatarange-rangeMinDatarange);
+        setFitResultGroup(record, index, model, param, tr("fit results"));
+        setFitResultLabel(record, index, model, param, tr("MaxEnt distribution"), QString("MaxEnt distribution: <i>p(&tau;)</i>"));
+        setFitResultSortPriority(record, index, model, param, true);
+
+
+
+        // save all the default values for all fit parameters as results.
+        for (int i=0; i<getModelCount(); i++) {
+            setFitResultValue(record, index, model, param=getParameterID(model, i), getFitValue(record, index, model, param), getParameterUnit(model, i, false));
+            setFitResultGroup(record, index, model, param, tr("fit results"));
+            setFitResultLabel(record, index, model, param, getParameterName(model, i, false), getParameterName(model, i, true));
+            setFitResultSortPriority(record, index, model, param, true);
+        }
+
+        // you con overwrite certain of these parameters using code like this:
+        /*setFitResultValue(record, index, model, param="focus_struct_fac", getFitValue(record, index, model, param));
+        setFitResultGroup(record, index, model, param, tr("fit results"));
+        setFitResultLabel(record, index, model, param, tr("focus structure factor"), QString("focus structure factor <i>&gamma;</i>"));
+        setFitResultSortPriority(record, index, model, param, true);*/
+
+
+
+
+        // store number of iterations ... you may also store more fit algorithm properties like this
+        setFitResultValueInt(record, index, model, param="maxent_iterations", 5);
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("number of iterations"), tr("number of iterations"));
+
+        setFitResultValueString(record, index, model, param="used_model", getModelName(model));
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("used model name"), tr("used model name"));
+
+        setFitResultValueInt(record, index, model, param="used_model_id", model);
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("used model id"), tr("used model id"));
+
+        setFitResultValueInt(record, index, model, param="used_run", index);
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("used run"), tr("used run"));
+
+        // CALCULATE FIT STATISTICS
+        //   now we evaluate the model for the given distribution
+        evaluateModel(record, index, model, taus, modelEval, N, &(taus[rangeMinDatarange]), &(dist[rangeMinDatarange]), rangeMaxDatarange-rangeMinDatarange);
+        //   then we can call calcFitStatistics()
+        QFFitStatistics fit_stat=calcFitStatistics(record, index, model, taus, corrdata, N, rangeMaxDatarange-rangeMinDatarange, rangeMinDatarange, rangeMaxDatarange, runAvgWidth, residualHistogramBins);
+        //   finally we have to free the memory allocated in the calcFitStatistics() result.
+        fit_stat.free();
+
+        free(dist);
+        free(weights);
+        free(modelEval);
+    }
+
+    if (doEmit) record->enableEmitResultsChanged(true);
+}
+
+QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html) const {
+    if (model==0) {
+        if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
+        if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
+        if (id==1) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+    }
+    return QString();
+}
+
+QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html) const {
+    if (model==0) {
+        if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
+        if (id==1) return QString("");
+        if (id==1) return QString("");
+    }
+    return QString();
+}
+int QFFCSMaxEntEvaluationItem::getParameterCount(int model) const {
+    if (model==0) return 3;
+    return 0;
+}
+
+QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) {
+    if (model==0) {
+        if (id==0) return tr("trip_tau");
+        if (id==1) return tr("trip_theta");
+        if (id==1) return tr("focus_struct_fac");
+    }
+    return QString("m%1_p%2").arg(model).arg(id);
+}
+
+int QFFCSMaxEntEvaluationItem::getModelCount() const
+{
+    return 1;
+}

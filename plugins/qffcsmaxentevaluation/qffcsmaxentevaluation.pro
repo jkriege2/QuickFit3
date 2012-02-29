@@ -18,13 +18,15 @@ HEADERS += qffcsmaxentevaluation.h \
            qffcsmaxentevaluation_editor.h \
     ../base_classes/qfusesresultsevaluation.h \
     ../base_classes/qfusesresultsbyindexevaluation.h \
-    ../interfaces/qfrdrfcsdatainterface.h
+    ../interfaces/qfrdrfcsdatainterface.h \
+    ../base_classes/qfusesresultsbyindexandmodelevaluation.h
 
 SOURCES += qffcsmaxentevaluation.cpp \
            qffcsmaxentevaluation_item.cpp \
            qffcsmaxentevaluation_editor.cpp \
     ../base_classes/qfusesresultsevaluation.cpp \
-    ../base_classes/qfusesresultsbyindexevaluation.cpp
+    ../base_classes/qfusesresultsbyindexevaluation.cpp \
+    ../base_classes/qfusesresultsbyindexandmodelevaluation.cpp
 
 FORMS =   
 

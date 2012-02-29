@@ -2,6 +2,7 @@
 #define QFFITPARAMETERBASICINTERFACE_H
 
 #include <QString>
+#include <QtPlugin>
 #include "libwid_imexport.h"
 
 /*! \brief generic interface that allows to access values, ranges and fix settinsg for fitting parameters
@@ -105,5 +106,9 @@ class QFWIDLIB_EXPORT QFFitParameterBasicInterface {
         /*! \brief reset the all parameters to the initial/global/default fix in current files */
         virtual void resetAllFitFixCurrent()=0;
 };
+
+Q_DECLARE_INTERFACE(QFFitParameterBasicInterface,
+                     "www.dkfz.de.b040.quickfit3.QFFitParameterBasicInterface/1.0")
+
 
 #endif // QFFITPARAMETERBASICINTERFACE_H

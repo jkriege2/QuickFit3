@@ -11,6 +11,7 @@
 #include "qffitalgorithm.h"
 #include "qffitparameterbasicinterface.h"
 #include "qffitalgorithmthreaddedfit.h"
+#include "qfsimplefitparameterinterface.h"
 
 /*! \brief evaluation item base class which implements some tool functions to more easily store fit results
     \ingroup qf3evaluationplugins
@@ -27,9 +28,10 @@ param_fix=<initial_fix>
     .
 
 */
-class QFUsesResultsEvaluation : public QFEvaluationItem
+class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParameterInterface
 {
         Q_OBJECT
+        Q_INTERFACES(QFSimpleFitParameterInterface)
     public:
         explicit QFUsesResultsEvaluation(QFProject *parent = 0, bool showRDRList=true, bool useSelection=false);
         virtual ~QFUsesResultsEvaluation();
@@ -54,6 +56,8 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
 
 
 
+
+        virtual void setFitResultSortPriority(QFRawDataRecord *r, const QString& resultID, const QString &parameterID, bool sortPriority);
 
         /** \brief sets the group of the given fit result
          *  \param r the record to adress
@@ -91,6 +95,98 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
 
 
 
+        /*! \brief set a fit parameter for the current record and resultID
+
+            The value may be stored at different positions:
+              - If no item is highlighted the parameter is not stored at all
+              - If a current raw data record is highlighted and no fit has been carried out so far for this record, the value
+                is stored in the preset value store of this QFEvaluationItem
+              - If a current raw data record is highlighted and a fit has already been carried out for this record, the value
+                is stored as a result in the highlighted QFRawDataRecord
+            .
+            This function also checks whether the value is to be stored (i.e. it's userEditable property is set)
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+            \param unit unit to be stored
+
+         */
+        virtual void setFitValue(const QString& parameterID, double value);
+        /*! \brief set a fit parameter for the current record and resultID
+
+            The value may be stored at different positions:
+              - If no item is highlighted the parameter is not stored at all
+              - If a current raw data record is highlighted and no fit has been carried out so far for this record, the value
+                is stored in the preset value store of this QFEvaluationItem
+              - If a current raw data record is highlighted and a fit has already been carried out for this record, the value
+                is stored as a result in the highlighted QFRawDataRecord
+            .
+            This function also checks whether the value is to be stored (i.e. it's userEditable property is set)
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+            \param unit unit to be stored
+
+         */
+        virtual void setFitValue(const QString& parameterID, double value, const QString& unit);
+        /*! \brief return the value of a given parameter
+            \param parameterID the parameter id
+            \return the value of the given parameter \a id
+
+            This function looks for the value at several positions:
+              -# if a fit has already been performed for the current record, the value is read from raw data record
+              -# if no fit has been performed, the value is taken from this evaluation (i.e. the preset value)
+              -# if also locally no value is available, the value is looked up in the application INI
+              -# if this also fails, the value is taken from the initial value stored in the fitFunction
+            .
+        */
+        virtual double getFitValue(const QString& parameterID);
+        /*! \brief return the fit error of a given parameter
+            \param parameterID the parameter id
+            \return the error associated with the given parameter.
+        */
+        virtual double getFitError(const QString& parameterID);
+
+        /*! \brief set the error of a given parameter
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param error error to be set
+        */
+        virtual void setFitError(const QString& parameterID, double error);
+
+        /*! \brief set the fix property of a fit parameter of the current fit function (see m_fitFunction)
+
+            For a description of when data is stored, see setFitValue()
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param fix fix to be stored
+
+         */
+        virtual void setFitFix(const QString& parameterID, bool fix);
+
+        /*! \brief return the fix property of a given parameter
+
+            \param parameterID the parameter id
+            For a detailed description of where the value is searched, see getFitValue()
+        */
+        virtual bool getFitFix(const QString& parameterID);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
 
@@ -110,6 +206,25 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
 
          */
         virtual void setFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, const QString& unit);
+
+        /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
+
+            The value may be stored at different positions:
+              - If no item is highlighted the parameter is not stored at all
+              - If a current raw data record is highlighted and no fit has been carried out so far for this record, the value
+                is stored in the preset value store of this QFEvaluationItem
+              - If a current raw data record is highlighted and a fit has already been carried out for this record, the value
+                is stored as a result in the highlighted QFRawDataRecord
+            .
+            This function also checks whether the value is to be stored (i.e. it's userEditable property is set)
+
+            \param r the record to adress
+            \param resultID the result ID which to access in the raw data records result store
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+
+         */
+        virtual void setFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value);
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -152,7 +267,7 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
          *  \param value value to be stored
          *  \param error error associated with \a value
          */
-        virtual void setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error, const QString& unit=QString());
+        virtual void setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error, const QString& unit);
 
         /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -161,6 +276,49 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
          *  \param error error to be stored
          */
         virtual void setFitResultError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double error);
+
+        /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord
+         *  \param r the record to adress
+         *  \param resultID the result ID which to access in the raw data records result store
+         *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+         *  \param value value array to be stored
+         *  \param error error array associated with \a value
+         *  \param N number of items in \a value and \a error
+         *  \param unit the unit name
+         */
+        virtual void setFitResultValueNumberArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double* value, double* error, uint32_t N, const QString& unit=QString());
+
+        /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord
+         *  \param r the record to adress
+         *  \param resultID the result ID which to access in the raw data records result store
+         *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
+         *  \param value value array to be stored
+         *  \param N number of items in \a value
+         *  \param unit the unit name
+         */
+        virtual void setFitResultValueNumberArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double* value, uint32_t N, const QString& unit=QString());
+
+        /*! \brief return the value array of a given parameter
+            \param r the record to adress
+            \param resultID the result ID which to access in the raw data records result store
+            \param parameterID the parameter id
+            \return the value of the given parameter \a id
+
+            This function looks for the value at several positions:
+              -# if a fit has already been performed for the current record, the value is read from raw data record
+              -# if no fit has been performed, the value is taken from this evaluation (i.e. the preset value)
+              -# if also locally no value is available, the value is looked up in the application INI
+              -# if this also fails, the value is taken from the initial value stored in the fitFunction
+            .
+        */
+        virtual QVector<double> getFitValueNumberArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
+        /*! \brief return the fit error array of a given parameter
+            \param r the record to adress
+            \param resultID the result ID which to access in the raw data records result store
+            \param parameterID the parameter id
+            \return the error associated with the given parameter.
+        */
+        virtual QVector<double> getFitValueErrorArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
 
 
 
@@ -224,8 +382,17 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
         */
         virtual bool getFitFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
 
+        /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */
+        virtual QString getParameterName(int model, int id, bool html=false) const;
+        /** \brief return the unit for the given parameter in the given model in either HTML richtext or plain text */
+        virtual QString getParameterUnit(int model, int id, bool html) const;
+        /** \brief return the number of parameters in the given model */
+        virtual int getParameterCount(int model) const;
+        /** \brief return the ID for the given parameter in the given model  */
+    virtual QString getParameterID(int model, int param);
 
-    signals:
+    virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error);
+signals:
         
     public slots:
 
@@ -318,6 +485,8 @@ class QFUsesResultsEvaluation : public QFEvaluationItem
             bool fix;
             double min;
             double max;
+            QVector<double> valueVector;
+            QVector<double> errorVector;
             FitParameterDefault();
         };
 

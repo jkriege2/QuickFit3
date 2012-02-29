@@ -74,7 +74,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/qrecentfilesmenu.h \
     qfplayercontrols.h \
     qfhtmlhelpwindow.h \
-    ../../../../LIB/trunk/qt/jkqtpoverlayelements.h
+    ../../../../LIB/trunk/qt/jkqtpoverlayelements.h \
+    qfsimplefitparameterinterface.h \
+    qfsimplefitparameterswidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -116,7 +118,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/qrecentfilesmenu.cpp \
     qfplayercontrols.cpp \
     qfhtmlhelpwindow.cpp \
-    ../../../../LIB/trunk/qt/jkqtpoverlayelements.cpp
+    ../../../../LIB/trunk/qt/jkqtpoverlayelements.cpp \
+    qfsimplefitparameterswidget.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

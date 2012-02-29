@@ -512,7 +512,7 @@ void QFFCSMaxEntEvaluationEditor::writeSettings() {
 int QFFCSMaxEntEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index, int defaultMin) {
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID(index);
+    const QString resultID=data->getEvaluationResultID(index, 0);
     if (!rec) return defaultMin;
 
 
@@ -522,7 +522,7 @@ int QFFCSMaxEntEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index, int
 int QFFCSMaxEntEvaluationEditor::getUserMax(QFRawDataRecord* rec, int index, int defaultMax) {
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID(index);
+    const QString resultID=data->getEvaluationResultID(index, 0);
 
     if (!rec) return defaultMax;
 
@@ -555,7 +555,7 @@ void QFFCSMaxEntEvaluationEditor::setUserMin(int userMin) {
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (!data) return;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex(), 0);
     rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
 }
 
@@ -564,7 +564,7 @@ void QFFCSMaxEntEvaluationEditor::setUserMax(int userMax) {
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (!data) return;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex(), 0);
     rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
 }
 
@@ -573,7 +573,7 @@ void QFFCSMaxEntEvaluationEditor::setUserMinMax(int userMin, int userMax) {
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (!data) return;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex(), 0);
     rdr->disableEmitPropertiesChanged();
     rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
     rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
@@ -826,6 +826,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     int index=eval->getCurrentIndex();
+    int model=eval->getCurrentModel();
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -870,28 +871,38 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 double* tauvals=data->getCorrelationT();
                 double* corrdata=NULL;
 
-                if (eval->getCurrentIndex()<0) {
+                if (index<0) {
                     corrdata=data->getCorrelationMean();
                 } else {
-                    if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
-                        corrdata=data->getCorrelationRun(eval->getCurrentIndex());
+                    if (index<(int)data->getCorrelationRuns()) {
+                        corrdata=data->getCorrelationRun(index);
                     } else {
                         corrdata=data->getCorrelationMean();
                     }
                 }
 
-                double* weights=eval->allocWeights(NULL, record, eval->getCurrentIndex(), datacut_min, datacut_max);
+                double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+
+                int rangeMaxDatarange=getUserMax(record, index);
+                int rangeMinDatarange=getUserMin(record, index);
 
 
                 /////////////////////////////////////////////////////////////////////////////////
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitStatistics fitResults=eval->calcFitStatistics(record, index, eval->getCurrentModel(), tauvals, N, datacut_min, datacut_max, runAvgWidth, residualHistogramBins);
+                double* modelVals=(double*)malloc(N*sizeof(double));
+                QVector<double> dist=eval->getDistribution(record, index, model);
+                QVector<double> distTau=eval->getDistributionTaus(record, index, model);
+                eval->evaluateModel(record, index, model, tauvals, modelVals, N, distTau.data(), dist.data(), dist.size());
+
+                // CALCULATE FIT STATISTICS
+                QFFitStatistics fit_stat=eval->calcFitStatistics(record, index, model, tauvals, modelVals, N, dist.size(), rangeMinDatarange, rangeMaxDatarange, runAvgWidth, residualHistogramBins);
+
                 record->enableEmitResultsChanged();
 
 
-                size_t c_fit = ds->addCopiedColumn(fitResults.fitfunc, N, "fit_model");
+                size_t c_fit = ds->addCopiedColumn(fit_stat.fitfunc, N, "fit_model");
                 //qDebug()<<"    f "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -917,10 +928,10 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 size_t c_residuals=0;
                 JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals->get_plotter());
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residuals=dsres->addCopiedColumn(fitResults.residuals_weighted, N, "residuals_weighted");
+                    c_residuals=dsres->addCopiedColumn(fit_stat.residuals_weighted, N, "residuals_weighted");
                     g_residuals->set_title("weighted residuals");
                 } else {
-                    c_residuals=dsres->addCopiedColumn(fitResults.residuals, N, "residuals");
+                    c_residuals=dsres->addCopiedColumn(fit_stat.residuals, N, "residuals");
                     g_residuals->set_title("residuals");
                 }
                 g_residuals->set_xColumn(c_taures);
@@ -944,16 +955,16 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals running average
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_tauresra=dsres->addCopiedColumn(fitResults.tau_runavg, fitResults.runAvgN, "tau_resid_runavg");
+                size_t c_tauresra=dsres->addCopiedColumn(fit_stat.tau_runavg, fit_stat.runAvgN, "tau_resid_runavg");
                 size_t c_residualsra=0;
                 JKQTPxyLineGraph* g_residualsra=new JKQTPxyLineGraph(pltResiduals->get_plotter());
 
 
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg_weighted, fitResults.runAvgN, "residuals_runavg_weighted");
+                    c_residualsra=dsres->addCopiedColumn(fit_stat.residuals_runavg_weighted, fit_stat.runAvgN, "residuals_runavg_weighted");
                     g_residualsra->set_title("weighted residuals, movAvg");
                 } else {
-                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg, fitResults.runAvgN, "residuals_runavg");
+                    c_residualsra=dsres->addCopiedColumn(fit_stat.residuals_runavg, fit_stat.runAvgN, "residuals_runavg");
                     g_residualsra->set_title("residuals, movAvg");
                 }
                 g_residualsra->set_xColumn(c_tauresra);
@@ -981,11 +992,11 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 size_t c_residualHistogramX=0;
                 size_t c_residualHistogramY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rminw+fitResults.residHistWBinWidth/2.0, fitResults.rmaxw-fitResults.residHistWBinWidth/2.0, "residualhist_weighted_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resWHistogram, residualHistogramBins, "residualhist_weighted_y");
+                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fit_stat.rminw+fit_stat.residHistWBinWidth/2.0, fit_stat.rmaxw-fit_stat.residHistWBinWidth/2.0, "residualhist_weighted_x");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fit_stat.resWHistogram, residualHistogramBins, "residualhist_weighted_y");
                 } else {
-                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rmin+fitResults.residHistBinWidth/2.0, fitResults.rmax-fitResults.residHistBinWidth/2.0, "residualhist_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resHistogram, residualHistogramBins, "residualhist_y");
+                    c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fit_stat.rmin+fit_stat.residHistBinWidth/2.0, fit_stat.rmax-fit_stat.residHistBinWidth/2.0, "residualhist_x");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fit_stat.resHistogram, residualHistogramBins, "residualhist_y");
                 }
                 JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram->get_plotter());
                 g_residualsHistogram->set_xColumn(c_residualHistogramX);
@@ -1000,12 +1011,12 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals correlations
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_residualCorrelationX=dsresc->addLinearColumn(fitResults.resN-1, 1, fitResults.resN-1, "residualcorr_x");
+                size_t c_residualCorrelationX=dsresc->addLinearColumn(fit_stat.resN-1, 1, fit_stat.resN-1, "residualcorr_x");
                 size_t c_residualCorrelationY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualCorrelationY=dsresc->addCopiedColumn(&(fitResults.resWCorrelation[1]), fitResults.resN-1, "residualcorr_weighted_y");
+                    c_residualCorrelationY=dsresc->addCopiedColumn(&(fit_stat.resWCorrelation[1]), fit_stat.resN-1, "residualcorr_weighted_y");
                 } else {
-                    c_residualCorrelationY=dsresh->addCopiedColumn(&(fitResults.resCorrelation[1]), fitResults.resN-1, "residualcorr_y");
+                    c_residualCorrelationY=dsresh->addCopiedColumn(&(fit_stat.resCorrelation[1]), fit_stat.resN-1, "residualcorr_y");
                 }
                 JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation->get_plotter());
                 g_residualsCorrelation->set_xColumn(c_residualCorrelationX);
@@ -1032,32 +1043,32 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                                 "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
                                 "<td align=\"right\" valign=\"bottom\"><font size=\"+2\">&chi;<sup>2</sup></font> (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.residSqrSum).arg(fitResults.residWeightSqrSum);
+                                "</tr>").arg(fit_stat.residSqrSum).arg(fit_stat.residWeightSqrSum);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">&lang;E&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
                                 "<td align=\"right\" valign=\"bottom\"> &lang;E&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.residAverage).arg(fitResults.residWeightAverage);
+                                "</tr>").arg(fit_stat.residAverage).arg(fit_stat.residWeightAverage);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;=</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>"
                                 "<td align=\"right\" valign=\"bottom\"> &radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; (weighted) =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.residStdDev).arg(fitResults.residWeightStdDev);
+                                "</tr>").arg(fit_stat.residStdDev).arg(fit_stat.residWeightStdDev);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">NP =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td></td>"
                                 "<td align=\"right\" valign=\"bottom\">NR =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.fitparamN).arg(fitResults.dataSize);
+                                "</tr>").arg(fit_stat.fitparamN).arg(fit_stat.dataSize);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">DF =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td></td>"
                                 "<td align=\"right\" valign=\"bottom\"></td><td align=\"left\" valign=\"bottom\"></td>"
-                                "</tr>").arg(fitResults.degFreedom);
+                                "</tr>").arg(fit_stat.degFreedom);
                 txtFit+=QString("<tr>"
                                 "<td align=\"right\" valign=\"bottom\">TSS  =</td><td align=\"left\" valign=\"bottom\">%1</td>"
                                 "<td></td>"
                                 "<td align=\"right\" valign=\"bottom\">R<sup>2</sup> =</td><td align=\"left\" valign=\"bottom\">%2</td>"
-                                "</tr>").arg(fitResults.TSS).arg(fitResults.Rsquared);
+                                "</tr>").arg(fit_stat.TSS).arg(fit_stat.Rsquared);
                 //qDebug()<<"    l "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1079,7 +1090,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 // clean memory
                 /////////////////////////////////////////////////////////////////////////////////
                 free(weights);
-                fitResults.free();
+                fit_stat.free();
 
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";
                 t.start();
@@ -1115,7 +1126,7 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    eval->doEvaluation(record, eval->getCurrentIndex());
+    eval->doFit(record, eval->getCurrentIndex(), eval->getCurrentModel(), getUserMin(record, eval->getCurrentIndex()), getUserMax(record, eval->getCurrentIndex()), 11, spinResidualHistogramBins->value());
 
     displayParameters();
     displayData();
@@ -1153,7 +1164,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
             for (int idx=-1; idx<data->getCorrelationRuns(); idx++) {
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
-                eval->doEvaluation(record, idx);
+                eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
@@ -1197,7 +1208,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
             for (int idx=-1; idx<data->getCorrelationRuns(); idx++) {
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
-                eval->doEvaluation(record, idx);
+                eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
@@ -1245,7 +1256,7 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
             int idx=eval->getCurrentIndex();
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
-                eval->doEvaluation(record, idx);
+                eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
