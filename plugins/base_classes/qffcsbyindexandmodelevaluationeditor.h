@@ -113,6 +113,12 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         DataCutSliders* datacut;
         /** \brief Splitter between Plots  */
         QVisibleHandleSplitter* splitPlot;
+        QVisibleHandleSplitter* splitPlots;
+        QVBoxLayout* plotLayout;
+        QWidget* wPlot;
+        /** \brief splitter between pltData and possibly more plots */
+        QVisibleHandleSplitter* splitMorePLot;
+
         /** \brief Splitter between Plots and Model */
         QVisibleHandleSplitter* splitModel;
         /** \brief QSpinBox that allows to select a special run */

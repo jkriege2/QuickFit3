@@ -91,6 +91,11 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         NumberEdit* edtAlpha;
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
+        /** \brief ploter for the MaxEnt Distribution */
+        JKQtPlotter* pltDistribution;
+        QToolBar* tbPlot;
+        QToolBar* tbPlotDistribution;
+
 
     private:
         void createWidgets();

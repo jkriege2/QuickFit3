@@ -39,6 +39,74 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     hblModel->addWidget(l);
     hblModel->addWidget(cmbWeights);
     hblModel->addStretch();
+
+
+    tbPlot=new QToolBar(QString("tbPlot"), this);
+    tbPlot->setIconSize(QSize(16,16));
+    tbPlot->addAction(pltData->get_plotter()->get_actSavePlot());
+    pltData->get_plotter()->get_actSavePlot()->setToolTip(tr("save the correlation and residuals plot as an image (PNG, JPEG, PDF, SVG, ...)"));
+    tbPlot->addAction(pltData->get_plotter()->get_actPrint());
+    pltData->get_plotter()->get_actPrint()->setToolTip(tr("print the correlation and residuals plot"));
+    tbPlot->addAction(pltData->get_plotter()->get_actCopyPixelImage());
+    pltData->get_plotter()->get_actCopyPixelImage()->setToolTip(tr("copy the correlation and residuals plot as an image to the system clipboard"));
+    tbPlot->addSeparator();
+    tbPlot->addAction(pltData->get_plotter()->get_actZoomAll());
+    tbPlot->addAction(pltData->get_plotter()->get_actZoomIn());
+    tbPlot->addAction(pltData->get_plotter()->get_actZoomOut());
+
+    toolbar->removeAction(pltData->get_plotter()->get_actSavePlot());
+    toolbar->removeAction(pltData->get_plotter()->get_actPrint());
+    toolbar->removeAction(pltData->get_plotter()->get_actCopyPixelImage());
+    toolbar->removeAction(pltData->get_plotter()->get_actZoomAll());
+    toolbar->removeAction(pltData->get_plotter()->get_actZoomIn());
+    toolbar->removeAction(pltData->get_plotter()->get_actZoomOut());
+    plotLayout->insertWidget(0, tbPlot);
+
+
+    pltDistribution=new JKQtPlotter(true, this);
+    pltDistribution->useExternalDatastore(pltData->getDatastore());
+    pltDistribution->set_displayToolbar(false);
+    pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+    pltDistribution->getXAxis()->set_labelFontSize(11);
+    pltDistribution->getXAxis()->set_tickLabelFontSize(10);
+    pltDistribution->getXAxis()->set_logAxis(true);
+    pltDistribution->getYAxis()->set_axisLabel(tr("MaxEnt distribution"));
+    pltDistribution->getYAxis()->set_labelFontSize(11);
+    pltDistribution->getYAxis()->set_tickLabelFontSize(10);
+    pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltDistribution->set_displayMousePosition(false);
+    pltDistribution->get_plotter()->set_keyFontSize(9);
+    pltDistribution->get_plotter()->set_keyXMargin(2);
+    pltDistribution->get_plotter()->set_keyYMargin(2);
+
+
+    tbPlotDistribution=new QToolBar(QString("tbPlotDistribution"), this);
+    tbPlotDistribution->setIconSize(QSize(16,16));
+    tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actSavePlot());
+    pltDistribution->get_plotter()->get_actSavePlot()->setToolTip(tr("save the distribution plot as an image (PNG, JPEG, PDF, SVG, ...)"));
+    tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actPrint());
+    pltDistribution->get_plotter()->get_actPrint()->setToolTip(tr("print the distribution plot "));
+    tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actCopyPixelImage());
+    pltDistribution->get_plotter()->get_actCopyPixelImage()->setToolTip(tr("copy the distribution plot as an image to the system clipboard"));
+    tbPlotDistribution->addSeparator();
+    tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomAll());
+    tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomIn());
+    tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomOut());
+
+
+    QWidget* wPltDist=new QWidget(this);
+    QVBoxLayout* layPltDist=new QVBoxLayout(this);
+    wPltDist->setLayout(layPltDist);
+    layPltDist->setContentsMargins(0,0,0,0);
+    layPltDist->addWidget(tbPlotDistribution);
+    layPltDist->addWidget(pltDistribution);
+    splitMorePLot->addWidget(wPltDist);
+
+    splitMorePLot->setCollapsible(splitMorePLot->indexOf(pltDistribution), false);
+
 }
 
 
@@ -112,6 +180,7 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
     JKQTPdatastore* dsresc=pltResidualCorrelation->getDatastore();
+    JKQTPdatastore* dsdist=pltDistribution->getDatastore();
 
     if ((!eval)||(!data)) {
         pltData->clearGraphs();
@@ -139,10 +208,14 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
         pltResidualCorrelation->set_doDrawing(false);
         pltResidualCorrelation->set_emitSignals(false);
         pltResidualCorrelation->clearGraphs();
+        pltDistribution->set_doDrawing(false);
+        pltDistribution->set_emitSignals(false);
+        pltDistribution->clearGraphs();
         dsres->clear();
         ds->clear();
         dsresh->clear();
         dsresc->clear();
+        dsdist->clear();
 
         //qDebug()<<"   a "<<t.elapsed()<<" ms";
         t.start();
@@ -245,6 +318,7 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
 
             pltData->zoomToFit(true, true);
             pltResiduals->zoomToFit(false, true);
+            pltDistribution->zoomToFit(true, true);
 
             pltResiduals->setX(pltData->getXMin(), pltData->getXMax());
 
@@ -263,6 +337,8 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
         pltResidualHistogram->set_emitSignals(true);
         pltResidualCorrelation->set_doDrawing(true);
         pltResidualCorrelation->set_emitSignals(true);
+        pltDistribution->set_doDrawing(true);
+        pltDistribution->set_emitSignals(true);
         //qDebug()<<"   g "<<t.elapsed()<<" ms";
         t.start();
 
@@ -277,6 +353,9 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
         t.start();
         pltResidualCorrelation->update_plot();
         //qDebug()<<"   k "<<t.elapsed()<<" ms";
+        t.start();
+        pltDistribution->update_plot();
+        //qDebug()<<"   l "<<t.elapsed()<<" ms";
         t.start();
         //qDebug()<<"  displayData end  runtime = "<<t1.elapsed()<<" ms";
 
@@ -298,6 +377,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
     JKQTPdatastore* dsresc=pltResidualCorrelation->getDatastore();
+    JKQTPdatastore* dsdist=pltDistribution->getDatastore();
 
 
     if ((!eval)||(!data)) {
@@ -491,6 +571,33 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 pltResidualCorrelation->addGraph(g_residualsCorrelation);
                 //qDebug()<<"    k "<<t.elapsed()<<" ms";
                 t.start();
+
+
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // plot distribution
+                /////////////////////////////////////////////////////////////////////////////////
+                QVector<double> mem_tau=eval->getDistributionTaus(record, index, model);
+                QVector<double> mem_dist=eval->getDistribution(record, index, model);
+                int c_disttau=-1;
+                int c_dist=-1;
+                if (mem_tau.size()>0 && mem_dist.size()>0) {
+                    c_disttau=dsdist->addCopiedColumn(mem_tau.data(), mem_tau.size(), "maxent_tau");
+                    c_dist=dsdist->addCopiedColumn(mem_dist.data(), mem_dist.size(), "maxent_tau");;
+                }
+                JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+                g_dist->set_drawLine(true);
+                g_dist->set_title("MaxEnt distribution");
+                g_dist->set_xColumn(c_disttau);
+                g_dist->set_yColumn(c_dist);
+                g_dist->set_datarange_start(datacut->get_userMin());
+                g_dist->set_datarange_end(datacut->get_userMax());
+                pltDistribution->addGraph(g_dist);
+                //qDebug()<<"    g "<<t.elapsed()<<" ms";
+                t.start();
+
+
+
 
                 /////////////////////////////////////////////////////////////////////////////////
                 // update display of fit results

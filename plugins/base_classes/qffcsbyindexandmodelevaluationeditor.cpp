@@ -114,7 +114,9 @@ void QFFCSByIndexAndModelEvaluationEditor::readSettings() {
         pltResiduals->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltresiduals/");
         pltResidualHistogram->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltresidualhistogram/");
         pltResidualCorrelation->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltresidualcorrelation/");
+        loadSplitter(*(settings->getQSettings()), splitMorePLot, "fcsmaxentevaleditor/splitter_more_plot");
         loadSplitter(*(settings->getQSettings()), splitPlot, "fcsmaxentevaleditor/splitter_plot");
+        loadSplitter(*(settings->getQSettings()), splitPlots, "fcsmaxentevaleditor/splitter_plots");
         loadSplitter(*(settings->getQSettings()), splitModel, "fcsmaxentevaleditor/splitter_model");
         loadSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsmaxentevaleditor/splitter_fitstatistics");
         spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsmaxentevaleditor/residual_histogram_bins", 25).toInt());
@@ -127,7 +129,9 @@ void QFFCSByIndexAndModelEvaluationEditor::readSettings() {
 void QFFCSByIndexAndModelEvaluationEditor::writeSettings() {
     QFUsesResultsByIndexEvaluationEditor::writeSettings();
     if (cmbModel) {
+        saveSplitter(*(settings->getQSettings()), splitMorePLot, "fcsmaxentevaleditor/splitter_more_plot");
         saveSplitter(*(settings->getQSettings()), splitPlot, "fcsmaxentevaleditor/splitter_plot");
+        saveSplitter(*(settings->getQSettings()), splitPlots, "fcsmaxentevaleditor/splitter_plots");
         saveSplitter(*(settings->getQSettings()), splitModel, "fcsmaxentevaleditor/splitter_model");
         saveSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsmaxentevaleditor/splitter_fitstatistics");
         settings->getQSettings()->setValue("fcsmaxentevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
@@ -215,13 +219,28 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     splitModel->setOrientation(Qt::Horizontal);
     mainLayout->addWidget(splitModel, 10);
 
+    splitPlots=new QVisibleHandleSplitter(this),
+    splitPlots->setOrientation(Qt::Vertical);
     splitPlot=new QVisibleHandleSplitter(this),
     splitPlot->setOrientation(Qt::Vertical);
-    splitModel->addWidget(splitPlot);
+    splitMorePLot=new QVisibleHandleSplitter(this),
+    splitMorePLot->setOrientation(Qt::Horizontal);
+
+    splitModel->addWidget(splitPlots);
+    splitPlots->addWidget(splitMorePLot);
+    splitMorePLot->addWidget(splitPlot);
 
     pltData=new JKQtPlotter(true, this);
     pltData->resize(300,200);
-    splitPlot->addWidget(pltData);
+    plotLayout=new QVBoxLayout(this);
+    wPlot=new QWidget(this);
+    wPlot->setLayout(plotLayout);
+    plotLayout->setContentsMargins(0,0,0,0);
+    plotLayout->addWidget(pltData);
+
+
+
+    splitPlot->addWidget(wPlot);
 
 
     QWidget* widgetResiduals=new QWidget(this);
@@ -274,7 +293,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     splitPlot->addWidget(widgetResiduals);
 
     splitFitStatistics=new QVisibleHandleSplitter(this);
-    splitPlot->addWidget(splitFitStatistics);
+    splitPlots->addWidget(splitFitStatistics);
     tabResidulas=new QTabWidget(this);
     tabResidulas->setTabPosition(QTabWidget::North);
     tabResidulas->setTabShape(QTabWidget::Triangular);
@@ -429,6 +448,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     splitPlot->setCollapsible(1, false);
     splitPlot->setStretchFactor(0,4);
     splitPlot->setStretchFactor(1,1);
+    splitMorePLot->setCollapsible(0, false);
 
     splitModel->setCollapsible(0, false);
     splitModel->setCollapsible(1, false);
