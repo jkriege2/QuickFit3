@@ -20,6 +20,7 @@
 
 */
 class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvaluation {
+        Q_OBJECT
     public:
         QFUsesResultsByIndexAndModelEvaluation(QFProject *parent = 0, bool showRDRList=true, bool useSelection=false);
 
@@ -266,8 +267,13 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
         int getCurrentModel() const;
 
 
-        virtual int getModelMin(QFRawDataRecord* r, int index) const;
-        virtual int getModelMax(QFRawDataRecord* r, int index) const;
+        virtual int getModelCount(QFRawDataRecord* r, int index) const;
+        virtual QString getModelName(int model) const;
+        /** \brief return the number of models in this object */
+        virtual int getModelCount(QFRawDataRecord* r) const;
+        /** \brief return the number of models in this object */
+        virtual int getModelCount() const;
+
     protected:
         /** \brief write object contents into XML file
          *

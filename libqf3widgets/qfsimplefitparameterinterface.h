@@ -76,8 +76,24 @@ class QFWIDLIB_EXPORT QFSimpleFitParameterInterface {
 };
 
 
+class QFWIDLIB_EXPORT QFSimpleFitParameterEnumeratorInterface {
+    public:
+        virtual ~QFSimpleFitParameterEnumeratorInterface() {};
+
+        /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */
+        virtual QString getParameterName(int model, int id, bool html=false) const=0;
+        /** \brief return the unit for the given parameter in the given model in either HTML richtext or plain text */
+        virtual QString getParameterUnit(int model, int id, bool html) const=0;
+        /** \brief return the number of parameters in the given model */
+        virtual int getParameterCount(int model) const=0;
+        /** \brief return the ID for the given parameter in the given model  */
+        virtual QString getParameterID(int model, int param) const=0;
+};
+
 Q_DECLARE_INTERFACE(QFSimpleFitParameterInterface,
                      "www.dkfz.de.b040.quickfit3.QFSimpleFitParameterInterface/1.0");
 
+Q_DECLARE_INTERFACE(QFSimpleFitParameterEnumeratorInterface,
+                     "www.dkfz.de.b040.quickfit3.QFSimpleFitParameterEnumeratorInterface/1.0");
 
 #endif // QFSIMPLEFITPARAMETERINTERFACE_H

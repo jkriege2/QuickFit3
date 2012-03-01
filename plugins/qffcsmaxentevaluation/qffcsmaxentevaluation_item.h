@@ -18,8 +18,9 @@
     
     
 */
-class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation {
+class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, public QFSimpleFitParameterEnumeratorInterface {
         Q_OBJECT
+        Q_INTERFACES(QFSimpleFitParameterEnumeratorInterface)
     public:
         /** \brief which data weighting should be applied */
         /** Default constructor */
@@ -51,8 +52,7 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation 
 
         virtual int getIndexMin(QFRawDataRecord* r) const;
         virtual int getIndexMax(QFRawDataRecord* r) const;
-        virtual int getModelMin(QFRawDataRecord* r, int index) const;
-        virtual int getModelMax(QFRawDataRecord* r, int index) const;
+        virtual int getModelCount(QFRawDataRecord* r, int index) const;
 
         void setCurrentWeights(int index);
         int getCurrentWeights() const;
@@ -73,9 +73,7 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation 
         /** \brief return the name for current model */
         QString getCurrentModelName() const;
         /** \brief return the name for given model */
-        QString getModelName(int model) const;
-        /** \brief return the number of models in this object */
-        int getModelCount() const;
+        virtual QString getModelName(int model) const;
 
         /*! \brief evaluate the model for a given record and index
 

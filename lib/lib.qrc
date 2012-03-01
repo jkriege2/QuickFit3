@@ -32,5 +32,7 @@
         <file alias="fitalg_icon.png">icons/fitalg_icon.png</file>
         <file alias="fitfunc_icon.png">icons/fitfunc_icon.png</file>
         <file alias="item_delete.png">icons/item_delete.png</file>
+        <file alias="printreport.png">icons/fcs_printreport.png</file>
+        <file alias="savereport.png">icons/fcs_savereport.png</file>
     </qresource>
 </RCC>

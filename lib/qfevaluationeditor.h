@@ -6,6 +6,7 @@
 #include <QPointer>
 #include "programoptions.h"
 #include "qfpluginservices.h"
+#include <QTextDocument>
 
 // forward declaration
 class QFEvaluationItem;
@@ -34,12 +35,18 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) =0;
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void resultsChanged() {};
+
     public slots:
         /** \brief read the settings */
         virtual void readSettings() =0;
         /** \brief write the settings */
         virtual void writeSettings() =0;
+        /** \brief save a report of the evaluation results */
+        virtual void saveReport();
+        /** \brief print a report of the evaluation results */
+        virtual void printReport();
     protected:
+        virtual void createReportDoc(QTextDocument* doc);
         virtual bool	event ( QEvent * event );
         void closeEvent( QCloseEvent * event );
         /** \brief points to the record currently displayed */
@@ -50,6 +57,11 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         int peID;
         /** \brief pointer that allows for access to central QuickFit services */
         QFPluginServices* services;
+        /** \brief button to print report */
+        QAction* actPrintReport;
+        /** \brief button to save report */
+        QAction* actSaveReport;
+
 
 };
 

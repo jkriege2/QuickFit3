@@ -36,5 +36,12 @@
         <file alias="player_rrew.png">icons/player_rrew.png</file>
         <file alias="player_start.png">icons/player_start.png</file>
         <file alias="player_stop.png">icons/player_stop.png</file>
+        <file alias="plot_ebars.png">icons/fcsplot_ebars.png</file>
+        <file alias="plot_elines.png">icons/fcsplot_elines.png</file>
+        <file alias="plot_elinesbars.png">icons/fcsplot_elinesbars.png</file>
+        <file alias="plotenone.png">icons/fcsplot_enone.png</file>
+        <file alias="plot_lines.png">icons/fcsplot_lines.png</file>
+        <file alias="plot_points.png">icons/fcsplot_points.png</file>
+        <file alias="plot_pointslines.png">icons/fcsplot_pointslines.png</file>
     </qresource>
 </RCC>

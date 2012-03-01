@@ -67,13 +67,7 @@ int QFFCSMaxEntEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
     return QFUsesResultsByIndexAndModelEvaluation::getIndexMin(r);
 }
 
-int QFFCSMaxEntEvaluationItem::getModelMin(QFRawDataRecord *r, int index) const {
-    return 0;
-}
 
-int QFFCSMaxEntEvaluationItem::getModelMax(QFRawDataRecord *r, int index) const {
-    return getModelCount()-1;
-}
 
 void QFFCSMaxEntEvaluationItem::setCurrentWeights(int index)
 {
@@ -566,7 +560,6 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
-int QFFCSMaxEntEvaluationItem::getModelCount() const
-{
+int QFFCSMaxEntEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
     return 1;
 }

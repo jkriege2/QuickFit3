@@ -17,8 +17,7 @@
 
 
 */
-class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation
-{
+class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
         Q_OBJECT
     public:
         explicit QFUsesResultsByIndexEvaluation(QFProject *parent = 0, bool showRDRList=true, bool useSelection=false);

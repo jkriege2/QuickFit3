@@ -50,12 +50,22 @@ void QFUsesResultsByIndexAndModelEvaluation::setCurrentModel(int model) {
 
 
 
-int QFUsesResultsByIndexAndModelEvaluation::getModelMin(QFRawDataRecord *r, int /*index*/) const {
+int QFUsesResultsByIndexAndModelEvaluation::getModelCount(QFRawDataRecord *r, int /*index*/) const {
     return 0;
 }
 
-int QFUsesResultsByIndexAndModelEvaluation::getModelMax(QFRawDataRecord *r, int /*index*/) const {
-    return 0;
+QString QFUsesResultsByIndexAndModelEvaluation::getModelName(int model) const {
+    return tr("model %1").arg(model);
+}
+
+int QFUsesResultsByIndexAndModelEvaluation::getModelCount(QFRawDataRecord *r) const
+{
+    return getModelCount(r, getCurrentIndex());
+}
+
+int QFUsesResultsByIndexAndModelEvaluation::getModelCount() const
+{
+    return getModelCount(getHighlightedRecord(), getCurrentIndex());
 }
 
 
