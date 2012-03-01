@@ -10,13 +10,13 @@ QFUsesResultsByIndexEvaluation::~QFUsesResultsByIndexEvaluation()
 {
 }
 
-bool QFUsesResultsByIndexEvaluation::hasResults(QFRawDataRecord *r1, int index) {
+bool QFUsesResultsByIndexEvaluation::hasResults(QFRawDataRecord *r1, int index) const {
     QFRawDataRecord* r=r1;
     QString rsid=getEvaluationResultID(index);
     return r->resultsExistsFromEvaluation(rsid);
 }
 
-QString QFUsesResultsByIndexEvaluation::getEvaluationResultID(int index) {
+QString QFUsesResultsByIndexEvaluation::getEvaluationResultID(int index) const {
     return QString("%1_%2_i%3").arg(getType()).arg(getID()).arg(index);
 }
 
@@ -73,19 +73,19 @@ void QFUsesResultsByIndexEvaluation::setFitResultValueNumberArray(QFRawDataRecor
     setFitResultValueNumberArray(r, getEvaluationResultID(index), parameterID, value, N, unit);
 }
 
-QVector<double> QFUsesResultsByIndexEvaluation::getFitValueNumberArray(QFRawDataRecord *r, int index, const QString &parameterID) {
+QVector<double> QFUsesResultsByIndexEvaluation::getFitValueNumberArray(QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitValueNumberArray(r, getEvaluationResultID(index), parameterID);
 }
 
-QVector<double> QFUsesResultsByIndexEvaluation::getFitValueErrorArray(QFRawDataRecord *r, int index, const QString &parameterID) {
+QVector<double> QFUsesResultsByIndexEvaluation::getFitValueErrorArray(QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitValueErrorArray(r, getEvaluationResultID(index), parameterID);
 }
 
-double QFUsesResultsByIndexEvaluation::getFitValue(QFRawDataRecord *r, int index, const QString &parameterID) {
+double QFUsesResultsByIndexEvaluation::getFitValue(QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitValue(r, getEvaluationResultID(index), parameterID);
 }
 
-double QFUsesResultsByIndexEvaluation::getFitError(QFRawDataRecord *r, int index, const QString &parameterID) {
+double QFUsesResultsByIndexEvaluation::getFitError(QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitError(r, getEvaluationResultID(index), parameterID);
 }
 
@@ -101,7 +101,7 @@ void QFUsesResultsByIndexEvaluation::setFitResultFix(QFRawDataRecord *r, int ind
     setFitResultFix(r, getEvaluationResultID(index), parameterID, fix);
 }
 
-bool QFUsesResultsByIndexEvaluation::getFitFix(QFRawDataRecord *r, int index, const QString &parameterID) {
+bool QFUsesResultsByIndexEvaluation::getFitFix(QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitFix(r, getEvaluationResultID(index), parameterID);
 }
 

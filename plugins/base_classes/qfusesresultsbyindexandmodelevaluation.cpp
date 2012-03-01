@@ -6,23 +6,23 @@ QFUsesResultsByIndexAndModelEvaluation::QFUsesResultsByIndexAndModelEvaluation(Q
     currentModel=0;
 }
 
-bool QFUsesResultsByIndexAndModelEvaluation::hasResults(QFRawDataRecord *r1, int index, int model) {
+bool QFUsesResultsByIndexAndModelEvaluation::hasResults(QFRawDataRecord *r1, int index, int model) const {
     QFRawDataRecord* r=r1;
     QString rsid=getEvaluationResultID(index, model);
     return r->resultsExistsFromEvaluation(rsid);
 
 }
 
-QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID(int currentIndex) {
+QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID(int currentIndex) const {
     return getEvaluationResultID(currentIndex, getCurrentModel());
 }
 
-QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID() {
+QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID() const {
     return getEvaluationResultID(getCurrentIndex(), getCurrentModel());
 }
 
 
-QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID(int currentIndex, int model) {
+QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID(int currentIndex, int model) const {
     return QString("%1_%2_m%3_run%4").arg(getType()).arg(getID()).arg(model).arg(currentIndex);
 }
 
@@ -50,11 +50,11 @@ void QFUsesResultsByIndexAndModelEvaluation::setCurrentModel(int model) {
 
 
 
-int QFUsesResultsByIndexAndModelEvaluation::getModelMin(QFRawDataRecord *r, int /*index*/) {
+int QFUsesResultsByIndexAndModelEvaluation::getModelMin(QFRawDataRecord *r, int /*index*/) const {
     return 0;
 }
 
-int QFUsesResultsByIndexAndModelEvaluation::getModelMax(QFRawDataRecord *r, int /*index*/) {
+int QFUsesResultsByIndexAndModelEvaluation::getModelMax(QFRawDataRecord *r, int /*index*/) const {
     return 0;
 }
 
@@ -117,19 +117,19 @@ void QFUsesResultsByIndexAndModelEvaluation::setFitResultValueNumberArray(QFRawD
     setFitResultValueNumberArray(r, getEvaluationResultID(index, model), parameterID, value, N, unit);
 }
 
-QVector<double> QFUsesResultsByIndexAndModelEvaluation::getFitValueNumberArray(QFRawDataRecord *r, int index, int model, const QString &parameterID) {
+QVector<double> QFUsesResultsByIndexAndModelEvaluation::getFitValueNumberArray(QFRawDataRecord *r, int index, int model, const QString &parameterID) const {
     return getFitValueNumberArray(r, getEvaluationResultID(index, model), parameterID);
 }
 
-QVector<double> QFUsesResultsByIndexAndModelEvaluation::getFitValueErrorArray(QFRawDataRecord *r, int index, int model, const QString &parameterID) {
+QVector<double> QFUsesResultsByIndexAndModelEvaluation::getFitValueErrorArray(QFRawDataRecord *r, int index, int model, const QString &parameterID) const {
     return getFitValueErrorArray(r, getEvaluationResultID(index, model), parameterID);
 }
 
-double QFUsesResultsByIndexAndModelEvaluation::getFitValue(QFRawDataRecord *r, int index, int model, const QString &parameterID) {
+double QFUsesResultsByIndexAndModelEvaluation::getFitValue(QFRawDataRecord *r, int index, int model, const QString &parameterID) const {
     return getFitValue(r, getEvaluationResultID(index, model), parameterID);
 }
 
-double QFUsesResultsByIndexAndModelEvaluation::getFitError(QFRawDataRecord *r, int index, int model, const QString &parameterID) {
+double QFUsesResultsByIndexAndModelEvaluation::getFitError(QFRawDataRecord *r, int index, int model, const QString &parameterID) const {
     return getFitError(r, getEvaluationResultID(index, model), parameterID);
 }
 
@@ -145,6 +145,6 @@ void QFUsesResultsByIndexAndModelEvaluation::setFitResultFix(QFRawDataRecord *r,
     setFitResultFix(r, getEvaluationResultID(index, model), parameterID, fix);
 }
 
-bool QFUsesResultsByIndexAndModelEvaluation::getFitFix(QFRawDataRecord *r, int index, int model, const QString &parameterID) {
+bool QFUsesResultsByIndexAndModelEvaluation::getFitFix(QFRawDataRecord *r, int index, int model, const QString &parameterID) const {
     return getFitFix(r, getEvaluationResultID(index, model), parameterID);
 }

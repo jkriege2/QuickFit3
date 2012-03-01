@@ -25,14 +25,14 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
 
 
         /** \breif return \c true if an evaluation has been performed for the given record \a r1 and the given inde x\a index therein */
-        virtual bool hasResults(QFRawDataRecord* r1, int index, int model);
+        virtual bool hasResults(QFRawDataRecord* r1, int index, int model) const;
 
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(int index, int model);
-        virtual QString getEvaluationResultID(int index);
-        virtual QString getEvaluationResultID();
+        virtual QString getEvaluationResultID(int index, int model) const;
+        virtual QString getEvaluationResultID(int index) const;
+        virtual QString getEvaluationResultID() const;
 
 
 
@@ -189,14 +189,14 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual QVector<double> getFitValueNumberArray(QFRawDataRecord* r, int index, int model, const QString& parameterID);
+        virtual QVector<double> getFitValueNumberArray(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
         /*! \brief return the fit error array of a given parameter
             \param r the record to adress
             \param index the index to access
             \param parameterID the parameter id
             \return the error associated with the given parameter.
         */
-        virtual QVector<double> getFitValueErrorArray(QFRawDataRecord* r, int index, int model, const QString& parameterID);
+        virtual QVector<double> getFitValueErrorArray(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
 
 
 
@@ -213,14 +213,14 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual double getFitValue(QFRawDataRecord* r, int index, int model, const QString& parameterID);
+        virtual double getFitValue(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
         /*! \brief return the fit error of a given parameter
             \param r the record to adress
             \param index the index to access
             \param parameterID the parameter id
             \return the error associated with the given parameter.
         */
-        virtual double getFitError(QFRawDataRecord* r, int index, int model, const QString& parameterID);
+        virtual double getFitError(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
 
         /*! \brief set the error of a given parameter
 
@@ -260,14 +260,14 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
             \param parameterID the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        virtual bool getFitFix(QFRawDataRecord* r, int index, int model, const QString& parameterID);
+        virtual bool getFitFix(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
 
         void setCurrentModel(int model);
         int getCurrentModel() const;
 
 
-        virtual int getModelMin(QFRawDataRecord* r, int index);
-        virtual int getModelMax(QFRawDataRecord* r, int index);
+        virtual int getModelMin(QFRawDataRecord* r, int index) const;
+        virtual int getModelMax(QFRawDataRecord* r, int index) const;
     protected:
         /** \brief write object contents into XML file
          *

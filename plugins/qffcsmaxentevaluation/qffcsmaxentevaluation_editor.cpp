@@ -277,11 +277,21 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     hblRun->addWidget(labRun, 2);
     fl->addRow(tr("run: "), hblRun);
     layModel->addLayout(fl, 0);
+    edtAlpha=new NumberEdit(this);
+    edtAlpha->setRange(0, DBL_MAX);
+    edtAlpha->setCheckBounds(true, false);
+    edtAlpha->setDecimals(10);
+    fl->addRow(tr("MaxEnt: <i>&alpha; = </i>"), edtAlpha);
+
+
 
     labFitParameters=new QLabel(this);
     layModel->addWidget(labFitParameters);
-
-
+    widFitParams=new QFSimpleFitParametersWidget(NULL, this);
+    scrollParameters=new JKVerticalScrollArea(this);
+    scrollParameters->setWidget(widFitParams);
+    scrollParameters->setWidgetResizable(true);
+    layModel->addWidget(scrollParameters, 1);
 
     QGridLayout* layBtn=new QGridLayout(this);
     layBtn->setContentsMargins(0,0,0,0);
@@ -418,6 +428,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(item_old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
         disconnect(datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         disconnect(spinRun, SIGNAL(valueChanged(int)), this, SLOT(runChanged(int)));
+        disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbModel, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged(int)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         disconnect(cmbPlotStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotStyleChanged(int)));
@@ -427,8 +438,11 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
         disconnect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
         disconnect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
+        disconnect(widFitParams, SIGNAL(parameterChanged(QString,double)), this, SLOT(fitParamChanged()));
+
 
         spinRun->setMaximum(-1);
+        widFitParams->setParameterInterface(NULL);
     }
 
 
@@ -444,6 +458,8 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         cmbResidualStyle->setCurrentIndex(current->getProperty("plot_residualsstyle", 0).toInt());
         chkWeightedResiduals->setChecked(current->getProperty("weighted_residuals", false).toBool());
         spinResidualHistogramBins->setValue(current->getProperty("plot_residualshistogrambins", 25).toInt());
+        edtAlpha->setValue(item->getAlpha());
+        widFitParams->setParameterInterface(item);
 
         cmbModel->clear();
         for (int i=0; i<item->getModelCount(); i++) {
@@ -467,6 +483,8 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
         connect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
         connect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
+        connect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
+        connect(widFitParams, SIGNAL(parameterChanged(QString,double)), this, SLOT(fitParamChanged()));
 
         dataEventsEnabled=true;
     }
@@ -544,11 +562,17 @@ int QFFCSMaxEntEvaluationEditor::getUserMax(QFRawDataRecord* rec) {
 
 
 int QFFCSMaxEntEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index) {
-    return getUserMin(rec, index, datacut->get_userMin());
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (!data) return 0;
+    return getUserMin(rec, index, 0);
 }
 
 int QFFCSMaxEntEvaluationEditor::getUserMax(QFRawDataRecord* rec, int index) {
-    return getUserMax(rec, index, datacut->get_userMax());
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (!data) return 0;
+    QFRDRFCSDataInterface* dintf=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
+    if (dintf) return getUserMax(rec, index, dintf->getCorrelationN()-1);
+    return getUserMax(rec, index, 0);
 }
 
 void QFFCSMaxEntEvaluationEditor::setUserMin(int userMin) {
@@ -607,6 +631,7 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         if (data->getCorrelationRuns()>1) spinRun->setSuffix(QString(" / 0..%1").arg(data->getCorrelationRuns()-1));
         cmbModel->setCurrentIndex(eval->getCurrentModel());
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
+        edtAlpha->setValue(eval->getAlpha());
 
         dataEventsEnabled=true;
     }
@@ -622,6 +647,14 @@ void QFFCSMaxEntEvaluationEditor::displayParameters() {
     // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if ((!record)||(!eval)/*||(!data)*/) return;
+
+    QStringList ids, labels;
+    for (int i=0; i<eval->getParameterCount(eval->getCurrentModel()); i++) {
+        ids.append(eval->getParameterID(eval->getCurrentModel(), i));
+        labels.append(eval->getParameterName(eval->getCurrentModel(), i, true));
+    }
+    widFitParams->setParameters(ids, labels);
+    widFitParams->updateWidgetValues();
 
     if (eval->hasResults(record)) {
         if (record->resultsExists(eval->getEvaluationResultID(), "evaluation_completed")) {
@@ -1401,6 +1434,14 @@ void QFFCSMaxEntEvaluationEditor::modelChanged(int model) {
     QApplication::restoreOverrideCursor();
 }
 
+void QFFCSMaxEntEvaluationEditor::alphaChanged(double alpha) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setAlpha(alpha);
+}
+
 void QFFCSMaxEntEvaluationEditor::weightsChanged(int weights) {
     if (!dataEventsEnabled) return;
     if (!current) return;
@@ -1514,6 +1555,13 @@ void QFFCSMaxEntEvaluationEditor::residualHistogramBinsChanged(int bins) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     current->setQFProperty("plot_residualshistogrambins", spinResidualHistogramBins->value(), false, false);
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSMaxEntEvaluationEditor::fitParamChanged() {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     displayData();
     QApplication::restoreOverrideCursor();
 }

@@ -43,12 +43,12 @@ class QFWIDLIB_EXPORT QFSimpleFitParameterInterface {
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual double getFitValue(const QString& parameterID)=0;
+        virtual double getFitValue(const QString& parameterID) const=0;
         /*! \brief return the fit error of a given parameter
             \param parameterID the parameter id
             \return the error associated with the given parameter.
         */
-        virtual double getFitError(const QString& parameterID)=0;
+        virtual double getFitError(const QString& parameterID) const=0;
 
         /*! \brief set the error of a given parameter
             \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -71,7 +71,7 @@ class QFWIDLIB_EXPORT QFSimpleFitParameterInterface {
             \param parameterID the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        virtual bool getFitFix(const QString& parameterID)=0;
+        virtual bool getFitFix(const QString& parameterID) const=0;
 
 };
 

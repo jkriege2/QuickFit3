@@ -10,6 +10,7 @@
 #include "libwid_imexport.h"
 #include "qfsimplefitparameterinterface.h"
 #include <QStringList>
+#include <QSpacerItem>
 
 class QFWIDLIB_EXPORT QFSimpleFitParametersWidget : public QWidget {
         Q_OBJECT
@@ -22,6 +23,7 @@ class QFWIDLIB_EXPORT QFSimpleFitParametersWidget : public QWidget {
         void setParameters(const QStringList& ids, const QStringList& labels);
 
     signals:
+        void parameterChanged(QString id, double value);
         
     public slots:
         void updateWidgetValues();
@@ -39,8 +41,10 @@ class QFWIDLIB_EXPORT QFSimpleFitParametersWidget : public QWidget {
         QList<subWidget> widgets;
 
         QGridLayout* mainLayout;
+        QSpacerItem* spacer;
 
         QString getIDForWidget(QObject *edit);
+
 
     protected slots:
         void valueChanged(double value);

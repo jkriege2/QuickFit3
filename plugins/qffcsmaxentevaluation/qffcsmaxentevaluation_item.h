@@ -68,7 +68,7 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation 
         /** \brief return the number of parameters in the given model */
         virtual int getParameterCount(int model) const;
         /** \brief return the ID for the given parameter in the given model  */
-        virtual QString getParameterID(int model, int param);
+        virtual QString getParameterID(int model, int param) const;
 
         /** \brief return the name for current model */
         QString getCurrentModelName() const;
@@ -86,14 +86,14 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation 
             For \c model==0 this function outputs this model:
               \f[ g(\tau)=\frac{1}{N}\cdot\left(\frac{1-\theta+\theta\cdot\exp(-\tau/\tau_T)}{1-\theta}\right)\cdot\sum\limits_{i=1}^{N_D}p_{T_i}\cdot\left(1+\frac{\tau}{T_i}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\cdot T_i}\right)^{-1} \f]
           */
-        void evaluateModel(QFRawDataRecord* record, int index, int model, double* taus, double* output, uint32_t N, double* distribution_tau, double* distribution, uint32_t distributionN);
+        void evaluateModel(QFRawDataRecord* record, int index, int model, double* taus, double* output, uint32_t N, double* distribution_tau, double* distribution, uint32_t distributionN) const;
 
         /*! \brief returns an array representing the distribution for the given record, index, model combination
           */
-        QVector<double> getDistribution(QFRawDataRecord* record, int index, int model);
+        QVector<double> getDistribution(QFRawDataRecord* record, int index, int model) const;
         /*! \brief returns an array representing the distribution tau values (lag time axis) for the given record, index, model combination
           */
-        QVector<double> getDistributionTaus(QFRawDataRecord* record, int index, int model);
+        QVector<double> getDistributionTaus(QFRawDataRecord* record, int index, int model) const;
 
 
         /*! \brief calculates fit statistics for the given fit function and dataset.
@@ -105,9 +105,9 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation 
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
+        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1) const;
 
-        virtual QString getEvaluationResultID(int currentIndex, int model);
+        virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
 protected:
         
@@ -124,7 +124,7 @@ protected:
         int currentWeights;
 
         /** \brief returns default values for a parameter */
-        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue);
+        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue) const;
 
 
 };

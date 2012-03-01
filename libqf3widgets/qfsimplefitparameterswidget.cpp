@@ -8,6 +8,8 @@ QFSimpleFitParametersWidget::QFSimpleFitParametersWidget(QFSimpleFitParameterInt
 
     mainLayout=new QGridLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
+    spacer=new QSpacerItem(10,10, QSizePolicy::Preferred, QSizePolicy::Expanding);
+    mainLayout->addItem(spacer, 0, 0);
     setLayout(mainLayout);
 }
 
@@ -19,6 +21,7 @@ void QFSimpleFitParametersWidget::clearWidgets() {
     for (int i=mainLayout->count()-1; i>=0; i--) {
         mainLayout->removeItem(mainLayout->itemAt(i));
     }
+    mainLayout->addItem(spacer, 0, 0);
     for (int i=0; i<widgets.size(); i++) {
         widgets[i].label->deleteLater();
         widgets[i].edit->deleteLater();
@@ -26,6 +29,10 @@ void QFSimpleFitParametersWidget::clearWidgets() {
     widgets.clear();
     updating=oldupd;
     setUpdatesEnabled(upd);
+}
+
+void QFSimpleFitParametersWidget::setParameterInterface(QFSimpleFitParameterInterface *paraminterface) {
+    this->paraminterface=paraminterface;
 }
 
 QString QFSimpleFitParametersWidget::getIDForWidget(QObject *edit) {
@@ -40,6 +47,7 @@ void QFSimpleFitParametersWidget::valueChanged(double value) {
     QString id=getIDForWidget(sender());
     if (paraminterface && !id.isEmpty()) {
         paraminterface->setFitValue(id, value);
+        emit parameterChanged(id, value);
     }
 }
 
@@ -59,12 +67,18 @@ void QFSimpleFitParametersWidget::addParameter(const QString &id, const QString 
     QFSimpleFitParametersWidget::subWidget w;
     w.id=id;
     w.label=new QLabel(label, this);
+    w.label->setTextFormat(Qt::RichText);
     w.edit=new NumberEdit(this);
+    w.edit->setCheckBounds(false, false);
+    w.edit->setDecimals(6);
     connect(w.edit, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
     w.label->setBuddy(w.edit);
+    widgets.append(w);
+    mainLayout->removeItem(spacer);
     int row=mainLayout->rowCount();
     mainLayout->addWidget(w.label, row, 0);
-    mainLayout->addWidget(w.label, row, 1);
+    mainLayout->addWidget(w.edit, row, 1);
+    mainLayout->addItem(spacer, row+1, 0);
     updateWidgetValues();
 }
 
@@ -87,10 +101,12 @@ void QFSimpleFitParametersWidget::setParameters(const QStringList &ids, const QS
             widgets[i].label->deleteLater();
             widgets[i].edit->deleteLater();
         }
-        for (int i=0; i<cnt; i++) {
-            widgets[i].id=ids[i];
-            widgets[i].label->setText(labels[i]);
-        }
+        mainLayout->removeItem(spacer);
+        mainLayout->addItem(spacer, cnt,0);
+    }
+    for (int i=0; i<cnt; i++) {
+        widgets[i].id=ids[i];
+        widgets[i].label->setText(labels[i]);
     }
     updateWidgetValues();
 }

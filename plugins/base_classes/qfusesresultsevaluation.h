@@ -40,17 +40,17 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
 
 
         /** \brief return \c true if an evaluation has been performed for the given record \a r1 */
-        virtual bool hasResults(QFRawDataRecord* r1);
+        virtual bool hasResults(QFRawDataRecord* r1) const;
         /** \brief return \c true if an evaluation has been performed for the current record */
-        virtual bool hasResults();
+        virtual bool hasResults() const;
 
         /** \brief return \c true if an evaluation has been performed for the given record \a r1 */
-        virtual bool hasResults(QFRawDataRecord* r1, QString resultID);
+        virtual bool hasResults(QFRawDataRecord* r1, QString resultID) const;
 
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID();
+        virtual QString getEvaluationResultID() const;
 
 
 
@@ -140,12 +140,12 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual double getFitValue(const QString& parameterID);
+        virtual double getFitValue(const QString& parameterID) const;
         /*! \brief return the fit error of a given parameter
             \param parameterID the parameter id
             \return the error associated with the given parameter.
         */
-        virtual double getFitError(const QString& parameterID);
+        virtual double getFitError(const QString& parameterID) const;
 
         /*! \brief set the error of a given parameter
             \param parameterID set the value of the parameter with this id (see QFFitFunction)
@@ -168,7 +168,7 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
             \param parameterID the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        virtual bool getFitFix(const QString& parameterID);
+        virtual bool getFitFix(const QString& parameterID) const;
 
 
 
@@ -311,14 +311,14 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual QVector<double> getFitValueNumberArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
+        virtual QVector<double> getFitValueNumberArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
         /*! \brief return the fit error array of a given parameter
             \param r the record to adress
             \param resultID the result ID which to access in the raw data records result store
             \param parameterID the parameter id
             \return the error associated with the given parameter.
         */
-        virtual QVector<double> getFitValueErrorArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
+        virtual QVector<double> getFitValueErrorArray(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
 
 
 
@@ -335,14 +335,14 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual double getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
+        virtual double getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
         /*! \brief return the fit error of a given parameter
             \param r the record to adress
             \param resultID the result ID which to access in the raw data records result store
             \param parameterID the parameter id
             \return the error associated with the given parameter.
         */
-        virtual double getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
+        virtual double getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
 
         /*! \brief set the error of a given parameter
 
@@ -380,7 +380,7 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
             \param parameterID the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        virtual bool getFitFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID);
+        virtual bool getFitFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
 
         /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */
         virtual QString getParameterName(int model, int id, bool html=false) const;
@@ -389,7 +389,7 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
         /** \brief return the number of parameters in the given model */
         virtual int getParameterCount(int model) const;
         /** \brief return the ID for the given parameter in the given model  */
-    virtual QString getParameterID(int model, int param);
+    virtual QString getParameterID(int model, int param) const;
 
     virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error);
 signals:
@@ -449,10 +449,10 @@ signals:
 
 
         /** \brief return a valid ID to access parameterStore for the given parameter (id) */
-        virtual QString getParameterStoreID(QString parameter);
+        virtual QString getParameterStoreID(QString parameter) const;
 
         /** \brief return a valid ID to access parameterStore for the given parameter (id) */
-        virtual QString getParameterStoreIDInQSettings(QString parameter);
+        virtual QString getParameterStoreIDInQSettings(QString parameter) const;
 
         virtual void intReadData(QDomElement *e);
         virtual void intWriteData(QXmlStreamWriter &w);
@@ -462,10 +462,10 @@ signals:
         virtual QString transformResultID(const QString& resultID) const;
 
         /** \brief returns an ID for a given fit parameter (i.e. prepends \c fitparam_ and if \a fix is \c true, also appends \c _fix ) */
-        virtual QString getFitParamID(QString fitparam);
+        virtual QString getFitParamID(QString fitparam) const;
 
         /** \brief returns an ID for a given fit parameter fix (i.e. prepends \c fitparam_ and appends \c _fix ) */
-        virtual QString getFitParamFixID(QString fitparam);
+        virtual QString getFitParamFixID(QString fitparam) const;
 
         /*! \brief allows to draw certain fit parameters from other sources (e.g. copy a property of the underlying record
 
@@ -477,7 +477,7 @@ signals:
             \return \c true if a special value is found. In that case it returns the value in \a value and \a error
 
          */
-        virtual bool hasSpecial(QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error);
+        virtual bool hasSpecial(QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error) const;
         /*! \brief struct used to describe fit parameter default values */
         struct FitParameterDefault {
             double value;
@@ -491,7 +491,7 @@ signals:
         };
 
         /** \brief returns default values for a parameter */
-        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, FitParameterDefault& defaultValue);
+        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, FitParameterDefault& defaultValue) const;
 
 
 };

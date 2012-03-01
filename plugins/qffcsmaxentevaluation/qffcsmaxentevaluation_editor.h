@@ -37,6 +37,7 @@
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfsimplefitparameterswidget.h"
 
 
 /*! \brief editor for QFFCSMaxEntEvaluationItem
@@ -92,6 +93,7 @@ class QFFCSMaxEntEvaluationEditor : public QFEvaluationEditor {
         void runChanged(int run);
         void weightsChanged(int weights);
         void modelChanged(int model);
+        void alphaChanged(double alpha);
         void slidersChanged(int userMin, int userMax, int min, int max);
         void residualHistogramBinsChanged(int bins);
         void chkWeightedResidualsToggled(bool checked);
@@ -100,6 +102,7 @@ class QFFCSMaxEntEvaluationEditor : public QFEvaluationEditor {
         void plotStyleChanged(int style);
         void chkGridToggled(bool checked);
         void chkXLogScaleToggled(bool checked);
+        void fitParamChanged();
 
         void updateFitFunctions();
 
@@ -187,6 +190,12 @@ class QFFCSMaxEntEvaluationEditor : public QFEvaluationEditor {
         QPushButton* btnCopyToAllRuns;
         /** \brief copy current parameter set to all files (but therein just the current run & initial parameters */
         QPushButton* btnCopyToAllCurrentRun;
+        /** \brief widget for fit parameters  */
+        QFSimpleFitParametersWidget* widFitParams;
+        /** \brief scroll area for widFitParams */
+        JKVerticalScrollArea* scrollParameters;
+        /** \brief number edit to change alpha */
+        NumberEdit* edtAlpha;
 
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */
