@@ -23,7 +23,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qffitresultsbyindexevaluationeditorbase.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
     ../interfaces/qfrdrimagetoruninterface.h \
-    ../base_classes/qffitresultsbyindexasvectorevaluation.h
+    ../base_classes/qffitresultsbyindexasvectorevaluation.h \
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -34,7 +35,8 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffitresultsevaluationeditorbase.cpp\
     ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp \
     ../base_classes/qffitresultsevaluation.cpp \
-    ../base_classes/qffitresultsbyindexasvectorevaluation.cpp
+    ../base_classes/qffitresultsbyindexasvectorevaluation.cpp \
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp
 
 
 FORMS =    

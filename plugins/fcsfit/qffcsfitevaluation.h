@@ -114,6 +114,7 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         using QFFitResultsByIndexEvaluation::getEvaluationResultID;
 
 
+        virtual QString getIndexName(QFRawDataRecord *rec, int index);
 };
 
 #endif // QFFCSFITEVALUATION_H

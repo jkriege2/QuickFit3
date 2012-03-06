@@ -29,6 +29,14 @@ QFFCSFitEvaluation::~QFFCSFitEvaluation() {
 }
 
 
+QString QFFCSFitEvaluation::getIndexName(QFRawDataRecord *rec, int index) {
+    QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    if (fcs) {
+        return fcs->getCorrelationRunName(index);
+    }
+    return QFFitResultsByIndexEvaluation::getIndexName(rec, index);
+}
+
 void QFFCSFitEvaluation::intWriteDataAlgorithm(QXmlStreamWriter& w) const {
     if (m_weighting==EqualWeighting) w.writeAttribute("weighting", "equal");
     if (m_weighting==StdDevWeighting) w.writeAttribute("weighting", "stddev");

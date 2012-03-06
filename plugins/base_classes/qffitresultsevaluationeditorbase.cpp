@@ -13,6 +13,10 @@ QFFitResultsEvaluationEditorBase::QFFitResultsEvaluationEditorBase(QString iniPr
     m_iniPrefix=iniPrefix;
     m_currentFPSSaveDir="";
     m_currentSaveDirectory="";
+    actSaveReport=new QAction(QIcon(":/lib/savereport.png"), tr("Save Report"), this);
+    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+    actPrintReport=new QAction(QIcon(":/lib/printreport.png"), tr("Print Report"), this);
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
 }
 
 
@@ -225,7 +229,7 @@ void QFFitResultsEvaluationEditorBase::createReportDoc(QTextDocument* document) 
 void QFFitResultsEvaluationEditorBase::saveReport() {
     QString fn = qfGetSaveFileName(this, tr("Save Report"),
                                 m_currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+                                tr("PDF File (*.pdf);;PostScript File (*.ps);;Open Document Format (*.odf);;HTML (*.html)"));
 
     if (!fn.isEmpty()) {
         m_currentSaveDirectory=QFileInfo(fn).absolutePath();
@@ -242,12 +246,20 @@ void QFFitResultsEvaluationEditorBase::saveReport() {
         printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
         QTextDocument* doc=new QTextDocument();
         doc->setTextWidth(printer->pageRect().size().width());
         createReportDoc(doc);
-        doc->print(printer);
+        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+            printer->setOutputFileName(fn);
+            doc->print(printer);
+        } else if (fi.suffix().toLower()=="odf") {
+            QTextDocumentWriter writer(fn, "odf");
+            writer.write(doc);
+        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
+            QTextDocumentWriter writer(fn, "html");
+            writer.write(doc);
+        }
         //qDebug()<<doc->toHtml();
         delete doc;
         delete printer;

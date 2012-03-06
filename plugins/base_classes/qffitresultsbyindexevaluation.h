@@ -49,6 +49,9 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         /** \brief set the current index to use */
         int getCurrentIndex();
 
+        /** \brief return a name for the given index */
+        virtual QString getIndexName(QFRawDataRecord *rec, int index);
+
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
 
             The value may be stored at different positions:

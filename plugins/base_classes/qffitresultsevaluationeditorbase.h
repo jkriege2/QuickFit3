@@ -24,6 +24,8 @@
 #include <QGridLayout>
 #include <QTabBar>
 #include <QTextDocument>
+#include <QFileInfo>
+#include <QTextDocumentWriter>
 #include "qffitparameterwidget.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
@@ -179,7 +181,7 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
          *  For correct sizing of the plots: set the textWidth of the document before calling this function!
          */
         virtual void createReportDoc(QTextDocument* document);
-    private:
+
         /** \brief last save/load directory in saveCurrentFitResults() and loadCurrentFitResults() */
         QString m_currentFPSSaveDir;
 

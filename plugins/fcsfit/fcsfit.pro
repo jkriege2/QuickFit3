@@ -22,7 +22,8 @@ HEADERS +=  qfpevalfcsfit.h \
             ../base_classes/qffitresultsbyindexevaluation.h \
             ../base_classes/qffitresultsevaluationeditorbase.h \
             ../base_classes/qffitresultsbyindexevaluationeditorbase.h \
-            ../interfaces/qfrdrsimplecountrateinterface.h
+            ../interfaces/qfrdrsimplecountrateinterface.h \
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \
@@ -33,7 +34,8 @@ SOURCES +=  qfpevalfcsfit.cpp \
             ../base_classes/qffitresultsevaluation.cpp \
             ../base_classes/qffitresultsbyindexevaluation.cpp \
             ../base_classes/qffitresultsevaluationeditorbase.cpp\
-            ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp
+            ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp \
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui

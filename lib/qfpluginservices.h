@@ -143,7 +143,7 @@ class QFPluginServices {
         /*! \brief return a pointer to a given toolbar, or NULL
 
             \param toolbar the toolbar to return. Some common toolbars are predefined: \c \"file\", \c \"data\",
-                   \c \"extensions\"
+                   \c \"extensions\", \c \"data/rdr\", \c \"data/eval\"
             \return a pointer to the given toolbar, or NULL if an invalid \a toolbar name was given.
 
          */

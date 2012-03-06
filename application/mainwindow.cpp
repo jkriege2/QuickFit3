@@ -729,6 +729,8 @@ void MainWindow::createMenus() {
 
     menus["file"]=fileMenu;
     menus["data"]=dataMenu;
+    menus["data/rdr"]=insertItemMenu;
+    menus["data/eval"]=evaluationMenu;
     menus["extensions"]=extensionMenu;
     menus["help"]=helpMenu;
 }

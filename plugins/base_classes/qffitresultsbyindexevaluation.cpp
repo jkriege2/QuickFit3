@@ -203,6 +203,10 @@ int QFFitResultsByIndexEvaluation::getCurrentIndex() {
     return index;
 }
 
+QString QFFitResultsByIndexEvaluation::getIndexName(QFRawDataRecord *rec, int index) {
+    return QString::number(index);
+}
+
 
 /*! \brief reset the all fit results to the initial/global/default value in the current file, but all indexs */
 void QFFitResultsByIndexEvaluation::resetAllFitResultsCurrentFileAllIndices() {
