@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/photoncounts">
+        <file alias="qfrdrphotoncounts.png">images/qfrdrphotoncounts.png</file>
+        <file alias="qfrdrphotoncounts_small.png">images/qfrdrphotoncounts_small.png</file>
+    </qresource>
+</RCC>

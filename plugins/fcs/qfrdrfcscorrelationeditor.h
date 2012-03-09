@@ -13,6 +13,23 @@
 #include <QAbstractTableModel>
 #include "datacutslider.h"
 #include "qvisiblehandlesplitter.h"
+/*! \brief model for runs in QFRDRFCSCorrelationEditor
+    \ingroup qf3rdrdp_fcs
+*/
+class QFRDRFCSCorrelationEditorRunsModel: public QAbstractTableModel {
+        Q_OBJECT
+    public:
+        QFRDRFCSCorrelationEditorRunsModel(QObject* parent=NULL);
+        void setCurrent(QFRawDataRecord* current);
+        virtual QVariant data(const QModelIndex &index, int role) const;
+        virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+        virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+        virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    protected:
+        QFRawDataRecord* current;
+};
+
 
 /*! \brief editor for FCS correlation curves
     \ingroup qf3rdrdp_fcs
@@ -20,20 +37,9 @@
 class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         Q_OBJECT
     protected:
-        class runsModel: public QAbstractTableModel {
-            public:
-                runsModel(QObject* parent=NULL);
-                void setCurrent(QFRawDataRecord* current);
-                virtual QVariant data(const QModelIndex &index, int role) const;
-                virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-                virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-                virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-                virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-            protected:
-                QFRawDataRecord* current;
-        };
 
-        runsModel runs;
+
+        QFRDRFCSCorrelationEditorRunsModel runs;
     public:
         /** Default constructor */
         QFRDRFCSCorrelationEditor(QFPluginServices* services, QWidget* parent);

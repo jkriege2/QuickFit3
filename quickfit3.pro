@@ -36,6 +36,10 @@ SUBDIRS += plg_imfcsfit
 plg_imfcsfit.subdir = ./plugins/imfcsfit
 plg_imfcsfit.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfrdrphotoncounts
+plg_qfrdrphotoncounts.subdir = ./plugins/qfrdrphotoncounts
+plg_qfrdrphotoncounts.depends = lib libqf3widgets
+
 SUBDIRS += plg_fcsmaxent
 plg_fcsmaxent.subdir = ./plugins/qffcsmaxentevaluation
 plg_fcsmaxent.depends = lib libqf3widgets

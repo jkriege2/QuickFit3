@@ -67,26 +67,28 @@ class QFRDRCountRatesInterface
 
 
         /** \brief calculate the mean value of the count rate */
-        virtual double calcRateMean(int run=0)=0;
+        //virtual double calcRateMean(int run=0)=0;
         /** \brief calculate the standard deviation of the count rate */
-        virtual double calcRateStdDev(int run=0)=0;
+        //virtual double calcRateStdDev(int run=0)=0;
         /** \brief return the mean value of the count rate, as last calculated by a call to calcRateMean() */
         virtual double getRateMean(int run=0)=0;
         /** \brief return the standard deviation of the count rate, as last calculated by a call to calcRateStdDev()  */
         virtual double getRateStdDev(int run=0)=0;
         /** \brief calculate minimum and maximum count rates */
-        virtual void calcRateMinMax(int run, double& min, double& max)=0;
+        //virtual void calcRateMinMax(int run, double& min, double& max)=0;
+        /** \brief calculate minimum and maximum count rates */
+        virtual void getRateMinMax(int run, double& min, double& max)=0;
 
         /** \brief set the number of datapoints in every binned count rate run.
          *
          * \note this function does only take effect BEFORE loading a dataset!
          *       If you want to recalculate the binned count rate call calcBinnedRate() afterwards!
          */
-        virtual void setBinnedRateN(int value)=0;
+        //virtual void setBinnedRateN(int value)=0;
 
         /** \brief this function changes the size of the binned count rate and recalculates it
          *         depending on the value of autoCalcRateN. */
-        virtual void calcBinnedRate()=0;
+        //virtual void calcBinnedRate()=0;
 };
 
 Q_DECLARE_INTERFACE( QFRDRCountRatesInterface,

@@ -294,8 +294,35 @@ void QFHTMLHelpWindow::print() {
 QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QString result;
 
+    QFontDatabase fontdb;
+    QStringList fonts=fontdb.families();
+
     JKQTmathText mathParser(this);
-    mathParser.set_fontSize(11);
+    mathParser.set_fontSize(12);
+    if (fonts.contains("Times New Roman")) {
+        //qDebug()<<"using Times New Roman";
+        mathParser.set_fontRoman("Times New Roman");
+        mathParser.set_fontMathRoman("Times New Roman");
+    }
+    if (fonts.contains("Arial")) {
+        //qDebug()<<"using Arial";
+        mathParser.set_fontSans("Arial");
+        mathParser.set_fontMathSans("Arial");
+    } else if (fonts.contains("Helvetica")) {
+        //qDebug()<<"using Helvetica";
+        mathParser.set_fontSans("Helvetica");
+        mathParser.set_fontMathSans("Helvetica");
+    }
+    if (!fonts.contains("Symbol")) {
+        //qDebug()<<"no Symbol";
+        mathParser.useAnyUnicode(mathParser.get_fontRoman(), mathParser.get_fontSans());
+    }
+    if (fonts.contains("Courier")) {
+        //qDebug()<<"using Courier";
+        mathParser.set_fontTypewriter("Courier");
+    }
+    //qDebug()<<fonts;
+
     // read HTML file
     QFile file(QFileInfo(filename).absoluteFilePath());
     QString fileDir=QFileInfo(filename).absolutePath();
@@ -578,7 +605,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math|bmath)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
@@ -586,13 +613,16 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex=rxLaTeX.cap(2).trimmed();
 
-                if (command=="math") {
+                if (command=="math" || command=="bmath") {
                     QPixmap pix(300,100);
                     QPainter p(&pix);
+                    p.setRenderHint(QPainter::Antialiasing);
+                    p.setRenderHint(QPainter::HighQualityAntialiasing);
+                    p.setRenderHint(QPainter::TextAntialiasing);
                     mathParser.parse(latex);
                     QSizeF size=mathParser.getSize(p);
                     p.end();
-                    pix=QPixmap(size.width()*1.1, size.height()*1.1);
+                    pix=QPixmap(size.width()*1.2, size.height()*1.1);
                     pix.fill(Qt::transparent);
                     p.begin(&pix);
                     mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
@@ -601,7 +631,11 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
                     pix.save(texfilename);
 
-                    result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: top; \" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                    if (command=="bmath") {
+                        result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
+                    } else {
+                        result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                    }
                 }
 
                 ++count;

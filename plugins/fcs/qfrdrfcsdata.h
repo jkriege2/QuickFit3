@@ -78,7 +78,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
         QStringList getExportFiletypes() {
             QStringList sl;
-            sl << "CSV" << "SYLK";
+            //sl << "CSV" << "SYLK";
             return sl;
         };
         /** \brief returns the title of the Export file dialog */
@@ -181,6 +181,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
 
         /** \brief calculate minimum and maximum count rates */
         virtual void calcRateMinMax(int run, double& min, double& max);
+        /** \brief calculate minimum and maximum count rates */
+        virtual void getRateMinMax(int run, double& min, double& max);
         /** \brief recalculate correlation curve mean and standard deviation */
         virtual void recalculateCorrelations();
 
@@ -289,6 +291,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
 
         QMap<int, double> rateMean;
         QMap<int, double> rateStdDev;
+        QMap<int, double> rateMin;
+        QMap<int, double> rateMax;
 
         /** \brief if positive this is the number of datapoints to which the countrate
          *         shall be binned in the binnedRate field. */

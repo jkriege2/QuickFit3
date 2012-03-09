@@ -43,5 +43,8 @@
         <file alias="plot_lines.png">icons/fcsplot_lines.png</file>
         <file alias="plot_points.png">icons/fcsplot_points.png</file>
         <file alias="plot_pointslines.png">icons/fcsplot_pointslines.png</file>
+        <file alias="plot_bars.png">icons/fcsplot_bars.png</file>
+        <file alias="plot_steps.png">icons/fcsplot_steps.png</file>
+        <file alias="plot_impulses.png">icons/fcsplot_impulses.png</file>
     </qresource>
 </RCC>

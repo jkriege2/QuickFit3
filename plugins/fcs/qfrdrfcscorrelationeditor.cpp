@@ -2,19 +2,19 @@
 #include "qfrdrfcsdata.h"
 
 
-QFRDRFCSCorrelationEditor::runsModel::runsModel(QObject* parent):
+QFRDRFCSCorrelationEditorRunsModel::QFRDRFCSCorrelationEditorRunsModel(QObject* parent):
     QAbstractTableModel(parent)
 {
     current=NULL;
 }
 
-void QFRDRFCSCorrelationEditor::runsModel::setCurrent(QFRawDataRecord* current) {
+void QFRDRFCSCorrelationEditorRunsModel::setCurrent(QFRawDataRecord* current) {
     this->current=current;
     reset();
 };
 
 
-QVariant QFRDRFCSCorrelationEditor::runsModel::data(const QModelIndex &index, int role) const {
+QVariant QFRDRFCSCorrelationEditorRunsModel::data(const QModelIndex &index, int role) const {
     if (!current || !index.isValid()) return QVariant();
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     if (role==Qt::BackgroundColorRole) {
@@ -58,22 +58,22 @@ void QFRDRFCSCorrelationEditor::includeRuns() {
 }
 
 
-Qt::ItemFlags QFRDRFCSCorrelationEditor::runsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QFRDRFCSCorrelationEditorRunsModel::flags(const QModelIndex &index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-QVariant QFRDRFCSCorrelationEditor::runsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QFRDRFCSCorrelationEditorRunsModel::headerData(int section, Qt::Orientation orientation, int role) const {
     return QVariant();
 }
 
-int QFRDRFCSCorrelationEditor::runsModel::rowCount(const QModelIndex &parent) const {
+int QFRDRFCSCorrelationEditorRunsModel::rowCount(const QModelIndex &parent) const {
     if (!current) return 0;
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     if (m) return 1+m->getCorrelationRuns();
     return 1;
 }
 
-int QFRDRFCSCorrelationEditor::runsModel::columnCount(const QModelIndex &parent) const {
+int QFRDRFCSCorrelationEditorRunsModel::columnCount(const QModelIndex &parent) const {
     return 1;
 }
 

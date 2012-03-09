@@ -118,6 +118,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     cmbRunDisplay->addItem(tr("all runs"));
     cmbRunDisplay->addItem(tr("all runs (highlighted)"));
     cmbRunDisplay->addItem(tr("used runs"));
+    cmbRunDisplay->addItem(tr("selected run"));
     connect(cmbRunDisplay, SIGNAL(currentIndexChanged(int)), this, SLOT(runsModeChanged(int)));
     lstRunsSelect=new QListView(w);
     lstRunsSelect->setModel(&runs);
@@ -213,8 +214,7 @@ void QFRDRFCSRateEditor::selectionChanged(const QItemSelection & current, const 
 }
 
 void QFRDRFCSRateEditor::runsModeChanged(int c) {
-    if (cmbRunDisplay->currentIndex()<=1) lstRunsSelect->setEnabled(true);
-    else lstRunsSelect->setEnabled(false);
+    lstRunsSelect->setEnabled((cmbRunDisplay->currentIndex()<=1) || (cmbRunDisplay->currentIndex()==3));
     replotData();
 }
 
@@ -343,6 +343,41 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
         } else if (cmbRunDisplay->currentIndex()==2) { // plot only selected runs
             for (unsigned int i=0; i<rateRuns; i++) {
                 if (!m->leaveoutRun(i)) {
+                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
+
+                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
+                    g->set_lineWidth(1);
+                    g->set_xColumn(c_tau);
+                    g->set_yColumn(c_run);
+                    g->set_title(tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name));
+                    plotter->addGraph(g);
+                    if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
+                        double mean=m->calcRateMean(i);
+                        double stddev=m->calcRateStdDev(i);
+                        double mi,ma;
+                        m->calcRateMinMax(i, mi, ma);
+                        labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name);
+                        if (chkDisplayAverage->isChecked()) {
+                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                            QColor c=g->get_color().darker().darker();
+                            r->set_color(g->get_color().darker().darker());
+                            r->set_centerColor(g->get_color().darker());
+                            r->set_rangeMin(mean-stddev);
+                            r->set_rangeMax(mean+stddev);
+                            r->set_plotCenterLine(true);
+                            r->set_rangeCenter(mean);
+                            c.setAlphaF(0.2);
+                            r->set_fillColor(c);
+                            //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
+                            plotter->addGraph(r);
+
+                        }
+                    }
+                }
+            }
+        }  else if (cmbRunDisplay->currentIndex()==3) { // plot only current run
+            for (unsigned int i=0; i<rateRuns; i++) {
+                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                     size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
 
                     JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());

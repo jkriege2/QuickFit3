@@ -98,6 +98,8 @@ void QFRDRFCSData::resizeRates(long long N, int runs) {
     emitRawDataChanged();
     rateMean.clear();
     rateStdDev.clear();
+    rateMin.clear();
+    rateMax.clear();
 }
 
 void QFRDRFCSData::resizeBinnedRates(long long N) {
@@ -126,11 +128,12 @@ void QFRDRFCSData::calcBinnedRate() {
     if (binnedRateN<=0 && autoCalcRateN>0) {*/
         d=(long long)ceil((double)rateN/(double)autoCalcRateN);
         N=(long long)ceil((double)rateN/(double)d);
-        if ((double)rateN/(double)autoCalcRateN<=1) N=0;
+        if ((double)rateN/(double)autoCalcRateN<1) N=rateN;
         resizeBinnedRates(N);
+        //qDebug()<<"rate N="<<N<<"    binnedRateN="<<binnedRateN;
     //}
     if (binnedRateN>0) {
-        if (N!=binnedRateN) resizeBinnedRates(N);
+        //if (N!=binnedRateN) resizeBinnedRates(N);
         for (long run=0; run<rateRuns; run++) {
             for (long long i=0; i<binnedRateN; i++) {
                 long long jmin=i*d;
@@ -241,7 +244,7 @@ double QFRDRFCSData::calcRateStdDev(int run) {
     }
     double m=0.0;
     double s=0.0;
-    if (run<rateRuns) {
+    if (run<rateRuns && run>=0) {
         for (long long i=0; i<rateN; i++) {
             double v=rate[run*rateN+i];
             m=m+v;
@@ -268,6 +271,18 @@ void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max) {
             if (r<min) min=r;
         }
     }
+    rateMin[run]=min;
+    rateMax[run]=max;
+}
+
+void QFRDRFCSData::getRateMinMax(int run, double &min, double &max) {
+    min=0;
+    max=0;
+    if (!(rateMin.contains(run) && rateMax.contains(run))) {
+        calcRateMinMax(run, min, max);
+    }
+    min=rateMin.value(run, 0);
+    max=rateMax.value(run, 0);
 }
 
 
@@ -315,6 +330,8 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
 
     rateMean.clear();
     rateStdDev.clear();
+    rateMin.clear();
+    rateMax.clear();
 
     if (filetype.toUpper()=="ALV5000") {
         if (files.size()<=0) {
@@ -342,7 +359,7 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
         loadCountRatesFromCSV(files[0]);
     } else if (filetype.toUpper()=="CSV_CORR_RATE") {
         if (files.size()<=1) {
-            setError(tr("there are too few files in the FCS record!"));
+            setError(tr("there are too few files in the FCS record (2 required)!"));
             return;
         }
         loadCorrelationCurvesFromCSV(files[0]);
@@ -357,6 +374,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
+    double ratefactor=getProperty("CSV_RATEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", ",").toString().toStdString();
@@ -373,7 +391,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
             rateT[l]=tab.get(0, l)*timefactor;
             //std::cout<<correlationT[l]<<", ";
             for (int c=1; c<columns; c++) {
-                rate[(c-1)*rateN+l]=tab.get(c, l);
+                rate[(c-1)*rateN+l]=tab.get(c, l)*ratefactor;
                 //std::cout<<correlation[(c-1)*correlationN+l]<<", ";
                 //std::cout<<"c="<<c<<std::endl;
             }
@@ -386,6 +404,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
     }
     //std::cout<<"opening CSV: "<<filename.toStdString()<<" ... DONE!\n";
     emitRawDataChanged();
+    if (rateN<1000) autoCalcRateN=rateN;
     calcBinnedRate();
     return true;
 }
@@ -656,6 +675,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
     recalculateCorrelations();
 
    // std::cout<<"calc binned rates ..."<<std::endl;
+    autoCalcRateN=rateN;
     calcBinnedRate();
     //std::cout<<"DONE !!!"<<std::endl;
     emitRawDataChanged();

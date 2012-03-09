@@ -12,42 +12,76 @@ This implements a Levenberg-Marquardt Least-Squares scheme using the library
 open source implementation of the Levenberg-Marquardt fitting algorithm
 which is widely used in different open source projects. For details, see the <a href="copyright.html">copyright information</a></p>
 <p>
-The next lines will give a short (and basic) description of the
-Levenberg-Marquardt method, as it is also described in
+<h2>The Levenberg-Marquardt Algorithm</h2>
+This paragraph will give a short (and basic) description of the Levenberg-Marquardt method, as it is also described in
 <blockquote><b>[PRE92]</b> Press, W. H., Teukolsky, S. A., Vetterling, W. T. und Flannery, B. P.: <b>Numerical Recipes in C.</b>
 The Art of Scientific Computing. 2. Auflage, Cambridge University
 Press, Cambridge - New York - Port Chester - Melbourne - Sydney,
-1992</blockquote></p><p>
-We start from a least-squares score function </p><p class="formulaDsp">
+1992</blockquote></p>
+<h3>Trust Region and Steepest Descent Optimization</h3>
+<p>We start from a least-squares score function </p><p class="formulaDsp">
 <blockquote><img  style="text-align: center;"  alt="\[ \chi^2(\vec{p})=\sum\limits_{i=1}^N\frac{\bigl(y_i-m(\tau_i, \vec{p})\bigr)^2}{\sigma_i^2} \]" src="form_213.png"></blockquote>
-</p><p>
+</p>
+
+<p>
  which we want to minimize with respect to the M parameters <img style="vertical-align: middle;"  alt="$ \vec{p}=(p_1,...,p_M)^t $" src="form_210.png">, i.e. we want to solve the minimization problem </p><p  style="vertical-align: middle;" >
-<blockquote><img  style="text-align: center;"  alt="\[ \min\limits_{\vec{p}}\chi^2(\vec{p}) \]" src="form_214.png"></blockquote>
-</p><p>
+ <blockquote><img  style="text-align: center;"  alt="\[ \min\limits_{\vec{p}}\chi^2(\vec{p}) \]" src="form_214.png"></blockquote>
+</p>
+
+<p>
  with the N measured data points <img style="vertical-align: middle;"  alt="$ (\tau_i, y_i)_{i=1..N} $" src="form_215.png">.</p><p>
-To do so we first note that it should be possible to approximate <img style="vertical-align: middle;"  alt="$ \chi^2 $" src="form_41.png"> by a quadratic form, if the local interval we look at is small enough. In this approximative case we have: </p><p  style="vertical-align: middle;" >
-<blockquote><img  style="text-align: center;"  alt="\[ \chi^2(\vec{p})\approx \gamma+\vec{d}\cdot\vec{p}+\frac{1}{2}\vec{p}\cdot\underline{H}\cdot\vec{p} \]" src="form_265.png"></blockquote>
-</p><p>
- Here <img style="vertical-align: middle;"  alt="$ \vec{d}=\vec{\nabla}\chi^2(\vec{p}_{opt}) $" src="form_266.png"> is the gradient of the function in the optimum <img style="vertical-align: middle;"  alt="$ \vec{p}_{opt} $" src="form_267.png"> which has to be 0 for an extremum. <img style="vertical-align: middle;"  alt="$ \underline{H}=(H_{i,j})=\frac{\partial^2\chi^2}{\partial p_i\;\partial p_j} $" src="form_268.png"> is the Hessian matrix or the matrix of the second derivatives also evaluated at <img style="vertical-align: middle;"  alt="$ \vec{p}_{opt} $" src="form_267.png">.</p><p>
-If this approximation is valid, one may <em>jump to the minimum of this quadratic form in one single leap</em>. Say the current parameter estimation is <img style="vertical-align: middle;"  alt="$ \vec{p}_{cur} $" src="form_261.png">, then the optimal parameter vector is </p><p  style="vertical-align: middle;" >
-<blockquote><img  style="text-align: center;"  alt="\[ \vec{p}_{opt}=\vec{p}_{cur}+\underline{H}^{-1}\cdot\bigl[-\vec{\nabla}\chi^2(\vec{p}_{cur})\bigr]. \]" src="form_262.png"></blockquote>
-</p><p>
- This result may be optained from the above approximation if you demand <img style="vertical-align: middle;"  alt="$ \vec{\nabla}\chi^2 $" src="form_258.png"> to vanish at <img style="vertical-align: middle;"  alt="$ \vec{p}=\vec{p}_{opt}. $" src="form_269.png"> Note that <img style="vertical-align: middle;"  alt="$ \vec{d} $" src="form_270.png"> and <img style="vertical-align: middle;"  alt="$ \underline{H} $" src="form_271.png"> have to be known constants, so the algorithm has to estimate these to do the jump.</p><p>
-If the above approximation is not valid we can not do much more than do a leap in the direction of the <em>steepest descent:</em> </p><p  style="vertical-align: middle;" >
-<blockquote><img  style="text-align: center;"  alt="\[ \vec{p}_{nex}=\vec{p}_{cur}-c\cdot\vec{\nabla}\chi^2(\vec{p}_{cur}) \]" src="form_264.png"></blockquote>
-</p><p>
- Here c denotes a positive constant which influences the jump size.</p><p>
-The Levenberg-Marquardt method is designed to vary smoothly between the
-two extremal cases described here. It uses the fact that the form of
-the function <img style="vertical-align: middle;"  alt="$ \chi^2(\vec{p}) $" src="form_272.png"> is known to be a quadratic form. So it is easy to estimate the first and second dervative if <img style="vertical-align: middle;"  alt="$ \chi^2(\vec{p}) $" src="form_272.png"> if the user provides the derivatives of the model function <img style="vertical-align: middle;"  alt="$ \bigl(\vec{\nabla}_{\vec{p}}m\bigr)(x,\vec{p}). $" src="form_274.png"></p><p>
+ To do so we first note that it should be possible to approximate <img style="vertical-align: middle;"  alt="$ \chi^2 $" src="form_41.png"> by a quadratic form, if the local interval we look at is small enough. In this approximative case we have: </p><p  style="vertical-align: middle;" >
+ <blockquote><img  style="text-align: center;"  alt="\[ \chi^2(\vec{p})\approx \gamma+\vec{d}\cdot\vec{p}+\frac{1}{2}\vec{p}\cdot\underline{H}\cdot\vec{p} \]" src="form_265.png"></blockquote>
+</p>
+
+<p>
+ Here <img style="vertical-align: middle;"  alt="$ \vec{d}=\vec{\nabla}\chi^2(\vec{p}_{opt}) $" src="form_266.png"> is the gradient of the function in the optimum <img style="vertical-align: middle;"  alt="$ \vec{p}_{opt} $" src="form_267.png"> which has to be 0 for an extremum. <img style="vertical-align: middle;"  alt="$ \underline{H}=(H_{i,j})=\frac{\partial^2\chi^2}{\partial p_i\;\partial p_j} $" src="form_268.png"> is the Hessian matrix or the matrix of the second derivatives also evaluated at <img style="vertical-align: middle;"  alt="$ \vec{p}_{opt} $" src="form_267.png">. As the minimum of a quadratic function can be calculated analytically, we can write the solution of the approximate optimization problem as:
+ <blockquote><img  style="text-align: center;"  alt="\[ \vec{p}_{opt}=\vec{p}_{cur}+\underline{H}^{-1}\cdot\bigl[-\vec{\nabla}\chi^2(\vec{p}_{cur})\bigr]. \]" src="form_262.png"></blockquote>
+ This result may be obtained from the above approximation if you demand <img style="vertical-align: middle;"  alt="$ \vec{\nabla}\chi^2 $" src="form_258.png"> to vanish at <img style="vertical-align: middle;"  alt="$ \vec{p}=\vec{p}_{opt}. $" src="form_269.png"> Note that <img style="vertical-align: middle;"  alt="$ \vec{d} $" src="form_266.png"> and <img style="vertical-align: middle;"  alt="$ \underline{H} $" src="form_268.png"> have to be known in order to calculate $$math:\vec{p}_{\rm{opt}}$$.
+</p>
+
+<p>As the given quadratic function is just an approximation, an algorithm might have to calculate $$math:\vec{p}_{\rm{opt}}$$ repeatedly with increasing accuracy:
+ <ol>
+   <li>start with a given parameter vector $$math:\vec{p}^{(0)}$$</li>
+   <li>calculate the hessian $$math:\ul{H}^{(i)}$$, it's inverse $$math:(\ul{H}^{(i)})^{-1}$$ and gradient $$math:\ul{\vec{d}}^{(i)}$$ using the current best fit $$math:\vec{p}^{(i)}$$</li>
+   <li>find the optimum of the quadratic form defined by $$math:\ul{H}^{(i)}$$ and $$math:\vec{d}^{(i)}$$: $$bmath:\vec{p}^{(i+1)}=\vec{p}^{(i)}-(\underline{H}^{(i)})^{-1}\cdot\vec{d}^{(i)}$$</li>
+   <li>if the algorithm did not converge yet, return to step 2 </li>
+ </ol>
+As the inverse hessian matrix and the gradient are usually not known analytically, they have to be estimated by the algorithm. The gradient is estimated using standard numerical derivation techniques. As calculating second derivatives numerically is very time consuming and especially matrix inversion is not very stable, many algorithms use an update scheme to not only estimate the optimal solution step by step, but also the inverse hessian matrix $$math:(\ul{H}^{(i)})^{-1}$$, as suggested by the algorithm above.</p> 
+ 
+ 
+<p> 
+ There are several ways to implement the described scheme:
+ <ul>
+   <li><b>gradient descent</b> methods do not use the hessian, but simply $$bmath:\vec{p}^{(i+1)}=\vec{p}^{(i)}-c\cdot\vec{\nabla}\chi^2(\vec{p}^{(i)})$$ where <i>c</i> is a scaling constant which determines the step size</</li>
+   <li><b>trust region</b> methods use different estimates for the inverse hessian and implement above's algorithm directly</li>
+   <li>The <b>Levenberg-Marquardt method</b> mixes the first two variants. It is a gradient descent scheme with a scaling of the step according to the current estimate of the hessian:
+     $$bmath:p_j^{(i+1)}=\vec{p}_j^{(i)}-\frac{1}{\lambda\cdot\ul{H}_{jj}^{(i)}\cdot d_j^{(i)}$$
+	 Here &lambda; is a (dimension-less) scaling factor for the step size, which is determined and changed during the optimization from iteration to iteration.
+   </li>
+ </ul>
+</p>
+ 
+<p>
 This implementation of the Levenberg-Marquardt scheme uses numerical
 methods to calculate the gradient, so it is not neccessary to know an
 analytic form of the derivatives. Levmar estimates the derivatives with
-the central difference scheme which is slower, but mor accurate than
+the central difference scheme which is slower, but more accurate than
 the standard forward/backward schemes. </p>
-<p>Finally these are the original papers describing the algorithm:
+
+
+<h2>Error Estimates</h2>
+<p>This plugin also estimates the errors $$math:e_i$$ of the fit parameters $$math:p_i$$. They are calculated from the covariance matrix $$math:C_{i,j}=\rm{Cov}(p_i, p_j)$$ as $$math:e_i=\sqrt{C_{i,i}}$$. These error estimates are very basic and valid only under the condition that there are no correlations between the parameters, i.e. $$math:C_{i,j}\approx 0$$ for $$math:i\neq j$$, as in the case of correlations the error ellipsoid may be sheared.</p>
+<p>The algorithm also outputs the complete covariance matrix, so a more detailed look at the fit errors is possible.</p>
+
+<h2>References</h2>
+<p>These are the original papers describing the algorithm:
 <ul>
   <li>Levenberg, K.: <b>A method for the solution of certain nonlinear problems in least squares.</b> <i>Quart. Appl. Math.</i> 2, 164-168, 1944.</li>
   <li>Marquardt, D. W.: <b>An algorithm for least squares estimation of nonlinear parameters.</b> <i>SIAM J. Appl. Math.</i> 11, 431-441, 1963</li>
-</ul></p>
+</ul>
+A good description of the algorithm can be found here:
+<ul>
+  <li> Press, W. H., Teukolsky, S. A., Vetterling, W. T. und Flannery, B. P.: <b>Numerical Recipes in C.</b> The Art of Scientific Computing. 2. Auflage, Cambridge University Press, Cambridge - New York - Port Chester - Melbourne - Sydney, 1992</li>
+</p>
 </body></html>
