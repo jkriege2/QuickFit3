@@ -2,6 +2,7 @@
 #include "qffcsmaxentevaluation_editor.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qfmathtools.h"
+#include "libb040mem.h"
 
 #define sqr(x) ((x)*(x))
 
@@ -100,7 +101,20 @@ double QFFCSMaxEntEvaluationItem::getAlpha() const {
 
 
 
+/*
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+void QFFCSMaxEntEvaluationItem::setNdist(uint32_t Ndist) {
+    setFitValue("maxent_Ndist", Ndist);
+}
 
+double QFFCSMaxEntEvaluationItem::getNdist() const {
+    return getFitValue("maxent_Ndist");
+}
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+*/
 
 
 
@@ -341,6 +355,7 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
             if (distribution_tau && distribution && distributionN>0) {
                 for (register uint32_t j=0; j<distributionN; j++) {
                     sum=sum+distribution[j]/(1+taus[i]/distribution_tau[j])/sqrt(1+taus[i]/distribution_tau[j]/sqr(gamma));
+
                 }
             } else {
                 sum=1.0;
@@ -415,22 +430,42 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
         getProject()->getServices()->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(defaultMinDatarange).arg(defaultMaxDatarange).arg(defaultMaxDatarange-defaultMinDatarange));
 
+
+        //////////
+        uint32_t Ndist=100; // default
+        //////////
+
         uint32_t N=data->getCorrelationN();
         double* taus=data->getCorrelationT();
-        double* dist=(double*)calloc(N,sizeof(double));
+        double* distTaus=(double*)calloc(Ndist,sizeof(double));
+        double* dist=(double*)calloc(Ndist,sizeof(double));
         double* modelEval=(double*)malloc(N*sizeof(double));
         bool weightsOK=false;
         double* corrdata=data->getCorrelationMean();
         if (index>=0) corrdata=data->getCorrelationRun(index);
-        double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, defaultMaxDatarange);
+        double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, rangeMaxDatarange);
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
         double alpha=getAlpha();
         bool fitSuccess=false;
 
+        double kappa=getFitValue("focus_struct_fac");
+        double tripTau=getFitValue("trip_tau")*1e-6;
+        double tripTheta=getFitValue("trip_theta");
+
         QElapsedTimer time;
         time.start();
 
-
+        /////////////////////////////////////////////////////////
+        /// MaxEnt Implementation ///////////////////////////////
+        /////////////////////////////////////////////////////////
+        MaxEntB040 mem;
+        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange);
+        mem.run(alpha,kappa,tripTau,tripTheta);
+        mem.setDistTaus(distTaus);
+        mem.setDistribution(dist);
+        //////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////
+/*
         // REPLACE THIS WITH THE ACTUAL MAXENT FIT!!!
         double T0=1e-4;
         double sigma=2e-5;
@@ -445,6 +480,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         }
         fitSuccess=true;
         // FIT CODE COMPLETE
+*/
 
         // duration measurement
         double duration=double(time.elapsed())/1000.0;
@@ -522,12 +558,15 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         free(dist);
         free(weights);
         free(modelEval);
+        free(distTaus);
+
     }
 
     if (doEmit) record->enableEmitResultsChanged(true);
     set_doEmitResultsChanged(thisDoEmitResults);
     set_doEmitPropertiesChanged(thisDoEmitProps);
 }
+
 
 QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html) const {
     if (model==0) {
