@@ -151,7 +151,7 @@ int QFRDRImagingFCSDataExplorer::getCropY1() const {
     return ui->spinY1->value();
 }
 
-bool QFRDRImagingFCSDataExplorer::init(QFRDRImageReader* reader, QFRDRImageReader* readerRaw, const QString& filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning) {
+bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporterImageSeries* readerRaw, const QString& filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning) {
     initing=true;
     this->reader=reader;
     this->readerRaw=readerRaw;

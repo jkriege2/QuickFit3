@@ -1,13 +1,15 @@
 #include "qfrdrimagingfcs_data.h"
 #include <QtXml>
 #include "libtiff_tools.h"
-#include "qfrdrimagereaderrh.h"
+#include "qfimporterimageseries.h"
 #include "csvtools.h"
 #include <QTextStream>
 #include "tools.h"
 #include "qfrdrimagingfcstools.h"
 #include "statistics_tools.h"
 #include "csvtools.h"
+#include "qfimporter.h"
+#include "qfimportermanager.h"
 
 #undef DEBUG_SIZES
 //#define DEBUG_SIZES
@@ -619,15 +621,20 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
 
     QString errorDescription="";
 
-    QFRDRImageReaderRH ReaderRH;
+    QFImporter* imp=getProject()->getServices()->getImporterManager()->createImporter("imageimporter_radhard");
+    if (!dynamic_cast<QFImporterImageSeries*>(imp)) {
+        if (imp) delete imp;
+        return false;
+    }
+    QFImporterImageSeries* ReaderRH=dynamic_cast<QFImporterImageSeries*>(imp);
 
-    ok=ReaderRH.open(filename);
+    ok=ReaderRH->open(filename);
 
     // LOAD FILE
 
     if (ok) {
-        width= ReaderRH.frameWidth();
-        height=ReaderRH.frameHeight();
+        width= ReaderRH->frameWidth();
+        height=ReaderRH->frameHeight();
         if((width==(128*8))&&(height==32)) {
 
             uint32_t **hwc_dump = (uint32_t **)malloc(1024 * sizeof(uint32_t*));
@@ -637,7 +644,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
             uint32_t header;
             //read data
             do {
-                //ReaderRH.readFrameCharRaw(hwc_line,&header);
+                //ReaderRH->readFrameCharRaw(hwc_line,&header);
                 uint32_t id= (header >> 8) & 0x00FFFFFFU;
                 uint32_t *src=(uint32_t *) &hwc_line[4]; //first dword: tics
                 uint32_t ticks=*((uint32_t *)hwc_line);
@@ -723,7 +730,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
         ok=false;
         errorDescription=tr("error loading file");
     }
-    ReaderRH.close();
+    ReaderRH->close();
 
 
     if (!ok) setError(tr("Error while reading Radhard2 file '%1': %2").arg(filename).arg(errorDescription));

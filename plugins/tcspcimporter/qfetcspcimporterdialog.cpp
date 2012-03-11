@@ -54,8 +54,8 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     ui->cmbFileformat->clear();
 
     // add more fileformats here
-    tcspcFilters=QFETCSPCImporterJobThread::getImageFilterList();
-    tcspcFormatNames=QFETCSPCImporterJobThread::getImageFormatNameList();
+    tcspcFilters=QFETCSPCImporterJobThread::getImporterFilterList(pluginServices);
+    tcspcFormatNames=QFETCSPCImporterJobThread::getImporterFormatNameList(pluginServices);
     ui->cmbFileformat->clear();
     ui->cmbFileformat->addItems(tcspcFormatNames);
 
@@ -318,7 +318,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
     TCSPCImporterJob job;
     job.progress=new QFETCSPCImporterThreadProgress(this);
-    job.thread=new QFETCSPCImporterJobThread(this);
+    job.thread=new QFETCSPCImporterJobThread(pluginServices, this);
     connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
     connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
     connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));

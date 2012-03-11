@@ -12,6 +12,7 @@ class QFFitFunctionManager;
 class QFExtensionManager;
 class ProgramOptions;
 class QFPlugin;
+class QFImporterManager;
 
 
 /*! \brief wrapper class that allows plugins to access basic logging services
@@ -96,6 +97,8 @@ class QFPluginServices {
         virtual QFFitAlgorithmManager* getFitAlgorithmManager()=0;
         /** \brief returns a QFExtensionManager object that allows access to all currently loaded QFExtensions */
         virtual QFExtensionManager* getExtensionManager()=0;
+        /** \brief returns a QFImporterManager object that allows access to all currently loaded QFImporter s */
+        virtual QFImporterManager* getImporterManager()=0;
         /** \brief return a pointer to a valid QSettings object for the main settings INI file */
         virtual QSettings* getSettings()=0;
         /** \brief return a pointer to the applications ProgramOptions object */

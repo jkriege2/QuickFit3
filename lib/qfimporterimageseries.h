@@ -1,8 +1,9 @@
-#ifndef QFRDRIMAGEREADER_H
-#define QFRDRIMAGEREADER_H
+#ifndef QFImporterImageSeries_H
+#define QFImporterImageSeries_H
 
 #include <stdint.h>
 #include <QString>
+#include "qfimporter.h"
 
 /*! \brief interface for image reader classes
     \ingroup qf3rdrdp_imaging_fcs
@@ -23,10 +24,10 @@
 
     The class also allows to set a binning and a cropping which will be applied transparently for the user.
 */
-class QFRDRImageReader {
+class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
     public:
-        QFRDRImageReader();
-        virtual ~QFRDRImageReader() {}
+        QFImporterImageSeries();
+        virtual ~QFImporterImageSeries() {}
         /** \brief open the given image sequence file
          *  \param filename name of the image sequence file
          *  \return \c true on success
@@ -51,14 +52,7 @@ class QFRDRImageReader {
         bool readFrameFloat(float* data);
         /** \brief read a new frame into the given array of integers */
         bool readFrameUINT16(uint16_t* data);
-        /** \brief return a description of the last error that occured */
-        QString lastError() const {
-            return err;
-        }
-        /** \brief return a filter string for the file format */
-        virtual QString filter() const =0;
-        /** \brief return a name string for the file format */
-        virtual QString formatName() const =0;
+
 
         /** \brief set binning */
         void setBinning(int bin) { binning=bin; }
@@ -83,12 +77,7 @@ class QFRDRImageReader {
         virtual bool intReadFrameUINT16(uint16_t* data)=0;
 
 
-        void setLastError(QString err) {
-            this->err=err;
-        }
-
     private:
-        QString err;
 
         int binning;
         int x0;
@@ -100,4 +89,4 @@ class QFRDRImageReader {
 
 
 
-#endif // QFRDRIMAGEREADER_H
+#endif // QFImporterImageSeries_H

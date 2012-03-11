@@ -15,7 +15,7 @@
     These plugins may contain several fitting functions. The function getIDs() returns a QStringList
     with all implemented plugin IDs.
 */
-class QFPluginFitFunction: public QFPlugin {
+class QFLIB_EXPORT QFPluginFitFunction: public QFPlugin {
     public:
         /** Default destructor */
         virtual ~QFPluginFitFunction() {}

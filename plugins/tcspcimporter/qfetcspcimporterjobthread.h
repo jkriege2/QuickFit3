@@ -14,6 +14,8 @@
 #include "correlator_multitau.h"
 #include <QtGlobal>
 #include <QtEndian>
+#include "qftcspcreader.h"
+#include "qfpluginservices.h"
 
 class QFETCSPCImporterThreadProgress; // forward
 class QFETCSPCImporterJobThread; // forward
@@ -82,14 +84,14 @@ class QFETCSPCImporterJobThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit QFETCSPCImporterJobThread(QObject *parent = 0);
+    explicit QFETCSPCImporterJobThread(QFPluginServices* services, QObject *parent = 0);
     ~QFETCSPCImporterJobThread();
     int status() const;
     void init(TCSPCImporterJob job);
-    static QStringList getImageFilterList();
-    static QStringList getImageFormatNameList();
-    static QFTCSPCReader* getImageReader(int idx);
-    static int getImageReaderCount();
+    static QStringList getImporterFilterList(QFPluginServices *pluginServices);
+    static QStringList getImporterFormatNameList(QFPluginServices *pluginServices);
+    static QFTCSPCReader* getImporter(int idx, QFPluginServices *pluginServices);
+    static int getImporterCount(QFPluginServices *pluginServices);
     QStringList getAddFiles() const;
     TCSPCImporterJob getJob() const;
     double durationMS() const;
@@ -142,6 +144,7 @@ protected:
 
     static QMutex* mutexFilename;
 
+    QFPluginServices* pluginServices;
 };
 
 #endif // QFETCSPCImporterJOBTHREAD_H

@@ -53,8 +53,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->cmbFileformat->clear();
 
     // add more fileformats here
-    imageFilters=QFRDRImagingFCSCorrelationJobThread::getImageFilterList();
-    imageFormatNames=QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList();
+    imageFilters=QFRDRImagingFCSCorrelationJobThread::getImageFilterList(pluginServices);
+    imageFormatNames=QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList(pluginServices);
     ui->cmbFileformat->clear();
     ui->cmbFileformat->addItems(imageFormatNames);
 
@@ -88,11 +88,11 @@ void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
 void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     QFRDRImagingFCSDataExplorer* explorer=new QFRDRImagingFCSDataExplorer(this);
     explorer->readSettings(*(pluginServices->getOptions()->getQSettings()), "imFCS/dataExplorer/");
-    QFRDRImageReader* reader=NULL;
-    QFRDRImageReader* readerRaw=NULL;
-    if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount()) {
-        reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex());
-        readerRaw=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex());
+    QFImporterImageSeries* reader=NULL;
+    QFImporterImageSeries* readerRaw=NULL;
+    if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(pluginServices)) {
+        reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
+        readerRaw=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
     }
     if (reader) {
         explorer->setBleachDecay(ui->spinDecay->value());
@@ -419,7 +419,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
     IMFCSJob job;
     job.progress=new QFRDRImagingFCSThreadProgress(this);
-    job.thread=new QFRDRImagingFCSCorrelationJobThread(this);
+    job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
     connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
     connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
     connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
@@ -714,10 +714,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
         prg.setLabelText(tr("Reading image series information ... counting frames ..."));
         QApplication::processEvents();
         QApplication::processEvents();
-        QFRDRImageReader* reader=NULL;
+        QFImporterImageSeries* reader=NULL;
         bool OK=false;
-        if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount()) {
-            reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex());
+        if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(pluginServices)) {
+            reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
         }
         if (reader) {
             OK=reader->open(filename);

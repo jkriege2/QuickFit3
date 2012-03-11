@@ -19,6 +19,7 @@
 #include "qffitalgorithmmanager.h"
 #include "qfhtmlhelpwindow.h"
 #include "qfextensionmanager.h"
+#include "qfimportermanager.h"
 #include "qfextension.h"
 #include "../version.h"
 #include "qvisiblehandlesplitter.h"
@@ -107,6 +108,9 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \copydoc QFPluginServices::getExtensionManager() */
         virtual QFExtensionManager* getExtensionManager();
+
+        /** \copydoc QFPluginServices::getImporterManager() */
+        virtual QFImporterManager* getImporterManager();
 
         /** \brief QFPluginServices::displayHelpWindow() */
         virtual void displayHelpWindow(const QString& helpfile=QString(""));
@@ -286,6 +290,8 @@ protected:
         QFFitAlgorithmManager* fitAlgorithmManager;
         /** \brief QFExtension manager */
         QFExtensionManager* extensionManager;
+        /** \brief QFImporter manager */
+        QFImporterManager* importerManager;
 
         /** \brief help display widget */
         QFHTMLHelpWindow* helpWindow;

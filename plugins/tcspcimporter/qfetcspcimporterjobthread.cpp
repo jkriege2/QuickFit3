@@ -3,10 +3,11 @@
 #include "qftcspcreader.h"
 #include "statistics_tools.h"
 #include <stdint.h>
+#include "qfimportermanager.h"
 
 QMutex* QFETCSPCImporterJobThread::mutexFilename=NULL;
 
-QFETCSPCImporterJobThread::QFETCSPCImporterJobThread(QObject *parent) :
+QFETCSPCImporterJobThread::QFETCSPCImporterJobThread(QFPluginServices *services, QObject *parent) :
     QThread(parent)
 {
     if (!mutexFilename) mutexFilename=new QMutex();
@@ -15,6 +16,7 @@ QFETCSPCImporterJobThread::QFETCSPCImporterJobThread(QObject *parent) :
     m_status=0;
     was_canceled=false;
     duration=0;
+    this->pluginServices=services;
 }
 
 QFETCSPCImporterJobThread::~QFETCSPCImporterJobThread() {
@@ -36,11 +38,11 @@ TCSPCImporterJob QFETCSPCImporterJobThread::getJob() const {
     return job;
 }
 
-QStringList QFETCSPCImporterJobThread::getImageFilterList()  {
+QStringList QFETCSPCImporterJobThread::getImporterFilterList(QFPluginServices* pluginServices)  {
     QStringList l;
     int i=0;
     QFTCSPCReader* r=NULL;
-    while ((r=getImageReader(i))!=NULL) {
+    while ((r=getImporter(i, pluginServices))!=NULL) {
         l.append(r->filter());
         delete r;
         i++;
@@ -48,11 +50,11 @@ QStringList QFETCSPCImporterJobThread::getImageFilterList()  {
     return l;
 }
 
-QStringList QFETCSPCImporterJobThread::getImageFormatNameList()  {
+QStringList QFETCSPCImporterJobThread::getImporterFormatNameList(QFPluginServices *pluginServices)  {
      QStringList l;
      int i=0;
      QFTCSPCReader* r=NULL;
-     while ((r=getImageReader(i))!=NULL) {
+     while ((r=getImporter(i, pluginServices))!=NULL) {
          l.append(r->formatName());
          delete r;
          i++;
@@ -60,25 +62,23 @@ QStringList QFETCSPCImporterJobThread::getImageFormatNameList()  {
      return l;
 }
 
-QFTCSPCReader *QFETCSPCImporterJobThread::getImageReader(int idx)  {
+QFTCSPCReader *QFETCSPCImporterJobThread::getImporter(int idx, QFPluginServices *pluginservices)  {
     QFTCSPCReader* r=NULL;
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // INSERT ADDITIONAL IMAGE FILTERS HERE!
-    //////////////////////////////////////////////////////////////////////////////////////////
-    /*if (idx==0) r=new QFRDRImageReaderTIFF();
-    if (idx==1) r=new QFRDRImageReaderRH();*/
+
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFTCSPCReader*>();
+
+    if (idx>=0 && idx<imp.size()) {
+        r=dynamic_cast<QFTCSPCReader*>(pluginservices->getImporterManager()->createImporter(imp[idx]));
+    }
 
     return r;
+
 }
 
-int QFETCSPCImporterJobThread::getImageReaderCount() {
-    int i=0;
-    QFTCSPCReader* r=NULL;
-    while ((r=getImageReader(i))!=NULL) {
-        delete r;
-        i++;
-    }
-    return i;
+int QFETCSPCImporterJobThread::getImporterCount(QFPluginServices *pluginservices) {
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFTCSPCReader*>();
+    return imp.size();
+
 }
 
 int QFETCSPCImporterJobThread::status() const {

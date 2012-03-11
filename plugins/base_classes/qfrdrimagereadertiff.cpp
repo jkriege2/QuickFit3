@@ -5,7 +5,7 @@
 #include <QDebug>
 
 QFRDRImageReaderTIFF::QFRDRImageReaderTIFF():
-    QFRDRImageReader()
+    QFImporterImageSeries()
 {
     width=0;
     height=0;
@@ -24,6 +24,10 @@ QString QFRDRImageReaderTIFF::filter() const {
 
 QString QFRDRImageReaderTIFF::formatName() const {
     return QObject::tr("TIFF");
+}
+
+QString QFRDRImageReaderTIFF::id() const {
+    return QString("imageimporter_libtiff");
 }
 
 

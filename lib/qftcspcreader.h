@@ -4,12 +4,14 @@
 
 #include <stdint.h>
 #include <QString>
+#include "qfimporter.h"
+#include "lib_imexport.h"
 
 /*! \brief a single-photon TCSPC record
     \ingroup qf3ext_tcspcimporter
 
 */
-struct QFTCSPCRecord {
+struct QFLIB_EXPORT QFTCSPCRecord {
     /** \brief photon arrival time in seconds */
     double macrotime;
     /** \brief microtime channel */
@@ -24,22 +26,20 @@ struct QFTCSPCRecord {
     /** \brief input channel in which the photon arrived */
     int32_t input_channel;
 
-    double absoluteTime() const {
-        return macrotime+microtime_offset+double(microtime_channel)*microtime_deltaT;
-    }
+    double absoluteTime() const ;
 
-    explicit QFTCSPCRecord(int32_t input_channel, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9);
+    QFTCSPCRecord(int32_t input_channel=0, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9) ;
 };
 
 /*! \brief interface for TCSPC reader classes
     \ingroup qf3ext_tcspcimporter
 
 */
-class QFTCSPCReader {
+class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
     public:
+        QFTCSPCReader();
 
-
-        virtual ~QFTCSPCReader() {}
+        virtual ~QFTCSPCReader();
         /** \brief open the given image sequence file
          *  \param filename name of the image sequence file
          *  \return \c true on success
@@ -51,10 +51,6 @@ class QFTCSPCReader {
         virtual void reset()=0;
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         virtual bool nextRecord()=0;
-        /** \brief return a description of the last error that occured */
-        QString lastError() const {
-            return err;
-        }
         /** \brief return a filter string for the file format */
         virtual QString filter() const =0;
         /** \brief return a name string for the file format */
@@ -66,15 +62,9 @@ class QFTCSPCReader {
         virtual int32_t inputChannels() const=0;
 
         /** \brief output the current photon record */
-        QFTCSPCRecord getCurrentRecord() const;
+        virtual QFTCSPCRecord getCurrentRecord() const=0;
     protected:
 
-        void setLastError(QString err) {
-            this->err=err;
-        }
-
-    private:
-        QString err;
 };
 
 

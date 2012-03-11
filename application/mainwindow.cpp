@@ -18,6 +18,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     fitFunctionManager=new QFFitFunctionManager(settings, this);
     fitAlgorithmManager=new QFFitAlgorithmManager(settings, this);
     extensionManager=new QFExtensionManager(settings, this);
+    importerManager=new QFImporterManager(settings, this);
 
     //settings=NULL;
     project=NULL;
@@ -41,12 +42,14 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     connect(fitAlgorithmManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(fitFunctionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(extensionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+    connect(importerManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
 
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitFunctionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(fitAlgorithmManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(extensionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
+    connect(importerManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
     connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
 
@@ -57,7 +60,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
 
     logFileMainWidget->dec_indent();
 
-    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()));
+    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
 
     htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(SVNVERSION).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(VERSION_STATUS)));
@@ -145,6 +148,7 @@ void MainWindow::searchAndRegisterPlugins() {
     evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
     fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
     fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
+    importerManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
     extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
 
 
@@ -351,6 +355,16 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     }
     text+="</table></center>";
 
+    text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Importer Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<importerManager->pluginCount(); i++) {
+        int id=i;
+        QStringList additional;
+        additional<<tr("implemented ids:")<<importerManager->getIDList(id).join(", ");
+        text+=createPluginDocItem(docLinks, importerManager->getID(id), importerManager->getName(id), importerManager->getDescription(id), importerManager->getIconFilename(id), importerManager->getAuthor(id), importerManager->getCopyright(id), importerManager->getWeblink(id), importerManager->getPluginFilename(id), importerManager->getMajorVersion(id), importerManager->getMinorVersion(id), additional);
+    }
+    text+="</table></center>";
+
     text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_extension.html\">Extension Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
@@ -417,6 +431,15 @@ QString MainWindow::createPluginDocCopyrights(QString mainitem_before, QString m
     }
     text+=mainitem_after;
 
+    text+=mainitem_before.arg(tr("Importers"));
+    // gather information about plugins
+    for (int i=0; i<importerManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=importerManager->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
     text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
@@ -468,6 +491,15 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     }
     text+=mainitem_after;
 
+    text+=mainitem_before.arg(tr("Importers"));
+    // gather information about plugins
+    for (int i=0; i<importerManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=importerManager->getPluginTutorial(id);
+        if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
     text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
@@ -515,6 +547,15 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
         int id=i;
         QString dir=fitFunctionManager->getPluginHelp(id);
         if (QFile::exists(dir)) text+=item_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("Importers"));
+    // gather information about plugins
+    for (int i=0; i<importerManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=importerManager->getPluginHelp(id);
+        if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
 
@@ -1305,6 +1346,10 @@ void MainWindow::insertToolBar(QString toolbarname, QToolBar* newToolbar) {
 
 QFExtensionManager* MainWindow::getExtensionManager() {
     return extensionManager;
+}
+
+QFImporterManager *MainWindow::getImporterManager() {
+    return importerManager;
 }
 
 QString MainWindow::getConfigFileDirectory() {

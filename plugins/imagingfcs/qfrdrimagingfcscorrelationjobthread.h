@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include <QPointer>
-#include "qfrdrimagereader.h"
+#include "qfimporterimageseries.h"
 #include <QLocale>
 #include <QList>
 #include <QVector>
@@ -15,6 +15,7 @@
 #include <QtGlobal>
 #include <QtEndian>
 #include "qfrdrimagingfcstools.h"
+#include "qfpluginservices.h"
 
 class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward
@@ -181,14 +182,14 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit QFRDRImagingFCSCorrelationJobThread(QObject *parent = 0);
+    explicit QFRDRImagingFCSCorrelationJobThread(QFPluginServices* services, QObject *parent = 0);
     ~QFRDRImagingFCSCorrelationJobThread();
     int status() const;
     void init(IMFCSJob job);
-    static QStringList getImageFilterList();
-    static QStringList getImageFormatNameList();
-    static QFRDRImageReader* getImageReader(int idx);
-    static int getImageReaderCount();
+    static QStringList getImageFilterList(QFPluginServices* pluginservices);
+    static QStringList getImageFormatNameList(QFPluginServices *pluginservices);
+    static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices);
+    static int getImageReaderCount(QFPluginServices* pluginservices);
     QStringList getAddFiles() const;
     IMFCSJob getJob() const;
     double durationMS() const;
@@ -384,7 +385,7 @@ data                                                   size [bytes]
     double duration;
 
     /** \brief this reader object is used to read the frames from the file */
-    QFRDRImageReader* reader;
+    QFImporterImageSeries* reader;
     uint32_t frames;
     uint32_t first_frame;
     uint32_t frame_width;
@@ -444,6 +445,8 @@ data                                                   size [bytes]
     float* lastFrames;
 
     static QMutex* mutexFilename;
+
+    QFPluginServices* pluginservices;
 
 };
 

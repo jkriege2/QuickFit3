@@ -1,16 +1,16 @@
 #include "qfrdrimagingfcscorrelationjobthread.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
-#include "qfrdrimagereadertiff.h"
-#include "qfrdrimagereaderrh.h"
 #include "libtiff_tools.h"
 #include "image_tools.h"
 #include "statistics_tools.h"
 #include <stdint.h>
 #include "tinytiffwriter.h"
+#include "qfimporterimageseries.h"
+#include "qfimportermanager.h"
 
 QMutex* QFRDRImagingFCSCorrelationJobThread::mutexFilename=NULL;
 
-QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QObject *parent) :
+QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPluginServices *services, QObject *parent) :
     QThread(parent)
 {
     if (!mutexFilename) mutexFilename=new QMutex();
@@ -20,6 +20,7 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QObject
     was_canceled=false;
     duration=0;
     backgroundImage=NULL;
+    pluginservices=services;
 }
 
 QFRDRImagingFCSCorrelationJobThread::~QFRDRImagingFCSCorrelationJobThread() {
@@ -42,11 +43,11 @@ IMFCSJob QFRDRImagingFCSCorrelationJobThread::getJob() const {
     return job;
 }
 
-QStringList QFRDRImagingFCSCorrelationJobThread::getImageFilterList()  {
+QStringList QFRDRImagingFCSCorrelationJobThread::getImageFilterList(QFPluginServices* pluginservices)  {
     QStringList l;
     int i=0;
-    QFRDRImageReader* r=NULL;
-    while ((r=getImageReader(i))!=NULL) {
+    QFImporterImageSeries* r=NULL;
+    while ((r=getImageReader(i, pluginservices))!=NULL) {
         l.append(r->filter());
         delete r;
         i++;
@@ -54,11 +55,11 @@ QStringList QFRDRImagingFCSCorrelationJobThread::getImageFilterList()  {
     return l;
 }
 
-QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList()  {
+QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList(QFPluginServices* pluginservices)  {
      QStringList l;
      int i=0;
-     QFRDRImageReader* r=NULL;
-     while ((r=getImageReader(i))!=NULL) {
+     QFImporterImageSeries* r=NULL;
+     while ((r=getImageReader(i, pluginservices))!=NULL) {
          l.append(r->formatName());
          delete r;
          i++;
@@ -66,25 +67,21 @@ QStringList QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList()  {
      return l;
 }
 
-QFRDRImageReader* QFRDRImagingFCSCorrelationJobThread::getImageReader(int idx)  {
-    QFRDRImageReader* r=NULL;
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // INSERT ADDITIONAL IMAGE FILTERS HERE!
-    //////////////////////////////////////////////////////////////////////////////////////////
-    if (idx==0) r=new QFRDRImageReaderTIFF();
-    if (idx==1) r=new QFRDRImageReaderRH();
+QFImporterImageSeries* QFRDRImagingFCSCorrelationJobThread::getImageReader(int idx, QFPluginServices* pluginservices)  {
+    QFImporterImageSeries* r=NULL;
+
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+
+    if (idx>=0 && idx<imp.size()) {
+        r=dynamic_cast<QFImporterImageSeries*>(pluginservices->getImporterManager()->createImporter(imp[idx]));
+    }
 
     return r;
 }
 
-int QFRDRImagingFCSCorrelationJobThread::getImageReaderCount() {
-    int i=0;
-    QFRDRImageReader* r=NULL;
-    while ((r=getImageReader(i))!=NULL) {
-        delete r;
-        i++;
-    }
-    return i;
+int QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(QFPluginServices* pluginservices) {
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+    return imp.size();
 }
 
 int QFRDRImagingFCSCorrelationJobThread::status() const {
@@ -151,7 +148,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
     ptime.start();
 
     emit messageChanged(tr("loading data ..."));
-    if ((job.fileFormat<0)||(job.fileFormat>=getImageReaderCount())) {
+    if ((job.fileFormat<0)||(job.fileFormat>=getImageReaderCount(pluginservices))) {
         m_status=-1;
         emit statusChanged(m_status);
         emit messageChanged(tr("file format not supported or given ... format given was: %1").arg(job.fileFormat));
@@ -171,8 +168,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
         reader=NULL;
         bool OK=false;
-        if (job.fileFormat>=0 && job.fileFormat<getImageReaderCount()) {
-            reader=getImageReader(job.fileFormat);
+        if (job.fileFormat>=0 && job.fileFormat<getImageReaderCount(pluginservices)) {
+            reader=getImageReader(job.fileFormat, pluginservices);
         }
         if (reader) {
             emit messageChanged(tr("opening %1 file ...").arg(reader->formatName()));
@@ -1716,10 +1713,10 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     if (job.backgroundCorrection==3) {
         //qDebug()<<job.filenameBackground<<QFile::exists(job.filenameBackground);
         if (QFile::exists(job.filenameBackground)) {
-            QFRDRImageReader* reader=NULL;
+            QFImporterImageSeries* reader=NULL;
             bool OK=false;
-            if (job.fileFormat>=0 && job.fileFormat<getImageReaderCount()) {
-                reader=getImageReader(job.fileFormat);
+            if (job.fileFormat>=0 && job.fileFormat<getImageReaderCount(pluginservices)) {
+                reader=getImageReader(job.fileFormat, pluginservices);
             }
             if (reader) {
                 emit messageChanged(tr("opening %1 background file ...").arg(reader->formatName()));

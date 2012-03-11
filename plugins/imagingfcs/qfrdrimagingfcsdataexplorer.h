@@ -2,7 +2,7 @@
 #define QFRDRIMAGINGFCSDATAEXPLORER_H
 
 #include <QDialog>
-#include "qfrdrimagereader.h"
+#include "qfimporterimageseries.h"
 #include "qmodernprogresswidget.h"
 #include "jkqtplotter.h"
 #include "jkqtpimageelements.h"
@@ -45,14 +45,14 @@ class QFRDRImagingFCSDataExplorer : public QDialog{
 
 
         /** \brief initializes the data explorer */
-        bool init(QFRDRImageReader *reader, QFRDRImageReader *readerRaw, const QString &filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning);
+        bool init(QFImporterImageSeries *reader, QFImporterImageSeries *readerRaw, const QString &filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning);
         int getCropX1() const;
         int getCropY0() const;
         int getCropY1() const;
 protected:
         Ui::QFRDRImagingFCSDataExplorer *ui;
-        QFRDRImageReader* reader;
-        QFRDRImageReader* readerRaw;
+        QFImporterImageSeries* reader;
+        QFImporterImageSeries* readerRaw;
         QString filename;
         uint32_t frames;
         QString fileFormat;

@@ -14,6 +14,9 @@
     \defgroup qf3fitfunplugins Fitting Function Plugins
     \ingroup qf3plugins
 
+   \defgroup qf3importerplugins Data Importer Plugins
+    \ingroup qf3plugins
+	
     \defgroup qf3extensionplugins QuickFit Extension Plugins
     \ingroup qf3plugins
 

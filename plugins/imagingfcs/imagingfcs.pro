@@ -24,18 +24,12 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscorrelationdialog.h \
     qfrdrimagingfcsthreadprogress.h \
     qfrdrimagingfcscorrelationjobthread.h \
-    ../base_classes/qfrdrimagereader.h \
-    ../base_classes/qfrdrimagereadertiff.h \
     ../../../../../LIB/trunk/tinytiffwriter.h \
     ../../../../../LIB/trunk/libtiff_tools.h \
     ../../../../../LIB/trunk/statistics_tools.h \
     ../../../../../LIB/trunk/shiftregister.h \
     ../../../../../LIB/trunk/multitau-correlator.h \
     ../../../../../LIB/trunk/correlator_multitau.h \
-    ../base_classes/qfrdrimagereaderrh.h \
-    ../../../../../LIB/trunk/frame.h \
-    ../../../../../LIB/trunk/crc_ccitt.h \
-    ../../../../../LIB/trunk/crc.h \
     ../base_classes/qfhistogramview.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
@@ -58,12 +52,9 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcscorrelationdialog.cpp \
     qfrdrimagingfcsthreadprogress.cpp \
     qfrdrimagingfcscorrelationjobthread.cpp \
-    ../base_classes/qfrdrimagereadertiff.cpp \
     ../../../../../LIB/trunk/tinytiffwriter.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
     ../../../../../LIB/trunk/statistics_tools.cpp \
-    ../base_classes/qfrdrimagereaderrh.cpp \
-    ../base_classes/qfrdrimagereader.cpp \
     ../base_classes/qfhistogramview.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \

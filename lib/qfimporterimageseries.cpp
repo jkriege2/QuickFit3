@@ -1,9 +1,9 @@
-#include "qfrdrimagereader.h"
+#include "qfimporterimageseries.h"
 #include <cstdlib>
 #include <cmath>
 #include<QDebug>
 
-QFRDRImageReader::QFRDRImageReader() {
+QFImporterImageSeries::QFImporterImageSeries() {
     binning=1;
     x0=0;
     x1=0;
@@ -12,7 +12,7 @@ QFRDRImageReader::QFRDRImageReader() {
     crop=false;
 }
 
-uint16_t QFRDRImageReader::frameWidth() {
+uint16_t QFImporterImageSeries::frameWidth() {
     int xx0=x0;
     int xx1=x1;
     if (!crop) {
@@ -28,7 +28,7 @@ uint16_t QFRDRImageReader::frameWidth() {
     return w/binning;
 }
 
-uint16_t QFRDRImageReader::frameHeight() {
+uint16_t QFImporterImageSeries::frameHeight() {
     int yy0=y0;
     int yy1=y1;
     if (!crop) {
@@ -44,7 +44,7 @@ uint16_t QFRDRImageReader::frameHeight() {
     return h/binning;
 }
 
-bool QFRDRImageReader::readFrameFloat(float* data) {
+bool QFImporterImageSeries::readFrameFloat(float* data) {
     if (!crop && binning==1) return intReadFrameFloat(data);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
@@ -104,7 +104,7 @@ bool QFRDRImageReader::readFrameFloat(float* data) {
     return true;
 }
 
-bool QFRDRImageReader::readFrameUINT16(uint16_t* data) {
+bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     if (!crop && binning==1) return intReadFrameUINT16(data);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
@@ -164,7 +164,7 @@ bool QFRDRImageReader::readFrameUINT16(uint16_t* data) {
     return true;
 }
 
-void QFRDRImageReader::setCropping(int x0, int x1, int y0, int y1) {
+void QFImporterImageSeries::setCropping(int x0, int x1, int y0, int y1) {
     this->x0=x0;
     this->x1=x1;
     this->y0=y0;

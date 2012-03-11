@@ -1,9 +1,9 @@
-#include "qfrdrimagereaderrh.h"
+#include "qfimagereaderradhard.h"
 
 #include <QObject>
 #include <QtGlobal>
 
-QFRDRImageReaderRH::QFRDRImageReaderRH():
+QFImageReaderRadhard::QFImageReaderRadhard():
     QFImporterImageSeries()
 {
     width=0;
@@ -14,24 +14,19 @@ QFRDRImageReaderRH::QFRDRImageReaderRH():
     buffer=NULL;
 }
 
-QFRDRImageReaderRH::~QFRDRImageReaderRH() {
+QFImageReaderRadhard::~QFImageReaderRadhard() {
     if (file) close();
 }
 
-QString QFRDRImageReaderRH::filter() const {
-    return QObject::tr("raw RH file (*.rrh *.dat)");
+QString QFImageReaderRadhard::filter() const {
+    return QObject::tr("raw Radhard file (*.rrh *.dat)");
 }
 
-QString QFRDRImageReaderRH::formatName() const {
-    return QObject::tr("RadHard raw Ddata");
+QString QFImageReaderRadhard::formatName() const {
+    return QObject::tr("RadHard Raw Data");
 }
 
-QString QFRDRImageReaderRH::id() const {
-    return QString("imageimporter_radhard");
-}
-
-
-unsigned int QFRDRImageReaderRH::calculateFrameSize() {
+unsigned int QFImageReaderRadhard::calculateFrameSize() {
   // lets assume we have correct shapes frames here... with correct CRCs
   //only accepts 32 bit packed data format
 
@@ -58,7 +53,7 @@ unsigned int QFRDRImageReaderRH::calculateFrameSize() {
 }
 
 
-bool QFRDRImageReaderRH::open(QString filename) {
+bool QFImageReaderRadhard::open(QString filename) {
   close();
   bool result=true;
   file = new QFile(filename);
@@ -86,7 +81,7 @@ bool QFRDRImageReaderRH::open(QString filename) {
   return result;
 }
 
-void QFRDRImageReaderRH::close() {
+void QFImageReaderRadhard::close() {
   if (!file) return ;
   if (buffer) free(buffer);
   buffer=NULL;
@@ -96,7 +91,7 @@ void QFRDRImageReaderRH::close() {
   filename="";
 }
 
-uint32_t QFRDRImageReaderRH::countFrames() {
+uint32_t QFImageReaderRadhard::countFrames() {
   uint32_t result=0;
   if (!file) return 0;
   unsigned int size=file->size();
@@ -107,33 +102,33 @@ uint32_t QFRDRImageReaderRH::countFrames() {
   return result;
 }
 
-bool QFRDRImageReaderRH::nextFrame() {
+bool QFImageReaderRadhard::nextFrame() {
     if (!file) return false;
     QDataStream in(file);
     in.readRawData((char*)buffer, frameSize);
     return !file->atEnd();
 }
 
-void QFRDRImageReaderRH::reset() {
+void QFImageReaderRadhard::reset() {
     QString fn=filename;
     close();
     open(fn);
 }
 
-uint16_t QFRDRImageReaderRH::intFrameWidth() {
+uint16_t QFImageReaderRadhard::intFrameWidth() {
     return width;
 }
 
-uint16_t QFRDRImageReaderRH::intFrameHeight() {
+uint16_t QFImageReaderRadhard::intFrameHeight() {
     return height;
 }
 
-bool QFRDRImageReaderRH::intReadFrameUINT16(uint16_t* data) {
+bool QFImageReaderRadhard::intReadFrameUINT16(uint16_t* data) {
   if (!file) return false;
   return readFrame_<uint16_t>(data);
 }
 
-bool QFRDRImageReaderRH::intReadFrameFloat(float* data) {
+bool QFImageReaderRadhard::intReadFrameFloat(float* data) {
     if (!file) return false;
   return readFrame_<float>(data);
 }

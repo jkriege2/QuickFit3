@@ -34,5 +34,6 @@
         <file alias="item_delete.png">icons/item_delete.png</file>
         <file alias="printreport.png">icons/fcs_printreport.png</file>
         <file alias="savereport.png">icons/fcs_savereport.png</file>
+        <file alias="importer_icon.png">icons/importer_icon.png</file>
     </qresource>
 </RCC>

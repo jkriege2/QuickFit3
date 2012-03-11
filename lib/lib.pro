@@ -63,7 +63,12 @@ HEADERS += dlgnewproperty.h \
     qfprojecttreemodelnode.h \
     qfstyleditemdelegate.h \
     binarydatatools.h \
-    qfmathtools.h
+    qfmathtools.h \
+    qfpluginimporters.h \
+    qfimportermanager.h \
+    qfimporter.h \
+    qfimporterimageseries.h \
+    qftcspcreader.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -98,7 +103,10 @@ SOURCES += dlgnewproperty.cpp \
     qfprojecttreemodelnode.cpp \
     qfstyleditemdelegate.cpp \
     binarydatatools.cpp \
-    qfmathtools.cpp
+    qfmathtools.cpp \
+    qfimportermanager.cpp \
+    qfimporterimageseries.cpp \
+    qftcspcreader.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui
