@@ -14,7 +14,7 @@
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
     \ingroup qf3lib_mathtools
  */
-#define QFFloatIsOK(v) (std::isfinite(v))
+#define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 
 /*! \brief round a value according to the error
     \ingroup qf3lib_mathtools

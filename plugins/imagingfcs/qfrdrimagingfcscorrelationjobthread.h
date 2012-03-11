@@ -41,7 +41,7 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
     documentation of QFRDRImagingFCSCorrelationJobThread which actually contains
     the code that executed the job.
 */
-struct Job {
+struct IMFCSJob {
     /** \brief progress widget for this job */
     QPointer<QFRDRImagingFCSThreadProgress> progress;
     /** \brief thread object for this job */
@@ -184,13 +184,13 @@ public:
     explicit QFRDRImagingFCSCorrelationJobThread(QObject *parent = 0);
     ~QFRDRImagingFCSCorrelationJobThread();
     int status() const;
-    void init(Job job);
+    void init(IMFCSJob job);
     static QStringList getImageFilterList();
     static QStringList getImageFormatNameList();
     static QFRDRImageReader* getImageReader(int idx);
     static int getImageReaderCount();
     QStringList getAddFiles() const;
-    Job getJob() const;
+    IMFCSJob getJob() const;
     double durationMS() const;
     double durationS() const;
 signals:
@@ -380,7 +380,7 @@ data                                                   size [bytes]
     bool was_canceled;
 
     /** \brief the Job object to work on */
-    Job job;
+    IMFCSJob job;
     double duration;
 
     /** \brief this reader object is used to read the frames from the file */

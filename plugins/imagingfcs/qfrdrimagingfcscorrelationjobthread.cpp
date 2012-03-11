@@ -38,7 +38,7 @@ QStringList QFRDRImagingFCSCorrelationJobThread::getAddFiles() const {
     return addFiles;
 }
 
-Job QFRDRImagingFCSCorrelationJobThread::getJob() const {
+IMFCSJob QFRDRImagingFCSCorrelationJobThread::getJob() const {
     return job;
 }
 
@@ -100,7 +100,7 @@ void QFRDRImagingFCSCorrelationJobThread::cancel() {
     }
 }
 
-void QFRDRImagingFCSCorrelationJobThread::init(Job job) {
+void QFRDRImagingFCSCorrelationJobThread::init(IMFCSJob job) {
     this->job=job;
     m_status=0;
     was_canceled=false;

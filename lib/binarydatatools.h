@@ -5,6 +5,7 @@
 #include <QString>
 #include <QVector>
 #include "lib_imexport.h"
+#include <QFile>
 
 /*! \brief decodes a string which contains an array of doubles (64-bit), which is encoded in base64
     \ingroup qf3lib_mathtools
@@ -82,4 +83,42 @@ QFLIB_EXPORT QVector<bool> stringToBoolArray(const QString& data);
     \ingroup qf3lib_mathtools
  */
 QFLIB_EXPORT QByteArray boolArrayToString(const QVector<bool>& data);
+
+
+/** \brief read a uint32_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT uint32_t binfileReadUint32(QFile& file);
+
+/** \brief write a uint32_t to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteUint32(QFile& file, uint32_t data);
+
+/** \brief read a double from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT double binfileReadDouble(QFile& file);
+
+/** \brief write a double to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteDouble(QFile& file, double data);
+
+/** \brief write an array of dataN doubles to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteDoubleArray(QFile& file, const double* data, uint32_t dataN);
+
+/** \brief write an array of dataN doubles to a binary file and subtract 1.0 from every entry
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteDoubleArrayMinus1(QFile& file, const double* data, uint32_t dataN);
+
+/** \brief read an array of dataN doubles from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN);
+
+
 #endif // BINARYDATATOOLS_H

@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/tcspcimporter">
+        <file alias="tcspcimporter.png">images/tcspcimporter.png</file>
+        <file alias="fileopen.png">images/fileopen.png</file>
+        <file alias="thread_error.png">images/thread_error.png</file>
+        <file alias="thread_ok.png">images/thread_ok.png</file>
+        <file alias="thread_run.png">images/thread_run.png</file>
+        <file alias="thread_wait.png">images/thread_wait.png</file>
+        <file alias="add_job.png">images/add_job.png</file>
+        <file alias="job_cancel.png">images/job_cancel.png</file>
+        <file alias="job_done.png">images/job_done.png</file>
+        <file alias="use_file.png">images/use_file.png</file>
+    </qresource>
+</RCC>

@@ -163,3 +163,55 @@ QByteArray boolArrayToString(const QVector<bool>& data) {
     }
     return result;
 }
+
+
+
+
+
+
+
+
+
+void binfileWriteUint32(QFile& file, uint32_t data) {
+    uint32_t w=qToLittleEndian(data);
+    file.write((char*)(&w), sizeof(w));
+}
+
+uint32_t binfileReadUint32(QFile& file) {
+    uint32_t d;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+void binfileWriteDouble(QFile& file, double data) {
+    double w=qToLittleEndian(data);
+    file.write((char*)(&w), sizeof(w));
+}
+
+double binfileReadDouble(QFile& file) {
+    double d;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+void binfileWriteDoubleArray(QFile& file, const double* data, uint32_t dataN) {
+    for (int i=0; i<dataN; i++)  {
+        const double w=qToLittleEndian(data[i]);
+        file.write((char*)(&w), sizeof(w));
+    }
+}
+
+void binfileWriteDoubleArrayMinus1(QFile& file, const double* data, uint32_t dataN) {
+    for (int i=0; i<dataN; i++)  {
+        const double w=qToLittleEndian(data[i]-1.0);
+        file.write((char*)(&w), sizeof(w));
+    }
+}
+
+void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN) {
+    for (int i=0; i<dataN; i++)  {
+        double d;
+        file.read((char*)&d, sizeof(d));
+        data[i]=qFromLittleEndian(d);
+    }
+}

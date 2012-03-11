@@ -1,35 +1,35 @@
-#ifndef QFRDRIMAGINGFCSCORRELATIONDIALOG_H
-#define QFRDRIMAGINGFCSCORRELATIONDIALOG_H
+#ifndef QFETCSPCImporterDIALOG_H
+#define QFETCSPCImporterDIALOG_H
 
 #include <QDialog>
 #include "qfproject.h"
 #include "programoptions.h"
-#include "qfrdrimagingfcsthreadprogress.h"
+#include "qfetcspcimporterthreadprogress.h"
 #include "qfpluginservices.h"
 #include <stdint.h>
 
-class QFRDRImagingFCSCorrelationJobThread; // forward
-struct IMFCSJob; // forward
+class QFETCSPCImporterJobThread; // forward
+struct TCSPCImporterJob; // forward
 namespace Ui {
-    class QFRDRImagingFCSCorrelationDialog; // forward
+    class QFETCSPCImporterDialog; // forward
 }
 
 /*! \brief dialog used to correlate image sequences
-    \ingroup qf3rdrdp_imaging_fcs
+    \ingroup qf3ext_tcspcimporter
 
     This dialog is called by QFRDRImagingFCSPlugin::correlateAndInsert(). It allows the user
     to create several correlation jobs that run in parallel and to wait until they are done.
     Finally getFilesToAdd() returns a list of file constaining ACFs and CCFs to be added to the
     project, by calling QFRDRImagingFCSPlugin::insertVideoCorrelatorFile().
 */
-class QFRDRImagingFCSCorrelationDialog : public QDialog
+class QFETCSPCImporterDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent = 0);
-    ~QFRDRImagingFCSCorrelationDialog();
+    QFETCSPCImporterDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent = 0);
+    ~QFETCSPCImporterDialog();
 
     void setProject(QFProject* project);
 
@@ -39,32 +39,23 @@ public:
     QStringList getFilesToAdd() const;
 
 protected slots:
-    void on_btnSelectImageFile_clicked();
-    void on_btnSelectBackgroundFile_clicked();
+    void on_btnSelectFile_clicked();
     void on_btnAddJob_clicked();
     void on_btnLoad_clicked();
     void on_btnHelp_clicked();
     void on_spinP_valueChanged(int val);
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
-    void on_spinDecay_valueChanged(double val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
-    void on_cmbBackground_currentIndexChanged(int idx);
-    void on_cmbBleachType_currentIndexChanged(int idx);
 
-    void frameTimeChanged(double value);
-    void frameRateChanged(double value);
     void updateProgress();
     void updateFromFile(bool readFrameCount=true);
     void updateCorrelator();
-    void updateFrameCount();
-    void updateImageSize();
-    void updateBleach();
+    void updateDuration();
     void startNextWaitingThread();
     void on_chkFirstFrame_clicked(bool checked);
     void on_chkLastFrame_clicked(bool checked);
     void setEditControlsEnabled(bool enabled);
-    void on_btnDataExplorer_clicked();
 protected:
     void done(int status);
     bool allThreadsDone() const;
@@ -72,29 +63,23 @@ protected:
     int waitingThreads() const;
 private:
     QFPluginServices* pluginServices;
-    Ui::QFRDRImagingFCSCorrelationDialog *ui;
+    Ui::QFETCSPCImporterDialog *ui;
     QPointer<QFProject> project;
     ProgramOptions* options;
-    QString lastImagefileDir;
-    QString lastImagefileFilter;
-    QStringList imageFilters;
-    QStringList imageFormatNames;
-    QList<IMFCSJob> jobs;
+    QString lastTCSPCFileDir;
+    QString lastTCSPCFileFilter;
+    QStringList tcspcFilters;
+    QStringList tcspcFormatNames;
+    QList<TCSPCImporterJob> jobs;
     //QList<Job> jobsToAdd;
     QStringList filesToAdd;
     bool closing;
-    int32_t frame_count;
-    QString inputconfigfile;
+    double duration;
 
-
-
-    int image_width;
-    int image_height;
-
-    int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
+    int getIDForProgress(const QFETCSPCImporterThreadProgress* w) const;
     int getLayoutIDForProgress(const QWidget* w) const;
 };
 
-#endif // QFRDRIMAGINGFCSCORRELATIONDIALOG_H
+#endif // QFETCSPCImporterDIALOG_H
 
 

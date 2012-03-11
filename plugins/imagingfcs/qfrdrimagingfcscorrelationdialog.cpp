@@ -417,7 +417,7 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
-    Job job;
+    IMFCSJob job;
     job.progress=new QFRDRImagingFCSThreadProgress(this);
     job.thread=new QFRDRImagingFCSCorrelationJobThread(this);
     connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));

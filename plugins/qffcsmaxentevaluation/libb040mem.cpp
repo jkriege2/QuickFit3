@@ -82,8 +82,8 @@ void MaxEntB040::setTauGrid()
     m_taudiffs.resize(m_N);
     double tminexp=floor(log10(m_xdata(0)));
 	double tmaxexp=ceil(log10(m_xdata(m_Nd-1)));
-	double taumin=pow(10,tminexp);
-	double taumax=pow(10,tmaxexp);
+    double taumin=pow(10.0,tminexp);
+    double taumax=pow(10.0,tmaxexp);
 	for (int i=0; i<m_N; i++)
         {
         m_taudiffs(i) = taumin*exp((i)*log(10)*log10(taumax/(taumin))/(m_N-1));
@@ -99,8 +99,8 @@ void MaxEntB040::setTmatrix(){
         {
             for (int j=0; j<m_N; j++)
                 {
-                	tripFactor=(1-m_tripTheta+m_tripTheta*exp(-m_xdata(i)/m_tripTau))/(1-m_tripTheta);
-                    value=(1/((1+m_xdata(i)/(m_taudiffs(j)))))*(1/(sqrt(1+m_xdata(i)/(m_taudiffs(j)*m_kappa*m_kappa))));
+                    tripFactor=(1.0-m_tripTheta+m_tripTheta*exp(-m_xdata(i)/m_tripTau))/(1.0-m_tripTheta);
+                    value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))))*(1.0/(sqrt(1+m_xdata(i)/(m_taudiffs(j)*m_kappa*m_kappa))));
                     m_T(i,j)=tripFactor*value;
                 }
         }  
@@ -145,8 +145,7 @@ void MaxEntB040::setMmatrix()
     }
     
     
-void MaxEntB040::performIter()
-	{
+void MaxEntB040::performIter() {
 	
 	 	
 	m_m.resize(m_N);
@@ -158,8 +157,8 @@ void MaxEntB040::performIter()
 
 	double value=m_N;
 	for (int i=0; i<m_N ; i++)
-		{m_m(i)=1/value;
-		m_f(i)=1/value;}
+        {m_m(i)=1.0/value;
+        m_f(i)=1.0/value;}
 		m_u=Eigen::VectorXd::Zero(m_s);
 	Eigen::VectorXd work(m_N);
 	Eigen::VectorXd work2(m_N);
@@ -184,12 +183,11 @@ void MaxEntB040::performIter()
 	
 //	double alpha=0.00005; // for twocomp.csv alpha=0.00005
 	//double alpha=0.001;
-	int NumIter=1000; // already tried out NumIter=300
+    int NumIter=100; // already tried out NumIter=300
 	
 	int counter=0;
 
-	for (int i=0; i<NumIter; i++)
-		{
+    for (int i=0; i<NumIter; i++) {
 		//current f
 		work=m_Ured*m_u;
 		for (int i=0; i<m_N ; i++){work2(i)=exp(work(i));}
@@ -213,17 +211,17 @@ void MaxEntB040::performIter()
 		m_u=m_u+du;	
 		
 		counter=counter+1;
-		}	
-		
-		//current_f
-		work=m_Ured*m_u;
-		for (int i=0; i<m_N ; i++){work2(i)=exp(work(i));}
-		m_f=m_m.array()*work2.array();
-		
-		//Modeldata F=V*S*U'*f
-		m_F=m_Vred*m_Sred*m_Ured.transpose()*m_f;		
+    }
 
-		}
+    //current_f
+    work=m_Ured*m_u;
+    for (int i=0; i<m_N ; i++){work2(i)=exp(work(i));}
+    m_f=m_m.array()*work2.array();
+
+    //Modeldata F=V*S*U'*f
+    m_F=m_Vred*m_Sred*m_Ured.transpose()*m_f;
+
+}
 		
 
 void MaxEntB040::setDistTaus(double * distTaus)		

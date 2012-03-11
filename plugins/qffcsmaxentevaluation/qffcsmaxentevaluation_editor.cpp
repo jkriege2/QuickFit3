@@ -590,8 +590,6 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 g_dist->set_title("MaxEnt distribution");
                 g_dist->set_xColumn(c_disttau);
                 g_dist->set_yColumn(c_dist);
-                g_dist->set_datarange_start(datacut->get_userMin());
-                g_dist->set_datarange_end(datacut->get_userMax());
                 pltDistribution->addGraph(g_dist);
                 //qDebug()<<"    g "<<t.elapsed()<<" ms";
                 t.start();

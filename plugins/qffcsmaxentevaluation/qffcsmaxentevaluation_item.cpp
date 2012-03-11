@@ -4,6 +4,7 @@
 #include "qfmathtools.h"
 #include "libb040mem.h"
 
+
 #define sqr(x) ((x)*(x))
 
 QFFCSMaxEntEvaluationItem::QFFCSMaxEntEvaluationItem(QFProject* parent):
@@ -29,6 +30,7 @@ void QFFCSMaxEntEvaluationItem::intWriteData(QXmlStreamWriter& w) {
     QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("maxent_config");
     w.writeAttribute("current_weights", QString::number(currentWeights));
+    w.writeEndElement();
 
 }
 
@@ -463,6 +465,15 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         mem.run(alpha,kappa,tripTau,tripTheta);
         mem.setDistTaus(distTaus);
         mem.setDistribution(dist);
+
+
+        // reset all NAN to 0
+        for (unsigned int i=0; i<Ndist; i++) {
+            double d=dist[i];
+            if (!QFFloatIsOK(dist[i])) dist[i]=0;
+            qDebug()<<distTaus[i]<<" ,\t"<<d<<" ,\t"<<dist[i];
+        }
+
         //////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////
 /*
@@ -489,12 +500,12 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
         // now store the results:
         QString param;
-        setFitResultValueNumberArray(record, index, model, param="maxent_tau", &(taus[rangeMinDatarange]), rangeMaxDatarange-rangeMinDatarange, QString("seconds"));
+        setFitResultValueNumberArray(record, index, model, param="maxent_tau", distTaus, Ndist, QString("seconds"));
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: lag times"), QString("MaxEnt distribution: lag times <i>&tau;</i>"));
         setFitResultSortPriority(record, index, model, param, true);
 
-        setFitResultValueNumberArray(record, index, model, param="maxent_distribution", &(dist[rangeMinDatarange]), rangeMaxDatarange-rangeMinDatarange);
+        setFitResultValueNumberArray(record, index, model, param="maxent_distribution", dist, Ndist);
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution"), QString("MaxEnt distribution: <i>p(&tau;)</i>"));
         setFitResultSortPriority(record, index, model, param, true);
