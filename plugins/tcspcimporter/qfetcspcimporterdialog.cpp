@@ -338,6 +338,9 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     job.postfix=ui->edtPostfix->text();
     job.fcs_taumin=ui->spinFCSTauMin->value()*1e-6;
     job.fcs_segments=ui->spinSegments->value();
+    job.doFCS=ui->chkFCS->isChecked();
+    job.doCountrate=ui->chkCountrate->isChecked();
+    job.fcs_crbinning=1e-2;
 
     //qDebug()<<job.filenameBackground;
     job.range_min=-1;
@@ -361,7 +364,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
 
 void QFETCSPCImporterDialog::updateCorrelator() {
     int corrType=ui->cmbCorrelator->currentIndex();
-    if (corrType==2) {
+    if (corrType==1) {
         ui->spinM->setEnabled(false);
         ui->labM->setEnabled(false);
         ui->spinM->setValue(2);
@@ -376,7 +379,7 @@ void QFETCSPCImporterDialog::updateCorrelator() {
     double taumin=ui->spinFCSTauMin->value();
     double taumax=taumin;
 
-    if (corrType==1) {
+    if (corrType==0) {
         taumax=0;
         for (int s=0; s<S; s++) {
             if (s==0) {
@@ -413,7 +416,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
 }
 
 
-QStringList QFETCSPCImporterDialog::getFilesToAdd() const {
+QList<QPair<QString, QString> > QFETCSPCImporterDialog::getFilesToAdd() const {
     return filesToAdd;
 }
 

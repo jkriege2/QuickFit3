@@ -18,17 +18,17 @@ struct QFLIB_EXPORT QFTCSPCRecord {
     int16_t microtime_channel;
 
 
-    /** \brief arrival time after macrotime of first microtime channel */
+    /** \brief arrival time after macrotime of first microtime channel [nanoseconds] */
     double microtime_offset;
-    /** \brief time difference between two microtime chanels */
+    /** \brief time difference between two microtime chanels [nanoseconds] */
     double microtime_deltaT;
 
     /** \brief input channel in which the photon arrived */
-    int32_t input_channel;
+    uint16_t input_channel;
 
     double absoluteTime() const ;
 
-    QFTCSPCRecord(int32_t input_channel=0, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9) ;
+    QFTCSPCRecord(uint16_t input_channel=0, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9) ;
 };
 
 /*! \brief interface for TCSPC reader classes
@@ -59,10 +59,13 @@ class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
         /** \brief returns the duration of the measurement in seconds */
         virtual double measurementDuration() const=0;
         /** \brief returns the number of input channels */
-        virtual int32_t inputChannels() const=0;
+        virtual uint16_t inputChannels() const=0;
 
         /** \brief output the current photon record */
         virtual QFTCSPCRecord getCurrentRecord() const=0;
+
+        /** \brief returns the position inside the input file in % */
+        virtual double percentCompleted()const =0;
     protected:
 
 };

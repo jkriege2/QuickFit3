@@ -20,10 +20,8 @@
 class QFETCSPCImporterThreadProgress; // forward
 class QFETCSPCImporterJobThread; // forward
 
-#define CORRELATOR_DIRECT 0
-#define CORRELATOR_DIRECTAVG 1
-#define CORRELATOR_MTAUALLMON 2
-#define CORRELATOR_MTAUONEMON 3
+#define CORRELATOR_MTAUALLMON 0
+#define CORRELATOR_MTAUONEMON 1
 
 
 /*! \brief job description for tcspc evaluation
@@ -57,6 +55,8 @@ struct TCSPCImporterJob {
     int m;
     /** \brief minimum integration time for FCS in seconds */
     double fcs_taumin;
+    /** \brief integration time for FCS countrate */
+    double fcs_crbinning;
     /** \brief cut the input sequence in this number of segments and calculate and average + stddev for every point in the ACF/CCF */
     int32_t fcs_segments;
     /** \brief start of range in seconds */
@@ -72,6 +72,9 @@ struct TCSPCImporterJob {
     /** \brief binning for count rates in seconds */
     double countrate_binning;
 
+    bool doFCS;
+    bool doCountrate;
+
 
 };
 
@@ -79,6 +82,33 @@ struct TCSPCImporterJob {
     \ingroup qf3ext_tcspcimporter
 
 
+
+    This class might save the countrate to a binary file with this format:
+\verbatim
+data                                                   size [bytes]
++---------------------------------------------------+
+| "QF3.0CNTRT"                    file id           |  10
++---------------------------------------------------+
+| channels                     channels in this file|  2 (uint16)
+| itemsPerChannel      items in each channel's array|  8 (uint64)
+| deltaT             duration of one item in seconds|  8 (double)
++---------------------------------------------------+
+| cr[0] of channel 0                                |  4 (uint16)
+| cr[0] of channel 1                                |  4 (uint16)
+| ...                                               |
+| cr[0] of channel channels-1                       |  4 (uint16)
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| cr[itemsPerChannel-1] of channel 0                |  4 (uint16)
+| cr[itemsPerChannel-1] of channel 1                |  4 (uint16)
+| ...                                               |
+| cr[itemsPerChannel-1] of channel channels-1       |  4 (uint16)
++---------------------------------------------------+
+\endverbatim
+        \note All numbers are stored in little-endian form!!!
 */
 class QFETCSPCImporterJobThread : public QThread
 {
@@ -92,7 +122,7 @@ public:
     static QStringList getImporterFormatNameList(QFPluginServices *pluginServices);
     static QFTCSPCReader* getImporter(int idx, QFPluginServices *pluginServices);
     static int getImporterCount(QFPluginServices *pluginServices);
-    QStringList getAddFiles() const;
+    QList<QPair<QString, QString> > getAddFiles() const;
     TCSPCImporterJob getJob() const;
     double durationMS() const;
     double durationS() const;
@@ -127,6 +157,8 @@ protected:
     /** \brief the run method of the thread */
     void run();
 
+    void runEval(QFTCSPCReader* reader, QFile *countrateFile);
+
     int m_status;
     bool was_canceled;
 
@@ -138,13 +170,22 @@ protected:
     QFTCSPCReader* reader;
 
     QLocale outLocale;
-    QStringList addFiles;
+    QList<QPair<QString, QString> > addFiles;
     QString outputFilenameBase;
 
 
     static QMutex* mutexFilename;
 
     QFPluginServices* pluginServices;
+
+    QList<correlatorjb<double, double>*> corrjb;
+    QList<MultiTauCorrelator<double, double>*> corrjk;
+
+    double starttime;
+    double range_duration;
+    double file_duration;
+    uint16_t channels;
+    uint64_t countrate_items;
 };
 
 #endif // QFETCSPCImporterJOBTHREAD_H

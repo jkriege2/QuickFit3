@@ -3,6 +3,7 @@
 #include "datatable2.h"
 #include "tools.h"
 #include "qfrdrphotoncounts_dataeditor.h"
+#include "binarydatatools.h"
 
 QFRDRPhotonCountsData::QFRDRPhotonCountsData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -86,7 +87,7 @@ void QFRDRPhotonCountsData::intReadData(QDomElement* e) {
             return;
         }
         loadCountRatesFromCSV(files[0]);
-    } else if (filetype.toUpper()=="CSV") {
+    } else if (filetype.toUpper()=="BINARY") {
         if (files.size()<=0) {
             setError(tr("there are no files in the COUNT RATES record!"));
             return;
@@ -142,6 +143,35 @@ bool QFRDRPhotonCountsData::loadCountRatesFromCSV(QString filename) {
 }
 
 bool QFRDRPhotonCountsData::loadCountRatesFromBinary(QString filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly)) {
+        QByteArray intro=f.read(10);
+        if (intro=="QF3.0CNTRT") {
+            uint16_t channels=binfileReadUint16(f);
+            uint64_t itemsPerChannel=binfileReadUint64(f);
+            double deltaT=binfileReadDouble(f);
+            resizeRates(itemsPerChannel, channels);
+            averageT=deltaT;
+
+            for (register uint64_t i=0; i<itemsPerChannel; i++) {
+                rateT[i]=double(i)*deltaT;
+                for (register uint16_t j=0; j<channels; j++) {
+                    uint16_t d=binfileReadUint16(f);
+                    rate[j*itemsPerChannel+i]=d;
+                }
+                if (f.atEnd()) break;
+            }
+
+            emitRawDataChanged();
+            if (rateN<1000) autoCalcRateN=rateN;
+            calcPhotonCountsBinned();
+            return true;
+
+        } else {
+            setError(tr("Error reading binary photoncounts file '%1': wrong file intro found ('%1' instead of 'QF3.0CNTRT'").arg(filename).arg(QString(intro)));
+            return false;
+        }
+    }
     return false;
 }
 
@@ -314,7 +344,7 @@ void QFRDRPhotonCountsData::calcPhotonCountsBinned() {
         N=(long long)ceil((double)rateN/(double)d);
         if ((double)rateN/(double)autoCalcRateN<1) N=rateN;
         resizeBinnedRates(N);
-        //qDebug()<<"rate N="<<N<<"    binnedRateN="<<binnedRateN;
+        qDebug()<<"rate N="<<N<<"    binnedRateN="<<binnedRateN;
     //}
     if (binnedRateN>0) {
         //if (N!=binnedRateN) resizeBinnedRates(N);
@@ -327,11 +357,14 @@ void QFRDRPhotonCountsData::calcPhotonCountsBinned() {
                 for (long long j=jmin; j<=jmax; j++) {
                     sum=sum+rate[channel*rateN+j];
                 }
-                binnedRate[channel*binnedRateN+i]=sum/(double)(jmax-jmin+1);
+                binnedRate[channel*binnedRateN+i]=sum;
                 binnedRateT[i]=rateT[jmin];
-                if (i>0) averageBinnedT=averageBinnedT+fabs(binnedRateT[i]-binnedRateT[i-1]);
             }
-            averageBinnedT=averageBinnedT/double(binnedRateN-1);
+            averageBinnedT=averageT*double(rateN)/double(binnedRateN);
+            qDebug()<<"averageT="<<averageT<<"   averageBinnedT="<<averageBinnedT;
+            for (long long i=0; i<binnedRateN; i++) {
+                binnedRate[channel*binnedRateN+i]=binnedRate[channel*binnedRateN+i]/averageBinnedT/1000.0;
+            }
         }
     }
     emitRawDataChanged();

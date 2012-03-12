@@ -74,6 +74,9 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
          */
         virtual void log_error(QString message);
 
+        void insertFCSCSVFile(const QString &filenameFCS, const QString& filenameCR, int channel, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
+        void insertCountRate(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
+
 	protected:
         QFPluginLogService* logService;
 		

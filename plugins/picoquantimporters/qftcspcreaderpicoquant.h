@@ -3,7 +3,8 @@
 #include "qfpluginimporters.h"
 #include "qfimporter.h"
 #include "qftcspcreader.h"
-
+#include <stdio.h>
+#include "picoquant_tools.h"
 
 
 /*! \brief QFImporter class for PicoQuant TTTR Files (as TCSPC files)
@@ -33,9 +34,26 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         /** \copydoc QFTCSPCReader::measurementDuration() */
         virtual double measurementDuration() const;
         /** \copydoc QFTCSPCReader::inputChannels() */
-        virtual int32_t inputChannels() const;
+        virtual uint16_t inputChannels() const;
         /** \copydoc QFTCSPCReader::getCurrentRecord() */
         virtual QFTCSPCRecord getCurrentRecord() const;
+
+        virtual double percentCompleted()const;
+
+    protected:
+        FILE* tttrfile;
+        TTTRTxtHdr txtHeader;
+        TTTRBinHdr binHeader;
+        TTTRBoardHdr boardHeader;
+        TTTRHdr TTTRHeader;
+
+        fpos_t fileResetPos;
+
+        uint64_t currentTTTRRecordNum;
+        uint64_t ofltime;
+        uint64_t overflows;
+
+        QFTCSPCRecord current;
 };
 
 #endif // QFTCSPCREADERPICOQUANT_H

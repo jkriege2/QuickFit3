@@ -170,6 +170,16 @@ QByteArray boolArrayToString(const QVector<bool>& data) {
 
 
 
+void binfileWriteUint64(QFile& file, uint64_t data) {
+    uint64_t w=qToLittleEndian(data);
+    file.write((char*)(&w), sizeof(w));
+}
+
+uint64_t binfileReadUint64(QFile& file) {
+    uint64_t d;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
 
 
 void binfileWriteUint32(QFile& file, uint32_t data) {
@@ -179,6 +189,28 @@ void binfileWriteUint32(QFile& file, uint32_t data) {
 
 uint32_t binfileReadUint32(QFile& file) {
     uint32_t d;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+void binfileWriteUint16(QFile& file, uint16_t data) {
+    uint16_t w=qToLittleEndian(data);
+    file.write((char*)(&w), sizeof(w));
+}
+
+uint16_t binfileReadUint16(QFile& file) {
+    uint16_t d;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+void binfileWriteUint8(QFile& file, uint8_t data) {
+    uint8_t w=qToLittleEndian(data);
+    file.write((char*)(&w), sizeof(w));
+}
+
+uint8_t binfileReadUint8(QFile& file) {
+    uint8_t d;
     file.read((char*)&d, sizeof(d));
     return qFromLittleEndian(d);
 }

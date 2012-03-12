@@ -260,7 +260,7 @@ void QFRDRPhotonCountsDataEditor::replotData(int dummy) {
     plotterBinned->getXAxis()->set_logAxis(false);
     plotterBinned->getYAxis()->set_logAxis(false);
     plotterBinned->getXAxis()->set_axisLabel(tr("time [s]"));
-    plotterBinned->getYAxis()->set_axisLabel(tr("photons"));
+    plotterBinned->getYAxis()->set_axisLabel(tr("count rate [kHz]"));
     plotterBinned->zoomToFit(true, true, false,chkIncludeRate0->isChecked());
     if (chkDisplayStatistics->isChecked()) labRateData->setText(labText); else labRateData->setText("");
     plotterBinned->set_doDrawing(true);
@@ -287,7 +287,20 @@ void QFRDRPhotonCountsDataEditor::replotDetail() {
     plotterDetail->getYAxis()->set_logAxis(false);
     plotterDetail->getXAxis()->set_axisLabel(tr("time [s]"));
     plotterDetail->getYAxis()->set_axisLabel(tr("photons"));
-    plotterDetail->zoomToFit(true, true, false,chkIncludeRate0->isChecked());
+    double mmin, mmax;
+    for (int c=0; c<m->getPhotonCountsBinnedChannels(); c++) {
+        double mi, ma;
+        m->getPhotonCountsMinMax(c, mi, ma, QFRDRPhotonCountsData::Counts);
+        if (c==0) {
+            mmin=mi;
+            mmax=ma;
+        } else {
+            if (mi<mmin) mmin=mi;
+            if (ma>mmax) mmax=ma;
+        }
+    }
+    plotterDetail->setY(mmin, mmax*1.05);
+    plotterDetail->zoomToFit(true, false, false,chkIncludeRate0->isChecked());
     plotterDetail->set_doDrawing(true);
     plotterDetail->set_emitSignals(true);
     plotterDetail->update_plot();

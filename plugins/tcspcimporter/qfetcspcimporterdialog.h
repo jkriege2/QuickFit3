@@ -36,7 +36,7 @@ public:
     void writeSettings();
     void readSettings();
 
-    QStringList getFilesToAdd() const;
+    QList<QPair<QString, QString> > getFilesToAdd() const;
 
 protected slots:
     void on_btnSelectFile_clicked();
@@ -72,7 +72,7 @@ private:
     QStringList tcspcFormatNames;
     QList<TCSPCImporterJob> jobs;
     //QList<Job> jobsToAdd;
-    QStringList filesToAdd;
+    QList<QPair<QString, QString> > filesToAdd;
     bool closing;
     double duration;
 

@@ -95,6 +95,37 @@ QFLIB_EXPORT uint32_t binfileReadUint32(QFile& file);
  */
 QFLIB_EXPORT void binfileWriteUint32(QFile& file, uint32_t data);
 
+/** \brief read a uint64_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT uint64_t binfileReadUint64(QFile& file);
+
+/** \brief write a uint64_t to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteUint64(QFile& file, uint64_t data);
+
+/** \brief read a uint16_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT uint16_t binfileReadUint16(QFile& file);
+
+/** \brief write a uint16_t to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteUint16(QFile& file, uint16_t data);
+
+
+/** \brief read a uint8_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT uint8_t binfileReadUint8(QFile& file);
+
+/** \brief write a uint8_t to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteUint8(QFile& file, uint8_t data);
+
 /** \brief read a double from a binary file
  *  \ingroup qf3lib_mathtools
  */
