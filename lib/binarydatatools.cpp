@@ -241,9 +241,18 @@ void binfileWriteDoubleArrayMinus1(QFile& file, const double* data, uint32_t dat
 }
 
 void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN) {
+    file.read((char*)data, dataN*sizeof(double));
     for (int i=0; i<dataN; i++)  {
-        double d;
-        file.read((char*)&d, sizeof(d));
+        double d=data[i];
+        data[i]=qFromLittleEndian(d);
+    }
+}
+
+
+void binfileReadUInt16Array(QFile& file, uint16_t* data, uint32_t dataN) {
+    file.read((char*)data, dataN*sizeof(uint16_t));
+    for (int i=0; i<dataN; i++)  {
+        uint16_t d=data[i];
         data[i]=qFromLittleEndian(d);
     }
 }

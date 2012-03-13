@@ -154,4 +154,10 @@ QFLIB_EXPORT void binfileWriteDoubleArrayMinus1(QFile& file, const double* data,
 QFLIB_EXPORT void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN);
 
 
+/** \brief read an array of dataN uint16s from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileReadUInt16Array(QFile& file, uint16_t* data, uint32_t dataN);
+
+
 #endif // BINARYDATATOOLS_H

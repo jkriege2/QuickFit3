@@ -152,15 +152,30 @@ bool QFRDRPhotonCountsData::loadCountRatesFromBinary(QString filename) {
             double deltaT=binfileReadDouble(f);
             resizeRates(itemsPerChannel, channels);
             averageT=deltaT;
+            uint32_t chunkSize=qMin(itemsPerChannel, (uint64_t)1024)*channels;
+            uint16_t* temp=(uint16_t*)malloc(chunkSize*sizeof(uint16_t));
 
             for (register uint64_t i=0; i<itemsPerChannel; i++) {
                 rateT[i]=double(i)*deltaT;
-                for (register uint16_t j=0; j<channels; j++) {
+            }
+            for (register uint64_t i=0; i<itemsPerChannel*channels; i=i+chunkSize) {
+                uint32_t chunksize_local=chunkSize;
+                if (i+chunkSize>itemsPerChannel*channels) {
+                    chunksize_local=(itemsPerChannel*channels-i);
+                }
+                binfileReadUInt16Array(f, temp, chunksize_local);
+                for (register uint32_t j=0; j<chunksize_local; j=j+1) {
+                    uint32_t channel=j%channels;
+                    uint32_t idx=(i+j)/channels;
+                    rate[channel*itemsPerChannel+idx]=temp[j];
+                }
+                /*for (register uint16_t j=0; j<channels; j++) {
                     uint16_t d=binfileReadUint16(f);
                     rate[j*itemsPerChannel+i]=d;
-                }
+                }*/
                 if (f.atEnd()) break;
             }
+            free(temp);
 
             emitRawDataChanged();
             if (rateN<1000) autoCalcRateN=rateN;
