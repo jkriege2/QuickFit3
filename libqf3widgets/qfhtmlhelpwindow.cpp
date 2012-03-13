@@ -313,9 +313,12 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         mathParser.set_fontSans("Helvetica");
         mathParser.set_fontMathSans("Helvetica");
     }
-    if (!fonts.contains("Symbol")) {
+    if (!fonts.contains("Symbol") && !fonts.contains("Standard Symbols L")) {
         //qDebug()<<"no Symbol";
         mathParser.useAnyUnicode(mathParser.get_fontRoman(), mathParser.get_fontSans());
+    } else  {
+        //qDebug()<<"no Symbol";
+        //mathParser.useAnyUnicode(mathParser.get_fontRoman(), mathParser.get_fontSans());
     }
     if (fonts.contains("Courier")) {
         //qDebug()<<"using Courier";
@@ -625,6 +628,9 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     pix=QPixmap(size.width()*1.2, size.height()*1.1);
                     pix.fill(Qt::transparent);
                     p.begin(&pix);
+                    p.setRenderHint(QPainter::Antialiasing);
+                    p.setRenderHint(QPainter::HighQualityAntialiasing);
+                    p.setRenderHint(QPainter::TextAntialiasing);
                     mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
                     p.end();
                     QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";

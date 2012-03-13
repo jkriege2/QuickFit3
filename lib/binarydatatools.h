@@ -1,7 +1,9 @@
 #ifndef BINARYDATATOOLS_H
 #define BINARYDATATOOLS_H
 
-
+#include <stdint.h>
+#include <cstdlib>
+#include <cstdio>
 #include <QString>
 #include <QVector>
 #include "lib_imexport.h"

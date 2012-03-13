@@ -10,6 +10,7 @@
 #include <QFile>
 #include "lib_imexport.h"
 #include <QFileDialog>
+#include <cstdlib>
 
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
     \ingroup qf3lib_mathtools

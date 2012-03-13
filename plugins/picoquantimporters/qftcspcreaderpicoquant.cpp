@@ -4,7 +4,7 @@
 QFTCSPCReaderPicoquant::QFTCSPCReaderPicoquant() {
     tttrfile=NULL;
     currentTTTRRecordNum=0;
-    fileResetPos=0;
+//fileResetPos=0;
     ofltime=0;
     overflows=0;
 }
@@ -89,7 +89,7 @@ bool QFTCSPCReaderPicoquant::open(QString filename) {
 void QFTCSPCReaderPicoquant::close() {
     if (tttrfile) fclose(tttrfile);
     tttrfile=NULL;
-    fileResetPos=0;
+    //fileResetPos=0;
     currentTTTRRecordNum=0;
     ofltime=0;
     overflows=0;
