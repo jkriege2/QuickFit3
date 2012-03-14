@@ -2,6 +2,7 @@
 #include <QtGui>
 #include <QtPlugin>
 #include <iostream>
+#include "pimercury863calibrationdialog.h"
 
 #define LOG_PREFIX "[PI863]: "
 
@@ -86,6 +87,15 @@ void QFExtensionLinearStagePI::initExtension() {
             d.state=QFExtensionLinearStage::Disconnected;
             d.name=axisname;
             axes.append(d);
+        }
+    }
+
+    actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks"), this);
+    connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
+    if (services) {
+        QMenu* m=services->getMenu("extensions");
+        if (m) {
+            m->addAction(actCalibrateJoysticks);
         }
     }
 }
@@ -227,6 +237,21 @@ void QFExtensionLinearStagePI::checkComError() {
         for (int i=0; i<axes.size(); i++) {
             axes[i].state=QFExtensionLinearStage::Error;
             log_error(tr(LOG_PREFIX " serial port error: %1\n").arg(com.getLastError().c_str()));
+        }
+    }
+}
+
+void QFExtensionLinearStagePI::calibrateJoysticks() {
+
+    for (int axis=0; axis<getAxisCount(); axis++) {
+        QMessageBox::StandardButton answer=QMessageBox::question(NULL, tr("PI Mercury C863 joystick calibration"), tr("Do you want to calibrate a joystick on axis %1?").arg(axis), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
+        if (answer==QMessageBox::Yes) {
+            setJoystickActive(axis, false);
+            PIMercury863CalibrationDialog* dlg=new PIMercury863CalibrationDialog(NULL, this, axis);
+            dlg->exec();
+            delete dlg;
+        } else if (answer==QMessageBox::Cancel)  {
+            break;
         }
     }
 }

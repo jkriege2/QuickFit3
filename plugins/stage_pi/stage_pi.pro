@@ -16,10 +16,12 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += stage_pi.h \
            ../interfaces/qfextensionlinearstage.h \
-           ../../../../../LIB/trunk/jkserialconnection.h
+           ../../../../../LIB/trunk/jkserialconnection.h \
+    pimercury863calibrationdialog.h
 
 SOURCES += stage_pi.cpp \
-           ../../../../../LIB/trunk/jkserialconnection.cpp
+           ../../../../../LIB/trunk/jkserialconnection.cpp \
+    pimercury863calibrationdialog.cpp
 
 FORMS =
 

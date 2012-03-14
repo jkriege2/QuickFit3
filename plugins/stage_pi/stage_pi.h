@@ -38,7 +38,7 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan Krieger"); };
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2011-2012 by Jan Krieger"); };
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); };
         /** \copydoc QFExtension::getIconFilename() */
@@ -116,8 +116,24 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
          */
         virtual void log_error(QString message);
 
+
+        bool checkComConnected();
+
+        void selectAxis(int i);
+        /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return) */
+        void sendCommand(std::string command);
+
+        /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
+         *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */
+        std::string queryCommand(std::string command);
+        void checkComError();
+
+    protected slots:
+        void calibrateJoysticks();
+
 	protected:
         QFPluginLogService* logService;
+        QAction* actCalibrateJoysticks;
 
         struct AxisDescription {
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -161,15 +177,6 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         /** \brief settings of max. velocity */
         double maxVelocity;
 
-        bool checkComConnected();
-
-        void selectAxis(int i);
-        /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return) */
-        void sendCommand(std::string command);
-
-        /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
-         *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */
-        std::string queryCommand(std::string command);
         /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
         double lengthFactor;
 
@@ -179,7 +186,6 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         /** \brief this factor is used to get the control electronics acceleration from the acceleration in micron/sec^2, given in (micron/sec^2)/unit */
         double accelerationFactor;
 
-        void checkComError();
 };
 
 #endif // STAGE_PI_H

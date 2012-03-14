@@ -1,20 +1,22 @@
 #include "pimercury863calibrationdialog.h"
+#include "stage_pi.h"
 #include <QtGui>
 
-PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, PIMercury863Stage* stage):
+PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QFExtensionLinearStagePI* stage, int axis):
     QDialog(parent)
 {
     this->stage=stage;
-    maxX=maxY=maxZ=-1;
-    minX=minY=minZ=-1;
-    zeroX=zeroY=zeroZ=127;
+    this->axis=axis;
+    maxX=-10000;
+    minX=-10000;
+    zeroX=127;
 
     for (int i=0; i<256; i++) {
-        calX[i]=calY[i]=calZ[i]=i;//(int)round(((double)i/255.0-0.5)*255.0);
+        calX[i]=i;//(int)round(((double)i/255.0-0.5)*255.0);
     }
 
     QVBoxLayout* vbl=new QVBoxLayout(this);
-    vbl->addWidget(new QLabel(tr("calibration<br><ol><li>press RESET CAL.</li><li>move joystick to center position and press CENTERED.</li><li>move joystick to maximum positions and press CALIBRATE.</li><li>accept calibration with OK or reject with CANCEL.</li></ol>"), this));
+    vbl->addWidget(new QLabel(tr("calibration of axis %1<br><ol><li>press RESET CAL.</li><li>move joystick to center position and press CENTERED.</li><li>move joystick to maximum positions and press CALIBRATE.</li><li>accept calibration with OK or reject with CANCEL.</li></ol>").arg(axis), this));
 
     QGridLayout* grid=new QGridLayout(this);
 
@@ -30,32 +32,6 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, PI
     grid->addWidget(labMinX, 0, 3);
     labMaxX=new QLabel(this);
     grid->addWidget(labMaxX, 0, 4);
-
-    prgY=new QProgressBar(this);
-    prgY->setRange(0,255);
-    prgY->setFormat("%v");
-    prgY->setValue(127);
-    grid->addWidget(new QLabel("y: ", this), 1, 0);
-    grid->addWidget(prgY, 1, 1);
-    labY=new QLabel(this);
-    grid->addWidget(labY, 1, 2);
-    labMinY=new QLabel(this);
-    grid->addWidget(labMinY, 1, 3);
-    labMaxY=new QLabel(this);
-    grid->addWidget(labMaxY, 1, 4);
-
-    prgZ=new QProgressBar(this);
-    prgZ->setRange(0,255);
-    prgZ->setFormat("%v");
-    prgZ->setValue(127);
-    grid->addWidget(new QLabel("z: ", this), 2, 0);
-    grid->addWidget(prgZ, 2, 1);
-    labZ=new QLabel(this);
-    grid->addWidget(labZ, 2, 2);
-    labMinZ=new QLabel(this);
-    grid->addWidget(labMinZ, 2, 3);
-    labMaxZ=new QLabel(this);
-    grid->addWidget(labMaxZ, 2, 4);
 
     vbl->addLayout(grid);
 
@@ -88,6 +64,8 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, PI
     setLayout(vbl);
 
     accepted=false;
+    setWindowIcon(QIcon(":/stage_pi/pi_joystick.png"));
+    setWindowTitle(tr("PI Mercury C863 joystick calibration, stage %1").arg(axis));
 
     QTimer::singleShot(100, this, SLOT(getJoystickValues()));
 }
@@ -102,168 +80,109 @@ void PIMercury863CalibrationDialog::resetCal() {
     // write calibration to controllers
     std::cout<<"\n\ncalX[...]=\n";
     for (int i=0; i<256; i++) {
-        stage->sendCommandX("SI"+inttostr(i));
+        stage->selectAxis(axis);
+        stage->sendCommand("SI"+inttostr(i));
         int c=(int)round(1024.0*((double)i-127.0)/128.0);
-        stage->sendCommandX("SJ"+inttostr(c));
+        stage->sendCommand("SJ"+inttostr(c));
         std::cout<<"   "<<i<<":  "<<c<<std::endl;
+        calX[i]=c;
     }
-    std::cout<<"\n\ncalY[...]=\n";
-    for (int i=0; i<256; i++) {
-        stage->sendCommandY("SI"+inttostr(i));
-        int c=(int)round(1024.0*((double)i-127.0)/128.0);
-        stage->sendCommandY("SJ"+inttostr(c));
-        std::cout<<"   "<<i<<":  "<<c<<std::endl;
-    }
-    std::cout<<"\n\ncalZ[...]=\n";
-    for (int i=0; i<256; i++) {
-        stage->sendCommandZ("SI"+inttostr(i));
-        int c=(int)round(1024.0*((double)i-127.0)/128.0);
-        stage->sendCommandZ("SJ"+inttostr(c));
-        std::cout<<"   "<<i<<":  "<<c<<std::endl;
-    }
+    minX=-10000;
+    maxX=-10000;
+    zeroX=127;
+
 }
 
 void PIMercury863CalibrationDialog::acceptCal() {
     accepted=true;
     // write calibration to controllers
-    std::cout<<"\n\ncalX[...]=\n";
+    stage->log_text(tr("sending calibration table for axis %1:\n").arg(axis));
+    stage->log_text(tr("  cal[i]=\tvalue\n").arg(axis));
     for (int i=0; i<256; i++) {
-        stage->sendCommandX("SI"+inttostr(i));
-        stage->sendCommandX("SJ"+inttostr(calX[i]));
-        std::cout<<"   "<<i<<":  "<<calX[i]<<std::endl;
-    }
-    std::cout<<"\n\ncalY[...]=\n";
-    for (int i=0; i<256; i++) {
-        stage->sendCommandY("SI"+inttostr(i));
-        stage->sendCommandY("SJ"+inttostr(calY[i]));
-        std::cout<<"   "<<i<<":  "<<calY[i]<<std::endl;
-    }
-    std::cout<<"\n\ncalZ[...]=\n";
-    for (int i=0; i<256; i++) {
-        stage->sendCommandZ("SI"+inttostr(i));
-        stage->sendCommandZ("SJ"+inttostr(calZ[i]));
-        std::cout<<"   "<<i<<":  "<<calZ[i]<<std::endl;
+        stage->selectAxis(axis);
+        stage->sendCommand("SI"+inttostr(i));
+        stage->sendCommand("SJ"+inttostr(calX[i]));
+        stage->log_text(tr("  %1\t%2\n").arg(i).arg(calX[i]));
     }
     accept();
 }
 
 void PIMercury863CalibrationDialog::calibrate() {
     /* calculate calibration curves as two half parabulas:
-         one from (minX, -1024) to (zerX, 0)
-         one from (zerX, 0) to (maxX, 1024)
+         one from (minX, -1000) to (zerX, 0)
+         one from (zerX, 0) to (maxX, 1000)
          the vertex of the parabulas is in both cases (zeroX, 0)
 
          thus the quadratic function may be written as:
             f(x)=a*(x-zeroX)^2
 
-            where a=1024/(maxX-zeroX)^2 above zeroX
-            and   a=-1024/(minX-zeroX)^2 below zeroX
-            above maxX calX equals 1024
-            below minX calX equals -1024
+            where a=1000/(maxX-zeroX)^2 above zeroX
+            and   a=-1000/(minX-zeroX)^2 below zeroX
+            above maxX calX equals 1000
+            below minX calX equals -1000
     */
-    double zerowidth=9;
+    double zerowidth=20;
     double ap=1, an=-1;
-    ap=1024.0/pow(maxX-(zeroX+zerowidth), 2.0);
-    an=-1024.0/pow(minX-(zeroX-zerowidth), 2.0);
+    ap=1000.0/pow(maxX-(zeroX+zerowidth), 2.0);
+    an=-1000.0/pow(minX-(zeroX-zerowidth), 2.0);
     for (int i=0; i<256; i++) {
-        if (i<minX) calX[i]=-1024;
+        if (i<minX) calX[i]=-1000;
         else if (i<zeroX-zerowidth) calX[i]=(int)round(an*pow(i-(zeroX-zerowidth), 2.0));
-        else if ((i>zeroX+zerowidth) && (i<maxX)) calX[i]=(int)round(ap*pow(i-(zeroX+zerowidth), 2.0));
+        else if ((i>zeroX+zerowidth) && (i<=maxX)) calX[i]=(int)round(ap*pow(i-(zeroX+zerowidth), 2.0));
         else if ((i>=zeroX-zerowidth) && (i<=zeroX+zerowidth)) calX[i]=0;
-        else calX[i]=1024;
+        else if (i>=maxX) calX[i]=1000;
+        else if (i<=minX) calX[i]=-1000;
+        else calX[i]=1000;
+
+        if (calX[i]>1000) calX[i]=1000;
+        if (calX[i]<-1000) calX[i]=-1000;
+        qDebug()<<"x "<<i<<minX<<i<<maxX<<calX[i];
     }
 
-    ap=1024.0/pow(maxY-(zeroY+zerowidth), 2.0);
-    an=-1024.0/pow(minY-(zeroY-zerowidth), 2.0);
-    for (int i=0; i<256; i++) {
-        if (i<minY) calY[i]=-1024;
-        else if (i<zeroY-zerowidth) calY[i]=(int)round(an*pow(i-(zeroY-zerowidth), 2.0));
-        else if ((i>zeroY+zerowidth) && (i<maxY)) calY[i]=(int)round(ap*pow(i-(zeroY+zerowidth), 2.0));
-        else if ((i>=zeroY-zerowidth) && (i<=zeroY+zerowidth)) calY[i]=0;
-        else calY[i]=1024;
-    }
 
-    ap=1024.0/pow(maxZ-(zeroZ+zerowidth), 2.0);
-    an=-1024.0/pow(minZ-(zeroZ-zerowidth), 2.0);
-    for (int i=0; i<256; i++) {
-        if (i<minZ) calZ[i]=-1024;
-        else if (i<zeroZ-zerowidth) calZ[i]=(int)round(an*pow(i-(zeroZ-zerowidth), 2.0));
-        else if ((i>zeroZ+zerowidth) && (i<maxZ)) calZ[i]=(int)round(ap*pow(i-(zeroZ+zerowidth), 2.0));
-        else if ((i>=zeroZ-zerowidth) && (i<=zeroZ+zerowidth)) calZ[i]=0;
-        else calZ[i]=1024;
-    }
-
-    zeroX=zeroY=zeroZ=0;
+    zeroX=0;
     QTimer::singleShot(10, this, SLOT(getJoystickValues()));
 }
 
 void PIMercury863CalibrationDialog::center() {
-    if (stage->isConnected()) {
-        stage->resetError();
+    if (stage->isConnected(axis)) {
+        //stage->resetError();
         std::string r;
-        r=stage->queryCommandX("TA5")+"\n";
-        if (!stage->hasErrorOccured())
+        stage->selectAxis(axis);
+        r=stage->queryCommand("TA5")+"\n";
+        //if (!stage->hasErrorOccured())
             sscanf(r.c_str(), "A5:%d", &zeroX);
-        r=stage->queryCommandY("TA5")+"\n";
-        if (!stage->hasErrorOccured())
-            sscanf(r.c_str(), "A5:%d", &zeroY);
-        r=stage->queryCommandZ("TA5")+"\n";
-        if (!stage->hasErrorOccured())
-            sscanf(r.c_str(), "A5:%d", &zeroZ);
     }
-    QTimer::singleShot(1, this, SLOT(getJoystickValues()));
+    minX=-1;
+    maxX=-1;
+
+    //QTimer::singleShot(1, this, SLOT(getJoystickValues()));
 }
 
 void PIMercury863CalibrationDialog::getJoystickValues() {
-    if (stage->isConnected()) {
-        stage->resetError();
+    if (stage->isConnected(axis)) {
         int jx=0, jy=0, jz=0;
         std::string r;
-        r=stage->queryCommandX("TA5")+"\n";
-        if (!stage->hasErrorOccured())
+        stage->selectAxis(axis);
+        r=stage->queryCommand("TA5")+"\n";
+        //if (!stage->hasErrorOccured())
             sscanf(r.c_str(), "A5:%d", &jx);
-        r=stage->queryCommandY("TA5")+"\n";
-        if (!stage->hasErrorOccured())
-            sscanf(r.c_str(), "A5:%d", &jy);
-        r=stage->queryCommandZ("TA5")+"\n";
-        if (!stage->hasErrorOccured())
-            sscanf(r.c_str(), "A5:%d", &jz);
-        if (jx<0) jx=0; if (jx>255) jx=255;
-        if (jy<0) jy=0; if (jy>255) jy=255;
-        if (jz<0) jz=0; if (jz>255) jz=255;
 
-        std::cout<<"("<<jx<<", "<<jy<<", "<<jz<<")\n";
-        labX->setText(tr("%1").arg(calX[jx]-zeroX));
+        int jjx=jx;
+        if (jx<0) jx=0; if (jx>255) jx=255;
+
+        //std::cout<<"("<<jx<<", "<<jy<<", "<<jz<<")\n";
+        labX->setText(tr("%1  (%2)").arg(calX[jx]-zeroX).arg(jjx));
         prgX->setValue(jx);
-        labY->setText(tr("%1").arg(calY[jy]-zeroY));
-        prgY->setValue(jy);
-        labZ->setText(tr("%1").arg(calZ[jz]-zeroZ));
-        prgZ->setValue(jz);
-        if (minX<0) minX=maxX=calX[jx];
+        if (minX<=-10000) minX=maxX=calX[jx];
         else {
             if (calX[jx]<minX) minX=calX[jx];
             if (calX[jx]>maxX) maxX=calX[jx];
         }
-        labMinX->setText(tr("min=%1").arg(minX-zeroX));
+        labMinX->setText(tr("zero=%2 min=%1").arg(minX-zeroX).arg(zeroX));
         labMaxX->setText(tr("max=%1").arg(maxX-zeroX));
-        if (minY<0) minY=maxY=calY[jy];
-        else {
-            if (calY[jy]<minY) minY=calY[jy];
-            if (calY[jy]>maxY) maxY=calY[jy];
-        }
-        labMinY->setText(tr("min=%1").arg(minY-zeroY));
-        labMaxY->setText(tr("max=%1").arg(maxY-zeroY));
-        if (minZ<0) minZ=maxZ=calZ[jz];
-        else {
-            if (calZ[jz]<minZ) minZ=calZ[jz];
-            if (calZ[jz]>maxZ) maxZ=calZ[jz];
-        }
-        labMinZ->setText(tr("min=%1").arg(minZ-zeroZ));
-        labMaxZ->setText(tr("max=%1").arg(maxZ-zeroZ));
     } else {
         labX->setText(tr("Not Connected"));
-        labY->setText(tr("Not Connected"));
-        labZ->setText(tr("Not Connected"));
     }
 
     if (!accepted) QTimer::singleShot(1, this, SLOT(getJoystickValues()));

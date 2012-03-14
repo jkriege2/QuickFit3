@@ -5,14 +5,16 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QLabel>
-#include "pimercury863stage.h"
+
+
+class QFExtensionLinearStagePI; // forward
 
 
 class PIMercury863CalibrationDialog : public QDialog {
         Q_OBJECT
     public:
         /** Default constructor */
-        PIMercury863CalibrationDialog(QWidget* parent, PIMercury863Stage* stage);
+        PIMercury863CalibrationDialog(QWidget* parent, QFExtensionLinearStagePI* stage, int axis);
         /** Default destructor */
         virtual ~PIMercury863CalibrationDialog();
     protected slots:
@@ -22,34 +24,26 @@ class PIMercury863CalibrationDialog : public QDialog {
         void center();
         void resetCal();
     protected:
-        PIMercury863Stage* stage;
+        QFExtensionLinearStagePI* stage;
         QProgressBar* prgX;
-        QProgressBar* prgY;
-        QProgressBar* prgZ;
         QPushButton* btnOK;
         QPushButton* btnCancel;
         QPushButton* btnCentered;
         QPushButton* btnCalibrated;
         QPushButton* btnResetCal;
         QLabel* labX;
-        QLabel* labY;
-        QLabel* labZ;
         QLabel* labMinX;
-        QLabel* labMinY;
-        QLabel* labMinZ;
         QLabel* labMaxX;
-        QLabel* labMaxY;
-        QLabel* labMaxZ;
 
-        int calX[255];
-        int calY[255];
-        int calZ[255];
+        int32_t calX[256];
 
-        int maxX, maxY, maxZ;
-        int minX, minY, minZ;
-        int zeroX, zeroY, zeroZ;
+        int32_t maxX;
+        int32_t minX;
+        int32_t zeroX;
 
         bool accepted;
+
+        int axis;
 
     private:
 };
