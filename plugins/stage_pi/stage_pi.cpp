@@ -246,10 +246,13 @@ void QFExtensionLinearStagePI::calibrateJoysticks() {
     for (int axis=0; axis<getAxisCount(); axis++) {
         QMessageBox::StandardButton answer=QMessageBox::question(NULL, tr("PI Mercury C863 joystick calibration"), tr("Do you want to calibrate a joystick on axis %1?").arg(axis), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
         if (answer==QMessageBox::Yes) {
+            bool wasConnected=isConnected(axis);
+            if (!wasConnected) connectDevice(axis);
             setJoystickActive(axis, false);
             PIMercury863CalibrationDialog* dlg=new PIMercury863CalibrationDialog(NULL, this, axis);
             dlg->exec();
             delete dlg;
+            if (!wasConnected) disconnectDevice(axis);
         } else if (answer==QMessageBox::Cancel)  {
             break;
         }

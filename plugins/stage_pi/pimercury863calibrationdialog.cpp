@@ -84,8 +84,8 @@ void PIMercury863CalibrationDialog::resetCal() {
         stage->sendCommand("SI"+inttostr(i));
         int c=(int)round(1024.0*((double)i-127.0)/128.0);
         stage->sendCommand("SJ"+inttostr(c));
-        std::cout<<"   "<<i<<":  "<<c<<std::endl;
-        calX[i]=c;
+        //std::cout<<"   "<<i<<":  "<<c<<std::endl;
+        calX[i]=i;
     }
     minX=-10000;
     maxX=-10000;
@@ -136,7 +136,7 @@ void PIMercury863CalibrationDialog::calibrate() {
 
         if (calX[i]>1000) calX[i]=1000;
         if (calX[i]<-1000) calX[i]=-1000;
-        qDebug()<<"x "<<i<<minX<<i<<maxX<<calX[i];
+        //qDebug()<<"x "<<i<<minX<<i<<maxX<<calX[i];
     }
 
 
