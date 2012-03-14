@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>931</width>
-    <height>721</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -431,7 +431,7 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -441,7 +441,7 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -500,6 +500,9 @@
          <item row="2" column="1">
           <widget class="QWidget" name="widFCS" native="true">
            <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="margin">
+             <number>0</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_12">
               <item>
@@ -556,12 +559,12 @@
             </item>
             <item>
              <widget class="QTableView" name="tvFCS">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
              </widget>
             </item>
             <item>
@@ -755,44 +758,70 @@
          </item>
          <item row="4" column="1">
           <widget class="QWidget" name="widCountrate" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="margin">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QDoubleSpinBox" name="spinCountrateBinning">
-              <property name="suffix">
-               <string> µs</string>
-              </property>
-              <property name="maximum">
-               <double>1000000.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>10.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>10.000000000000000</double>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QDoubleSpinBox" name="spinCountrateBinning">
+                <property name="suffix">
+                 <string> µs</string>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_23">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="labStatistics">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <spacer name="horizontalSpacer_23">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
+             <widget class="QTableView" name="tabCR">
+              <property name="maximumSize">
                <size>
-                <width>40</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>64</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="labStatistics">
-              <property name="text">
-               <string/>
+              <property name="editTriggers">
+               <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
               </property>
-              <property name="textFormat">
-               <enum>Qt::RichText</enum>
-              </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
              </widget>
             </item>
            </layout>
@@ -918,7 +947,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>891</width>
-           <height>109</height>
+           <height>69</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1025,7 +1054,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinM</tabstop>
   <tabstop>spinFCSTauMin</tabstop>
   <tabstop>chkCountrate</tabstop>
-  <tabstop>spinCountrateBinning</tabstop>
   <tabstop>chkAddToProject</tabstop>
   <tabstop>btnAddJob</tabstop>
   <tabstop>scrollArea</tabstop>

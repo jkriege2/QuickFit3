@@ -43,18 +43,18 @@ class QFTableModel : public QAbstractTableModel {
             quint32 r=row;
             quint32 c=column;
             return c| (r<<16);
-        };
+        }
 
         /** \brief extracts the row from a UInt32 adress */
         inline quint16 UInt32ToRow(quint32 a) const {
             quint32 as=a>>16;
             return as & 0xFFFF;
-        };
+        }
 
         /** \brief extracts the column from a UInt32 adress */
         inline quint16 UInt32ToColumn(quint32 a) const  {
             return a & 0xFFFF;
-        };
+        }
 
         /** \brief the number of rows */
         quint16 rows;
@@ -72,6 +72,8 @@ class QFTableModel : public QAbstractTableModel {
         QStringList columnNames;
         /** \brief indicates whether the model is readonly (via the QAbstractTableModel interface!!!) or not */
         bool readonly;
+        /** \brief indicates whether the model is still checkable when readonly */
+        bool readonlyButStillCheckable;
         /** \brief indicates whether the data has been changed since the last call of resetChanged(); */
         bool hasDataChanged;
     public:
@@ -87,10 +89,11 @@ class QFTableModel : public QAbstractTableModel {
         virtual int columnCount(const QModelIndex &parent = QModelIndex()) const ;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-        inline bool isReadonly() const { return readonly; };
-        inline void setReadonly(bool r) { readonly=r; emit readonlyChanged(r); emit notReadonlyChanged(!r);};
-        inline void resetChanged() { hasDataChanged=false; };
-        inline bool hasChanged() const { return hasDataChanged; };
+        inline void setReadonlyButStillCheckable(bool r) { readonlyButStillCheckable=r; }
+        inline bool isReadonly() const { return readonly; }
+        inline void setReadonly(bool r) { readonly=r; emit readonlyChanged(r); emit notReadonlyChanged(!r);}
+        inline void resetChanged() { hasDataChanged=false; }
+        inline bool hasChanged() const { return hasDataChanged; }
 
         /** \brief resize the internal table (cells that are out of range will be deleted) */
         void resize(quint16 rows, quint16 columns);
@@ -118,6 +121,7 @@ class QFTableModel : public QAbstractTableModel {
         QString columnTitle(quint16 column) const;
         /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
         quint16 getAddRow(quint16 column, QVariant data);
+
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>
          *

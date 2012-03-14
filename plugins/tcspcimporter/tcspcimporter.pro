@@ -16,12 +16,14 @@ include(../../libquickfitwidgets.pri)
 HEADERS += qfetcspcimporter.h \
     qfetcspcimporterthreadprogress.h \
     qfetcspcimporterjobthread.h \
-    qfetcspcimporterdialog.h
+    qfetcspcimporterdialog.h \
+    ../base_classes/qftablemodel.h
 
 SOURCES += qfetcspcimporter.cpp \
     qfetcspcimporterthreadprogress.cpp \
     qfetcspcimporterjobthread.cpp \
-    qfetcspcimporterdialog.cpp
+    qfetcspcimporterdialog.cpp \
+    ../base_classes/qftablemodel.cpp
 
 FORMS = \
     qfetcspcimporterthreadprogress.ui \

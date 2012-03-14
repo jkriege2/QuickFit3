@@ -7,6 +7,7 @@
 #include "qfetcspcimporterthreadprogress.h"
 #include "qfpluginservices.h"
 #include <stdint.h>
+#include "qftablemodel.h"
 
 class QFETCSPCImporterJobThread; // forward
 struct TCSPCImporterJob; // forward
@@ -46,6 +47,7 @@ protected slots:
     void on_spinP_valueChanged(int val);
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
+    void on_spinFCSTauMin_valueChanged(double val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
 
     void updateProgress();
@@ -71,10 +73,14 @@ private:
     QStringList tcspcFilters;
     QStringList tcspcFormatNames;
     QList<TCSPCImporterJob> jobs;
+    QFTableModel* tmCR;
+    QFTableModel* tmFCS;
     //QList<Job> jobsToAdd;
     QList<QPair<QString, QString> > filesToAdd;
+    QString countRateString;
     bool closing;
     double duration;
+    int channels;
 
     int getIDForProgress(const QFETCSPCImporterThreadProgress* w) const;
     int getLayoutIDForProgress(const QWidget* w) const;

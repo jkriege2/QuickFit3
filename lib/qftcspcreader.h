@@ -61,6 +61,9 @@ class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
         /** \brief returns the number of input channels */
         virtual uint16_t inputChannels() const=0;
 
+        /** \brief returns the average count rate in kHz for a given channel */
+        virtual double avgCountRate(uint16_t channel) const=0;
+
         /** \brief output the current photon record */
         virtual QFTCSPCRecord getCurrentRecord() const=0;
 

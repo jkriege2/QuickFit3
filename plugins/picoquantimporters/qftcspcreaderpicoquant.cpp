@@ -80,6 +80,25 @@ bool QFTCSPCReaderPicoquant::open(QString filename) {
         current.microtime_deltaT=boardHeader.Resolution;
         nextRecord();
 
+        // read some photons to estimate a countrate
+        cr.clear();
+        double t=0;
+        uint16_t cnt=0;
+        do {
+            QFTCSPCRecord r=getCurrentRecord();
+            t=r.absoluteTime();
+            cr[r.input_channel]=cr.value(r.input_channel, 0)+1;
+            cnt++;
+        } while (nextRecord() && (t<0.01) && (cnt<10000));
+        for (int i=0; i<inputChannels(); i++) {
+            cr[i]=cr.value(i, 0)/t/1000.0;
+        }
+
+        fsetpos(tttrfile, &fileResetPos);
+        currentTTTRRecordNum=0;
+        current.microtime_offset=0;
+        current.microtime_deltaT=boardHeader.Resolution;
+
         return true;
     }
     setLastError(QObject::tr("could not open TTTR file '%1'").arg(filename));
@@ -143,6 +162,10 @@ double QFTCSPCReaderPicoquant::measurementDuration() const {
 uint16_t QFTCSPCReaderPicoquant::inputChannels() const {
 
     return binHeader.RoutingChannels;
+}
+
+double QFTCSPCReaderPicoquant::avgCountRate(uint16_t channel) const {
+    return cr.value(channel, 0);
 }
 
 QFTCSPCRecord QFTCSPCReaderPicoquant::getCurrentRecord() const {

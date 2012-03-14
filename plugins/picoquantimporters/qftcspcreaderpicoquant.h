@@ -4,6 +4,7 @@
 #include "qfimporter.h"
 #include "qftcspcreader.h"
 #include <stdio.h>
+#include <QMap>
 #include "picoquant_tools.h"
 
 
@@ -35,6 +36,9 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         virtual double measurementDuration() const;
         /** \copydoc QFTCSPCReader::inputChannels() */
         virtual uint16_t inputChannels() const;
+
+        /** \copydoc QFTCSPCReader::avgCountRate() */
+        virtual double avgCountRate(uint16_t channel) const;
         /** \copydoc QFTCSPCReader::getCurrentRecord() */
         virtual QFTCSPCRecord getCurrentRecord() const;
 
@@ -54,6 +58,7 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         uint64_t overflows;
 
         QFTCSPCRecord current;
+        QMap<uint16_t, double> cr;
 };
 
 #endif // QFTCSPCREADERPICOQUANT_H

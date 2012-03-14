@@ -16,6 +16,7 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     this->options=opt;
     lastTCSPCFileDir="";
     duration=0;
+    channels=0;
     ui->setupUi(this);
     ui->spinRangeStart->setRange(0,1e10);
     ui->spinRangeStart->setValue(0);
@@ -25,6 +26,22 @@ QFETCSPCImporterDialog::QFETCSPCImporterDialog(QFPluginServices* pluginservices,
     ui->spinCountrateBinning->setValue(10);
     ui->spinFCSTauMin->setRange(1e-6,1e10);
     ui->spinFCSTauMin->setValue(1);
+
+    tmCR=new QFTableModel(ui->tabCR);
+    tmCR->setReadonly(true);
+    tmCR->setReadonlyButStillCheckable(true);
+    tmCR->setReadonly(false);
+    tmCR->clear();
+    tmCR->setReadonly(true);
+    ui->tabCR->setModel(tmCR);
+
+
+    tmFCS=new QFTableModel(ui->tvFCS);
+    tmFCS->setReadonlyButStillCheckable(true);
+    tmFCS->setReadonly(false);
+    tmFCS->clear();
+    tmFCS->setReadonly(true);
+    ui->tvFCS->setModel(tmFCS);
 /*
 %counter% by the value of \a counter, if this value is >0, or by an empty string
           - \c %S% S parameter of the correlator
@@ -174,6 +191,10 @@ void QFETCSPCImporterDialog::setProject(QFProject* project) {
 }
 
 void QFETCSPCImporterDialog::on_spinP_valueChanged(int val) {
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_spinFCSTauMin_valueChanged(double val) {
     updateCorrelator();
 }
 
@@ -402,17 +423,90 @@ void QFETCSPCImporterDialog::updateDuration() {
     if (!ui->chkFirstFrame->isChecked()) {
         start=qMin(duration, ui->spinRangeStart->value());
     }
-    double stop=0;
+    double stop=duration;
     if (!ui->chkLastFrame->isChecked()) {
         stop=qMin(duration, ui->spinRangeEnd->value());
     }
-    ui->labRange->setText(tr("duration: %1 s").arg(fabs(stop-start)));
+    ui->labRange->setText(tr("duration: %1s countrates: [ %2 ] kHz").arg(fabs(stop-start)).arg(countRateString));
+    ui->labSegments->setText(tr("à %1 seconds").arg(fabs(stop-start)/double(ui->spinSegments->value())));
 }
 
 
 
 void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
+    QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);
+    if (reader) {
+        if (reader->open(ui->edtTCSPCFile->text())) {
+            duration=reader->measurementDuration();
+            channels=reader->inputChannels();
+            reader->close();
+
+            ui->tabCR->setModel(NULL);
+            //qDebug()<<channels<<tmCR->columnCount();
+            tmCR->setReadonly(false);
+            if (tmCR->rowCount()<=0) tmCR->appendRow();
+            if (channels>tmCR->columnCount()) {
+                int cols=tmCR->columnCount();
+                for (int i=cols; i<channels; i++) {
+                    tmCR->appendColumn();
+                    tmCR->setCell(0,i, tr("CH %1").arg(i+1));
+                    if (reader->avgCountRate(i)>0) tmCR->setCellCheckedRole(0,i, Qt::Checked);
+                    else tmCR->setCellCheckedRole(0,i, Qt::Unchecked);
+                }
+            } else if (channels<tmCR->columnCount()) {
+                while (tmCR->columnCount()>channels) {
+                    tmCR->deleteColumn(tmCR->columnCount()-1);
+                }
+            }
+            while (tmCR->rowCount()>1) {
+                //tmCR->deleteRow(tmCR->rowCount()-1);
+            }
+            tmCR->setReadonly(true);
+            ui->tabCR->setModel(tmCR);
+
+            ui->tvFCS->setModel(NULL);
+            tmFCS->setReadonly(false);
+            if (tmFCS->rowCount()<=0) tmCR->appendRow();
+            if (tmFCS->columnCount()<=0) tmCR->appendColumn();
+            //qDebug()<<channels<<tmFCS->columnCount();
+            if (channels>tmFCS->columnCount()) {
+                int cols=tmFCS->columnCount();
+                for (int i=cols; i<channels; i++) {
+                    tmFCS->appendColumn();
+                    tmFCS->appendRow();
+                    for (int j=0; j<tmFCS->columnCount(); j++) {
+                        if (i==j) tmFCS->setCell(j,i, tr("ACF %1").arg(i+1));
+                        else tmFCS->setCell(j,i, tr("CCF %1,%2").arg(j+1).arg(i+1));
+                        tmFCS->setCellCheckedRole(j,i, Qt::Checked);
+                        if (i<=j && reader->avgCountRate(i)>0 && reader->avgCountRate(j)>0) tmFCS->setCellCheckedRole(j,i, Qt::Checked);
+                        else tmFCS->setCellCheckedRole(j,i, Qt::Unchecked);
+
+                        if (i==j) tmFCS->setCell(i,j, tr("ACF %1").arg(i+1));
+                        else tmFCS->setCell(i,j, tr("CCF %1,%2").arg(i+1).arg(j+1));
+                        if (j<=i && reader->avgCountRate(i)>0 && reader->avgCountRate(j)>0) tmFCS->setCellCheckedRole(i,j, Qt::Checked);
+                        else tmFCS->setCellCheckedRole(i,j, Qt::Unchecked);
+                    }
+                }
+            } else if (channels<tmFCS->columnCount()) {
+                int cols=tmFCS->columnCount();
+                for (int i=cols-1; i>=channels; i--) {
+                    tmFCS->deleteColumn(i);
+                    tmFCS->deleteRow(i);
+                }
+            }
+            tmFCS->setReadonly(true);
+            ui->tvFCS->setModel(tmFCS);
+
+            countRateString="";
+            for (int i=0; i<channels; i++) {
+                if (countRateString.size()>0) countRateString=countRateString+"; ";
+                countRateString.append(QString::number(reader->avgCountRate(i)));
+            }
+
+        }
+    }
     updateDuration();
+    updateCorrelator();
 }
 
 

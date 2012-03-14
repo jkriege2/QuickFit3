@@ -1,9 +1,11 @@
 #include "qftablemodel.h"
+#include <QDebug>
 
 QFTableModel::QFTableModel(QObject * parent):
     QAbstractTableModel(parent)
 {
     readonly=true;
+    readonlyButStillCheckable=false;
     //quint32 a=xyAdressToUInt32(5, 5);
     //std::cout<<"adress test: "<<a<<" => row="<<UInt32ToRow(a)<<", column="<<UInt32ToColumn(a)<<"\n";
 }
@@ -43,7 +45,8 @@ QVariant QFTableModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags QFTableModel::flags(const QModelIndex &index) const {
     if (!index.isValid()) return 0;
-    if (!readonly) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    if (!readonly) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
+    if (readonlyButStillCheckable) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
@@ -56,11 +59,20 @@ QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int 
 }
 
 bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    if (index.isValid() && role == Qt::EditRole && (!readonly)) {
+    //qDebug()<<index<<"("<<role<<" chk="<<Qt::CheckStateRole<<")"<<value;
+    if (index.isValid() && role == Qt::EditRole && (!readonly || readonlyButStillCheckable)) {
         quint32 a=xyAdressToUInt32(index.row(), index.column());
         QVariant old=QVariant();
         if (dataMap.contains(a)) old=dataMap[a];
         dataMap[a]=value;
+        hasDataChanged=hasDataChanged | (old!=value);
+        emit dataChanged(index, index);
+        return true;
+    } else if (index.isValid() && role == Qt::CheckStateRole && (!readonly || readonlyButStillCheckable)) {
+        quint32 a=xyAdressToUInt32(index.row(), index.column());
+        QVariant old=QVariant();
+        if (dataCheckedMap.contains(a)) old=dataCheckedMap[a];
+        dataCheckedMap[a]=value;
         hasDataChanged=hasDataChanged | (old!=value);
         emit dataChanged(index, index);
         return true;
@@ -70,7 +82,7 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
 
 void QFTableModel::resize(quint16 rows, quint16 columns) {
     if (readonly) return;
-    //std::cout<<"  resize("<<rows<<", "<<columns<<"): 1\n";
+    std::cout<<"  resize("<<rows<<", "<<columns<<"): 1\n";
     //quint16 oldrows=this->rows;
     quint16 oldcolumns=this->columns;
 
@@ -85,13 +97,13 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
     }
 
 
-    //std::cout<<"  resize("<<rows<<", "<<columns<<"): 2\n";
+    std::cout<<"  resize("<<rows<<", "<<columns<<"): 2\n";
     this->rows=rows;
     this->columns=columns;
 
     QList<quint32> idx=dataMap.keys();
     QList<quint32> didx;
-    //std::cout<<"  resize("<<rows<<", "<<columns<<"): 3\n";
+    std::cout<<"  resize("<<rows<<", "<<columns<<"): 3\n";
     if (idx.size()>0) for (int i = idx.size()-1; i>=0; i--) {
         quint16 r=UInt32ToRow(idx[i]);
         quint16 c=UInt32ToColumn(idx[i]);
@@ -99,14 +111,14 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
             didx.append(idx[i]);
         }
     }
-    //std::cout<<"  resize("<<rows<<", "<<columns<<"): 4\n";
+    std::cout<<"  resize("<<rows<<", "<<columns<<"): 4\n";
     if (didx.size()>0) for (int i = didx.size()-1; i>=0; i--) {
         dataMap.remove(didx[i]);
         if (dataEditMap.contains(didx[i])) dataEditMap.remove(didx[i]);
     }
-    //std::cout<<"  resize("<<rows<<", "<<columns<<"): 5\n";
+    std::cout<<"  resize("<<rows<<", "<<columns<<"): 5\n";
     reset();
-    //std::cout<<"  resize("<<rows<<", "<<columns<<"): 6\n";
+    std::cout<<"  resize("<<rows<<", "<<columns<<"): 6\n";
 }
 
 void QFTableModel::insertRow(quint16 r) {
