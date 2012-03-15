@@ -866,7 +866,7 @@ void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableCursor=table->cellAt(0, 6).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
     tableCursor.insertText(tr("Parameter"), fTextBoldSmall);
-    tableCursor=table->cellAt(0, 7).firstCursorPosition();
+    tableCursor=table->cellAt(0, 8).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
     tableCursor.insertText(tr("Value"), fTextBoldSmall);
     if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 11).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
