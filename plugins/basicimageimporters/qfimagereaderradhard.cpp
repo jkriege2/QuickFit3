@@ -78,6 +78,7 @@ bool QFImageReaderRadhard::open(QString filename) {
   if (result) {
       buffer = (unsigned char*)malloc(frameSize*sizeof(unsigned char)); //new unsigned char [frameSize];
   }
+  nextFrame();
   return result;
 }
 
@@ -99,7 +100,7 @@ uint32_t QFImageReaderRadhard::countFrames() {
     if((size % frameSize)==0)
       result=size/frameSize;
   }
-  return result;
+  return result-1;
 }
 
 bool QFImageReaderRadhard::nextFrame() {

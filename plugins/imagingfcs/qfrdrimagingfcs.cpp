@@ -8,6 +8,7 @@ QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
     QObject(parent), QFPluginRawDataRecordBase()
 {
     //constructor
+    dlgCorrelate=NULL;
 }
 
 QFRDRImagingFCSPlugin::~QFRDRImagingFCSPlugin()
@@ -44,44 +45,53 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
 }
 
 void QFRDRImagingFCSPlugin::correlateAndInsert() {
-    if (project && settings) {
-        QFRDRImagingFCSCorrelationDialog* dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
+    if (dlgCorrelate) dlgCorrelate->show();
+    else if (project && settings) {
+        dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
         dlgCorrelate->setProject(project);
         dlgCorrelate->setWindowModality(Qt::WindowModal);
         //qDebug()<<parentWidget,
-        dlgCorrelate->exec();
+        dlgCorrelate->show();
 
+        connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
 
-
-        QStringList list=dlgCorrelate->getFilesToAdd();
-
-        QStringList::Iterator it = list.begin();
-        services->setProgressRange(0, list.size());
-        services->setProgress(0);
-        int i=0;
-        QModernProgressDialog progress(tr("Loading imFCS Data ..."), "", NULL);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setHasCancel(false);
-        progress.open();
-        while(it != list.end()) {
-            i++;
-            services->log_text(tr("loading '%1' ...\n").arg(*it));
-            progress.setLabelText(tr("loading '%1' ...\n").arg(*it));
-            QString filename=*it;
-            QString overview="";
-            QApplication::processEvents();
-            insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
-            settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
-            services->setProgress(i);
-            QApplication::processEvents();
-            ++it;
-        }
-        progress.accept();
-        services->setProgress(0);
-
-        delete dlgCorrelate;
     }
 }
+
+void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
+
+    disconnect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
+
+    QStringList list=dlgCorrelate->getFilesToAdd();
+
+    QStringList::Iterator it = list.begin();
+    services->setProgressRange(0, list.size());
+    services->setProgress(0);
+    int i=0;
+    QModernProgressDialog progress(tr("Loading imFCS Data ..."), "", NULL);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setHasCancel(false);
+    progress.open();
+    while(it != list.end()) {
+        i++;
+        services->log_text(tr("loading '%1' ...\n").arg(*it));
+        progress.setLabelText(tr("loading '%1' ...\n").arg(*it));
+        QString filename=*it;
+        QString overview="";
+        QApplication::processEvents();
+        insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
+        settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+        services->setProgress(i);
+        QApplication::processEvents();
+        ++it;
+    }
+    progress.accept();
+    services->setProgress(0);
+
+    dlgCorrelate->deleteLater();
+    dlgCorrelate=NULL;
+}
+
 
 void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
@@ -581,3 +591,4 @@ void QFRDRImagingFCSPlugin::insertRadhard2File(const QString& filename) {
 }
 
 Q_EXPORT_PLUGIN2(imaging_fcs, QFRDRImagingFCSPlugin)
+

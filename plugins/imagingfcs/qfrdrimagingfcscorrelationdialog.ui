@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>917</width>
-    <height>655</height>
+    <height>741</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1687,8 +1687,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>877</width>
-           <height>69</height>
+           <width>873</width>
+           <height>71</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1829,26 +1829,11 @@ p, li { white-space: pre-wrap; }
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrimagingfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1109</x>
-     <y>630</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>719</x>
-     <y>494</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>chkVideo</sender>
    <signal>toggled(bool)</signal>
@@ -1856,12 +1841,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>265</x>
-     <y>405</y>
+     <x>303</x>
+     <y>487</y>
     </hint>
     <hint type="destinationlabel">
-     <x>437</x>
-     <y>407</y>
+     <x>500</x>
+     <y>489</y>
     </hint>
    </hints>
   </connection>
@@ -1872,12 +1857,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>265</x>
-     <y>405</y>
+     <x>303</x>
+     <y>487</y>
     </hint>
     <hint type="destinationlabel">
-     <x>506</x>
-     <y>407</y>
+     <x>582</x>
+     <y>489</y>
     </hint>
    </hints>
   </connection>
@@ -1888,12 +1873,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>150</x>
-     <y>181</y>
+     <x>169</x>
+     <y>220</y>
     </hint>
     <hint type="destinationlabel">
-     <x>621</x>
-     <y>185</y>
+     <x>705</x>
+     <y>225</y>
     </hint>
    </hints>
   </connection>
@@ -1904,8 +1889,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>730</x>
-     <y>185</y>
+     <x>836</x>
+     <y>225</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
@@ -1920,8 +1905,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
-     <y>185</y>
+     <x>322</x>
+     <y>225</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -1936,8 +1921,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>353</x>
-     <y>185</y>
+     <x>410</x>
+     <y>225</y>
     </hint>
     <hint type="destinationlabel">
      <x>275</x>
@@ -1952,8 +1937,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>443</x>
-     <y>185</y>
+     <x>514</x>
+     <y>225</y>
     </hint>
     <hint type="destinationlabel">
      <x>365</x>
@@ -1968,8 +1953,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>518</x>
-     <y>185</y>
+     <x>602</x>
+     <y>225</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
@@ -1984,12 +1969,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>321</x>
-     <y>303</y>
+     <x>368</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
-     <x>374</x>
-     <y>305</y>
+     <x>422</x>
+     <y>371</y>
     </hint>
    </hints>
   </connection>
@@ -2000,12 +1985,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>321</x>
-     <y>303</y>
+     <x>368</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
-     <x>435</x>
-     <y>305</y>
+     <x>494</x>
+     <y>371</y>
     </hint>
    </hints>
   </connection>
@@ -2016,12 +2001,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>321</x>
-     <y>303</y>
+     <x>368</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
-     <x>462</x>
-     <y>305</y>
+     <x>522</x>
+     <y>371</y>
     </hint>
    </hints>
   </connection>
@@ -2032,12 +2017,28 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>321</x>
-     <y>303</y>
+     <x>368</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
-     <x>523</x>
-     <y>305</y>
+     <x>594</x>
+     <y>371</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImagingFCSCorrelationDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>865</x>
+     <y>717</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>725</x>
+     <y>699</y>
     </hint>
    </hints>
   </connection>

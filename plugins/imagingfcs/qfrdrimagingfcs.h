@@ -66,6 +66,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         void insertRecord();
         /** \brief correlate image data and insert the result */
         void correlateAndInsert();
+        /** \brief called when the correlation dialog was accepted by the user */
+        void importCorrelationsFromDialog();
     protected:
         /*! \brief add a video_correlator file to the current project
 
@@ -81,6 +83,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);
+
+        QFRDRImagingFCSCorrelationDialog* dlgCorrelate;
 
 };
 
