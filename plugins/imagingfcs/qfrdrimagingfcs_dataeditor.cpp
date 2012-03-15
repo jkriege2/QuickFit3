@@ -235,7 +235,6 @@ void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
-        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
         sliders->disableSliderSignals();
         sliders->set_min(0);
@@ -243,6 +242,7 @@ void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
         sliders->set_userMin(current->getProperty("imfcs_correditor_datacut_min", 0).toInt());
         sliders->set_userMax(current->getProperty("imfcs_correditor_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
+        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     } else {
 //        runs.setCurrent(current);
     }

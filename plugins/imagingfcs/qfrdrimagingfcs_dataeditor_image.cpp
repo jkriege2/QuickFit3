@@ -15,7 +15,6 @@
 #define sqr(x) ((x)*(x))
 
 #define CLICK_UPDATE_TIMEOUT 500
-
 //#define DEBUG_TIMIMNG
 #undef DEBUG_TIMIMNG
 
@@ -1339,8 +1338,6 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
-        connect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
-        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         sliders->disableSliderSignals();
         sliders->set_min(0);
         sliders->set_max(m->getCorrelationN());
@@ -1349,6 +1346,8 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         sliders->enableSliderSignals();
         selected.clear();
         selected.insert(0);
+        connect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     } else {
         selected.clear();
     }

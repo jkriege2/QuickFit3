@@ -37,11 +37,11 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
     connect(action, SIGNAL(triggered()), this, SLOT(insertRecord()));
     m->addAction(action);
 
-
     QAction* actCorrelate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_correlate.png"), tr("&correlate images and insert"), parentWidget);
     actCorrelate->setStatusTip(tr("Correlate an image series and insert the result into the current project"));
     connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
     m->addAction(actCorrelate);
+
 }
 
 void QFRDRImagingFCSPlugin::correlateAndInsert() {
@@ -475,7 +475,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             if (!isCross && !isDCCF) {
                 if (!binary) {
                     initParams["CORRELATION_COLUMN"]=1;
-                    if (isJanBFile) initParams["CORRELATION_COLUMN"]=7;
+                    if (isJanBFile && columns>=7) initParams["CORRELATION_COLUMN"]=7;
+                    if (isJanBFile && columns==2) initParams["TAU_FACTOR"]=1e-6;
                 }
                 files.prepend(filename);
                 files_types.prepend("acf");

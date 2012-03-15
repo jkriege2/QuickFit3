@@ -102,17 +102,19 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("list", l);
         w.writeEndElement();
     }*/
-    QString l="";
-    for (int i=0; i<width*height; i++) {
-        if (leaveout[i]!=0) {
-            if (!l.isEmpty()) l=l+",";
-            l=l+QString::number(i);
+    if (leaveout) {
+        QString l="";
+        for (int i=0; i<width*height; i++) {
+            if (leaveout[i]!=0) {
+                if (!l.isEmpty()) l=l+",";
+                l=l+QString::number(i);
+            }
         }
-    }
-    if (l.size()>0) {
-        w.writeStartElement("leaveout");
-        w.writeAttribute("list", l);
-        w.writeEndElement();
+        if (l.size()>0) {
+            w.writeStartElement("leaveout");
+            w.writeAttribute("list", l);
+            w.writeEndElement();
+        }
     }
 }
 
