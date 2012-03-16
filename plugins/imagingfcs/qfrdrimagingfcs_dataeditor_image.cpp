@@ -673,12 +673,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plotterResid->getYAxis()->set_axisLabel(tr("residuals"));
     plotterResid->getYAxis()->set_labelFontSize(11);
     plotterResid->getYAxis()->set_tickLabelFontSize(10);
+    plotterResid->getYAxis()->set_minTicks(5);
     plotter->getXAxis()->set_axisLabel("");
     plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
     plotter->getYAxis()->set_labelFontSize(11);
     plotter->getYAxis()->set_tickLabelFontSize(10);
     plotter->getXAxis()->set_drawMode1(JKQTPCADMticks);
     plotter->getXAxis()->set_tickLabelFontSize(10);
+    plotter->getYAxis()->set_minTicks(5);
     plotterResid->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
     plotterResid->get_plotter()->setBorder(1,1,1,1);
     plotter->get_plotter()->setBorder(1,1,1,1);
