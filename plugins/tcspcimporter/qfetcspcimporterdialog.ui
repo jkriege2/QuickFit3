@@ -510,6 +510,9 @@
                 <property name="text">
                  <string>&amp;cut input into: </string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinSegments</cstring>
+                </property>
                </widget>
               </item>
               <item>
@@ -558,17 +561,45 @@
              </layout>
             </item>
             <item>
-             <widget class="QTableView" name="tvFCS">
-              <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <widget class="QTableView" name="tvFCS">
+                <attribute name="horizontalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;the correlator will calculate CCF(&lt;span style=&quot; font-style:italic;&quot;&gt;i,j&lt;/span&gt;),&lt;br /&gt;where channel &lt;span style=&quot; font-style:italic;&quot;&gt;i&lt;/span&gt; will be undelayed and&lt;br /&gt;channel &lt;span style=&quot; font-style:italic;&quot;&gt;j&lt;/span&gt; will be delayed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>&amp;correlator:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>cmbCorrelator</cstring>
+                </property>
+               </widget>
+              </item>
               <item>
                <widget class="QComboBox" name="cmbCorrelator">
                 <property name="minimumSize">
@@ -614,6 +645,9 @@
                 <property name="text">
                  <string># Correlators (&amp;S):</string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinS</cstring>
+                </property>
                </widget>
               </item>
               <item>
@@ -646,6 +680,9 @@
                <widget class="QLabel" name="label_10">
                 <property name="text">
                  <string># Lags/Cor. &amp;(P):</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinP</cstring>
                 </property>
                </widget>
               </item>
@@ -680,6 +717,9 @@
                 <property name="text">
                  <string># lag factor (&amp;m):</string>
                 </property>
+                <property name="buddy">
+                 <cstring>spinM</cstring>
+                </property>
                </widget>
               </item>
               <item>
@@ -709,6 +749,9 @@
                <widget class="QLabel" name="label_29">
                 <property name="text">
                  <string>min. lag time &amp;tau;&lt;sub&gt;min&lt;/sub&gt;:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>spinFCSTauMin</cstring>
                 </property>
                </widget>
               </item>
@@ -1047,7 +1090,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinRangeEnd</tabstop>
   <tabstop>chkFCS</tabstop>
   <tabstop>spinSegments</tabstop>
-  <tabstop>tvFCS</tabstop>
   <tabstop>cmbCorrelator</tabstop>
   <tabstop>spinS</tabstop>
   <tabstop>spinP</tabstop>

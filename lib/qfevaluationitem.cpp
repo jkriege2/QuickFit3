@@ -200,11 +200,11 @@ void QFEvaluationItem::selectAllAplicableRecords() {
     }
 }
 
- QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getApplicableRecords() {
-     QList<QPointer<QFRawDataRecord> > recs;
+QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getApplicableRecords() {
+    QList<QPointer<QFRawDataRecord> > recs;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QPointer<QFRawDataRecord> rec=project->getRawDataByNum(i);
-        recs.append(rec);
+        if (isApplicable(rec)) recs.append(rec);
     }
     return recs;
 }

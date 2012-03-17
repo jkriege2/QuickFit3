@@ -16,6 +16,8 @@
 #include <QtEndian>
 #include "qftcspcreader.h"
 #include "qfpluginservices.h"
+#include <QSet>
+#include <QPair>
 
 class QFETCSPCImporterThreadProgress; // forward
 class QFETCSPCImporterJobThread; // forward
@@ -46,13 +48,13 @@ struct TCSPCImporterJob {
     /** \brief fileformat of the input file */
     int fileFormat;
     /** \brief correlator to use */
-    int correlator;
+    int fcs_correlator;
     /** \brief correlator: number of linear correlators */
-    int S;
+    int fcs_S;
     /** \brief correlator: channels per lin. correlator */
-    int P;
+    int fcs_P;
     /** \brief correlator: m factor */
-    int m;
+    int fcs_m;
     /** \brief minimum integration time for FCS in seconds */
     double fcs_taumin;
     /** \brief integration time for FCS countrate */
@@ -75,6 +77,8 @@ struct TCSPCImporterJob {
     bool doFCS;
     bool doCountrate;
 
+    QSet<QPair<int, int> > fcs_correlate;
+    QSet<int> countrate_channels;
 
 };
 
@@ -93,19 +97,24 @@ data                                                   size [bytes]
 | itemsPerChannel      items in each channel's array|  8 (uint64)
 | deltaT             duration of one item in seconds|  8 (double)
 +---------------------------------------------------+
-| cr[0] of channel 0                                |  4 (uint16)
-| cr[0] of channel 1                                |  4 (uint16)
+| input channel 0                                   |  2 (uint16)
+| input channel 1                                   |  2 (uint16)
 | ...                                               |
-| cr[0] of channel channels-1                       |  4 (uint16)
+| input channel channels-1                          |  2 (uint16)
++---------------------------------------------------+
+| cr[0] of channel 0                                |  2 (uint16)
+| cr[0] of channel 1                                |  2 (uint16)
+| ...                                               |
+| cr[0] of channel channels-1                       |  2 (uint16)
 +---------------------------------------------------+
 .                                                   .
 .                                                   .
 .                                                   .
 +---------------------------------------------------+
-| cr[itemsPerChannel-1] of channel 0                |  4 (uint16)
-| cr[itemsPerChannel-1] of channel 1                |  4 (uint16)
+| cr[itemsPerChannel-1] of channel 0                |  2 (uint16)
+| cr[itemsPerChannel-1] of channel 1                |  2 (uint16)
 | ...                                               |
-| cr[itemsPerChannel-1] of channel channels-1       |  4 (uint16)
+| cr[itemsPerChannel-1] of channel channels-1       |  2 (uint16)
 +---------------------------------------------------+
 \endverbatim
         \note All numbers are stored in little-endian form!!!
@@ -122,7 +131,7 @@ public:
     static QStringList getImporterFormatNameList(QFPluginServices *pluginServices);
     static QFTCSPCReader* getImporter(int idx, QFPluginServices *pluginServices);
     static int getImporterCount(QFPluginServices *pluginServices);
-    QList<QPair<QString, QString> > getAddFiles() const;
+    QList<QPair<QStringList, QString> > getAddFiles() const;
     TCSPCImporterJob getJob() const;
     double durationMS() const;
     double durationS() const;
@@ -159,6 +168,49 @@ protected:
 
     void runEval(QFTCSPCReader* reader, QFile *countrateFile);
 
+    /** \brief converts a (row, column) adress into a QHash index: (row<<16) | column */
+    inline quint32 xyAdressToUInt32(quint16 row, quint16 column) const {
+        quint32 r=row;
+        quint32 c=column;
+        return c| (r<<16);
+    }
+
+    /** \brief extracts the row from a UInt32 adress */
+    inline quint16 UInt32ToRow(quint32 a) const {
+        quint32 as=a>>16;
+        return as & 0xFFFF;
+    }
+
+    /** \brief extracts the column from a UInt32 adress */
+    inline quint16 UInt32ToColumn(quint32 a) const  {
+        return a & 0xFFFF;
+    }
+
+    /** \brief converts a (x,y,z) adress into a QHash index*/
+    inline quint64 xyzAdressToUInt64(quint16 x, quint16 y, quint16 z) const {
+        quint64 r=x;
+        quint64 c=y;
+        quint64 zz=z;
+        return zz|(c<<16)| (r<<32);
+    }
+
+    /** \brief extracts the x from a UInt64 adress */
+    inline quint16 UInt32ToX(quint64 a) const {
+        quint64 as=a>>32;
+        return as & 0xFFFF;
+    }
+
+    /** \brief extracts the y from a UInt64 adress */
+    inline quint16 UInt32ToY(quint64 a) const {
+        quint64 as=a>>16;
+        return as & 0xFFFF;
+    }
+
+    /** \brief extracts the Z from a UInt64 adress */
+    inline quint16 UInt32ToZ(quint64 a) const {
+        return a & 0xFFFF;
+    }
+
     int m_status;
     bool was_canceled;
 
@@ -170,7 +222,7 @@ protected:
     QFTCSPCReader* reader;
 
     QLocale outLocale;
-    QList<QPair<QString, QString> > addFiles;
+    QList<QPair<QStringList, QString> > addFiles;
     QString outputFilenameBase;
 
 
@@ -178,14 +230,36 @@ protected:
 
     QFPluginServices* pluginServices;
 
-    QList<correlatorjb<double, double>*> corrjb;
-    QList<MultiTauCorrelator<double, double>*> corrjk;
+    QMap<uint32_t, correlatorjb<double, double>*> corrjb;
+    QMap<uint32_t, MultiTauCorrelator<double, double>*> corrjk;
+    QMap<uint64_t, QVector<double> > fcs_ccfs;
+    QMap<uint32_t, QVector<double> > fcs_crs;
+    QVector<double> fcs_tau;
+
+    void clearCorrelators();
+    void createCorrelators();
+    void copyCorrelatorIntermediateResults(uint16_t fcs_segment);
 
     double starttime;
     double range_duration;
     double file_duration;
     uint16_t channels;
     uint64_t countrate_items;
+
+    struct ccfFileConfig {
+        QString filename;
+        int channel1;
+        int channel2;
+
+        QString filenameCR;
+
+        ccfFileConfig() {
+            channel1=0;
+            channel2=0;
+            filename="";
+            filenameCR="";
+        }
+    };
 };
 
 #endif // QFETCSPCImporterJOBTHREAD_H

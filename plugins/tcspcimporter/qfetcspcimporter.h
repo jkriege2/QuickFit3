@@ -5,6 +5,8 @@
 #include <QObject>
 #include "qfextension.h"
 
+class QFETCSPCImporterDialog; // forward
+
 /*!
     \defgroup qf3ext_tcspcimporter QFExtension implementation
     \ingroup qf3extensionplugins
@@ -74,15 +76,15 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
          */
         virtual void log_error(QString message);
 
-        void insertFCSCSVFile(const QString &filenameFCS, const QString& filenameCR, int channel, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
+        void insertFCSCSVFile(const QString &filenameFCS, const QString& filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
         void insertCountRate(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
 
+        QFETCSPCImporterDialog* dlgCorrelate;
 	protected:
         QFPluginLogService* logService;
 		
 	protected slots:
-	    /** \brief target, used in example code in initExtension() */
-	    //void startPlugin();
+        void correlationDialogClosed();
 
 };
 

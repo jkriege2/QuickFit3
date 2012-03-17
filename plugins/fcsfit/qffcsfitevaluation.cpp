@@ -88,6 +88,7 @@ int QFFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) {
 int QFFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
+    if (!fcs) return 0;
     if (fcs->getCorrelationRuns()<=0) return -1;
     else return fcs->getCorrelationRuns()-1;
 }

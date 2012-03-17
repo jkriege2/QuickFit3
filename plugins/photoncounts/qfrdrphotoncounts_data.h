@@ -186,6 +186,7 @@ class QFRDRPhotonCountsData : public QFRawDataRecord, public QFRDRPhotonCountsIn
         QMap<int, double> rateStdDev;
         QMap<int, double> rateMin;
         QMap<int, double> rateMax;
+        QMap<uint16_t, QString> channelName;
 
         /** \brief if positive this is the number of datapoints to which the countrate
          *         shall be binned in the binnedRate field. */

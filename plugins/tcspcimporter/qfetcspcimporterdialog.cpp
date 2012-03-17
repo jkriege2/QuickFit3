@@ -283,10 +283,10 @@ void QFETCSPCImporterDialog::readSettings() {
     ui->edtPrefix->setText(options->getQSettings()->value("tcspcimporter/dlg_correlate/prefix", ui->edtPrefix->text()).toString());
     ui->edtPostfix->setText(options->getQSettings()->value("tcspcimporter/dlg_correlate/postfix", ui->edtPostfix->text()).toString());
     ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/segments", ui->spinSegments->value()).toInt());
-    ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/cr_binning", ui->spinCountrateBinning->value()).toDouble());
-    ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value()).toDouble());
-    ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value()).toDouble());
-    ui->spinSegments->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value()).toDouble());
+    ui->spinCountrateBinning->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/cr_binning", ui->spinCountrateBinning->value()).toDouble());
+    ui->spinFCSTauMin->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value()).toDouble());
+    ui->spinRangeEnd->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value()).toDouble());
+    ui->spinRangeStart->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value()).toDouble());
 
 }
 
@@ -347,12 +347,12 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
     connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
     job.filename=ui->edtTCSPCFile->text();
-    job.correlator=ui->cmbCorrelator->currentIndex();
+    job.fcs_correlator=ui->cmbCorrelator->currentIndex();
     job.fileFormat=ui->cmbFileformat->currentIndex();
     //qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
-    job.S=ui->spinS->value();
-    job.P=ui->spinP->value();
-    job.m=ui->spinM->value();
+    job.fcs_S=ui->spinS->value();
+    job.fcs_P=ui->spinP->value();
+    job.fcs_m=ui->spinM->value();
     job.countrate_binning=ui->spinCountrateBinning->value()*1e-6;
     job.addToProject=ui->chkAddToProject->isChecked();
     job.prefix=ui->edtPrefix->text();
@@ -362,6 +362,22 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     job.doFCS=ui->chkFCS->isChecked();
     job.doCountrate=ui->chkCountrate->isChecked();
     job.fcs_crbinning=1e-2;
+
+    job.fcs_correlate.clear();
+    for (int i=0; i<channels; i++) {
+        for (int j=0; j<channels; j++) {
+            if (tmFCS->data(tmFCS->index(i, j),Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
+                job.fcs_correlate.insert(qMakePair(i,j));
+            }
+        }
+    }
+
+    job.countrate_channels.clear();
+    for (int i=0; i<channels; i++) {
+        if (tmCR->data(tmCR->index(0, i),Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
+            job.countrate_channels.insert(i);
+        }
+    }
 
     //qDebug()<<job.filenameBackground;
     job.range_min=-1;
@@ -478,12 +494,12 @@ void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
                         if (i==j) tmFCS->setCell(j,i, tr("ACF %1").arg(i+1));
                         else tmFCS->setCell(j,i, tr("CCF %1,%2").arg(j+1).arg(i+1));
                         tmFCS->setCellCheckedRole(j,i, Qt::Checked);
-                        if (i<=j && reader->avgCountRate(i)>0 && reader->avgCountRate(j)>0) tmFCS->setCellCheckedRole(j,i, Qt::Checked);
+                        if (i>=j && reader->avgCountRate(i)>0 && reader->avgCountRate(j)>0) tmFCS->setCellCheckedRole(j,i, Qt::Checked);
                         else tmFCS->setCellCheckedRole(j,i, Qt::Unchecked);
 
                         if (i==j) tmFCS->setCell(i,j, tr("ACF %1").arg(i+1));
                         else tmFCS->setCell(i,j, tr("CCF %1,%2").arg(i+1).arg(j+1));
-                        if (j<=i && reader->avgCountRate(i)>0 && reader->avgCountRate(j)>0) tmFCS->setCellCheckedRole(i,j, Qt::Checked);
+                        if (j>=i && reader->avgCountRate(i)>0 && reader->avgCountRate(j)>0) tmFCS->setCellCheckedRole(i,j, Qt::Checked);
                         else tmFCS->setCellCheckedRole(i,j, Qt::Unchecked);
                     }
                 }
@@ -510,7 +526,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
 }
 
 
-QList<QPair<QString, QString> > QFETCSPCImporterDialog::getFilesToAdd() const {
+QList<QPair<QStringList, QString> > QFETCSPCImporterDialog::getFilesToAdd() const {
     return filesToAdd;
 }
 

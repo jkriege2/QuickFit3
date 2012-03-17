@@ -51,7 +51,7 @@ void QFRDRPhotonCountsData::exportData(const QString& format, const QString& fil
 }
 
 QString QFRDRPhotonCountsData::getPhotonCountsChannelName(int channel) {
-    return tr("channel %1").arg(channel+1);
+    return channelName.value(channel, tr("channel %1 in file").arg(channel+1));
 }
 
 int QFRDRPhotonCountsData::getPhotonCountsChannels()
@@ -80,6 +80,7 @@ void QFRDRPhotonCountsData::intReadData(QDomElement* e) {
     rateStdDev.clear();
     rateMin.clear();
     rateMax.clear();
+    channelName.clear();
 
     if (filetype.toUpper()=="CSV") {
         if (files.size()<=0) {
@@ -150,6 +151,12 @@ bool QFRDRPhotonCountsData::loadCountRatesFromBinary(QString filename) {
             uint16_t channels=binfileReadUint16(f);
             uint64_t itemsPerChannel=binfileReadUint64(f);
             double deltaT=binfileReadDouble(f);
+
+            channelName.clear();
+            for (uint16_t i=0; i<channels; i++) {
+                channelName[i]=tr("channel %1").arg(binfileReadUint16(f));
+            }
+
             resizeRates(itemsPerChannel, channels);
             averageT=deltaT;
             uint32_t chunkSize=qMin(itemsPerChannel, (uint64_t)1024)*channels;

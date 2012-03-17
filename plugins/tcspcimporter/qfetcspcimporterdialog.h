@@ -37,7 +37,7 @@ public:
     void writeSettings();
     void readSettings();
 
-    QList<QPair<QString, QString> > getFilesToAdd() const;
+    QList<QPair<QStringList, QString> > getFilesToAdd() const;
 
 protected slots:
     void on_btnSelectFile_clicked();
@@ -76,7 +76,7 @@ private:
     QFTableModel* tmCR;
     QFTableModel* tmFCS;
     //QList<Job> jobsToAdd;
-    QList<QPair<QString, QString> > filesToAdd;
+    QList<QPair<QStringList, QString> > filesToAdd;
     QString countRateString;
     bool closing;
     double duration;
