@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>931</width>
-    <height>598</height>
+    <width>878</width>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -613,12 +613,12 @@ p, li { white-space: pre-wrap; }
                 </property>
                 <item>
                  <property name="text">
-                  <string>Multi-Tau 1 (one monitor per lag)</string>
+                  <string>bin and correlate: Multi-Tau 1 (one monitor per lag)</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Multi-Tau 2 (one monitor for all lags)</string>
+                  <string>bin and correlate: Multi-Tau 2 (one monitor for all lags)</string>
                  </property>
                 </item>
                </widget>
@@ -989,7 +989,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>891</width>
+           <width>838</width>
            <height>69</height>
           </rect>
          </property>

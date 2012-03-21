@@ -406,7 +406,7 @@ QString QFRDRPhotonCountsDataEditor::addItemToPlot(double* rateT, double* rate, 
     QColor color;
     if (cmbRunDisplay->currentIndex()==0) { // plot all runs
         for (unsigned int i=0; i<rateRuns; i++) {
-            size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2run %1").arg(i).arg(binned));
+            size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 channel %1").arg(i).arg(binned));
 
             JKQTPxyGraph* g=createPlot(Qt::transparent, parent, color);
             g->set_xColumn(c_tau);
@@ -448,7 +448,7 @@ QString QFRDRPhotonCountsDataEditor::addItemToPlot(double* rateT, double* rate, 
                 g->set_yColumn(c_run);
                 g->set_datarange_start(datarange_start);
                 g->set_datarange_end(datarange_end);
-                g->set_title(tr("%2run %1").arg(i).arg(binned));
+                g->set_title(tr("%2 channel %1").arg(i).arg(binned));
                 parent->addGraph(g);
                 if ((showAvg&&chkDisplayAverage->isChecked()) || chkDisplayStatistics->isChecked()) {
                     double mean=m->getPhotonCountsMean(i, QFRDRPhotonCountsInterface::KiloHertz);
@@ -473,14 +473,19 @@ QString QFRDRPhotonCountsDataEditor::addItemToPlot(double* rateT, double* rate, 
                     }
                 }
             } else {
-                parent->get_plotter()->addGraph(c_tau, c_run, tr("%2 channel %1").arg(i).arg(binned), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                JKQTPxyGraph* g=createPlot(QColor("black"), parent, color);
+                g->set_xColumn(c_tau);
+                g->set_yColumn(c_run);
+                g->set_datarange_start(datarange_start);
+                g->set_datarange_end(datarange_end);
+                g->set_title(tr("%2 channel %1").arg(i).arg(binned));
             }
         }
 
     }  else if (cmbRunDisplay->currentIndex()==2) { // plot only current runs
         for (unsigned int i=0; i<rateRuns; i++) {
             if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
+                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 channel %1").arg(i).arg(binned));
 
                 JKQTPxyGraph* g=createPlot(Qt::transparent, parent, color);
                 g->set_xColumn(c_tau);

@@ -230,8 +230,11 @@ protected:
 
     QFPluginServices* pluginServices;
 
-    QMap<uint32_t, correlatorjb<double, double>*> corrjb;
-    QMap<uint32_t, MultiTauCorrelator<double, double>*> corrjk;
+    typedef correlatorjb<double, double> corrjb_type;
+    typedef MultiTauCorrelator<uint16_t, uint64_t> corrjk_type;
+
+    QMap<uint32_t, corrjb_type*> corrjb;
+    QMap<uint32_t, corrjk_type*> corrjk;
     QMap<uint64_t, QVector<double> > fcs_ccfs;
     QMap<uint32_t, QVector<double> > fcs_crs;
     QVector<double> fcs_tau;
@@ -239,6 +242,7 @@ protected:
     void clearCorrelators();
     void createCorrelators();
     void copyCorrelatorIntermediateResults(uint16_t fcs_segment);
+    void shiftIntoCorrelators(uint16_t *fcs_countrate, uint32_t count);
 
     double starttime;
     double range_duration;

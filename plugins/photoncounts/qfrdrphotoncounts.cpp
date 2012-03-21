@@ -35,7 +35,7 @@ void QFRDRPhotonCountsPlugin::insertRecord() {
         QString format_name_csv=tr("Photon Counts CSV files (*.dat *.txt *.csv)");
         QString format_name_bin=tr("Photon Counts binary files (*.dat)");
         QStringList format_names, format_names_short;
-        format_names<<format_name_csv;
+        format_names<<format_name_csv<<format_name_bin;
         format_names_short<<tr("CSV File")<<tr("binary files");
         format_names_short<<tr("unknown file format");
         // look into INI which was the last used format 
@@ -77,10 +77,10 @@ void QFRDRPhotonCountsPlugin::insertRecord() {
 					// insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
 					QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName(), QStringList(filename), initParams, paramsReadonly);
 					if (e->error()) { // when an error occured: remove record and output an error message
-						project->deleteRawData(e->getID());
                         QMessageBox::critical(parentWidget, tr("QuickFit"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
 						services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
-					}                
+                        project->deleteRawData(e->getID());
+                    }
 				}
                 settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
                 ++it;
