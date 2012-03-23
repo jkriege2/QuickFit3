@@ -12,7 +12,10 @@ SyscamConfigDialog::SyscamConfigDialog(VideoCapture *vid, int cam, QWidget *pare
     int min=0;
     int max=0;
 
+    qDebug()<<"settings up syscam config dialog";
+
     min=max=0; vid->getUserPropertyRange(VideoCapture::upBrightness, min, max);
+    qDebug()<<min<<max;
     ui->spinBrightsness->setRange(min, max);
     ui->spinBrightsness->setEnabled(vid->supportsUserProperty(VideoCapture::upBrightness));
     ui->spinBrightsness->setValue(vid->getUserProperty(VideoCapture::upBrightness));
@@ -103,7 +106,7 @@ SyscamConfigDialog::SyscamConfigDialog(VideoCapture *vid, int cam, QWidget *pare
                 combos[i]=new QComboBox(this);
                 std::vector<std::string> l=vid->getUserPropertyMenuItems(i);
                 for (size_t li=0; li<l.size(); li++) {
-                    combos[i]->addItem(l[li].c_str(), min+li);
+                    combos[i]->addItem(l[li].c_str(), int(min+li));
                 }
                 combos[i]->setEnabled(en);
                 combos[i]->setCurrentIndex(combos[i]->findData(val));
