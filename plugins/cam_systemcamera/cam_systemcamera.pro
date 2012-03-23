@@ -15,11 +15,13 @@ HEADERS += qfecamsystemcamera.h \
            ../interfaces/qfextensioncamera.h \
         ../../../../../LIB/trunk/graphics_tools.h \
         ../../../../../LIB/trunk/videocapture.h \
-    videocaptureuserpropertywindow.h
+    videocaptureuserpropertywindow.h \
+    syscamconfigdialog.h
 
 SOURCES += qfecamsystemcamera.cpp \
         ../../../../../LIB/trunk/graphics_tools.cpp \
-    videocaptureuserpropertywindow.cpp
+    videocaptureuserpropertywindow.cpp \
+    syscamconfigdialog.cpp
 
 
 unix {
@@ -33,7 +35,8 @@ win32 {
 }
 
 
-FORMS =
+FORMS = \
+    syscamconfigdialog.ui
 
 RESOURCES += qfecamsystemcamera.qrc
 

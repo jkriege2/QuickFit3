@@ -3,6 +3,7 @@
 #include <QtPlugin>
 #include <iostream>
 #include "videocapture.h"
+#include "syscamconfigdialog.h"
 
 
 #define LOG_PREFIX QString("cam_systemcam >>> ").toUpper()
@@ -38,6 +39,22 @@ static void RGBToGray(uint8_t* rgb, uint32_t* out, int width, int height, QFECam
                 }
             }
             break;
+        case QFECamSystemcamera::tgmSaturation:
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    QColor c(rgb[y*width*3+x*3], rgb[y*width*3+x*3+1], rgb[y*width*3+x*3+2]);
+                    out[y*width+x]=c.saturation();
+                }
+            }
+            break;
+        case QFECamSystemcamera::tgmBrightness:
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    QColor c(rgb[y*width*3+x*3], rgb[y*width*3+x*3+1], rgb[y*width*3+x*3+2]);
+                    out[y*width+x]=c.value();
+                }
+            }
+            break;
     }
 
 }
@@ -47,7 +64,7 @@ QFECamSystemcamera::QFECamSystemcamera(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
-    toGrayMethod=QFECamSystemcamera::tgmAverage;
+    toGrayMethod=QFECamSystemcamera::tgmBrightness;
 }
 
 QFECamSystemcamera::~QFECamSystemcamera() {
@@ -103,15 +120,34 @@ unsigned int QFECamSystemcamera::getCameraCount() {
     return cameras.size();
 }
 
+#define VIDSETPROP(prop, name) if (settings.contains(name) && vid->supportsUserProperty(prop)) vid->setUserProperty(prop, settings.value(name).toInt());
+
 void QFECamSystemcamera::useCameraSettings(unsigned int camera, const QSettings& settings) {
-    /* set the camera settings to the values specified in settings parameter, called before acquire() */
+    VideoCapture* vid=vids.value(camera, NULL);
+    if (vid) {
+        VIDSETPROP(VideoCapture::upAutogain, "syscam/autogain");
+        VIDSETPROP(VideoCapture::upAutoWhitebalance, "syscam/autowhitebalance");
+        VIDSETPROP(VideoCapture::upPowerlineFilter, "syscam/powerlinefilter");
+        VIDSETPROP(VideoCapture::upBacklightCompensation, "syscam/backlightcompensation");
+        VIDSETPROP(VideoCapture::upBlueBalance, "syscam/bluebalance");
+        VIDSETPROP(VideoCapture::upBrightness, "syscam/brightness");
+        VIDSETPROP(VideoCapture::upContrast, "syscam/contrast");
+        VIDSETPROP(VideoCapture::upExposure, "syscam/exposure");
+        VIDSETPROP(VideoCapture::upGain, "syscam/gain");
+        VIDSETPROP(VideoCapture::upGamma, "syscam/gamma");
+        VIDSETPROP(VideoCapture::upHue, "syscam/hue");
+        VIDSETPROP(VideoCapture::upRedBalance, "syscam/redbalance");
+        VIDSETPROP(VideoCapture::upSaturation, "syscam/saturation");
+        VIDSETPROP(VideoCapture::upSharpness, "syscam/sharpness");
+        if (settings.contains("syscam/togray")) toGrayMethod=(QFECamSystemcamera::toGrayMethods)settings.value("syscam/togray", 5).toInt();
+    }
 }
 
 bool QFECamSystemcamera::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     /* set the camera settings to the values specified in settings parameter, called before startAcquisition() */
 
     // uncomment this if the code is the same as in useCameraSettings()
-    //useCameraSettings(camera, settings);
+    useCameraSettings(camera, settings);
 
     return true;
 }
@@ -125,41 +161,21 @@ void QFECamSystemcamera::showCameraSettingsDialog(unsigned int camera, QSettings
 	   alternatively you may also display a window which stays open and allows the suer to set settings also
 	   during the measurement.
 	*/
-
+    VideoCapture* vid=vids.value(camera, NULL);
+    if (!vid) return;
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// if you want the settings dialog to be modal, you may uncomment the next lines
 	// and add implementations
 	/////////////////////////////////////////////////////////////////////////////////
-    /*
-	QDialog* dlg=new QDialog(parent);
-
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
-    dlg->setLayout(lay);
-
-    QFormLayout* formlayout=new QFormLayout(dlg);
-
-
-    //  create your widgets here, do not to initialize them with the current settings
-    // QWidget* widget=new QWidget(dlg);
-    // lay->addRow(tr("Name"), widget);
-    // lay->setValue(settings.value(QString("device/name%1").arg(camera), devfaultValue ).toInt());
-
-
-    lay->addLayout(formlayout);
-
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
-    lay->addWidget(buttonBox);
-
-    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
+    SyscamConfigDialog* dlg=new SyscamConfigDialog(vid, camera, parent);
+    dlg->loadFromQSettings(settings);
 
     if ( dlg->exec()==QDialog::Accepted ) {
-         //  read back values entered into the widgets and store in settings
-         // settings.setValue(QString("device/name%1").arg(camera), widget->value() );
+        dlg->saveToQSettings(settings);
     }
     delete dlg;
-	*/
+
 }
 
 int QFECamSystemcamera::getImageWidth(unsigned int camera) {

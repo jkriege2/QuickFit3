@@ -140,10 +140,12 @@ class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExte
         virtual void log_error(QString message);
 
         enum toGrayMethods {
-            tgmRed,
-            tgmGreen,
-            tgmBlue,
-            tgmAverage
+            tgmRed=0,
+            tgmGreen=1,
+            tgmBlue=2,
+            tgmAverage=3,
+            tgmSaturation=4,
+            tgmBrightness=5
         };
 
     protected:

@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SyscamConfigDialog</class>
+ <widget class="QDialog" name="SyscamConfigDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>304</width>
+    <height>411</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>System Camera Configuration</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="qfecamsystemcamera.qrc">
+    <normaloff>:/cam_systemcam/qfecamsystemcamera.png</normaloff>:/cam_systemcam/qfecamsystemcamera.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>&amp;brightness:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinBrightsness</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>&amp;contrast:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinContrast</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>&amp;saturation:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinSaturation</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>&amp;hue:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinHue</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>&amp;white balance:</string>
+       </property>
+       <property name="buddy">
+        <cstring>chkAutoWhiteBalance</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>&amp;red balance:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinRedBalance</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>b&amp;lue balance:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinBlueBalance</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>&amp;gamma:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinGamma</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>&amp;exposure:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinExposure</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>&amp;gain:</string>
+       </property>
+       <property name="buddy">
+        <cstring>chkAutoGain</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSpinBox" name="spinContrast">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="spinBrightsness">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="spinSaturation">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="spinHue">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QCheckBox" name="chkAutoWhiteBalance">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="spinRedBalance">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QSpinBox" name="spinBlueBalance">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QSpinBox" name="spinGamma">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QSpinBox" name="spinExposure">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QCheckBox" name="chkAutoGain">
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinGain"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>&amp;power line filter:</string>
+       </property>
+       <property name="buddy">
+        <cstring>cmbPowerlineFilter</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QComboBox" name="cmbPowerlineFilter">
+       <item>
+        <property name="text">
+         <string>off</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>50Hz</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>60Hz</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string>&amp;sharpness:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinSharpness</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="QSpinBox" name="spinSharpness">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>back&amp;light compensation:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinBacklightCompensation</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="1">
+      <widget class="QSpinBox" name="spinBacklightCompensation">
+       <property name="minimum">
+        <number>-10000</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="13" column="0">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>convert to grayscale method:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="1">
+      <widget class="QComboBox" name="cmbToGray">
+       <item>
+        <property name="text">
+         <string>red channel</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>green channel</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>blue channel</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>average</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>saturation</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>brightness</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="qfecamsystemcamera.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SyscamConfigDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SyscamConfigDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
