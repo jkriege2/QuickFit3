@@ -26,6 +26,17 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     edtAlpha->setDecimals(10);
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&alpha; = </i>"), edtAlpha);
 
+////////////////////////////////////////
+    edtNdist=new NumberEdit(this);
+    edtNdist->setRange(0, INT_MAX);
+    edtNdist->setCheckBounds(true, false);
+    edtNdist->setDecimals(0);
+    flAlgorithmParams->addRow(tr("MaxEnt: <i>&Ndist = </i>"), edtNdist);
+////////////////////////////////////////
+
+
+
+
     cmbWeights=new QComboBox(this);
     cmbWeights->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbWeights->setEditable(false);
@@ -124,6 +135,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (old) {
         disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+        disconnect(edtNdist, SIGNAL(valueChanged(uint32_t)),this,SLOT(NdistChanged(uint32_t)));
     }
 
     QFFCSMaxEntEvaluationItem* item=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
@@ -133,6 +145,9 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
         edtAlpha->setValue(item->getAlpha());
         connect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
+
+        edtNdist->setValue(item->getNdist());
+        connect(edtNdist, SIGNAL(valueChanged(uint32_t)), this, SLOT(NdistChanged(uint32_t)));
 
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
@@ -164,6 +179,7 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
     if (data && eval) {
         edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
+        edtNdist->setValue(eval->getNdist());
     }
 
 }
@@ -676,6 +692,26 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
 
 }
 
+void QFFCSMaxEntEvaluationEditor::displayParameters() {
+    QFFCSByIndexAndModelEvaluationEditor::displayParameters();
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    QFSimpleFitParameterEnumeratorInterface* peval=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return;
+
+
+    if (eval->hasResults(record)) {
+        datacut->setEnabled(false);
+        edtNdist->setEnabled(false);
+    } else {
+        datacut->setEnabled(true);
+        edtNdist->setEnabled(true);
+    }
+
+}
+
 
 
 
@@ -905,6 +941,13 @@ void QFFCSMaxEntEvaluationEditor::alphaChanged(double alpha) {
     if (data) data->setAlpha(alpha);
 }
 
+void QFFCSMaxEntEvaluationEditor::NdistChanged(uint32_t Ndist) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setNdist(Ndist);
+}
 
 void QFFCSMaxEntEvaluationEditor::weightsChanged(int weights) {
     if (!dataEventsEnabled) return;

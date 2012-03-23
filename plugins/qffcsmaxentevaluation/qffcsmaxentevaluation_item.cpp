@@ -103,20 +103,19 @@ double QFFCSMaxEntEvaluationItem::getAlpha() const {
 
 
 
-/*
-/////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 void QFFCSMaxEntEvaluationItem::setNdist(uint32_t Ndist) {
     setFitValue("maxent_Ndist", Ndist);
 }
 
-double QFFCSMaxEntEvaluationItem::getNdist() const {
-    return getFitValue("maxent_Ndist");
+uint32_t QFFCSMaxEntEvaluationItem::getNdist() const {
+    return round(getFitValue("maxent_Ndist"));
 }
 
-/////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
-*/
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -397,6 +396,11 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
         return true;
     }
 
+    else if (parameterID=="maxent_Ndist") {
+        defaultValue.value=100;
+        return true;
+    }
+
     return false;
 }
 
@@ -432,15 +436,16 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
         getProject()->getServices()->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(defaultMinDatarange).arg(defaultMaxDatarange).arg(defaultMaxDatarange-defaultMinDatarange));
 
-
+        /*
         //////////
         uint32_t Ndist=100; // default
         //////////
+        */
 
         uint32_t N=data->getCorrelationN();
         double* taus=data->getCorrelationT();
-        double* distTaus=(double*)calloc(Ndist,sizeof(double));
-        double* dist=(double*)calloc(Ndist,sizeof(double));
+        double* distTaus=NULL;//(double*)calloc(Ndist,sizeof(double));
+        double* dist=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* modelEval=(double*)malloc(N*sizeof(double));
         bool weightsOK=false;
         double* corrdata=data->getCorrelationMean();
@@ -448,11 +453,42 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, rangeMaxDatarange);
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
         double alpha=getAlpha();
+        ///////////
+        uint32_t Ndist=getNdist();
+        //////////
         bool fitSuccess=false;
 
         double kappa=getFitValue("focus_struct_fac");
         double tripTau=getFitValue("trip_tau")*1e-6;
         double tripTheta=getFitValue("trip_theta");
+
+        QVector<double> init_tau=getFitValueNumberArray(record, index, model, "maxent_tau");
+        QVector<double> init_dist=getFitValueNumberArray(record, index, model, "maxent_distribution");
+
+        //qDebug()<<init_tau;
+        //qDebug()<<init_dist;
+
+
+        bool old_distribution=false; // default value
+        if (init_tau.size()>0 && init_dist.size()>0)
+            {
+                Ndist=qMin(init_tau.size(), init_dist.size());
+                distTaus=(double*)calloc(Ndist,sizeof(double));
+                dist=(double*)calloc(Ndist,sizeof(double));
+                for (int i=0; i<Ndist; i++)
+                    {
+                        distTaus[i]=init_tau[i];
+                        dist[i]=init_dist[i];
+                    }
+                old_distribution=true;
+            }
+        else
+            {
+                distTaus=NULL;
+                dist=NULL;
+                old_distribution=false;
+            }
+
 
         QElapsedTimer time;
         time.start();
@@ -461,10 +497,17 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         /// MaxEnt Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
         MaxEntB040 mem;
-        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange);
+        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus);
         mem.run(alpha,kappa,tripTau,tripTheta);
-        mem.setDistTaus(distTaus);
-        mem.setDistribution(dist);
+        if (old_distribution==false)
+            {
+                distTaus=(double*)calloc(Ndist,sizeof(double));
+                dist=(double*)calloc(Ndist,sizeof(double));
+            }
+        mem.writeDistTaus(distTaus);
+        mem.writeDistribution(dist);
+        /////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////
 
 
         // reset all NAN to 0
@@ -473,6 +516,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
             if (!QFFloatIsOK(dist[i])) dist[i]=0;
             qDebug()<<distTaus[i]<<" ,\t"<<d<<" ,\t"<<dist[i];
         }
+
 
         //////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////
@@ -545,6 +589,10 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         setFitResultValueString(record, index, model, param="used_model", getModelName(model));
         setFitResultGroup(record, index, model, param, tr("fit properties"));
         setFitResultLabel(record, index, model, param, tr("used model name"), tr("used model name"));
+
+        setFitResultValueInt(record, index, model, param="maxent_Ndist", model);
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("MaxEnt number of distribution points"), tr("MaxEnt number of distribution points"));
 
         setFitResultValueInt(record, index, model, param="used_model_id", model);
         setFitResultGroup(record, index, model, param, tr("fit properties"));

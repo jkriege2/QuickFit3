@@ -217,6 +217,7 @@ QVector<double> QFUsesResultsEvaluation::getFitValueNumberArray(QFRawDataRecord 
     return res;
 }
 
+
 QVector<double> QFUsesResultsEvaluation::getFitValueErrorArray(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const {
     QVector<double> res;
 
@@ -267,6 +268,7 @@ double QFUsesResultsEvaluation::getFitValue(QFRawDataRecord *r, const QString &r
     //qDebug()<<"  getFitValue("<<resultID<<", "<<parameterID<<") = "<<res;
     return res;
 }
+
 
 double QFUsesResultsEvaluation::getFitError(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const {
     double sval=0, serr=0;
@@ -452,6 +454,7 @@ void QFUsesResultsEvaluation::intReadData(QDomElement* e) {
         }
     }
 }
+
 
 QFUsesResultsEvaluation::FitParameterDefault::FitParameterDefault() {
     value=0;

@@ -60,6 +60,13 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         void setAlpha(double alpha);
         /** \brief return the current alpha value */
         double getAlpha() const;
+        /** \brief set the number of distribution points Ndist */
+        void setNdist(uint32_t Ndist);
+        /** \brief return the current number of distribution points Ndist */
+        uint32_t getNdist() const;
+
+
+
 
         /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */
         virtual QString getParameterName(int model, int id, bool html=false) const;

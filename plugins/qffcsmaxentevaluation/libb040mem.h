@@ -13,6 +13,11 @@
 #ifndef LIBB040MEM_H
 #define LIBB040MEM_H
 
+
+#define FloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
+
+
+
 /*! \defgroup libb040mem Maximum Entropy for FCS
 
     Group description
@@ -28,6 +33,8 @@
     \return the result
 */
 
+
+
 class MaxEntB040 {
 
     public:
@@ -36,16 +43,21 @@ class MaxEntB040 {
         /** Default destructor */
         virtual ~MaxEntB040();
 
-        void setData(const double* taus, const double* correlation, const double* weights,unsigned long long Nd,int rangeMinDatarange,int rangeMaxDatarange);
 
-		void setDistribution(double * dist);
 
-		void setDistTaus(double * distTaus);
+        void setData(const double* taus, const double* correlation,\
+        	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
+        	int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus);
+
+		void writeDistribution(double * dist);
+		
+		void writeDistTaus(double * distTaus);
 
         bool run(double alpha,double kappa, double tripTau,double tripTheta);
 
     protected:
         //protected member variables
+        bool m_oldDist;
         int m_Nd;
         int m_N;
         int m_cutoff;
@@ -76,6 +88,8 @@ class MaxEntB040 {
 		Eigen::VectorXd m_F;
 		Eigen::VectorXd m_g;
 		
+        
+
 
         //protected member methods
 
@@ -135,6 +149,8 @@ class MaxEntB040 {
     int gsl_blas_fgemm(CblasNoTrans,CblasNoTrans,1.0,A,B,0.0,C);
     \endcode
     which does \f$ C=AB \f$.
+
+
 
     \param data input data
     \param[out] dataout output data
