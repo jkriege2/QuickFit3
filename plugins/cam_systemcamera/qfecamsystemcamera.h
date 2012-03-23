@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <QObject>
+#include <QStringList>
 #include "qfextension.h"
 #include "../interfaces/qfextensioncamera.h"
 #include "videocapture.h"
@@ -33,12 +34,12 @@ class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExte
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return QObject::tr("vfw camera"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return QObject::tr("this plugin gives access to cameras (e.g. webcams) registered with the operating system"); }
+        virtual QString getDescription() const  { return QObject::tr("this plugin gives access to cameras (e.g. webcams) registered with the operating system as Video for Windows (vfw) device"); }
 #else
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return QObject::tr("v4l2 camera"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return QObject::tr("this plugin gives access to cameras (e.g. webcams) registered with the operating system"); }
+        virtual QString getDescription() const  { return QObject::tr("this plugin gives access to cameras (e.g. webcams) registered with the operating system and using the Video4Linux v2 driver"); }
 #endif
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return QObject::tr("Jan W. Krieger"); }
@@ -159,6 +160,10 @@ class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExte
 
 
         toGrayMethods toGrayMethod;
+
+        QMap<QObject*, QPair<VideoCapture*, int> > dlgActions;
+    protected slots:
+        void dlgActionTriggered();
 };
 
 #endif // QFECAMSYSTEMCAMERA_H

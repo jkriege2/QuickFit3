@@ -7,6 +7,8 @@ SyscamConfigDialog::SyscamConfigDialog(VideoCapture *vid, int cam, QWidget *pare
     ui(new Ui::SyscamConfigDialog)
 {
     ui->setupUi(this);
+    this->vid=vid;
+    this->cam=cam;
     int min=0;
     int max=0;
 
@@ -75,6 +77,43 @@ SyscamConfigDialog::SyscamConfigDialog(VideoCapture *vid, int cam, QWidget *pare
     ui->cmbPowerlineFilter->setEnabled(vid->supportsUserProperty(VideoCapture::upPowerlineFilter));
     ui->cmbPowerlineFilter->setCurrentIndex(vid->getUserProperty(VideoCapture::upPowerlineFilter));
 
+    for (int i=VideoCapture::upFirstAdditional; i<VideoCapture::upFirstAdditional+vid->getAdditionalUserPropertyCount(); i++) {
+        if (vid->supportsUserProperty(i)) {
+            VideoCapture::UserPropertieType t=vid->getUserPropertyType(i);
+            min=max=0; vid->getUserPropertyRange(i, min, max);
+            bool en=vid->isUserPropertyEnabled(i);
+            int val=vid->getUserProperty(i);
+            if (t==VideoCapture::uptInteger) {
+                spins[i]=new QSpinBox(this);
+                spins[i]->setRange(min, max);
+                spins[i]->setEnabled(en);
+                spins[i]->setValue(val);
+                int row=ui->gridLayout->rowCount();
+                ui->gridLayout->addWidget(spins[i], row, 1);
+                ui->gridLayout->addWidget(new QLabel(vid->getUserPropertyName(i).c_str(), this), row, 0);
+            } else if (t==VideoCapture::uptBoolean) {
+                checks[i]=new QCheckBox(this);
+                checks[i]->setText("");
+                checks[i]->setEnabled(en);
+                checks[i]->setChecked(val!=0);
+                int row=ui->gridLayout->rowCount();
+                ui->gridLayout->addWidget(checks[i], row, 1);
+                ui->gridLayout->addWidget(new QLabel(vid->getUserPropertyName(i).c_str(), this), row, 0);
+            } else if (t==VideoCapture::uptMenu) {
+                combos[i]=new QComboBox(this);
+                std::vector<std::string> l=vid->getUserPropertyMenuItems(i);
+                for (size_t li=0; li<l.size(); li++) {
+                    combos[i]->addItem(l[li].c_str(), min+li);
+                }
+                combos[i]->setEnabled(en);
+                combos[i]->setCurrentIndex(combos[i]->findData(val));
+                int row=ui->gridLayout->rowCount();
+                ui->gridLayout->addWidget(combos[i], row, 1);
+                ui->gridLayout->addWidget(new QLabel(vid->getUserPropertyName(i).c_str(), this), row, 0);
+            }
+
+        }
+    }
 
 }
 
@@ -100,6 +139,26 @@ void SyscamConfigDialog::loadFromQSettings(QSettings &data) {
     ui->spinSaturation->setValue(data.value("syscam/saturation", ui->spinSaturation->value()).toInt());
     ui->spinSharpness->setValue(data.value("syscam/sharpness", ui->spinSharpness->value()).toInt());
 
+
+
+    QStringList key=data.allKeys();
+    for (int i=0; i<key.size(); i++) {
+        if (key[i].startsWith("moresyscam/")) {
+            QRegExp rx("moresyscam/control(\\d+)",Qt::CaseInsensitive);
+            int pos = rx.indexIn(key[i]);
+            if (pos > -1) {
+                int id = rx.cap(1).toInt();
+                //VIDSETPROP(id, key[i]);
+                if (spins.contains(id)) {
+                    spins[id]->setValue(data.value(key[i]).toInt());
+                } else if (combos.contains(id)) {
+                    combos[id]->setCurrentIndex(combos[i]->findData(data.value(key[i]).toInt()));
+                } else if (checks.contains(id)) {
+                    checks[id]->setChecked(data.value(key[i]).toInt()!=0);
+                }
+             }
+        }
+    }
 }
 
 void SyscamConfigDialog::saveToQSettings(QSettings &data) {
@@ -118,4 +177,16 @@ void SyscamConfigDialog::saveToQSettings(QSettings &data) {
     data.setValue("syscam/redbalance", ui->spinRedBalance->value());
     data.setValue("syscam/saturation", ui->spinSaturation->value());
     data.setValue("syscam/sharpness", ui->spinSharpness->value());
+
+    for (QMap<int, QSpinBox*>::iterator si = spins.begin(); si != spins.end(); ++si) {
+        data.setValue("moresyscam/control"+QString::number(si.key()), si.value()->value());
+    }
+
+    for (QMap<int, QCheckBox*>::iterator ci = checks.begin(); ci != checks.end(); ++ci) {
+        data.setValue("moresyscam/control"+QString::number(ci.key()), (ci.value()->isChecked())?1:0);
+    }
+
+    for (QMap<int, QComboBox*>::iterator bi = combos.begin(); bi != combos.end(); ++bi) {
+        data.setValue("moresyscam/control"+QString::number(bi.key()), bi.value()->itemData(bi.value()->currentIndex()));
+    }
 }

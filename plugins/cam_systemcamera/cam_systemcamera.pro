@@ -6,6 +6,7 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
 include(../plugins.pri)
+include(../../extlibs/cimg.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 
@@ -13,14 +14,10 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfecamsystemcamera.h \
            ../interfaces/qfextensioncamera.h \
-        ../../../../../LIB/trunk/graphics_tools.h \
         ../../../../../LIB/trunk/videocapture.h \
-    videocaptureuserpropertywindow.h \
     syscamconfigdialog.h
 
 SOURCES += qfecamsystemcamera.cpp \
-        ../../../../../LIB/trunk/graphics_tools.cpp \
-    videocaptureuserpropertywindow.cpp \
     syscamconfigdialog.cpp
 
 

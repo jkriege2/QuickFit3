@@ -4,6 +4,11 @@
 #include <QDialog>
 #include <QSettings>
 #include "qfecamsystemcamera.h"
+#include <QMap>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QLabel>
+#include <QCheckBox>
 
 class VideoCapture; //forward
 namespace Ui {
@@ -23,6 +28,11 @@ class SyscamConfigDialog : public QDialog
         
     private:
         Ui::SyscamConfigDialog *ui;
+        VideoCapture* vid;
+        int cam;
+        QMap<int, QSpinBox*> spins;
+        QMap<int, QCheckBox*> checks;
+        QMap<int, QComboBox*> combos;
 };
 
 #endif // SYSCAMCONFIGDIALOG_H

@@ -90,8 +90,23 @@ void QFECamSystemcamera::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     VideoCapture cap;
     cameras=cap.getDeviceList();
+    QMenu* scm=new QMenu(tr("&System Camera Controls"));
+    scm->setIcon(QIcon(":/cam_systemcam/qfecamsystemcamera.png"));
     for (int i=0; i<cameras.size(); i++) {
         vids.append(new VideoCapture());
+        if (vids[i]->getConfigDialogCount()>0) {
+            QMenu* m=scm->addMenu(cameras[i].c_str());
+            for (int d=0; d<vids[i]->getConfigDialogCount(); d++) {
+                QAction* a=new QAction(vids[i]->getConfigDialogName(d).c_str(), this);
+                dlgActions[a]=qMakePair(vids[i], d);
+                m->addAction(a);
+                connect(a, SIGNAL(triggered()), this, SLOT(dlgActionTriggered()));
+            }
+        }
+    }
+    QMenu* extm=services->getMenu("extensions");
+    if (extm && scm->children().size()>0) {
+        extm->addMenu(scm);
     }
 }
 
@@ -140,6 +155,21 @@ void QFECamSystemcamera::useCameraSettings(unsigned int camera, const QSettings&
         VIDSETPROP(VideoCapture::upSaturation, "syscam/saturation");
         VIDSETPROP(VideoCapture::upSharpness, "syscam/sharpness");
         if (settings.contains("syscam/togray")) toGrayMethod=(QFECamSystemcamera::toGrayMethods)settings.value("syscam/togray", 5).toInt();
+
+        //settings.beginGroup("moresyscam");
+        QStringList key=settings.allKeys();
+        for (int i=0; i<key.size(); i++) {
+            if (key[i].startsWith("moresyscam/")) {
+                QRegExp rx("moresyscam/control(\\d+)",Qt::CaseInsensitive);
+                int pos = rx.indexIn(key[i]);
+                if (pos > -1) {
+                    int id = rx.cap(1).toInt();
+                    VIDSETPROP(id, key[i]);
+                 }
+            }
+        }
+        //settings.endGroup();
+
     }
 }
 
@@ -205,7 +235,7 @@ QString QFECamSystemcamera::getCameraName(unsigned int camera) {
 }
 
 QString QFECamSystemcamera::getCameraSensorName(unsigned int camera) {
-    return "";
+    return getCameraName(camera);
 }
 
 bool QFECamSystemcamera::isConnected(unsigned int camera) {
@@ -296,7 +326,16 @@ void QFECamSystemcamera::log_warning(QString message) {
 
 void QFECamSystemcamera::log_error(QString message) {
 	if (logService) logService->log_error(LOG_PREFIX+message);
-	else if (services) services->log_error(LOG_PREFIX+message);
+    else if (services) services->log_error(LOG_PREFIX+message);
+}
+
+void QFECamSystemcamera::dlgActionTriggered() {
+    if (dlgActions.contains(sender())) {
+        QPair<VideoCapture*, int> p=dlgActions[sender()];
+        if (p.first) {
+            p.first->showConfigDialog(p.second);
+        }
+    }
 }
 
 
