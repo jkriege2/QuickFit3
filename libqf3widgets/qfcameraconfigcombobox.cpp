@@ -97,7 +97,7 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
     }
     // fill comboboxes
     for (int i=0; i<filenames.size(); i++) {
-        QSettings set(filenames[i]);
+        QSettings set(filenames[i],QSettings::IniFormat);
         QString fn=set.value("camconfigname", QFileInfo(filenames[i]).baseName()).toString();
         addItem(QIcon(":/libqf3widgets/camera_config.png"), fn, filenames[i]);
     }
@@ -171,7 +171,7 @@ void QFCameraConfigComboBox::saveAsCurrent() {
             }
             if (ok) {
                 QFile::copy(filename, newfilename);
-                QSettings set(newfilename);
+                QSettings set(newfilename, QSettings::IniFormat);
                 set.setValue("camconfigname", newshowname);
                 if (m_notifier) m_notifier->emitUpdate();
                 setCurrentConfig(newname);
@@ -200,9 +200,11 @@ void QFCameraConfigComboBox::renameCurrent() {
                 if (ret==QMessageBox::No) ok=false;
             }
             if (ok) {
-                QFile::copy(filename, newfilename);
-                QFile::remove(filename);
-                QSettings set(newfilename);
+                if (filename!=newfilename)  {
+                    QFile::copy(filename, newfilename);
+                    QFile::remove(filename);
+                }
+                QSettings set(newfilename, QSettings::IniFormat);
                 set.setValue("camconfigname", newshowname);
                 if (m_notifier) m_notifier->emitUpdate();
                 setCurrentConfig(newname);
@@ -249,7 +251,7 @@ void QFCameraConfigComboBox::addNew() {
             //copy_file(tempFile.toStdString(), newfilename.toStdString());
             QFile::copy(tempFile, newfilename);
             QFile::remove(tempFile);
-            QSettings set(newfilename);
+            QSettings set(newfilename, QSettings::IniFormat);
             set.setValue("camconfigname", newshowname);
             if (m_notifier) m_notifier->emitUpdate();
             setCurrentConfig(newname);

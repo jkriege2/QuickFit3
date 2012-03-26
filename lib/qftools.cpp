@@ -353,18 +353,18 @@ int getApplicationBitDepth() {
 
 QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, bool removeSlash) {
     QString t=text.simplified();
-    QString regexp="";
-    t=t.remove(QRegExp(regexp+"[^\\w\\d \\_\\(\\)\\.\\/]"));
     t=t.replace(" ", "_");
-    if (removeDot) t=t.remove('.');
+    if (removeDot) t=t=t.remove('.');
     if (removeSlash) {
         t=t.remove('\\');
         t=t.remove('/');
     }
     QString t1=t;
     t="";
+    //qDebug()<<"cleanStringForFilename("<<text<<")   t1 = "<<t1;
     for (int i=0; i<t1.size(); i++) {
-        if (t1[i]<128) t=t+t[i];
+        if (t1[i]>'0' && t1[i]<'9') t=t+t1[i];
+        else if (t1[i]>'A' && t1[i]<'z') t=t+t1[i];
         else {
             switch(t1[i].toAscii()) {
                 case 'ä': t=t+"ae"; break;
@@ -376,12 +376,24 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
                 case 'ß': t=t+"ss"; break;
                 case '@': t=t+"_at_"; break;
                 case 'µ': t=t+"mu"; break;
+                case ';':
+                case ',':
+                case '?':
+                case '!':
+                case ':': t=t+'_'; break;
+                case '_':
+                case '.':
+                case '(':
+                case ')':
+                case '[':
+                case ']':
+                    t=t+t1[i].toAscii(); break;
             }
         }
     }
     if (maxLen>0 && t.size()>maxLen) {
         t=t.left(maxLen);
     }
-    qDebug()<<"cleanStringForFilename("<<text<<") = "<<t;
+    //qDebug()<<"cleanStringForFilename("<<text<<") = "<<t;
     return t;
 }
