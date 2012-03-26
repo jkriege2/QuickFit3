@@ -14,7 +14,7 @@
 
                        ( http://cimg.sourceforge.net )
 
-                                   1.4.8
+                                   1.4.9
 
 --------------------------------------------------------------------------------
 
@@ -68,6 +68,7 @@
   - Julien Morat
   - Baptiste Mougel
   - Guillaume Nee
+  - Andrea Onofri
   - Renaud Peteri
   - Martin Petricek
   - Paolo Prete
@@ -162,6 +163,13 @@
 
 # Current list of available CImg plug-ins
 #-----------------------------------------
+
+ --------------------------------------------------------------------------------
+  - VTK legacy format ('plugins/vtk.h') (April 2011).
+
+    This plug-in allows to save 3d scenes as VTK files.
+
+    by Haz-Edine Assemlal (http://www.cim.mcgill.ca/~assemlal/)
 
  --------------------------------------------------------------------------------
   - CImg IPL 2nd edition ('plugins/cimg_ipl.h') (September 2009).
