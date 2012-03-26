@@ -174,6 +174,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
     QFormLayout* stagelayout=new QFormLayout(this);
+    stagelayout->setHorizontalSpacing(2);
     setLayout(stagelayout);
 
 
@@ -226,10 +227,11 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 
     hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
-    chkJoystick=new QCheckBox(tr("enabled"), this);
+    chkJoystick=new QCheckBox(tr("joystick:"), this);
+    QFont fb=chkJoystick->font();
+    fb.setBold(true);
+    chkJoystick->setFont(fb);
     connect(chkJoystick, SIGNAL(clicked(bool)), this, SLOT(updateJoystick()));
-    hbl->addWidget(chkJoystick);
-    hbl->addSpacing(24);
     hbl->addWidget(l=new QLabel("max. speed [&mu;m/s]: ", this));
     l->setTextFormat(Qt::RichText);
     spinJoystickMaxSpeed=new QDoubleSpinBox(this);
@@ -239,24 +241,32 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinJoystickMaxSpeed->setDecimals(0);
     connect(spinJoystickMaxSpeed, SIGNAL(valueChanged(double)), this, SLOT(updateJoystick()));
     hbl->addWidget(spinJoystickMaxSpeed);
-    btnX2=new QPushButton(tr("x2"), this);
-    btnX2->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
+    btnX2=new QToolButton(this);
+    btnX2->setIcon(QIcon(":/spimb040/x2.png"));
+    btnX2->setToolTip(tr("double the joystick maximum speed"));
+    //btnX2->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
     hbl->addWidget(btnX2);
     connect(btnX2, SIGNAL(clicked()), this, SLOT(speedX2()));
-    btnX10=new QPushButton(tr("x10"), this);
-    btnX10->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
+    btnX10=new QToolButton(this);
+    btnX10->setIcon(QIcon(":/spimb040/x10.png"));
+    btnX10->setToolTip(tr("increase the joystick maximum speed ten-fold"));
+    //btnX10->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
     hbl->addWidget(btnX10);
     connect(btnX10, SIGNAL(clicked()), this, SLOT(speedX10()));
-    btnD2=new QPushButton(tr(":2"), this);
-    btnD2->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
+    btnD2=new QToolButton(this);
+    btnD2->setIcon(QIcon(":/spimb040/d2.png"));
+    btnD2->setToolTip(tr("half the joystick maximum speed"));
+    //btnD2->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
     hbl->addWidget(btnD2);
     connect(btnD2, SIGNAL(clicked()), this, SLOT(speedD2()));
-    btnD10=new QPushButton(tr(":10"), this);
-    btnD10->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
+    btnD10=new QToolButton(this);
+    //btnD10->setMaximumSize(cmbStageX->height()*3, cmbStageX->height()*1.2);
+    btnD10->setIcon(QIcon(":/spimb040/d10.png"));
+    btnD10->setToolTip(tr("decrease the joystick maximum speed ten-fold"));
     hbl->addWidget(btnD10);
     connect(btnD10, SIGNAL(clicked()), this, SLOT(speedD10()));
     hbl->addStretch();
-    stagelayout->addRow(tr("<b>joystick:</b>"), hbl);
+    stagelayout->addRow(chkJoystick, hbl);
 
     QGridLayout* gl=new QGridLayout(this);
     gl->addWidget(new QLabel("<b>x [&mu;m]:</b>", this), 0, 0);
@@ -292,7 +302,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->setVerticalSpacing(1);
     connect(btnMoveAbsolute, SIGNAL(clicked()), this, SLOT(moveAbsolute()));
     connect(btnMoveRelative, SIGNAL(clicked()), this, SLOT(moveRelative()));
-    stagelayout->addRow(tr("<b>movement:</b>"), gl);
+    stagelayout->addRow(tr("<b>move:</b>"), gl);
 
 
     gl=new QGridLayout(this);
@@ -538,6 +548,8 @@ void QFESPIMB040SampleStageConfig::disConnectX() {
     int axis=getXStageAxis();
     bool oldJoystick=chkJoystick->isChecked();
     chkJoystick->setChecked(false);
+    updateJoystick();
+
     if (stage) {
         if (conn) {
             stage->setLogging(m_log);
@@ -557,6 +569,7 @@ void QFESPIMB040SampleStageConfig::disConnectX() {
         actConnectX->setChecked(false);
     }
     chkJoystick->setChecked(oldJoystick);
+    updateJoystick();
     updateStates();
     QApplication::restoreOverrideCursor();
     if (useThread) stageThread->start(QThread::LowPriority);
@@ -571,6 +584,7 @@ void QFESPIMB040SampleStageConfig::disConnectY() {
     int axis=getYStageAxis();
     bool oldJoystick=chkJoystick->isChecked();
     chkJoystick->setChecked(false);
+    updateJoystick();
     if (stage) {
         if (conn) {
             stage->setLogging(m_log);
@@ -603,6 +617,7 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
     int axis=getZStageAxis();
     bool oldJoystick=chkJoystick->isChecked();
     chkJoystick->setChecked(false);
+    updateJoystick();
     if (stage) {
         if (conn) {
             stage->setLogging(m_log);

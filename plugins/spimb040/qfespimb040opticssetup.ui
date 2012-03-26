@@ -125,6 +125,9 @@ p, li { white-space: pre-wrap; }
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
        </property>
+       <property name="verticalSpacing">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
@@ -186,6 +189,9 @@ p, li { white-space: pre-wrap; }
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
        </property>
+       <property name="verticalSpacing">
+        <number>2</number>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="QFESPIMB040SimpleCameraConfig" name="camConfig2">
          <property name="minimumSize">
@@ -244,6 +250,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QFormLayout" name="formLayout_2">
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
+       <property name="verticalSpacing">
+        <number>2</number>
        </property>
        <item row="0" column="0" colspan="2">
         <widget class="QFESPIMB040SimpleCameraConfig" name="camConfig1">
@@ -320,6 +329,12 @@ p, li { white-space: pre-wrap; }
       <layout class="QFormLayout" name="formLayout">
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
+       <property name="horizontalSpacing">
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>2</number>
        </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
@@ -594,7 +609,7 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="text">
-         <string>&amp;light path config:</string>
+         <string>&amp;light path config:  </string>
         </property>
         <property name="buddy">
          <cstring>cmbLightpathConfig</cstring>

@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QLocale>
+#include <QDebug>
 
 void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
     settings.setValue(prefix+"pos", widget->pos());
@@ -347,4 +348,40 @@ QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QSt
 
 int getApplicationBitDepth() {
     return 8*sizeof(void*);
+}
+
+
+QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, bool removeSlash) {
+    QString t=text.simplified();
+    QString regexp="";
+    t=t.remove(QRegExp(regexp+"[^\\w\\d \\_\\(\\)\\.\\/]"));
+    t=t.replace(" ", "_");
+    if (removeDot) t=t.remove('.');
+    if (removeSlash) {
+        t=t.remove('\\');
+        t=t.remove('/');
+    }
+    QString t1=t;
+    t="";
+    for (int i=0; i<t1.size(); i++) {
+        if (t1[i]<128) t=t+t[i];
+        else {
+            switch(t1[i].toAscii()) {
+                case 'ä': t=t+"ae"; break;
+                case 'Ä': t=t+"Ae"; break;
+                case 'ö': t=t+"oe"; break;
+                case 'Ö': t=t+"Oe"; break;
+                case 'ü': t=t+"ue"; break;
+                case 'Ü': t=t+"Ue"; break;
+                case 'ß': t=t+"ss"; break;
+                case '@': t=t+"_at_"; break;
+                case 'µ': t=t+"mu"; break;
+            }
+        }
+    }
+    if (maxLen>0 && t.size()>maxLen) {
+        t=t.left(maxLen);
+    }
+    qDebug()<<"cleanStringForFilename("<<text<<") = "<<t;
+    return t;
 }

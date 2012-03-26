@@ -184,4 +184,9 @@ QFLIB_EXPORT QString qfGetSaveFileName ( QWidget * parent = 0, const QString & c
  */
 QFLIB_EXPORT int getApplicationBitDepth();
 
+/*! \brief convert the given string to a string suitable for use in filenames
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString cleanStringForFilename(const QString& text, int maxLen=127, bool removeDot=true, bool removeSlash=true);
+
 #endif // QFTOOLS_H

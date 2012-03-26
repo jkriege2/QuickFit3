@@ -274,7 +274,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
 
 
             JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
-            g->set_color(QColor("blue"));
+            g->set_color(QColor("darkblue"));
             g->set_errorColor(QColor("blue").lighter());
             g->set_lineWidth(2);
             g->set_xColumn(c_tau);
@@ -296,7 +296,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
             for (int i=0; i<m->getCorrelationRuns(); i++) {
                 size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
                 size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_run);
@@ -319,7 +319,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
             for (int i=0; i<m->getCorrelationRuns(); i++) {
                 size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
                 size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
                 g->set_lineWidth(1);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_run);
@@ -356,7 +356,7 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                 if (!m->leaveoutRun(i)) {
                     size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
                     size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
                     g->set_lineWidth(1);
                     g->set_xColumn(c_tau);
                     g->set_yColumn(c_run);
@@ -381,12 +381,12 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                 if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                     size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
                     size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
                     g->set_lineWidth(1);
                     g->set_xColumn(c_tau);
                     g->set_yColumn(c_run);
                     g->set_title(tr("run %1").arg(i));
-                    g->set_color(QColor("red"));
+                    //g->set_color(QColor("red"));
                     g->set_datarange_start(sliders->get_userMin());
                     g->set_datarange_end(sliders->get_userMax());
 

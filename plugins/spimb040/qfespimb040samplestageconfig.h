@@ -163,10 +163,10 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief label to display joystick status */
         QLabel* labJoystick;
         QLabel* labThread;
-        QPushButton* btnX2;
-        QPushButton* btnX10;
-        QPushButton* btnD2;
-        QPushButton* btnD10;
+        QToolButton* btnX2;
+        QToolButton* btnX10;
+        QToolButton* btnD2;
+        QToolButton* btnD10;
 
 
         /** \brief action to connect to stage for axis x */

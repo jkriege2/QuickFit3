@@ -236,7 +236,7 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     hbl->setContentsMargins(0,0,0,0);
     spinAcquisitionDelay=new QDoubleSpinBox(this);
     spinAcquisitionDelay->setMinimum(2);
-    spinAcquisitionDelay->setSuffix(tr("ms"));
+    spinAcquisitionDelay->setSuffix(tr(" ms"));
     spinAcquisitionDelay->setMaximum(10000);
     spinAcquisitionDelay->setSingleStep(1);
     spinAcquisitionDelay->setDecimals(0);
@@ -276,11 +276,13 @@ void QFESPIMB040CameraConfig::createActions() {
     actDisConnect->setCheckable(true);
     connect(actDisConnect, SIGNAL(triggered()), this, SLOT(disConnectAcquisitionDevice()));
 
-    actStartStopPreview = new QAction(QIcon(":/spimb040/acquisitionstart.png"), tr("&Start acquisition"), this);
+    actStartStopPreview = new QAction(QIcon(":/spimb040/acquisitionstart.png"), tr("&start acq."), this);
+    actStartStopPreview->setToolTip(tr("start a continuous preview acquisition with the given frame delay"));
     actStartStopPreview->setCheckable(true);
     connect(actStartStopPreview, SIGNAL(triggered()), this, SLOT(startStopPreview()));
 
-    actPreviewSingle = new QAction(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acquire single image"), this);
+    actPreviewSingle = new QAction(QIcon(":/spimb040/acquisitionsingle.png"), tr("&Acq. single"), this);
+    actPreviewSingle->setToolTip(tr("acquire a single frame and show it in the preview window"));
     connect(actPreviewSingle, SIGNAL(triggered()), this, SLOT(previewSingle()));
 
     actPreviewConfig=cmbPreviewConfiguration->configAction();
