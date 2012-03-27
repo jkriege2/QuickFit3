@@ -27,10 +27,10 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&alpha; = </i>"), edtAlpha);
 
 ////////////////////////////////////////
-    edtNdist=new NumberEdit(this);
-    edtNdist->setRange(0, INT_MAX);
-    edtNdist->setCheckBounds(true, false);
-    edtNdist->setDecimals(0);
+    edtNdist=new QSpinBox(this);
+    edtNdist->setRange(10, INT_MAX);
+    //edtNdist->setCheckBounds(true, false);
+    //edtNdist->setDecimals(0);
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&Ndist = </i>"), edtNdist);
 ////////////////////////////////////////
 
@@ -135,7 +135,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (old) {
         disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
-        disconnect(edtNdist, SIGNAL(valueChanged(uint32_t)),this,SLOT(NdistChanged(uint32_t)));
+        disconnect(edtNdist, SIGNAL(valueChanged(int)),this,SLOT(NdistChanged(int)));
     }
 
     QFFCSMaxEntEvaluationItem* item=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
@@ -147,7 +147,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
 
         edtNdist->setValue(item->getNdist());
-        connect(edtNdist, SIGNAL(valueChanged(uint32_t)), this, SLOT(NdistChanged(uint32_t)));
+        connect(edtNdist, SIGNAL(valueChanged(int)), this, SLOT(NdistChanged(int)));
 
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
@@ -177,9 +177,13 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
 
     if (data && eval) {
+        bool oldde=dataEventsEnabled;
+        dataEventsEnabled=false;
         edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
+        edtNdist->setRange(10,data->getCorrelationN()); //qMax(0,data->getCorrelationN())
         edtNdist->setValue(eval->getNdist());
+        dataEventsEnabled=oldde;
     }
 
 }
@@ -701,6 +705,11 @@ void QFFCSMaxEntEvaluationEditor::displayParameters() {
     QFSimpleFitParameterEnumeratorInterface* peval=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
     if ((!record)||(!eval)/*||(!data)*/) return;
 
+    bool oldde=dataEventsEnabled;
+    dataEventsEnabled=false;
+    edtNdist->setValue(eval->getNdist());
+    dataEventsEnabled=oldde;
+
 
     if (eval->hasResults(record)) {
         datacut->setEnabled(false);
@@ -735,7 +744,10 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
 
     // here we call doEvaluation to execute our evaluation for the current record only
     eval->doFit(record, eval->getCurrentIndex(), eval->getCurrentModel(), getUserMin(record, eval->getCurrentIndex()), getUserMax(record, eval->getCurrentIndex()), 11, spinResidualHistogramBins->value());
-
+    ///////////
+    qDebug()<< "The Ndist value after the doFit method has been called";
+    qDebug()<< eval->getNdist();
+    ////////////
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);
@@ -941,7 +953,7 @@ void QFFCSMaxEntEvaluationEditor::alphaChanged(double alpha) {
     if (data) data->setAlpha(alpha);
 }
 
-void QFFCSMaxEntEvaluationEditor::NdistChanged(uint32_t Ndist) {
+void QFFCSMaxEntEvaluationEditor::NdistChanged(int Ndist) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;

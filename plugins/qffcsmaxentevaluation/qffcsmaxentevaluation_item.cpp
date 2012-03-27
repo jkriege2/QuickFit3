@@ -108,6 +108,8 @@ double QFFCSMaxEntEvaluationItem::getAlpha() const {
 ///////////////////////////////////////////////////////////////////////////////////////
 void QFFCSMaxEntEvaluationItem::setNdist(uint32_t Ndist) {
     setFitValue("maxent_Ndist", Ndist);
+    qDebug()<< "setNdist is called with: ";
+               qDebug()<< Ndist;
 }
 
 uint32_t QFFCSMaxEntEvaluationItem::getNdist() const {
@@ -116,31 +118,6 @@ uint32_t QFFCSMaxEntEvaluationItem::getNdist() const {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -436,6 +413,9 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
         getProject()->getServices()->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(defaultMinDatarange).arg(defaultMaxDatarange).arg(defaultMaxDatarange-defaultMinDatarange));
 
+
+
+
         /*
         //////////
         uint32_t Ndist=100; // default
@@ -443,7 +423,11 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         */
 
         uint32_t N=data->getCorrelationN();
+        qDebug()<<"Number of Data Points: ";
+        qDebug()<< N;
         double* taus=data->getCorrelationT();
+        qDebug() << "Der erste x-Wert: ";
+        qDebug() << taus[0];
         double* distTaus=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* dist=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* modelEval=(double*)malloc(N*sizeof(double));
@@ -453,8 +437,12 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, rangeMaxDatarange);
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
         double alpha=getAlpha();
+        qDebug()<< "The default value from getAlpha(); befor the mem call";
+        qDebug()<< alpha;
         ///////////
         uint32_t Ndist=getNdist();
+        qDebug()<< "The default value from getNdist(); befor the mem call";
+        qDebug()<< Ndist;
         //////////
         bool fitSuccess=false;
 
@@ -466,12 +454,14 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         QVector<double> init_dist=getFitValueNumberArray(record, index, model, "maxent_distribution");
 
         //qDebug()<<init_tau;
-        //qDebug()<<init_dist;
+
 
 
         bool old_distribution=false; // default value
         if (init_tau.size()>0 && init_dist.size()>0)
             {
+
+                qDebug()<< "THERE ALREADY WAS A OLD MAXENT FIT THAT IS USED TO INITIALIZE THIS CURRENT FIT";
                 Ndist=qMin(init_tau.size(), init_dist.size());
                 distTaus=(double*)calloc(Ndist,sizeof(double));
                 dist=(double*)calloc(Ndist,sizeof(double));
@@ -481,14 +471,32 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         dist[i]=init_dist[i];
                     }
                 old_distribution=true;
+                qDebug()<< "Der Ndist Wert aus der old Dist Schleife:";
+                qDebug()<< Ndist;
             }
         else
             {
+
+                qDebug()<< "NEW MAXENT FIT";
                 distTaus=NULL;
                 dist=NULL;
                 old_distribution=false;
+                if (Ndist>(rangeMaxDatarange-rangeMinDatarange))
+                    {
+                        Ndist=(rangeMaxDatarange-rangeMinDatarange);
+                        qDebug()<< "Ndsit out of range; Ndist set to: ";
+                        qDebug()<< Ndist;
+                    }
+
             }
 
+
+        /*
+        QMessageBox msgBox;
+        msgBox.setText("Hallo");
+        msgBox.setDetailedText("Detailed Information");
+        msgBox.exec();
+        */
 
         QElapsedTimer time;
         time.start();
@@ -497,6 +505,8 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         /// MaxEnt Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
         MaxEntB040 mem;
+        qDebug()<< "calling mem with Ndist: ";
+        qDebug()<< Ndist;
         mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus);
         mem.run(alpha,kappa,tripTau,tripTheta);
         if (old_distribution==false)
@@ -590,7 +600,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         setFitResultGroup(record, index, model, param, tr("fit properties"));
         setFitResultLabel(record, index, model, param, tr("used model name"), tr("used model name"));
 
-        setFitResultValueInt(record, index, model, param="maxent_Ndist", model);
+        setFitResultValueInt(record, index, model, param="maxent_Ndist",Ndist);
         setFitResultGroup(record, index, model, param, tr("fit properties"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt number of distribution points"), tr("MaxEnt number of distribution points"));
 
@@ -608,9 +618,15 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
         // CALCULATE FIT STATISTICS
         //   now we evaluate the model for the given distribution
-        evaluateModel(record, index, model, taus, modelEval, N, &(taus[rangeMinDatarange]), &(dist[rangeMinDatarange]), rangeMaxDatarange-rangeMinDatarange);
+        /////////////////////////
+        /////////////////////////
+        // I changed the 7th argument in the evaluateModel call from &(taus[rangeMindatarange]) to &(distTaus[rangeMinDatarange])
+        // this is what the 7th and 8th argument used to be like: &(distTaus[rangeMinDatarange]), &(dist[rangeMinDatarange])
+        // this was the last argument:  rangeMaxDatarange-rangeMinDatarange, now changed to Ndist
+        ////////////////////////
+        evaluateModel(record, index, model, taus, modelEval, N, distTaus,dist,Ndist);
         //   then we can call calcFitStatistics()
-        QFFitStatistics fit_stat=calcFitStatistics(record, index, model, taus, corrdata, N, rangeMaxDatarange-rangeMinDatarange, rangeMinDatarange, rangeMaxDatarange, runAvgWidth, residualHistogramBins);
+        QFFitStatistics fit_stat=calcFitStatistics(record, index, model, taus, corrdata, N,Ndist, rangeMinDatarange, rangeMaxDatarange, runAvgWidth, residualHistogramBins);
         //   finally we have to free the memory allocated in the calcFitStatistics() result.
         fit_stat.free();
 
