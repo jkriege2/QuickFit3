@@ -111,6 +111,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         void resultsChanged();
 
+        void refreshResults();
+
         /** \brief save results to a file */
         void saveResults();
 

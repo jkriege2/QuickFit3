@@ -259,6 +259,12 @@ void QFEvaluationPropertyEditor::resultsChanged() {
     if (tvResults->model()->columnCount()*tvResults->model()->rowCount()<10000) tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }
 
+void QFEvaluationPropertyEditor::refreshResults()
+{
+    resultsModel->resultsChanged();
+    resultsChanged();
+}
+
 void QFEvaluationPropertyEditor::displayHelp() {
     QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
     services->displayHelpWindow(dll);
@@ -404,7 +410,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
-    connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(resultsChanged()));
+    connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 

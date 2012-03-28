@@ -64,6 +64,8 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
          */
         virtual void setFitResultEvaluationDescription(QFRawDataRecord* r, int index, const QString& description);
 
+        /** \brief reset all fit results for the given \a index in the given record \a r */
+        void resetAllFitResults(QFRawDataRecord* r, int index);
 
 
 
@@ -286,7 +288,7 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
         using QFUsesResultsEvaluation::getFitValueNumberArray;
         using QFUsesResultsEvaluation::getFitValueErrorArray;
         using QFUsesResultsEvaluation::setFitResultSortPriority;
-
+        using QFUsesResultsEvaluation::resetAllFitResults;
 
         
 };

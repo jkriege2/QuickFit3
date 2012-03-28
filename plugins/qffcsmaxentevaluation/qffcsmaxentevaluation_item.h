@@ -64,6 +64,10 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         void setNdist(uint32_t Ndist);
         /** \brief return the current number of distribution points Ndist */
         uint32_t getNdist() const;
+        /** \brief set the number of distribution points Ndist */
+        void setNumIter(uint32_t NumIter);
+        /** \brief return the current number of distribution points Ndist */
+        uint32_t getNumIter() const;
 
 
 

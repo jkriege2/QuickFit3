@@ -78,6 +78,10 @@ void QFUsesResultsByIndexAndModelEvaluation::setFitResultSortPriority(QFRawDataR
     setFitResultSortPriority(r, getEvaluationResultID(index, model), parameterID, sortPriority);
 }
 
+void QFUsesResultsByIndexAndModelEvaluation::resetAllFitResults(QFRawDataRecord *r, int index, int model) {
+    resetAllFitResults(r, getEvaluationResultID(index, model));
+}
+
 void QFUsesResultsByIndexAndModelEvaluation::setFitResultLabel(QFRawDataRecord *r, int index, int model, const QString &parameterID, const QString &label, const QString &label_richtext)
 {
     setFitResultLabel(r, getEvaluationResultID(index, model), parameterID, label, label_richtext);

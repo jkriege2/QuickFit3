@@ -29,9 +29,10 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 ////////////////////////////////////////
     edtNdist=new QSpinBox(this);
     edtNdist->setRange(10, INT_MAX);
-    //edtNdist->setCheckBounds(true, false);
-    //edtNdist->setDecimals(0);
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&Ndist = </i>"), edtNdist);
+    edtNumIter=new QSpinBox(this);
+    edtNumIter->setRange(10, INT_MAX);
+    flAlgorithmParams->addRow(tr("MaxEnt: <i>&Iterations/Step = </i>"), edtNumIter);
 ////////////////////////////////////////
 
 
@@ -136,6 +137,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         disconnect(edtNdist, SIGNAL(valueChanged(int)),this,SLOT(NdistChanged(int)));
+        disconnect(edtNumIter, SIGNAL(valueChanged(int)),this,SLOT(NumIterChanged(int)));
     }
 
     QFFCSMaxEntEvaluationItem* item=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
@@ -148,6 +150,9 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
         edtNdist->setValue(item->getNdist());
         connect(edtNdist, SIGNAL(valueChanged(int)), this, SLOT(NdistChanged(int)));
+
+        edtNumIter->setValue(item->getNumIter());
+        connect(edtNumIter, SIGNAL(valueChanged(int)), this, SLOT(NumIterChanged(int)));
 
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
@@ -183,6 +188,8 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
         edtNdist->setRange(10,data->getCorrelationN()); //qMax(0,data->getCorrelationN())
         edtNdist->setValue(eval->getNdist());
+        edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
+        edtNumIter->setValue(eval->getNumIter());
         dataEventsEnabled=oldde;
     }
 
@@ -604,6 +611,8 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 if (mem_tau.size()>0 && mem_dist.size()>0) {
                     c_disttau=dsdist->addCopiedColumn(mem_tau.data(), mem_tau.size(), "maxent_tau");
                     c_dist=dsdist->addCopiedColumn(mem_dist.data(), mem_dist.size(), "maxent_tau");;
+                } else {
+                    pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
                 }
                 JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
                 g_dist->set_drawLine(true);
@@ -622,6 +631,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 QString txtFit="<font face=\"Arial\">";
                 QString fitResult=record->resultsGetAsString(eval->getEvaluationResultID(), "fitalg_messageHTML");
+                if (fitResult.isEmpty()) fitResult=record->resultsGetAsString(eval->getEvaluationResultID(), "fitalg_message");
 
                 if (!fitResult.isEmpty()) {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>%1</center></div><br>").arg(fitResult);
@@ -708,6 +718,7 @@ void QFFCSMaxEntEvaluationEditor::displayParameters() {
     bool oldde=dataEventsEnabled;
     dataEventsEnabled=false;
     edtNdist->setValue(eval->getNdist());
+    edtNumIter->setValue(eval->getNumIter());
     dataEventsEnabled=oldde;
 
 
@@ -742,8 +753,14 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+    bool oldde=dataEventsEnabled;
+    dataEventsEnabled=false;
+
     // here we call doEvaluation to execute our evaluation for the current record only
-    eval->doFit(record, eval->getCurrentIndex(), eval->getCurrentModel(), getUserMin(record, eval->getCurrentIndex()), getUserMax(record, eval->getCurrentIndex()), 11, spinResidualHistogramBins->value());
+    eval->doFit(record, eval->getCurrentIndex(), eval->getCurrentModel(), getUserMin(record, eval->getCurrentIndex()), getUserMax(record, eval->getCurrentIndex()), 11, spinResidualHistogramBins->value());    
+    dataEventsEnabled=oldde;
+    eval->emitResultsChanged(record);
+    record->emitResultsChanged();
     ///////////
     qDebug()<< "The Ndist value after the doFit method has been called";
     qDebug()<< eval->getNdist();
@@ -771,6 +788,8 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+    bool oldde=dataEventsEnabled;
+    dataEventsEnabled=false;
 
     // iterate through all records and all runs therein and do the fits
     //for (int i=0; i<recs.size(); i++) {
@@ -791,8 +810,11 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
                 dlgEvaluationProgress->setValue(idx);
             }
         }
+        record->emitResultsChanged();
         QApplication::processEvents();
     //}
+    dataEventsEnabled=oldde;
+    eval->emitResultsChanged(record);
     dlgEvaluationProgress->setValue(recs.size());
     displayParameters();
     displayData();
@@ -800,7 +822,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsCurrent() {
 }
 
 
-void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
+void QFFCSMaxEntEvaluationEditor::fitAll() {
     /* EXECUTE AN EVALUATION FOR ALL RECORDS */
     if (!current) return;
 
@@ -814,6 +836,8 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
     dlgEvaluationProgress->open();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    bool oldde=dataEventsEnabled;
+    dataEventsEnabled=false;
 
 
     // iterate through all records and all runs therein and do the fits
@@ -833,12 +857,15 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
             }
+            record->emitResultsChanged();
         }
         dlgEvaluationProgress->setValue(i);
         QApplication::processEvents();
         // check whether the user canceled this evaluation
         if (dlgEvaluationProgress->wasCanceled()) break;
     }
+    dataEventsEnabled=oldde;
+    eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
     displayParameters();
     displayData();
@@ -847,7 +874,7 @@ void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
 
 
 
-void QFFCSMaxEntEvaluationEditor::fitAll() {
+void QFFCSMaxEntEvaluationEditor::fitRunsAll() {
     /* EXECUTE AN EVALUATION FOR ALL RECORDS */
     if (!current) return;
 
@@ -861,6 +888,8 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
     dlgEvaluationProgress->open();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    bool oldde=dataEventsEnabled;
+    dataEventsEnabled=false;
 
 
     // iterate through all records and all runs therein and do the fits
@@ -873,7 +902,7 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
             // here we call doEvaluation to execute our evaluation for the current record only
 
             //for (int idx=-1; idx<data->getCorrelationRuns(); idx++) {
-            int idx=eval->getCurrentIndex();
+                int idx=eval->getCurrentIndex();
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
                 QApplication::processEvents();
                 eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
@@ -881,12 +910,15 @@ void QFFCSMaxEntEvaluationEditor::fitAll() {
                 // check whether the user canceled this evaluation
                 if (dlgEvaluationProgress->wasCanceled()) break;
             //}
+                record->emitResultsChanged();
         }
         dlgEvaluationProgress->setValue(i);
         QApplication::processEvents();
         // check whether the user canceled this evaluation
         if (dlgEvaluationProgress->wasCanceled()) break;
     }
+    dataEventsEnabled=oldde;
+    eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
     displayParameters();
     displayData();
@@ -959,6 +991,14 @@ void QFFCSMaxEntEvaluationEditor::NdistChanged(int Ndist) {
     if (!current->getHighlightedRecord()) return;
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (data) data->setNdist(Ndist);
+}
+
+void QFFCSMaxEntEvaluationEditor::NumIterChanged(int NumIter) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setNumIter(NumIter);
 }
 
 void QFFCSMaxEntEvaluationEditor::weightsChanged(int weights) {

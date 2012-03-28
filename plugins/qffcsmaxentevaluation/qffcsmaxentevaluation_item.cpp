@@ -116,6 +116,14 @@ uint32_t QFFCSMaxEntEvaluationItem::getNdist() const {
     return round(getFitValue("maxent_Ndist"));
 }
 
+void QFFCSMaxEntEvaluationItem::setNumIter(uint32_t NumIter) {
+    setFitValue("maxent_numiter", NumIter);
+}
+
+uint32_t QFFCSMaxEntEvaluationItem::getNumIter() const {
+    return round(getFitValue("maxent_numiter"));
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -336,7 +344,7 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
 
                 }
             } else {
-                sum=1.0;
+                sum=1.0/double(N);
             }
             output[i]=sum/N_particle*trip_factor;
         }
@@ -371,10 +379,11 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
     if (parameterID=="maxent_alpha") {
         defaultValue.value=0.001;
         return true;
-    }
-
-    else if (parameterID=="maxent_Ndist") {
+    } else if (parameterID=="maxent_Ndist") {
         defaultValue.value=100;
+        return true;
+    } else if (parameterID=="maxent_numiter") {
+        defaultValue.value=20;
         return true;
     }
 
@@ -449,6 +458,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         double kappa=getFitValue("focus_struct_fac");
         double tripTau=getFitValue("trip_tau")*1e-6;
         double tripTheta=getFitValue("trip_theta");
+        int NumIter=getNumIter();
 
         QVector<double> init_tau=getFitValueNumberArray(record, index, model, "maxent_tau");
         QVector<double> init_dist=getFitValueNumberArray(record, index, model, "maxent_distribution");
@@ -465,7 +475,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                 Ndist=qMin(init_tau.size(), init_dist.size());
                 distTaus=(double*)calloc(Ndist,sizeof(double));
                 dist=(double*)calloc(Ndist,sizeof(double));
-                for (int i=0; i<Ndist; i++)
+                for (uint32_t i=0; i<Ndist; i++)
                     {
                         distTaus[i]=init_tau[i];
                         dist[i]=init_dist[i];
@@ -481,7 +491,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                 distTaus=NULL;
                 dist=NULL;
                 old_distribution=false;
-                if (Ndist>(rangeMaxDatarange-rangeMinDatarange))
+                if (int64_t(Ndist)>(rangeMaxDatarange-rangeMinDatarange))
                     {
                         Ndist=(rangeMaxDatarange-rangeMinDatarange);
                         qDebug()<< "Ndsit out of range; Ndist set to: ";
@@ -508,7 +518,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         qDebug()<< "calling mem with Ndist: ";
         qDebug()<< Ndist;
         mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus);
-        mem.run(alpha,kappa,tripTau,tripTheta);
+        mem.run(alpha,kappa,tripTau,tripTheta, NumIter);
         if (old_distribution==false)
             {
                 distTaus=(double*)calloc(Ndist,sizeof(double));
@@ -592,9 +602,13 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         setFitResultGroup(record, index, model, param, tr("fit properties"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt scaling parameter alpha"), tr("scaling parameter &alpha;"));
 
-        setFitResultValueInt(record, index, model, param="maxent_iterations", 5);
+        setFitResultValueInt(record, index, model, param="maxent_iterations", ceil(getFitValue(record, index, model, param)+NumIter));
         setFitResultGroup(record, index, model, param, tr("fit properties"));
         setFitResultLabel(record, index, model, param, tr("number of MaxEnt iterations"), tr("number of MaxEnt iterations"));
+
+        setFitResultValueInt(record, index, model, param="maxent_numiter", NumIter);
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("number of MaxEnt iterations in last run of algorithm"), tr("last MaxEnt iterations"));
 
         setFitResultValueString(record, index, model, param="used_model", getModelName(model));
         setFitResultGroup(record, index, model, param, tr("fit properties"));
@@ -615,6 +629,14 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         setFitResultValue(record, index, model, param="runtime", duration, tr("seconds"));
         setFitResultGroup(record, index, model, param, tr("fit properties"));
         setFitResultLabel(record, index, model, param, tr("fit runtime"), tr("fit runtime"));
+
+        setFitResultValueString(record, index, model, param="fitalg_message", tr("MaxEnt finished successfully after %1 iterations with alpha=%2").arg(NumIter).arg(alpha));
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("MaxEnt message"), tr("MaxEnt message"));
+
+        setFitResultValueString(record, index, model, param="fitalg_messageHTML", tr("<b>MaxEnt finished successfully</b><br>after %1 iterations with &alpha;=%2").arg(NumIter).arg(alpha));
+        setFitResultGroup(record, index, model, param, tr("fit properties"));
+        setFitResultLabel(record, index, model, param, tr("MaxEnt message"), tr("MaxEnt message"));
 
         // CALCULATE FIT STATISTICS
         //   now we evaluate the model for the given distribution

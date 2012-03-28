@@ -69,14 +69,21 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
 
-        /** \brief evaluate all files */
+        /** \brief evaluate in all files the current run */
         virtual void fitRunsAll()=0;
-        /** \brief evaluate current file */
+        /** \brief evaluate current file and run */
         virtual void fitCurrent()=0;
-        /** \brief display the data from the current raw data record */
+        /** \brief evaluate all runs in all files */
         virtual void fitAll()=0;
-
+        /** \brief evaluate all runs in current files */
         virtual void fitRunsCurrent()=0;
+
+        /** \brief reset current results */
+        virtual void resetCurrent();
+        /** \brief reset all runs in all files */
+        virtual void resetAll();
+        /** \brief reset all runs in current files */
+        virtual void resetAllRuns();
 
         void plotMouseMove(double x, double y);
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);

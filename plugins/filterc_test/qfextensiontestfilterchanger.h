@@ -119,7 +119,7 @@ class QFExtensionTestFilterChanger : public QObject, public QFExtensionBase, pub
 	protected:
         QFPluginLogService* logService;
         bool connected[2];
-        int filter[2];
+        unsigned int filter[2];
         QTime lastAction[2];
 
 };

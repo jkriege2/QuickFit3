@@ -53,7 +53,7 @@ class MaxEntB040 {
 		
 		void writeDistTaus(double * distTaus);
 
-        bool run(double alpha,double kappa, double tripTau,double tripTheta);
+        bool run(double alpha,double kappa, double tripTau,double tripTheta, int NumIter);
 
     protected:
         //protected member variables
@@ -66,6 +66,7 @@ class MaxEntB040 {
         double m_alpha;
         double m_tripTau;
         double m_tripTheta;
+        int NumIter;
         Eigen::VectorXd m_xdata;
 		Eigen::VectorXd m_ydata;
 		Eigen::VectorXd m_stdev;

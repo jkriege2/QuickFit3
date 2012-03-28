@@ -7,7 +7,7 @@ QFSimpleFitParametersWidget::QFSimpleFitParametersWidget(QFSimpleFitParameterInt
     updating=false;
 
     mainLayout=new QGridLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
+    //mainLayout->setContentsMargins(0,0,0,0);
     spacer=new QSpacerItem(10,10, QSizePolicy::Preferred, QSizePolicy::Expanding);
     mainLayout->addItem(spacer, 0, 0);
     setLayout(mainLayout);

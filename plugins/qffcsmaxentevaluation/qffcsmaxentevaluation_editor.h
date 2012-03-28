@@ -59,6 +59,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         void alphaChanged(double alpha);
         void weightsChanged(int weights);
         void NdistChanged(int Ndist);
+        void NumIterChanged(int NumIter);
 
 
         /** \brief connect widgets to current data record */
@@ -93,6 +94,8 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         NumberEdit* edtAlpha;
         /** \brief number edit to change Ndist */
         QSpinBox* edtNdist;
+        /** \brief number edit to change NumIter */
+        QSpinBox* edtNumIter;
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
         /** \brief ploter for the MaxEnt Distribution */

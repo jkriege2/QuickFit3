@@ -491,7 +491,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
     connect(btnFitCurrent, SIGNAL(clicked()), this, SLOT(fitCurrent()));
     connect(btnFitAll, SIGNAL(clicked()), this, SLOT(fitRunsAll()));
-    connect(btnFitRunsAll, SIGNAL(clicked()), this, SLOT(fitRunsAll()));
+    connect(btnFitRunsAll, SIGNAL(clicked()), this, SLOT(fitAll()));
     connect(btnFitRunsCurrent, SIGNAL(clicked()), this, SLOT(fitRunsCurrent()));
     connect(btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetAll()));
@@ -609,8 +609,8 @@ void QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(QFRawDataRecord* 
         datacut->set_max(data->getCorrelationN()-1);
         QString run="avg";
         if (eval->getCurrentIndex()>-1) run=QString::number(eval->getCurrentIndex());
-        datacut->set_userMin(getUserMin(0));
-        datacut->set_userMax(getUserMax(currentRecord, data->getCorrelationN()-1));
+        datacut->set_userMin(getUserMin(currentRecord, eval->getCurrentIndex(), 0));
+        datacut->set_userMax(getUserMax(currentRecord, eval->getCurrentIndex(), data->getCorrelationN()-1));
         datacut->enableSliderSignals();
         spinRun->setMaximum(data->getCorrelationRuns()-1);
         if (data->getCorrelationRuns()==1) spinRun->setMaximum(-1);
@@ -624,6 +624,67 @@ void QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(QFRawDataRecord* 
     // ensure that data of new highlighted record is displayed
     displayParameters();
     displayData();
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::resetCurrent() {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    eval->resetAllFitResults(record, eval->getCurrentIndex(), eval->getCurrentModel());
+    // ensure that data of new highlighted record is displayed
+    displayParameters();
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::resetAll() {
+    if (!current) return;
+    //QFRawDataRecord* record=current->getHighlightedRecord();
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QPointer<QFRawDataRecord> > records=eval->getApplicableRecords();
+
+    bool rc=eval->get_doEmitResultsChanged();
+    eval->set_doEmitResultsChanged(false);
+    foreach (QFRawDataRecord* record, records) {
+        bool rec=record->isEmitResultsChangedEnabled();
+        record->disableEmitResultsChanged();
+        for (int idx=eval->getIndexMin(record); idx<=eval->getIndexMax(record); idx++) {
+            eval->resetAllFitResults(record, idx, eval->getCurrentModel());
+        }
+        if (rec)record->enableEmitResultsChanged();
+    }
+    eval->set_doEmitResultsChanged(rc);
+    if (rc) eval->emitResultsChanged();
+    // ensure that data of new highlighted record is displayed
+    displayParameters();
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::resetAllRuns() {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    bool rc=eval->get_doEmitResultsChanged();
+    eval->set_doEmitResultsChanged(false);
+    bool rec=record->isEmitResultsChangedEnabled();
+    record->disableEmitResultsChanged();
+    for (int idx=eval->getIndexMin(record); idx<=eval->getIndexMax(record); idx++) {
+        eval->resetAllFitResults(record, idx, eval->getCurrentModel());
+    }
+    if (rec)record->enableEmitResultsChanged();
+    eval->set_doEmitResultsChanged(rc);
+    if (rc) eval->emitResultsChanged(record);
+    // ensure that data of new highlighted record is displayed
+    displayParameters();
+    displayData();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFFCSByIndexAndModelEvaluationEditor::displayParameters() {

@@ -91,6 +91,8 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
         virtual void setFitResultEvaluationDescription(QFRawDataRecord* r, const QString& resultID, const QString& description);
 
 
+        /** \brief reset all fit results for the given \a resultID in the given record \a r */
+        void resetAllFitResults(QFRawDataRecord* r, const QString& resultID);
 
 
 

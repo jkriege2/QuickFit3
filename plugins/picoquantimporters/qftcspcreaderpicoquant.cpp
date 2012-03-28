@@ -152,7 +152,7 @@ bool QFTCSPCReaderPicoquant::nextRecord() {
         }
     } while (!(TTTRrecord.Valid));
 
-    return (currentTTTRRecordNum<TTTRHeader.NoOfRecords && !feof(tttrfile));
+    return (int64_t(currentTTTRRecordNum)<TTTRHeader.NoOfRecords && !feof(tttrfile));
 }
 
 double QFTCSPCReaderPicoquant::measurementDuration() const {

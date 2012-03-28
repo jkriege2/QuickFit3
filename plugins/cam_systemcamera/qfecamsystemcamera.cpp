@@ -92,7 +92,7 @@ void QFECamSystemcamera::initExtension() {
     cameras=cap.getDeviceList();
     QMenu* scm=new QMenu(tr("&System Camera Controls"));
     scm->setIcon(QIcon(":/cam_systemcam/qfecamsystemcamera.png"));
-    for (int i=0; i<cameras.size(); i++) {
+    for (size_t i=0; i<cameras.size(); i++) {
         vids.append(new VideoCapture());
         if (vids[i]->getConfigDialogCount()>0) {
             QMenu* m=scm->addMenu(cameras[i].c_str());

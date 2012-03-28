@@ -37,6 +37,10 @@ void QFUsesResultsByIndexEvaluation::setFitResultEvaluationDescription(QFRawData
     setFitResultEvaluationDescription(r, getEvaluationResultID(index), description);
 }
 
+void QFUsesResultsByIndexEvaluation::resetAllFitResults(QFRawDataRecord *r, int index) {
+    resetAllFitResults(r, getEvaluationResultID(index));
+}
+
 void QFUsesResultsByIndexEvaluation::setFitValue(QFRawDataRecord *r, int index, const QString &parameterID, double value, const QString &unit) {
     setFitValue(r, getEvaluationResultID(index), parameterID, value, unit);
 }

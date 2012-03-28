@@ -18,8 +18,7 @@
 
 
 // Default Constructor
-MaxEntB040::MaxEntB040()
-    {
+MaxEntB040::MaxEntB040() {
     
     m_Nd=0; //initialisation
     m_kappa=6.0; //default if not overwritten by user
@@ -30,8 +29,9 @@ MaxEntB040::MaxEntB040()
 	m_N=100; // number of distribution points (default value)
 	m_s=0; //internal deafult value for the singular space dimension
 	m_oldDist=false; //default
+    NumIter=200;
 
-    }
+}
 
 //Default Destructor
 MaxEntB040::~MaxEntB040(){}
@@ -77,12 +77,13 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
     }
 
 
-bool MaxEntB040::run(double alpha,double kappa,double tripTau,double tripTheta)
+bool MaxEntB040::run(double alpha,double kappa,double tripTau,double tripTheta, int NumIter)
     {
     m_alpha=alpha;
     m_kappa=kappa;
     m_tripTau=tripTau;
     m_tripTheta=tripTheta;
+    this->NumIter=NumIter;
     if (m_oldDist==false){setTauGrid();}
     setTmatrix();
     performSVD();
@@ -221,7 +222,6 @@ void MaxEntB040::performIter()
 	Eigen::VectorXd du(m_s);
 	
 	//////////////////
-    int NumIter=200;
 	int counter=0;
 	//////////////////
 

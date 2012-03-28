@@ -70,6 +70,13 @@ void QFUsesResultsEvaluation::setFitResultEvaluationDescription(QFRawDataRecord 
     }
 }
 
+void QFUsesResultsEvaluation::resetAllFitResults(QFRawDataRecord *r, const QString &resultID) {
+    QFRawDataRecord* re=getHighlightedRecord();
+    if (!re) return;
+    r->resultsClear(transformResultID(resultID));
+
+}
+
 void QFUsesResultsEvaluation::setFitValue(const QString &parameterID, double value, const QString &unit) {
     setFitValue(getHighlightedRecord(), getEvaluationResultID(), parameterID, value, unit);
 }

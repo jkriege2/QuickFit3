@@ -76,6 +76,8 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
 
 
 
+        /** \brief reset all fit results for the given \a index in the given record \a r */
+        void resetAllFitResults(QFRawDataRecord* r, int index, int model);
 
 
 
@@ -309,7 +311,7 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
         using QFUsesResultsByIndexEvaluation::getFitValueNumberArray;
         using QFUsesResultsByIndexEvaluation::getFitValueErrorArray;
         using QFUsesResultsByIndexEvaluation::setFitResultSortPriority;
-
+        using QFUsesResultsByIndexEvaluation::resetAllFitResults;
 };
 
 #endif // QFUSESRESULTSBYINDEXANDMODELEVALUATION_H

@@ -40,7 +40,7 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
 
 
     }
-    if ( column<0 || row<0 ) {
+    if ( (column<0) || (row<0) ) {
         QTime t;
         t.start();
         //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged()";
