@@ -31,6 +31,9 @@ class QFESPIMB040ConfigComboBox : public QEnhancedComboBox {
          *  \param filename contains the full filename including the absolute path.
          */
         void currentConfigChanged(QString filename);
+
+        /** \brief emitted when the list of lightpath configs changes */
+        void configsChanged(QList<QPair<QIcon, QString> > configs);
     public slots:
         /** \brief select the given configuration from a given filename
          *

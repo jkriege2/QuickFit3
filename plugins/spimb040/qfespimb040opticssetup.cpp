@@ -29,6 +29,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogServ
     ui->shutterMainIllumination->init(m_log, m_pluginServices);
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
+    connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QList<QPair<QIcon,QString> >)), this, SLOT(configsChanged(QList<QPair<QIcon,QString> >)));
 }
 
 QFESPIMB040OpticsSetup::~QFESPIMB040OpticsSetup()
@@ -215,6 +216,10 @@ void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
 void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
     ui->camConfig1->disconnectCamera();
     ui->camConfig2->disconnectCamera();
+}
+
+void QFESPIMB040OpticsSetup::configsChanged(QList<QPair<QIcon, QString> > configs) {
+    emit lightpathesChanged(configs);
 }
 
 

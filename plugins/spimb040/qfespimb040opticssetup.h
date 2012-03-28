@@ -132,6 +132,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
         bool isMainIlluminationShutterAvailable();
         /** \brief get main illumination shutter state */
         bool getMainIlluminationShutter();
+    signals:
+        void lightpathesChanged(QList<QPair<QIcon, QString> > lightpathes);
+
     protected slots:
         void updateMagnifications();
 
@@ -139,6 +142,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void on_btnConnectCameras_clicked();
         void on_btnDisconnectDevices_clicked();
         void on_btnDisconnectCameras_clicked();
+        void configsChanged(QList<QPair<QIcon, QString> > configs);
 
 
     protected:

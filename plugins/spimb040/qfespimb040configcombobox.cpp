@@ -10,7 +10,7 @@ QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
     baseDir=QApplication::applicationDirPath();
     m_ext="ini";
-    icon=QIcon();
+    icon=QIcon(":/spimb040/lightpath.png");
     clear();
 }
 
@@ -42,12 +42,15 @@ void QFESPIMB040ConfigComboBox::init(QString baseDir, QString extension) {
 
     QDir dir=QDir(baseDir, "*."+m_ext);
     //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
-    QStringList filenames;
-    foreach (QString fileName, dir.entryList(QDir::Files)) {
+    QStringList filenames=dir.entryList(QDir::Files);
+    QList<QPair<QIcon, QString> > configs;
+    foreach (QString fileName, filenames) {
         QString absfn=dir.absoluteFilePath(fileName);
+        configs.append(qMakePair(getConfigIcon(absfn), getConfigName(absfn)));
         addItem(getConfigIcon(absfn), getConfigName(absfn), absfn);
     }
 
+    emit configsChanged(configs);
 }
 
 void QFESPIMB040ConfigComboBox::setCurrentConfigFilename(QString filename) {
@@ -64,14 +67,14 @@ void QFESPIMB040ConfigComboBox::cmbCurrentIndexChanged(int index) {
 
 QString QFESPIMB040ConfigComboBox::getConfigName(QString filename) const {
     QSettings settings(filename, QSettings::IniFormat);
-    return settings.value("name", "").toString();
+    return settings.value("name",  QFileInfo(filename).baseName()).toString();
 }
 
 QIcon QFESPIMB040ConfigComboBox::getConfigIcon(QString filename) const {
     QSettings settings(filename, QSettings::IniFormat);
     QIcon res=icon;
-    QString ic=settings.value("name", QFileInfo(filename).baseName()).toString();
-    if (!ic.isEmpty()) res=QIcon(ic);
+    QString ic=QFileInfo(filename).baseName()+".png";
+    ic=settings.value("icon", ic).toString();
+    if (QFile::exists(ic)) res=QIcon(ic);
     return res;
-
 }
