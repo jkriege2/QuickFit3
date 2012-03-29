@@ -25,6 +25,9 @@ class QFESPIMB040ConfigComboBox : public QEnhancedComboBox {
         QString currentConfig() const;
         void setIcon(QIcon icon);
         void init(QString baseDir, QString extension=QString("ini"));
+        void updateItems();
+        void updateItems(const QString& newCurrent);
+        QStringList getConfigs() const;
     signals:
         /** \brief called when the user selects a new configuration.
          *
@@ -50,6 +53,7 @@ class QFESPIMB040ConfigComboBox : public QEnhancedComboBox {
         QIcon icon;
         QString baseDir;
         QString m_ext;
+        bool updating;
     protected slots:
         void cmbCurrentIndexChanged(int index);
         QString getConfigName(QString filename) const;

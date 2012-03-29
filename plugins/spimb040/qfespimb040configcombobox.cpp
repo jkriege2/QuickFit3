@@ -7,6 +7,7 @@
 QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
     QEnhancedComboBox(parent)
 {
+    updating=false;
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
     baseDir=QApplication::applicationDirPath();
     m_ext="ini";
@@ -37,8 +38,18 @@ void QFESPIMB040ConfigComboBox::setIcon(QIcon icon) {
 void QFESPIMB040ConfigComboBox::init(QString baseDir, QString extension) {
     this->baseDir=baseDir;
     this->m_ext=extension;
+    updateItems();
+}
 
+void QFESPIMB040ConfigComboBox::updateItems() {
+    updateItems("");
+}
+
+void QFESPIMB040ConfigComboBox::updateItems(const QString &newCurrent) {
+    int idx=currentIndex();
+    updating=true;
     clear();
+    addItem(tr("--- none ---"), "");
 
     QDir dir=QDir(baseDir, "*."+m_ext);
     //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
@@ -50,7 +61,16 @@ void QFESPIMB040ConfigComboBox::init(QString baseDir, QString extension) {
         addItem(getConfigIcon(absfn), getConfigName(absfn), absfn);
     }
 
+    updating=false;
     emit configsChanged(configs);
+    if (!newCurrent.isEmpty()) idx=findText(newCurrent);
+    setCurrentIndex(idx);
+}
+
+QStringList QFESPIMB040ConfigComboBox::getConfigs() const {
+    QStringList l;
+    for (int i=1; i<count(); i++) l.append(itemText(i));
+    return l;
 }
 
 void QFESPIMB040ConfigComboBox::setCurrentConfigFilename(QString filename) {
@@ -62,7 +82,7 @@ void QFESPIMB040ConfigComboBox::setCurrentConfig(QString config)  {
 }
 
 void QFESPIMB040ConfigComboBox::cmbCurrentIndexChanged(int index) {
-    emit currentConfigChanged(itemData(index).toString());
+    if (!updating) emit currentConfigChanged(itemData(index).toString());
 }
 
 QString QFESPIMB040ConfigComboBox::getConfigName(QString filename) const {

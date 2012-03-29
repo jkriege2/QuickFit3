@@ -2,13 +2,14 @@
 #define QFESPIMB040OPTICSSETUP_H
 
 #include <QWidget>
+#include <QSettings>
 #include "programoptions.h"
 #include "qfpluginservices.h"
 
 #include "programoptions.h"
 #include "jkimage.h"
 #include "jkqttools.h"
-
+#include "qftools.h"
 
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
@@ -132,6 +133,12 @@ class QFESPIMB040OpticsSetup : public QWidget {
         bool isMainIlluminationShutterAvailable();
         /** \brief get main illumination shutter state */
         bool getMainIlluminationShutter();
+
+    public slots:
+        void loadLightpathConfig(const QString& filename);
+        void saveLightpathConfig(const QString& filename, const QString &name);
+        void saveCurrentLightpatConfig();
+        void deleteCurrentLightpatConfig();
     signals:
         void lightpathesChanged(QList<QPair<QIcon, QString> > lightpathes);
 

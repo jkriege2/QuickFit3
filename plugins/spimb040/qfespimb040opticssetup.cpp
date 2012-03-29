@@ -27,6 +27,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogServ
     ui->objTube1->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube2->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->shutterMainIllumination->init(m_log, m_pluginServices);
+    ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
     connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QList<QPair<QIcon,QString> >)), this, SLOT(configsChanged(QList<QPair<QIcon,QString> >)));
@@ -310,6 +311,76 @@ void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened) {
 
 bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
     return ui->shutterMainIllumination->getShutterState();
+}
+
+void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename) {
+    if (!QFile::exists(filename)) return;
+    //qDebug()<<"loadLightpathConfig("<<filename<<")";
+    QSettings set(filename, QSettings::IniFormat);
+
+    // LOAD RELEVANT WIDGETS HERE
+
+
+}
+
+void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name) {
+    { // this block ensures that set is destroyed (and the file written) before updateItems() is called
+        QSettings set(filename, QSettings::IniFormat);
+        set.setValue("name", name);
+
+
+        // SAVE RELEVANT WIDGETS HERE
+
+
+    }
+    ui->cmbLightpathConfig->updateItems(name);
+}
+
+void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
+    bool dlgOK=true;
+    QString name="";
+    while (true) {
+        QStringList l=ui->cmbLightpathConfig->getConfigs();
+        int idx=-1;
+        if (!name.isEmpty() && !l.contains(name)) {
+            l.append(name);
+        }
+        idx=l.indexOf(name);
+        name=QInputDialog::getItem(this, tr("B040 SPIM"),
+                                      tr("Enter a name for the lightpath:"), l,idx, true, &dlgOK);
+        if (dlgOK) {
+            if (!name.isEmpty()) {
+                QString filename=m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/"+cleanStringForFilename(name)+".lpc";
+                if (QFile::exists(filename)) {
+                    QMessageBox::StandardButton res=QMessageBox::question(this, tr("B040 SPIM"),
+                                                                          tr("A lightpath config with the name '%1' already exists.\n  filename: '%2'\nOverwrite?").arg(name).arg(filename),
+                                                                          QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+                    if (res==QMessageBox::Yes) {
+                        saveLightpathConfig(filename, name);
+                        return;
+                    } else if (res==QMessageBox::Cancel) {
+                        return;
+                    }
+                } else {
+                    saveLightpathConfig(filename, name);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+void QFESPIMB040OpticsSetup::deleteCurrentLightpatConfig() {
+    QString fn=ui->cmbLightpathConfig->currentConfigFilename();
+    QString name=ui->cmbLightpathConfig->currentConfig();
+    if (QFile::exists(fn)) {
+        if (QMessageBox::question(this, tr("B040 SPIM"), tr("Do you really want to delete lightpath '%1'?\nfile: '%2'").arg(name).arg(fn),
+                                  QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes)
+        {
+            QFile::remove(fn);
+            ui->cmbLightpathConfig->updateItems();
+        }
+    }
 }
 
 bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {

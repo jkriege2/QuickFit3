@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
-    <height>593</height>
+    <width>708</width>
+    <height>491</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,8 +40,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QLabel" name="image">
      <property name="minimumSize">
       <size>
-       <width>300</width>
-       <height>500</height>
+       <width>230</width>
+       <height>355</height>
       </size>
      </property>
      <property name="text">
@@ -764,6 +764,9 @@ p, li { white-space: pre-wrap; }
    <class>QFESPIMB040ConfigComboBox</class>
    <extends>QComboBox</extends>
    <header>qfespimb040configcombobox.h</header>
+   <slots>
+    <signal>currentConfigChanged(QString)</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -789,8 +792,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateMagnifications()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>970</x>
-     <y>73</y>
+     <x>696</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
      <x>402</x>
@@ -805,8 +808,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateMagnifications()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>970</x>
-     <y>466</y>
+     <x>696</x>
+     <y>390</y>
     </hint>
     <hint type="destinationlabel">
      <x>404</x>
@@ -821,8 +824,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateMagnifications()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>970</x>
-     <y>293</y>
+     <x>696</x>
+     <y>251</y>
     </hint>
     <hint type="destinationlabel">
      <x>404</x>
@@ -837,12 +840,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>970</x>
-     <y>24</y>
+     <x>696</x>
+     <y>35</y>
     </hint>
     <hint type="destinationlabel">
-     <x>970</x>
-     <y>100</y>
+     <x>696</x>
+     <y>96</y>
     </hint>
    </hints>
   </connection>
@@ -853,12 +856,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>960</x>
-     <y>22</y>
+     <x>696</x>
+     <y>33</y>
     </hint>
     <hint type="destinationlabel">
-     <x>826</x>
-     <y>110</y>
+     <x>696</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -869,12 +872,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>949</x>
-     <y>31</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>970</x>
-     <y>274</y>
+     <x>696</x>
+     <y>236</y>
     </hint>
    </hints>
   </connection>
@@ -885,12 +888,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>965</x>
-     <y>17</y>
+     <x>696</x>
+     <y>28</y>
     </hint>
     <hint type="destinationlabel">
-     <x>970</x>
-     <y>293</y>
+     <x>696</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
@@ -901,12 +904,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>949</x>
-     <y>31</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>970</x>
-     <y>447</y>
+     <x>696</x>
+     <y>375</y>
     </hint>
    </hints>
   </connection>
@@ -917,12 +920,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>963</x>
-     <y>25</y>
+     <x>696</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
-     <x>970</x>
-     <y>466</y>
+     <x>696</x>
+     <y>390</y>
     </hint>
    </hints>
   </connection>
@@ -933,8 +936,8 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>956</x>
-     <y>30</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
      <x>174</x>
@@ -949,12 +952,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>959</x>
-     <y>18</y>
+     <x>696</x>
+     <y>29</y>
     </hint>
     <hint type="destinationlabel">
-     <x>281</x>
-     <y>111</y>
+     <x>230</x>
+     <y>122</y>
     </hint>
    </hints>
   </connection>
@@ -965,12 +968,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>954</x>
-     <y>24</y>
+     <x>696</x>
+     <y>35</y>
     </hint>
     <hint type="destinationlabel">
-     <x>902</x>
-     <y>79</y>
+     <x>696</x>
+     <y>81</y>
     </hint>
    </hints>
   </connection>
@@ -981,12 +984,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>712</x>
-     <y>421</y>
+     <x>696</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>732</x>
-     <y>445</y>
+     <x>577</x>
+     <y>375</y>
     </hint>
    </hints>
   </connection>
@@ -997,12 +1000,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>782</x>
-     <y>424</y>
+     <x>696</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>791</x>
-     <y>439</y>
+     <x>696</x>
+     <y>375</y>
     </hint>
    </hints>
   </connection>
@@ -1013,12 +1016,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>757</x>
-     <y>422</y>
+     <x>696</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>692</x>
-     <y>463</y>
+     <x>551</x>
+     <y>390</y>
     </hint>
    </hints>
   </connection>
@@ -1029,12 +1032,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>843</x>
-     <y>425</y>
+     <x>696</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>839</x>
-     <y>463</y>
+     <x>696</x>
+     <y>390</y>
     </hint>
    </hints>
   </connection>
@@ -1045,12 +1048,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>743</x>
-     <y>246</y>
+     <x>696</x>
+     <y>221</y>
     </hint>
     <hint type="destinationlabel">
-     <x>709</x>
-     <y>268</y>
+     <x>577</x>
+     <y>236</y>
     </hint>
    </hints>
   </connection>
@@ -1061,12 +1064,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>827</x>
-     <y>249</y>
+     <x>696</x>
+     <y>221</y>
     </hint>
     <hint type="destinationlabel">
-     <x>828</x>
-     <y>270</y>
+     <x>696</x>
+     <y>236</y>
     </hint>
    </hints>
   </connection>
@@ -1077,12 +1080,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>739</x>
-     <y>251</y>
+     <x>696</x>
+     <y>221</y>
     </hint>
     <hint type="destinationlabel">
-     <x>722</x>
-     <y>289</y>
+     <x>551</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
@@ -1093,12 +1096,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>791</x>
-     <y>249</y>
+     <x>696</x>
+     <y>221</y>
     </hint>
     <hint type="destinationlabel">
-     <x>792</x>
-     <y>290</y>
+     <x>696</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
@@ -1109,12 +1112,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>954</x>
-     <y>33</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>116</x>
-     <y>579</y>
+     <x>135</x>
+     <y>480</y>
     </hint>
    </hints>
   </connection>
@@ -1125,12 +1128,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>947</x>
-     <y>36</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>947</x>
-     <y>253</y>
+     <x>696</x>
+     <y>221</y>
     </hint>
    </hints>
   </connection>
@@ -1141,12 +1144,12 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>963</x>
-     <y>18</y>
+     <x>696</x>
+     <y>29</y>
     </hint>
     <hint type="destinationlabel">
-     <x>873</x>
-     <y>421</y>
+     <x>696</x>
+     <y>360</y>
     </hint>
    </hints>
   </connection>
@@ -1157,8 +1160,8 @@ p, li { white-space: pre-wrap; }
    <slot>setReadOnly(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>965</x>
-     <y>21</y>
+     <x>696</x>
+     <y>32</y>
     </hint>
     <hint type="destinationlabel">
      <x>211</x>
@@ -1173,12 +1176,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>960</x>
-     <y>29</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>589</x>
-     <y>21</y>
+     <x>487</x>
+     <y>38</y>
     </hint>
    </hints>
   </connection>
@@ -1189,17 +1192,68 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>957</x>
-     <y>33</y>
+     <x>696</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>652</x>
-     <y>26</y>
+     <x>517</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLightpathSave</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup</receiver>
+   <slot>saveCurrentLightpatConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLightpathDelete</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup</receiver>
+   <slot>deleteCurrentLightpatConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>513</x>
+     <y>16</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbLightpathConfig</sender>
+   <signal>currentConfigChanged(QString)</signal>
+   <receiver>QFESPIMB040OpticsSetup</receiver>
+   <slot>loadLightpathConfig(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>392</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>231</x>
+     <y>6</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>updateMagnifications()</slot>
+  <slot>loadLightpathConfig(QString)</slot>
+  <slot>saveCurrentLightpatConfig()</slot>
+  <slot>deleteCurrentLightpatConfig()</slot>
  </slots>
 </ui>
