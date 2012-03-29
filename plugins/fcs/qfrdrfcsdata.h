@@ -128,6 +128,10 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
         virtual QString getCorrelationRunName(int run);
 
+
+        /** \brief returns the number of channels with count rates */
+        virtual int getRateChannels()  { return rateChannels; }
+
         /** \brief number of countrate runs in this object */
         inline virtual int getRateRuns() { return rateRuns; };
         /** \brief number of datapoints in every count rate curve */
@@ -140,17 +144,17 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRate() { return rate; };
+        inline virtual double* getRate(int channel=0) { return &(rate[channel*rateN*rateRuns]); };
         /** \brief values of the count rate nfor a given run.
          *         This is a 1D array of length  rateN
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRateRun (int run) { return &(rate[run*rateN]); };
+        inline virtual double* getRateRun (int run, int channel=0) { return &(rate[channel*rateN*rateRuns+run*rateN]); };
 
 
         /** \brief number of binned count rate runs in this object */
-        inline virtual int getBinnedRateRuns() { return rateRuns; };
+        inline virtual int getBinnedRateRuns(int channel=0) { return rateRuns; };
         /** \brief number of datapoints in every binned count rate */
         inline virtual long long getBinnedRateN() { return binnedRateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate
@@ -161,28 +165,28 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline virtual double* getBinnedRate() { return binnedRate; };
+        inline virtual double* getBinnedRate(int channel=0) { return &binnedRate[channel*binnedRateN*rateRuns]; };
         /** \brief values of the binned count rate for a given run.
          *         This is a 1D array of length  binnedRateN
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline virtual double* getBinnedRateRun (int run) { return &(binnedRate[run*binnedRateN]); };
+        inline virtual double* getBinnedRateRun (int run, int channel=0) { return &(binnedRate[channel*binnedRateN*rateRuns + run*binnedRateN]); };
 
 
         /** \brief calculate the mean value of the count rate */
-        virtual double calcRateMean(int run=0);
+        virtual double calcRateMean(int run=0, int channel=0);
         /** \brief calculate the standard deviation of the count rate */
-        virtual double calcRateStdDev(int run=0);
+        virtual double calcRateStdDev(int run=0, int channel=0);
         /** \brief return the mean value of the count rate, as last calculated by a call to calcRateMean() */
-        virtual double getRateMean(int run=0);
+        virtual double getRateMean(int run=0, int channel=0);
         /** \brief return the standard deviation of the count rate, as last calculated by a call to calcRateStdDev()  */
-        virtual double getRateStdDev(int run=0);
+        virtual double getRateStdDev(int run=0, int channel=0);
 
         /** \brief calculate minimum and maximum count rates */
-        virtual void calcRateMinMax(int run, double& min, double& max);
+        virtual void calcRateMinMax(int run, double& min, double& max, int channel=0);
         /** \brief calculate minimum and maximum count rates */
-        virtual void getRateMinMax(int run, double& min, double& max);
+        virtual void getRateMinMax(int run, double& min, double& max, int channel=0);
         /** \brief recalculate correlation curve mean and standard deviation */
         virtual void recalculateCorrelations();
 
@@ -233,7 +237,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          * \param N number of datapoints in every count rate run
          * \param runs number of runs of the count rate
          */
-        void resizeRates(long long N, int runs);
+        void resizeRates(long long N, int runs, int channels);
         /** \brief resize the binned rate curve data. Afterwards the binned rate curves do not contain
          *         valid adat anymore.
          *
@@ -299,6 +303,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         int autoCalcRateN;
         /** \brief number of datapoints in every binned count rate curve */
         long long binnedRateN;
+
+        int rateChannels;
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate curve.
          *         This is a 1D array of size binnedRateN */
         double* binnedRateT;

@@ -34,19 +34,22 @@ class QFRDRCountRatesInterface
         /** \brief values of the count rate.
          *         This is a 2D array of size runs * rateN
          *
-         * access this as \code rate[run*rateN + n] \endcode
+         * access this as \code rate[channel*binnedRateN*runs + run*rateN + n] \endcode
          */
-        virtual double* getRate()=0;
+        virtual double* getRate(int channel=0)=0;
         /** \brief values of the count rate nfor a given run.
          *         This is a 1D array of length  rateN
          *
-         * access this as \code rate[run*rateN + n] \endcode
+         * access this as \code rate[channel*binnedRateN*runs + run*rateN + n] \endcode
          */
-        virtual double* getRateRun (int run)=0;
+        virtual double* getRateRun (int run, int channel=0)=0;
+
+        /** \brief returns the number of channels with count rates */
+        virtual int getRateChannels()=0;
 
 
         /** \brief number of binned count rate runs in this object */
-        virtual int getBinnedRateRuns()=0;
+        virtual int getBinnedRateRuns(int channel=0)=0;
         /** \brief number of datapoints in every binned count rate */
         virtual long long getBinnedRateN()=0;
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate
@@ -55,40 +58,24 @@ class QFRDRCountRatesInterface
         /** \brief values of the binned count rate.
          *         This is a 2D array of size runs * binnedRateN
          *
-         * access this as \code rate[run*binnedRateN + n] \endcode
+         * access this as \code rate[channel*binnedRateN*runs + run*binnedRateN + n] \endcode
          */
-        virtual double* getBinnedRate()=0;
+        virtual double* getBinnedRate(int channel=0)=0;
         /** \brief values of the binned count rate for a given run.
          *         This is a 1D array of length  binnedRateN
          *
-         * access this as \code rate[run*binnedRateN + n] \endcode
+         * access this as \code rate[channel*binnedRateN*runs + run*binnedRateN + n] \endcode
          */
-        virtual double* getBinnedRateRun (int run)=0;
+        virtual double* getBinnedRateRun (int run, int channel=0)=0;
 
 
-        /** \brief calculate the mean value of the count rate */
-        //virtual double calcRateMean(int run=0)=0;
-        /** \brief calculate the standard deviation of the count rate */
-        //virtual double calcRateStdDev(int run=0)=0;
         /** \brief return the mean value of the count rate, as last calculated by a call to calcRateMean() */
-        virtual double getRateMean(int run=0)=0;
+        virtual double getRateMean(int run=0, int channel=0)=0;
         /** \brief return the standard deviation of the count rate, as last calculated by a call to calcRateStdDev()  */
-        virtual double getRateStdDev(int run=0)=0;
+        virtual double getRateStdDev(int run=0, int channel=0)=0;
         /** \brief calculate minimum and maximum count rates */
-        //virtual void calcRateMinMax(int run, double& min, double& max)=0;
-        /** \brief calculate minimum and maximum count rates */
-        virtual void getRateMinMax(int run, double& min, double& max)=0;
+        virtual void getRateMinMax(int run, double& min, double& max, int channel=0)=0;
 
-        /** \brief set the number of datapoints in every binned count rate run.
-         *
-         * \note this function does only take effect BEFORE loading a dataset!
-         *       If you want to recalculate the binned count rate call calcBinnedRate() afterwards!
-         */
-        //virtual void setBinnedRateN(int value)=0;
-
-        /** \brief this function changes the size of the binned count rate and recalculates it
-         *         depending on the value of autoCalcRateN. */
-        //virtual void calcBinnedRate()=0;
 };
 
 Q_DECLARE_INTERFACE( QFRDRCountRatesInterface,

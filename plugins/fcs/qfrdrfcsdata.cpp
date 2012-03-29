@@ -82,7 +82,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     emitRawDataChanged();
 }
 
-void QFRDRFCSData::resizeRates(long long N, int runs) {
+void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
     if (rateT) free(rateT);
     if (rate) free(rate);
     rateRuns=0;
@@ -91,8 +91,9 @@ void QFRDRFCSData::resizeRates(long long N, int runs) {
     rate=NULL;
     rateN=N;
     rateRuns=runs;
+    rateChannels=channels;
     rateT=(double*)calloc(rateN, sizeof(double));
-    rate=(double*)calloc(rateN*rateRuns, sizeof(double));
+    rate=(double*)calloc(rateChannels*rateN*rateRuns, sizeof(double));
     if (!rateT || !rate)
         setError(tr("Error while allocating memory for count rate data!"));
     emitRawDataChanged();
@@ -111,7 +112,7 @@ void QFRDRFCSData::resizeBinnedRates(long long N) {
     binnedRateN=N;
     if (N>0) {
         binnedRateT=(double*)calloc(binnedRateN, sizeof(double));
-        binnedRate=(double*)calloc(binnedRateN*rateRuns, sizeof(double));
+        binnedRate=(double*)calloc(rateChannels*binnedRateN*rateRuns, sizeof(double));
         if (!binnedRateT || !binnedRate)
             setError(tr("Error while allocating memory for binned count rate data!"));
         setIntProperty("BINNED_RATE_N", binnedRateN, false, false);
@@ -134,7 +135,7 @@ void QFRDRFCSData::calcBinnedRate() {
     //}
     if (binnedRateN>0) {
         //if (N!=binnedRateN) resizeBinnedRates(N);
-        for (long run=0; run<rateRuns; run++) {
+        for (long run=0; run<rateRuns*rateChannels; run++) {
             for (long long i=0; i<binnedRateN; i++) {
                 long long jmin=i*d;
                 long long jmax=mmin(rateN, (i+1)*d)-1;
@@ -175,7 +176,7 @@ void QFRDRFCSData::recalculateCorrelations() {
     emitRawDataChanged();
 }
 
-double QFRDRFCSData::calcRateMean(int run) {
+double QFRDRFCSData::calcRateMean(int run, int channel) {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
@@ -183,25 +184,25 @@ double QFRDRFCSData::calcRateMean(int run) {
     double m=0.0;
     if (run<rateRuns) {
         for (long long i=0; i<rateN; i++) {
-            m=m+rate[run*rateN+i];
+            m=m+rate[channel*rateN*rateRuns + run*rateN+i];
         }
     }
     double me= m/(double)rateN;
-    rateMean[run]=me;
+    rateMean[channel*rateRuns+run]=me;
     return me;
 }
 
 
 
-double QFRDRFCSData::getRateMean(int run) {
+double QFRDRFCSData::getRateMean(int run, int channel) {
     if (rateN<=0 || !rate) {
         return 0.0;
     }
     if (run<0) {
         double cnt=0;
         double sum=0;
-        for (int i=0; i<rateN; i++) {
-            double r=getRateMean(i);
+        for (int i=0; i<rateRuns; i++) {
+            double r=getRateMean(i, channel);
             if (r>0) {
                 sum=sum+r;
                 cnt++;
@@ -209,21 +210,21 @@ double QFRDRFCSData::getRateMean(int run) {
         }
         return sum/cnt;
     }
-    if (!rateMean.contains(run)) {
-        rateMean[run]=calcRateMean(run);
+    if (!rateMean.contains(channel*rateRuns+run)) {
+        rateMean[channel*rateRuns+run]=calcRateMean(run, channel);
     }
-    return rateMean[run];
+    return rateMean[channel*rateRuns+run];
 }
 
-double QFRDRFCSData::getRateStdDev(int run) {
+double QFRDRFCSData::getRateStdDev(int run, int channel) {
    if (rateN<0 || !rate) {
         return 0.0;
     }
     if (run<0) {
         double cnt=0;
         double sum=0;
-        for (int i=0; i<rateN; i++) {
-            double r=getRateStdDev(i);
+        for (int i=0; i<rateRuns; i++) {
+            double r=getRateStdDev(i, channel);
             if (r>0) {
                 sum=sum+r;
                 cnt++;
@@ -231,13 +232,13 @@ double QFRDRFCSData::getRateStdDev(int run) {
         }
         return sum/cnt;
     }
-    if (!rateStdDev.contains(run)) {
-        rateStdDev[run]=calcRateStdDev(run);
+    if (!rateStdDev.contains(channel*rateRuns+run)) {
+        rateStdDev[channel*rateRuns+run]=calcRateStdDev(run, channel);
     }
-    return rateStdDev[run];
+    return rateStdDev[channel*rateRuns+run];
 }
 
-double QFRDRFCSData::calcRateStdDev(int run) {
+double QFRDRFCSData::calcRateStdDev(int run, int channel) {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
@@ -246,17 +247,17 @@ double QFRDRFCSData::calcRateStdDev(int run) {
     double s=0.0;
     if (run<rateRuns && run>=0) {
         for (long long i=0; i<rateN; i++) {
-            double v=rate[run*rateN+i];
+            double v=rate[channel*rateN*rateRuns + run*rateN+i];
             m=m+v;
             s=s+v*v         ;
         }
     }
     double sd=sqrt(s/(double)rateN-m*m/(double)rateN/(double)rateN);
-    rateStdDev[run]=sd;
+    rateStdDev[channel*rateRuns+run]=sd;
     return sd;
 }
 
-void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max) {
+void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max, int channel) {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return;
@@ -266,23 +267,23 @@ void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max) {
         min=rate[run*rateN];
         max=min;
         for (long long i=0; i<rateN; i++) {
-            double r=rate[run*rateN+i];
+            double r=rate[channel*rateN*rateRuns + run*rateN+i];
             if (r>max) max=r;
             if (r<min) min=r;
         }
     }
-    rateMin[run]=min;
-    rateMax[run]=max;
+    rateMin[channel*rateRuns+run]=min;
+    rateMax[channel*rateRuns+run]=max;
 }
 
-void QFRDRFCSData::getRateMinMax(int run, double &min, double &max) {
+void QFRDRFCSData::getRateMinMax(int run, double &min, double &max, int channel) {
     min=0;
     max=0;
-    if (!(rateMin.contains(run) && rateMax.contains(run))) {
-        calcRateMinMax(run, min, max);
+    if (!(rateMin.contains(channel*rateRuns+run) && rateMax.contains(channel*rateRuns+run))) {
+        calcRateMinMax(run, min, max, channel);
     }
-    min=rateMin.value(run, 0);
-    max=rateMax.value(run, 0);
+    min=rateMin.value(channel*rateRuns+run, 0);
+    max=rateMax.value(channel*rateRuns+run, 0);
 }
 
 
@@ -385,7 +386,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
         tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
         long long lines=tab.get_line_count();
         long long columns=tab.get_column_count();
-        resizeRates(lines, columns-1);
+        resizeRates(lines, columns-1, 1);
         //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
         for (long long l=0; l<lines; l++) {
             rateT[l]=tab.get(0, l)*timefactor;
@@ -641,7 +642,8 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
             getNew=false;
             QVector<QVector<double> > dat;
             token=ALV_readNumberMatrix(alv_file, &dat);
-            resizeRates(dat.size(), runs);
+            if (getProperty("CROSS_CORRELATION", false).toBool()) resizeRates(dat.size(), runs, 2);
+            else resizeRates(dat.size(), runs, 1);
             //std::cout<<"  reading in rate section ... lines="<<dat.size()<<" runs="<<runs<<" channel="<<channel<<std::endl;
             for (long long i=0; i<dat.size(); i++) {
                 QVector<double>& d=dat[i];
@@ -650,20 +652,54 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
                     return false;
                 }
                 rateT[i]=d[0];
-                if (runs==1) {
-                    // one run => there is no average in the file!
-                    if (d.size()<=1+channel)  {
-                        setError(tr("too few columns in line %1 of rate block.").arg(i));
-                        return false;
+                if (rateChannels<=1) {
+                    if (runs==1) {
+                        // one run => there is no average in the file!
+                        if (d.size()<=1+channel)  {
+                            setError(tr("too few columns in line %1 of rate block.").arg(i));
+                            return false;
+                        }
+                        rate[i]=d[1+channel];
+                    } else if (runs>1) {
+                        // multiple runs -> average is in file -> ignore average column
+                        if (d.size()<=1+channel) {
+                            setError(tr("too few columns in line %1 of rate block.").arg(i));
+                            return false;
+                        }
+                        rate[(runs-1)*rateN+i]=d[1+channel];
                     }
-                    rate[i]=d[1+channel];
-                } else if (runs>1) {
-                    // multiple runs -> average is in file -> ignore average column
-                    if (d.size()<=1+channel) {
-                        setError(tr("too few columns in line %1 of rate block.").arg(i));
-                        return false;
+                } else {
+                    if (runs==1) {
+                        // one run => there is no average in the file!
+                        if (d.size()<=1+channel)  {
+                            setError(tr("too few columns in line %1 of rate block.").arg(i));
+                            return false;
+                        }
+                        if (isDual && channel==1) {
+                            for (int c=0; c<rateChannels; c++) {
+                                rate[c*rateN*rateRuns+i]=d[1+rateChannels-1-c];
+                            }
+                        } else {
+                            for (int c=0; c<rateChannels; c++) {
+                                rate[c*rateN*rateRuns+i]=d[1+c];
+                            }
+                        }
+                    } else if (runs>1) {
+                        // multiple runs -> average is in file -> ignore average column
+                        if (d.size()<=1+channel) {
+                            setError(tr("too few columns in line %1 of rate block.").arg(i));
+                            return false;
+                        }
+                        if (isDual) {
+                            for (int c=0; c<rateChannels; c++) {
+                                rate[c*rateN*rateRuns+(runs-1)*rateN+i]=d[1+rateChannels-1-c];
+                            }
+                        } else {
+                            for (int c=0; c<rateChannels; c++) {
+                                rate[c*rateN*rateRuns+(runs-1)*rateN+i]=d[1+c];
+                            }
+                        }
                     }
-                    rate[(runs-1)*rateN+i]=d[1+channel];
                 }
             }
         }

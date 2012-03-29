@@ -561,7 +561,8 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
     double sval=res, serr=0;
     if (hasSpecial(r, resultID, parameterID, sval, serr)) {
         res=sval;
-    } else if (hasFit(r, resultID)) {
+    }
+    if (hasFit(r, resultID)) {
         QString en=transformResultID(resultID);
         QString pid=getFitParamID(parameterID);
         if (r->resultsExists(en, pid)) res=r->resultsGetAsDouble(en, pid);
@@ -573,13 +574,13 @@ double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& re
 
     //if (specials.contains(parameterID)) return specials[parameterID];
     double sval=0, serr=0;
-    if (hasSpecial(r, resultID, parameterID, sval, serr)) {
-       return serr;
-    }
     if (hasFit(r, resultID)) {
         if (r!=NULL) {
             return r->resultsGetErrorAsDouble(transformResultID(resultID), getFitParamID(parameterID));
         }
+    }
+    if (hasSpecial(r, resultID, parameterID, sval, serr)) {
+       return serr;
     }
     QString psID=getParameterStoreID(parameterID);
     if (parameterStore.contains(psID)) {

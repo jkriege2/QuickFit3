@@ -5,7 +5,7 @@
 
 
 QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
-    QFFitResultsByIndexEvaluation("fcs_,dls_", parent)
+    QFFitResultsByIndexEvaluation("fcs_,dls_,fccs_", parent)
 {
 
     m_weighting=EqualWeighting;
@@ -69,15 +69,37 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         if (crintf) {
             error=crintf->getRateStdDev(run)*1000;
             value=crintf->getRateMean(run)*1000;
+            return true;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
         if (scrintf && value==0) {
             value=scrintf->getSimpleCountrateAverage(run);
             error=scrintf->getSimpleCountrateVariance(run);
+            return true;
         }
-        return true;
 
+    } else if (paramid=="count_rate1") {
+        QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
+        value=0;
+        error=0;
+        if (crintf && crintf->getRateChannels()>0) {
+            error=crintf->getRateStdDev(run, 0)*1000.0;
+            value=crintf->getRateMean(run, 0)*1000.0;
+            //qDebug()<<"getRateMean(run="<<run<<", ch=0) = "<<value<<" +/- "<<error;
+            return true;
+        }
+    } else if (paramid=="count_rate2") {
+        QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
+        value=0;
+        error=0;
+        if (crintf && crintf->getRateChannels()>1) {
+            error=crintf->getRateStdDev(run, 1)*1000.0;
+            value=crintf->getRateMean(run, 1)*1000.0;
+            //qDebug()<<"getRateMean(run="<<run<<", ch=1) = "<<value<<" +/- "<<error;
+            return true;
+        }
     }
+
     return false;
 }
 

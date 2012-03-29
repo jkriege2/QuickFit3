@@ -232,188 +232,194 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
 
     JKQTPdatastore* ds=plotter->getDatastore();
 
-    double* rateT=m->getRateT();
-    double* rate=m->getRate();
-    unsigned long rateN=m->getRateN();
-    unsigned int rateRuns=m->getRateRuns();
-    QString binned="";
-    if (cmbRateDisplay->currentIndex()==0) {
-        rateT=m->getBinnedRateT();
-        rate=m->getBinnedRate();
-        rateN=m->getBinnedRateN();
-        binned=tr("bin ");
-    } else if (cmbRateDisplay->currentIndex()==1) {
-        if (m->getBinnedRateN()>0){
+    for (int channel=0; channel<m->getRateChannels(); channel++) {
+        double* rateT=m->getRateT();
+        double* rate=m->getRate(channel);
+        unsigned long rateN=m->getRateN();
+        unsigned int rateRuns=m->getRateRuns();
+        unsigned int rateChannels=m->getRateChannels();
+        QString binned="";
+        QString channelName="";
+        if (rateChannels>1) channelName=tr(" channel %1").arg(channel);
+        if (cmbRateDisplay->currentIndex()==0) {
             rateT=m->getBinnedRateT();
-            rate=m->getBinnedRate();
+            rate=m->getBinnedRate(channel);
             rateN=m->getBinnedRateN();
             binned=tr("bin ");
-        }
-    } else if (cmbRateDisplay->currentIndex()==2) {
-        if (rateN<=0){
-            rateT=m->getBinnedRateT();
-            rate=m->getBinnedRate();
-            rateN=m->getBinnedRateN();
-            binned=tr("bin ");
-        }
-    }
-
-    if (rateN>0 && cmbRateDisplay->currentIndex()<3) {
-        size_t c_tau=ds->addColumn(rateT, rateN, "time");
-        double tt[2];
-        tt[0]=rateT[0];
-        tt[1]=rateT[rateN-1];
-        //size_t c_tau2=ds->addCopiedColumn(tt, 2, "time");
-
-        if (cmbRunDisplay->currentIndex()==0) { // plot all runs
-            for (unsigned int i=0; i<rateRuns; i++) {
-                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3: %2run %1").arg(i).arg(binned).arg(name));
-
-                JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
-                g->set_lineWidth(1);
-                g->set_xColumn(c_tau);
-                g->set_yColumn(c_run);
-                g->set_title(tr("\\verb{%3} %2run %1").arg(i).arg(binned).arg(name));
-                plotter->addGraph(g);
-                if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
-                    double mean=m->calcRateMean(i);
-                    double stddev=m->calcRateStdDev(i);
-                    double mi,ma;
-                    m->calcRateMinMax(i, mi, ma);
-                    labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name);
-
-                    if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
-                            QColor c=g->get_color().darker().darker();
-                            r->set_color(c);
-                            r->set_centerColor(g->get_color().darker());
-                            r->set_rangeMin(mean-stddev);
-                            r->set_rangeMax(mean+stddev);
-                            r->set_plotCenterLine(true);
-                            r->set_rangeCenter(mean);
-                            c.setAlphaF(0.2);
-                            r->set_fillColor(c);
-                            //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
-                            plotter->addGraph(r);
-
-                    }
-                }
+        } else if (cmbRateDisplay->currentIndex()==1) {
+            if (m->getBinnedRateN()>0){
+                rateT=m->getBinnedRateT();
+                rate=m->getBinnedRate(channel);
+                rateN=m->getBinnedRateN();
+                binned=tr("bin ");
             }
-        } else if (cmbRunDisplay->currentIndex()==1) { // plot all runs with the current one selected
-            for (unsigned int i=0; i<rateRuns; i++) {
-                size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
-                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
+        } else if (cmbRateDisplay->currentIndex()==2) {
+            if (rateN<=0){
+                rateT=m->getBinnedRateT();
+                rate=m->getBinnedRate(channel);
+                rateN=m->getBinnedRateN();
+                binned=tr("bin ");
+            }
+        }
+
+        if (rateN>0 && cmbRateDisplay->currentIndex()<3) {
+            size_t c_tau=ds->addColumn(rateT, rateN, "time");
+            double tt[2];
+            tt[0]=rateT[0];
+            tt[1]=rateT[rateN-1];
+            //size_t c_tau2=ds->addCopiedColumn(tt, 2, "time");
+
+            if (cmbRunDisplay->currentIndex()==0) { // plot all runs
+                for (unsigned int i=0; i<rateRuns; i++) {
+                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName));
+
                     JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                     g->set_lineWidth(1);
-                    g->set_color(QColor("red"));
                     g->set_xColumn(c_tau);
                     g->set_yColumn(c_run);
-                    g->set_title(tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name));
+                    g->set_title(tr("\\verb{%3}%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName));
                     plotter->addGraph(g);
                     if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
-                        double mean=m->calcRateMean(i);
-                        double stddev=m->calcRateStdDev(i);
+                        double mean=m->getRateMean(i, channel);
+                        double stddev=m->getRateStdDev(i, channel);
                         double mi,ma;
-                        m->calcRateMinMax(i, mi, ma);
-                        labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg("red").arg(name);
+                        m->getRateMinMax(i, mi, ma, channel);
+                        labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7:%8 %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name).arg(channelName);
 
                         if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
-                            QColor c=g->get_color().darker().darker();
-                            r->set_color(g->get_color().darker().darker());
-                            r->set_centerColor(g->get_color().darker());
-                            r->set_rangeMin(mean-stddev);
-                            r->set_rangeMax(mean+stddev);
-                            r->set_plotCenterLine(true);
-                            r->set_rangeCenter(mean);
-                            c.setAlphaF(0.2);
-                            r->set_fillColor(c);
-                            //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
-                            plotter->addGraph(r);
+                                JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                                QColor c=g->get_color().darker().darker();
+                                r->set_color(c);
+                                r->set_centerColor(g->get_color().darker());
+                                r->set_rangeMin(mean-stddev);
+                                r->set_rangeMax(mean+stddev);
+                                r->set_plotCenterLine(true);
+                                r->set_rangeCenter(mean);
+                                c.setAlphaF(0.2);
+                                r->set_fillColor(c);
+                                //r->set_title(tr("%2:%3 run %1: avg").arg(i).arg(name).arg(channelName));
+                                plotter->addGraph(r);
+
                         }
                     }
-                } else {
-                    if (!m->leaveoutRun(i)) {
-                        plotter->get_plotter()->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                }
+            } else if (cmbRunDisplay->currentIndex()==1) { // plot all runs with the current one selected
+                for (unsigned int i=0; i<rateRuns; i++) {
+                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2%3 run %1").arg(i).arg(binned).arg(channelName));
+                    if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
+                        JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
+                        g->set_lineWidth(1);
+                        g->set_color(QColor("red"));
+                        g->set_xColumn(c_tau);
+                        g->set_yColumn(c_run);
+                        g->set_title(tr("\\verb{%3}:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName));
+                        plotter->addGraph(g);
+                        if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
+                            double mean=m->getRateMean(i, channel);
+                            double stddev=m->getRateStdDev(i, channel);
+                            double mi,ma;
+                            m->getRateMinMax(i, mi, ma, channel);
+                            labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7:%8 %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg("red").arg(name).arg(channelName);
+
+                            if (chkDisplayAverage->isChecked()) {
+                                JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                                QColor c=g->get_color().darker().darker();
+                                r->set_color(g->get_color().darker().darker());
+                                r->set_centerColor(g->get_color().darker());
+                                r->set_rangeMin(mean-stddev);
+                                r->set_rangeMax(mean+stddev);
+                                r->set_plotCenterLine(true);
+                                r->set_rangeCenter(mean);
+                                c.setAlphaF(0.2);
+                                r->set_fillColor(c);
+                                //r->set_title(tr("%2:%3 run %1: avg").arg(i).arg(name).arg(channelName));
+                                plotter->addGraph(r);
+                            }
+                        }
                     } else {
-                        plotter->get_plotter()->addGraph(c_tau, c_run, tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name), JKQTPlines, QColor("grey"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        if (!m->leaveoutRun(i)) {
+                            plotter->get_plotter()->addGraph(c_tau, c_run, tr("\\verb{%3}:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName), JKQTPlines, QColor("black"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        } else {
+                            plotter->get_plotter()->addGraph(c_tau, c_run, tr("\\verb{%3}:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName), JKQTPlines, QColor("grey"), JKQTPnoSymbol, Qt::SolidLine, 1);
+                        }
                     }
                 }
-            }
-        } else if (cmbRunDisplay->currentIndex()==2) { // plot only selected runs
-            for (unsigned int i=0; i<rateRuns; i++) {
-                if (!m->leaveoutRun(i)) {
-                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
+            } else if (cmbRunDisplay->currentIndex()==2) { // plot only selected runs
+                for (unsigned int i=0; i<rateRuns; i++) {
+                    if (!m->leaveoutRun(i)) {
+                        size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3 %2 run %1").arg(i).arg(binned).arg(channelName));
 
-                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_run);
-                    g->set_title(tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name));
-                    plotter->addGraph(g);
-                    if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
-                        double mean=m->calcRateMean(i);
-                        double stddev=m->calcRateStdDev(i);
-                        double mi,ma;
-                        m->calcRateMinMax(i, mi, ma);
-                        labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name);
-                        if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
-                            QColor c=g->get_color().darker().darker();
-                            r->set_color(g->get_color().darker().darker());
-                            r->set_centerColor(g->get_color().darker());
-                            r->set_rangeMin(mean-stddev);
-                            r->set_rangeMax(mean+stddev);
-                            r->set_plotCenterLine(true);
-                            r->set_rangeCenter(mean);
-                            c.setAlphaF(0.2);
-                            r->set_fillColor(c);
-                            //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
-                            plotter->addGraph(r);
+                        JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
+                        g->set_lineWidth(1);
+                        g->set_xColumn(c_tau);
+                        g->set_yColumn(c_run);
+                        g->set_title(tr("\\verb{%3}:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName));
+                        plotter->addGraph(g);
+                        if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
+                            double mean=m->getRateMean(i, channel);
+                            double stddev=m->getRateStdDev(i, channel);
+                            double mi,ma;
+                            m->getRateMinMax(i, mi, ma, channel);
+                            labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7:%8 %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name).arg(channelName);
+                            if (chkDisplayAverage->isChecked()) {
+                                JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                                QColor c=g->get_color().darker().darker();
+                                r->set_color(g->get_color().darker().darker());
+                                r->set_centerColor(g->get_color().darker());
+                                r->set_rangeMin(mean-stddev);
+                                r->set_rangeMax(mean+stddev);
+                                r->set_plotCenterLine(true);
+                                r->set_rangeCenter(mean);
+                                c.setAlphaF(0.2);
+                                r->set_fillColor(c);
+                                //r->set_title(tr("%2:%3 run %1: avg").arg(i).arg(name).arg(channelName));
+                                plotter->addGraph(r);
 
+                            }
+                        }
+                    }
+                }
+            }  else if (cmbRunDisplay->currentIndex()==3) { // plot only current run
+                for (unsigned int i=0; i<rateRuns; i++) {
+                    if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
+                        size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%3 %2 run %1").arg(i).arg(binned).arg(channelName));
+
+                        JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
+                        g->set_lineWidth(1);
+                        g->set_xColumn(c_tau);
+                        g->set_yColumn(c_run);
+                        g->set_title(tr("\\verb{%3}:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName));
+                        plotter->addGraph(g);
+                        if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
+                            double mean=m->getRateMean(i, channel);
+                            double stddev=m->getRateStdDev(i, channel);
+                            double mi,ma;
+                            m->getRateMinMax(i, mi, ma, channel);
+                            labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7:%8 %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name).arg(channelName);
+                            if (chkDisplayAverage->isChecked()) {
+                                JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
+                                QColor c=g->get_color().darker().darker();
+                                r->set_color(g->get_color().darker().darker());
+                                r->set_centerColor(g->get_color().darker());
+                                r->set_rangeMin(mean-stddev);
+                                r->set_rangeMax(mean+stddev);
+                                r->set_plotCenterLine(true);
+                                r->set_rangeCenter(mean);
+                                c.setAlphaF(0.2);
+                                r->set_fillColor(c);
+                                //r->set_title(tr("%2:%3 run %1: avg").arg(i).arg(name).arg(channelName));
+                                plotter->addGraph(r);
+
+                            }
                         }
                     }
                 }
             }
-        }  else if (cmbRunDisplay->currentIndex()==3) { // plot only current run
-            for (unsigned int i=0; i<rateRuns; i++) {
-                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                    size_t c_run=ds->addColumn(&(rate[i*rateN]), rateN, QString("%2 run %1").arg(i).arg(binned));
 
-                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_run);
-                    g->set_title(tr("\\verb{%3}: %2run %1").arg(i).arg(binned).arg(name));
-                    plotter->addGraph(g);
-                    if (chkDisplayAverage->isChecked() || chkDisplayStatistics->isChecked()) {
-                        double mean=m->calcRateMean(i);
-                        double stddev=m->calcRateStdDev(i);
-                        double mi,ma;
-                        m->calcRateMinMax(i, mi, ma);
-                        labText+=tr("<tr><td>&nbsp;<font color='%6'>&diams;&nbsp;</font>%7: %1&nbsp;</td><td>&nbsp;%2 +/- %3&nbsp;</td><td>&nbsp;%4&nbsp;</td><td>&nbsp;%5&nbsp;</td></tr>").arg(i).arg(mean).arg(stddev).arg(mi).arg(ma).arg(g->get_color().name()).arg(name);
-                        if (chkDisplayAverage->isChecked()) {
-                            JKQTPhorizontalRange* r=new JKQTPhorizontalRange(plotter->get_plotter());
-                            QColor c=g->get_color().darker().darker();
-                            r->set_color(g->get_color().darker().darker());
-                            r->set_centerColor(g->get_color().darker());
-                            r->set_rangeMin(mean-stddev);
-                            r->set_rangeMax(mean+stddev);
-                            r->set_plotCenterLine(true);
-                            r->set_rangeCenter(mean);
-                            c.setAlphaF(0.2);
-                            r->set_fillColor(c);
-                            //r->set_title(tr("%2: run %1: avg").arg(i).arg(name));
-                            plotter->addGraph(r);
-
-                        }
-                    }
-                }
-            }
         }
-
     }
     return labText;
+
 }
 
 void QFRDRFCSRateEditor::replotData(int dummy) {

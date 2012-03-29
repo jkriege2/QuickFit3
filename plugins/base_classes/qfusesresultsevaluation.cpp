@@ -326,7 +326,8 @@ double QFUsesResultsEvaluation::getFitValue(QFRawDataRecord *r, const QString &r
     if (hasSpecial(r, resultID, parameterID, sval, serr)) {
         //qDebug()<<"  - hasSpecial "<<sval;
         res=sval;
-    } else if (r && hasResults(r, resultID)) {
+    }
+    if (r && hasResults(r, resultID)) {
         QString tresultID=transformResultID(resultID);
         QString pid=getFitParamID(parameterID);
         //qDebug()<<"  - hasResults "<<tresultID<<pid;
@@ -343,13 +344,13 @@ double QFUsesResultsEvaluation::getFitValue(QFRawDataRecord *r, const QString &r
 
 double QFUsesResultsEvaluation::getFitError(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const {
     double sval=0, serr=0;
-    if (hasSpecial(r, resultID, parameterID, sval, serr)) {
-       return serr;
-    }
     if (hasResults(r, resultID)) {
         if (r!=NULL) {
             return r->resultsGetErrorAsDouble(transformResultID(resultID), getFitParamID(parameterID));
         }
+    }
+    if (hasSpecial(r, resultID, parameterID, sval, serr)) {
+       return serr;
     }
 
     QString psID=getParameterStoreID(parameterID);

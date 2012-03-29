@@ -5,7 +5,7 @@
 
 
 QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
-    QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_", parent)
+    QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent)
 {
 
     m_weighting=EqualWeighting;

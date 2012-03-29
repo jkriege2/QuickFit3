@@ -72,6 +72,8 @@ class QFFitAlgorithmInst : public QObject, public QFPluginFitFunction {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFFitFunction* get(QString id, QObject* parent) const ;
+		
+        QF_PLUGIN
     private:
 };
 

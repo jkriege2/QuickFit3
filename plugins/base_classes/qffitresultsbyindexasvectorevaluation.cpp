@@ -612,7 +612,8 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, co
         double sval=res, serr=0;
         if (hasSpecial(r, resultID, parameterID, sval, serr)) {
             res=sval;
-        } else if (hasFit(r, resultID)) {
+        }
+        if (hasFit(r, resultID)) {
             if (r->resultsExists(tresultID, fpid)) {
                 if (r->resultsExists(tresultID, getParamNameLocalStore(fpid))) {
                     if (r->resultsGetInBooleanList(tresultID, getParamNameLocalStore(fpid), index, false)) {
@@ -655,7 +656,8 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, co
         double sval=0, serr=res;
         if (hasSpecial(r, resultID, parameterID, sval, serr)) {
             res=serr;
-        } else if (hasFit(r, resultID)) {
+        }
+        if (hasFit(r, resultID)) {
             if (r->resultsExists(tresultID, fpid)) {
                 if (r->resultsExists(tresultID, getParamNameLocalStore(fpid))) {
                     if (r->resultsGetInBooleanList(tresultID, getParamNameLocalStore(fpid), index, false)) {
