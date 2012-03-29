@@ -77,7 +77,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/jkqtpoverlayelements.h \
     qfsimplefitparameterinterface.h \
     qfsimplefitparameterswidget.h \
-    ../../../../LIB/trunk/image_tools.h
+    ../../../../LIB/trunk/image_tools.h \
+    ../../../../LIB/trunk/qt/qkeysequenceedit.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -121,7 +122,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfhtmlhelpwindow.cpp \
     ../../../../LIB/trunk/qt/jkqtpoverlayelements.cpp \
     qfsimplefitparameterswidget.cpp \
-    ../../../../LIB/trunk/image_tools.cpp
+    ../../../../LIB/trunk/image_tools.cpp \
+    ../../../../LIB/trunk/qt/qkeysequenceedit.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
@@ -130,8 +132,10 @@ FORMS += qfdlg_csvparameters.ui \
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
              ../../../../LIB/trunk/qt/jkstyledbutton.qrc \
-    libqf3widgets.qrc \
-    ../../../../LIB/trunk/qt/libqt.qrc
+             ../../../../LIB/trunk/qt/libqt.qrc \
+             ../../../../LIB/trunk/qt/qkeysequenceedit.qrc \
+             ../../../../LIB/trunk/qt/numberedit.qrc \
+             libqf3widgets.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 

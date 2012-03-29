@@ -209,6 +209,66 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
          */
         virtual void setFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, const QString& unit);
 
+        /*! \brief set the initial fit parameter value
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+         */
+        virtual void setInitFitValue(const QString& parameterID, double value);
+
+        /*! \brief set the initial fit parameter value
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+            \param error error to be stored
+         */
+        virtual void setInitFitValue(const QString& parameterID, double value, double error);
+
+        /*! \brief set the initial fit parameter value
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+            \param error error to be stored
+            \param fix fix to be stored
+         */
+        virtual void setInitFitValue(const QString& parameterID, double value, double error, bool fix);
+
+        /*! \brief set the initial fit parameter value
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param value value to be stored
+            \param fix fix to be stored
+         */
+        virtual void setInitFitValue(const QString& parameterID, double value, bool fix);
+
+        /*! \brief set the initial fit parameter error
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param error error to be stored
+         */
+        virtual void setInitFitValueError(const QString& parameterID, double error);
+
+        /*! \brief set the initial fit parameter fix
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param fix fix to be stored
+         */
+        virtual void setInitFitFix(const QString& parameterID, bool fix);
+
+        /*! \brief set the initial fit parameter min value
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param min minimum value to be stored
+         */
+        virtual void setInitFitValueMin(const QString& parameterID, double min);
+
+        /*! \brief set the initial fit parameter max value
+
+            \param parameterID set the value of the parameter with this id (see QFFitFunction)
+            \param max maximum value to be stored
+         */
+        virtual void setInitFitValueMax(const QString& parameterID, double max);
+
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
 
             The value may be stored at different positions:

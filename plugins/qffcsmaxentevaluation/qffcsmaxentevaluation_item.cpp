@@ -352,7 +352,7 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
 }
 
 QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
-    if (model==0) return tr("FCS: 3D diffusion");
+    if (model==0) return tr("FCS: 3D diffusion with Triplet");
     return "";
 }
 
@@ -519,6 +519,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         qDebug()<< Ndist;
         mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus);
         mem.run(alpha,kappa,tripTau,tripTheta, NumIter);
+        fitSuccess=true;
         if (old_distribution==false)
             {
                 distTaus=(double*)calloc(Ndist,sizeof(double));

@@ -30,82 +30,9 @@ QFFCSByIndexAndModelEvaluationEditor::~QFFCSByIndexAndModelEvaluationEditor()
     delete dlgEvaluationProgress;
 }
 
-int QFFCSByIndexAndModelEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index, int defaultMin) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID(index, 0);
-    if (!rec) return defaultMin;
 
 
-    return rec->getProperty(resultID+"_datacut_min", defaultMin).toInt();
-}
 
-int QFFCSByIndexAndModelEvaluationEditor::getUserMax(QFRawDataRecord* rec, int index, int defaultMax) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID(index, 0);
-
-    if (!rec) return defaultMax;
-
-    return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
-}
-
-
-int QFFCSByIndexAndModelEvaluationEditor::getUserMin(QFRawDataRecord* rec) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return 0;
-    return getUserMin(rec, data->getCurrentIndex());
-}
-
-int QFFCSByIndexAndModelEvaluationEditor::getUserMax(QFRawDataRecord* rec) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return 0;
-    return getUserMax(rec, data->getCurrentIndex());
-}
-
-
-int QFFCSByIndexAndModelEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return 0;
-    return getUserMin(rec, index, 0);
-}
-
-int QFFCSByIndexAndModelEvaluationEditor::getUserMax(QFRawDataRecord* rec, int index) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return 0;
-    QFRDRFCSDataInterface* dintf=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
-    if (dintf) return getUserMax(rec, index, dintf->getCorrelationN()-1);
-    return getUserMax(rec, index, 0);
-}
-
-void QFFCSByIndexAndModelEvaluationEditor::setUserMin(int userMin) {
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return;
-    QFRawDataRecord* rdr=current->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex(), 0);
-    rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
-}
-
-void QFFCSByIndexAndModelEvaluationEditor::setUserMax(int userMax) {
-    if (!current) return;
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return;
-    QFRawDataRecord* rdr=current->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex(), 0);
-    rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
-}
-
-void QFFCSByIndexAndModelEvaluationEditor::setUserMinMax(int userMin, int userMax) {
-    if (!current) return;
-    QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    if (!data) return;
-    QFRawDataRecord* rdr=current->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex(), 0);
-    rdr->disableEmitPropertiesChanged();
-    rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
-    rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
-    rdr->enableEmitPropertiesChanged(true);
-}
 
 void QFFCSByIndexAndModelEvaluationEditor::readSettings() {
     QFUsesResultsByIndexEvaluationEditor::readSettings();
@@ -411,7 +338,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     btnResetCurrent->setToolTip(tr("reset the currently displayed file (and run) to the initial parameters\nThis deletes all fit results stored for the current file."));
     layBtn->addWidget(btnResetCurrent, 2, 0);
     btnResetAll=new QPushButton(tr("&Reset All"), this);
-    btnResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
+    btnResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files (and all runs therein)."));
     layBtn->addWidget(btnResetAll, 3, 1);
 
     btnResetAllRuns=new QPushButton(tr("&Reset All Runs"), this);
@@ -419,7 +346,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     layBtn->addWidget(btnResetAllRuns, 2, 1);
 
     btnCopyToInitial=new QPushButton(tr("Copy to &Initial"), this);
-    btnCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
+    btnCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\nso they are used by files/runs that were not fit yet."));
     layBtn->addWidget(btnCopyToInitial, 4, 0);
     btnCopyToAllRuns=new QPushButton(tr("&Copy to All Runs"), this);
     btnCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all runs in the current file."));
@@ -507,6 +434,12 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     connect(datacut, SIGNAL(copyUserMinToAllRuns(int)), this, SLOT(copyUserMinToAllRuns(int)));
     connect(datacut, SIGNAL(copyUserMaxToAllRuns(int)), this, SLOT(copyUserMaxToAllRuns(int)));
     connect(datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));
+}
+
+int QFFCSByIndexAndModelEvaluationEditor::getUserMinAbsMax(QFRawDataRecord *rec, int index) {
+    QFRDRFCSDataInterface* dintf=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    if (dintf) return dintf->getCorrelationN()-1;
+    return 0;
 }
 
 
@@ -687,6 +620,8 @@ void QFFCSByIndexAndModelEvaluationEditor::resetAllRuns() {
     QApplication::restoreOverrideCursor();
 }
 
+
+
 void QFFCSByIndexAndModelEvaluationEditor::displayParameters() {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -847,4 +782,173 @@ void QFFCSByIndexAndModelEvaluationEditor::fitParamChanged() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     displayData();
     QApplication::restoreOverrideCursor();
+}
+
+
+void QFFCSByIndexAndModelEvaluationEditor::copyToInitial() {
+    if (!current) return;
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    QFSimpleFitParameterEnumeratorInterface* itemp=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
+    int model=eval->getCurrentModel();
+    if (!eval || !itemp) return;
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    //bool erc=eval->get_doEmitResultsChanged();
+    bool epc=eval->get_doEmitPropertiesChanged();
+    //eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+
+    for (int i=0; i<itemp->getParameterCount(model); i++) {
+        QString id=itemp->getParameterID(model, i);
+        double value=eval->getFitValue(id);
+        double error=eval->getFitError(id);
+        bool fix=eval->getFitFix(id);
+        eval->setInitFitValue(id, value, error, fix);
+    }
+    copyMoreDataToInitial();
+
+
+    //eval->set_doEmitResultsChanged(erc);
+    eval->set_doEmitPropertiesChanged(epc);
+    //if (erc) eval->emitResultsChanged();
+    if (epc) eval->emitPropertiesChanged();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::copyToAll() {
+    if (!current) return;
+    //QFRawDataRecord* record=current->getHighlightedRecord();
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    QFSimpleFitParameterEnumeratorInterface* itemp=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
+    int model=eval->getCurrentModel();
+    if (!eval || !itemp) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QPointer<QFRawDataRecord> > records=eval->getApplicableRecords();
+
+    bool rc=eval->get_doEmitResultsChanged();
+    eval->set_doEmitResultsChanged(false);
+    foreach (QFRawDataRecord* record, records) {
+        bool rec=record->isEmitResultsChangedEnabled();
+        record->disableEmitResultsChanged();
+        for (int idx=eval->getIndexMin(record); idx<=eval->getIndexMax(record); idx++) {
+            //eval->resetAllFitResults(record, idx, eval->getCurrentModel());
+            if (eval->hasResults(record, idx, model)) {
+                for (int i=0; i<itemp->getParameterCount(model); i++) {
+                    QString id=itemp->getParameterID(model, i);
+                    double value=eval->getFitValue(id);
+                    double error=eval->getFitError(id);
+                    bool fix=eval->getFitFix(id);
+                    eval->setFitValue(record, idx, model, id, value);
+                    eval->setFitFix(record, idx, model, id, fix);
+                    eval->setFitError(record, idx, model, id, error);
+                }
+                copyMoreData(record, idx, model);
+            }
+        }
+        if (rec)record->enableEmitResultsChanged();
+    }
+    eval->set_doEmitResultsChanged(rc);
+    if (rc) eval->emitResultsChanged();
+    // ensure that data of new highlighted record is displayed
+    QApplication::restoreOverrideCursor();
+
+    if (QMessageBox::question(this, tr("MaxEnt Fit"), tr("Copy the current data also to the initial values?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        copyToInitial();
+    }
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::copyToAllRuns() {
+    if (!current) return;
+    //QFRawDataRecord* record=current->getHighlightedRecord();
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    QFSimpleFitParameterEnumeratorInterface* itemp=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
+    int model=eval->getCurrentModel();
+    if (!eval || !itemp) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QList<QPointer<QFRawDataRecord> > records=eval->getApplicableRecords();
+
+    bool rc=eval->get_doEmitResultsChanged();
+    eval->set_doEmitResultsChanged(false);
+    //foreach (QFRawDataRecord* record, records) {
+    QFRawDataRecord* record=eval->getHighlightedRecord();
+        bool rec=record->isEmitResultsChangedEnabled();
+        record->disableEmitResultsChanged();
+        for (int idx=eval->getIndexMin(record); idx<=eval->getIndexMax(record); idx++) {
+            //eval->resetAllFitResults(record, idx, eval->getCurrentModel());
+            if (eval->hasResults(record, idx, model)) {
+                for (int i=0; i<itemp->getParameterCount(model); i++) {
+                    QString id=itemp->getParameterID(model, i);
+                    double value=eval->getFitValue(id);
+                    double error=eval->getFitError(id);
+                    bool fix=eval->getFitFix(id);
+                    eval->setFitValue(record, idx, model, id, value);
+                    eval->setFitFix(record, idx, model, id, fix);
+                    eval->setFitError(record, idx, model, id, error);
+                }
+                copyMoreData(record, idx, model);
+            }
+        }
+        if (rec)record->enableEmitResultsChanged();
+    //}
+    eval->set_doEmitResultsChanged(rc);
+    if (rc) eval->emitResultsChanged();
+    // ensure that data of new highlighted record is displayed
+    QApplication::restoreOverrideCursor();
+
+    if (QMessageBox::question(this, tr("MaxEnt Fit"), tr("Copy the current data also to the initial values?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        copyToInitial();
+    }
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::copyToAllCurrentRun() {
+    if (!current) return;
+    //QFRawDataRecord* record=current->getHighlightedRecord();
+    QFUsesResultsByIndexAndModelEvaluation* eval=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    QFSimpleFitParameterEnumeratorInterface* itemp=qobject_cast<QFSimpleFitParameterEnumeratorInterface*>(current);
+    int model=eval->getCurrentModel();
+    if (!eval || !itemp) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QPointer<QFRawDataRecord> > records=eval->getApplicableRecords();
+
+    bool rc=eval->get_doEmitResultsChanged();
+    eval->set_doEmitResultsChanged(false);
+    foreach (QFRawDataRecord* record, records) {
+        bool rec=record->isEmitResultsChangedEnabled();
+        record->disableEmitResultsChanged();
+        //for (int idx=eval->getIndexMin(record); idx<=eval->getIndexMax(record); idx++) {
+        int idx=eval->getCurrentIndex();
+        if (eval->getIndexMin(record)<=idx && idx<=eval->getIndexMax(record)) {
+            //eval->resetAllFitResults(record, idx, eval->getCurrentModel());
+            if (eval->hasResults(record, idx, model)) {
+                for (int i=0; i<itemp->getParameterCount(model); i++) {
+                    QString id=itemp->getParameterID(model, i);
+                    double value=eval->getFitValue(id);
+                    double error=eval->getFitError(id);
+                    bool fix=eval->getFitFix(id);
+                    eval->setFitValue(record, idx, model, id, value);
+                    eval->setFitFix(record, idx, model, id, fix);
+                    eval->setFitError(record, idx, model, id, error);
+                }
+                copyMoreData(record, idx, model);
+            }
+        }
+        if (rec)record->enableEmitResultsChanged();
+    }
+    eval->set_doEmitResultsChanged(rc);
+    if (rc) eval->emitResultsChanged();
+    // ensure that data of new highlighted record is displayed
+    QApplication::restoreOverrideCursor();
+
+    if (QMessageBox::question(this, tr("MaxEnt Fit"), tr("Copy the current data also to the initial values?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+        copyToInitial();
+    }
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::copyMoreData(QFRawDataRecord *record, int index, int model) {
+    // may be overwritten by derived classes
+}
+
+void QFFCSByIndexAndModelEvaluationEditor::copyMoreDataToInitial() {
+    // may be overwritten by derived classes
 }

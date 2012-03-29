@@ -132,11 +132,11 @@ int QFUsesResultsByIndexEvaluation::getCurrentIndex() const {
 }
 
 int QFUsesResultsByIndexEvaluation::getIndexMin(QFRawDataRecord *r) const {
-    return INT_MIN;
+    return 0;
 }
 
 int QFUsesResultsByIndexEvaluation::getIndexMax(QFRawDataRecord *r) const {
-    return INT_MAX;
+    return 0;
 }
 
 void QFUsesResultsByIndexEvaluation::setFitResultSortPriority(QFRawDataRecord *r, int index, const QString &parameterID, bool sortPriority) {

@@ -126,14 +126,78 @@ void QFUsesResultsEvaluation::setFitValue(QFRawDataRecord *r, const QString &res
     }
 }
 
+void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].value=value;
+    parameterStore[dsid].valueSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value, double error) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].value=value;
+    parameterStore[dsid].valueSet=true;
+    parameterStore[dsid].error=error;
+    parameterStore[dsid].errorSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value, double error, bool fix) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].value=value;
+    parameterStore[dsid].valueSet=true;
+    parameterStore[dsid].error=error;
+    parameterStore[dsid].errorSet=true;
+    parameterStore[dsid].fix=fix;
+    parameterStore[dsid].fixSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value, bool fix) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].value=value;
+    parameterStore[dsid].valueSet=true;
+    parameterStore[dsid].fix=fix;
+    parameterStore[dsid].fixSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitValueError(const QString &parameterID, double error) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].error=error;
+    parameterStore[dsid].errorSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitFix(const QString &parameterID, bool fix) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].fix=fix;
+    parameterStore[dsid].fixSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitValueMin(const QString &parameterID, double min) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].min=min;
+    parameterStore[dsid].minSet=true;
+    emitPropertiesChanged();
+}
+
+void QFUsesResultsEvaluation::setInitFitValueMax(const QString &parameterID, double max) {
+    const QString dsid=getParameterStoreID(parameterID);
+    parameterStore[dsid].max=max;
+    parameterStore[dsid].maxSet=true;
+    emitPropertiesChanged();
+}
+
 void QFUsesResultsEvaluation::setFitValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value) {
     if (r!=NULL) {
-        QString dsid=getParameterStoreID(parameterID);
+        const QString dsid=getParameterStoreID(parameterID);
         if (hasResults(r, resultID)) {
             setFitResultValue(r, resultID, parameterID, value, getFitError(r, resultID, parameterID));
         } else {
-            parameterStore[getParameterStoreID(parameterID)].value=value;
-            parameterStore[getParameterStoreID(parameterID)].valueSet=true;
+            parameterStore[dsid].value=value;
+            parameterStore[dsid].valueSet=true;
             emitPropertiesChanged();
         }
 

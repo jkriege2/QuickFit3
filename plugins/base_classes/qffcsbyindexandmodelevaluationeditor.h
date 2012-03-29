@@ -46,15 +46,8 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
     public:
         explicit QFFCSByIndexAndModelEvaluationEditor(QFPluginServices* services, QWidget *parent = 0);
         ~QFFCSByIndexAndModelEvaluationEditor();
-        virtual int getUserMin(QFRawDataRecord *rec, int index, int defaultMin);
-        virtual int getUserMax(QFRawDataRecord *rec, int index, int defaultMax);
-        virtual int getUserMin(QFRawDataRecord *rec);
-        virtual int getUserMax(QFRawDataRecord *rec);
-        virtual int getUserMax(QFRawDataRecord *rec, int index);
-        virtual int getUserMin(QFRawDataRecord *rec, int index);
-        virtual void setUserMin(int userMin);
-        virtual void setUserMax(int userMax);
-        virtual void setUserMinMax(int userMin, int userMax);
+
+
 
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -64,6 +57,10 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+    public slots:
+
+
+
 
     protected slots:
         /** \brief activated when the highlighted record changed */
@@ -84,6 +81,22 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         virtual void resetAll();
         /** \brief reset all runs in current files */
         virtual void resetAllRuns();
+
+        /** \brief copy the current fit parameters to the initial settings */
+        virtual void  copyToInitial();
+        /** \brief copy current values to all records and all runs therein */
+        virtual void copyToAll();
+
+        /** \brief copy current values to all runs in the current record */
+        virtual void copyToAllRuns();
+
+        /** \brief copy current values to all records and the current run therein */
+        virtual void copyToAllCurrentRun();
+
+        /** \brief this may be overwritten to copy more than the enumerated fit parameters to another (the specified) record */
+        virtual void copyMoreData(QFRawDataRecord* record, int index, int model);
+        /** \brief this may be overwritten to copy more than the enumerated fit parameters to the initial values */
+        virtual void copyMoreDataToInitial();
 
         void plotMouseMove(double x, double y);
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
@@ -107,6 +120,7 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
     protected:
 
         void createWidgets();
+        virtual int getUserMinAbsMax(QFRawDataRecord *rec, int index);
 
         /** \brief label displaying the current record */
         QLabel* labRecord;

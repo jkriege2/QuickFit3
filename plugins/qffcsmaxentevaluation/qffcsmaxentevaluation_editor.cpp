@@ -974,6 +974,24 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
 
 }
 
+void QFFCSMaxEntEvaluationEditor::copyMoreData(QFRawDataRecord *record, int index, int model) {
+    QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (!eval) return;
+
+    eval->setFitValue(record, index, model, "maxent_alpha", eval->getAlpha());
+    eval->setFitValue(record, index, model, "maxent_numiter", eval->getNumIter());
+    eval->setFitValue(record, index, model, "maxent_Ndist", eval->getNdist());
+}
+
+void QFFCSMaxEntEvaluationEditor::copyMoreDataToInitial() {
+    QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (!eval) return;
+
+    eval->setInitFitValue("maxent_alpha", eval->getAlpha());
+    eval->setInitFitValue("maxent_numiter", eval->getNumIter());
+    eval->setInitFitValue("maxent_Ndist", eval->getNdist());
+}
+
 
 
 
@@ -1000,6 +1018,7 @@ void QFFCSMaxEntEvaluationEditor::NumIterChanged(int NumIter) {
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (data) data->setNumIter(NumIter);
 }
+
 
 void QFFCSMaxEntEvaluationEditor::weightsChanged(int weights) {
     if (!dataEventsEnabled) return;

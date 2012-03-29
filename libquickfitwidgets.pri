@@ -12,3 +12,5 @@ macx {
 }
 
 INCLUDEPATH += $$QFOUTPUT/../libqf3widgets/
+
+

@@ -61,7 +61,6 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         void NdistChanged(int Ndist);
         void NumIterChanged(int NumIter);
 
-
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
         /** \brief read the settings */
@@ -89,6 +88,10 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
     protected:       
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
+        /** \brief this may be overwritten to copy more than the enumerated fit parameters to another (the specified) record */
+        virtual void copyMoreData(QFRawDataRecord* record, int index, int model);
+        /** \brief this may be overwritten to copy more than the enumerated fit parameters to the initial values */
+        virtual void copyMoreDataToInitial();
 
         /** \brief number edit to change alpha */
         NumberEdit* edtAlpha;

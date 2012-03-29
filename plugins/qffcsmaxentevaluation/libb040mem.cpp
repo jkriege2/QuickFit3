@@ -68,7 +68,7 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
     		m_oldDist=true;
     		m_taudiffs.resize(m_N);
     		m_f.resize(m_N);
-    		for (int i=0; i<Ndist; i++)
+            for (uint32_t i=0; i<Ndist; i++)
     			{
     				m_taudiffs(i)=distTaus[i];	
     				m_f(i)=dist[i];
