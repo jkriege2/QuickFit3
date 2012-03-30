@@ -15,8 +15,8 @@
 #define sqr(x) ((x)*(x))
 
 #define CLICK_UPDATE_TIMEOUT 500
-//#define DEBUG_TIMIMNG
-#undef DEBUG_TIMIMNG
+#define DEBUG_TIMIMNG
+//#undef DEBUG_TIMIMNG
 
 #define OverlayRectanglesAsImageOverlay true
 
@@ -3014,20 +3014,27 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
 bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index) {
     QString fitfunc="";
     bool isMatrixResults=false;
+    qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size();
     if (index<0) {
         fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
     } else {
-        switch (current->resultsGetType(evaluation, "fit_model_name")) {
-            case QFRawDataRecord::qfrdreStringVector:
-            case QFRawDataRecord::qfrdreStringMatrix:
-                fitfunc=current->resultsGetInStringList(evaluation, "fit_model_name", index);
-                isMatrixResults=true;
-                break;
-            default:
-                break;
+        if (current->resultsExists(evaluation, "fit_model_name")) {
+            switch (current->resultsGetType(evaluation, "fit_model_name")) {
+                case QFRawDataRecord::qfrdreStringVector:
+                case QFRawDataRecord::qfrdreStringMatrix:
+                    fitfunc=current->resultsGetInStringList(evaluation, "fit_model_name", index);
+                    isMatrixResults=true;
+                    break;
+                case QFRawDataRecord::qfrdreString:
+                    fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
+                    break;
+                default:
+                    break;
+            }
+
         }
     }
-    //qDebug()<<"evaluateFitFunction()  "<<evaluation<<index<<"  => "<<fitfunc<<isMatrixResults;
+    qDebug()<<"evaluateFitFunction()  "<<evaluation<<index<<"  => "<<fitfunc<<isMatrixResults;
     QFFitFunction* ff=m_fitFunctions.value(fitfunc, NULL);
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size()<<ff;
     if (!ff) return false;
