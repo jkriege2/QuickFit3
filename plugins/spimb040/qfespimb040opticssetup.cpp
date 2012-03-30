@@ -4,12 +4,14 @@
 #include "objectives.h"
 #include "filters.h"
 #include "qfespimb040mainwindow.h"
+#include "qfespimb040shortcutconfigdialog.h"
 
-QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices) :
+QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040OpticsSetup)
 {
     m_pluginServices=pluginServices;
+    m_pluginMainWidget=pluginMainWidget;
     m_log=log;
     ui->setupUi(this);
     ui->camConfig1->init(0, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory());
@@ -31,6 +33,34 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogServ
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
     connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QList<QPair<QIcon,QString> >)), this, SLOT(configsChanged(QList<QPair<QIcon,QString> >)));
+
+    // create shortcuts
+    connect(addShortCut("stage_x2", "translation stage: joystick speed x2"), SIGNAL(activated()), ui->stageSetup, SLOT(speedX2()));
+    connect(addShortCut("stage_x10", "translation stage: joystick speed x10"), SIGNAL(activated()), ui->stageSetup, SLOT(speedX10()));
+    connect(addShortCut("stage_d2", "translation stage: joystick speed /2"), SIGNAL(activated()), ui->stageSetup, SLOT(speedD2()));
+    connect(addShortCut("stage_d10", "translation stage: joystick speed /10"), SIGNAL(activated()), ui->stageSetup, SLOT(speedD10()));
+    connect(addShortCut("stage_stepx", "translation stage: step x"), SIGNAL(activated()), ui->stageSetup, SLOT(stepX()));
+    connect(addShortCut("stage_stepmx", "translation stage: step -x"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusX()));
+    connect(addShortCut("stage_stepy", "translation stage: step y"), SIGNAL(activated()), ui->stageSetup, SLOT(stepY()));
+    connect(addShortCut("stage_stepmy", "translation stage: step -y"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusY()));
+    connect(addShortCut("stage_stepz", "translation stage: step z"), SIGNAL(activated()), ui->stageSetup, SLOT(stepZ()));
+    connect(addShortCut("stage_stepmz", "translation stage: step -z"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusZ()));
+    connect(addShortCut("stage_joysticktoggle", "translation stage: toggle joystick"), SIGNAL(activated()), ui->stageSetup, SLOT(toggleJoystick()));
+    connect(addShortCut("stage_joystick_on", "translation stage: joystick on"), SIGNAL(activated()), ui->stageSetup, SLOT(joystickOn()));
+    connect(addShortCut("stage_joystick_off", "translation stage: joystick off"), SIGNAL(activated()), ui->stageSetup, SLOT(joystickOff()));
+
+    connect(addShortCut("mainshutter_toggle", "main shutter: toggle"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(toggleShutter()));
+    connect(addShortCut("mainshutter_on", "main shutter: on"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(shutterOn()));
+    connect(addShortCut("mainshutter_off", "main shutter: off"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(shutterOff()));
+
+    connect(addShortCut("cam1_acquire_single", "camera 1: acquire single frame"), SIGNAL(activated()), ui->camConfig1, SLOT(previewSingle()));
+    connect(addShortCut("cam1_acquire_continuous_toggle", "camera 1: toggle preview acquisition"), SIGNAL(activated()), ui->camConfig1, SLOT(startStopPreview()));
+    connect(addShortCut("cam1_acquire_continuous_stop", "camera 1: stop preview"), SIGNAL(activated()), ui->camConfig1, SLOT(stopPreview()));
+
+    connect(addShortCut("cam2_acquire_single", "camera 2: acquire single frame"), SIGNAL(activated()), ui->camConfig2, SLOT(previewSingle()));
+    connect(addShortCut("cam2_acquire_continuous_toggle", "camera 2: toggle preview acquisition"), SIGNAL(activated()), ui->camConfig2, SLOT(startStopPreview()));
+    connect(addShortCut("cam2_acquire_continuous_stop", "camera 2: stop preview"), SIGNAL(activated()), ui->camConfig2, SLOT(stopPreview()));
+
 }
 
 QFESPIMB040OpticsSetup::~QFESPIMB040OpticsSetup()
@@ -57,6 +87,19 @@ void QFESPIMB040OpticsSetup::showEvent( QShowEvent * event ) {
     ui->camConfig2->show();
 }
 
+QShortcut *QFESPIMB040OpticsSetup::addShortCut(const QString &id, const QString &label, const QKeySequence& sequence) {
+    QFESPIMB040OpticsSetup::shortcutItem itm;
+    itm.shortcut=new QShortcut(m_pluginMainWidget);
+    itm.shortcut->setKey(sequence);
+    itm.shortcut->setWhatsThis(label);
+    itm.shortcut->setContext(Qt::ApplicationShortcut);
+    itm.shortcut->setEnabled(!sequence.isEmpty());
+    itm.id=id;
+    itm.label=label;
+    shortcuts.append(itm);
+    return itm.shortcut;
+}
+
 void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
@@ -71,6 +114,10 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->objTube1->loadSettings(settings, prefix+"objectives/tubelens1");
     ui->objTube2->loadSettings(settings, prefix+"objectives/tubelens2");
     ui->shutterMainIllumination->loadSettings(settings, prefix+"main_illumination_shutter");
+
+    for (int i=0; i<shortcuts.size(); i++) {
+        shortcuts[i].shortcut->setKey(QKeySequence(settings.value(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString()).toString()));
+    }
 }
 
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {
@@ -88,6 +135,9 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->objTube2->saveSettings(settings, prefix+"objectives/tubelens2");
     ui->shutterMainIllumination->saveSettings(settings, prefix+"main_illumination_shutter");
 
+    for (int i=0; i<shortcuts.size(); i++) {
+        settings.setValue(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString());
+    }
 }
 
 double QFESPIMB040OpticsSetup::getCameraMagnification(int setup_cam) const {
@@ -221,6 +271,23 @@ void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
 
 void QFESPIMB040OpticsSetup::configsChanged(QList<QPair<QIcon, QString> > configs) {
     emit lightpathesChanged(configs);
+}
+
+void QFESPIMB040OpticsSetup::configShortcuts() {
+    QFESPIMB040ShortcutConfigDialog* dlg=new QFESPIMB040ShortcutConfigDialog(this);
+
+    for (int i=0; i<shortcuts.size(); i++) {
+        dlg->addShortcut(shortcuts[i].label, shortcuts[i].shortcut->key());
+    }
+
+    if (dlg->exec()==QDialog::Accepted) {
+        for (int i=0; i<shortcuts.size(); i++) {
+            QKeySequence seq=dlg->getSequence(i);
+            shortcuts[i].shortcut->setKey(seq);
+            shortcuts[i].shortcut->setEnabled(!seq.isEmpty());
+        }
+    }
+    delete dlg;
 }
 
 

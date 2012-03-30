@@ -67,5 +67,7 @@
         <file alias="d10.png">icons/d10.png</file>
         <file alias="x2.png">icons/x2.png</file>
         <file alias="x10.png">icons/x10.png</file>
+        <file alias="configsteps.png">icons/configsteps.png</file>
+        <file alias="shortcut_settings.png">icons/shortcut_settings.png</file>
     </qresource>
 </RCC>

@@ -34,7 +34,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040OpticsSetup(QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices);
+        explicit QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices);
         ~QFESPIMB040OpticsSetup();
 
         void setLogging(QFPluginLogService* log);
@@ -151,6 +151,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void on_btnDisconnectCameras_clicked();
         void configsChanged(QList<QPair<QIcon, QString> > configs);
 
+        void configShortcuts();
+
 
     protected:
         void closeEvent(QCloseEvent * event);
@@ -160,6 +162,18 @@ class QFESPIMB040OpticsSetup : public QWidget {
         QFPluginServices* m_pluginServices;
 
         QFPluginLogService* m_log;
+
+        struct shortcutItem {
+            QShortcut* shortcut;
+            QString label;
+            QString id;
+        };
+
+        QList<shortcutItem> shortcuts;
+
+        QWidget* m_pluginMainWidget;
+
+        QShortcut* addShortCut(const QString& id, const QString& label, const QKeySequence& sequence=QKeySequence());
 };
 
 #endif // QFESPIMB040OPTICSSETUP_H

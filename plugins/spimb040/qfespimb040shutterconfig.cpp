@@ -260,6 +260,18 @@ void QFESPIMB040ShutterConfig::setShutter(bool opened) {
     actState->setChecked(opened);
 }
 
+void QFESPIMB040ShutterConfig::toggleShutter() {
+    actState->setChecked(!actState->isChecked());
+}
+
+void QFESPIMB040ShutterConfig::shutterOff() {
+    actState->setChecked(false);
+}
+
+void QFESPIMB040ShutterConfig::shutterOn() {
+    actState->setChecked(true);
+}
+
 void QFESPIMB040ShutterConfig::shutterActionClicked(bool opened) {
     QFExtensionShutter* shutter;
     int shutterID;

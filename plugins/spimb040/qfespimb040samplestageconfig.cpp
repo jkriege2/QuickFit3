@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "qfespimb040samplestageconfigthread.h"
+#include "qfespimb040samplestagestepconfigdialog.h"
 
 
 
@@ -25,6 +26,8 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool
     m_log=NULL;
     m_pluginServices=NULL;
     locked=false;
+
+    m_stepX=m_stepY=m_stepZ=1;
 
     this->useThread=useThread;
     stageThread=new QFESPIMB040SampleStageConfigThread(this);
@@ -141,6 +144,9 @@ void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString pre
     spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
     stageStateUpdateInterval=settings.value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
     chkJoystick->setChecked(settings.value(prefix+"joystick_enabled", true).toBool());
+    m_stepX=settings.value(prefix+"step_x", m_stepX).toDouble();
+    m_stepY=settings.value(prefix+"step_y", m_stepY).toDouble();
+    m_stepZ=settings.value(prefix+"step_z", m_stepZ).toDouble();
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
@@ -154,6 +160,9 @@ void QFESPIMB040SampleStageConfig::storeSettings(QSettings& settings, QString pr
     settings.setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
     settings.setValue(prefix+"joystick_enabled", chkJoystick->isChecked());
     settings.setValue(prefix+"update_interval", stageStateUpdateInterval);
+    settings.setValue(prefix+"step_x", m_stepX);
+    settings.setValue(prefix+"step_y", m_stepY);
+    settings.setValue(prefix+"step_z", m_stepZ);
 }
 
 /*
@@ -183,6 +192,8 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    btnConfigSteps=new QToolButton(this);
+
     cmbStageX=new QFStageComboBox(this);
     QHBoxLayout* hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
@@ -193,6 +204,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     btnConfigureX=new QToolButton(this);
     hbl->addWidget(btnConfigureX);
     hbl->addStretch();
+    hbl->addWidget(btnConfigSteps);
     stagelayout->addRow(tr("<b>x axis:</b>"), hbl);
     cmbStageX->setEnabled(false);
 
@@ -231,7 +243,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     QFont fb=chkJoystick->font();
     fb.setBold(true);
     chkJoystick->setFont(fb);
-    connect(chkJoystick, SIGNAL(clicked(bool)), this, SLOT(updateJoystick()));
+    connect(chkJoystick, SIGNAL(toggled(bool)), this, SLOT(updateJoystick()));
     hbl->addWidget(l=new QLabel("max. speed [&mu;m/s]: ", this));
     l->setTextFormat(Qt::RichText);
     spinJoystickMaxSpeed=new QDoubleSpinBox(this);
@@ -378,10 +390,10 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     labJoystick->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     gl->addWidget(labJoystick, 0,0);
 
-    labThread=new QLabel(this);
+    /*labThread=new QLabel(this);
     QFont f=labThread->font();
     f.setPointSizeF(f.pointSizeF()*0.75);
-    labThread->setFont(f);
+    labThread->setFont(f);*/
 
     gl->addWidget(labXState, 1,1);
     gl->addWidget(labYState, 1,2);
@@ -393,12 +405,12 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(labYSpeed, 3,2);
     gl->addWidget(labZSpeed, 3,3);
     gl->addWidget(new QWidget(this), 4,4);
-    gl->addWidget(labThread, 5,0);
+    //gl->addWidget(labThread, 5,0);
     gl->setColumnStretch(4,10);
     gl->setRowStretch(4,10);
     gl->setContentsMargins(0,0,0,0);
-    gl->setHorizontalSpacing(2);
-    gl->setVerticalSpacing(2);
+    gl->setHorizontalSpacing(1);
+    gl->setVerticalSpacing(1);
     stagelayout->addRow(tr("<b>status:</b>"), gl);
 
 }
@@ -434,6 +446,9 @@ void QFESPIMB040SampleStageConfig::createActions() {
     connect(actConfigureZ, SIGNAL(triggered()), this, SLOT(configureZ()));
     btnConfigureZ->setDefaultAction(actConfigureZ);
 
+    actConfigSteps=new QAction(QIcon(":/spimb040/configsteps.png"), tr("Configure step sizes ..."), this);
+    connect(actConfigSteps, SIGNAL(triggered()), this, SLOT(configSteps()));
+    btnConfigSteps->setDefaultAction(actConfigSteps);
 
 }
 
@@ -453,7 +468,7 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         chkJoystick->setEnabled(anyconn);
         spinJoystickMaxSpeed->setEnabled(anyconn);*/
     } else {
-        labThread->setText("");
+        //labThread->setText("");
         stage=getXStage();
         axis=getXStageAxis();
         conn=false;
@@ -892,7 +907,22 @@ void QFESPIMB040SampleStageConfig::moveRelative() {
     double x=spinMoveX->value();
     double y=spinMoveY->value();
     double z=spinMoveZ->value();
+    moveRelative(x,y,z);
+}
 
+void QFESPIMB040SampleStageConfig::configSteps() {
+    QFESPIMB040SampleStageStepConfigDialog* dlg=new QFESPIMB040SampleStageStepConfigDialog(m_stepX, m_stepY, m_stepZ, this);
+
+    if (dlg->exec()==QDialog::Accepted) {
+        m_stepX=dlg->x();
+        m_stepY=dlg->y();
+        m_stepZ=dlg->z();
+    }
+    delete dlg;
+}
+
+
+void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z) {
     if (useThread) {
         stageThread->moveRel(x,y,z);
     } else {
@@ -1070,12 +1100,12 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
 }
 
 void QFESPIMB040SampleStageConfig::threadStarted() {
-    labThread->setText(tr("thread started ..."));
+    //labThread->setText(tr("thread started ..."));
     QApplication::processEvents();
 }
 
 void QFESPIMB040SampleStageConfig::threadFinished() {
-    labThread->setText(tr("thread finished ..."));
+    //labThread->setText(tr("thread finished ..."));
     QApplication::processEvents();
 }
 
@@ -1112,5 +1142,41 @@ void QFESPIMB040SampleStageConfig::speedD2() {
 
 void QFESPIMB040SampleStageConfig::speedD10() {
     spinJoystickMaxSpeed->setValue(spinJoystickMaxSpeed->value()/10);
+}
+
+void QFESPIMB040SampleStageConfig::toggleJoystick() {
+    chkJoystick->setChecked(!chkJoystick->isChecked());
+}
+
+void QFESPIMB040SampleStageConfig::joystickOn() {
+    chkJoystick->setChecked(true);
+}
+
+void QFESPIMB040SampleStageConfig::joystickOff() {
+    chkJoystick->setChecked(false);
+}
+
+void QFESPIMB040SampleStageConfig::stepX() {
+    moveRelative(m_stepX,0,0);
+}
+
+void QFESPIMB040SampleStageConfig::stepY() {
+    moveRelative(0,m_stepY,0);
+}
+
+void QFESPIMB040SampleStageConfig::stepZ() {
+    moveRelative(0,0,m_stepZ);
+}
+
+void QFESPIMB040SampleStageConfig::stepMinusX() {
+    moveRelative(-m_stepX,0,0);
+}
+
+void QFESPIMB040SampleStageConfig::stepMinusY() {
+    moveRelative(0,-m_stepY,0);
+}
+
+void QFESPIMB040SampleStageConfig::stepMinusZ() {
+    moveRelative(0,0,-m_stepZ);
 }
 

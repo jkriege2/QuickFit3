@@ -139,6 +139,10 @@ class QFESPIMB040ShutterConfig : public QWidget {
     public slots:
         void setShutter(bool shutterOpened);
 
+        void toggleShutter();
+        void shutterOff();
+        void shutterOn();
+
     protected slots:
         void disConnect();
         void configure();

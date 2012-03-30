@@ -79,6 +79,21 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
     public slots:
         void setReadOnly(bool readonly);
 
+        void speedX2();
+        void speedX10();
+        void speedD2();
+        void speedD10();
+        void toggleJoystick();
+        void joystickOn();
+        void joystickOff();
+
+        void stepX();
+        void stepY();
+        void stepZ();
+        void stepMinusX();
+        void stepMinusY();
+        void stepMinusZ();
+
     protected slots:
         void updateStates();
 
@@ -140,6 +155,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QPushButton* btnMoveRelative;
 
 
+
         /** \brief label for x-axis state */
         QLabel* labXState;
         /** \brief label for x-axis position */
@@ -162,7 +178,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QLabel* labZSpeed;
         /** \brief label to display joystick status */
         QLabel* labJoystick;
-        QLabel* labThread;
+        //QLabel* labThread;
         QToolButton* btnX2;
         QToolButton* btnX10;
         QToolButton* btnD2;
@@ -183,6 +199,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief action to configuzre stage for axis z */
         QAction* actConfigureZ;
 
+        QAction* actConfigSteps;
+        QToolButton* btnConfigSteps;
+
         QTimer* timUpdate;
 
         bool locked;
@@ -199,6 +218,10 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
 
         QTimer timerDisplayUpdate;
         QFESPIMB040SampleStageConfigThread* stageThread;
+
+        double m_stepX;
+        double m_stepY;
+        double m_stepZ;
 
         bool useThread;
 
@@ -239,6 +262,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         bool isYStageConnected() const;
         bool isZStageConnected() const;
 
+        void moveRelative(double x, double y, double z);
     protected slots:
         void disConnectX();
         void disConnectY();
@@ -250,11 +274,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void displayAxisStates();
         void moveAbsolute();
         void moveRelative();
+        void configSteps();
 
-        void speedX2();
-        void speedX10();
-        void speedD2();
-        void speedD10();
+
 };
 
 #endif // QFESPIMB040SAMPLESTAGECONFIG_H

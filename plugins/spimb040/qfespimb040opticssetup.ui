@@ -673,6 +673,33 @@ p, li { white-space: pre-wrap; }
        </spacer>
       </item>
       <item>
+       <widget class="QToolButton" name="btnShortcutConfig">
+        <property name="toolTip">
+         <string>configure the keyboard shortcuts for the SPIM control</string>
+        </property>
+        <property name="text">
+         <string>configure keyboard shortcuts</string>
+        </property>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/shortcut_settings.png</normaloff>:/spimb040/shortcut_settings.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_8">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnLockFiltersEtc">
         <property name="minimumSize">
          <size>
@@ -1180,7 +1207,7 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>487</x>
+     <x>470</x>
      <y>38</y>
     </hint>
    </hints>
@@ -1196,8 +1223,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>517</x>
-     <y>37</y>
+     <x>500</x>
+     <y>38</y>
     </hint>
    </hints>
   </connection>
@@ -1224,8 +1251,8 @@ p, li { white-space: pre-wrap; }
    <slot>deleteCurrentLightpatConfig()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>513</x>
-     <y>16</y>
+     <x>500</x>
+     <y>27</y>
     </hint>
     <hint type="destinationlabel">
      <x>557</x>
@@ -1249,11 +1276,28 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnShortcutConfig</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup</receiver>
+   <slot>configShortcuts()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>641</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>534</x>
+     <y>45</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>updateMagnifications()</slot>
   <slot>loadLightpathConfig(QString)</slot>
   <slot>saveCurrentLightpatConfig()</slot>
   <slot>deleteCurrentLightpatConfig()</slot>
+  <slot>configShortcuts()</slot>
  </slots>
 </ui>

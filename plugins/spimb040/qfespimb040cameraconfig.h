@@ -289,14 +289,6 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
                  or disconnectDevice().
          */
         void disConnectAcquisitionDevice();
-        /** \brief start/stop image continuous acquisition (depending on actStartStopAcquisition)
-         */
-        void startStopPreview();
-        /** \brief stop image continuous acquisition
-         *
-         * \note This function ensures that \c viewData.abort_continuous_acquisition=true so any preview is really stopped!
-         */
-        void stopPreview();
          /** \brief acquire a single frame from continuous series
          *
          *  This function is called by a QTimer. The continuous series is started by startStopAcquisition1()
@@ -304,13 +296,21 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
          *
          */
         void previewContinuous();
-        /** \brief acquire single preview frame */
-        void previewSingle();
 
         /** \brief set enabled/disabled states of the actions and widgets according to the given parameter */
         void displayStates(States state);
 
-    private:
+    public slots:
+        /** \brief start/stop image continuous acquisition (depending on actStartStopAcquisition)
+         */
+        void startStopPreview();
+        /** \brief acquire single preview frame */
+        void previewSingle();
+        /** \brief stop image continuous acquisition
+         *
+         * \note This function ensures that \c viewData.abort_continuous_acquisition=true so any preview is really stopped!
+         */
+        void stopPreview();
 };
 
 #endif // QFESPIMB040CAMERACONFIG_H
