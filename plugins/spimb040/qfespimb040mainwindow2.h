@@ -37,6 +37,7 @@
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget2.h"
 #include "qfespimb040acquisitionconfigwidget2.h"
+#include "qfespimb040camparamstackconfigwidget2.h"
 #include "qfhtmlhelpwindow.h"
 #include "qfespimb040opticssetup.h"
 #include "qtriple.h"
@@ -79,6 +80,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         QTabWidget* tabAcquisition;
         QFESPIMB040AcquisitionConfigWidget2* widAcquisition;
         QFESPIMB040ImageStackConfigWidget2* widImageStack;
+        QFESPIMB040CamParamStackConfigWidget2* widCmParamScan;
 
 
         QTabWidget* tabMain;
@@ -139,6 +141,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
             16-bit TIFF file for eachcamera separately.
           */
         void doImageStack();
+
+        void doCamParamStack();
 
         void displayHelp();
 

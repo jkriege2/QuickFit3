@@ -4,17 +4,13 @@
 #include <iostream>
 
 
-
-
-
-
-
-
-
-
 QFESPIMB040ShutterConfig::QFESPIMB040ShutterConfig(QWidget* parent):
     QWidget(parent)
 {
+
+    shutterStateUpdateInterval=351;
+    iconOpened=QPixmap(":/spimb040/shutter_opened.png");
+    iconClosed=QPixmap(":/spimb040/shutter_closed.png");
 
     timUpdate=new QTimer(this);
     timUpdate->setSingleShot(true);
@@ -26,9 +22,6 @@ QFESPIMB040ShutterConfig::QFESPIMB040ShutterConfig(QWidget* parent):
     moving=false;
 
 
-    shutterStateUpdateInterval=351;
-    iconOpened=QPixmap(":/spimb040/shutter_opened.png");
-    iconClosed=QPixmap(":/spimb040/shutter_closed.png");
     createWidgets();
     createActions();
     updateStates();

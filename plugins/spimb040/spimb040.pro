@@ -42,7 +42,8 @@ HEADERS += spimb040.h \
     qfespimb040shutterconfig.h \
     qfespimb040configcombobox.h \
     qfespimb040samplestagestepconfigdialog.h \
-    qfespimb040shortcutconfigdialog.h
+    qfespimb040shortcutconfigdialog.h \
+    qfespimb040camparamstackconfigwidget2.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -67,7 +68,8 @@ SOURCES += spimb040.cpp \
     qfespimb040shutterconfig.cpp \
     qfespimb040configcombobox.cpp \
     qfespimb040samplestagestepconfigdialog.cpp \
-    qfespimb040shortcutconfigdialog.cpp
+    qfespimb040shortcutconfigdialog.cpp \
+    qfespimb040camparamstackconfigwidget2.cpp
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \
@@ -77,7 +79,8 @@ FORMS = \
     qfespimb040imagestackconfigwidget2.ui \
     qfespimb040acquisitionconfigwidget2.ui \
     qfespimb040samplestagestepconfigdialog.ui \
-    qfespimb040shortcutconfigdialog.ui
+    qfespimb040shortcutconfigdialog.ui \
+    qfespimb040camparamstackconfigwidget2.ui
 
 RESOURCES += spimb040.qrc
 

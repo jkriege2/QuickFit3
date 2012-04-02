@@ -105,7 +105,7 @@ QF3ObjectiveCombobox::~QF3ObjectiveCombobox() {
 
 void QF3ObjectiveCombobox::currentObjectiveChanged(int idx) {
     int iD=cmbObjective->currentIndex();
-    if (iD>=0 && iD<objectives.size()) labObjectiveDescription->setText(tr("magn.: %1x<br>NA: %2").arg(objectives[iD].magnification).arg(objectives[iD].NA));
+    if (iD>=0 && iD<objectives.size()) labObjectiveDescription->setText(tr("<small>magn.: %1x<br>NA: %2</small>").arg(objectives[iD].magnification).arg(objectives[iD].NA));
     else labObjectiveDescription->setText("");
 
     emit objectiveChanged();

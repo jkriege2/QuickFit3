@@ -32,6 +32,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
+    if (widCmParamScan) widCmParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
@@ -41,6 +42,7 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
+    if (widCmParamScan) widCmParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
 
 }
 
@@ -122,6 +124,13 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //tabAcquisition->addTab(widImageStack, tr("Image S&tack"));
         tabMain->addTab(widImageStack, tr("Acquisition: Image S&tack"));
         connect(widImageStack, SIGNAL(doStack()), this, SLOT(doImageStack()));
+
+        //------------------------------------------------------------------------------------------
+        // create tab for cam parameter image series acquisition
+        //------------------------------------------------------------------------------------------
+        widCmParamScan=new QFESPIMB040CamParamStackConfigWidget2(this, m_pluginServices, optSetup, m_pluginServices->getConfigFileDirectory());
+        tabMain->addTab(widCmParamScan, tr("Acquisition: Camera Parameter Series"));
+        connect(widCmParamScan, SIGNAL(doAcquisition()), this, SLOT(doCamParamStack()));
 }
 
 #define IMAGESTACK_ERROR(message) \
@@ -760,6 +769,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
     }
     optSetup->unlockStages();
 
+}
+
+void QFESPIMB040MainWindow2::doCamParamStack() {
 }
 
 

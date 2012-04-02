@@ -29,6 +29,8 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->objTube1->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube2->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->shutterMainIllumination->init(m_log, m_pluginServices);
+    ui->shutterLaser1->init(m_log, m_pluginServices);
+    ui->shutterLaser2->init(m_log, m_pluginServices);
     ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
@@ -52,6 +54,14 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     connect(addShortCut("mainshutter_toggle", "main shutter: toggle"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(toggleShutter()));
     connect(addShortCut("mainshutter_on", "main shutter: on"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(shutterOn()));
     connect(addShortCut("mainshutter_off", "main shutter: off"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(shutterOff()));
+
+    connect(addShortCut("shutter_laser1_toggle", "laser 1 shutter: toggle"), SIGNAL(activated()), ui->shutterLaser1, SLOT(toggleShutter()));
+    connect(addShortCut("shutter_laser1_on", "laser 1 shutter: on"), SIGNAL(activated()), ui->shutterLaser1, SLOT(shutterOn()));
+    connect(addShortCut("shutter_laser1_off", "laser 1 shutter: off"), SIGNAL(activated()), ui->shutterLaser1, SLOT(shutterOff()));
+
+    connect(addShortCut("shutter_laser2_toggle", "laser 2 shutter: toggle"), SIGNAL(activated()), ui->shutterLaser2, SLOT(toggleShutter()));
+    connect(addShortCut("shutter_laser2_on", "laser 2 shutter: on"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOn()));
+    connect(addShortCut("shutter_laser2_off", "laser 2 shutter: off"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOff()));
 
     connect(addShortCut("cam1_acquire_single", "camera 1: acquire single frame"), SIGNAL(activated()), ui->camConfig1, SLOT(previewSingle()));
     connect(addShortCut("cam1_acquire_continuous_toggle", "camera 1: toggle preview acquisition"), SIGNAL(activated()), ui->camConfig1, SLOT(startStopPreview()));
@@ -114,6 +124,8 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->objTube1->loadSettings(settings, prefix+"objectives/tubelens1");
     ui->objTube2->loadSettings(settings, prefix+"objectives/tubelens2");
     ui->shutterMainIllumination->loadSettings(settings, prefix+"main_illumination_shutter");
+    ui->shutterLaser1->loadSettings(settings, prefix+"laser1_shutter");
+    ui->shutterLaser2->loadSettings(settings, prefix+"laser2_shutter");
 
     for (int i=0; i<shortcuts.size(); i++) {
         shortcuts[i].shortcut->setKey(QKeySequence(settings.value(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString()).toString()));
@@ -134,6 +146,8 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->objTube1->saveSettings(settings, prefix+"objectives/tubelens1");
     ui->objTube2->saveSettings(settings, prefix+"objectives/tubelens2");
     ui->shutterMainIllumination->saveSettings(settings, prefix+"main_illumination_shutter");
+    ui->shutterLaser1->saveSettings(settings, prefix+"laser1_shutter");
+    ui->shutterLaser2->saveSettings(settings, prefix+"laser2_shutter");
 
     for (int i=0; i<shortcuts.size(); i++) {
         settings.setValue(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString());
@@ -219,6 +233,10 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam ) const {
         setup["objectives/tube_lens2/magnification"]=objective.magnification;
     }
 
+    setup["shutters/transmission_illumination/state"]=ui->shutterMainIllumination->getShutterState();
+    setup["shutters/laser1/state"]=ui->shutterLaser1->getShutterState();
+    setup["shutters/laser2/state"]=ui->shutterLaser1->getShutterState();
+
 
     return setup;
 }
@@ -230,6 +248,8 @@ void QFESPIMB040OpticsSetup::setLogging(QFPluginLogService* log) {
     ui->camConfig2->setLog(m_log);
     ui->stageSetup->setLog(m_log);
     ui->shutterMainIllumination->setLog(m_log);
+    ui->shutterLaser1->setLog(m_log);
+    ui->shutterLaser2->setLog(m_log);
 }
 
 bool QFESPIMB040OpticsSetup::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
@@ -249,9 +269,9 @@ void QFESPIMB040OpticsSetup::releaseCamera(int setup_cam) {
 
 void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     ui->shutterMainIllumination->connectShutter();
-    qDebug()<<"shutter connected";
+    ui->shutterLaser1->connectShutter();
+    ui->shutterLaser2->connectShutter();
     ui->stageSetup->connectStages();
-    qDebug()<<"stages connected";
 }
 
 void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
@@ -262,6 +282,8 @@ void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
 void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
     ui->stageSetup->disconnectStages();
     ui->shutterMainIllumination->disconnectShutter();
+    ui->shutterLaser1->disconnectShutter();
+    ui->shutterLaser2->disconnectShutter();
 }
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
@@ -386,6 +408,8 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename) {
     QSettings set(filename, QSettings::IniFormat);
 
     // LOAD RELEVANT WIDGETS HERE
+    if (set.contains("laser1/shutter/state")) ui->shutterLaser1->setShutter(set.value("laser1/shutter/state").toBool());
+    if (set.contains("laser2/shutter/state")) ui->shutterLaser2->setShutter(set.value("laser1/shutter/state").toBool());
 
 
 }
@@ -397,6 +421,8 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const 
 
 
         // SAVE RELEVANT WIDGETS HERE
+        if (ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) set.setValue("laser1/shutter/state", ui->shutterLaser1->getShutterState());
+        if (ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) set.setValue("laser2/shutter/state", ui->shutterLaser2->getShutterState());
 
 
     }
