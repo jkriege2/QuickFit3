@@ -501,12 +501,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
             }
 
 
-        /*
-        QMessageBox msgBox;
-        msgBox.setText("Hallo");
-        msgBox.setDetailedText("Detailed Information");
-        msgBox.exec();
-        */
+
 
         QElapsedTimer time;
         time.start();

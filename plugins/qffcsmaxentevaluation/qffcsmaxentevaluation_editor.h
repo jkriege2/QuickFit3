@@ -42,6 +42,26 @@
 #include "qffcsbyindexandmodelevaluationeditor.h"
 
 
+/////////////
+#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QFormLayout>
+#include "qfrawdatarecord.h"
+#include "qfevaluationitem.h"
+#include "../interfaces/qfrdrfcsdatainterface.h"
+#include <iostream>
+#include <cfloat>
+#include "tools.h"
+#include "statistics_tools.h"
+#include <QThread>
+#include "qmoretextobject.h"
+#include "qmodernprogresswidget.h"
+#include "qffitfunctionmanager.h"
+#include "qffitalgorithmmanager.h"
+////////////
+
+
 /*! \brief editor for QFFCSMaxEntEvaluationItem
     \ingroup qf3rdrdp_GROUPNAME
 */
