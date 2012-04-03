@@ -146,6 +146,15 @@ QString CDoubleToQString(double value) {
     return loc.toString(value, 'g', 10);
 }
 
+QString CDoubleListToQString(const QList<double> values, const QString& separator) {
+    QString result="";
+    foreach(double value, values) {
+        if (!result.isEmpty()) result+=separator;
+        result+=CDoubleToQString(value);
+    }
+    return result;
+}
+
 
 double CQStringToDouble(QString value) {
     QLocale loc=QLocale::c();

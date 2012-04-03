@@ -109,14 +109,14 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item row="2" column="3">
-    <widget class="QLineEdit" name="edtPrefix1">
+    <widget class="QEnhancedLineEdit" name="edtPrefix1">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
    <item row="3" column="3">
-    <widget class="QLineEdit" name="edtPrefix2">
+    <widget class="QEnhancedLineEdit" name="edtPrefix2">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -201,6 +201,13 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qenhancedlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>spinCounter</tabstop>
   <tabstop>chkUse1</tabstop>

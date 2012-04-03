@@ -10,6 +10,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     QWidget(parent),
     ui(new Ui::QFESPIMB040OpticsSetup)
 {
+    setting_lightpath=false;
     m_pluginServices=pluginServices;
     m_pluginMainWidget=pluginMainWidget;
     m_log=log;
@@ -34,7 +35,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
-    connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QList<QPair<QIcon,QString> >)), this, SLOT(configsChanged(QList<QPair<QIcon,QString> >)));
+    connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QFESPIMB040OpticsSetupItems)), this, SLOT(configsChanged(QFESPIMB040OpticsSetupItems)));
 
     // create shortcuts
     connect(addShortCut("stage_x2", "translation stage: joystick speed x2"), SIGNAL(activated()), ui->stageSetup, SLOT(speedX2()));
@@ -291,7 +292,7 @@ void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
     ui->camConfig2->disconnectCamera();
 }
 
-void QFESPIMB040OpticsSetup::configsChanged(QList<QPair<QIcon, QString> > configs) {
+void QFESPIMB040OpticsSetup::configsChanged(QFESPIMB040OpticsSetupItems configs) {
     emit lightpathesChanged(configs);
 }
 
@@ -402,7 +403,26 @@ bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
     return ui->shutterMainIllumination->getShutterState();
 }
 
-void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename) {
+bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {
+    if (setting_lightpath) {
+        bool ok=true;
+        QSettings set(filename, QSettings::IniFormat);
+        if (ok && set.contains("laser1/shutter/state")) ok=ok&&(ui->shutterLaser1->getShutterState()==set.value("laser1/shutter/state").toBool());
+        if (ok && set.contains("laser2/shutter/state")) ok=ok&&(ui->shutterLaser2->getShutterState()==set.value("laser2/shutter/state").toBool());
+        return ok;
+    }
+    return true;
+}
+
+QString QFESPIMB040OpticsSetup::getCurrentLightpathFilename() const {
+    return ui->cmbLightpathConfig->currentConfigFilename();
+}
+
+QString QFESPIMB040OpticsSetup::getCurrentLightpath() const {
+    return ui->cmbLightpathConfig->currentText();
+}
+
+void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool waiting) {
     if (!QFile::exists(filename)) return;
     //qDebug()<<"loadLightpathConfig("<<filename<<")";
     QSettings set(filename, QSettings::IniFormat);
@@ -411,6 +431,15 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename) {
     if (set.contains("laser1/shutter/state")) ui->shutterLaser1->setShutter(set.value("laser1/shutter/state").toBool());
     if (set.contains("laser2/shutter/state")) ui->shutterLaser2->setShutter(set.value("laser1/shutter/state").toBool());
 
+    if (waiting) {
+        setting_lightpath=true;
+        while (!lightpathLoaded(filename)) {
+            QApplication::processEvents();
+        }
+        setting_lightpath=false;
+    } else {
+        setting_lightpath=true;
+    }
 
 }
 
@@ -420,13 +449,24 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const 
         set.setValue("name", name);
 
 
-        // SAVE RELEVANT WIDGETS HERE
-        if (ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) set.setValue("laser1/shutter/state", ui->shutterLaser1->getShutterState());
-        if (ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) set.setValue("laser2/shutter/state", ui->shutterLaser2->getShutterState());
-
+        QMap<QString, QVariant> data;
+        saveLightpathConfig(data, name);
+        QMap<QString, QVariant>::iterator i=data.begin();
+        for (i = data.begin(); i != data.end(); ++i) {
+            set.setValue(i.key(), i.value());
+        }
 
     }
     ui->cmbLightpathConfig->updateItems(name);
+}
+
+void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix) {
+    data[prefix+"name"]=name;
+
+    // SAVE RELEVANT WIDGETS HERE
+    if (ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) data["laser1/shutter/state"]=ui->shutterLaser1->getShutterState();
+    if (ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) data["laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
+
 }
 
 void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
@@ -474,6 +514,10 @@ void QFESPIMB040OpticsSetup::deleteCurrentLightpatConfig() {
             ui->cmbLightpathConfig->updateItems();
         }
     }
+}
+
+void QFESPIMB040OpticsSetup::emitLighpathesChanged() {
+    ui->cmbLightpathConfig->updateItems(ui->cmbLightpathConfig->currentText());
 }
 
 bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {

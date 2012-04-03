@@ -108,6 +108,12 @@ QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', 
 */
 QFLIB_EXPORT QString CDoubleToQString(double value);
 
+/*! \brief convert a list of numbers to a QString with the c-locale (and without group separator)
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString CDoubleListToQString(const QList<double> values, const QString &separator=QString(", "));
+
 /*! \brief convert a number to a QString with the c-locale (and without group separator)
     \ingroup qf3lib_tools
 

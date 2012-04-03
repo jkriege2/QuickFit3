@@ -195,7 +195,8 @@ class QFExtensionCamera {
 
          enum CameraSetting {
              CamSetExposureTime,
-             CamSetNumberFrames
+             CamSetNumberFrames,
+             CamSetGain
          };
 
          /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */

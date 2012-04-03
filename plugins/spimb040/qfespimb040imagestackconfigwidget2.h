@@ -6,11 +6,12 @@
 #include <QToolButton>
 #include <QWidget>
 #include "../interfaces/qfextensionlinearstage.h"
+#include "qfespimb040filenametool.h"
+#include "qfespimb040opticssetup.h"
 
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
 class QFExtension;
-class QFESPIMB040OpticsSetup;
 
 namespace Ui {
     class QFESPIMB040ImageStackConfigWidget2;
@@ -20,7 +21,7 @@ namespace Ui {
 /*! \brief widget that allows to configure an image stack acquisition
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040ImageStackConfigWidget2 : public QWidget {
+class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040FilenameTool {
         Q_OBJECT
 
     public:
@@ -39,11 +40,8 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget {
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
-        /** \brief returns the current counter value */
-        int counter() const;
-        /** \brief increment the current counter value */
-        void incCounter();
 
+        int images() const;
         QString prefix1() const;
         QString prefix2() const;
         bool use1() const;
@@ -75,6 +73,19 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget {
         int stackCount3() const;
         double stackStart3() const;
         double stackDelta3() const;
+
+        bool lightpath1Activated() const;
+        bool lightpath2Activated() const;
+        bool lightpath3Activated() const;
+
+        QString lightpath1() const;
+        QString lightpath1Filename() const;
+        QString lightpath2() const;
+        QString lightpath2Filename() const;
+        QString lightpath3() const;
+        QString lightpath3Filename() const;
+public slots:
+        void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
     protected slots:
         void on_btnAcquire_clicked();
         void on_chkUse1_clicked(bool enabled);

@@ -54,10 +54,10 @@ void QFESPIMB040ConfigComboBox::updateItems(const QString &newCurrent) {
     QDir dir=QDir(baseDir, "*."+m_ext);
     //std::cout<<"should have created all dirs: '"<<directory.toStdString()<<"'"<<std::endl;
     QStringList filenames=dir.entryList(QDir::Files);
-    QList<QPair<QIcon, QString> > configs;
+    QFESPIMB040OpticsSetupItems configs;
     foreach (QString fileName, filenames) {
         QString absfn=dir.absoluteFilePath(fileName);
-        configs.append(qMakePair(getConfigIcon(absfn), getConfigName(absfn)));
+        configs.append(qMakeTriple(getConfigIcon(absfn), getConfigName(absfn), absfn));
         addItem(getConfigIcon(absfn), getConfigName(absfn), absfn);
     }
 

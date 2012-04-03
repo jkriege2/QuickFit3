@@ -4,7 +4,10 @@
 #include <QComboBox>
 #include <QIcon>
 #include <QString>
+#include "qtriple.h"
 #include "qenhancedcombobox.h"
+
+#include "qfespimb040opticssetup.h"
 
 /*! \brief a combobox which displays a set of configuration files from a given directory
     \ingroup qf3ext_spimb040
@@ -36,7 +39,7 @@ class QFESPIMB040ConfigComboBox : public QEnhancedComboBox {
         void currentConfigChanged(QString filename);
 
         /** \brief emitted when the list of lightpath configs changes */
-        void configsChanged(QList<QPair<QIcon, QString> > configs);
+        void configsChanged(QFESPIMB040OpticsSetupItems configs);
     public slots:
         /** \brief select the given configuration from a given filename
          *

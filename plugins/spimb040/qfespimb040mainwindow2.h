@@ -80,7 +80,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         QTabWidget* tabAcquisition;
         QFESPIMB040AcquisitionConfigWidget2* widAcquisition;
         QFESPIMB040ImageStackConfigWidget2* widImageStack;
-        QFESPIMB040CamParamStackConfigWidget2* widCmParamScan;
+        QFESPIMB040CamParamStackConfigWidget2* widCamParamScan;
 
 
         QTabWidget* tabMain;
@@ -169,6 +169,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
             \return \c true on success
          */
         bool savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32);
+
+        bool prepareCamera(int num, int camera, QFExtensionCamera *cam, const QString& acquisitionSettingsFilename, int &width, int &height, uint32_t **buffer);
 
     public:
 

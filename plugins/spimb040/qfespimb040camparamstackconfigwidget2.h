@@ -6,11 +6,13 @@
 #include <QToolButton>
 #include <QWidget>
 #include "../interfaces/qfextensionlinearstage.h"
-
+#include "qfespimb040filenametool.h"
+#include "qtriple.h"
+#include "qfespimb040opticssetup.h"
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
 class QFExtension;
-class QFESPIMB040OpticsSetup;
+//class QFESPIMB040OpticsSetup;
 
 namespace Ui {
     class QFESPIMB040CamParamStackConfigWidget2;
@@ -20,7 +22,7 @@ namespace Ui {
 /*! \brief widget that allows to configure an image stack acquisition
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040CamParamStackConfigWidget2 : public QWidget {
+class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040FilenameTool {
         Q_OBJECT
 
     public:
@@ -35,28 +37,34 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget {
     signals:
         void doStack();
 
+    public slots:
+        void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
     public:
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
-        /** \brief returns the current counter value */
-        int counter() const;
-        /** \brief increment the current counter value */
-        void incCounter();
 
         QString prefix1() const;
         QString prefix2() const;
         bool use1() const;
         bool use2() const;
 
+        int images() const;
+
         int stackParameter() const;
+        QString stackParameterName() const;
         int stackMode() const;
+        QString stackModeName() const;
         double stackStart() const;
         double stackDelta() const;
         double stackEnd() const;
         QList<double> stack() const;
 
-    protected slots:
+        bool lightpathActivated() const;
+        QString lightpathFilename() const;
+
+        QString lightpath() const;
+protected slots:
         void on_spinEnd_valueChanged(double value);
         void on_btnAcquire_clicked();
         void on_chkUse1_clicked(bool enabled);

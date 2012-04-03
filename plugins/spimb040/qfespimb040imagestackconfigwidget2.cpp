@@ -35,6 +35,9 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* 
         ui->cmbCam2Settings->connectTo(opticsSetup->cameraComboBox(1));
     }
 
+    bindLineEdit(ui->edtPrefix1);
+    bindLineEdit(ui->edtPrefix2);
+
     QTimer::singleShot(STAGE_INTERVAL_MS, this, SLOT(checkStage()));
 }
 
@@ -76,6 +79,14 @@ void QFESPIMB040ImageStackConfigWidget2::loadSettings(QSettings& settings, QStri
     ui->chkStage2->setChecked(settings.value(prefix+"stage2", false).toBool());
     ui->chkStage3->setChecked(settings.value(prefix+"stage3", false).toBool());
 
+    ui->chkLightpath1->setChecked(settings.value(prefix+"lightath1", false).toBool());
+    ui->chkLightpath2->setChecked(settings.value(prefix+"lightath2", false).toBool());
+    ui->chkLightpath3->setChecked(settings.value(prefix+"lightath3", false).toBool());
+    ui->cmbLightpath1->setCurrentIndex(settings.value(prefix+"lightath1idx", -1).toInt());
+    ui->cmbLightpath2->setCurrentIndex(settings.value(prefix+"lightath2idx", -1).toInt());
+    ui->cmbLightpath3->setCurrentIndex(settings.value(prefix+"lightath3idx", -1).toInt());
+
+    ui->spinImages->setValue(settings.value(prefix+"images", 1).toInt());
     on_chkUse1_clicked(true);
     on_chkUse2_clicked(true);
 }
@@ -110,26 +121,31 @@ void QFESPIMB040ImageStackConfigWidget2::storeSettings(QSettings& settings, QStr
 
     settings.setValue(prefix+"stage2", ui->chkStage2->isChecked());
     settings.setValue(prefix+"stage3", ui->chkStage3->isChecked());
+
+    settings.setValue(prefix+"images", ui->spinImages->value());
+
+    settings.setValue(prefix+"lightpath1idx", ui->cmbLightpath1->currentIndex());
+    settings.setValue(prefix+"lightpath2idx", ui->cmbLightpath2->currentIndex());
+    settings.setValue(prefix+"lightpath3idx", ui->cmbLightpath3->currentIndex());
+    settings.setValue(prefix+"lightpath1", ui->chkLightpath1->isChecked());
+    settings.setValue(prefix+"lightpath2", ui->chkLightpath2->isChecked());
+    settings.setValue(prefix+"lightpath3", ui->chkLightpath3->isChecked());
 }
 
-
-int QFESPIMB040ImageStackConfigWidget2::counter() const {
-    return ui->spinCounter->value();
+int QFESPIMB040ImageStackConfigWidget2::images() const {
+    return ui->spinImages->value();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::incCounter() {
-    ui->spinCounter->setValue(ui->spinCounter->value()+1);
-}
 
 QString QFESPIMB040ImageStackConfigWidget2::prefix1() const {
     QString filename= ui->edtPrefix1->text();
-    filename=filename.replace("%counter%", QString("%1").arg((qlonglong)counter(), (int)3, (int)10, QChar('0')));
+    filename=transformFilename(filename);
     return filename;
 }
 
 QString QFESPIMB040ImageStackConfigWidget2::prefix2() const {
     QString filename= ui->edtPrefix2->text();
-    filename=filename.replace("%counter%", QString("%1").arg((qlonglong)counter(), (int)3, (int)10, QChar('0')));
+    filename=transformFilename(filename);
     return filename;
 }
 
@@ -460,6 +476,41 @@ double QFESPIMB040ImageStackConfigWidget2::stackDelta3() const {
     return ui->spinDelta3->value();
 }
 
+bool QFESPIMB040ImageStackConfigWidget2::lightpath1Activated() const {
+    return ui->chkLightpath1->isChecked();
+}
+
+bool QFESPIMB040ImageStackConfigWidget2::lightpath2Activated() const {
+    return ui->chkLightpath2->isChecked();
+}
+
+bool QFESPIMB040ImageStackConfigWidget2::lightpath3Activated() const {
+    return ui->chkLightpath3->isChecked();
+}
+
+QString QFESPIMB040ImageStackConfigWidget2::lightpath1() const {
+    return ui->cmbLightpath1->currentText();
+}
+
+QString QFESPIMB040ImageStackConfigWidget2::lightpath2() const {
+    return ui->cmbLightpath2->currentText();
+}
+
+QString QFESPIMB040ImageStackConfigWidget2::lightpath3() const {
+    return ui->cmbLightpath3->currentText();
+}
+
+QString QFESPIMB040ImageStackConfigWidget2::lightpath1Filename() const {
+    return ui->cmbLightpath1->itemData(ui->cmbLightpath1->currentIndex()).toString();
+}
+
+QString QFESPIMB040ImageStackConfigWidget2::lightpath2Filename() const {
+    return ui->cmbLightpath2->itemData(ui->cmbLightpath2->currentIndex()).toString();
+}
+
+QString QFESPIMB040ImageStackConfigWidget2::lightpath3Filename() const {
+    return ui->cmbLightpath3->itemData(ui->cmbLightpath3->currentIndex()).toString();
+}
 
 void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrent3_clicked() {
     if (opticsSetup) opticsSetup->lockStages();
@@ -521,4 +572,25 @@ QString QFESPIMB040ImageStackConfigWidget2::currentConfigName(int camera) const 
     if (camera==0) return ui->cmbCam1Settings->currentConfigName();
     if (camera==1) return ui->cmbCam2Settings->currentConfigName();
     return "";
+}
+
+
+void QFESPIMB040ImageStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes) {
+    QString idx1=ui->cmbLightpath1->currentText();
+    QString idx2=ui->cmbLightpath2->currentText();
+    QString idx3=ui->cmbLightpath3->currentText();
+    ui->cmbLightpath1->clear();
+    ui->cmbLightpath2->clear();
+    ui->cmbLightpath3->clear();
+    //qDebug()<<"QFESPIMB040CamParamStackConfigWidget2::lightpathesChanged "<<lightpathes.size();
+    for (int i=0; i<lightpathes.size(); i++) {
+        QTriple<QIcon, QString, QString> p=lightpathes[i];
+        ui->cmbLightpath1->addItem(p.first, p.second, p.third);
+        ui->cmbLightpath2->addItem(p.first, p.second, p.third);
+        ui->cmbLightpath3->addItem(p.first, p.second, p.third);
+    }
+    ui->cmbLightpath1->setCurrentIndex(qMax(0, ui->cmbLightpath1->findText(idx1)));
+    ui->cmbLightpath2->setCurrentIndex(qMax(0, ui->cmbLightpath2->findText(idx2)));
+    ui->cmbLightpath3->setCurrentIndex(qMax(0, ui->cmbLightpath3->findText(idx3)));
+
 }

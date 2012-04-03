@@ -21,12 +21,15 @@
 #include "qfextensioncamera.h"
 #include "qfcameraconfigcombobox.h"
 #include "qfcameracombobox.h"
+#include "qtriple.h"
 
 
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
     class QFESPIMB040OpticsSetup; // forward
 }
+
+typedef QList<QTriple<QIcon, QString, QString> > QFESPIMB040OpticsSetupItems;
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): instrument setup widget
     \ingroup qf3ext_spimb040
  */
@@ -134,13 +137,18 @@ class QFESPIMB040OpticsSetup : public QWidget {
         /** \brief get main illumination shutter state */
         bool getMainIlluminationShutter();
 
+        bool lightpathLoaded(const QString &filename);
+        QString getCurrentLightpath() const;
+        QString getCurrentLightpathFilename() const;
     public slots:
-        void loadLightpathConfig(const QString& filename);
+        void loadLightpathConfig(const QString& filename, bool waiting=false);
         void saveLightpathConfig(const QString& filename, const QString &name);
+        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""));
         void saveCurrentLightpatConfig();
         void deleteCurrentLightpatConfig();
+        void emitLighpathesChanged();
     signals:
-        void lightpathesChanged(QList<QPair<QIcon, QString> > lightpathes);
+        void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
 
     protected slots:
         void updateMagnifications();
@@ -149,7 +157,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void on_btnConnectCameras_clicked();
         void on_btnDisconnectDevices_clicked();
         void on_btnDisconnectCameras_clicked();
-        void configsChanged(QList<QPair<QIcon, QString> > configs);
+        void configsChanged(QFESPIMB040OpticsSetupItems configs);
 
         void configShortcuts();
 
@@ -162,6 +170,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         QFPluginServices* m_pluginServices;
 
         QFPluginLogService* m_log;
+
+        bool setting_lightpath;
 
         struct shortcutItem {
             QShortcut* shortcut;
