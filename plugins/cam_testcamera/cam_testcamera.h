@@ -184,6 +184,7 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         /** \brief indicate whether there should be some hot pixels */
         int hotpixels[2];
 
+
         void initParticles(int camera, int n);
         void stepParticles(int camera);
 

@@ -693,6 +693,7 @@ double QFExtensionCameraAndor::getExposureTime(unsigned int camera) {
 bool QFExtensionCameraAndor::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
     if (which==QFExtensionCamera::CamSetExposureTime) return true;
     if (which==QFExtensionCamera::CamSetNumberFrames) return true;
+    if (which==QFExtensionCamera::CamSetGain) return true;
     return false;
 }
 
@@ -700,12 +701,17 @@ void QFExtensionCameraAndor::changeCameraSetting(QSettings& settings, QFExtensio
     QString prefix="cam_andor/";
     if (which==QFExtensionCamera::CamSetExposureTime) settings.setValue(prefix+"exposure_time", value);
     if (which==QFExtensionCamera::CamSetNumberFrames) settings.setValue(prefix+"kinetic_cycles", value);
+    if (which==QFExtensionCamera::CamSetGain) {
+        settings.setValue(prefix+"emgain", value);
+        settings.setValue(prefix+"emgain_enabled", true);
+    }
 }
 
 QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
     QString prefix="cam_andor/";
     if (which==QFExtensionCamera::CamSetExposureTime) return settings.value(prefix+"exposure_time");
     if (which==QFExtensionCamera::CamSetNumberFrames) return settings.value(prefix+"kinetic_cycles");
+    if (which==QFExtensionCamera::CamSetGain) return settings.value(prefix+"emgain");
     return QVariant();
 }
 
