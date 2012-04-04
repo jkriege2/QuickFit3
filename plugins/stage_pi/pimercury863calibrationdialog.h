@@ -5,6 +5,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QLabel>
+#include <stdint.h>
 
 
 class QFExtensionLinearStagePI; // forward

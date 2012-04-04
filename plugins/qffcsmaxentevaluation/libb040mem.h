@@ -9,6 +9,7 @@
 #include <sstream>
 #include "Eigen/Dense"
 #include "Eigen/SVD"
+#include <stdint.h>
 
 #ifndef LIBB040MEM_H
 #define LIBB040MEM_H
