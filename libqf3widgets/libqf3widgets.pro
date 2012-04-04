@@ -78,7 +78,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfsimplefitparameterinterface.h \
     qfsimplefitparameterswidget.h \
     ../../../../LIB/trunk/image_tools.h \
-    ../../../../LIB/trunk/qt/qkeysequenceedit.h
+    ../../../../LIB/trunk/qt/qkeysequenceedit.h \
+    qffilterchangercombobox.h \
+    ../plugins/interfaces/qfextensionlightsource.h \
+    ../plugins/interfaces/qfextensionfilterchanger.h \
+    qflightsourcecombobox.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -123,7 +127,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/jkqtpoverlayelements.cpp \
     qfsimplefitparameterswidget.cpp \
     ../../../../LIB/trunk/image_tools.cpp \
-    ../../../../LIB/trunk/qt/qkeysequenceedit.cpp
+    ../../../../LIB/trunk/qt/qkeysequenceedit.cpp \
+    qffilterchangercombobox.cpp \
+    qflightsourcecombobox.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

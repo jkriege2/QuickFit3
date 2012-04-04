@@ -153,7 +153,7 @@ void QFESPIMB040ShutterConfig::updateStates() {
     actConfigure->setEnabled(shutter!=NULL && shutterID>=0);
     actConnect->setEnabled(shutter!=NULL && shutterID>=0);
     cmbShutter->setEnabled(!conn);
-    actState->setEnabled(conn && shutter!=NULL);
+    actState->setEnabled(conn && shutter!=NULL && (!moving));
 
 }
 
@@ -230,19 +230,23 @@ void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
     int shutterID;
     shutter=getShutter();
     shutterID=getShutterID();
-    if (shutter && !moving) {
-        bool opened=shutter->isShutterOpen(shutterID);
-        disconnect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
-        if (opened) {
-            actState->setIcon(iconOpened);
-            actState->setText(tr("opened"));
-            actState->setChecked(true);
+    if (shutter) {
+        if (!moving)  {
+            bool opened=shutter->isShutterOpen(shutterID);
+            disconnect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
+            if (opened) {
+                actState->setIcon(iconOpened);
+                actState->setText(tr("opened"));
+                actState->setChecked(true);
+            } else {
+                actState->setIcon(iconClosed);
+                actState->setText(tr("closed"));
+                actState->setChecked(false);
+            }
+            connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
         } else {
-            actState->setIcon(iconClosed);
-            actState->setText(tr("closed"));
-            actState->setChecked(false);
+            actState->setEnabled(false);
         }
-        connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
     }
     updateStates();
 

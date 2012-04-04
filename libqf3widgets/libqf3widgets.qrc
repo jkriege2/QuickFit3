@@ -27,6 +27,8 @@
         <file alias="filter_notch.png">icons/filter_notch.png</file>
         <file alias="acquisition_configuration.png">icons/camera_settings.png</file>
         <file alias="shutter_none.png">icons/shutter_none.png</file>
+        <file alias="filterchanger_none.png">icons/filterchanger_none.png</file>
+        <file alias="lightsource_none.png">icons/lightsource_none.png</file>
         <file alias="player_end.png">icons/player_end.png</file>
         <file alias="player_fwd.png">icons/player_fwd.png</file>
         <file alias="player_ffwd.png">icons/player_ffwd.png</file>

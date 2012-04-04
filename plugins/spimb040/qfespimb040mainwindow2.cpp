@@ -1023,8 +1023,9 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                 return;
 
             } else {
-                log_text(tr("  - setting acquisition lightpath settings '%1' ...").arg(widCamParamScan->lightpath()));
+                log_text(tr("  - setting acquisition lightpath settings '%1' ...\n").arg(widCamParamScan->lightpath()));
                 optSetup->loadLightpathConfig(widCamParamScan->lightpathFilename(), true);
+                log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE\n").arg(widCamParamScan->lightpath()));
             }
         }
 
@@ -1221,7 +1222,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
         //////////////////////////////////////////////////////////////////////////////////////
         if (widCamParamScan->lightpathActivated()) {
             optSetup->loadLightpathConfig(oldLightpath, false);
-            log_text(tr("  - resetting to old lightpath settings ..."));
+            log_text(tr("  - resetting to old lightpath settings ...\n"));
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -1462,9 +1463,9 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             return;
 
         } else {
-            log_text(tr("  - setting acquisition lightpath settings '%1' ...").arg(widAcquisition->lightpath()));
+            log_text(tr("  - setting acquisition lightpath settings '%1' ...\n").arg(widAcquisition->lightpath()));
             optSetup->loadLightpathConfig(widAcquisition->lightpathFilename(), true);
-            log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE").arg(widAcquisition->lightpath()));
+            log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE\n").arg(widAcquisition->lightpath()));
         }
     }
 
@@ -1902,7 +1903,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     if (widAcquisition->lightpathActivated()) {
         optSetup->loadLightpathConfig(oldLightpath, false);
-        log_text(tr("  - resetting acquisition lightpath ..."));
+        log_text(tr("  - resetting acquisition lightpath ...\n"));
     }
 
     //////////////////////////////////////////////////////////////////////////////////////

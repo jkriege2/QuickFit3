@@ -44,7 +44,8 @@ HEADERS += spimb040.h \
     qfespimb040samplestagestepconfigdialog.h \
     qfespimb040shortcutconfigdialog.h \
     qfespimb040camparamstackconfigwidget2.h \
-    qfespimb040filenametool.h
+    qfespimb040filenametool.h \
+    qfespimb040filterchangerconfig.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -71,7 +72,8 @@ SOURCES += spimb040.cpp \
     qfespimb040samplestagestepconfigdialog.cpp \
     qfespimb040shortcutconfigdialog.cpp \
     qfespimb040camparamstackconfigwidget2.cpp \
-    qfespimb040filenametool.cpp
+    qfespimb040filenametool.cpp \
+    qfespimb040filterchangerconfig.cpp
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \

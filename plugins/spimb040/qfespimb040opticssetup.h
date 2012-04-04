@@ -157,6 +157,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void on_btnConnectCameras_clicked();
         void on_btnDisconnectDevices_clicked();
         void on_btnDisconnectCameras_clicked();
+        void on_chkDetectionFilterWheel_toggled(bool checked);
         void configsChanged(QFESPIMB040OpticsSetupItems configs);
 
         void configShortcuts();
