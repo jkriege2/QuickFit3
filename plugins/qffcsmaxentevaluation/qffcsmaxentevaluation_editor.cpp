@@ -20,7 +20,7 @@
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
-////////////
+////////////c
 
 
 #include <QtGui>
@@ -139,6 +139,11 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
     splitMorePLot->setCollapsible(splitMorePLot->indexOf(pltDistribution), false);
 
+
+    /////
+    connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
+    /////
+
 }
 
 
@@ -177,9 +182,18 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
 
+
+
+
+
         dataEventsEnabled=true;
     }
 
+    /*
+    /////
+    connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
+    /////
+    */
 }
 
 
@@ -630,7 +644,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 int c_dist=-1;
                 if (mem_tau.size()>0 && mem_dist.size()>0) {
                     c_disttau=dsdist->addCopiedColumn(mem_tau.data(), mem_tau.size(), "maxent_tau");
-                    c_dist=dsdist->addCopiedColumn(mem_dist.data(), mem_dist.size(), "maxent_tau");;
+                    c_dist=dsdist->addCopiedColumn(mem_dist.data(), mem_dist.size(), "maxent_dist");;
                 } else {
                     pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
                 }
@@ -781,10 +795,7 @@ void QFFCSMaxEntEvaluationEditor::fitCurrent() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     record->emitResultsChanged();
-    ///////////
-    qDebug()<< "The Ndist value after the doFit method has been called";
-    qDebug()<< eval->getNdist();
-    ////////////
+
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);

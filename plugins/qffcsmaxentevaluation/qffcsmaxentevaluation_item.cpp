@@ -446,12 +446,8 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, rangeMaxDatarange);
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
         double alpha=getAlpha();
-        qDebug()<< "The default value from getAlpha(); befor the mem call";
-        qDebug()<< alpha;
         ///////////
         uint32_t Ndist=getNdist();
-        qDebug()<< "The default value from getNdist(); befor the mem call";
-        qDebug()<< Ndist;
         //////////
         bool fitSuccess=false;
 
@@ -471,7 +467,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (init_tau.size()>0 && init_dist.size()>0)
             {
 
-                qDebug()<< "THERE ALREADY WAS A OLD MAXENT FIT THAT IS USED TO INITIALIZE THIS CURRENT FIT";
+
                 Ndist=qMin(init_tau.size(), init_dist.size());
                 distTaus=(double*)calloc(Ndist,sizeof(double));
                 dist=(double*)calloc(Ndist,sizeof(double));
@@ -481,21 +477,15 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         dist[i]=init_dist[i];
                     }
                 old_distribution=true;
-                qDebug()<< "Der Ndist Wert aus der old Dist Schleife:";
-                qDebug()<< Ndist;
             }
         else
             {
-
-                qDebug()<< "NEW MAXENT FIT";
                 distTaus=NULL;
                 dist=NULL;
                 old_distribution=false;
                 if (int64_t(Ndist)>(rangeMaxDatarange-rangeMinDatarange))
                     {
                         Ndist=(rangeMaxDatarange-rangeMinDatarange);
-                        qDebug()<< "Ndsit out of range; Ndist set to: ";
-                        qDebug()<< Ndist;
                     }
 
             }

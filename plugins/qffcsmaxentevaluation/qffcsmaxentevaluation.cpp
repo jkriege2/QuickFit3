@@ -1,3 +1,4 @@
+
 #include "qffcsmaxentevaluation.h"
 #include <QtGui>
 #include "qffcsmaxentevaluation_item.h"
