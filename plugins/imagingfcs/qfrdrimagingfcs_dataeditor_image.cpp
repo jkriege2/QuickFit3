@@ -15,8 +15,8 @@
 #define sqr(x) ((x)*(x))
 
 #define CLICK_UPDATE_TIMEOUT 500
-#define DEBUG_TIMIMNG
-//#undef DEBUG_TIMIMNG
+//#define DEBUG_TIMIMNG
+#undef DEBUG_TIMIMNG
 
 #define OverlayRectanglesAsImageOverlay true
 

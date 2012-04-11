@@ -54,6 +54,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void lockStages();
         /** \brief unlock access to stages: restart the thread used for stage access by this widget  */
         void unlockStages();
+
+        void lockLightpath();
+        void unlockLightpath();
         /*! \brief return a map containing a description of the optics setup, suitable for meta-data storage
 
             This function saves a description of the optics setup to a QMap. This method saves:

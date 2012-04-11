@@ -47,6 +47,12 @@ void QFESPIMB040FilterChangerConfig::unlockFilterChangers() {
 }
 
 
+void QFESPIMB040FilterChangerConfig::lockFilterChangers() {
+    locked=true;
+    disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
+    timUpdate->stop();
+}
+
 void QFESPIMB040FilterChangerConfig::setLog(QFPluginLogService* log) {
     m_log=log;
 }
@@ -245,6 +251,7 @@ int QFESPIMB040FilterChangerConfig::getFilterChangerState() {
 
 
 void QFESPIMB040FilterChangerConfig::displayFilterChangerStates(/*bool automatic*/) {
+    if (locked) return;
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     FilterChanger=getFilterChanger();
@@ -263,7 +270,13 @@ void QFESPIMB040FilterChangerConfig::displayFilterChangerStates(/*bool automatic
 
     updateStates();
 
-    QTimer::singleShot(FilterChangerStateUpdateInterval, this, SLOT(displayFilterChangerStates()));
+    //QTimer::singleShot(FilterChangerStateUpdateInterval, this, SLOT(displayFilterChangerStates()));
+    if (!locked) {
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(FilterChangerStateUpdateInterval);
+        timUpdate->start(FilterChangerStateUpdateInterval);
+
+    }
 }
 
 void QFESPIMB040FilterChangerConfig::setFilterChanger(int filter) {
@@ -305,3 +318,5 @@ void QFESPIMB040FilterChangerConfig::setReadOnly(bool readonly) {
 bool QFESPIMB040FilterChangerConfig::isFilterChangerConnected() const {
     return actConnect->isChecked();
 }
+
+

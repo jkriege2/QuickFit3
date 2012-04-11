@@ -40,6 +40,13 @@ QFESPIMB040ShutterConfig::~QFESPIMB040ShutterConfig()
     timUpdate->stop();
 }
 
+void QFESPIMB040ShutterConfig::lockShutters() {
+    locked=true;
+    disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
+    timUpdate->stop();
+}
+
+
 void QFESPIMB040ShutterConfig::unlockShutters() {
     locked=false;
     connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
@@ -200,15 +207,15 @@ void QFESPIMB040ShutterConfig::configure() {
 
 
 
-QFExtensionShutter* QFESPIMB040ShutterConfig::getShutter() {
+QFExtensionShutter* QFESPIMB040ShutterConfig::getShutter() const {
     return cmbShutter->currentExtensionShutter();
 }
 
-QFExtension* QFESPIMB040ShutterConfig::getShutterExtension() {
+QFExtension* QFESPIMB040ShutterConfig::getShutterExtension() const {
     return cmbShutter->currentExtension();
 }
 
-int QFESPIMB040ShutterConfig::getShutterID() {
+int QFESPIMB040ShutterConfig::getShutterID()  const{
 
     return cmbShutter->currentShutterID();
 }
@@ -226,6 +233,8 @@ bool QFESPIMB040ShutterConfig::getShutterState() {
 
 
 void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
+    if (locked) return;
+
     QFExtensionShutter* shutter;
     int shutterID;
     shutter=getShutter();
@@ -250,7 +259,13 @@ void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
     }
     updateStates();
 
-    QTimer::singleShot(shutterStateUpdateInterval, this, SLOT(displayShutterStates()));
+    if (!locked) {
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(shutterStateUpdateInterval);
+        timUpdate->start(shutterStateUpdateInterval);
+
+    }
+
 }
 
 void QFESPIMB040ShutterConfig::setShutter(bool opened) {
@@ -304,3 +319,15 @@ void QFESPIMB040ShutterConfig::setReadOnly(bool readonly) {
 bool QFESPIMB040ShutterConfig::isShutterConnected() const {
     return actConnect->isChecked();
 }
+
+bool QFESPIMB040ShutterConfig::isShutterDone() const {
+    QFExtensionShutter* shutter;
+    int shutterID;
+    shutter=getShutter();
+    shutterID=getShutterID();
+    if (shutter) {
+        return shutter->isLastShutterActionFinished(shutterID);
+    }
+    return true;
+}
+

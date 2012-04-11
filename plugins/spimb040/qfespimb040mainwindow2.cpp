@@ -162,6 +162,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
     log_text(tr("starting image stack acquisition:\n"));
     log_text(tr("  - locking stages\n"));
     optSetup->lockStages();
+    optSetup->lockLightpath();
 
     bool ok=true;
     int axisCount=1; // number of axes to use for scan
@@ -176,6 +177,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         IMAGESTACK_ERROR(tr("no stage selected"));
         QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage selected!"));
         optSetup->unlockStages();
+        optSetup->unlockLightpath();
         return;
     }
     if (ok && (!stage->isConnected(stageAxis))) {
@@ -204,6 +206,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 IMAGESTACK_ERROR(tr("no stage 2 selected"));
                 QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 2 selected!"));
                 optSetup->unlockStages();
+                optSetup->unlockLightpath();
                 return;
             }
             if (ok && (!stage2->isConnected(stageAxis2))) {
@@ -223,6 +226,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
         if (!ok) {
             optSetup->unlockStages();
+            optSetup->unlockLightpath();
             return;
         }
 
@@ -237,6 +241,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 IMAGESTACK_ERROR(tr("no stage 3 selected"));
                 QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 3 selected!"));
                 optSetup->unlockStages();
+                optSetup->unlockLightpath();
                 return;
             }
             if (ok && (!stage3->isConnected(stageAxis3))) {
@@ -256,6 +261,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
         if (!ok) {
             optSetup->unlockStages();
+            optSetup->unlockLightpath();
             return;
         }
 
@@ -895,6 +901,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         if (ok) log_text(tr("image stack acquisition DONE!\n"));
     }
     optSetup->unlockStages();
+    optSetup->unlockLightpath();
 
 }
 
@@ -932,6 +939,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
     log_text(tr("  - scan start: %1\n").arg(widCamParamScan->stackStart()));
     log_text(tr("  - scan end: %1\n").arg(widCamParamScan->stackEnd()));
     log_text(tr("  - scan delta: %1\n").arg(widCamParamScan->stackDelta()));
+    optSetup->lockLightpath();
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -972,6 +980,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
     if (ok && !useCam1 && !useCam2) {
         CAMPARAMSTACK_ERROR(tr("Cannot start image acquisition: No camera selected, or both cameras not usable!"));
+        optSetup->unlockLightpath();
         ok=false;
     }
 
@@ -1020,6 +1029,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
         if (widCamParamScan->lightpathActivated()) {
             if (!QFile::exists(widCamParamScan->lightpathFilename())) {
                 CAMPARAMSTACK_ERROR(tr("  - acquisition lighpath configuration '%1' does not exist!\n").arg(widCamParamScan->lightpath()));
+                optSetup->unlockLightpath();
                 return;
 
             } else {
@@ -1346,6 +1356,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
         if (ok) log_text(tr("image stack acquisition DONE!\n"));
     }
+    optSetup->unlockLightpath();
 }
 
 
@@ -1441,6 +1452,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 
     bool ok=true;
     log_text(tr("starting image series acquisition:\n"));
+    optSetup->lockLightpath();
 
     //////////////////////////////////////////////////////////////////////////////////////
     // collect common acquisition data
@@ -1460,6 +1472,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     if (widAcquisition->lightpathActivated()) {
         if (!QFile::exists(widAcquisition->lightpathFilename())) {
             ACQUISITION_ERROR(tr("  - acquisition lighpath configuration '%1' does not exist!\n").arg(widAcquisition->lightpath()));
+            optSetup->unlockLightpath();
             return;
 
         } else {

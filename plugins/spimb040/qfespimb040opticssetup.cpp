@@ -422,8 +422,8 @@ bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {
     if (setting_lightpath) {
         bool ok=true;
         QSettings set(filename, QSettings::IniFormat);
-        if (ok && set.contains("laser1/shutter/state")) ok=ok&&(ui->shutterLaser1->getShutterState()==set.value("laser1/shutter/state").toBool());
-        if (ok && set.contains("laser2/shutter/state")) ok=ok&&(ui->shutterLaser2->getShutterState()==set.value("laser2/shutter/state").toBool());
+        if (ok && set.contains("laser1/shutter/state")) ok=ok&&ui->shutterLaser1->isShutterDone()&&(ui->shutterLaser1->getShutterState()==set.value("laser1/shutter/state").toBool());
+        if (ok && set.contains("laser2/shutter/state")) ok=ok&&ui->shutterLaser2->isShutterDone()&&(ui->shutterLaser2->getShutterState()==set.value("laser2/shutter/state").toBool());
         if (ok && set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked())
             ok=ok&&(ui->filtcDetection->getFilterChangerState()==set.value("detection/filterchanger/filter").toInt());
         return ok;
@@ -446,13 +446,18 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool w
 
     // LOAD RELEVANT WIDGETS HERE
     if (set.contains("laser1/shutter/state")) ui->shutterLaser1->setShutter(set.value("laser1/shutter/state").toBool());
-    if (set.contains("laser2/shutter/state")) ui->shutterLaser2->setShutter(set.value("laser1/shutter/state").toBool());
+    if (set.contains("laser2/shutter/state")) ui->shutterLaser2->setShutter(set.value("laser2/shutter/state").toBool());
     if (set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->setFilterChanger(set.value("detection/filterchanger/filter").toInt());
 
     if (waiting) {
         setting_lightpath=true;
+        QTime t1;
+        t1.start();
         while (!lightpathLoaded(filename)) {
-            QApplication::processEvents();
+            if (t1.elapsed()>20) {
+                QApplication::processEvents();
+                t1.start();
+            }
         }
         setting_lightpath=false;
     } else {
@@ -544,4 +549,16 @@ void QFESPIMB040OpticsSetup::emitLighpathesChanged() {
 
 bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {
     return ui->shutterMainIllumination->isShutterConnected();
+}
+
+void QFESPIMB040OpticsSetup::lockLightpath() {
+    ui->shutterLaser1->lockShutters();
+    ui->shutterLaser2->lockShutters();
+    ui->filtcDetection->lockFilterChangers();
+}
+
+void QFESPIMB040OpticsSetup::unlockLightpath() {
+    ui->shutterLaser1->unlockShutters();
+    ui->shutterLaser2->unlockShutters();
+    ui->filtcDetection->unlockFilterChangers();
 }

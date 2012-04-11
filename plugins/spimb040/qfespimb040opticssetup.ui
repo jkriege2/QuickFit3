@@ -1368,8 +1368,8 @@ p, li { white-space: pre-wrap; }
      <y>412</y>
     </hint>
     <hint type="destinationlabel">
-     <x>799</x>
-     <y>427</y>
+     <x>797</x>
+     <y>429</y>
     </hint>
    </hints>
   </connection>
@@ -1400,8 +1400,8 @@ p, li { white-space: pre-wrap; }
      <y>412</y>
     </hint>
     <hint type="destinationlabel">
-     <x>773</x>
-     <y>442</y>
+     <x>772</x>
+     <y>444</y>
     </hint>
    </hints>
   </connection>
@@ -1432,8 +1432,8 @@ p, li { white-space: pre-wrap; }
      <y>246</y>
     </hint>
     <hint type="destinationlabel">
-     <x>799</x>
-     <y>261</y>
+     <x>797</x>
+     <y>263</y>
     </hint>
    </hints>
   </connection>
@@ -1464,8 +1464,8 @@ p, li { white-space: pre-wrap; }
      <y>246</y>
     </hint>
     <hint type="destinationlabel">
-     <x>773</x>
-     <y>276</y>
+     <x>772</x>
+     <y>278</y>
     </hint>
    </hints>
   </connection>
@@ -1674,6 +1674,38 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>956</x>
      <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>shutterLaser1</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>989</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>140</x>
+     <y>137</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>shutterLaser2</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>990</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>209</x>
+     <y>179</y>
     </hint>
    </hints>
   </connection>

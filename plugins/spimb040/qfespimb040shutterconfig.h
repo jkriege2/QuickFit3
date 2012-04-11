@@ -120,10 +120,10 @@ class QFESPIMB040ShutterConfig : public QWidget {
     public:
 
         /** \brief return a pointer to the shutter */
-        QFExtensionShutter* getShutter();
+        QFExtensionShutter* getShutter() const;
 
         /** \brief return a pointer to the ahutter QFExtension class */
-        QFExtension* getShutterExtension();
+        QFExtension* getShutterExtension() const;
 
         QPixmap iconOpened;
         QPixmap iconClosed;
@@ -132,9 +132,11 @@ class QFESPIMB040ShutterConfig : public QWidget {
 
 
         /** \brief get the shutter number of the given axis */
-        int getShutterID();
+        int getShutterID() const;
 
         bool isShutterConnected() const;
+
+        bool isShutterDone() const;
 
     public slots:
         void setShutter(bool shutterOpened);

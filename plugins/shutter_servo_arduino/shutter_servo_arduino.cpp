@@ -141,6 +141,13 @@ void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool 
     if (opened) shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutters[shutter].id)+"1");
     else shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutters[shutter].id)+"0");
     shutters[shutter].lastAction=QTime::currentTime();
+
+    QTime t=QTime::currentTime();
+    QTime t2;
+    t.start();
+    while (t.elapsed()<20) {
+        t2.start();
+    }
 }
 
 bool QFExtensionShutterServoArduino::isLastShutterActionFinished(unsigned int shutter) {
