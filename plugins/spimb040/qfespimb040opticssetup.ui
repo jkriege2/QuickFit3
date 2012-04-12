@@ -562,7 +562,11 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
-       <widget class="QFESPIMB040ConfigComboBox" name="cmbLightpathConfig"/>
+       <widget class="QFESPIMB040ConfigComboBox" name="cmbLightpathConfig">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QToolButton" name="btnLightpathSave">

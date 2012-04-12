@@ -91,11 +91,11 @@ plg_picoquantimporters.depends = lib
     plg_cam_testcamera.subdir=./plugins/cam_testcamera
     plg_cam_testcamera.depends = lib libqf3widgets
 
-    #SUBDIRS += plg_cam_systemcamera
+    SUBDIRS += plg_cam_systemcamera
     plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
     plg_cam_systemcamera.depends = lib libqf3widgets
 
-    #SUBDIRS += plg_cam_radhard2
+    SUBDIRS += plg_cam_radhard2
     plg_cam_radhard2.subdir=./plugins/cam_radhard2
     plg_cam_radhard2.depends = lib libqf3widgets
 
@@ -120,6 +120,10 @@ plg_picoquantimporters.depends = lib
     SUBDIRS += plg_filterc_test
     plg_filterc_test.subdir=./plugins/filterc_test
     plg_filterc_test.depends = lib libqf3widgets
+
+    SUBDIRS += plg_filterc_tmcl
+    plg_filterc_tmcl.subdir=./plugins/filterc_tmcl
+    plg_filterc_tmcl.depends = lib libqf3widgets
 
 }
 

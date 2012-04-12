@@ -2148,7 +2148,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
 
         if (m->getImageFromRunsPreview()) {
             plteOverview->set_autoImageRange(false);
-            uint16_t mi, ma;
+            uint16_t mi=0, ma=0;
             statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, plteImageSize, mi, ma, false);
             plteOverview->set_imageMin(mi);
             plteOverview->set_imageMax(ma);

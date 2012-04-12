@@ -127,23 +127,6 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
 
         QList<SHUTTER> shutters;
 
-        /** \brief number of servos/shutters */
-        unsigned int shutter_count;
-        /** \brief duration of a shutter operation in milliseconds */
-        unsigned int shutter_operation_duration;
-
-        QString infoMessage;
-        QTime lastAction;
-
-        /** \brief tty port */
-        QString COMPort;
-        /** \brief speed of com port */
-        int COMPortSpeed;
-        /** \brief serial connection object */
-        JKSerialConnection com;
-        QF3SimpleB040SerialProtocolHandler* serial;
-
-
 };
 
 #endif // SHUTTER_SERVO_ARDUINO_H
