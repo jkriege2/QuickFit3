@@ -38,18 +38,22 @@ CLASSNAME_UC=`echo $CLASSNAME | tr a-z A-Z`
 FNAME=`echo $CLASSNAME | tr A-Z a-z`
 echo -n "file name for QFExtension implementation: " $FNAME ".*
 "
-mkdir -p $FNAME
+DIRNAME=`echo $TARGETNAME | tr A-Z a-z`
+echo -n "file name for QFExtension implementation: " $DIRNAME ".*
+"
+mkdir -p $DIRNAME
 
 for i in ${BASENAME}.*; do 
-  cp -v "$i" "./$FNAME/${FNAME}${i/$BASENAME}"; 
+  cp -v "$i" "./$DIRNAME/${FNAME}${i/$BASENAME}"; 
 done
 
-mkdir -p $FNAME/translations
-mkdir -p $FNAME/assets
-mkdir -p $FNAME/help
-mkdir -p $FNAME/help/pic
-cp ftarget.html $FNAME/help/${TARGETNAME}.html
-cp tutorial.html $FNAME/help/tutorial.html
+mkdir -p $DIRNAME/translations
+mkdir -p $DIRNAME/assets
+mkdir -p $DIRNAME/help
+mkdir -p $DIRNAME/help/pic
+cp ftarget.html $DIRNAME/help/${TARGETNAME}.html
+cp project.pro $DIRNAME/${DIRNAME}.pro
+cp tutorial.html $DIRNAME/help/tutorial.html
 
 replace_in_all 's/QFExtensionTestFilterChanger/'$CLASSNAME'/g'
 replace_in_all 's/filterc_test/'$TARGETNAME'/g'
