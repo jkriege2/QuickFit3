@@ -39,8 +39,8 @@ void QFUsesResultsByIndexAndModelEvaluation::intReadData(QDomElement *e) {
 }
 
 int QFUsesResultsByIndexAndModelEvaluation::getCurrentModel() const {
-    if (currentModel<getIndexMin(getHighlightedRecord())) return getIndexMin(getHighlightedRecord());
-    if (currentModel>=getIndexMax(getHighlightedRecord())) return getIndexMax(getHighlightedRecord());
+    if (currentModel<0) return 0;
+    if (currentModel>=getModelCount()) return getModelCount()-1;
     return currentModel;
 }
 
@@ -52,6 +52,7 @@ void QFUsesResultsByIndexAndModelEvaluation::setCurrentModel(int model) {
 
 int QFUsesResultsByIndexAndModelEvaluation::getModelCount(QFRawDataRecord *r, int /*index*/) const {
     return 0;
+
 }
 
 QString QFUsesResultsByIndexAndModelEvaluation::getModelName(int model) const {

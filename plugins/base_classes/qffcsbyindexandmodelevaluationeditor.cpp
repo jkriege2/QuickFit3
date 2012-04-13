@@ -486,12 +486,20 @@ void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* curr
         widFitParams->setParameterInterface(item);
 
         cmbModel->clear();
+
+
         for (int i=0; i<item->getModelCount(); i++) {
             cmbModel->addItem(item->getModelName(i));
         }
 
+        /*
+        cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
+        connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+        */
 
         cmbModel->setCurrentIndex(item->getCurrentModel());
+        qDebug() << "THE CURRENT MODEL IS: ";
+        qDebug() << item->getCurrentModel();
         /* connect widgets and fill with data from item here */
         connect(item, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
 
@@ -507,6 +515,12 @@ void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* curr
         connect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
         connect(spinResidualHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(residualHistogramBinsChanged(int)));
         connect(widFitParams, SIGNAL(parameterChanged(QString,double)), this, SLOT(fitParamChanged()));
+
+
+        /////
+        //connect(cmbModel, SIGNAL(activated(int)),this,SLOT(modelChanged(int)));
+        /////
+
 
         dataEventsEnabled=true;
     }
@@ -550,6 +564,7 @@ void QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(QFRawDataRecord* 
         spinRun->setValue(eval->getCurrentIndex());
         if (data->getCorrelationRuns()>1) spinRun->setSuffix(QString(" / 0..%1").arg(data->getCorrelationRuns()-1));
         cmbModel->setCurrentIndex(eval->getCurrentModel());
+
 
         dataEventsEnabled=true;
     }
