@@ -2,9 +2,55 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Extension filterc_tmcl Help</title>
+		<title>Extension Filter-Wheel with TMCL(tm) controlled stepper motors</title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<p>This plugin controls a filter wheel, which is attatched to a stepper motor which may be controlled over RS-232/458 with the <a href="http://www.trinamic.com/tmc/media/Downloads/PANdrives/PD-108-28/PD-108-28_TMCL_firmware_manual.pdf">TMCL(tm) command language by Trinamic</a>. The Motor (e.g. a PDx-108-28-SE should be connected to a serial port of the PC using e.g. a serial to USB converter and a virtual COM port driver. Also the filter wheel should be equipped with a reference switch, so we can automatically find filter 1. Here is an example schematic for a filter wheel using 6 filter, a PDx-108-28-SE motor, an FTDI USB-to-RS485 cable and a hall sensor as reference switch:
+		<center><img src="./pic/schematic.png" border="1"></center>
+		</p>
+	 <p>The controllers are configured by a global configuration file <tt>filterwheel_tmcl.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>filterwheel_tmcl.ini</tt> either in the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/filterc_tmcl/</tt>) for the plugin.
+	 </p>
+	 <p>In the <tt>filterwheel_tmcl.ini</tt> you will have to tell the plugin which filter wheels are available and which serial ports they use. This is done inside a <tt>[<b>filterwheel</b><i>N</i>]</tt> block for each shutter <i>N</i> (default values are <u>underlined</u>):
+	 <blockquote><tt>
+[<b>filterwheel</b><i>N</i>]<br>
+<b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
+<b>port_speed</b> = <i>port speed (<u>9600</u> | 19200 | 38400 | ...)</i><br>
+<b>port_databits</b> = <i>data bits used for the communication (5 | 6 | 7 | <u>8</u> | 9)</i><br>
+<b>port_parity</b> = <i>parity bit (<u>none</u> | odd | even)</i><br>
+<b>port_handshaking</b> = <i>handshaking mode (<u>none</u> | xonxoff | hardware)</i><br>
+<b>port_stopbits</b> = <i>port speed (<u>1</u> | 1.5 | 2)</i><br>
+<b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
+<b>id</b> = <i>TMCL address of the motor that controls this wheel (0 | <u>1</u> | ...). If only one motor per COM port is used, this is usually 1.</i><br>
+<b>axis</b> = <i>TMCL motor/axis number of the motor that controls this wheel (<u>0</u> | 1 | ...). If only one motor is connected to each controller, this is usually 0.</i><br>
+<b>max_speed</b> = <i>maximum speed (1 ... 15, default <u>15</u>)</i><br>
+<b>max_acceleration</b> = <i>maximum acceleration (1 ... 15, default <u>2</u>)</i><br>
+<b>max_current</b> = <i>maximum current (1 ... 15, default <u>15</u>)</i><br>
+<b>standby_current</b> = <i>stynd-by current (1 ... 15, default <u>8</u>)</i><br>
+<b>fast_ref_speed</b> = <i>fast referencing speed (<u>1</u> ... 15)</i><br>
+<b>slow_ref_speed</b> = <i>slow referencing speed (1 ... 15, default <u>1</u>)</i><br>
+<b>steps_per_revolution</b> = <i>how many (micro-)steps per revolution of the wheel (default: <u>200*16=3200</u> for a 1.8° step motor controlled with 16 microsteps)</i><br>
+<b>motor</b> = <i>configure some parameters (currently only <tt>steps_per_revolution</tt>) for a given motor (pd-108-28 | <u>none</u>)</i><br>
+<b>filter_count</b> = <i>number of filters in the wheel (default: <u>6</u>)</i><br>
+<br>
+	 </tt></blockquote> 
+	 The number of filter wheels is stored in the variable <tt>filterwheel_count</tt>.
+	 </p>
+	 <p>Here is an example configuration file for windows and two filter wheels on two controllers connected to COM6 and COM7 with 6 and 4 filters respectively:
+	 <blockquote><tt>
+filterwheel_count=2<br><br>
+[filterwheel1]<br>
+filter_count=6<br>
+motor=pd-108-28<br>
+id=1<br>
+port=COM6<br>
+port_speed=9600<br><br>
+[filterwheel2]<br>
+filter_count=4<br>
+motor=pd-108-28<br>
+id=1<br>
+port=COM7<br>
+port_speed=9600<br>
+	 </tt></blockquote></p>
 	</body>
 </html>

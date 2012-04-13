@@ -29,6 +29,7 @@
 #define TMCL_APPL_STOP 128
 #define TMCL_APPL_RUN 129
 #define TMCL_APPL_RESET 131
+#define TMCL_GETFIRMWARE 136
 
 //Options for MVP commandds
 #define MVP_ABS 0
@@ -70,28 +71,43 @@ class QF3TMCLProtocolHandler {
 
         bool checkComConnected();
 
-        /** \brief send a TMCL command  */
-        bool sendCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value);
 
-        /** \brief send a TMCL command  */
+        /** \brief send a TMCL command, receive the answer */
         bool sendAndCheckCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value);
-        /** \brief send a TMCL command  */
+        /** \brief send a TMCL command, receive the answer and return address, status and value from the answer  */
         bool queryCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value, uint8_t *rAddress, uint8_t *rStatus, int32_t *rValue);
-        /** \brief send a TMCL command  */
+        /** \brief send a TMCL command, receive the answer and return the status from the answer  */
         bool queryStatus(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value, uint8_t *rStatus);
 
-        /** \brief read an answer */
-        int readResult(uint8_t *Address, uint8_t *Status, int32_t *Value);
+        bool setAxisParameter(uint8_t Address, uint8_t parameter, int32_t value, uint8_t motor=0);
+        bool getAxisParameter(uint8_t Address, uint8_t parameter, int32_t& value, uint8_t motor=0);
+        bool setGlobalParameter(uint8_t Address, uint8_t parameter, int32_t value, uint8_t bank=0);
+        bool getGlobalParameter(uint8_t Address, uint8_t parameter, int32_t& value, uint8_t bank=0);
+        QString getFirmwareVersion(uint8_t Address, uint8_t motor);
 
         void checkComError();
 
         bool hasErrorOccured();
         QString getLastError();
-    private:
+    protected:
+        /** \brief send a TMCL command
+         *
+         *  \note You will have to call readResult() after this command to receive/swallow the answer .... otherwise it will go on residing in the COM buffer!
+         */
+        bool sendCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value);
+        /** \brief read an answer */
+        int readResult(uint8_t *Address, uint8_t *Status, int32_t *Value);
+        /** \brief read the answer of a command 136 (get firmware version) */
+        bool readVersionResult(QString &version);
+
         JKSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;
+        /** \brief number of retries, when sending a command */
+        int retries;
+        /** \brief milliseconds to wait, before receiving an answer */
+        int command_delay_ms;
 };
 
 #endif // QF3TMCLPROTOCOLHANDLER_H

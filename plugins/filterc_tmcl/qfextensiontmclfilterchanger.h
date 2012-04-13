@@ -134,6 +134,14 @@ class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, pub
             QTime lastAction;
             int filters;
             uint64_t steps_per_revolution;
+            int32_t maximumSpeed;
+            int32_t maximumAcceleration;
+            int32_t maximumCurrent;
+            int32_t standbyCurrent;
+            int32_t slowRFSSpeed;
+            int32_t fastRFSSpeed;
+            int currentFilter;
+            uint8_t motor;
         };
 
         QList<FILTERWHEEL> wheels;

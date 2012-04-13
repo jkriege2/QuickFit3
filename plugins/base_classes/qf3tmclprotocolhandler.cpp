@@ -10,11 +10,91 @@ QF3TMCLProtocolHandler::QF3TMCLProtocolHandler(JKSerialConnection* com, QString 
     this->log=NULL;
     this->LOG_PREFIX="";
     this->name=name;
+    this->retries=10;
+    this->command_delay_ms=30;
 }
 
 void QF3TMCLProtocolHandler::setLogging(QFPluginLogService* log, QString LOG_PREFIX) {
     this->log=log;
     this->LOG_PREFIX=LOG_PREFIX;
+}
+
+bool QF3TMCLProtocolHandler::sendAndCheckCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value) {
+    bool ok=sendCommand(Address, Command, Type, Motor, Value);
+    if (ok) {
+        uint8_t Address;
+        uint8_t Status;
+        int32_t Value;
+        ok=readResult(&Address, &Status, &Value);
+    }
+    return ok;
+}
+
+bool QF3TMCLProtocolHandler::queryCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value, uint8_t *rAddress, uint8_t *rStatus, int32_t *rValue) {
+    int retry=0;
+    bool done=false;
+    bool ok=false;
+    while (retry<retries && !done) {
+        //qDebug()<<"queryCommand "<<Command<<"   retry="<<retry;
+        ok=sendCommand(Address, Command, Type, Motor, Value);
+        QTime t;
+        t.start();
+        while (t.elapsed()<command_delay_ms);
+        ok=ok&&readResult(rAddress, rStatus, rValue)!=0;
+        if (ok) done=true;
+        retry++;
+    }
+    return ok;
+}
+
+bool QF3TMCLProtocolHandler::queryStatus(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value, uint8_t *rStatus) {
+    int32_t rValue;
+    uint8_t rAddress;
+    return queryCommand( Address,  Command,  Type,  Motor,  Value, &rAddress, rStatus, &rValue);
+}
+
+bool QF3TMCLProtocolHandler::setAxisParameter(uint8_t Address, uint8_t parameter, int32_t value, uint8_t motor) {
+    uint8_t status=0;
+    bool ok=queryStatus(Address, TMCL_SAP, parameter, motor, value, &status);
+    return ok&&(status==100);
+}
+
+bool QF3TMCLProtocolHandler::getAxisParameter(uint8_t Address, uint8_t parameter, int32_t &value, uint8_t motor) {
+    uint8_t status=0;
+    uint8_t rAddress=0;
+    bool ok=queryCommand(Address, TMCL_GAP, parameter, motor, value, &rAddress, &status, &value);
+    return ok&&(status==100);
+
+}
+
+bool QF3TMCLProtocolHandler::setGlobalParameter(uint8_t Address, uint8_t parameter, int32_t value, uint8_t bank) {
+    uint8_t status=0;
+    bool ok=queryStatus(Address, TMCL_SGP, parameter, bank, value, &status);
+    return ok&&(status==100);
+}
+
+bool QF3TMCLProtocolHandler::getGlobalParameter(uint8_t Address, uint8_t parameter, int32_t &value, uint8_t bank) {
+    uint8_t status=0;
+    uint8_t rAddress=0;
+    bool ok=queryCommand(Address, TMCL_GGP, parameter, bank, value, &rAddress, &status, &value);
+    return ok&&(status==100);
+}
+
+QString QF3TMCLProtocolHandler::getFirmwareVersion(uint8_t Address, uint8_t motor) {
+    int retry=0;
+    bool done=false;
+    bool ok=false;
+    QString ver="";
+    while (retry<retries && !done) {
+        ok=sendCommand(Address, TMCL_GETFIRMWARE, 0, motor, 0);
+        QTime t;
+        t.start();
+        while (t.elapsed()<command_delay_ms);
+        ok=ok&&readVersionResult(ver);
+        if (ok) done=true;
+        retry++;
+    }
+    return ver;
 }
 
 bool QF3TMCLProtocolHandler::sendCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value) {
@@ -44,38 +124,26 @@ bool QF3TMCLProtocolHandler::sendCommand(uint8_t Address, uint8_t Command, uint8
     return com->write(buffer, 9);
 }
 
-bool QF3TMCLProtocolHandler::sendAndCheckCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value) {
-    bool ok=sendCommand(Address, Command, Type, Motor, Value);
-    if (ok) {
-        uint8_t Address;
-        uint8_t Status;
-        int32_t Value;
-        ok=readResult(&Address, &Status, &Value);
-    }
-    return ok;
-}
+bool QF3TMCLProtocolHandler::readVersionResult(QString& version) {
+    if (!com) return false;
 
-bool QF3TMCLProtocolHandler::queryCommand(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value, uint8_t *rAddress, uint8_t *rStatus, int32_t *rValue) {
-    int retry=0;
-    bool done=false;
+    UCHAR RxBuffer[9], Checksum;
+
+
     bool ok=false;
-    while (retry<10 && !done) {
-        //qDebug()<<"queryCommand "<<Command<<"   retry="<<retry;
-        ok=sendCommand(Address, Command, Type, Motor, Value);
-        QTime t;
-        t.start();
-        while (t.elapsed()<30);
-        ok=ok&&readResult(rAddress, rStatus, rValue)!=0;
-        if (ok) done=true;
-        retry++;
-    }
-    return ok;
-}
+    ok=com->read(RxBuffer, 9);
 
-bool QF3TMCLProtocolHandler::queryStatus(uint8_t Address, uint8_t Command, uint8_t Type, uint8_t Motor, int32_t Value, uint8_t *rStatus) {
-    int32_t rValue;
-    uint8_t rAddress;
-    return queryCommand( Address,  Command,  Type,  Motor,  Value, &rAddress, rStatus, &rValue);
+    version="";
+
+    if (ok) {
+
+        Checksum=0;
+        for(int i=1; i<9; i++) {
+            version=version+RxBuffer[i];
+        }
+    }
+
+    return ok;
 }
 
 int QF3TMCLProtocolHandler::readResult(uint8_t *Address, uint8_t *Status, int32_t *Value) {

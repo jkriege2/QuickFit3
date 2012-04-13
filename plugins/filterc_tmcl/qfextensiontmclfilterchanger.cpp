@@ -38,8 +38,16 @@ void QFExtensionTMCLFilterChanger::initExtension() {
         FILTERWHEEL s;
         s.port=ports.addCOMPort(inifile, "filterwheel"+QString::number(i+1)+"/");
         s.id=inifile.value("filterwheel"+QString::number(i+1)+"/id", 1).toInt();
-        s.filters=inifile.value("filterwheel"+QString::number(i+1)+"/filter_count", 200*16).toInt();
-        s.steps_per_revolution=inifile.value("filterwheel"+QString::number(i+1)+"/steps_per_revolution", 2).toULongLong();
+        s.motor=inifile.value("filterwheel"+QString::number(i+1)+"/axis", 0).toUInt();
+        s.filters=inifile.value("filterwheel"+QString::number(i+1)+"/filter_count", 6).toInt();
+        s.steps_per_revolution=inifile.value("filterwheel"+QString::number(i+1)+"/steps_per_revolution", 200*16).toULongLong();
+        s.fastRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/fast_ref_speed", 1).toULongLong();
+        s.maximumAcceleration=inifile.value("filterwheel"+QString::number(i+1)+"/max_acceleration", 2).toULongLong();
+        s.maximumCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/max_current", 15).toULongLong();
+        s.maximumSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/max_speed", 15).toULongLong();
+        s.slowRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/slow_ref_speed", 1).toULongLong();
+        s.standbyCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/standby_current", 8).toULongLong();
+
         QString motor=inifile.value("filterwheel"+QString::number(i+1)+"/motor", "none").toString().toLower();
         if (motor=="pd-108-28" || motor=="pd1-108-28" || motor=="pd3-108-28" || motor=="pdx-108-28") {
             s.steps_per_revolution=200*16;
@@ -116,6 +124,21 @@ unsigned int QFExtensionTMCLFilterChanger::getFilterChangerCount() {
     return wheels.size();
 }
 
+#define TMCL_TESTOK(command, errormessage) \
+    ok=ok&&(command);\
+    if (!ok) {\
+        log_error(QString("      ")+(errormessage)+QString("\n"));\
+        ok=false;\
+    }
+
+#define TMCL_TESTOK_STATUS(command, errormessage, status_okval) \
+    ok=ok&&(command);\
+    if (!ok || status!=(status_okval)) {\
+    log_error(QString("       ")+(errormessage)+QString("\n"));\
+        ok=false;\
+    }
+
+
 void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChanger) {
     if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
@@ -135,94 +158,92 @@ void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChang
         bool ok=true;
 
         // reset position
-        log_text(tr("%1  - resetting position\n").arg(LOG_PREFIX));
-        if (ok) {
-            ok=ok&&tmcl->queryStatus(wheels[filterChanger].id, TMCL_SAP, 1, 0, 0, &status);
-            if (!ok || status!=100) {
-                log_error(tr("%1 error resetting position (status=%2)\n").arg(LOG_PREFIX).arg(status));
-                ok=false;
-            }
-        }
+        wheels[filterChanger].currentFilter=0;
 
-        // move about a third rotation
+        log_text(tr("  - firmware version: %1\n").arg(tmcl->getFirmwareVersion(wheels[filterChanger].id, wheels[filterChanger].motor)));
+        int32_t value=0;
+        /*tmcl->getAxisParameter(wheels[filterChanger].id, 4, value, 0); log_text(tr("  - maximum speed: %1\n").arg(value));
+        tmcl->getAxisParameter(wheels[filterChanger].id, 14, value, 0); log_text(tr("  - minimum speed: %1\n").arg(value));
+        tmcl->getAxisParameter(wheels[filterChanger].id, 5, value, 0); log_text(tr("  - maximum acceleration: %1\n").arg(value));
+        tmcl->getAxisParameter(wheels[filterChanger].id, 6, value, 0); log_text(tr("  - maximum current: %1\n").arg(value));
+        tmcl->getAxisParameter(wheels[filterChanger].id, 7, value, 0); log_text(tr("  - standby current: %1\n").arg(value));
+        tmcl->getAxisParameter(wheels[filterChanger].id, 194, value, 0); log_text(tr("  - slow reference speed: %1\n").arg(value));
+        tmcl->getAxisParameter(wheels[filterChanger].id, 195, value, 0); log_text(tr("  - fast reference speed: %1\n").arg(value));*/
+        log_text(tr("  - resetting position\n"));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position\n"));
+        log_text(tr("  - set fast referencing speed to %1\n").arg(wheels[filterChanger].fastRFSSpeed));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 195, wheels[filterChanger].fastRFSSpeed, wheels[filterChanger].motor), tr("error setting fast referencing speed"));
+        log_text(tr("  - set slow referencing speed to %1\n").arg(wheels[filterChanger].slowRFSSpeed));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 194, wheels[filterChanger].slowRFSSpeed, wheels[filterChanger].motor), tr("error setting slow referencing speed"));
+        log_text(tr("  - set max. acceleration to %1\n").arg(wheels[filterChanger].maximumAcceleration));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 5, wheels[filterChanger].maximumAcceleration, wheels[filterChanger].motor), tr("error setting max. acceleration"));
+        log_text(tr("  - set max. speed to %1\n").arg(wheels[filterChanger].maximumSpeed));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 4, wheels[filterChanger].maximumSpeed, wheels[filterChanger].motor), tr("error setting max. speed"));
+        log_text(tr("  - set standby current to %1\n").arg(wheels[filterChanger].standbyCurrent));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 7, wheels[filterChanger].standbyCurrent, wheels[filterChanger].motor), tr("error setting standby current"));
+        log_text(tr("  - set maximum current to %1\n").arg(wheels[filterChanger].maximumCurrent));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 6, wheels[filterChanger].maximumCurrent, wheels[filterChanger].motor), tr("error setting maximum current"));
+        log_text(tr("  - set acceleration with ramps\n"));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 15, 0, wheels[filterChanger].motor), tr("error setting acceleration with ramps"));
+
+        // move about a third rotation and wait until movement finished
         com->clearBuffer();
-        log_text(tr("%1  - moving motor\n").arg(LOG_PREFIX));
-        ok=ok&&tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_REL, 0, wheels[filterChanger].steps_per_revolution/2, &status);
-        if (!ok || status!=100) {
-            log_error(tr("%1 error moving motor (status=%2)\n").arg(LOG_PREFIX).arg(status));
-            ok=false;
-        }
+        log_text(tr("  - moving motor\n"));
+        TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_REL, wheels[filterChanger].motor, wheels[filterChanger].steps_per_revolution/3, &status), tr("error moving motor (status=%1)\n").arg(status), 100);
         bool reached=false;
         t.start();
         while (ok && !reached) {
             uint8_t rAddress;
             int32_t value=0;
             // read parameter 8 (target pos. reached) until it is 1
-            tmcl->queryCommand(wheels[filterChanger].id, TMCL_GAP, 8, 0, 1, &rAddress, &status, &value);
+            tmcl->queryCommand(wheels[filterChanger].id, TMCL_GAP, 8, wheels[filterChanger].motor, 1, &rAddress, &status, &value);
             if (ok && status==100) {
                 reached=((value==0)&&(t.elapsed()>100));
             }
-            qDebug()<<"status = "<<status<<"    value = "<<value<<"    reached = "<<reached;
 
             if (t.elapsed()>MVP_TIMEOUT) {
-                log_error(tr("%1 timeout during move\n").arg(LOG_PREFIX));
+                log_error(tr("      timeout during move\n"));
                 ok=false;
             }
         }
         ok=reached;
 
+        log_text(tr("  - performing reference search\n"));
+
         // set the correct reference search algorithm (#1 in parameter 193)
-        log_text(tr("%1  - performing reference search\n").arg(LOG_PREFIX));
-        if (ok) {
-            ok=ok&&tmcl->queryStatus(wheels[filterChanger].id, TMCL_SAP, 193, 0, 1, &status);
-            if (!ok || status!=100) {
-                log_error(tr("%1 error setting reference search algorithm (status=%2)\n").arg(LOG_PREFIX).arg(status));
-                ok=false;
-            }
-        }
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 193, 1, wheels[filterChanger].motor), tr("error setting reference search algorithm (status=%1)\n").arg(status));
+
         // do a reference queryStatus
         if (ok) {
-            ok=ok&&tmcl->queryStatus(wheels[filterChanger].id, TMCL_RFS, 0, 0, 0, &status);
-            if (!ok || status!=100) {
-                log_error(tr("%1 error doing reference search (status=%2)\n").arg(LOG_PREFIX).arg(status));
-                ok=false;
-            }
+            TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_RFS, 0, wheels[filterChanger].motor, 0, &status), tr("error starting reference search (status=%1)\n").arg(status), 100);
             reached=false;
             t.start();
             while (ok && !reached) {
                 uint8_t rAddress;
                 int32_t value=0;
                 // check whether RFS finished
-                if (ok) ok=ok&&tmcl->queryCommand(wheels[filterChanger].id, TMCL_RFS, 2, 0, 0, &rAddress, &status, &value);
-                if (!ok || status!=100) {
-                    log_error(tr("%1 error reading axis parameter 8 (status=%2)\n").arg(LOG_PREFIX).arg(status));
-                    ok=false;
+                tmcl->queryCommand(wheels[filterChanger].id, TMCL_RFS, 2, wheels[filterChanger].motor, 0, &rAddress, &status, &value);
+                if (ok && status==100) {
+                    reached=(value==0)&&(t.elapsed()>100);
                 }
-                reached=(value==0)&&(t.elapsed()>100);
                 if (t.elapsed()>RFS_TIMEOUT) {
-                    log_error(tr("%1 timeout during reference search\n").arg(LOG_PREFIX));
+                    log_error(tr("      timeout during reference search\n"));
                     ok=false;
                 }
             }
         }
 
         // set the encoder position to 0
-        log_text(tr("%1  - reseting position\n").arg(LOG_PREFIX));
-        if (ok) {
-            ok=ok&&tmcl->queryStatus(wheels[filterChanger].id, TMCL_SAP, 209, 0, 0, &status);
-            if (!ok || status!=100) {
-                log_error(tr("%1 error setting encoder position (status=%2)\n").arg(LOG_PREFIX).arg(status));
-                ok=false;
-            }
-        }
+        log_text(tr("  - reseting position\n"));
+        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position (status=%1)\n").arg(status));
         if (!ok) {
             com->close();
-            log_error(tr("%1 connection closed\n").arg(LOG_PREFIX));
+            log_error(tr("  - connection closed\n"));
         }
 
     } else {
-        log_error(tr("%1 Could not connect to TMCL filterwheel [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
-        log_error(tr("%1 reason: %2\n").arg(LOG_PREFIX).arg(wheels[filterChanger].tmcl->getLastError()));
+        log_error(tr(" Could not connect to TMCL filterwheel [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
+        log_error(tr(" reason: %1\n").arg(wheels[filterChanger].tmcl->getLastError()));
     }
 }
 
@@ -251,15 +272,66 @@ unsigned int QFExtensionTMCLFilterChanger::getFilterChangerFilterCount(unsigned 
 }
 
 void QFExtensionTMCLFilterChanger::setFilterChangerFilter(unsigned int filterChanger, unsigned int filter) {
+    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return ;
+    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
+    if (!com || !tmcl) return;
+    if (isFilterChangerConnected(filterChanger)) {
+        int cfilter=wheels[filterChanger].currentFilter;
+        int32_t pos=wheels[filterChanger].steps_per_revolution*filter/wheels[filterChanger].filters;
+        int32_t cpos=wheels[filterChanger].steps_per_revolution*cfilter/wheels[filterChanger].filters;
+        int32_t halfpos=wheels[filterChanger].steps_per_revolution/2;
+        if (cpos!=pos) {
+            int32_t d=pos-cpos;
+            if (abs(d)<=halfpos) {
+                bool ok=true;
+                uint8_t status;
+                TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_REL, wheels[filterChanger].motor, d, &status), tr("error moving motor (status=%1)\n").arg(status), 100);
+                if (ok) wheels[filterChanger].currentFilter=filter;
+            } else {
+                if (d>halfpos) {
+                    d=d-2*halfpos;
+                }
+                if (d<-halfpos) {
+                    d=d+2*halfpos;
+                }
+                bool ok=true;
+                uint8_t status;
+                TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_REL, wheels[filterChanger].motor, d, &status), tr("error moving motor (status=%1)\n").arg(status), 100);
+                if (ok) wheels[filterChanger].currentFilter=filter;
+            }
+
+        }
+        /*bool ok=true;
+        uint8_t status;
+        TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_ABS, wheels[filterChanger].motor, pos, &status), tr("error moving motor (status=%1)\n").arg(status), 100);
+        if (ok) wheels[filterChanger].currentFilter=filter;*/
+    }
+
 }
 
 unsigned int QFExtensionTMCLFilterChanger::getFilterChangerCurrentFilter(unsigned int filterChanger) {
-    return 0;
+    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return 0;
+    return wheels[filterChanger].currentFilter;
 }
 
 bool QFExtensionTMCLFilterChanger::isLastFilterChangerActionFinished(unsigned int filterChanger) {
     if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return true;
-    return wheels[filterChanger].lastAction.elapsed()>100;
+    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
+    if (!com || !tmcl) return true;
+    bool reached=false;
+    if (isFilterChangerConnected(filterChanger)) {
+        uint8_t rAddress;
+        int32_t value=0;
+        uint8_t status;
+        // read parameter 8 (target pos. reached) until it is 1
+        bool ok=tmcl->queryCommand(wheels[filterChanger].id, TMCL_GAP, 8, wheels[filterChanger].motor, 1, &rAddress, &status, &value);
+        if (ok && status==100) {
+            reached=(value==0);
+        }
+    }
+    return reached;
 }
 
 QString QFExtensionTMCLFilterChanger::getFilterChangerDescription(unsigned int filterChanger) {
