@@ -46,7 +46,7 @@ void QFExtensionTMCLFilterChanger::initExtension() {
         s.maximumCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/max_current", 15).toULongLong();
         s.maximumSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/max_speed", 15).toULongLong();
         s.slowRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/slow_ref_speed", 1).toULongLong();
-        s.standbyCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/standby_current", 8).toULongLong();
+        s.standbyCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/standby_current", 6).toULongLong();
 
         QString motor=inifile.value("filterwheel"+QString::number(i+1)+"/motor", "none").toString().toLower();
         if (motor=="pd-108-28" || motor=="pd1-108-28" || motor=="pd3-108-28" || motor=="pdx-108-28") {
