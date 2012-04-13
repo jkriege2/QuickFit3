@@ -94,7 +94,9 @@ public:
     void saveSettings(QSettings& settings, QString property);
 
     static QList<FilterDescription> getFilterList(QString globalfilters, QString localfilters=QString(""));
+    static FilterDescription getFilter(QString filter, QString globalfilters, QString localfilters=QString(""));
     static QIcon getFilterIcon(const FilterDescription& description);
+    static QIcon getFilterIcon(QString filter, QString globalfilters, QString localfilters=QString(""));
 public slots:
     void loadFilters();
     void storeFilters();
@@ -102,6 +104,7 @@ public slots:
     void deleteFilter();
     void editFilter();
     void setReadOnly(bool readonly);
+    void setCurrentFilter(const QString& name);
 
 protected slots:
     void currentFilterChanged(int idx);

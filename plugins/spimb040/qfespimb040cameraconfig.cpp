@@ -173,6 +173,8 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
     cmbAcquisitionDevice=new QFCameraComboBox(extManager, this);
+    cmbAcquisitionDevice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     QHBoxLayout* hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
     hbl->addWidget(cmbAcquisitionDevice);
@@ -190,9 +192,13 @@ void QFESPIMB040CameraConfig::createWidgets(QFExtensionManager* extManager) {
     ogl->addWidget(new QLabel("lightsheet:"), 1,0);
     ogl->addWidget(new QLabel("tube lens:"), 2,0);
     cmbObjective=new QComboBox(this);
+    cmbObjective->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     connect(cmbObjective, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
     ogl->addWidget(cmbObjective, 0,1);
     cmbObjectiveProjection=new QComboBox(this);
+    cmbObjectiveProjection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     connect(cmbObjectiveProjection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentObjectiveChanged(int)));
     ogl->addWidget(cmbObjectiveProjection, 1,1);
     cmbTubelens=new QComboBox(this);

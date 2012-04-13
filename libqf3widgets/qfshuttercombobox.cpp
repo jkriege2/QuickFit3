@@ -4,6 +4,8 @@ QFShutterComboBox::QFShutterComboBox(QFExtensionManager* extManager, QWidget* pa
     QEnhancedComboBox(parent)
 {
     m_extManager=extManager;
+    setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     findExtensions();
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged(int)));
 }

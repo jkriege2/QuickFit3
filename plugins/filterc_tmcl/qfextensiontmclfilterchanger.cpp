@@ -42,7 +42,7 @@ void QFExtensionTMCLFilterChanger::initExtension() {
         s.filters=inifile.value("filterwheel"+QString::number(i+1)+"/filter_count", 6).toInt();
         s.steps_per_revolution=inifile.value("filterwheel"+QString::number(i+1)+"/steps_per_revolution", 200*16).toULongLong();
         s.fastRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/fast_ref_speed", 1).toULongLong();
-        s.maximumAcceleration=inifile.value("filterwheel"+QString::number(i+1)+"/max_acceleration", 2).toULongLong();
+        s.maximumAcceleration=inifile.value("filterwheel"+QString::number(i+1)+"/max_acceleration", 3).toULongLong();
         s.maximumCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/max_current", 15).toULongLong();
         s.maximumSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/max_speed", 15).toULongLong();
         s.slowRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/slow_ref_speed", 1).toULongLong();
@@ -160,6 +160,7 @@ void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChang
         // reset position
         wheels[filterChanger].currentFilter=0;
 
+        log_text(tr("  - port: %1   speed: %4   id: %2   axis: %3\n").arg(com->get_port().c_str()).arg(wheels[filterChanger].id).arg(wheels[filterChanger].motor).arg(com->get_baudrate()));
         log_text(tr("  - firmware version: %1\n").arg(tmcl->getFirmwareVersion(wheels[filterChanger].id, wheels[filterChanger].motor)));
         int32_t value=0;
         /*tmcl->getAxisParameter(wheels[filterChanger].id, 4, value, 0); log_text(tr("  - maximum speed: %1\n").arg(value));

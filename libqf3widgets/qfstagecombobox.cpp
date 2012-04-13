@@ -10,6 +10,8 @@ QFStageComboBox::QFStageComboBox(QWidget* parent):
     QEnhancedComboBox(parent)
 {
     m_extManager=NULL;
+    setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
 }
 
 QFStageComboBox::~QFStageComboBox()

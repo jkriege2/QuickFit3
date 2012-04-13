@@ -253,6 +253,7 @@ void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
                 actState->setChecked(false);
             }
             connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
+            actState->setEnabled(true);
         } else {
             actState->setEnabled(false);
         }
@@ -292,13 +293,16 @@ void QFESPIMB040ShutterConfig::shutterActionClicked(bool opened) {
     if (shutter) {
         //qDebug()<<"set shutter state opened="<<opened;
         shutter->setShutterState(shutterID, opened);
-        moving=true;
-        QTime started=QTime::currentTime();
-        while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<5000)) {
-            //qDebug()<<started.elapsed();
-            QApplication::processEvents();
+        if (!locked) {
+            moving=true;
+            actState->setEnabled(false);
+            QTime started=QTime::currentTime();
+            while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<20000)) {
+                //qDebug()<<started.elapsed();
+                QApplication::processEvents();
+            }
+            moving=false;
         }
-        moving=false;
     }
 }
 

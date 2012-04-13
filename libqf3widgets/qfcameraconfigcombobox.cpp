@@ -275,7 +275,7 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
     combobox=new QFCameraConfigComboBox(this, configDirectory);
-    //combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     layout->addWidget(combobox, 2);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 

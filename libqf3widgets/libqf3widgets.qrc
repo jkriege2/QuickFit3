@@ -25,6 +25,7 @@
         <file alias="filter_splitterpol.png">icons/filter_splitterpol.png</file>
         <file alias="filter_neutraldensity.png">icons/filter_neutraldensity.png</file>
         <file alias="filter_notch.png">icons/filter_notch.png</file>
+        <file alias="filter_invalid.png">icons/filter_invalid.png</file>
         <file alias="acquisition_configuration.png">icons/camera_settings.png</file>
         <file alias="shutter_none.png">icons/shutter_none.png</file>
         <file alias="filterchanger_none.png">icons/filterchanger_none.png</file>

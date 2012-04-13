@@ -4,6 +4,8 @@ QFCameraComboBox::QFCameraComboBox(QFExtensionManager* extManager, QWidget* pare
     QEnhancedComboBox(parent)
 {
     m_extManager=extManager;
+    setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     findExtensions();
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(camIndexChanged(int)));
 }

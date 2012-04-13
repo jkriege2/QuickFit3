@@ -65,7 +65,16 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     connect(addShortCut("shutter_laser2_on", "laser 2 shutter: on"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOn()));
     connect(addShortCut("shutter_laser2_off", "laser 2 shutter: off"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOff()));
 
-    //connect(addShortCut("filterchanger_detection_filter1", "detection filter changer: filter 1"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOff()));
+    connect(addShortCut("filterchanger_detection_filter1", "detection filter changer: set filter #1"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter0()));
+    connect(addShortCut("filterchanger_detection_filter2", "detection filter changer: set filter #2"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter1()));
+    connect(addShortCut("filterchanger_detection_filter3", "detection filter changer: set filter #3"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter2()));
+    connect(addShortCut("filterchanger_detection_filter4", "detection filter changer: set filter #4"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter3()));
+    connect(addShortCut("filterchanger_detection_filter5", "detection filter changer: set filter #5"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter4()));
+    connect(addShortCut("filterchanger_detection_filter6", "detection filter changer: set filter #6"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter5()));
+    connect(addShortCut("filterchanger_detection_filter7", "detection filter changer: set filter #7"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter6()));
+    connect(addShortCut("filterchanger_detection_filter8", "detection filter changer: set filter #8"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter7()));
+    connect(addShortCut("filterchanger_detection_filter9", "detection filter changer: set filter #9"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter8()));
+    connect(addShortCut("filterchanger_detection_filter10", "detection filter changer: set filter #10"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter9()));
 
     connect(addShortCut("cam1_acquire_single", "camera 1: acquire single frame"), SIGNAL(activated()), ui->camConfig1, SLOT(previewSingle()));
     connect(addShortCut("cam1_acquire_continuous_toggle", "camera 1: toggle preview acquisition"), SIGNAL(activated()), ui->camConfig1, SLOT(startStopPreview()));
@@ -134,7 +143,9 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->chkDetectionFilterWheel->setChecked(settings.value(prefix+"filterchanger_detection", false).toBool());
 
     for (int i=0; i<shortcuts.size(); i++) {
-        shortcuts[i].shortcut->setKey(QKeySequence(settings.value(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString()).toString()));
+        QKeySequence seq(settings.value(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString()).toString());
+        shortcuts[i].shortcut->setKey(seq);
+        shortcuts[i].shortcut->setEnabled(!seq.isEmpty());
     }
 }
 
@@ -179,6 +190,15 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam ) const {
         setup["filters/detection/name"]=filter.name;
         setup["filters/detection/type"]=filter.type;
         setup["filters/detection/manufacturer"]=filter.manufacturer;
+    }
+
+    if (ui->chkDetectionFilterWheel->isChecked()) {
+        FilterDescription filter=ui->filtcDetection->getCurrentFilterDescription();
+        if (filter.isValid) {
+            setup["filters/detection_filterchanger/name"]=filter.name;
+            setup["filters/detection_filterchanger/type"]=filter.type;
+            setup["filters/detection_filterchanger/manufacturer"]=filter.manufacturer;
+        }
     }
 
     if (setup_cam<0 || setup_cam==0) {
@@ -427,7 +447,7 @@ bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {
         if (ok && set.contains("laser1/shutter/state")) ok=ok&&ui->shutterLaser1->isShutterDone()&&(ui->shutterLaser1->getShutterState()==set.value("laser1/shutter/state").toBool());
         if (ok && set.contains("laser2/shutter/state")) ok=ok&&ui->shutterLaser2->isShutterDone()&&(ui->shutterLaser2->getShutterState()==set.value("laser2/shutter/state").toBool());
         if (ok && set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked())
-            ok=ok&&(ui->filtcDetection->getFilterChangerState()==set.value("detection/filterchanger/filter").toInt());
+            ok=ok&&ui->filtcDetection->isLastActionComplete()&&(ui->filtcDetection->getFilterChangerState()==set.value("detection/filterchanger/filter").toInt());
         return ok;
     }
     return true;

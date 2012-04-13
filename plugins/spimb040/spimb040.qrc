@@ -69,14 +69,12 @@
         <file alias="x10.png">icons/x10.png</file>
         <file alias="configsteps.png">icons/configsteps.png</file>
         <file alias="shortcut_settings.png">icons/shortcut_settings.png</file>
-
         <file alias="connect_filterchanger.png">icons/connect_filterchanger.png</file>
         <file alias="disconnect_filterchanger.png">icons/disconnect_filterchanger.png</file>
         <file alias="configure_filterchanger.png">icons/configure_alt.png</file>
-
         <file alias="connect_lightsource.png">icons/connect_lightsource.png</file>
         <file alias="disconnect_lightsource.png">icons/disconnect_lightsource.png</file>
         <file alias="configure_lightsource.png">icons/configure_alt.png</file>
-
+        <file alias="filterchanger_selectfilters.png">icons/filterchanger_selectfilters.png</file>
     </qresource>
 </RCC>

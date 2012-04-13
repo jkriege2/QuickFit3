@@ -76,11 +76,25 @@ void QFESPIMB040FilterChangerConfig::loadSettings(QSettings& settings, QString p
     cmbFilterChanger->loadSettings(settings, prefix+"FilterChanger/");
 
     FilterChangerStateUpdateInterval=settings.value(prefix+"update_interval", FilterChangerStateUpdateInterval).toDouble();
+
+    int fcnt=settings.value(prefix+"filter_count", 0).toInt();
+    for (int i=0; i<fcnt; i++) {
+        if (i<filters.size()) {
+            filters[i]=settings.value(prefix+"filter"+QString::number(i), "").toString();
+        } else {
+            filters.append(settings.value(prefix+"filter"+QString::number(i), "").toString());
+        }
+    }
+    updateFilters();
 }
 
 void QFESPIMB040FilterChangerConfig::saveSettings(QSettings& settings, QString prefix) {
     cmbFilterChanger->storeSettings(settings, prefix+"FilterChanger/");
     settings.setValue(prefix+"update_interval", FilterChangerStateUpdateInterval);
+    settings.setValue(prefix+"filter_count", filters.size());
+    for (int i=0; i<filters.size(); i++) {
+        settings.setValue(prefix+"filter"+QString::number(i), filters[i]);
+    }
 }
 
 void QFESPIMB040FilterChangerConfig::createWidgets() {
@@ -99,18 +113,22 @@ void QFESPIMB040FilterChangerConfig::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     cmbFilter=new QComboBox(this);
     widgetLayout->addWidget(cmbFilter,0,0);
+    cmbFilter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
-
+    btnSelectFilters=new QToolButton(this);
+    widgetLayout->addWidget(btnSelectFilters,0,1);
     cmbFilterChanger=new QFFilterChangerComboBox(this);
-    widgetLayout->addWidget(cmbFilterChanger,0,1);
+    cmbFilterChanger->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    widgetLayout->addWidget(cmbFilterChanger,0,2);
     btnConnect=new QToolButton(this);
-    widgetLayout->addWidget(btnConnect,0,2);
+    widgetLayout->addWidget(btnConnect,0,3);
     btnConfigure=new QToolButton(this);
-    widgetLayout->addWidget(btnConfigure,0,3);
+    widgetLayout->addWidget(btnConfigure,0,4);
+
     QWidget* w=new QWidget(this);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    widgetLayout->addWidget(w,0,4);
-    widgetLayout->setColumnStretch(4,1);
+    widgetLayout->addWidget(w,0,5);
+    widgetLayout->setColumnStretch(5,1);
     cmbFilterChanger->setEnabled(false);
 
 
@@ -127,6 +145,10 @@ void QFESPIMB040FilterChangerConfig::createActions() {
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 
+
+    actSetFilters=new QAction(QIcon(":/spimb040/filterchanger_selectfilters.png"), tr("select the filters in the filter changer ..."), this);
+    connect(actSetFilters, SIGNAL(triggered()), this, SLOT(selectFilters()));
+    btnSelectFilters->setDefaultAction(actSetFilters);
 
 
 }
@@ -158,6 +180,8 @@ void QFESPIMB040FilterChangerConfig::updateStates() {
     actConfigure->setEnabled(FilterChanger!=NULL && FilterChangerID>=0);
     actConnect->setEnabled(FilterChanger!=NULL && FilterChangerID>=0);
     cmbFilterChanger->setEnabled(!conn);
+    actSetFilters->setEnabled(conn);
+    cmbFilter->setEnabled(conn);
 }
 
 void QFESPIMB040FilterChangerConfig::updateFilters() {
@@ -170,7 +194,14 @@ void QFESPIMB040FilterChangerConfig::updateFilters() {
     if (FilterChanger) {
         if (FilterChanger->isFilterChangerConnected(FilterChangerID)) {
             for (unsigned int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
-                cmbFilter->addItem(tr("filter #%1").arg(i+1));
+                QString f="---";
+                if (i<filters.size()) {
+                    if (!filters[i].isEmpty()) {
+                        f=filters[i];
+                    }
+                }
+                cmbFilter->addItem(QF3FilterCombobox::getFilterIcon(f, m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini"),
+                                   tr("filter #%1: %2").arg(i+1).arg(f), f);
             }
         }
     }
@@ -179,6 +210,52 @@ void QFESPIMB040FilterChangerConfig::updateFilters() {
     cmbFilter->setCurrentIndex(cmbFilter->findText(idx));
     connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     updateStates();
+}
+
+void QFESPIMB040FilterChangerConfig::selectFilters() {
+    QFExtensionFilterChanger* FilterChanger=getFilterChanger();
+    int FilterChangerID=getFilterChangerID();
+
+    if (!FilterChanger) return;
+
+    QDialog* dlg=new QDialog(this);
+
+    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    dlg->setLayout(lay);
+
+    QFormLayout* formlayout=new QFormLayout(dlg);
+
+    QList<QF3FilterCombobox*> combos;
+    for (int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
+        QF3FilterCombobox* cmb=new QF3FilterCombobox(this);
+        combos.append(cmb);
+        cmb->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+        formlayout->addRow(tr("filter #%1:").arg(i+1), cmb);
+        if (i<filters.size()) cmb->setCurrentFilter(filters[i]);
+    }
+
+    lay->addLayout(formlayout);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
+    lay->addWidget(buttonBox);
+
+    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
+
+    if ( dlg->exec()==QDialog::Accepted ) {
+         //  read back values entered into the widgets and store in settings
+        for (int i=0; i<combos.size(); i++) {
+            QString fn=combos[i]->filter().name;
+            if (!combos[i]->filter().isValid) fn=tr(" --- none ---");
+            if (i<filters.size()) {
+                filters[i]=fn;
+            } else {
+                filters.append(fn);
+            }
+        }
+    }
+    delete dlg;
+    updateFilters();
 }
 
 void QFESPIMB040FilterChangerConfig::disConnect() {
@@ -225,15 +302,15 @@ void QFESPIMB040FilterChangerConfig::configure() {
 
 
 
-QFExtensionFilterChanger* QFESPIMB040FilterChangerConfig::getFilterChanger() {
+QFExtensionFilterChanger* QFESPIMB040FilterChangerConfig::getFilterChanger() const {
     return cmbFilterChanger->currentExtensionFilterChanger();
 }
 
-QFExtension* QFESPIMB040FilterChangerConfig::getFilterChangerExtension() {
+QFExtension* QFESPIMB040FilterChangerConfig::getFilterChangerExtension() const {
     return cmbFilterChanger->currentExtension();
 }
 
-int QFESPIMB040FilterChangerConfig::getFilterChangerID() {
+int QFESPIMB040FilterChangerConfig::getFilterChangerID() const {
 
     return cmbFilterChanger->currentFilterChangerID();
 }
@@ -247,6 +324,17 @@ int QFESPIMB040FilterChangerConfig::getFilterChangerState() {
         return FilterChanger->getFilterChangerCurrentFilter(FilterChangerID);
     }
     return -1;
+}
+
+QString QFESPIMB040FilterChangerConfig::getCurrentFilter() const {
+    if (cmbFilter->currentIndex()<0) return QString("---");
+    return cmbFilter->itemData(cmbFilter->currentIndex()).toString();
+}
+
+FilterDescription QFESPIMB040FilterChangerConfig::getCurrentFilterDescription() const {
+    QString f="---";
+    if (cmbFilter->currentIndex()>=0) f=cmbFilter->itemData(cmbFilter->currentIndex()).toString();
+    return QF3FilterCombobox::getFilter(f, m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
 }
 
 
@@ -291,13 +379,16 @@ void QFESPIMB040FilterChangerConfig::FilterChangerNewFilterSelected(int index) {
     if (FilterChanger) {
         //qDebug()<<"set FilterChanger state opened="<<opened;
         FilterChanger->setFilterChangerFilter(FilterChangerID, index);
-        moving=true;
-        QTime started=QTime::currentTime();
-        while (!FilterChanger->isLastFilterChangerActionFinished(FilterChangerID) && (started.elapsed()<5000)) {
-            //qDebug()<<started.elapsed();
-            QApplication::processEvents();
+        if (!locked) {
+            moving=true;
+            QTime started=QTime::currentTime();
+            cmbFilter->setEnabled(false);
+            while (!FilterChanger->isLastFilterChangerActionFinished(FilterChangerID) && (started.elapsed()<20000)) {
+                //qDebug()<<started.elapsed();
+                QApplication::processEvents();
+            }
+            moving=false;
         }
-        moving=false;
     }
 }
 
@@ -314,16 +405,68 @@ void QFESPIMB040FilterChangerConfig::setReadOnly(bool readonly) {
 }
 
 void QFESPIMB040FilterChangerConfig::setFilter(int filter) {
-    if (isFilterChangerConnected()) {
+    if (isFilterChangerConnected() && isLastActionComplete() && !moving) {
         if (filter>=0 && filter<cmbFilter->count())
             cmbFilter->setCurrentIndex(filter);
     }
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter0() {
+    setFilter(0);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter1() {
+    setFilter(1);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter2() {
+    setFilter(2);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter3() {
+    setFilter(3);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter4() {
+    setFilter(4);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter5() {
+    setFilter(5);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter6() {
+    setFilter(6);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter7() {
+    setFilter(7);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter8() {
+    setFilter(8);
+}
+
+void QFESPIMB040FilterChangerConfig::setFilter9() {
+    setFilter(9);
 }
 
 
 
 bool QFESPIMB040FilterChangerConfig::isFilterChangerConnected() const {
     return actConnect->isChecked();
+}
+
+bool QFESPIMB040FilterChangerConfig::isLastActionComplete() const {
+    QFExtensionFilterChanger* FilterChanger;
+    int FilterChangerID;
+    FilterChanger=getFilterChanger();
+    FilterChangerID=getFilterChangerID();
+    if (FilterChanger) {
+        //qDebug()<<"set FilterChanger state opened="<<opened;
+        return FilterChanger->isLastFilterChangerActionFinished(FilterChangerID);
+    }
+    return true;
 }
 
 

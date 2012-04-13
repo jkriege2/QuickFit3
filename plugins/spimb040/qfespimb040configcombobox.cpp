@@ -13,6 +13,8 @@ QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
     m_ext="ini";
     icon=QIcon(":/spimb040/lightpath.png");
     clear();
+    setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
 }
 
 QFESPIMB040ConfigComboBox::~QFESPIMB040ConfigComboBox()

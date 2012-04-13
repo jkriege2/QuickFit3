@@ -151,7 +151,19 @@ QList<FilterDescription> QF3FilterCombobox::getFilterList(QString globalfilters,
     return filterList;
 }
 
+FilterDescription QF3FilterCombobox::getFilter(QString filter, QString globalfilters, QString localfilters) {
+    QList<FilterDescription> f=getFilterList(globalfilters, localfilters);
+    FilterDescription fd;
+    for (int i=0; i<f.size(); i++) {
+        if (f[i].name==filter) {
+            return f[i];
+        }
+    }
+    return fd;
+}
+
 QIcon QF3FilterCombobox::getFilterIcon(const FilterDescription &o) {
+    if (!o.isValid) return QIcon(":/libqf3widgets/filter_invalid.png");
     if (o.type.contains("dichro")) return QIcon(":/libqf3widgets/filter_dichroic.png");
     else if (o.type.contains("polar")) {
         if (o.type.contains("split")) return QIcon(":/libqf3widgets/filter_splitterpol.png");
@@ -167,6 +179,10 @@ QIcon QF3FilterCombobox::getFilterIcon(const FilterDescription &o) {
     } else if (o.type.contains("mirror")) return QIcon(":/libqf3widgets/filter_mirror.png");
     else return QIcon(":/libqf3widgets/filter.png");
     return QIcon(":/libqf3widgets/filter.png");
+}
+
+QIcon QF3FilterCombobox::getFilterIcon(QString filter, QString globalfilters, QString localfilters) {
+    return getFilterIcon(getFilter(filter, globalfilters, localfilters));
 }
 
 
@@ -278,4 +294,14 @@ void QF3FilterCombobox::setReadOnly(bool readonly) {
     btnAddFilter->setEnabled(!readonly);
     btnEditFilter->setEnabled(!readonly);
     btnDeleteFilter->setEnabled(!readonly);
+}
+
+void QF3FilterCombobox::setCurrentFilter(const QString &name) {
+    cmbFilters->setCurrentIndex(0);
+    for (int i=0; i<filters.size(); i++) {
+        if (name==filters[i].name) {
+            cmbFilters->setCurrentIndex(i+1);
+            break;
+        }
+    }
 }

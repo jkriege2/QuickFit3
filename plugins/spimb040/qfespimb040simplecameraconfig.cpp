@@ -197,6 +197,8 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
     cmbAcquisitionDevice=new QFCameraComboBox(this);
+    cmbAcquisitionDevice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     QHBoxLayout* hbl=new QHBoxLayout(this);
     hbl->setContentsMargins(0,0,0,0);
     hbl->addWidget(cmbAcquisitionDevice);
@@ -205,11 +207,13 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     hbl->addStretch();
     camlayout->addRow(tr("<b>Device:</b>"), hbl);
     cmbAcquisitionDevice->setEnabled(false);
+    cmbAcquisitionDevice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
 
 
     cmbPreviewConfiguration=new QFCameraConfigEditorWidget(this);
     cmbPreviewConfiguration->connectTo(cmbAcquisitionDevice);
+
     camlayout->addRow(tr("<b>Preview:</b>"), cmbPreviewConfiguration);
     connect(cmbPreviewConfiguration, SIGNAL(currentIndexChanged(int)), this, SLOT(previewCurrentIndexChanged(int)));
     cmbPreviewConfiguration->setStopResume(this);
