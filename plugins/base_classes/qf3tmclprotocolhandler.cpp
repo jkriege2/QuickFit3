@@ -127,7 +127,7 @@ bool QF3TMCLProtocolHandler::sendCommand(uint8_t Address, uint8_t Command, uint8
 bool QF3TMCLProtocolHandler::readVersionResult(QString& version) {
     if (!com) return false;
 
-    UCHAR RxBuffer[9], Checksum;
+    uint8_t RxBuffer[9], Checksum;
 
 
     bool ok=false;
@@ -149,7 +149,7 @@ bool QF3TMCLProtocolHandler::readVersionResult(QString& version) {
 int QF3TMCLProtocolHandler::readResult(uint8_t *Address, uint8_t *Status, int32_t *Value) {
     if (!com) return false;
 
-    UCHAR RxBuffer[9], Checksum;
+    uint8_t RxBuffer[9], Checksum;
 
 
     bool ok=false;

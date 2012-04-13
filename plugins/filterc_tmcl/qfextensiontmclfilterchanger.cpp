@@ -33,7 +33,7 @@ void QFExtensionTMCLFilterChanger::initExtension() {
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/%1").arg(GLOBAL_CONFIGFILE);
     QSettings inifile(ini, QSettings::IniFormat);
     int count=inifile.value("filterwheel_count", 0).toUInt();
-    qDebug()<<"FILTERWHEEL_COUNT = "<<count;
+    //qDebug()<<"FILTERWHEEL_COUNT = "<<count;
     for (int i=0; i<count; i++) {
         FILTERWHEEL s;
         s.port=ports.addCOMPort(inifile, "filterwheel"+QString::number(i+1)+"/");
@@ -56,7 +56,7 @@ void QFExtensionTMCLFilterChanger::initExtension() {
         s.lastAction=QTime::currentTime();
         s.tmcl=new QF3TMCLProtocolHandler(ports.getCOMPort(s.port), getName());
         wheels.append(s);
-        qDebug()<<"FILTERWHEEL("<<i<<") ... id="<<s.id;
+        //qDebug()<<"FILTERWHEEL("<<i<<") ... id="<<s.id;
     }
 }
 

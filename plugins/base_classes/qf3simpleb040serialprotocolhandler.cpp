@@ -1,5 +1,7 @@
 #include "qf3simpleb040serialprotocolhandler.h"
 #include <QObject>
+#include <QTime>
+#include <QDebug>
 
 QF3SimpleB040SerialProtocolHandler::QF3SimpleB040SerialProtocolHandler(JKSerialConnection* com, QString name) {
     this->com=com;
@@ -23,7 +25,11 @@ QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
     std::string res="";
     //std::cout<<"\n\ncommand: '"<<command<<"'\n";
     com->clearBuffer();
+    com->clearBuffer();
     if (com->write(QString(command+"\n").toStdString())) {
+        QTime t;
+        t.start();
+        while (t.elapsed()<20);
         res=com->readUntil("\n\n");
         //std::cout<<" ... reading ... ";
     }
@@ -35,6 +41,7 @@ QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
     for (unsigned int i=0; i<res.size(); i++) {
         data+=QLatin1Char(res[i]);
     }
+    //qDebug()<<"queryCommand("<<command<<")   "<<data.left(data.size()-2);
     return data.left(data.size()-2);
 }
 

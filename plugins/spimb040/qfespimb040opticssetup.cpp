@@ -37,6 +37,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);
     connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QFESPIMB040OpticsSetupItems)), this, SLOT(configsChanged(QFESPIMB040OpticsSetupItems)));
+    connect(ui->cmbLightpathConfig, SIGNAL(currentConfigChanged(QString)), this, SLOT(userChangedLightpath(QString)));
 
     // create shortcuts
     connect(addShortCut("stage_x2", "translation stage: joystick speed x2"), SIGNAL(activated()), ui->stageSetup, SLOT(speedX2()));
@@ -509,10 +510,14 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
     data[prefix+"name"]=name;
 
     // SAVE RELEVANT WIDGETS HERE
-    if (ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID()))
+    if (ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) {
         data["laser1/shutter/state"]=ui->shutterLaser1->getShutterState();
-    if (ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID()))
+        qDebug()<<"laser1/shutter/state="<<data["laser1/shutter/state"]<<ui->shutterLaser1->getShutterState();
+    }
+    if (ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
         data["laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
+        qDebug()<<"laser2/shutter/state="<<data["laser2/shutter/state"]<<ui->shutterLaser2->getShutterState();
+    }
     if (ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->getFilterChanger()->isFilterChangerConnected(ui->filtcDetection->getFilterChangerID()))
         data["detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
 
@@ -520,7 +525,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
 
 void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
     bool dlgOK=true;
-    QString name="";
+    QString name=ui->cmbLightpathConfig->currentText();
     while (true) {
         QStringList l=ui->cmbLightpathConfig->getConfigs();
         int idx=-1;
@@ -536,15 +541,17 @@ void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
                 if (QFile::exists(filename)) {
                     QMessageBox::StandardButton res=QMessageBox::question(this, tr("B040 SPIM"),
                                                                           tr("A lightpath config with the name '%1' already exists.\n  filename: '%2'\nOverwrite?").arg(name).arg(filename),
-                                                                          QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+                                                                          QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
                     if (res==QMessageBox::Yes) {
                         saveLightpathConfig(filename, name);
+                        ui->cmbLightpathConfig->setCurrentConfig(name);
                         return;
                     } else if (res==QMessageBox::Cancel) {
                         return;
                     }
                 } else {
                     saveLightpathConfig(filename, name);
+                    ui->cmbLightpathConfig->setCurrentConfig(name);
                     return;
                 }
             }
@@ -583,4 +590,12 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
     ui->shutterLaser1->unlockShutters();
     ui->shutterLaser2->unlockShutters();
     ui->filtcDetection->unlockFilterChangers();
+}
+
+void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
+    lockLightpath();
+    ui->cmbLightpathConfig->setEnabled(false);
+    loadLightpathConfig(filename, true);
+    ui->cmbLightpathConfig->setEnabled(true);
+    unlockLightpath();
 }

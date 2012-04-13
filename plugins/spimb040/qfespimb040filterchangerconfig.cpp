@@ -201,7 +201,7 @@ void QFESPIMB040FilterChangerConfig::updateFilters() {
                     }
                 }
                 cmbFilter->addItem(QF3FilterCombobox::getFilterIcon(f, m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini"),
-                                   tr("filter #%1: %2").arg(i+1).arg(f), f);
+                                   tr("#%1: %2").arg(i+1).arg(f), f);
             }
         }
     }

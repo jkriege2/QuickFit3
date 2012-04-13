@@ -55,7 +55,7 @@ void QFESPIMB040FilenameTool::bindLineEdit(QEnhancedLineEdit *edit) {
 void QFESPIMB040FilenameTool::fillLineEdits() {
     foreach(QEnhancedLineEdit* edit, edits) {
         edit->clearContextMenu();
-        edit->addContextMenuEntry(QObject::tr("insert %counter% ..."), "%counter%");
+        edit->addInsertContextMenuEntry(QObject::tr("insert %counter% ..."), "%counter%");
         foreach(QString item, replaceValues.keys()) {
             edit->addInsertContextMenuEntry(QObject::tr("insert %1 ...").arg("%"+item+"%"), "%"+item+"%");
         }

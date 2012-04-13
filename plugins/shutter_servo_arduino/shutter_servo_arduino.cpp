@@ -129,6 +129,7 @@ bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
     if (!com) return false;
     if (!com->isConnectionOpen()) return false;
     QString result=shutters[shutter].serial->queryCommand(QString("Q")+QString::number(shutters[shutter].id));
+    //qDebug()<<"shutter result: "<<result;
     if (result.startsWith("0")) return false;
     else return true;
 }

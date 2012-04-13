@@ -150,6 +150,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void saveCurrentLightpatConfig();
         void deleteCurrentLightpatConfig();
         void emitLighpathesChanged();
+        void userChangedLightpath(QString filename);
     signals:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
 

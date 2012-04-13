@@ -1618,22 +1618,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cmbLightpathConfig</sender>
-   <signal>currentConfigChanged(QString)</signal>
-   <receiver>QFESPIMB040OpticsSetup</receiver>
-   <slot>loadLightpathConfig(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>597</x>
-     <y>34</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>231</x>
-     <y>6</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnShortcutConfig</sender>
    <signal>clicked()</signal>
    <receiver>QFESPIMB040OpticsSetup</receiver>
