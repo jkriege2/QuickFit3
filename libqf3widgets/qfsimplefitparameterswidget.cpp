@@ -1,4 +1,5 @@
 #include "qfsimplefitparameterswidget.h"
+#include <QDebug>
 
 QFSimpleFitParametersWidget::QFSimpleFitParametersWidget(QFSimpleFitParameterInterface *paraminterface, QWidget *parent) :
     QWidget(parent)
@@ -86,6 +87,7 @@ void QFSimpleFitParametersWidget::setParameters(const QStringList &ids, const QS
     int cnt=qMin(ids.count(), labels.count());
     int oldCnt=widgets.size();
     if (cnt>widgets.size()) {
+        //qDebug()<<"cnt>widgets.size(): "<<cnt<<">"<<widgets.size();
         for (int i=0; i<cnt; i++) {
             if (i<oldCnt) {
                 widgets[i].id=ids[i];
@@ -94,17 +96,22 @@ void QFSimpleFitParametersWidget::setParameters(const QStringList &ids, const QS
                 addParameter(ids[i], labels[i]);
             }
         }
+        //qDebug()<<widgets.size();
     } else if (cnt<widgets.size()) {
+        //qDebug()<<"cnt<widgets.size(): "<<cnt<<"<"<<widgets.size();
+        mainLayout->removeItem(spacer);
         for (int i=widgets.size()-1; i>=cnt; i--) {
             mainLayout->removeWidget(widgets[i].label);
             mainLayout->removeWidget(widgets[i].edit);
-            widgets[i].label->deleteLater();
-            widgets[i].edit->deleteLater();
+            if (widgets[i].label) widgets[i].label->deleteLater();
+            if (widgets[i].edit) widgets[i].edit->deleteLater();
+            widgets.removeAt(i);
         }
-        mainLayout->removeItem(spacer);
-        mainLayout->addItem(spacer, cnt,0);
+        mainLayout->addItem(spacer, mainLayout->rowCount(), 0);
+        //qDebug()<<widgets.size();
     }
     for (int i=0; i<cnt; i++) {
+        //qDebug()<< widgets[i].id<<widgets[i].label;
         widgets[i].id=ids[i];
         widgets[i].label->setText(labels[i]);
     }

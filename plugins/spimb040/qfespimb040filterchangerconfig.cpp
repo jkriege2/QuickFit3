@@ -313,6 +313,13 @@ void QFESPIMB040FilterChangerConfig::setReadOnly(bool readonly) {
     cmbFilterChanger->setReadOnly(readonly);
 }
 
+void QFESPIMB040FilterChangerConfig::setFilter(int filter) {
+    if (isFilterChangerConnected()) {
+        if (filter>=0 && filter<cmbFilter->count())
+            cmbFilter->setCurrentIndex(filter);
+    }
+}
+
 
 
 bool QFESPIMB040FilterChangerConfig::isFilterChangerConnected() const {

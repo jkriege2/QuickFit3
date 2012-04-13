@@ -35,8 +35,8 @@ class QFWIDLIB_EXPORT QFSimpleFitParametersWidget : public QWidget {
 
         struct subWidget {
             QString id;
-            QLabel* label;
-            NumberEdit* edit;
+            QPointer<QLabel> label;
+            QPointer<NumberEdit> edit;
         };
         QList<subWidget> widgets;
 

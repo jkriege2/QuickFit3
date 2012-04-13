@@ -76,6 +76,7 @@ class QFESPIMB040FilterChangerConfig : public QWidget {
 
     public slots:
         void setReadOnly(bool readonly);
+        void setFilter(int filter);
 
     protected slots:
         void updateStates();

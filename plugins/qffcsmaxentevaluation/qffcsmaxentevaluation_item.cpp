@@ -239,7 +239,7 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
         }
         //double* modelVals=(double*)malloc(N*sizeof(double));
         //
-        (record, index, model, taus, modelVals, N);
+        //(record, index, model, taus, modelVals, N);
         double* weights=allocWeights(NULL, record, index);
 
         QFFitStatistics result= calculateFitStatistics(N, taus, modelVals, corrdata, weights, datacut_min, datacut_max, MaxEntParams, runAvgWidth, residualHistogramBins);
@@ -338,8 +338,10 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
                     param_vector[2]=getFitValue(record,index,model,"focus_struct_fac"); // kappa
                     param_vector[3]=getFitValue(record,index,model,"dark_tau")*1e-6;
                     param_vector[4]=getFitValue(record,index,model,"dark_theta");
+                    qDebug() <<"dark_theta="<< param_vector[4] <<"   dark_tau="<< param_vector[3];
                     param_vector[5]=getFitValue(record,index,model,"offset");
                     qDebug() << "Read Out of Parameters for Model 1";
+                    break;
 
 
 
@@ -351,8 +353,7 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
         case 4: return tr("FCS Blinking with 3D diffusion");
     */
          }
-    double* params=(double*)calloc(getParameterCount(model),sizeof(double));
-    params=param_vector.data();
+    double* params=param_vector.data();
 
 
 
@@ -549,6 +550,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         param_vector[2]=getFitValue(record,index,model,"focus_struct_fac");
                         param_vector[3]=getFitValue(record,index,model,"dark_tau")*1e-6;
                         param_vector[4]=getFitValue(record,index,model,"dark_theta");
+                        qDebug() <<"dark_theta="<< param_vector[4] <<"   dark_tau="<< param_vector[3];
                         param_vector[5]=getFitValue(record,index,model,"offset");
                         break;
 
@@ -559,8 +561,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         */
              }
 
-        double *param_list=(double*)calloc(getParameterCount(model),sizeof(double));
-        param_list=param_vector.data();
+        double *param_list=param_vector.data();
         //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
