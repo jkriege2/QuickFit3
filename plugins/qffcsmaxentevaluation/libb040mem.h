@@ -16,7 +16,7 @@
 
 
 #define FloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
-
+#define sqr(x) ((x)*(x))
 
 
 /*! \defgroup libb040mem Maximum Entropy for FCS
@@ -36,7 +36,7 @@
 
 
 
-class MaxEntB040 {
+class MaxEntB040{
 
     public:
     	/** Default constructor */
@@ -48,13 +48,20 @@ class MaxEntB040 {
 
         void setData(const double* taus, const double* correlation,\
         	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
-        	int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus);
+            int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus);
 
 		void writeDistribution(double * dist);
 		
 		void writeDistTaus(double * distTaus);
 
-        bool run(double alpha,double kappa, double tripTau,double tripTheta, int NumIter);
+        bool run(double alpha,int NumIter,double * param_list,int model,int parameter_count);
+
+        void evaluateModel(double * taus,double *modelEval,uint32_t N,double* distTaus, double* dist,\
+                           uint32_t Ndist, double* param_list,int model);
+
+
+
+
 
     protected:
         //protected member variables
@@ -68,6 +75,7 @@ class MaxEntB040 {
         double m_tripTau;
         double m_tripTheta;
         int NumIter;
+        int m_model;
         Eigen::VectorXd m_xdata;
 		Eigen::VectorXd m_ydata;
 		Eigen::VectorXd m_stdev;
@@ -89,6 +97,7 @@ class MaxEntB040 {
 		Eigen::MatrixXd m_K;
 		Eigen::VectorXd m_F;
 		Eigen::VectorXd m_g;
+        Eigen::VectorXd m_paramStore;
 		
         
 

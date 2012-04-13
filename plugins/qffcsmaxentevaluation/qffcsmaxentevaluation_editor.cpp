@@ -502,6 +502,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 double* modelVals=(double*)malloc(N*sizeof(double));
                 QVector<double> dist=eval->getDistribution(record, index, model);
                 QVector<double> distTau=eval->getDistributionTaus(record, index, model);
+                qDebug() << "EVALUATEMODEL called";
                 eval->evaluateModel(record, index, model, tauvals, modelVals, N, distTau.data(), dist.data(), dist.size());
 
                 // CALCULATE FIT STATISTICS

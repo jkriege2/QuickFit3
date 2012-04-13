@@ -14,7 +14,7 @@
 
 
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
-
+#define sqr(x) ((x)*(x))
 
 
 // Default Constructor
@@ -30,6 +30,7 @@ MaxEntB040::MaxEntB040() {
 	m_s=0; //internal deafult value for the singular space dimension
 	m_oldDist=false; //default
     NumIter=200;
+    m_model=0; //default
 
 }
 
@@ -39,7 +40,7 @@ MaxEntB040::~MaxEntB040(){}
 
 void MaxEntB040::setData(const double* taus, const double* correlation,\
 	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
-	int rangeMaxDatarange,uint32_t Ndist,double * dist, double * distTaus) 
+    int rangeMaxDatarange,uint32_t Ndist,double * dist, double * distTaus)
 	{
     m_Nd=rangeMaxDatarange-rangeMinDatarange;
 	m_xdata.resize(rangeMaxDatarange-rangeMinDatarange);
@@ -77,12 +78,33 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
     }
 
 
-bool MaxEntB040::run(double alpha,double kappa,double tripTau,double tripTheta, int NumIter)
+bool MaxEntB040::run(double alpha,int NumIter,double * param_list,int model,int parameter_count)
     {
     m_alpha=alpha;
+    m_model=model;
+    m_paramStore.resize(parameter_count);
+    for (int i=0; i<parameter_count; i++)
+        {
+            m_paramStore(i)=param_list[i];
+        }
+
+    /*
+    switch(m_model)
+        {
+            case 0:
+                    m_tripTau=param_list[0];
+                    m_tripTheta=param_list[1];
+                    m_kappa=param_list[2];
+                    break;
+         }
+    */
+
+/*
     m_kappa=kappa;
     m_tripTau=tripTau;
     m_tripTheta=tripTheta;
+*/
+
     this->NumIter=NumIter;
     if (m_oldDist==false){setTauGrid();}
     setTmatrix();
@@ -115,21 +137,58 @@ void MaxEntB040::setTauGrid()
 void MaxEntB040::setTmatrix(){
 	
 	m_T.resize(m_Nd,m_N);
+
     double value;
     double tripFactor;
-    
-	for (int i=0; i<m_Nd; i++)
-        {
-            for (int j=0; j<m_N; j++)
-                {
-                	tripFactor=(1.0-m_tripTheta+m_tripTheta*\
-                	exp(-m_xdata(i)/m_tripTau))/(1.0-m_tripTheta);
-                    value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))))*\
-                    (1.0/(sqrt(1.0+m_xdata(i)/(m_taudiffs(j)*m_kappa*m_kappa))));
-                    m_T(i,j)=tripFactor*value;
-                }
-        }
+
+
+    switch (m_model)
+    {
+    // model #1: FCS 3D diffusion with triplet
+    case 0:
+
+        m_tripTau=m_paramStore(0);
+        m_tripTheta=m_paramStore(1);
+        m_kappa=m_paramStore(2);
+
+
+
+        for (int i=0; i<m_Nd; i++)
+            {
+                for (int j=0; j<m_N; j++)
+                    {
+                        tripFactor=(1.0-m_tripTheta+m_tripTheta*\
+                        exp(-m_xdata(i)/m_tripTau))/(1.0-m_tripTheta);
+                        value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))))*\
+                        (1.0/(sqrt(1.0+m_xdata(i)/(m_taudiffs(j)*m_kappa*m_kappa))));
+                        m_T(i,j)=tripFactor*value;
+                    }
+            }
+        break;
+    // model #2: FCS 3D diffusion with two blinking components
+    case 1:
+        m_tripTau=m_paramStore(0);
+        m_tripTheta=m_paramStore(1);
+        m_kappa=m_paramStore(2);
+        double darkTau=m_paramStore(3);
+        double darkTheta=m_paramStore(4);
+        double offset=m_paramStore(5);
+
+
+        for (int i=0; i<m_Nd; i++)
+            {
+            tripFactor=(1.0-m_tripTheta+m_tripTheta*exp(-m_xdata(i)/m_tripTau)-darkTheta+darkTheta*exp(-m_xdata(i)/darkTau))/(1.0-m_tripTheta-darkTheta);
+                for (int j=0; j<m_N; j++)
+                    {
+                        value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))))*\
+                        (1.0/(sqrt(1.0+m_xdata(i)/(m_taudiffs(j)*m_kappa*m_kappa))));
+                        m_T(i,j)=tripFactor*value+offset;
+                    }
+            }
+        break;
+
     }
+}
 
 
 void MaxEntB040::performSVD()
@@ -275,8 +334,87 @@ void MaxEntB040::performIter()
 
 	
 
-	}
-//////////////END OF performIter ////////////////// 		
+    }
+//////////////END OF performIter //////////////////
+
+
+
+
+
+void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
+                              double* distTaus,double* dist,uint32_t Ndist, double* param_list, int model)
+{
+
+    double gamma;
+    double trip_tau;
+    double trip_theta;
+    double N_particle;
+    double dark_tau;
+    double dark_theta;
+    double offset;
+    double trip_factor;
+    register double sum;
+
+
+    switch(model)
+    {
+        case 0: // 3D diffusion with triplet
+                gamma=param_list[2];
+                trip_tau=param_list[0];
+                trip_theta=param_list[1];
+                N_particle=1;
+
+                for (uint32_t i=0; i<N; i++) {
+                    trip_factor=(1.0-trip_theta+trip_theta*exp(-taus[i]/trip_tau))/(1.0-trip_theta);
+                    //output[i]=trip_factor*1.0/N/(1+taus[i]/100e-6)/sqrt(1+taus[i]/100e-6/sqr(gamma));
+                    sum=0;
+                    if (distTaus && dist && Ndist>0) {
+                        for (register uint32_t j=0; j<Ndist; j++) {
+                            sum=sum+dist[j]/(1.0+taus[i]/distTaus[j])/sqrt(1.0+taus[i]/distTaus[j]/sqr(gamma));
+
+                        }
+                    } else {
+                        sum=1.0/double(N);
+                    }
+                    modelEval[i]=sum/N_particle*trip_factor;
+                }
+                break;
+
+
+          case 1:
+               trip_tau=param_list[0];
+               trip_theta=param_list[1];
+               gamma=param_list[2];
+               dark_tau=param_list[3];
+               dark_theta=param_list[4];
+               offset=param_list[5];
+               N_particle=1;
+
+
+
+               for (uint32_t i=0; i<N; i++) {
+                   trip_factor=(1.0-trip_theta+trip_theta*exp(-taus[i]/trip_tau)-dark_theta+dark_theta*exp(-taus[i]/dark_tau))/(1.0-trip_theta-dark_theta);
+                   sum=0;
+                   if (distTaus && dist && Ndist>0) {
+                       for (register uint32_t j=0; j<Ndist; j++) {
+                           sum=sum+dist[j]/(1.0+taus[i]/distTaus[j])/sqrt(1.0+taus[i]/distTaus[j]/sqr(gamma));
+                       }
+                   } else {
+                       sum=1.0/double(N);
+                   }
+                   modelEval[i]=offset+sum/N_particle*trip_factor;
+               }
+
+               break;
+
+    }
+
+}
+
+
+
+
+
 
 
 void MaxEntB040::writeDistTaus(double * distTaus)		

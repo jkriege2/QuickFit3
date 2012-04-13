@@ -108,8 +108,6 @@ double QFFCSMaxEntEvaluationItem::getAlpha() const {
 ///////////////////////////////////////////////////////////////////////////////////////
 void QFFCSMaxEntEvaluationItem::setNdist(uint32_t Ndist) {
     setFitValue("maxent_Ndist", Ndist);
-    qDebug()<< "setNdist is called with: ";
-               qDebug()<< Ndist;
 }
 
 uint32_t QFFCSMaxEntEvaluationItem::getNdist() const {
@@ -240,7 +238,8 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
             freeModelVals=true;
         }
         //double* modelVals=(double*)malloc(N*sizeof(double));
-        //evaluateModel(record, index, model, taus, modelVals, N);
+        //
+        (record, index, model, taus, modelVals, N);
         double* weights=allocWeights(NULL, record, index);
 
         QFFitStatistics result= calculateFitStatistics(N, taus, modelVals, corrdata, weights, datacut_min, datacut_max, MaxEntParams, runAvgWidth, residualHistogramBins);
@@ -322,9 +321,49 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IMPLEMENT THE FIT MODEL, THE FIT AND ALL THE PARAMETERS REQUIRED FOR THOSE
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, int model, double *taus, double *output, uint32_t N, double* distribution_tau, double* distribution, uint32_t distributionN) const {
-    if (!taus || !output) return;
+void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, int model, double *taus, double *modelEval, uint32_t N, double* distTaus, double* dist, uint32_t Ndist) const {
+    if (!taus || !modelEval) return;
     //qDebug()<<"evalModel(N="<<N<<"  distributionN="<<distributionN<<")";
+
+    QVector<double> param_vector(getParameterCount(model));
+    switch(model)
+        {
+            case 0:
+                    param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
+                    param_vector[1]=getFitValue(record,index,model,"trip_theta");
+                    param_vector[2]=getFitValue(record,index,model,"focus_struct_fac"); // kappa
+                    break;
+            case 1: param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
+                    param_vector[1]=getFitValue(record,index,model,"trip_theta");
+                    param_vector[2]=getFitValue(record,index,model,"focus_struct_fac"); // kappa
+                    param_vector[3]=getFitValue(record,index,model,"dark_tau")*1e-6;
+                    param_vector[4]=getFitValue(record,index,model,"dark_theta");
+                    param_vector[5]=getFitValue(record,index,model,"offset");
+                    qDebug() << "Read Out of Parameters for Model 1";
+
+
+
+
+    /*
+        case 1: return tr("FCS: 3D diffusion with 2 blinking components");
+        case 2: return tr("FCS: 2D diffusion with 2 blinking components");
+        case 3: return tr("Dynamic Light Scattering");
+        case 4: return tr("FCS Blinking with 3D diffusion");
+    */
+         }
+    double* params=(double*)calloc(getParameterCount(model),sizeof(double));
+    params=param_vector.data();
+
+
+
+    MaxEntB040 mem_eval;
+    qDebug() << "===> mem_eval Class calls EVALUATE MODEL";
+    mem_eval.evaluateModel(taus,modelEval,N,distTaus,dist,Ndist,params,model);
+
+
+
+    /*
+
     if (model==0) { // 3D diffusion model
 
         // first we read the stored fit parameters:
@@ -332,6 +371,8 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
         double trip_tau=getFitValue(record, index, model, "trip_tau")*1e-6; // stored in microseconds!!!
         double trip_theta=getFitValue(record, index, model, "trip_theta");
         double N_particle=1;
+
+
 
         // now we evaluate the model
         for (uint32_t i=0; i<N; i++) {
@@ -349,31 +390,76 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
             output[i]=sum/N_particle*trip_factor;
         }
     }
+    */
 }
 
+
+
+
+
 QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
+    switch(model)
+    {
+    case 0: return tr("FCS: 3D diffusion with Triplet");
+    case 1: return tr("FCS: 3D diffusion with 2 blinking components");
+    case 2: return tr("FCS: 2D diffusion with 2 blinking components");
+    case 3: return tr("Dynamic Light Scattering");
+    case 4: return tr("FCS Blinking with 3D diffusion");
+    }
+    /*
     if (model==0) return tr("FCS: 3D diffusion with Triplet");
+    */
+
     return "";
 }
 
 bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
-    if (currentModel==0) {
-        if (parameterID=="trip_tau") {
-            defaultValue.value=3;
-            return true;
-        }
-        if (parameterID=="trip_theta") {
-            defaultValue.value=0.2;
-            return true;
-        }
-        if (parameterID=="focus_struct_fac") {
-            defaultValue.value=6;
-            return true;
-        }
+    switch (currentModel)
+    {
+    case 0:
+            if (parameterID=="trip_tau") {
+                defaultValue.value=3;
+                return true;
+                }
+            if (parameterID=="trip_theta") {
+                defaultValue.value=0.2;
+                return true;
+                }
+            if (parameterID=="focus_struct_fac") {
+                defaultValue.value=6;
+                return true;
+            }
        /* if (parameterID=="n_particle") {
             defaultValue.value=8;
             return true;
         }*/
+   case 1:
+            if (parameterID=="trip_tau") {
+                defaultValue.value=3;
+                return true;
+                }
+            if (parameterID=="trip_theta") {
+                defaultValue.value=0.2;
+                return true;
+                }
+            if (parameterID=="focus_struct_fac") {
+                defaultValue.value=6;
+                return true;
+                    }
+            if (parameterID=="dark_tau") {
+                defaultValue.value=100.0;
+                return true;
+                    }
+            if (parameterID=="dark_theta") {
+                defaultValue.value=0;
+                return true;
+                    }
+            if (parameterID=="offset") {
+                defaultValue.value=0;
+                return true;
+        }
+
+
     }
 
     if (parameterID=="maxent_alpha") {
@@ -398,6 +484,10 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
     set_doEmitResultsChanged(false);
     set_doEmitPropertiesChanged(false);
     record->disableEmitResultsChanged();
+
+
+    qDebug() << "SELECTED MODEL NUMBER:";
+    qDebug() << model;
 
 
     /* IMPLEMENT THIS
@@ -425,18 +515,8 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
 
 
-        /*
-        //////////
-        uint32_t Ndist=100; // default
-        //////////
-        */
-
         uint32_t N=data->getCorrelationN();
-        qDebug()<<"Number of Data Points: ";
-        qDebug()<< N;
         double* taus=data->getCorrelationT();
-        qDebug() << "Der erste x-Wert: ";
-        qDebug() << taus[0];
         double* distTaus=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* dist=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* modelEval=(double*)malloc(N*sizeof(double));
@@ -445,16 +525,55 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (index>=0) corrdata=data->getCorrelationRun(index);
         double* weights=allocWeights(&weightsOK, record, index, rangeMinDatarange, rangeMaxDatarange);
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
+
+        //////////Load Algorithm Parameters ////////////////////////////////////////////////
         double alpha=getAlpha();
-        ///////////
+        int NumIter=getNumIter();
         uint32_t Ndist=getNdist();
-        //////////
+        ////////////////////////////////////////////////////////////////////////////////////
         bool fitSuccess=false;
 
-        double kappa=getFitValue("focus_struct_fac");
-        double tripTau=getFitValue("trip_tau")*1e-6;
-        double tripTheta=getFitValue("trip_theta");
-        int NumIter=getNumIter();
+        //////////Load Model Parameters//////////////////////////////////////////////////////
+        //int parameter_count=getParameterCount(model);
+        QVector<double> param_vector(getParameterCount(model));
+        switch(model)
+            {
+                // FCS 3D diffusion with triplet
+                case 0: param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
+                        param_vector[1]=getFitValue(record,index,model,"trip_theta");
+                        param_vector[2]=getFitValue(record,index,model,"focus_struct_fac"); // kappa
+                        break;
+                // FCS 3D diffusion with 2 blinking components
+                case 1: param_vector[0]=getFitValue(record,index,model,"trip_tau")*1e-6;
+                        param_vector[1]=getFitValue(record,index,model,"trip_theta");
+                        param_vector[2]=getFitValue(record,index,model,"focus_struct_fac");
+                        param_vector[3]=getFitValue(record,index,model,"dark_tau")*1e-6;
+                        param_vector[4]=getFitValue(record,index,model,"dark_theta");
+                        param_vector[5]=getFitValue(record,index,model,"offset");
+                        break;
+
+        /*
+            case 2: return tr("FCS: 2D diffusion with 2 blinking components");
+            case 3: return tr("Dynamic Light Scattering");
+            case 4: return tr("FCS Blinking with 3D diffusion");
+        */
+             }
+
+        double *param_list=(double*)calloc(getParameterCount(model),sizeof(double));
+        param_list=param_vector.data();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        qDebug() << "HERE HERE HERE";
+        qDebug() << param_list[3];
+
+
+
+        /*
+        double kappa=getFitValue(record,index,model,"focus_struct_fac");
+        double tripTau=getFitValue(record,index,model,"trip_tau")*1e-6;
+        double tripTheta=getFitValue(record,index,model,"trip_theta");
+        */
 
         QVector<double> init_tau=getFitValueNumberArray(record, index, model, "maxent_tau");
         QVector<double> init_dist=getFitValueNumberArray(record, index, model, "maxent_distribution");
@@ -466,8 +585,6 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         bool old_distribution=false; // default value
         if (init_tau.size()>0 && init_dist.size()>0)
             {
-
-
                 Ndist=qMin(init_tau.size(), init_dist.size());
                 distTaus=(double*)calloc(Ndist,sizeof(double));
                 dist=(double*)calloc(Ndist,sizeof(double));
@@ -500,10 +617,8 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         /// MaxEnt Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
         MaxEntB040 mem;
-        qDebug()<< "calling mem with Ndist: ";
-        qDebug()<< Ndist;
         mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus);
-        mem.run(alpha,kappa,tripTau,tripTheta, NumIter);
+        mem.run(alpha,NumIter,param_list,model,getParameterCount(model));
         fitSuccess=true;
         if (old_distribution==false)
             {
@@ -512,6 +627,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
             }
         mem.writeDistTaus(distTaus);
         mem.writeDistribution(dist);
+        /////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////
 
@@ -632,6 +748,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         // this is what the 7th and 8th argument used to be like: &(distTaus[rangeMinDatarange]), &(dist[rangeMinDatarange])
         // this was the last argument:  rangeMaxDatarange-rangeMinDatarange, now changed to Ndist
         ////////////////////////
+
         evaluateModel(record, index, model, taus, modelEval, N, distTaus,dist,Ndist);
         //   then we can call calcFitStatistics()
         QFFitStatistics fit_stat=calcFitStatistics(record, index, model, taus, corrdata, N,Ndist, rangeMinDatarange, rangeMaxDatarange, runAvgWidth, residualHistogramBins);
@@ -643,6 +760,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         free(modelEval);
         free(distTaus);
 
+
     }
 
     if (doEmit) record->enableEmitResultsChanged(true);
@@ -652,36 +770,70 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
 
 QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html) const {
-    if (model==0) {
+    switch (model)
+    {
+    case 0: //3D diffusion with triplet
         if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
         if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
         if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+    case 1: //3D diffusion with 2 blinking components
+        if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
+        if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
+        if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+        if (id==3) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
+        if (id==4) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
+        if (id==5) return (html)?tr("Offset G"):tr("Offset G");
     }
     return QString();
 }
 
+
 QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html) const {
-    if (model==0) {
+    switch (model)
+    {
+    case 0:
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==1) return QString("");
         if (id==2) return QString("");
+    case 1:
+        if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
+        if (id==1) return QString("");
+        if (id==2) return QString("");
+        if (id==3) return (html)?tr("&mu;s"):tr("microseconds");
+        if (id==4) return QString("");
+        if (id==5) return QString("");
     }
     return QString();
 }
 int QFFCSMaxEntEvaluationItem::getParameterCount(int model) const {
-    if (model==0) return 3;
+    switch (model)
+    {
+    case 0: return 3;
+    case 1: return 6;
+
+
+    }
     return 0;
 }
 
 QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
-    if (model==0) {
+    switch (model)
+    {
+    case 0:
         if (id==0) return tr("trip_tau");
         if (id==1) return tr("trip_theta");
         if (id==2) return tr("focus_struct_fac");
+    case 1:
+        if (id==0) return tr("trip_tau");
+        if (id==1) return tr("trip_theta");
+        if (id==2) return tr("focus_struct_fac");
+        if (id==3) return tr("dark_tau");
+        if (id==4) return tr("dark_theta");
+        if (id==5) return tr("offset");
     }
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
 int QFFCSMaxEntEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 1;
+    return 5;
 }
