@@ -1,10 +1,9 @@
-#include "qfespimb040filterchangerconfig.h"
-#include "qfespimb040mainwindow.h"
+#include "qffilterchangerconfigwidget.h"
 #include <QtGui>
 #include <iostream>
 
 
-QFESPIMB040FilterChangerConfig::QFESPIMB040FilterChangerConfig(QWidget* parent):
+QFFilterChangerConfigWidget::QFFilterChangerConfigWidget(QWidget* parent):
     QWidget(parent)
 {
 
@@ -31,14 +30,14 @@ QFESPIMB040FilterChangerConfig::QFESPIMB040FilterChangerConfig(QWidget* parent):
 }
 
 
-QFESPIMB040FilterChangerConfig::~QFESPIMB040FilterChangerConfig()
+QFFilterChangerConfigWidget::~QFFilterChangerConfigWidget()
 {
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
     timUpdate->stop();
 }
 
-void QFESPIMB040FilterChangerConfig::unlockFilterChangers() {
+void QFFilterChangerConfigWidget::unlockFilterChangers() {
     locked=false;
     connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
     timUpdate->setSingleShot(true);
@@ -47,17 +46,18 @@ void QFESPIMB040FilterChangerConfig::unlockFilterChangers() {
 }
 
 
-void QFESPIMB040FilterChangerConfig::lockFilterChangers() {
+void QFFilterChangerConfigWidget::lockFilterChangers() {
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
     timUpdate->stop();
 }
 
-void QFESPIMB040FilterChangerConfig::setLog(QFPluginLogService* log) {
+void QFFilterChangerConfigWidget::setLog(QFPluginLogService* log) {
     m_log=log;
 }
 
-void QFESPIMB040FilterChangerConfig::init(QFPluginLogService* log, QFPluginServices* pluginServices) {
+void QFFilterChangerConfigWidget::init(const QString &filterconfig, QFPluginLogService *log, QFPluginServices *pluginServices) {
+    m_filterconfig=filterconfig;
     m_log=log;
     m_pluginServices=pluginServices;
 
@@ -72,7 +72,7 @@ void QFESPIMB040FilterChangerConfig::init(QFPluginLogService* log, QFPluginServi
     updateStates();
 }
 
-void QFESPIMB040FilterChangerConfig::loadSettings(QSettings& settings, QString prefix) {
+void QFFilterChangerConfigWidget::loadSettings(QSettings& settings, QString prefix) {
     cmbFilterChanger->loadSettings(settings, prefix+"FilterChanger/");
 
     FilterChangerStateUpdateInterval=settings.value(prefix+"update_interval", FilterChangerStateUpdateInterval).toDouble();
@@ -88,7 +88,7 @@ void QFESPIMB040FilterChangerConfig::loadSettings(QSettings& settings, QString p
     updateFilters();
 }
 
-void QFESPIMB040FilterChangerConfig::saveSettings(QSettings& settings, QString prefix) {
+void QFFilterChangerConfigWidget::saveSettings(QSettings& settings, QString prefix) {
     cmbFilterChanger->storeSettings(settings, prefix+"FilterChanger/");
     settings.setValue(prefix+"update_interval", FilterChangerStateUpdateInterval);
     settings.setValue(prefix+"filter_count", filters.size());
@@ -97,7 +97,7 @@ void QFESPIMB040FilterChangerConfig::saveSettings(QSettings& settings, QString p
     }
 }
 
-void QFESPIMB040FilterChangerConfig::createWidgets() {
+void QFFilterChangerConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,26 +134,26 @@ void QFESPIMB040FilterChangerConfig::createWidgets() {
 
 }
 
-void QFESPIMB040FilterChangerConfig::createActions() {
-    actConnect=new QAction(QIcon(":/spimb040/connect_filterchanger.png"), tr("Connect to filter changer driver/hardware ..."), this);
+void QFFilterChangerConfigWidget::createActions() {
+    actConnect=new QAction(QIcon(":/libqf3widgets/connect_filterchanger.png"), tr("Connect to filter changer driver/hardware ..."), this);
     actConnect->setCheckable(true);
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
 
-    actConfigure=new QAction(QIcon(":/spimb040/configure_filterchanger.png"), tr("Configure filter changer ..."), this);
+    actConfigure=new QAction(QIcon(":/libqf3widgets/configure_filterchanger.png"), tr("Configure filter changer ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 
 
-    actSetFilters=new QAction(QIcon(":/spimb040/filterchanger_selectfilters.png"), tr("select the filters in the filter changer ..."), this);
+    actSetFilters=new QAction(QIcon(":/libqf3widgets/filterchanger_selectfilters.png"), tr("select the filters in the filter changer ..."), this);
     connect(actSetFilters, SIGNAL(triggered()), this, SLOT(selectFilters()));
     btnSelectFilters->setDefaultAction(actSetFilters);
 
 
 }
 
-void QFESPIMB040FilterChangerConfig::updateStates() {
+void QFFilterChangerConfigWidget::updateStates() {
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     bool conn;
@@ -166,11 +166,11 @@ void QFESPIMB040FilterChangerConfig::updateStates() {
         conn=FilterChanger->isFilterChangerConnected(FilterChangerID);
         if (conn) {
             actConnect->setChecked(true);
-            actConnect->setIcon(QIcon(":/spimb040/disconnect_filterchanger.png"));
+            actConnect->setIcon(QIcon(":/libqf3widgets/disconnect_filterchanger.png"));
             actConnect->setText(tr("Disconnect from filter changer driver/hardware ..."));
         } else {
             actConnect->setChecked(false);
-            actConnect->setIcon(QIcon(":/spimb040/connect_filterchanger.png"));
+            actConnect->setIcon(QIcon(":/libqf3widgets/connect_filterchanger.png"));
             actConnect->setText(tr("Connect from filter changer driver/hardware ..."));
         }
         disconnect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
@@ -184,7 +184,7 @@ void QFESPIMB040FilterChangerConfig::updateStates() {
     cmbFilter->setEnabled(conn);
 }
 
-void QFESPIMB040FilterChangerConfig::updateFilters() {
+void QFFilterChangerConfigWidget::updateFilters() {
     QString idx=cmbFilter->currentText();
     disconnect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     cmbFilter->clear();
@@ -200,7 +200,7 @@ void QFESPIMB040FilterChangerConfig::updateFilters() {
                         f=filters[i];
                     }
                 }
-                cmbFilter->addItem(QF3FilterCombobox::getFilterIcon(f, m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini"),
+                cmbFilter->addItem(QF3FilterCombobox::getFilterIcon(f, m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig),
                                    tr("#%1: %2").arg(i+1).arg(f), f);
             }
         }
@@ -212,7 +212,7 @@ void QFESPIMB040FilterChangerConfig::updateFilters() {
     updateStates();
 }
 
-void QFESPIMB040FilterChangerConfig::selectFilters() {
+void QFFilterChangerConfigWidget::selectFilters() {
     QFExtensionFilterChanger* FilterChanger=getFilterChanger();
     int FilterChangerID=getFilterChangerID();
 
@@ -229,7 +229,7 @@ void QFESPIMB040FilterChangerConfig::selectFilters() {
     for (int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
         QF3FilterCombobox* cmb=new QF3FilterCombobox(this);
         combos.append(cmb);
-        cmb->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+        cmb->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig);
         formlayout->addRow(tr("filter #%1:").arg(i+1), cmb);
         if (i<filters.size()) cmb->setCurrentFilter(filters[i]);
     }
@@ -258,7 +258,7 @@ void QFESPIMB040FilterChangerConfig::selectFilters() {
     updateFilters();
 }
 
-void QFESPIMB040FilterChangerConfig::disConnect() {
+void QFFilterChangerConfigWidget::disConnect() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     bool conn=actConnect->isChecked();
     QFExtensionFilterChanger* FilterChanger=getFilterChanger();
@@ -292,7 +292,7 @@ void QFESPIMB040FilterChangerConfig::disConnect() {
 
 
 
-void QFESPIMB040FilterChangerConfig::configure() {
+void QFFilterChangerConfigWidget::configure() {
     QFExtensionFilterChanger* FilterChanger=getFilterChanger();
     int FilterChangerID=getFilterChangerID();
     if (FilterChanger) FilterChanger->showFilterChangerSettingsDialog(FilterChangerID, this);
@@ -302,20 +302,20 @@ void QFESPIMB040FilterChangerConfig::configure() {
 
 
 
-QFExtensionFilterChanger* QFESPIMB040FilterChangerConfig::getFilterChanger() const {
+QFExtensionFilterChanger* QFFilterChangerConfigWidget::getFilterChanger() const {
     return cmbFilterChanger->currentExtensionFilterChanger();
 }
 
-QFExtension* QFESPIMB040FilterChangerConfig::getFilterChangerExtension() const {
+QFExtension* QFFilterChangerConfigWidget::getFilterChangerExtension() const {
     return cmbFilterChanger->currentExtension();
 }
 
-int QFESPIMB040FilterChangerConfig::getFilterChangerID() const {
+int QFFilterChangerConfigWidget::getFilterChangerID() const {
 
     return cmbFilterChanger->currentFilterChangerID();
 }
 
-int QFESPIMB040FilterChangerConfig::getFilterChangerState() {
+int QFFilterChangerConfigWidget::getFilterChangerState() {
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     FilterChanger=getFilterChanger();
@@ -326,19 +326,19 @@ int QFESPIMB040FilterChangerConfig::getFilterChangerState() {
     return -1;
 }
 
-QString QFESPIMB040FilterChangerConfig::getCurrentFilter() const {
+QString QFFilterChangerConfigWidget::getCurrentFilter() const {
     if (cmbFilter->currentIndex()<0) return QString("---");
     return cmbFilter->itemData(cmbFilter->currentIndex()).toString();
 }
 
-FilterDescription QFESPIMB040FilterChangerConfig::getCurrentFilterDescription() const {
+FilterDescription QFFilterChangerConfigWidget::getCurrentFilterDescription() const {
     QString f="---";
     if (cmbFilter->currentIndex()>=0) f=cmbFilter->itemData(cmbFilter->currentIndex()).toString();
-    return QF3FilterCombobox::getFilter(f, m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    return QF3FilterCombobox::getFilter(f, m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig);
 }
 
 
-void QFESPIMB040FilterChangerConfig::displayFilterChangerStates(/*bool automatic*/) {
+void QFFilterChangerConfigWidget::displayFilterChangerStates(/*bool automatic*/) {
     if (locked) return;
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
@@ -367,11 +367,11 @@ void QFESPIMB040FilterChangerConfig::displayFilterChangerStates(/*bool automatic
     }
 }
 
-void QFESPIMB040FilterChangerConfig::setFilterChanger(int filter) {
+void QFFilterChangerConfigWidget::setFilterChanger(int filter) {
     cmbFilter->setCurrentIndex(filter);
 }
 
-void QFESPIMB040FilterChangerConfig::FilterChangerNewFilterSelected(int index) {
+void QFFilterChangerConfigWidget::FilterChangerNewFilterSelected(int index) {
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     FilterChanger=getFilterChanger();
@@ -392,72 +392,72 @@ void QFESPIMB040FilterChangerConfig::FilterChangerNewFilterSelected(int index) {
     }
 }
 
-void QFESPIMB040FilterChangerConfig::connectFilterChanger() {
+void QFFilterChangerConfigWidget::connectFilterChanger() {
     actConnect->setChecked(true);
 }
 
-void QFESPIMB040FilterChangerConfig::disconnectFilterChanger() {
+void QFFilterChangerConfigWidget::disconnectFilterChanger() {
     actConnect->setChecked(false);
 }
 
-void QFESPIMB040FilterChangerConfig::setReadOnly(bool readonly) {
+void QFFilterChangerConfigWidget::setReadOnly(bool readonly) {
     cmbFilterChanger->setReadOnly(readonly);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter(int filter) {
+void QFFilterChangerConfigWidget::setFilter(int filter) {
     if (isFilterChangerConnected() && isLastActionComplete() && !moving) {
         if (filter>=0 && filter<cmbFilter->count())
             cmbFilter->setCurrentIndex(filter);
     }
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter0() {
+void QFFilterChangerConfigWidget::setFilter0() {
     setFilter(0);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter1() {
+void QFFilterChangerConfigWidget::setFilter1() {
     setFilter(1);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter2() {
+void QFFilterChangerConfigWidget::setFilter2() {
     setFilter(2);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter3() {
+void QFFilterChangerConfigWidget::setFilter3() {
     setFilter(3);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter4() {
+void QFFilterChangerConfigWidget::setFilter4() {
     setFilter(4);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter5() {
+void QFFilterChangerConfigWidget::setFilter5() {
     setFilter(5);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter6() {
+void QFFilterChangerConfigWidget::setFilter6() {
     setFilter(6);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter7() {
+void QFFilterChangerConfigWidget::setFilter7() {
     setFilter(7);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter8() {
+void QFFilterChangerConfigWidget::setFilter8() {
     setFilter(8);
 }
 
-void QFESPIMB040FilterChangerConfig::setFilter9() {
+void QFFilterChangerConfigWidget::setFilter9() {
     setFilter(9);
 }
 
 
 
-bool QFESPIMB040FilterChangerConfig::isFilterChangerConnected() const {
+bool QFFilterChangerConfigWidget::isFilterChangerConnected() const {
     return actConnect->isChecked();
 }
 
-bool QFESPIMB040FilterChangerConfig::isLastActionComplete() const {
+bool QFFilterChangerConfigWidget::isLastActionComplete() const {
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     FilterChanger=getFilterChanger();

@@ -1,5 +1,5 @@
-#ifndef QFESPIMB040CAMERACONFIG_H
-#define QFESPIMB040CAMERACONFIG_H
+#ifndef QFCAMERACONFIGWIDGET_H
+#define QFCAMERACONFIGWIDGET_H
 
 #include <QGroupBox>
 
@@ -59,7 +59,7 @@ class QFCameraConfigNotifier: public QObject {
 
 
  */
-class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxStartResume {
+class QFCameraConfigWidget : public QGroupBox, public QFCameraConfigComboBoxStartResume {
         Q_OBJECT
     protected:
         /** \brief states used in conjunction with displayStates() */
@@ -69,9 +69,9 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
 
 
         /** Default constructor */
-        QFESPIMB040CameraConfig(QFESPIMB040MainWindow* parent, int camViewID, QFPluginServices* pluginServices);
+        QFCameraConfigWidget(QFESPIMB040MainWindow* parent, int camViewID, QFPluginServices* pluginServices);
         /** Default destructor */
-        virtual ~QFESPIMB040CameraConfig();
+        virtual ~QFCameraConfigWidget();
 
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings, QString prefix);
@@ -313,4 +313,4 @@ class QFESPIMB040CameraConfig : public QGroupBox, public QFCameraConfigComboBoxS
         void stopPreview();
 };
 
-#endif // QFESPIMB040CAMERACONFIG_H
+#endif // QFCAMERACONFIGWIDGET_H

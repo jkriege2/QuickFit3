@@ -58,7 +58,6 @@
         <file alias="shutter_opened.png">icons/shutter_open.png</file>
         <file alias="connect_shutter.png">icons/connect_shutter.png</file>
         <file alias="disconnect_shutter.png">icons/disconnect_shutter.png</file>
-        <file alias="configure_shutter.png">icons/configure_alt.png</file>
         <file alias="lightpath.png">icons/lightpath.png</file>
         <file alias="lightpath_delete.png">icons/lightpath_delete.png</file>
         <file alias="lightpath_save.png">icons/lightpath_save.png</file>
@@ -71,10 +70,11 @@
         <file alias="shortcut_settings.png">icons/shortcut_settings.png</file>
         <file alias="connect_filterchanger.png">icons/connect_filterchanger.png</file>
         <file alias="disconnect_filterchanger.png">icons/disconnect_filterchanger.png</file>
+        <file alias="configure_shutter.png">icons/configure_alt.png</file>
         <file alias="configure_filterchanger.png">icons/configure_alt.png</file>
+        <file alias="configure_lightsource.png">icons/configure_alt.png</file>
         <file alias="connect_lightsource.png">icons/connect_lightsource.png</file>
         <file alias="disconnect_lightsource.png">icons/disconnect_lightsource.png</file>
-        <file alias="configure_lightsource.png">icons/configure_alt.png</file>
         <file alias="filterchanger_selectfilters.png">icons/filterchanger_selectfilters.png</file>
     </qresource>
 </RCC>

@@ -33,7 +33,7 @@
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
-#include "qfespimb040cameraconfig.h"
+#include "qfcameraconfigwidget.h"
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget2.h"
 #include "qfespimb040acquisitionconfigwidget2.h"

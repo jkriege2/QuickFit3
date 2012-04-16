@@ -177,7 +177,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QFESPIMB040ShutterConfig" name="shutterLaser1" native="true">
+           <widget class="QFShutterConfigWidget" name="shutterLaser1" native="true">
             <property name="minimumSize">
              <size>
               <width>5</width>
@@ -249,7 +249,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QFESPIMB040ShutterConfig" name="shutterLaser2" native="true">
+           <widget class="QFShutterConfigWidget" name="shutterLaser2" native="true">
             <property name="minimumSize">
              <size>
               <width>5</width>
@@ -321,7 +321,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QFESPIMB040ShutterConfig" name="shutterMainIllumination" native="true">
+           <widget class="QFShutterConfigWidget" name="shutterMainIllumination" native="true">
             <property name="minimumSize">
              <size>
               <width>5</width>
@@ -956,7 +956,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QFESPIMB040FilterChangerConfig" name="filtcDetection" native="true">
+        <widget class="QFFilterChangerConfigWidget" name="filtcDetection" native="true">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -1125,9 +1125,9 @@ p, li { white-space: pre-wrap; }
    </slots>
   </customwidget>
   <customwidget>
-   <class>QFESPIMB040ShutterConfig</class>
+   <class>QFShutterConfigWidget</class>
    <extends>QWidget</extends>
-   <header>qfespimb040shutterconfig.h</header>
+   <header>qfshutterconfigwidget.h</header>
    <container>1</container>
    <slots>
     <slot>setReadOnly(bool)</slot>
@@ -1142,9 +1142,9 @@ p, li { white-space: pre-wrap; }
    </slots>
   </customwidget>
   <customwidget>
-   <class>QFESPIMB040FilterChangerConfig</class>
+   <class>QFFilterChangerConfigWidget</class>
    <extends>QWidget</extends>
-   <header>qfespimb040filterchangerconfig.h</header>
+   <header>QFFilterChangerConfigWidget.h</header>
    <container>1</container>
    <slots>
     <slot>setReadOnly(bool)</slot>

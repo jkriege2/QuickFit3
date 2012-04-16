@@ -1,5 +1,5 @@
-#ifndef QFESPIMB040FilterChangerConfig_H
-#define QFESPIMB040FilterChangerConfig_H
+#ifndef QFFILTERCHANGERCONFIGWIDGET_H
+#define QFFILTERCHANGERCONFIGWIDGET_H
 
 #include <QGroupBox>
 
@@ -30,11 +30,12 @@ class QFESPIMB040MainWindow; // forward
 #include "jkqttools.h"
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionfilterchanger.h"
+#include "qfextensionfilterchanger.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "qffilterchangercombobox.h"
 #include "filters.h"
+#include "libwid_imexport.h"
 
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a FilterChanger
@@ -42,15 +43,15 @@ class QFESPIMB040MainWindow; // forward
 
 
  */
-class QFESPIMB040FilterChangerConfig : public QWidget {
+class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFESPIMB040FilterChangerConfig(QWidget* parent=NULL);
+        QFFilterChangerConfigWidget(QWidget* parent=NULL);
         /** Default destructor */
-        virtual ~QFESPIMB040FilterChangerConfig();
+        virtual ~QFFilterChangerConfigWidget();
 
-        void init(QFPluginLogService* log, QFPluginServices* pluginServices);
+        void init(const QString& filterconfig, QFPluginLogService* log, QFPluginServices* pluginServices);
         void setLog(QFPluginLogService* log);
 
         /** \brief load settings */
@@ -101,6 +102,7 @@ class QFESPIMB040FilterChangerConfig : public QWidget {
         //QFESPIMB040MainWindow* m_parent;
         QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
+        QString m_filterconfig;
 
 
         void createWidgets();
@@ -170,4 +172,4 @@ class QFESPIMB040FilterChangerConfig : public QWidget {
         void FilterChangerNewFilterSelected(int index);
 };
 
-#endif // QFESPIMB040FilterChangerConfig_H
+#endif // QFFILTERCHANGERCONFIGWIDGET_H

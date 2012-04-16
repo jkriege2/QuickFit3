@@ -1,9 +1,8 @@
-#ifndef QFESPIMB040ShutterConfig_H
-#define QFESPIMB040ShutterConfig_H
+#ifndef QFSHUTTERCONFIGWIDGET_H
+#define QFSHUTTERCONFIGWIDGET_H
 
 #include <QGroupBox>
 
-class QFESPIMB040MainWindow; // forward
 
 #include <QWidget>
 #include "qvisiblehandlesplitter.h"
@@ -30,10 +29,11 @@ class QFESPIMB040MainWindow; // forward
 #include "jkqttools.h"
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionshutter.h"
+#include "qfextensionshutter.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "qfshuttercombobox.h"
+#include "libwid_imexport.h"
 
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a shutter
@@ -41,13 +41,13 @@ class QFESPIMB040MainWindow; // forward
 
 
  */
-class QFESPIMB040ShutterConfig : public QWidget {
+class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFESPIMB040ShutterConfig(QWidget* parent=NULL);
+        QFShutterConfigWidget(QWidget* parent=NULL);
         /** Default destructor */
-        virtual ~QFESPIMB040ShutterConfig();
+        virtual ~QFShutterConfigWidget();
 
         void init(QFPluginLogService* log, QFPluginServices* pluginServices);
         void setLog(QFPluginLogService* log);
@@ -81,7 +81,6 @@ class QFESPIMB040ShutterConfig : public QWidget {
         void updateStates();
 
     protected:
-        //QFESPIMB040MainWindow* m_parent;
         QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
 
@@ -153,4 +152,4 @@ class QFESPIMB040ShutterConfig : public QWidget {
         void shutterActionClicked(bool shutterOpened);
 };
 
-#endif // QFESPIMB040ShutterConfig_H
+#endif // QFSHUTTERCONFIGWIDGET_H

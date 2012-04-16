@@ -120,9 +120,9 @@ void QFESPIMB040MainWindow::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create camera config widgets
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    camConfig1=new QFESPIMB040CameraConfig(this, 0, m_pluginServices);
+    camConfig1=new QFCameraConfigWidget(this, 0, m_pluginServices);
     mainlayout->addWidget(camConfig1, 0, 0);
-    camConfig2=new QFESPIMB040CameraConfig(this, 1, m_pluginServices);
+    camConfig2=new QFCameraConfigWidget(this, 1, m_pluginServices);
     mainlayout->addWidget(camConfig2, 0, 1);
 
     //connect(camConfig1, SIGNAL(configFilesChanged()), camConfig2, SLOT(rereadConfigCombos()));
@@ -1176,7 +1176,7 @@ QString QFESPIMB040MainWindow::saveAcquisitionDescription(QFExtension* extension
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
-    QFESPIMB040CameraConfig* cam=camConfig1;
+    QFCameraConfigWidget* cam=camConfig1;
     if (camera==1) cam=camConfig2;
 
     QList<QFExtensionCamera::AcquititonFileDescription> files;
@@ -1252,7 +1252,7 @@ QString QFESPIMB040MainWindow::savePreviewDescription(QFExtension* extension, QF
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
-    QFESPIMB040CameraConfig* cam=camConfig1;
+    QFCameraConfigWidget* cam=camConfig1;
     if (camera==1) cam=camConfig2;
 
     QMap<QString, QVariant> parameters;

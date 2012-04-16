@@ -12,7 +12,7 @@
 /*! \brief Interface that allows to stop/resume an acquisition
     \ingroup qf3lib_widgets
  */
-class QFCameraConfigComboBoxStartResume {
+class QFWIDLIB_EXPORT QFCameraConfigComboBoxStartResume {
 public:
    ~QFCameraConfigComboBoxStartResume() {};
 

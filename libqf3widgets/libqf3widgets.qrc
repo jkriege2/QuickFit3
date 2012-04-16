@@ -49,5 +49,19 @@
         <file alias="plot_bars.png">icons/fcsplot_bars.png</file>
         <file alias="plot_steps.png">icons/fcsplot_steps.png</file>
         <file alias="plot_impulses.png">icons/fcsplot_impulses.png</file>
+        <file alias="connect_filterchanger.png">icons/connect_filterchanger.png</file>
+        <file alias="connect_lightsource.png">icons/connect_lightsource.png</file>
+        <file alias="connect_shutter.png">icons/connect_shutter.png</file>
+        <file alias="connect_stage.png">icons/connect_stage.png</file>
+        <file alias="disconnect_filterchanger.png">icons/disconnect_filterchanger.png</file>
+        <file alias="disconnect_lightsource.png">icons/disconnect_lightsource.png</file>
+        <file alias="disconnect_shutter.png">icons/disconnect_shutter.png</file>
+        <file alias="disconnect_stage.png">icons/disconnect_stage.png</file>
+        <file alias="filterchanger_selectfilters.png">icons/filterchanger_selectfilters.png</file>
+        <file alias="configure_shutter.png">icons/configure_alt.png</file>
+        <file alias="configure_filterchanger.png">icons/configure_alt.png</file>
+        <file alias="configure_lightsource.png">icons/configure_alt.png</file>
+        <file alias="shutter_closed.png">icons/shutter_closed.png</file>
+        <file alias="shutter_open.png">icons/shutter_open.png</file>
     </qresource>
 </RCC>

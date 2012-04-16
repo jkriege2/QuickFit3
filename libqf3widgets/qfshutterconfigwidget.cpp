@@ -1,16 +1,15 @@
-#include "qfespimb040shutterconfig.h"
-#include "qfespimb040mainwindow.h"
+#include "qfshutterconfigwidget.h"
 #include <QtGui>
 #include <iostream>
 
 
-QFESPIMB040ShutterConfig::QFESPIMB040ShutterConfig(QWidget* parent):
+QFShutterConfigWidget::QFShutterConfigWidget(QWidget* parent):
     QWidget(parent)
 {
 
     shutterStateUpdateInterval=351;
-    iconOpened=QPixmap(":/spimb040/shutter_opened.png");
-    iconClosed=QPixmap(":/spimb040/shutter_closed.png");
+    iconOpened=QPixmap(":/libqf3widgets/shutter_opened.png");
+    iconClosed=QPixmap(":/libqf3widgets/shutter_closed.png");
 
     timUpdate=new QTimer(this);
     timUpdate->setSingleShot(true);
@@ -33,21 +32,21 @@ QFESPIMB040ShutterConfig::QFESPIMB040ShutterConfig(QWidget* parent):
 }
 
 
-QFESPIMB040ShutterConfig::~QFESPIMB040ShutterConfig()
+QFShutterConfigWidget::~QFShutterConfigWidget()
 {
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
     timUpdate->stop();
 }
 
-void QFESPIMB040ShutterConfig::lockShutters() {
+void QFShutterConfigWidget::lockShutters() {
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
     timUpdate->stop();
 }
 
 
-void QFESPIMB040ShutterConfig::unlockShutters() {
+void QFShutterConfigWidget::unlockShutters() {
     locked=false;
     connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
     timUpdate->setSingleShot(true);
@@ -56,11 +55,11 @@ void QFESPIMB040ShutterConfig::unlockShutters() {
 }
 
 
-void QFESPIMB040ShutterConfig::setLog(QFPluginLogService* log) {
+void QFShutterConfigWidget::setLog(QFPluginLogService* log) {
     m_log=log;
 }
 
-void QFESPIMB040ShutterConfig::init(QFPluginLogService* log, QFPluginServices* pluginServices) {
+void QFShutterConfigWidget::init(QFPluginLogService* log, QFPluginServices* pluginServices) {
     m_log=log;
     m_pluginServices=pluginServices;
 
@@ -73,18 +72,18 @@ void QFESPIMB040ShutterConfig::init(QFPluginLogService* log, QFPluginServices* p
     updateStates();
 }
 
-void QFESPIMB040ShutterConfig::loadSettings(QSettings& settings, QString prefix) {
+void QFShutterConfigWidget::loadSettings(QSettings& settings, QString prefix) {
     cmbShutter->loadSettings(settings, prefix+"shutter/");
 
     shutterStateUpdateInterval=settings.value(prefix+"update_interval", shutterStateUpdateInterval).toDouble();
 }
 
-void QFESPIMB040ShutterConfig::saveSettings(QSettings& settings, QString prefix) {
+void QFShutterConfigWidget::saveSettings(QSettings& settings, QString prefix) {
     cmbShutter->storeSettings(settings, prefix+"shutter/");
     settings.setValue(prefix+"update_interval", shutterStateUpdateInterval);
 }
 
-void QFESPIMB040ShutterConfig::createWidgets() {
+void QFShutterConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,14 +115,14 @@ void QFESPIMB040ShutterConfig::createWidgets() {
 
 }
 
-void QFESPIMB040ShutterConfig::createActions() {
-    actConnect=new QAction(QIcon(":/spimb040/connect_shutter.png"), tr("Connect to shutter driver/hardware ..."), this);
+void QFShutterConfigWidget::createActions() {
+    actConnect=new QAction(QIcon(":/libqf3widgets/connect_shutter.png"), tr("Connect to shutter driver/hardware ..."), this);
     actConnect->setCheckable(true);
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
 
-    actConfigure=new QAction(QIcon(":/spimb040/configure_shutter.png"), tr("Configure shutter ..."), this);
+    actConfigure=new QAction(QIcon(":/libqf3widgets/configure_shutter.png"), tr("Configure shutter ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 
@@ -136,7 +135,7 @@ void QFESPIMB040ShutterConfig::createActions() {
 
 }
 
-void QFESPIMB040ShutterConfig::updateStates() {
+void QFShutterConfigWidget::updateStates() {
     QFExtensionShutter* shutter;
     int shutterID;
     bool conn;
@@ -149,11 +148,11 @@ void QFESPIMB040ShutterConfig::updateStates() {
         conn=shutter->isShutterConnected(shutterID);
         if (conn) {
             actConnect->setChecked(true);
-            actConnect->setIcon(QIcon(":/spimb040/disconnect_shutter.png"));
+            actConnect->setIcon(QIcon(":/libqf3widgets/disconnect_shutter.png"));
             actConnect->setText(tr("Disconnect from shutter driver/hardware ..."));
         } else {
             actConnect->setChecked(false);
-            actConnect->setIcon(QIcon(":/spimb040/connect_shutter.png"));
+            actConnect->setIcon(QIcon(":/libqf3widgets/connect_shutter.png"));
             actConnect->setText(tr("Connect from shutter driver/hardware ..."));
         }
     }
@@ -164,7 +163,7 @@ void QFESPIMB040ShutterConfig::updateStates() {
 
 }
 
-void QFESPIMB040ShutterConfig::disConnect() {
+void QFShutterConfigWidget::disConnect() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     bool conn=actConnect->isChecked();
     QFExtensionShutter* shutter=getShutter();
@@ -197,7 +196,7 @@ void QFESPIMB040ShutterConfig::disConnect() {
 
 
 
-void QFESPIMB040ShutterConfig::configure() {
+void QFShutterConfigWidget::configure() {
     QFExtensionShutter* shutter=getShutter();
     int shutterID=getShutterID();
     if (shutter) shutter->showShutterSettingsDialog(shutterID, this);
@@ -207,20 +206,20 @@ void QFESPIMB040ShutterConfig::configure() {
 
 
 
-QFExtensionShutter* QFESPIMB040ShutterConfig::getShutter() const {
+QFExtensionShutter* QFShutterConfigWidget::getShutter() const {
     return cmbShutter->currentExtensionShutter();
 }
 
-QFExtension* QFESPIMB040ShutterConfig::getShutterExtension() const {
+QFExtension* QFShutterConfigWidget::getShutterExtension() const {
     return cmbShutter->currentExtension();
 }
 
-int QFESPIMB040ShutterConfig::getShutterID()  const{
+int QFShutterConfigWidget::getShutterID()  const{
 
     return cmbShutter->currentShutterID();
 }
 
-bool QFESPIMB040ShutterConfig::getShutterState() {
+bool QFShutterConfigWidget::getShutterState() {
     QFExtensionShutter* shutter;
     int shutterID;
     shutter=getShutter();
@@ -232,7 +231,7 @@ bool QFESPIMB040ShutterConfig::getShutterState() {
 }
 
 
-void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
+void QFShutterConfigWidget::displayShutterStates(/*bool automatic*/) {
     if (locked) return;
 
     QFExtensionShutter* shutter;
@@ -269,23 +268,23 @@ void QFESPIMB040ShutterConfig::displayShutterStates(/*bool automatic*/) {
 
 }
 
-void QFESPIMB040ShutterConfig::setShutter(bool opened) {
+void QFShutterConfigWidget::setShutter(bool opened) {
     actState->setChecked(opened);
 }
 
-void QFESPIMB040ShutterConfig::toggleShutter() {
+void QFShutterConfigWidget::toggleShutter() {
     actState->setChecked(!actState->isChecked());
 }
 
-void QFESPIMB040ShutterConfig::shutterOff() {
+void QFShutterConfigWidget::shutterOff() {
     actState->setChecked(false);
 }
 
-void QFESPIMB040ShutterConfig::shutterOn() {
+void QFShutterConfigWidget::shutterOn() {
     actState->setChecked(true);
 }
 
-void QFESPIMB040ShutterConfig::shutterActionClicked(bool opened) {
+void QFShutterConfigWidget::shutterActionClicked(bool opened) {
     QFExtensionShutter* shutter;
     int shutterID;
     shutter=getShutter();
@@ -306,25 +305,25 @@ void QFESPIMB040ShutterConfig::shutterActionClicked(bool opened) {
     }
 }
 
-void QFESPIMB040ShutterConfig::connectShutter() {
+void QFShutterConfigWidget::connectShutter() {
     actConnect->setChecked(true);
 }
 
-void QFESPIMB040ShutterConfig::disconnectShutter() {
+void QFShutterConfigWidget::disconnectShutter() {
     actConnect->setChecked(false);
 }
 
-void QFESPIMB040ShutterConfig::setReadOnly(bool readonly) {
+void QFShutterConfigWidget::setReadOnly(bool readonly) {
     cmbShutter->setReadOnly(readonly);
 }
 
 
 
-bool QFESPIMB040ShutterConfig::isShutterConnected() const {
+bool QFShutterConfigWidget::isShutterConnected() const {
     return actConnect->isChecked();
 }
 
-bool QFESPIMB040ShutterConfig::isShutterDone() const {
+bool QFShutterConfigWidget::isShutterDone() const {
     QFExtensionShutter* shutter;
     int shutterID;
     shutter=getShutter();

@@ -82,7 +82,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qffilterchangercombobox.h \
     ../plugins/interfaces/qfextensionlightsource.h \
     ../plugins/interfaces/qfextensionfilterchanger.h \
-    qflightsourcecombobox.h
+    qflightsourcecombobox.h \
+    qfshutterconfigwidget.h \
+    qffilterchangerconfigwidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -129,7 +131,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/image_tools.cpp \
     ../../../../LIB/trunk/qt/qkeysequenceedit.cpp \
     qffilterchangercombobox.cpp \
-    qflightsourcecombobox.cpp
+    qflightsourcecombobox.cpp \
+    qfshutterconfigwidget.cpp \
+    qffilterchangerconfigwidget.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

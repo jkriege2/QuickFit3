@@ -32,7 +32,7 @@
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
-#include "qfespimb040cameraconfig.h"
+#include "qfcameraconfigwidget.h"
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget.h"
 #include "qfespimb040acquisitionconfigwidget.h"
@@ -67,8 +67,8 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         /** \brief main log widget */
         QtLogFile* logMain;
 
-        QFESPIMB040CameraConfig* camConfig1;
-        QFESPIMB040CameraConfig* camConfig2;
+        QFCameraConfigWidget* camConfig1;
+        QFCameraConfigWidget* camConfig2;
         QFESPIMB040SampleStageConfig* sampleStages;
         QFPluginServices* m_pluginServices;
 

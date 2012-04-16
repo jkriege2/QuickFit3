@@ -17,7 +17,6 @@ include(../../libquickfitwidgets.pri)
 HEADERS += spimb040.h \
            qfespimb040mainwindow.h \
            qfespimb040cameraview.h \
-           qfespimb040cameraconfig.h \
            qfespimb040samplestageconfig.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
@@ -39,18 +38,16 @@ HEADERS += spimb040.h \
     qfespimb040samplestageconfigthread.h \
     qfespimb040imagestackconfigwidget2.h \
     qfespimb040acquisitionconfigwidget2.h \
-    qfespimb040shutterconfig.h \
     qfespimb040configcombobox.h \
     qfespimb040samplestagestepconfigdialog.h \
     qfespimb040shortcutconfigdialog.h \
     qfespimb040camparamstackconfigwidget2.h \
     qfespimb040filenametool.h \
-    qfespimb040filterchangerconfig.h
+    qfcameraconfigwidget.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
            qfespimb040cameraview.cpp \
-           qfespimb040cameraconfig.cpp \
            qfespimb040samplestageconfig.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
@@ -67,13 +64,12 @@ SOURCES += spimb040.cpp \
     qfespimb040samplestageconfigthread.cpp \
     qfespimb040imagestackconfigwidget2.cpp \
     qfespimb040acquisitionconfigwidget2.cpp \
-    qfespimb040shutterconfig.cpp \
     qfespimb040configcombobox.cpp \
     qfespimb040samplestagestepconfigdialog.cpp \
     qfespimb040shortcutconfigdialog.cpp \
     qfespimb040camparamstackconfigwidget2.cpp \
     qfespimb040filenametool.cpp \
-    qfespimb040filterchangerconfig.cpp
+    qfcameraconfigwidget.cpp
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \
