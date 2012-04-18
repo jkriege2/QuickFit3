@@ -22,6 +22,8 @@
 #include "qfcameraconfigcombobox.h"
 #include "qfcameracombobox.h"
 #include "qtriple.h"
+#include "qcheckablestringlistmodel.h"
+#include "qftablemodel.h"
 
 
 class QFESPIMB040MainWindow; // forward
@@ -145,8 +147,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         QString getCurrentLightpathFilename() const;
     public slots:
         void loadLightpathConfig(const QString& filename, bool waiting=false);
-        void saveLightpathConfig(const QString& filename, const QString &name);
-        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""));
+        void saveLightpathConfig(const QString& filename, const QString &name, const QList<bool> &saveProp=QList<bool>());
+        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), const QList<bool>& saveProp=QList<bool>());
         void saveCurrentLightpatConfig();
         void deleteCurrentLightpatConfig();
         void emitLighpathesChanged();
@@ -189,6 +191,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         QWidget* m_pluginMainWidget;
 
         QShortcut* addShortCut(const QString& id, const QString& label, const QKeySequence& sequence=QKeySequence());
+
+        QFTableModel* lightpathConfigModel;
 };
 
 #endif // QFESPIMB040OPTICSSETUP_H

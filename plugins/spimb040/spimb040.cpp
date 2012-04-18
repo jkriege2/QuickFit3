@@ -50,7 +50,7 @@ void QFESPIMB040::initExtension() {
     //std::cout<<"extensions toolbars: "<<exttb<<std::endl;
     if (exttb) {
         exttb->addAction(actStartPlugin);
-        exttb->addAction(actStartPluginOld);
+        //exttb->addAction(actStartPluginOld);
     }
     QMenu* extm=services->getMenu("extensions");
     //std::cout<<"extensions menu: "<<extm<<std::endl;

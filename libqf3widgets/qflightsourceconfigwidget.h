@@ -34,7 +34,7 @@
 #include "qfextensionlightsource.h"
 #include "qfextension.h"
 #include "tools.h"
-#include "qfLightSourcecombobox.h"
+#include "qflightsourcecombobox.h"
 #include "filters.h"
 #include "libwid_imexport.h"
 
@@ -73,9 +73,34 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         /** \brief unlock access to stages: restart the thread used for stage access by this widget  */
         void unlockLightSource();
 
+        /** \brief return a pointer to the LightSource */
+        QFExtensionLightSource* getLightSource() const;
+
+        /** \brief return a pointer to the ahutter QFExtension class */
+        QFExtension* getLightSourceExtension() const;
+
+
+        /** \brief get the LightSource number of the given axis */
+        int getLightSourceID() const;
+
+        bool isLightSourceConnected() const;
+
+        bool isLastActionComplete() const;
+
+        int getLineCount() const;
+        QString getLineDescription(int line) const;
+        double getSetPower(int line) const;
+        double getMeasuredPower(int line) const;
+        bool isLineEnabled(int line) const;
+        QString getLineUnit(int line) const;
+
 
     public slots:
         void setReadOnly(bool readonly);
+        /** \brief switch the given line on or off. While the widget is NOT locked, this function is blocking until the action completes  */
+        void setLineEnabled(int line, bool enabled);
+        /** \brief set the given line power. While the widget is NOT locked, this function is blocking until the action completes  */
+        void setLinePower(int line, double power);
 
     protected:
         QFPluginLogService* m_log;
@@ -129,22 +154,6 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         void updateLSLinesWidgets();
 
         int getLineByWidget(QObject *widget);
-
-    public:
-
-        /** \brief return a pointer to the LightSource */
-        QFExtensionLightSource* getLightSource() const;
-
-        /** \brief return a pointer to the ahutter QFExtension class */
-        QFExtension* getLightSourceExtension() const;
-
-
-        /** \brief get the LightSource number of the given axis */
-        int getLightSourceID() const;
-
-        bool isLightSourceConnected() const;
-
-        bool isLastActionComplete() const;
 
 
     protected slots:

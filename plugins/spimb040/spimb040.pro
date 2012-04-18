@@ -43,7 +43,9 @@ HEADERS += spimb040.h \
     qfespimb040shortcutconfigdialog.h \
     qfespimb040camparamstackconfigwidget2.h \
     qfespimb040filenametool.h \
-    qfcameraconfigwidget.h
+    qfcameraconfigwidget.h \
+    qfespimb040lightpathsavedialog.h \
+    ../base_classes/qftablemodel.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \
@@ -69,7 +71,9 @@ SOURCES += spimb040.cpp \
     qfespimb040shortcutconfigdialog.cpp \
     qfespimb040camparamstackconfigwidget2.cpp \
     qfespimb040filenametool.cpp \
-    qfcameraconfigwidget.cpp
+    qfcameraconfigwidget.cpp \
+    qfespimb040lightpathsavedialog.cpp \
+    ../base_classes/qftablemodel.cpp
 FORMS = \
     qfespimb040imagestackconfigwidget.ui \
     qfespimb040acquisitionconfigwidget.ui \
@@ -80,7 +84,8 @@ FORMS = \
     qfespimb040acquisitionconfigwidget2.ui \
     qfespimb040samplestagestepconfigdialog.ui \
     qfespimb040shortcutconfigdialog.ui \
-    qfespimb040camparamstackconfigwidget2.ui
+    qfespimb040camparamstackconfigwidget2.ui \
+    qfespimb040lightpathsavedialog.ui
 
 RESOURCES += spimb040.qrc
 

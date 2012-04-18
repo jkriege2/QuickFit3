@@ -116,9 +116,9 @@ void QFLightSourceConfigWidget::createWidgets() {
     linesLayout->setHorizontalSpacing(2);
     linesLayout->setVerticalSpacing(2);
     widgetLayout->addWidget(linesLayoutWidget, 1,0,1,3);
-    linesLayout->addWidget(new QLabel(tr("<small><b>line</b></small>")), 0, 0);
-    linesLayout->addWidget(new QLabel(tr("<small><b>set power</b></small>")), 0, 1);
-    linesLayout->addWidget(new QLabel(tr("<small><b>measured power</b></small>")), 0, 2);
+    linesLayout->addWidget(new QLabel(tr("<small><b>line</b></small>"), linesLayoutWidget), 0, 0);
+    linesLayout->addWidget(new QLabel(tr("<small><b>set power</b></small>"), linesLayoutWidget), 0, 1);
+    linesLayout->addWidget(new QLabel(tr("<small><b>measured power</b></small>"), linesLayoutWidget), 0, 2);
     /*QWidget* w=new QWidget(this);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     widgetLayout->addWidget(w,widgetLayout->rowCount()-1,widgetLayout->columnCount());
@@ -168,11 +168,64 @@ bool QFLightSourceConfigWidget::isLastActionComplete() const {
     int LightSourceID;
     LightSource=getLightSource();
     LightSourceID=getLightSourceID();
-    if (LightSource) {
-        //qDebug()<<"set LightSource state opened="<<opened;
+    if (LightSource && isLightSourceConnected()) {
         return LightSource->isLastLightSourceActionFinished(LightSourceID);
     }
     return true;
+}
+
+int QFLightSourceConfigWidget::getLineCount() const {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource && isLightSourceConnected()) {
+        return LightSource->getLightSourceLineCount(LightSourceID);
+    }
+    return 0;
+}
+
+QString QFLightSourceConfigWidget::getLineDescription(int line) const {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource && isLightSourceConnected()) {
+        return LightSource->getLightSourceLineDescription(LightSourceID, line);
+    }
+    return QString("");
+}
+
+double QFLightSourceConfigWidget::getSetPower(int line) const {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource && isLightSourceConnected()) {
+        return LightSource->getLightSourceCurrentSetPower(LightSourceID, line);
+    }
+    return 0;
+}
+
+double QFLightSourceConfigWidget::getMeasuredPower(int line) const {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource && isLightSourceConnected()) {
+        return LightSource->getLightSourceCurrentMeasuredPower(LightSourceID, line);
+    }
+    return 0;
+}
+
+bool QFLightSourceConfigWidget::isLineEnabled(int line) const {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource && isLightSourceConnected()) {
+        return LightSource->getLightSourceLineEnabled(LightSourceID, line);
+    }
+    return 0;
+}
+
+QString QFLightSourceConfigWidget::getLineUnit(int line) const {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource && isLightSourceConnected()) {
+        return LightSource->getLightSourceLinePowerUnit(LightSourceID, line);
+    }
+    return QString("");
 }
 
 void QFLightSourceConfigWidget::updateStates() {
@@ -207,7 +260,7 @@ void QFLightSourceConfigWidget::setPowerChanged(double value) {
     LightSource=getLightSource();
     LightSourceID=getLightSourceID();
     if (LightSource) {
-        LightSource->setLightSourcePower(LightSourceID, getLineByWidget(sender()), value);
+        setLinePower(getLineByWidget(sender()), value);
     }
 
 }
@@ -218,7 +271,7 @@ void QFLightSourceConfigWidget::lineEnabledToggled(bool enabled) {
     LightSource=getLightSource();
     LightSourceID=getLightSourceID();
     if (LightSource) {
-        LightSource->setLightSourceLineEnabled(LightSourceID, getLineByWidget(sender()), enabled);
+        setLineEnabled(getLineByWidget(sender()), enabled);
     }
 }
 
@@ -294,7 +347,7 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
             linesLayout->addWidget(w.labPower, widgetLayout->rowCount()-1, 2);
             lineWidgets.append(w);
             connect(w.chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            connect(w.spinPower, SIGNAL(valueCHanged(double)), this, SLOT(setPowerChanged(double)));
+            connect(w.spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
         }
     }
 
@@ -304,7 +357,7 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
         double max=0;
         lightSource->getLightSourceLinePowerRange(id, i, min, max);
         disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-        disconnect(lineWidgets[i].spinPower, SIGNAL(valueCHanged(double)), this, SLOT(setPowerChanged(double)));
+        disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
         lineWidgets[i].spinPower->setRange(min, max);
         lineWidgets[i].spinPower->setValue(lightSource->getLightSourceCurrentSetPower(id, i));
         lineWidgets[i].spinPower->setSuffix(QString(" ")+lightSource->getLightSourceLinePowerUnit(id, i));
@@ -312,7 +365,7 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
         lineWidgets[i].chkEnable->setChecked(lightSource->getLightSourceLineEnabled(id, i));
         lineWidgets[i].labPower->setText(QString("%1 %2").arg(lightSource->getLightSourceCurrentMeasuredPower(id, i)).arg(lightSource->getLightSourceLinePowerUnit(id, i)));
         connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-        connect(lineWidgets[i].spinPower, SIGNAL(valueCHanged(double)), this, SLOT(setPowerChanged(double)));
+        connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
     }
 
     linesLayoutWidget->setVisible(newLines>0);
@@ -336,16 +389,25 @@ void QFLightSourceConfigWidget::displayStates() {
     LightSource=getLightSource();
     LightSourceID=getLightSourceID();
     if (LightSource) {
+        bool enabled=!moving && LightSource->isLastLightSourceActionFinished(LightSourceID);
         for (int i=0; i<lineWidgets.size(); i++) {
             disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            disconnect(lineWidgets[i].spinPower, SIGNAL(valueCHanged(double)), this, SLOT(setPowerChanged(double)));
-            lineWidgets[i].chkEnable->setChecked(LightSource->getLightSourceLineEnabled(LightSourceID, i));
-            lineWidgets[i].labPower->setText(QString("%1 %2").arg(LightSource->getLightSourceCurrentMeasuredPower(LightSourceID, i)).arg(LightSource->getLightSourceLinePowerUnit(LightSourceID, i)));
-            lineWidgets[i].spinPower->setEnabled(LightSource->isLastLightSourceActionFinished(LightSourceID));
+            disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            if (enabled) {
+                lineWidgets[i].chkEnable->setChecked(LightSource->getLightSourceLineEnabled(LightSourceID, i));
+            }
+
             double setP=LightSource->getLightSourceCurrentSetPower(LightSourceID, i);
-            if (lineWidgets[i].spinPower->value()!=setP) lineWidgets[i].spinPower->setValue(setP);
+            if (enabled && (lineWidgets[i].spinPower->value()!=setP)) lineWidgets[i].spinPower->setValue(setP);
+
+            lineWidgets[i].labPower->setText(QString("%1 %2").arg(LightSource->getLightSourceCurrentMeasuredPower(LightSourceID, i)).arg(LightSource->getLightSourceLinePowerUnit(LightSourceID, i)));
+
+            lineWidgets[i].spinPower->setEnabled(enabled);
+            lineWidgets[i].chkEnable->setEnabled(enabled);
+            lineWidgets[i].labPower->setEnabled(enabled);
+
             connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            connect(lineWidgets[i].spinPower, SIGNAL(valueCHanged(double)), this, SLOT(setPowerChanged(double)));
+            connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
         }
     }
 
@@ -362,4 +424,38 @@ void QFLightSourceConfigWidget::displayStates() {
 
 void QFLightSourceConfigWidget::setReadOnly(bool readonly) {
     cmbLightSource->setReadOnly(readonly);
+}
+
+void QFLightSourceConfigWidget::setLineEnabled(int line, bool enabled) {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource) {
+        LightSource->setLightSourceLineEnabled(LightSourceID, line, enabled);
+        if (!locked) {
+            moving=true;
+            QTime started=QTime::currentTime();
+            while (!LightSource->isLastLightSourceActionFinished(LightSourceID) && (started.elapsed()<20000)) {
+                //qDebug()<<started.elapsed();
+                QApplication::processEvents();
+            }
+            moving=false;
+        }
+    }
+}
+
+void QFLightSourceConfigWidget::setLinePower(int line, double power) {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    if (LightSource) {
+        LightSource->setLightSourcePower(LightSourceID, line, power);
+        if (!locked) {
+            moving=true;
+            QTime started=QTime::currentTime();
+            while (!LightSource->isLastLightSourceActionFinished(LightSourceID) && (started.elapsed()<20000)) {
+                //qDebug()<<started.elapsed();
+                QApplication::processEvents();
+            }
+            moving=false;
+        }
+    }
 }
