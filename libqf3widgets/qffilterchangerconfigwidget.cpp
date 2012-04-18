@@ -4,9 +4,11 @@
 
 
 QFFilterChangerConfigWidget::QFFilterChangerConfigWidget(QWidget* parent):
-    QWidget(parent)
+    QFrame(parent)
 {
 
+    setFrameStyle(QFrame::Panel|QFrame::Raised);
+    setLineWidth(1);
     FilterChangerStateUpdateInterval=251;
 
     timUpdate=new QTimer(this);
@@ -105,6 +107,7 @@ void QFFilterChangerConfigWidget::createWidgets() {
     setLayout(widgetLayout);
     widgetLayout->setContentsMargins(0,0,0,0);
     widgetLayout->setHorizontalSpacing(2);
+    widgetLayout->setVerticalSpacing(2);
 
 
 
@@ -112,23 +115,23 @@ void QFFilterChangerConfigWidget::createWidgets() {
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
     cmbFilter=new QComboBox(this);
-    widgetLayout->addWidget(cmbFilter,0,0);
+    widgetLayout->addWidget(cmbFilter,0,0,1,2);
     cmbFilter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     btnSelectFilters=new QToolButton(this);
-    widgetLayout->addWidget(btnSelectFilters,0,1);
+    widgetLayout->addWidget(btnSelectFilters,0,2);
     cmbFilterChanger=new QFFilterChangerComboBox(this);
     cmbFilterChanger->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    widgetLayout->addWidget(cmbFilterChanger,0,2);
+    widgetLayout->addWidget(cmbFilterChanger,1,0);
     btnConnect=new QToolButton(this);
-    widgetLayout->addWidget(btnConnect,0,3);
+    widgetLayout->addWidget(btnConnect,1,1);
     btnConfigure=new QToolButton(this);
-    widgetLayout->addWidget(btnConfigure,0,4);
+    widgetLayout->addWidget(btnConfigure,1,2);
 
     QWidget* w=new QWidget(this);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    widgetLayout->addWidget(w,0,5);
-    widgetLayout->setColumnStretch(5,1);
+    widgetLayout->addWidget(w,widgetLayout->rowCount()-1,widgetLayout->columnCount());
+    widgetLayout->setColumnStretch(widgetLayout->columnCount()-1,1);
     cmbFilterChanger->setEnabled(false);
 
 

@@ -3,7 +3,6 @@
 
 #include <QGroupBox>
 
-class QFESPIMB040MainWindow; // forward
 
 #include <QWidget>
 #include "qvisiblehandlesplitter.h"
@@ -25,7 +24,7 @@ class QFESPIMB040MainWindow; // forward
 #include <QThread>
 #include <QQueue>
 #include <QMutex>
-
+#include <QFrame>
 #include "programoptions.h"
 #include "jkqttools.h"
 #include "qtlogfile.h"
@@ -43,7 +42,7 @@ class QFESPIMB040MainWindow; // forward
 
 
  */
-class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QWidget {
+class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
         Q_OBJECT
     public:
         /** Default constructor */

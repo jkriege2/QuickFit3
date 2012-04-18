@@ -84,7 +84,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../plugins/interfaces/qfextensionfilterchanger.h \
     qflightsourcecombobox.h \
     qfshutterconfigwidget.h \
-    qffilterchangerconfigwidget.h
+    qffilterchangerconfigwidget.h \
+    qflightsourceconfigwidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -133,7 +134,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffilterchangercombobox.cpp \
     qflightsourcecombobox.cpp \
     qfshutterconfigwidget.cpp \
-    qffilterchangerconfigwidget.cpp
+    qffilterchangerconfigwidget.cpp \
+    qflightsourceconfigwidget.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

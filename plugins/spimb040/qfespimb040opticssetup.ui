@@ -84,7 +84,7 @@ p, li { white-space: pre-wrap; }
           <property name="bottomMargin">
            <number>3</number>
           </property>
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_10">
             <property name="font">
              <font>
@@ -101,11 +101,76 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QF3FilterCombobox" name="filtTransmission" native="true">
             <property name="enabled">
              <bool>true</bool>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>source:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QFLightSourceConfigWidget" name="lsTransmission" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;shutter:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QFShutterConfigWidget" name="shutterTransmission" native="true">
             <property name="minimumSize">
              <size>
               <width>5</width>
@@ -159,7 +224,7 @@ p, li { white-space: pre-wrap; }
           <property name="bottomMargin">
            <number>3</number>
           </property>
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_20">
             <property name="font">
              <font>
@@ -176,8 +241,40 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QFShutterConfigWidget" name="shutterLaser1" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>source:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QFLightSourceConfigWidget" name="lsLaser1" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>5</width>
@@ -231,7 +328,7 @@ p, li { white-space: pre-wrap; }
           <property name="bottomMargin">
            <number>3</number>
           </property>
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_21">
             <property name="font">
              <font>
@@ -248,8 +345,40 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QFShutterConfigWidget" name="shutterLaser2" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>source:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QFLightSourceConfigWidget" name="lsLaser2" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>5</width>
@@ -582,8 +711,8 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="iconSize">
          <size>
-          <width>22</width>
-          <height>22</height>
+          <width>16</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -602,8 +731,8 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="iconSize">
          <size>
-          <width>22</width>
-          <height>22</height>
+          <width>16</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -1150,6 +1279,15 @@ p, li { white-space: pre-wrap; }
     <slot>setReadOnly(bool)</slot>
    </slots>
   </customwidget>
+  <customwidget>
+   <class>QFLightSourceConfigWidget</class>
+   <extends>QWidget</extends>
+   <header>qflightsourceconfigwidget.h</header>
+   <container>1</container>
+   <slots>
+    <slot>setReadOnly(bool)</slot>
+   </slots>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>btnConnectDevices</tabstop>
@@ -1324,8 +1462,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>270</x>
-     <y>246</y>
+     <x>317</x>
+     <y>306</y>
     </hint>
    </hints>
   </connection>
@@ -1340,8 +1478,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>288</x>
-     <y>98</y>
+     <x>317</x>
+     <y>113</y>
     </hint>
    </hints>
   </connection>
@@ -1372,8 +1510,8 @@ p, li { white-space: pre-wrap; }
      <y>412</y>
     </hint>
     <hint type="destinationlabel">
-     <x>797</x>
-     <y>429</y>
+     <x>799</x>
+     <y>427</y>
     </hint>
    </hints>
   </connection>
@@ -1404,8 +1542,8 @@ p, li { white-space: pre-wrap; }
      <y>412</y>
     </hint>
     <hint type="destinationlabel">
-     <x>772</x>
-     <y>444</y>
+     <x>773</x>
+     <y>442</y>
     </hint>
    </hints>
   </connection>
@@ -1436,8 +1574,8 @@ p, li { white-space: pre-wrap; }
      <y>246</y>
     </hint>
     <hint type="destinationlabel">
-     <x>797</x>
-     <y>263</y>
+     <x>799</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>
@@ -1468,8 +1606,8 @@ p, li { white-space: pre-wrap; }
      <y>246</y>
     </hint>
     <hint type="destinationlabel">
-     <x>772</x>
-     <y>278</y>
+     <x>773</x>
+     <y>276</y>
     </hint>
    </hints>
   </connection>
@@ -1548,8 +1686,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>307</x>
-     <y>218</y>
+     <x>317</x>
+     <y>278</y>
     </hint>
    </hints>
   </connection>
@@ -1676,8 +1814,8 @@ p, li { white-space: pre-wrap; }
      <y>20</y>
     </hint>
     <hint type="destinationlabel">
-     <x>140</x>
-     <y>137</y>
+     <x>211</x>
+     <y>183</y>
     </hint>
    </hints>
   </connection>
@@ -1692,8 +1830,72 @@ p, li { white-space: pre-wrap; }
      <y>26</y>
     </hint>
     <hint type="destinationlabel">
-     <x>209</x>
-     <y>179</y>
+     <x>280</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lsTransmission</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>999</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>93</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>shutterTransmission</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1001</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>222</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lsLaser1</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1004</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>305</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lsLaser2</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1007</x>
+     <y>19</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>317</x>
+     <y>218</y>
     </hint>
    </hints>
   </connection>

@@ -58,8 +58,11 @@ class QFExtensionLightSource {
         /** \brief set wavelength power in the given light source */
         virtual void setLightSourcePower(unsigned int lightSource, unsigned int wavelengthLine, double power) =0;
 
-        /** \brief return the currently selected light source power */
-        virtual double getLightSourceCurrentPower(unsigned int lightSource, unsigned int wavelengthLine) =0;
+        /** \brief return the currently selected light source set power */
+        virtual double getLightSourceCurrentSetPower(unsigned int lightSource, unsigned int wavelengthLine) =0;
+
+        /** \brief return the currently selected light source measured power */
+        virtual double getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int wavelengthLine) =0;
 
         /** \brief en-/disable the wavelength line in the given light source */
         virtual void setLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine, bool enabled) =0;

@@ -32,6 +32,10 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->shutterMainIllumination->init(m_log, m_pluginServices);
     ui->shutterLaser1->init(m_log, m_pluginServices);
     ui->shutterLaser2->init(m_log, m_pluginServices);
+    ui->shutterTransmission->init(m_log, m_pluginServices);
+    ui->lsTransmission->init(m_log, m_pluginServices);
+    ui->lsLaser1->init(m_log, m_pluginServices);
+    ui->lsLaser2->init(m_log, m_pluginServices);
     ui->filtcDetection->init("spimb040_filters.ini", m_log, m_pluginServices);
     ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
@@ -65,6 +69,10 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     connect(addShortCut("shutter_laser2_toggle", "laser 2 shutter: toggle"), SIGNAL(activated()), ui->shutterLaser2, SLOT(toggleShutter()));
     connect(addShortCut("shutter_laser2_on", "laser 2 shutter: on"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOn()));
     connect(addShortCut("shutter_laser2_off", "laser 2 shutter: off"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOff()));
+
+    connect(addShortCut("shutter_transmission_toggle", "transmission illumination shutter: toggle"), SIGNAL(activated()), ui->shutterTransmission, SLOT(toggleShutter()));
+    connect(addShortCut("shutter_transmission_on", "transmission illumination shutter: on"), SIGNAL(activated()), ui->shutterTransmission, SLOT(shutterOn()));
+    connect(addShortCut("shutter_transmission_off", "transmission illumination shutter: off"), SIGNAL(activated()), ui->shutterTransmission, SLOT(shutterOff()));
 
     connect(addShortCut("filterchanger_detection_filter1", "detection filter changer: set filter #1"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter0()));
     connect(addShortCut("filterchanger_detection_filter2", "detection filter changer: set filter #2"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter1()));
@@ -140,6 +148,10 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->shutterMainIllumination->loadSettings(settings, prefix+"main_illumination_shutter");
     ui->shutterLaser1->loadSettings(settings, prefix+"laser1_shutter");
     ui->shutterLaser2->loadSettings(settings, prefix+"laser2_shutter");
+    ui->shutterTransmission->loadSettings(settings, prefix+"transmission_shutter");
+    ui->lsLaser1->loadSettings(settings, prefix+"lightsource_laser1");
+    ui->lsLaser2->loadSettings(settings, prefix+"lightsource_laser2");
+    ui->lsTransmission->loadSettings(settings, prefix+"lightsource_transmission");
     ui->filtcDetection->loadSettings(settings, prefix+"filterchanger_detection");
     ui->chkDetectionFilterWheel->setChecked(settings.value(prefix+"filterchanger_detection", false).toBool());
 
@@ -167,6 +179,10 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->shutterLaser1->saveSettings(settings, prefix+"laser1_shutter");
     ui->shutterLaser2->saveSettings(settings, prefix+"laser2_shutter");
     ui->filtcDetection->saveSettings(settings, prefix+"filterchanger_detection");
+    ui->shutterTransmission->saveSettings(settings, prefix+"transmission_shutter");
+    ui->lsLaser1->saveSettings(settings, prefix+"lightsource_laser1");
+    ui->lsLaser2->saveSettings(settings, prefix+"lightsource_laser2");
+    ui->lsTransmission->saveSettings(settings, prefix+"lightsource_transmission");
     settings.setValue(prefix+"filterchanger_detection", ui->chkDetectionFilterWheel->isChecked());
 
     for (int i=0; i<shortcuts.size(); i++) {
@@ -262,7 +278,8 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam ) const {
         setup["objectives/tube_lens2/magnification"]=objective.magnification;
     }
 
-    setup["shutters/transmission_illumination/state"]=ui->shutterMainIllumination->getShutterState();
+    setup["shutters/main_illumination/state"]=ui->shutterMainIllumination->getShutterState();
+    setup["shutters/transmission_illumination/state"]=ui->shutterTransmission->getShutterState();
     setup["shutters/laser1/state"]=ui->shutterLaser1->getShutterState();
     setup["shutters/laser2/state"]=ui->shutterLaser2->getShutterState();
     if (ui->chkDetectionFilterWheel->isChecked()) setup["filterchangers/detection/filter"]=ui->filtcDetection->getFilterChangerState();
@@ -281,6 +298,10 @@ void QFESPIMB040OpticsSetup::setLogging(QFPluginLogService* log) {
     ui->shutterLaser1->setLog(m_log);
     ui->shutterLaser2->setLog(m_log);
     ui->filtcDetection->setLog(m_log);
+    ui->shutterTransmission->setLog(m_log);
+    ui->lsLaser1->setLog(m_log);
+    ui->lsLaser2->setLog(m_log);
+    ui->lsTransmission->setLog(m_log);
 }
 
 bool QFESPIMB040OpticsSetup::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
@@ -302,13 +323,12 @@ void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     ui->shutterMainIllumination->connectShutter();
     ui->shutterLaser1->connectShutter();
     ui->shutterLaser2->connectShutter();
+    ui->shutterTransmission->connectShutter();
+    ui->lsLaser1->connectLightSource();
+    ui->lsLaser2->connectLightSource();
+    ui->lsTransmission->connectLightSource();
     ui->stageSetup->connectStages();
     if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->connectFilterChanger();
-}
-
-void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
-    ui->camConfig1->connectCamera();
-    ui->camConfig2->connectCamera();
 }
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
@@ -316,8 +336,17 @@ void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
     ui->shutterMainIllumination->disconnectShutter();
     ui->shutterLaser1->disconnectShutter();
     ui->shutterLaser2->disconnectShutter();
+    ui->shutterTransmission->disconnectShutter();
+    ui->lsLaser1->disconnectLightSource();
+    ui->lsLaser2->disconnectLightSource();
+    ui->lsTransmission->disconnectLightSource();
     if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->disconnectFilterChanger();
 }
+void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
+    ui->camConfig1->connectCamera();
+    ui->camConfig2->connectCamera();
+}
+
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
     ui->camConfig1->disconnectCamera();
@@ -447,6 +476,7 @@ bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {
         QSettings set(filename, QSettings::IniFormat);
         if (ok && set.contains("laser1/shutter/state")) ok=ok&&ui->shutterLaser1->isShutterDone()&&(ui->shutterLaser1->getShutterState()==set.value("laser1/shutter/state").toBool());
         if (ok && set.contains("laser2/shutter/state")) ok=ok&&ui->shutterLaser2->isShutterDone()&&(ui->shutterLaser2->getShutterState()==set.value("laser2/shutter/state").toBool());
+        if (ok && set.contains("transmission/shutter/state")) ok=ok&&ui->shutterTransmission->isShutterDone()&&(ui->shutterTransmission->getShutterState()==set.value("transmission/shutter/state").toBool());
         if (ok && set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked())
             ok=ok&&ui->filtcDetection->isLastActionComplete()&&(ui->filtcDetection->getFilterChangerState()==set.value("detection/filterchanger/filter").toInt());
         return ok;
@@ -470,6 +500,7 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool w
     // LOAD RELEVANT WIDGETS HERE
     if (set.contains("laser1/shutter/state")) ui->shutterLaser1->setShutter(set.value("laser1/shutter/state").toBool());
     if (set.contains("laser2/shutter/state")) ui->shutterLaser2->setShutter(set.value("laser2/shutter/state").toBool());
+    if (set.contains("transmission/shutter/state")) ui->shutterTransmission->setShutter(set.value("transmission/shutter/state").toBool());
     if (set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->setFilterChanger(set.value("detection/filterchanger/filter").toInt());
 
     if (waiting) {
@@ -517,6 +548,10 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
     if (ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
         data["laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
         qDebug()<<"laser2/shutter/state="<<data["laser2/shutter/state"]<<ui->shutterLaser2->getShutterState();
+    }
+    if (ui->shutterTransmission->getShutter() && ui->shutterTransmission->getShutter()->isShutterConnected(ui->shutterTransmission->getShutterID())) {
+        data["transmission/shutter/state"]=ui->shutterTransmission->getShutterState();
+        qDebug()<<"transmission/shutter/state="<<data["transmission/shutter/state"]<<ui->shutterTransmission->getShutterState();
     }
     if (ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->getFilterChanger()->isFilterChangerConnected(ui->filtcDetection->getFilterChangerID()))
         data["detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
@@ -583,12 +618,20 @@ bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {
 void QFESPIMB040OpticsSetup::lockLightpath() {
     ui->shutterLaser1->lockShutters();
     ui->shutterLaser2->lockShutters();
+    ui->shutterTransmission->lockShutters();
+    ui->lsLaser1->lockLightSource();
+    ui->lsLaser2->lockLightSource();
+    ui->lsTransmission->lockLightSource();
     ui->filtcDetection->lockFilterChangers();
 }
 
 void QFESPIMB040OpticsSetup::unlockLightpath() {
     ui->shutterLaser1->unlockShutters();
     ui->shutterLaser2->unlockShutters();
+    ui->shutterTransmission->unlockShutters();
+    ui->lsLaser1->unlockLightSource();
+    ui->lsLaser2->unlockLightSource();
+    ui->lsTransmission->unlockLightSource();
     ui->filtcDetection->unlockFilterChangers();
 }
 
