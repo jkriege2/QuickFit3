@@ -198,6 +198,21 @@ void QFETCSPCImporterDialog::on_spinFCSTauMin_valueChanged(double val) {
     updateCorrelator();
 }
 
+void QFETCSPCImporterDialog::on_spinSegments_value_changed(int val) {
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_spinRangeStart_value_changed(int val) {
+    updateDuration();
+    updateCorrelator();
+}
+
+void QFETCSPCImporterDialog::on_spinRangeEnd_value_changed(int val) {
+    updateDuration();
+    updateCorrelator();
+}
+
 void QFETCSPCImporterDialog::on_spinS_valueChanged(int val) {
     updateCorrelator();
 }

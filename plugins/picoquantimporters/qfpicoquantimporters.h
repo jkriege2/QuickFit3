@@ -2,7 +2,6 @@
 #define QFPICOQUANTIMPORTERS_H
 
 #include "qfpluginimporters.h"
-#include "qftcspcreaderpicoquant.h"
 
 /*!
     \defgroup qf3importerplugins_importers_picoquant Importer Plugin for PicoQuant TTTR files

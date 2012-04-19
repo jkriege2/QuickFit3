@@ -5,7 +5,7 @@
 #include "qftcspcreader.h"
 #include <stdio.h>
 #include <QMap>
-#include "picoquant_tools.h"
+#include "picoquant_t3r_tools.h"
 
 
 /*! \brief QFImporter class for PicoQuant TTTR Files (as TCSPC files)

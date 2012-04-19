@@ -255,7 +255,15 @@ void QFETCSPCImporterJobThread::run() {
                     if ((m_status==1) && !was_canceled) {
                         runEval(reader, &crFile);
 
-                        if (crFile.isOpen()) crFile.close();
+                        if (crFile.isOpen()) {
+                            // write real measurement parameters!
+                            crFile.seek(0);
+                            crFile.write("QF3.0CNTRT");
+                            binfileWriteUint16(crFile, job.countrate_channels.size());
+                            binfileWriteUint64(crFile, real_countrate_items);
+
+                            crFile.close();
+                        }
                     }
 
 
@@ -441,12 +449,14 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     double nextReporterStep=range_duration/1000.0;
     uint16_t fcs_segment=0;
     fcs_ccfs.clear();
+    real_countrate_items=0;
     do {
         QFTCSPCRecord record=reader->getCurrentRecord();
         const register double t=record.absoluteTime()-starttime;
         const register int c=record.input_channel;
         //qDebug()<<c<<t;
         if (t>=0 && t<=range_duration) {
+            real_duration=t;
 
             // PROCESS COUNTRATE
             if (job.doCountrate) {
@@ -460,6 +470,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                         if (job.countrate_channels.contains(c)) binfileWriteUint16(*countrateFile, countrate[c]);
                         countrate[c]=0;
                     }
+                    real_countrate_items+=emptyrecords;
 
                     countrate[c]++;
                     crCounter+=emptyrecords;

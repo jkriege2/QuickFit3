@@ -247,8 +247,10 @@ protected:
     double starttime;
     double range_duration;
     double file_duration;
+    double real_duration;
     uint16_t channels;
     uint64_t countrate_items;
+    uint64_t real_countrate_items;
 
     struct ccfFileConfig {
         QString filename;

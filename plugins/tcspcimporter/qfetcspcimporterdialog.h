@@ -39,7 +39,9 @@ public:
 
     QList<QPair<QStringList, QString> > getFilesToAdd() const;
 
-protected slots:
+    protected slots:
+    void on_spinRangeEnd_value_changed(int val);
+    void on_spinRangeStart_value_changed(int val);
     void on_btnSelectFile_clicked();
     void on_btnAddJob_clicked();
     void on_btnLoad_clicked();
@@ -48,6 +50,7 @@ protected slots:
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
     void on_spinFCSTauMin_valueChanged(double val);
+    void on_spinSegments_value_changed(int val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
 
     void updateProgress();

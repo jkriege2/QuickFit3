@@ -10,11 +10,15 @@ DESTDIR = $$QFOUTPUT/plugins
 # Input
 HEADERS += qfpicoquantimporters.h \
            qftcspcreaderpicoquant.h \
-    picoquant_tools.h
+    picoquant_t3r_tools.h \
+    picoquant_pt3_tools.h \
+    qftcspcreaderpicoquantpt3.h
 
 SOURCES += qfpicoquantimporters.cpp\
            qftcspcreaderpicoquant.cpp \
-    picoquant_tools.cpp
+    picoquant_t3r_tools.cpp \
+    picoquant_pt3_tools.cpp \
+    qftcspcreaderpicoquantpt3.cpp
 
 FORMS =
 
