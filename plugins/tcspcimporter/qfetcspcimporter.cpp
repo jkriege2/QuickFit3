@@ -54,7 +54,7 @@ void QFETCSPCImporter::startPlugin() {
     } else if (project && settings) {
         dlgCorrelate=new QFETCSPCImporterDialog(services, settings, parentWidget);
         dlgCorrelate->setProject(project);
-        dlgCorrelate->setWindowModality(Qt::WindowModal);
+        dlgCorrelate->setWindowModality(Qt::NonModal);
         //qDebug()<<parentWidget,
         dlgCorrelate->show();
         connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(correlationDialogClosed()));

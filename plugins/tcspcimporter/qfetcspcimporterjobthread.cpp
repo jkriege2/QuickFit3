@@ -478,7 +478,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                     fcs_countrate_counter=fcs_countrate_counter+emptyrecords;
 
                     if (fcs_countrate_counter>=FCS_CHANNELBUFFER_ITEMS) {
-                        qDebug()<<"  loop shift @t="<<t<<"   emptyrecords="<<emptyrecords<<"  fcs_countrate_counter="<<fcs_countrate_counter;
+                        //qDebug()<<"  loop shift @t="<<t<<"   emptyrecords="<<emptyrecords<<"  fcs_countrate_counter="<<fcs_countrate_counter;
                         shiftIntoCorrelators(fcs_countrate, FCS_CHANNELBUFFER_ITEMS);
 
                         memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
@@ -529,7 +529,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                 if (t>=fcsNextSegmentValue) {
                     if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
                     copyCorrelatorIntermediateResults(fcs_segment);
-                    qDebug()<<"-- fcs segment "<<fcs_segment<<" @ t="<<t<<" -----------------------------";
+                    //qDebug()<<"-- fcs segment "<<fcs_segment<<" @ t="<<t<<" -----------------------------";
                     for (register int cc=0; cc<channels; cc++) {
                         fcs_countrate[cc]=0;
                         fcs_storecountrate[cc]=0;
@@ -539,7 +539,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                     fcs_countrate_counter=0;
                     fcs_segment++;
                     fcsNextSegmentValue=fcsNextSegmentValue+range_duration/double(job.fcs_segments);
-                    qDebug()<<"-- fcsNextSegmentValue "<<fcsNextSegmentValue;
+                    //qDebug()<<"-- fcsNextSegmentValue "<<fcsNextSegmentValue;
                 }
             }
         }
@@ -551,13 +551,14 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
         if (t>nextReporterStep) {
             emit progressIncrement(1);
             nextReporterStep=nextReporterStep+range_duration/1000.0;
+            emit messageChanged(tr("running data processing [t=%1s, runtime: %2s] ...").arg(t).arg(range_duration));
         }
 
     } while (reader->nextRecord() && (m_status==1) && (!was_canceled));
     if (job.doFCS) {
         if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
         while (fcs_segment<job.fcs_segments) {
-            qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
+            //qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
             copyCorrelatorIntermediateResults(fcs_segment);
             fcs_segment++;
         }
@@ -620,7 +621,7 @@ void QFETCSPCImporterJobThread::createCorrelators() {
 }
 
 void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_segment) {
-    qDebug()<<"copyCorrelatorIntermediateResults("<<fcs_segment<<") ... ";
+    //qDebug()<<"copyCorrelatorIntermediateResults("<<fcs_segment<<") ... ";
 
     if (job.fcs_correlator==CORRELATOR_MTAUALLMON) {
         for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
@@ -657,13 +658,13 @@ void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_s
         }
 
     }
-    qDebug()<<"copyCorrelatorIntermediateResults("<<fcs_segment<<") ... DONE";
+    //qDebug()<<"copyCorrelatorIntermediateResults("<<fcs_segment<<") ... DONE";
 
 }
 
 
 void QFETCSPCImporterJobThread::shiftIntoCorrelators(uint16_t* fcs_countrate, uint32_t count) {
-    qDebug()<<"shift "<<count<<" items ... ";
+    //qDebug()<<"shift "<<count<<" items ... ";
     if (job.fcs_correlator==CORRELATOR_MTAUALLMON) {
         for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
              QPair<int, int> ccf=*i;
@@ -687,6 +688,6 @@ void QFETCSPCImporterJobThread::shiftIntoCorrelators(uint16_t* fcs_countrate, ui
         }
 
     }
-    qDebug()<<"shift "<<count<<" items ... DONE!";
+    //qDebug()<<"shift "<<count<<" items ... DONE!";
 }
 

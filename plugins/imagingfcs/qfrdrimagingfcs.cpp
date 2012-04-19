@@ -49,7 +49,7 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
     else if (project && settings) {
         dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
         dlgCorrelate->setProject(project);
-        dlgCorrelate->setWindowModality(Qt::WindowModal);
+        dlgCorrelate->setWindowModality(Qt::NonModal);
         //qDebug()<<parentWidget,
         dlgCorrelate->show();
 
