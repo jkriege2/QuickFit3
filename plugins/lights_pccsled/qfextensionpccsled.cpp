@@ -1,0 +1,265 @@
+#include "qfextensionpccsled.h"
+#include <QtGui>
+#include <QtPlugin>
+#include <iostream>
+
+#define LIGHTSOURCE_ACTION_DURATION 50
+#define LOG_PREFIX "[LightSourcePCCPLED]: "
+#define GLOBAL_CONFIGFILE "lights_pccsled.ini"
+#define CONNECTION_DELAY_MS 200
+
+QFExtensionPCCSLED::QFExtensionPCCSLED(QObject* parent):
+    QObject(parent)
+{
+	logService=NULL;
+}
+
+QFExtensionPCCSLED::~QFExtensionPCCSLED() {
+
+}
+
+
+
+void QFExtensionPCCSLED::projectChanged(QFProject* oldProject, QFProject* project) {
+	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
+	   But: possibly you could read config information from the project here
+	 */
+}
+
+void QFExtensionPCCSLED::initExtension() {
+    /* do initializations here but do not yet connect to the camera! */
+    QString ini=services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE);
+    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE);
+    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/%1").arg(GLOBAL_CONFIGFILE);
+    QSettings inifile(ini, QSettings::IniFormat);
+    int count=inifile.value("lightsource_count", 0).toUInt();
+    for (int i=0; i<count; i++) {
+        LIGHTSOURCE s;
+        s.port=ports.addCOMPort(inifile, "lightsource"+QString::number(i+1)+"/");
+        s.infoMessage="";
+        s.lastAction=QTime::currentTime();
+        s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
+        sources.append(s);
+    }
+    //qDebug()<<sources.size()<<" light sources";
+}
+
+
+void QFExtensionPCCSLED::loadSettings(ProgramOptions* settingspo) {
+	/* here you could read config information from the quickfit.ini file using settings object */
+    if (!settingspo) return;
+	if (settingspo->getQSettings()==NULL) return;
+    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+
+}
+
+void QFExtensionPCCSLED::storeSettings(ProgramOptions* settingspo) {
+	/* here you could write config information to the quickfit.ini file using settings object */
+    if (!settingspo) return;
+	if (settingspo->getQSettings()==NULL) return;
+    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+
+	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+
+}
+
+void QFExtensionPCCSLED::deinit() {
+    /* add code for cleanup here */
+    QSettings inifile(services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE), QSettings::IniFormat);
+    if (inifile.isWritable()) {
+        inifile.setValue("lightsource_count", getLightSourceCount());
+        for (unsigned int i=0; i<sources.size(); i++) {
+            int p=sources[i].port;
+            if (ports.getCOMPort(p)) {
+                ports.storeCOMPort(p, inifile, "lightsource"+QString::number(i+1)+"/");
+            }
+        }
+    }
+}
+
+unsigned int QFExtensionPCCSLED::getLightSourceCount() {
+    return sources.size();
+}
+
+void QFExtensionPCCSLED::lightSourceConnect(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    if (!com) return;
+    com->open();
+    if (com->isConnectionOpen()) {
+        QTime t;
+        t.start();
+        // wait CONNECTION_DELAY_MS ms for connection!
+        while (t.elapsed()<CONNECTION_DELAY_MS)  {
+            QApplication::processEvents();
+        }
+        sources[lightSource].infoMessage=sources[lightSource].serial->queryCommand("?");
+        //qDebug()<<"infoMessage '"<<infoMessage<<"'";
+        if (!(sources[lightSource].infoMessage.toLower().contains("pccs") && sources[lightSource].infoMessage.toLower().contains("jan krieger"))) {
+            com->close();
+            log_error(tr("%1 Could not connect to Light Source Driver [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
+            log_error(tr("%1 reason: received wrong ID string from light source driver: string was '%2'\n").arg(LOG_PREFIX).arg(sources[lightSource].infoMessage));
+        }
+    } else {
+        log_error(tr("%1 Could not connect to Light Source Driver [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
+        log_error(tr("%1 reason: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].serial->getLastError()));
+    }
+}
+
+void QFExtensionPCCSLED::lightSourceDisonnect(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    if (!com) return;
+    com->close();
+}
+
+void QFExtensionPCCSLED::setLightSourceLogging(QFPluginLogService *logService) {
+    this->logService=logService;
+}
+
+bool QFExtensionPCCSLED::isLightSourceConnected(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    if (!com) return false;
+    return com->isConnectionOpen();
+}
+
+unsigned int QFExtensionPCCSLED::getLightSourceLineCount(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    if (!com) return 0;
+    return 1;
+}
+
+QString QFExtensionPCCSLED::getLightSourceLineDescription(unsigned int lightSource, unsigned int wavelengthLine) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return QString("");
+    QString led=serial->queryCommand("Y").trimmed();
+    QString manufacturer=serial->queryCommand("q").trimmed();
+    QString wavelength=serial->queryCommand("j").trimmed();
+    QString power=serial->queryCommand("f").trimmed();
+    QString name=manufacturer;
+    if (!name.isEmpty()) name+=" ";
+    name+=led;
+    if (wavelength.size()>0 || power.size()>0) {
+        name+="(";
+        name+=wavelength;
+        if (wavelength.size()>0 && power.size()>0) name+=", ";
+        name+=power;
+        name+=")";
+    }
+    return name;
+    //return tr("line #%1").arg(wavelengthLine+1);
+}
+
+void QFExtensionPCCSLED::getLightSourceLinePowerRange(unsigned int lightSource, unsigned int wavelengthLine, double &minimum, double &maximum) {
+    minimum=maximum=0;
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return ;
+    minimum=0;
+    maximum=serial->queryCommand("X").toDouble();
+}
+
+QString QFExtensionPCCSLED::getLightSourceLinePowerUnit(unsigned int lightSource, unsigned int wavelengthLine) {
+    return tr("mA");
+}
+
+void QFExtensionPCCSLED::setLightSourcePower(unsigned int lightSource, unsigned int wavelengthLine, double power) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return ;
+    serial->sendCommand(QString("I%1").arg((int)round(power)));
+    sources[lightSource].lastAction=QTime::currentTime();
+}
+
+double QFExtensionPCCSLED::getLightSourceCurrentSetPower(unsigned int lightSource, unsigned int wavelengthLine) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return 0;
+    return serial->queryCommand("G").toDouble();
+}
+
+double QFExtensionPCCSLED::getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int wavelengthLine) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return 0;
+    return serial->queryCommand("C").toDouble();
+
+}
+
+void QFExtensionPCCSLED::setLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine, bool enabled) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return ;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return ;
+    if (enabled) serial->sendCommand("L1");
+    else serial->sendCommand("L0");
+    sources[lightSource].lastAction=QTime::currentTime();
+}
+
+bool QFExtensionPCCSLED::getLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return false;
+    return !serial->queryCommand("N").startsWith("0");
+}
+
+bool QFExtensionPCCSLED::isLastLightSourceActionFinished(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return false;
+    return sources[lightSource].lastAction.elapsed()>LIGHTSOURCE_ACTION_DURATION;
+}
+
+QString QFExtensionPCCSLED::getLightSourceDescription(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return QString("");
+    return tr("Programmable Constant Current SOurce for LEDs");
+}
+
+QString QFExtensionPCCSLED::getLightSourceShortName(unsigned int lightSource) {
+    if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
+    JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+    QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    if (!com || !serial) return QString("");
+    return tr("PCCS");
+}
+
+void QFExtensionPCCSLED::log_text(QString message) {
+	if (logService) logService->log_text(LOG_PREFIX+message);
+	else if (services) services->log_text(LOG_PREFIX+message);
+}
+
+void QFExtensionPCCSLED::log_warning(QString message) {
+	if (logService) logService->log_warning(LOG_PREFIX+message);
+	else if (services) services->log_warning(LOG_PREFIX+message);
+}
+
+void QFExtensionPCCSLED::log_error(QString message) {
+	if (logService) logService->log_error(LOG_PREFIX+message);
+    else if (services) services->log_error(LOG_PREFIX+message);
+}
+
+void QFExtensionPCCSLED::showLightSourceSettingsDialog(unsigned int lightSource, QWidget *parent) {
+    QString ini1=services->getGlobalConfigFileDirectory()+QString("/")+GLOBAL_CONFIGFILE;
+    QString ini2=services->getConfigFileDirectory()+QString("/")+GLOBAL_CONFIGFILE;
+    QString ini3=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/")+GLOBAL_CONFIGFILE;
+    QMessageBox::information(parent, getName(), tr("There is no configuration dialog for this device. Set all config in the appropriate ini file:\n  %1\n  or: %2\n  or: %3").arg(ini1).arg(ini2).arg(ini3));
+}
+
+
+Q_EXPORT_PLUGIN2(lights_pccsled, QFExtensionPCCSLED)

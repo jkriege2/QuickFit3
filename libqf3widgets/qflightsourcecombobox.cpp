@@ -41,6 +41,8 @@ void QFLightSourceComboBox::findExtensions() {
     QPoint sl(-1,-1);
     addItem(QIcon(":/libqf3widgets/lightsource_none.png"), tr("--- none ---"), sl);
 
+    qDebug()<<LightSources.size()<<" lss in combobox";
+
     for (int i=0; i<LightSources.size(); i++) {
         QFExtension* extension=qobject_cast<QFExtension*>(LightSources[i]);
         QFExtensionLightSource* LightSource = qobject_cast<QFExtensionLightSource*>(LightSources[i]);

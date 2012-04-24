@@ -39,7 +39,7 @@ QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
     //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
     QString data="";
     for (unsigned int i=0; i<res.size(); i++) {
-        data+=QLatin1Char(res[i]);
+        if (res[i]>0) data+=QLatin1Char(res[i]);
     }
     //qDebug()<<"queryCommand("<<command<<")   "<<data.left(data.size()-2);
     return data.left(data.size()-2);

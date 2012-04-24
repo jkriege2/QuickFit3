@@ -699,9 +699,6 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <widget class="QToolButton" name="btnLightpathSave">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="text">
          <string>save the current lightpath (shutters, filterwheels, ...) to a config file</string>
         </property>
@@ -719,9 +716,6 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <widget class="QToolButton" name="btnLightpathDelete">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="text">
          <string>delete the currently selected lightpath (shutters, filterwheels, ...) config file</string>
         </property>
@@ -1692,38 +1686,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>btnLockFiltersEtc</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnLightpathSave</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1009</x>
-     <y>38</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>627</x>
-     <y>38</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnLockFiltersEtc</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnLightpathDelete</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1009</x>
-     <y>38</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>657</x>
-     <y>38</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnLightpathSave</sender>
    <signal>clicked()</signal>
    <receiver>QFESPIMB040OpticsSetup</receiver>
@@ -1746,8 +1708,8 @@ p, li { white-space: pre-wrap; }
    <slot>deleteCurrentLightpatConfig()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>38</y>
+     <x>651</x>
+     <y>35</y>
     </hint>
     <hint type="destinationlabel">
      <x>557</x>

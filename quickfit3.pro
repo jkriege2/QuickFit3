@@ -125,6 +125,13 @@ plg_picoquantimporters.depends = lib
     plg_filterc_tmcl.subdir=./plugins/filterc_tmcl
     plg_filterc_tmcl.depends = lib libqf3widgets
 
+    SUBDIRS += plg_lights_pccsled
+    plg_lights_pccsled.subdir=./plugins/lights_pccsled
+    plg_lights_pccsled.depends = lib libqf3widgets
+
+    SUBDIRS += plg_lights_b040laserbox
+    plg_lights_b040laserbox.subdir=./plugins/lights_b040laserbox
+    plg_lights_b040laserbox.depends = lib libqf3widgets
 }
 
 

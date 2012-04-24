@@ -294,7 +294,7 @@ void QFLightSourceConfigWidget::disConnect() {
                 m_log->log_error("error connecting to light source driver ...\n");
             }
         } else {
-            LightSource->lightSourceConnect(LightSourceID);
+            LightSource->lightSourceDisonnect(LightSourceID);
             m_log->log_text("disconnected from light source driver ...\n");
         }
     } else {
@@ -342,9 +342,10 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
             w.labPower=new QLabel(this);
             connect(w.chkEnable, SIGNAL(toggled(bool)), w.spinPower, SLOT(setEnabled(bool)));
             connect(w.chkEnable, SIGNAL(toggled(bool)), w.labPower, SLOT(setEnabled(bool)));
-            linesLayout->addWidget(w.chkEnable, widgetLayout->rowCount(), 0);
-            linesLayout->addWidget(w.spinPower, widgetLayout->rowCount()-1, 1);
-            linesLayout->addWidget(w.labPower, widgetLayout->rowCount()-1, 2);
+            int line=widgetLayout->rowCount();
+            linesLayout->addWidget(w.chkEnable, line, 0);
+            linesLayout->addWidget(w.spinPower, line, 1);
+            linesLayout->addWidget(w.labPower, line, 2);
             lineWidgets.append(w);
             connect(w.chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
             connect(w.spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
@@ -401,6 +402,7 @@ void QFLightSourceConfigWidget::displayStates() {
             if (enabled && (lineWidgets[i].spinPower->value()!=setP)) lineWidgets[i].spinPower->setValue(setP);
 
             lineWidgets[i].labPower->setText(QString("%1 %2").arg(LightSource->getLightSourceCurrentMeasuredPower(LightSourceID, i)).arg(LightSource->getLightSourceLinePowerUnit(LightSourceID, i)));
+            lineWidgets[i].chkEnable->setText(LightSource->getLightSourceLineDescription(LightSourceID, i));
 
             lineWidgets[i].spinPower->setEnabled(enabled);
             lineWidgets[i].chkEnable->setEnabled(enabled);

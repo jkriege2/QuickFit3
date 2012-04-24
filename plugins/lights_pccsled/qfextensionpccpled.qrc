@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="lights_pccsled/lights_pccsled.png">lights_pccsled.png</file>
+</qresource>
+</RCC>
