@@ -9,6 +9,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <QDebug>
+
 #include "Eigen/Dense"
 #include "Eigen/SVD"
 
@@ -38,9 +40,12 @@ MaxEntB040::MaxEntB040() {
 MaxEntB040::~MaxEntB040(){}
 
 
+
+
 void MaxEntB040::setData(const double* taus, const double* correlation,\
 	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
-    int rangeMaxDatarange,uint32_t Ndist,double * dist, double * distTaus)
+    int rangeMaxDatarange,uint32_t Ndist,double * dist, double * distTaus, int model,\
+    int parameterCount,double * param_list)
 	{
     m_Nd=rangeMaxDatarange-rangeMinDatarange;
 	m_xdata.resize(rangeMaxDatarange-rangeMinDatarange);
@@ -55,6 +60,25 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
 		if (fabs(weights[i+rangeMinDatarange])>1e3) m_stdev(i)=1e3;
         }
 	
+    ///// model specific transformation of the ydata //////////
+    switch (model)
+    {
+        case 1:
+        double offset;
+        offset=param_list[5];
+        for (int i=0;i<m_Nd;i++)
+            {
+            m_ydata(i)=m_ydata(i)-offset;
+            }
+        break;
+
+    }
+    ///////////////////////////////////////////////////////////
+
+
+
+
+
 	double value;
 	double value2=m_Nd;
 	value=m_stdev.sum();
@@ -80,6 +104,9 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
 
 bool MaxEntB040::run(double alpha,int NumIter,double * param_list,int model,int parameter_count)
     {
+
+
+
     m_alpha=alpha;
     m_model=model;
     m_paramStore.resize(parameter_count);
@@ -106,11 +133,19 @@ bool MaxEntB040::run(double alpha,int NumIter,double * param_list,int model,int 
 */
 
     this->NumIter=NumIter;
+
+    qDebug() << "DEBUG #3 from memB040 alpha = " << alpha << "Ndist = "<< m_N << "NumIter= " << NumIter << "model= " << m_model;
+
     if (m_oldDist==false){setTauGrid();}
     setTmatrix();
     performSVD();
 	setMmatrix();
 	performIter();
+
+
+
+
+
     return true;
     }
 
@@ -140,8 +175,18 @@ void MaxEntB040::setTmatrix(){
 
     double value;
     double tripFactor;
+    double darkTau;
+    double darkTheta;
+    double offset;
+    double tau1;
+    double tau2;
+    double fraction;
+    double particle_number;
+    double factor;
 
+    qDebug() << "calling from setTmatrix with model= " << m_model;
 
+    //m_model=0;
     switch (m_model)
     {
     // model #1: FCS 3D diffusion with triplet
@@ -170,9 +215,9 @@ void MaxEntB040::setTmatrix(){
         m_tripTau=m_paramStore(0);
         m_tripTheta=m_paramStore(1);
         m_kappa=m_paramStore(2);
-        double darkTau=m_paramStore(3);
-        double darkTheta=m_paramStore(4);
-        double offset=m_paramStore(5);
+        darkTau=m_paramStore(3);
+        darkTheta=m_paramStore(4);
+        offset=m_paramStore(5);
 
 
         for (int i=0; i<m_Nd; i++)
@@ -185,7 +230,63 @@ void MaxEntB040::setTmatrix(){
                         m_T(i,j)=tripFactor*value+offset;
                     }
             }
+
         break;
+
+    case 2:
+        m_tripTau=m_paramStore(0);
+        m_tripTheta=m_paramStore(1);
+        darkTau=m_paramStore(2);
+        darkTheta=m_paramStore(3);
+        offset=m_paramStore(4);
+
+        for (int i=0; i<m_Nd; i++)
+            {
+            tripFactor=(1.0-m_tripTheta+m_tripTheta*exp(-m_xdata(i)/m_tripTau)-darkTheta+darkTheta*exp(-m_xdata(i)/darkTau))/(1.0-m_tripTheta-darkTheta);
+                for (int j=0; j<m_N; j++)
+                    {
+                        value=(1.0/((1.0+m_xdata(i)/(m_taudiffs(j)))));
+                        ///////////////////////////////////////////////////////////////////////////////////////////
+                        m_T(i,j)=tripFactor*value+offset; // this offset that is added here should still be changed
+                        ///////////////////////////////////////////////////////////////////////////////////////////
+                    }
+            }
+
+        break;
+
+    case 3:// Dynamic Light Scattering
+        //double A=m_paramStore(0);
+        for (int i=0; i<m_Nd; i++)
+            {
+            for (int j=0; j<m_N;j++)
+                {
+                    m_T(i,j)=exp(-m_xdata(i)/m_taudiffs(j));
+                }
+            }
+
+
+    break;
+
+    case 4:
+        tau1=m_paramStore(0);
+        tau2=m_paramStore(1);
+        m_kappa=m_paramStore(2);
+        fraction=m_paramStore(3);
+        particle_number=m_paramStore(4);
+        offset=m_paramStore(5);
+
+        for (int i=0; i<m_Nd; i++)
+            {
+            factor=(1/(particle_number))*(fraction*(1/(1+m_xdata(i)/tau1))*(1/(sqrt(1+m_xdata(i)/(sqr(m_kappa)*tau1))))\
+                   +(1-fraction)*((1/(1+m_xdata(i)/tau2))*(1/(sqrt(1+m_xdata(i)/(sqr(m_kappa)*tau2))))));
+
+                for (int j=0; j<m_N; j++)
+                    {
+                    value=exp(-m_xdata(i)/m_taudiffs(j));
+                    m_T(i,j)=factor*value;
+                    }
+            }
+
 
     }
 }
@@ -354,6 +455,11 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
     double offset;
     double trip_factor;
     register double sum;
+    double A;
+    double tau_1;
+    double tau_2;
+    double fraction;
+    double factor,sum1,sum2;
 
 
     switch(model)
@@ -380,8 +486,7 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
                 }
                 break;
 
-
-          case 1:
+          case 1://FCS: 3D diffusion with 2 blinking components
                trip_tau=param_list[0];
                trip_theta=param_list[1];
                gamma=param_list[2];
@@ -405,10 +510,71 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
                    modelEval[i]=offset+sum/N_particle*trip_factor;
                }
 
-               break;
+        break;
+
+
+        case 2: //FCS: 2D diffusion with 2 blinking components
+            trip_tau=param_list[0];
+            trip_theta=param_list[1];
+            dark_tau=param_list[2];
+            dark_theta=param_list[3];
+            offset=param_list[4];
+            N_particle=1;
+            for (uint32_t i=0; i<N; i++) {
+                trip_factor=(1.0-trip_theta+trip_theta*exp(-taus[i]/trip_tau)-dark_theta+dark_theta*exp(-taus[i]/dark_tau))/(1.0-trip_theta-dark_theta);
+                sum=0;
+                if (distTaus && dist && Ndist>0) {
+                    for (register uint32_t j=0; j<Ndist; j++) {
+                        sum=sum+dist[j]/(1.0+taus[i]/distTaus[j]);
+                    }
+                } else {
+                sum=1.0/double(N);
+                }
+                modelEval[i]=offset+sum/N_particle*trip_factor;
+                }
+        break;
+
+
+        case 3://Dynamic Light Scattering
+        A=param_list[0];
+        for (uint32_t i=0; i<N; i++) {
+            sum=0;
+            if (distTaus && dist && Ndist>0) {
+                for (register uint32_t j=0; j<Ndist; j++) {
+                    sum=sum+dist[j]*exp(-taus[i]/distTaus[j]);
+                }
+            } else {
+            sum=1.0/double(N);
+            }
+            modelEval[i]=A+sqr(sum);
+            }
+        break;
+
+        case 4://FCS Blinking with 3D diffusion
+
+        tau_1=param_list[0];
+        tau_2=param_list[1];
+        gamma=param_list[2];
+        fraction=param_list[3];
+        N_particle=param_list[4];
+        offset=param_list[5];
+        for (uint32_t i=0; i<N; i++)
+        {
+            sum1=0;
+            sum2=0;
+            factor=(1/N_particle)*(fraction*(1/(1+(taus[i]/tau_1)))*(1/(sqrt(1+(taus[i]/(sqr(gamma)*tau_1)))))\
+                                   +(1-fraction)*(1/(1+(taus[i]/tau_2)))*(1/(sqrt(1+(taus[i]/(sqr(gamma)*tau_1))))));
+            for (uint32_t j=0; j<Ndist;j++)
+                    {
+                sum1=sum1+dist[j]*exp(-taus[i]/dist[j]);
+                sum2=sum2+dist[j];
+                    }
+            modelEval[i]=offset+(1+sum1/(1-sum2))*factor;
+        }
+        break;
+
 
     }
-
 }
 
 

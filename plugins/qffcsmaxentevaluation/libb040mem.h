@@ -11,6 +11,8 @@
 #include "Eigen/SVD"
 #include <stdint.h>
 
+#include <QDebug>
+
 #ifndef LIBB040MEM_H
 #define LIBB040MEM_H
 
@@ -36,6 +38,10 @@
 
 
 
+
+
+
+
 class MaxEntB040{
 
     public:
@@ -48,7 +54,8 @@ class MaxEntB040{
 
         void setData(const double* taus, const double* correlation,\
         	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
-            int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus);
+            int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus,\
+            int model,int parameterCount, double *param_list);
 
 		void writeDistribution(double * dist);
 		
@@ -56,7 +63,7 @@ class MaxEntB040{
 
         bool run(double alpha,int NumIter,double * param_list,int model,int parameter_count);
 
-        void evaluateModel(double * taus,double *modelEval,uint32_t N,double* distTaus, double* dist,\
+        static void evaluateModel(double * taus,double *modelEval,uint32_t N,double* distTaus, double* dist,\
                            uint32_t Ndist, double* param_list,int model);
 
 
