@@ -45,11 +45,15 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QList<QFPluginServ
 }
 
 void QFRawDataRecordFactory::distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent) {
-    for (int i=0; i<getIDList().size(); i++) {
-        items[getIDList().at(i)]->setProject(project);
-        items[getIDList().at(i)]->setSettings(settings);
-        items[getIDList().at(i)]->setServices(services);
-        items[getIDList().at(i)]->setParentWidget(parent);
+    QMapIterator<QString, QFPluginRawDataRecord*> i(items);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value())  {
+            i.value()->setProject(project);
+            i.value()->setSettings(settings);
+            i.value()->setServices(services);
+            i.value()->setParentWidget(parent);
+        }
     }
 }
 
