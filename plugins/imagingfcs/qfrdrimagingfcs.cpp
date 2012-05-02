@@ -3,6 +3,7 @@
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcstools.h"
+#include "yaid_rh.h"
 
 QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
     QObject(parent), QFPluginRawDataRecordBase()
@@ -100,11 +101,11 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         QString format_binVideoCorrelator_short=tr("binary imFCS correlation data");
         QString format_videoCorrelator=tr("CSV imFCS Correlations (*.autocorrelation.dat *.acf.dat *.crosscorrelation.dat *.ccf.dat *.dccf.dat *.qf.dat)");
         QString format_videoCorrelator_short=tr("CSV imFCS correlation data");
-        QString format_Radhard2=tr("SPAD array Correlations (*.dat)");
-        QString format_Radhard2_short=tr("SPAD array data");
+        QString format_RH2Cor=tr("RH2 hw correlator dump (*.cor.dat)");
+        QString format_RH2Cor_short=tr("RH2 hw cor dump");
         QStringList formats, formats_short;
-        formats<<format_binVideoCorrelator<<format_videoCorrelator<<format_Radhard2;
-        formats_short<<format_binVideoCorrelator_short<<format_videoCorrelator_short<<format_Radhard2_short;
+        formats<<format_binVideoCorrelator<<format_videoCorrelator<<format_RH2Cor;
+        formats_short<<format_binVideoCorrelator_short<<format_videoCorrelator_short<<format_RH2Cor_short;
         // look into INI which was the last used format
         QString current_format_name=settings->getQSettings()->value("imaging_fcs/current_format_filter", format_videoCorrelator).toString();
         // let the user select some files to import
@@ -176,9 +177,9 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 }
                 if (!QFile::exists(overview)) overview="";
                 insertVideoCorrelatorFile(filename, overview, true);
-            } else if (current_format_name==format_Radhard2) {
+            } else if (current_format_name==format_RH2Cor) {
                 QString filename=*it;
-                insertRadhard2File(filename);
+                insertRH2CorFile(filename);
             }
             settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
             services->setProgress(i);
@@ -561,7 +562,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
 
 
-void QFRDRImagingFCSPlugin::insertRadhard2File(const QString& filename) {
+void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
 
@@ -569,16 +570,45 @@ void QFRDRImagingFCSPlugin::insertRadhard2File(const QString& filename) {
     QStringList paramsReadonly;
     paramsReadonly<<"FILETYPE";
 
-    //bool ok=true;
+    bool ok=true, okk=true;
 
-
+    int height=QInputDialog::getInt(NULL, tr("Radhard2 image properties"), tr("Height [ROI]= "), 32, 1, 100000, 1, &okk);
+    ok=ok&&okk;
+    int width=32;
+    ok=ok&&okk;
 
     // set whatever you want (FILETYPE is just an example)!
     initParams["FILETYPE"]="RADHARD2";
+    initParams["WIDTH"]=width;
+    initParams["HEIGHT"]=height;
+    paramsReadonly<<"WIDTH"<<"HEIGHT";
 
-    if (QFile::exists(filename)) {
+    QString filenameValid=filename+".valid";
+
+    //First we check the file
+    struct yaid_rh::analyzerInfoBlock analyzerInfo;
+    analyzerInfo.frameSize=0;
+    analyzerInfo.bytesToCheck=1024*1024; //Seems to be a valid choice
+    analyzerInfo.validFrames=0;
+
+    const unsigned char *buffer;
+    struct yaid_rh::frameIdent *fID=NULL;
+    long lSize=yaid_rh::readFileToMem((char*) (filename.toLocal8Bit()).constData(),(unsigned char**)&buffer);
+    unsigned char *bufferEnd=(unsigned char*)buffer+lSize-1;
+
+    findFrames(buffer, bufferEnd, &fID, 0, &analyzerInfo, NULL, 0);
+    findGhostFrames(&fID,&analyzerInfo,1);
+    yaid_rh::writeFileFromMem((unsigned char*) (filenameValid.toLocal8Bit()).constData(),&fID,&analyzerInfo,1);
+
+    int steps=*((uint32_t*) (fID[analyzerInfo.validFrames-1].pos+4));
+    steps*=1024;
+    free((void*)buffer);
+    initParams["STEPS"]=steps;
+    paramsReadonly<<"WIDTH"<<"HEIGHT"<<"STEPS";
+
+    if (ok && QFile::exists(filename)) {
         QStringList files, files_types;
-        files<<filename;
+        files<<filename+".valid";
         files_types<<"acf";
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
         QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files,            initParams,         paramsReadonly, files_types);

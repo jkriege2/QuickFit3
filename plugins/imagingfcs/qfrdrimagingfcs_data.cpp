@@ -10,6 +10,7 @@
 #include "csvtools.h"
 #include "qfimporter.h"
 #include "qfimportermanager.h"
+#include "yaid_rh.h"
 
 #undef DEBUG_SIZES
 //#define DEBUG_SIZES
@@ -611,138 +612,48 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
     return ok;
 }
 
-
-
-
-
-
-
-
 bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
-    bool ok=true;
+    int height=getProperty("HEIGHT", 0).toInt();
+    int width=getProperty("WIDTH", 0).toInt();
+    int steps=getProperty("STEPS", 0).toInt();
 
-    QString errorDescription="";
-
-    QFImporter* imp=getProject()->getServices()->getImporterManager()->createImporter("imageimporter_radhard");
-    if (!dynamic_cast<QFImporterImageSeries*>(imp)) {
-        if (imp) delete imp;
-        return false;
-    }
-    QFImporterImageSeries* ReaderRH=dynamic_cast<QFImporterImageSeries*>(imp);
-
-    ok=ReaderRH->open(filename);
+    if((height*width*steps)==0)return false;
 
     // LOAD FILE
+    struct yaid_rh::correlationInfoBlock correlationInfo;
+    correlationInfo.width=(unsigned int)width;
+    correlationInfo.height=(unsigned int)height;
+    correlationInfo.steps=(unsigned int)steps;
+    correlationInfo.blocks=14;
+    correlationInfo.lags=8;
+    correlationInfo.isNewFileFormat=false;
+    correlationInfo.doCrosscorrelation=false;
+    correlationInfo.ignoreErrors=false;
 
-    if (ok) {
-        width= ReaderRH->frameWidth();
-        height=ReaderRH->frameHeight();
-        if((width==(128*8))&&(height==32)) {
+    struct yaid_rh::corData **corValues = (yaid_rh::corData**)malloc(32*correlationInfo.height*sizeof(struct yaid_rh::corData*));
+    for(int i=0;i<32*correlationInfo.height;i++)
+        corValues[i]=(yaid_rh::corData*)malloc((correlationInfo.blocks*correlationInfo.lags)*sizeof(struct yaid_rh::corData));
 
-            uint32_t **hwc_dump = (uint32_t **)malloc(1024 * sizeof(uint32_t*));
-                for(int i=0;i<1024;i++)
-                    hwc_dump[i]=(uint32_t*)malloc((128) * sizeof(uint32_t));
-            unsigned char *hwc_line = (unsigned char*) malloc(2*4+(64*128)*4+2);
-            uint32_t header;
-            //read data
-            do {
-                //ReaderRH->readFrameCharRaw(hwc_line,&header);
-                uint32_t id= (header >> 8) & 0x00FFFFFFU;
-                uint32_t *src=(uint32_t *) &hwc_line[4]; //first dword: tics
-                uint32_t ticks=*((uint32_t *)hwc_line);
-                for(int x=0;x<32;x++) {
-                    uint32_t *dst=hwc_dump[(id&31)*32+x];
-                    for(int i=0;i<128;i++)
-                    {
-                        *dst=*src;
-                        dst++;
-                        src++;
-                    }
-                    src+=128; //skip delay registers
-                }
+    yaid_rh::readCorFile((char*)filename.toLocal8Bit().constData(),corValues,&correlationInfo,0);
 
-            }while(true);
-            for(unsigned int correlator=0;correlator<1024;correlator++)
-            {
-                    uint32_t *hwc_value=hwc_dump[correlator];
-                    unsigned int tau=0;
+    allocateContents(correlationInfo.width,correlationInfo.height,correlationInfo.blocks*correlationInfo.lags);
 
-                    uint32_t channel0=*hwc_value & 0xFFFFFFFFU;
-                    uint32_t count_global=hwc_dump[correlator][126];
-                    uint32_t count_local=hwc_dump[correlator][127];
-                    unsigned int blocks=14;
-                    unsigned int lags=8;
-                    unsigned int steps=blocks*lags;
-                    for(unsigned int block=0;block<blocks;block++)
-                    {
-
-
-                            for(unsigned int lag=0;lag<lags;lag++)
-                            {
-                                    uint32_t dword=*hwc_value;
-                                    hwc_value++;
-                                    unsigned int value=(dword & 0xFFFFFFFFU);
-
-                                    //G, taken from correlator_multitau.h, should use buitl-in normalization function
-                                    float result=1.0;
-                                    if(steps>tau)
-                                    {
-                                            float correction_factor=(float(steps-tau))/(float)steps;
-                                            result=((float)value*(float)steps)/((float)(1<<block)*(float)(correction_factor*count_global*count_local));// see "A distributed algorithm for multi-tau autocorrelation"
-                                    }
-                                    //\G
-
-                                    //correlator_hw_values[correlator][block*lags+lag].tau=tau*10;//*10E-6s
-                                    //correlator_hw_values[correlator][block*lags+lag].raw=value;
-                                    //6correlator_hw_values[correlator][block*lags+lag].val=result;
-                                    tau+=(1<<block);
-                            }
-                    }
-            }
-                        allocateContents(32,height,14*8);
-           // correlations[]
-
-
-        } else {
-            ok=false;
+    for(int i=0; i<correlationInfo.width*correlationInfo.height; i++) {
+        for (int j=0; j<correlationInfo.blocks*correlationInfo.lags; j++) {
+            tau[j]=corValues[i][j].tau*1e-6;
+            correlations[i*correlationInfo.blocks*correlationInfo.lags+j]=corValues[i][j].val;
+            sigmas[i*correlationInfo.blocks*correlationInfo.lags+j]=0;
         }
-        if(ok) {
-            width=32;
-            height=32;
-            int NN=100; // number of lags per correlation function
-            //setQFProperty("WIDTH", width, false, true);
-            //setQFProperty("HEIGHT", height, false, true);
-
-
-
-
-            for (int i=0; i<width*height; i++) {
-                for (int j=0; j<NN; j++) {
-                    tau[j]=j;//data_matrix[i].at(j).first;
-                    correlations[i*NN+j]=0;//data_matrix[i].at(j).second;
-                    sigmas[i*NN+j]=0;//data_matrix[i].at(j).third;
-                }
-            }
-        }
-
-        QApplication::processEvents();
-        recalcCorrelations();
-        QApplication::processEvents();
-    } else {
-        ok=false;
-        errorDescription=tr("error loading file");
     }
-    ReaderRH->close();
 
+    free(corValues);
 
-    if (!ok) setError(tr("Error while reading Radhard2 file '%1': %2").arg(filename).arg(errorDescription));
-    return ok;
+    QApplication::processEvents();
+    recalcCorrelations();
+    QApplication::processEvents();
+
+    return true;
 }
-
-
-
-
-
 
 int QFRDRImagingFCSData::getCorrelationRuns() {
     return width*height;

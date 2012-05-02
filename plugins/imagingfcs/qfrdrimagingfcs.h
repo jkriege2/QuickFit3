@@ -79,7 +79,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
             \param filename filename of the input file
         */
-        void insertRadhard2File(const QString& filename);
+        void insertRH2CorFile(const QString& filename);
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);
