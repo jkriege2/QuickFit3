@@ -7,6 +7,7 @@
 #include "qffitfunctionfcssimplediff.h"
 #include "qffitfunctionfcsflow.h"
 #include "qffitfunctionfcsrot.h"
+#include "qffitfunctionfcsoscillation.h"
 
 
 
@@ -18,7 +19,7 @@
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffrot";
+    res<<"fcs_diff"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffrot"<<"fcs_oscillation";
     return res;
 }
 
@@ -35,6 +36,8 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCSFlow();
     } else if (id=="fcs_diffrot") {
         return new QFFitFunctionFCSRot();
+    } else if (id=="fcs_oscillation") {
+        return new QFFitFunctionFCSOscillation();
     }
     return NULL;
 }
