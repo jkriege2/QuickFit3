@@ -620,33 +620,25 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     if((height*width*steps)==0)return false;
 
     // LOAD FILE
-    struct yaid_rh::correlationInfoBlock correlationInfo;
-    correlationInfo.width=(unsigned int)width;
-    correlationInfo.height=(unsigned int)height;
-    correlationInfo.steps=(unsigned int)steps;
-    correlationInfo.blocks=14;
-    correlationInfo.lags=8;
-    correlationInfo.isNewFileFormat=false;
-    correlationInfo.doCrosscorrelation=false;
-    correlationInfo.ignoreErrors=false;
+    yaid_rh::corFileReader *cfr=new yaid_rh::corFileReader(filename.toLocal8Bit().constData(),width,height,steps);
+    cfr->processFrames(1);
 
-    struct yaid_rh::corData **corValues = (yaid_rh::corData**)malloc(32*correlationInfo.height*sizeof(struct yaid_rh::corData*));
-    for(int i=0;i<32*correlationInfo.height;i++)
-        corValues[i]=(yaid_rh::corData*)malloc((correlationInfo.blocks*correlationInfo.lags)*sizeof(struct yaid_rh::corData));
-
-    yaid_rh::readCorFile((char*)filename.toLocal8Bit().constData(),corValues,&correlationInfo,0);
-
-    allocateContents(correlationInfo.width,correlationInfo.height,correlationInfo.blocks*correlationInfo.lags);
-
-    for(int i=0; i<correlationInfo.width*correlationInfo.height; i++) {
-        for (int j=0; j<correlationInfo.blocks*correlationInfo.lags; j++) {
-            tau[j]=corValues[i][j].tau*1e-6;
-            correlations[i*correlationInfo.blocks*correlationInfo.lags+j]=corValues[i][j].val;
-            sigmas[i*correlationInfo.blocks*correlationInfo.lags+j]=0;
+    allocateContents(width,height,cfr->getTotalLagCount());
+    //load correlation data
+    for(int i=0; i<width*height; i++) {
+        for (int j=0; j<cfr->getTotalLagCount(); j++) {
+            tau[j]=cfr->getTau(i,j)*1e-6;
+            correlations[i*cfr->getTotalLagCount()+j]=cfr->getVal(i,j);
+            sigmas[i*cfr->getTotalLagCount()+j]=0;
         }
     }
+    for(int i=0; i<width*height; i++) {
+        overview[i]=cfr->getRaw(i,0);
+        overviewF[i]=cfr->getRaw(i,0);
+    }
+    delete cfr;
 
-    free(corValues);
+    //Sfree(corValues);
 
     QApplication::processEvents();
     recalcCorrelations();

@@ -586,25 +586,24 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
     QString filenameValid=filename+".valid";
 
     //First we check the file
-    struct yaid_rh::analyzerInfoBlock analyzerInfo;
-    analyzerInfo.frameSize=0;
-    analyzerInfo.bytesToCheck=1024*1024; //Seems to be a valid choice
-    analyzerInfo.validFrames=0;
+    if(QFile::exists(filename)){
+        yaid_rh::frameAnalyzer *fa=new yaid_rh::frameAnalyzer(filename.toLocal8Bit().constData());
+        fa->findFrames(0,1024*16,NULL,1);
+        fa->findGhostFrames(1);
+        if(QFile::exists(filenameValid)){
+            QMessageBox::critical(NULL,tr("RH2 Correlation File Importer"),tr("The analyzed file %1 already exists.\nPlease delete it!").arg(filenameValid));
+            return;
+        }else{
+            fa->writeFileFromMem(filenameValid.toLocal8Bit().constData(),1);
+        }
 
-    const unsigned char *buffer;
-    struct yaid_rh::frameIdent *fID=NULL;
-    long lSize=yaid_rh::readFileToMem((char*) (filename.toLocal8Bit()).constData(),(unsigned char**)&buffer);
-    unsigned char *bufferEnd=(unsigned char*)buffer+lSize-1;
+        int steps=fa->getSteps();
+        delete fa;
+        fa=NULL;
 
-    findFrames(buffer, bufferEnd, &fID, 0, &analyzerInfo, NULL, 0);
-    findGhostFrames(&fID,&analyzerInfo,1);
-    yaid_rh::writeFileFromMem((unsigned char*) (filenameValid.toLocal8Bit()).constData(),&fID,&analyzerInfo,1);
-
-    int steps=*((uint32_t*) (fID[analyzerInfo.validFrames-1].pos+4));
-    steps*=1024;
-    free((void*)buffer);
-    initParams["STEPS"]=steps;
-    paramsReadonly<<"WIDTH"<<"HEIGHT"<<"STEPS";
+        initParams["STEPS"]=steps;
+        paramsReadonly<<"STEPS";
+    }
 
     if (ok && QFile::exists(filename)) {
         QStringList files, files_types;
