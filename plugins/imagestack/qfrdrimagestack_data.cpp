@@ -51,7 +51,36 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                     stacks.append(s);
                     loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmGetSize);
                     getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2') size:   width=%3,   height=%4,   frames=%5\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames));
+                    setQFProperty(QString("WIDTH%1").arg(stacks.size()-1), stacks.last().width, false, true);
+                    setQFProperty(QString("HEIGHT%1").arg(stacks.size()-1), stacks.last().height, false, true);
+                    setQFProperty(QString("FRAMES%1").arg(stacks.size()-1), stacks.last().frames, false, true);
+                    setQFProperty(QString("CHANNELS%1").arg(stacks.size()-1), stacks.last().channels, false, true);
+                    setQFProperty(QString("FILENUM%1").arg(stacks.size()-1), stacks.last().file, false, true);
+
+                    QString p;
+                    p=QString("XUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
+                    p=QString("YUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
+                    p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
+                    p=QString("CUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, ""), true, true);
+
+                    p=QString("XAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "x"), true, true);
+                    p=QString("YAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "y"), true, true);
+                    p=QString("TAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "z/t"), true, true);
+                    p=QString("CAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "channel"), true, true);
+
+                    p=QString("XUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+                    p=QString("YUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+                    p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+                    p=QString("CUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+
+                    p=QString("STACK_DESCRIPTION"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, tr("stack %1").arg(stacks.size())), true, true);
+                    for (int c=0; c<stacks.last().channels; c++) {
+                        p=QString("CHANNELNAME_%1_%2").arg(stacks.size()-1).arg(c);
+                        setQFProperty(p, getProperty(p, QFileInfo(files[f]).completeBaseName()), true, true);
+                    }
+
                 }
+
             }
             if (allocateMemory()) {
                 getProject()->getServices()->log_text(tr("  - allocated %1 of memory\n").arg(bytestostr(memsize).c_str()));

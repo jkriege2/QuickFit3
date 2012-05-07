@@ -40,7 +40,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsoverviewrateeditor.h \
     qfrdrimagingfcstools.h \
     ../interfaces/qfrdrimagestackinterface.h \
-    ../interfaces/qfrdrsimplecountrateinterface.h
+    ../interfaces/qfrdrsimplecountrateinterface.h \
+    ../../../../../LIB/trunk/yaid_rh.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
