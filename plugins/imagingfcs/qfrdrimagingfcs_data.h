@@ -283,20 +283,32 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double getImageStackXUnitFactor(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackXUnitName() */
         virtual QString getImageStackXUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackXName() */
+        virtual QString getImageStackXName(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackYUnitFactor() */
         virtual double getImageStackYUnitFactor(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackYUnitName() */
         virtual QString getImageStackYUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackYName() */
+        virtual QString getImageStackYName(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackTUnitFactor() */
         virtual double getImageStackTUnitFactor(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackTUnitName() */
         virtual QString getImageStackTUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackTName() */
+        virtual QString getImageStackTName(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackCUnitFactor() */
         virtual double getImageStackCUnitFactor(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackCUnitName() */
         virtual QString getImageStackCUnitName(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackCName() */
+        virtual QString getImageStackCName(int stack) const;
         /** \copydoc QFRDRImageStackInterface::getImageStackDescription() */
         virtual QString getImageStackDescription(int stack) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackChannelName() */
+        virtual QString getImageStackChannelName(int stack, int channel) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackTimepointName() */
+        virtual QString getImageStackTimepointName(int stack, int t) const;
 
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateAverage() */
         virtual double getSimpleCountrateAverage(int run=-1);

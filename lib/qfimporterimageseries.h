@@ -50,6 +50,8 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         uint16_t frameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
         bool readFrameFloat(float* data);
+        /** \brief read a new frame into the given array of double-precision floating point numbers */
+        bool readFrameDouble(double* data);
         /** \brief read a new frame into the given array of integers */
         bool readFrameUINT16(uint16_t* data);
 
@@ -73,6 +75,8 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         virtual uint16_t intFrameHeight()=0;
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intReadFrameFloat(float* data)=0;
+        /** \brief read a new frame into the given array of floating point numbers */
+        virtual bool intReadFrameDouble(double* data)=0;
         /** \brief read a new frame into the given array of integers */
         virtual bool intReadFrameUINT16(uint16_t* data)=0;
 

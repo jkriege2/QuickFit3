@@ -80,6 +80,10 @@ SUBDIRS += plg_picoquantimporters
 plg_picoquantimporters.subdir=./plugins/picoquantimporters
 plg_picoquantimporters.depends = lib
 
+SUBDIRS += plg_imagestack
+plg_imagestack.subdir=./plugins/imagestack
+plg_imagestack.depends = lib libqf3widgets
+
 
 !macx {
 

@@ -51,6 +51,7 @@ class QFImageReaderRadhard : public QFImporterImageSeries
         virtual bool intReadFrameFloat(float* data);
         /** \brief read a new frame into the given array of integers */
         virtual bool intReadFrameUINT16(uint16_t* data);
+        virtual bool intReadFrameDouble(double* data);
 
 
         uint16_t width;

@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="image_stack/qfrdrimagestack.png">./images/qfrdrimagestack.png</file>
+    <file alias="image_stack/qfrdrimagestack_small.png">./images/qfrdrimagestack_small.png</file>
+</qresource>
+</RCC>

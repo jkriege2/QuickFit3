@@ -129,6 +129,11 @@ bool QFImageReaderRadhard::intReadFrameUINT16(uint16_t* data) {
   return readFrame_<uint16_t>(data);
 }
 
+bool QFImageReaderRadhard::intReadFrameDouble(double *data) {
+    if (!file) return false;
+    return readFrame_<double>(data);
+}
+
 bool QFImageReaderRadhard::intReadFrameFloat(float* data) {
     if (!file) return false;
   return readFrame_<float>(data);

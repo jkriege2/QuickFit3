@@ -1111,12 +1111,20 @@ QString QFRDRImagingFCSData::getImageStackXUnitName(int stack) const {
     return QString("micrometer");
 }
 
+QString QFRDRImagingFCSData::getImageStackXName(int stack) const {
+    return tr("x");
+}
+
 double QFRDRImagingFCSData::getImageStackYUnitFactor(int stack) const {
     return getProperty("PIXEL_HEIGHT", 1.0).toDouble();
 }
 
 QString QFRDRImagingFCSData::getImageStackYUnitName(int stack) const {
     return QString("micrometer");
+}
+
+QString QFRDRImagingFCSData::getImageStackYName(int stack) const {
+    return QString("y");
 }
 
 double QFRDRImagingFCSData::getImageStackTUnitFactor(int stack) const {
@@ -1128,8 +1136,14 @@ double QFRDRImagingFCSData::getImageStackTUnitFactor(int stack) const {
 }
 
 QString QFRDRImagingFCSData::getImageStackTUnitName(int stack) const {
-    if (stack==0) return tr("time [seconds]");
+    if (stack==0) return tr("seconds");
     return QString("");
+}
+
+QString QFRDRImagingFCSData::getImageStackTName(int stack) const {
+    if (stack==0) return tr("time");
+    return QString("");
+
 }
 
 double QFRDRImagingFCSData::getImageStackCUnitFactor(int stack) const {
@@ -1140,9 +1154,22 @@ QString QFRDRImagingFCSData::getImageStackCUnitName(int stack) const {
     return QString("");
 }
 
+QString QFRDRImagingFCSData::getImageStackCName(int stack) const
+{
+    return tr("channel");
+}
+
 QString QFRDRImagingFCSData::getImageStackDescription(int stack) const {
     if (stack==0) return tr("averaged video");
     return QString("");
+}
+
+QString QFRDRImagingFCSData::getImageStackChannelName(int stack, int channel) const {
+    return QString("");
+}
+
+QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const {
+    return QString("%1%2").arg(getImageStackTUnitFactor(stack)*t).arg(getImageStackTUnitName(stack));
 }
 
 double QFRDRImagingFCSData::getSimpleCountrateAverage(int /*run*/) {

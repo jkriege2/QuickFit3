@@ -107,23 +107,37 @@ class QFRDRImageStackInterface {
 
         /** \brief returns a factor that scales the image stack x-dimension [0..width-1] to real coordinates */
         virtual double getImageStackXUnitFactor(int stack) const=0;
-        /** \brief returns the name of the image stack x-dimension */
+        /** \brief returns the unit name of the image stack x-dimension */
         virtual QString getImageStackXUnitName(int stack) const=0;
+        /** \brief returns the name of the image stack x-dimension */
+        virtual QString getImageStackXName(int stack) const=0;
 
         /** \brief returns a factor that scales the image stack y-dimension [0..height-1] to real coordinates */
         virtual double getImageStackYUnitFactor(int stack) const=0;
-        /** \brief returns the name of the image stack y-dimension */
+        /** \brief returns the unit name of the image stack y-dimension */
         virtual QString getImageStackYUnitName(int stack) const=0;
+        /** \brief returns the name of the image stack y-dimension */
+        virtual QString getImageStackYName(int stack) const=0;
 
         /** \brief returns a factor that scales the image stack t-dimension [0..frames-1] to real coordinates */
         virtual double getImageStackTUnitFactor(int stack) const=0;
-        /** \brief returns the name of the image stack t-dimension */
+        /** \brief returns the unit name of the image stack t-dimension */
         virtual QString getImageStackTUnitName(int stack) const=0;
+        /** \brief returns the name of the image stack t-dimension */
+        virtual QString getImageStackTName(int stack) const=0;
 
         /** \brief returns a factor that scales the image stack channel-dimension [0..channels-1] to real coordinates */
         virtual double getImageStackCUnitFactor(int stack) const=0;
-        /** \brief returns the name of the image stack channel-dimension */
+        /** \brief returns the unit name of the image stack channel-dimension */
         virtual QString getImageStackCUnitName(int stack) const=0;
+        /** \brief returns the name of the image stack channel-dimension */
+        virtual QString getImageStackCName(int stack) const=0;
+
+        /** \brief returns the name of the given channel (e.g. "red", "green", ...) */
+        virtual QString getImageStackChannelName(int stack, int channel) const=0;
+
+        /** \brief returns the name of the given timepoint (e.g. "1s", "1.23s", "z=45µm", ...) */
+        virtual QString getImageStackTimepointName(int stack, int t) const=0;
 
 
         /** \brief returns a description for the video */
