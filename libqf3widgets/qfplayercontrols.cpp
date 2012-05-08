@@ -160,7 +160,7 @@ void QFPLayerControls::createActions() {
     actPlayPause->setCheckable(true);
     actPlayPause->setChecked(false);
     lastPlaying=false;
-    connect(actPlayPause, SIGNAL(triggered(bool)), this, SLOT(playPauseTriggered(bool)));
+    connect(actPlayPause, SIGNAL(toggled(bool)), this, SLOT(playPauseTriggered(bool)));
     actRewind=new QAction(QIcon(":/libqf3widgets/player_start.png"), tr("back to first frame"), this);
     connect(actRewind, SIGNAL(triggered()), this, SLOT(rewind()));
     actNextFrame=new QAction(QIcon(":/libqf3widgets/player_fwd.png"), tr("one frame forward"), this);

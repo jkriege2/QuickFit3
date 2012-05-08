@@ -183,7 +183,7 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             The data is stored in the given ImageStack \a stack. If \a mode is lmGetSize, only the image stack sizes are stored in
             stack, if \a mode is lmReadData the image stack is read from the file.
          */
-        bool loadImageFile(ImageStack &stack, QString filename, loadMode mode);
+        bool loadImageFile(ImageStack &stack, QString filename, loadMode mode, int channel=0);
         QList<ImageStack> stacks;
         /** \brief allocate memory for all entries in stacks */
         bool allocateMemory();

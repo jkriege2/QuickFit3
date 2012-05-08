@@ -39,7 +39,7 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
     QString stacktype=getProperty("STACKTYPE", "ONEFILEPERCHANNEL").toString().toUpper();
     clearMemory();
     stacks.clear();
-    if (stacktype=="ONEFILEPERCHANNEL") {
+    if (stacktype=="ONEFILEPERSTACK") {
         if (files.size()>0) {
             getProject()->getServices()->log_text(tr("  - loading images in image stack '%1'\n").arg(getName()));
             // we need two runs: in the first one, we only read the image stack sizes, then we can allocate the memory for the
@@ -84,10 +84,86 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
             }
             if (allocateMemory()) {
                 getProject()->getServices()->log_text(tr("  - allocated %1 of memory\n").arg(bytestostr(memsize).c_str()));
+                int stack=0;
+                for (int f=0; f<files.size(); f++) {
+                    if (files_types.value(f, "image").toLower()=="image" && (stack<stacks.size())) {
+                        getProject()->getServices()->log_text(tr("    * loading image stack %1/%2 (file: '%3') ...\n").arg(stack+1).arg(stacks.size()).arg(files[f]));
+                        if (loadImageFile(stacks[stack], files[f], QFRDRImageStackData::lmReadData)) {
+                            stack++;
+                        } else {
+                            setError(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
+                            return;
+                        }
+                    }
+                }
+            } else setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
+        } else setError(tr("there are no files in the %1 record!").arg(getName()));
+    } else if (stacktype=="ONEFILEPERCHANNEL") {
+        if (files.size()>0) {
+            getProject()->getServices()->log_text(tr("  - loading images in image stack '%1'\n").arg(getName()));
+            // we need two runs: in the first one, we only read the image stack sizes, then we can allocate the memory for the
+            // image series and finally read in the data
+
+            { QFRDRImageStackData::ImageStack s;
+            stacks.append(s); }
+            for (int f=0; f<files.size(); f++) {
+                if (files_types.value(f, "image").toLower()=="image") {
+                    stacks.last().file=f;
+
+                    int c=stacks.last().channels;
+                    int w=stacks.last().width;
+                    int h=stacks.last().height;
+                    int fr=stacks.last().frames;
+
+                    loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmGetSize);
+                    getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2') size:   width=%3,   height=%4,   frames=%5\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames));
+                    setQFProperty(QString("WIDTH%1").arg(stacks.size()-1), stacks.last().width, false, true);
+                    setQFProperty(QString("HEIGHT%1").arg(stacks.size()-1), stacks.last().height, false, true);
+                    setQFProperty(QString("FRAMES%1").arg(stacks.size()-1), stacks.last().frames, false, true);
+                    setQFProperty(QString("FILENUM%1").arg(stacks.size()-1), stacks.last().file, false, true);
+
+                    stacks.last().channels=c+1;
+
+                    setQFProperty(QString("CHANNELS%1").arg(stacks.size()-1), stacks.last().channels, false, true);
+                    QString  p=QString("CHANNELNAME_%1_%2").arg(stacks.size()-1).arg(stacks.last().channels-1);
+                    setQFProperty(p, getProperty(p, QFileInfo(files[f]).completeBaseName()), true, true);
+
+                    if ( (c>1) && ((w!=stacks.last().width)
+                         ||(h!=stacks.last().height)
+                         ||(fr!=stacks.last().frames)) ) {
+                        setError(tr("size of file '%1'' does not fit the size of the other files in this stack").arg(files[f]));
+                    }
+
+                }
+
+            }
+
+            QString p;
+            p=QString("XUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
+            p=QString("YUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
+            p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
+            p=QString("CUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, ""), true, true);
+
+            p=QString("XAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "x"), true, true);
+            p=QString("YAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "y"), true, true);
+            p=QString("TAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "z/t"), true, true);
+            p=QString("CAXIS_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "channel"), true, true);
+
+            p=QString("XUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+            p=QString("YUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+            p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+            p=QString("CUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
+
+            p=QString("STACK_DESCRIPTION"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, tr("stack %1").arg(stacks.size())), true, true);
+
+            if (allocateMemory()) {
+                int channel=0;
+                getProject()->getServices()->log_text(tr("  - allocated %1 of memory\n").arg(bytestostr(memsize).c_str()));
                 for (int f=0; f<files.size(); f++) {
                     if (files_types.value(f, "image").toLower()=="image") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2') ...\n").arg(stacks.size()).arg(files[f]));
-                        if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData)) {
+                        if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel)) {
+                            channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
                             return;
@@ -103,7 +179,7 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
 
 }
 
-bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, QString filename, loadMode mode) {
+bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, QString filename, loadMode mode, int channel) {
 	bool ok=true;
     QString filetype=getProperty("FILETYPE", "").toString();
     QStringList reader_id=QFRDRImageStackData::getImageReaderIDList(getProject()->getServices());
@@ -124,7 +200,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
             } else {
                 int i=0;
                 do {
-                    double* d=&(stack.data[i*stack.width*stack.height]);
+                    double* d=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
                     reader->readFrameDouble(d);
                     i++;
                 } while (i<stack.frames && reader->nextFrame());
@@ -210,6 +286,8 @@ double *QFRDRImageStackData::getImageStack(int stackID, uint32_t frame, uint32_t
     QFRDRImageStackData::ImageStack stack=stacks.value(stackID, QFRDRImageStackData::ImageStack());
     if (stack.data==NULL) return NULL;
     else {
+        if (frame>=stack.frames) return NULL;
+        if (channel>=stack.channels) return NULL;
         return &(stack.data[channel*stack.width*stack.height*stack.frames+frame*stack.width*stack.height]);
     }
 }

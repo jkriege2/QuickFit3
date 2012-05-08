@@ -1,6 +1,16 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="image_stack/qfrdrimagestack.png">./images/qfrdrimagestack.png</file>
-    <file alias="image_stack/qfrdrimagestack_small.png">./images/qfrdrimagestack_small.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="image_stack/qfrdrimagestack.png">images/qfrdrimagestack.png</file>
+        <file alias="image_stack/qfrdrimagestack_small.png">images/qfrdrimagestack_small.png</file>
+    </qresource>
+    <qresource prefix="/image_stack">
+        <file alias="image.png">images/image.png</file>
+        <file alias="player_end.png">images/player_end.png</file>
+        <file alias="player_fwd.png">images/player_fwd.png</file>
+        <file alias="player_pause.png">images/player_pause.png</file>
+        <file alias="player_play.png">images/player_play.png</file>
+        <file alias="player_rew.png">images/player_rew.png</file>
+        <file alias="player_start.png">images/player_start.png</file>
+        <file alias="player_stop.png">images/player_stop.png</file>
+    </qresource>
 </RCC>

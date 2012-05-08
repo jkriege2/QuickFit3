@@ -33,6 +33,10 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
+ASSETS_TESTDATA.files = ./assets/testdata/*.*
+ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/testdata/
+INSTALLS += ASSETS_TESTDATA
+
 QT += gui xml core
 CONFIG += exceptions rtti stl
 

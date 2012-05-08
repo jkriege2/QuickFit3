@@ -128,7 +128,7 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
         pltImage->get_plotter()->set_maintainAspectRatio(true);
         pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
         labDescription->setText(tr("<b>image size:</b> %1 &times; %2 pixels = %3 &times; %4 %5&times;%6").arg(width).arg(height).arg(rwidth).arg(rheight).arg(mv->getImageStackXUnitName(idx)).arg(mv->getImageStackYUnitName(idx)));
-        player->play();
+        //player->play();
     } else  {
         image->set_data(NULL, 0, 0, JKQTPMathImageBase::UInt16Array);
         player->setVisible(false);
