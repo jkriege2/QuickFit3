@@ -15,6 +15,9 @@
 #include "jkqttools.h"
 #include "jkqtpgeoelements.h"
 #include "qfplayercontrols.h"
+#include "qvisiblehandlesplitter.h"
+#include "qftools.h"
+#include "statistics_tools.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_image_stack
@@ -46,14 +49,29 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
     protected:
         QLabel* labDescription;
         JKQtPlotter* pltImage;
+        JKQtPlotter* pltData;
         QToolBar* toolbar;
         QComboBox* cmbImageStack;
         QComboBox* cmbChannelR;
         QComboBox* cmbChannelG;
         QComboBox* cmbChannelB;
         QComboBox* cmbChannelMode;
+        QSpinBox* spinBins;
         QLabel* labTAxis;
         QLabel* labFrame;
+        QVisibleHandleSplitter* splitter;
+
+        //JKQTPbarHorizontalGraph* plteHistogram;
+        //JKQTPxyLineGraph* plteLine;
+
+
+        enum DataMode {
+            dmFullHistogram=0,
+            dmLineProfile=1,
+            dmSelectionHistogram=2
+        };
+
+        DataMode dataMode;
 
 
         QFPLayerControls* player;
@@ -66,6 +84,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+
+        void addDataHistogram(double* data, int size, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
 };
 
 #endif // QFRDRIMAGESTACKEDITOR_H

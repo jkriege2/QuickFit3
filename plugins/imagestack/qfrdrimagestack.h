@@ -58,6 +58,7 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
     protected slots:
         /** \brief insertdata from file*/
         void insertSingleFileImageStack();
+        void insertMultiFileImageStack();
 };
 
 #endif // QFRDRIMAGESTACK_H

@@ -4,6 +4,7 @@
 QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services, QWidget* parent):
     QFRawDataEditor(services, parent)
 {
+    dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
     createWidgets();
 }
 
@@ -22,6 +23,12 @@ void QFRDRImageStackDataEditor::createWidgets() {
     cmbImageStack=new QComboBox(this);
     layTop->addWidget(cmbImageStack);
     layTop->addStretch();
+
+    spinBins=new QSpinBox(this);
+    spinBins->setRange(10,100000);
+    spinBins->setValue(256);
+    layTop->addWidget(new QLabel(tr("histogram bins: ")));
+    layTop->addWidget(spinBins);
 
 
     layTop=new QHBoxLayout(this);
@@ -74,10 +81,30 @@ void QFRDRImageStackDataEditor::createWidgets() {
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
 
-    QHBoxLayout* layImage=new QHBoxLayout(this);
-    layImage->setContentsMargins(0,0,0,0);
-    layImage->addWidget(pltImage, 1);
-    mainLay->addLayout(layImage, 1);
+
+
+
+    pltData=new JKQtPlotter(this);
+    pltData->get_plotter()->getXAxis()->set_minTicks(5);
+    pltData->get_plotter()->getYAxis()->set_minTicks(5);
+
+    pltData->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
+    pltData->get_plotter()->getYAxis()->set_tickLabelFontSize(8);
+    pltData->get_plotter()->getXAxis()->set_axisLabel("");
+    pltData->get_plotter()->getYAxis()->set_axisLabel("");
+    pltData->get_plotter()->setGrid(true);
+    pltData->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltData->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltData->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
+
+
+    splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
+    splitter->addWidget(pltImage);
+    splitter->addWidget(pltData);
+    mainLay->addWidget(splitter, 1);
+    QList<int> sizes;
+    sizes<<round(splitter->width()/2.0)<<round(splitter->width()/2.0);
+    splitter->setSizes(sizes);
 
 
 
@@ -142,6 +169,8 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
 
     cmbImageStack->setCurrentIndex(current->getProperty("imstack_invrimgdisp_image", 0).toInt());
 
+    dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
+
     player->setPosition(current->getProperty("imstack_invrimgdisp_playpos", 0).toInt());
     connect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
@@ -162,7 +191,10 @@ void QFRDRImageStackDataEditor::readSettings() {
     QString prefix="image_stack/";
     player->setFPS(settings->getQSettings()->value(prefix+"player_fps", player->getFPS()).toDouble());
     player->setReplay(settings->getQSettings()->value(prefix+"player_replay", player->getReplay()).toBool());
-};
+    cmbChannelMode->setCurrentIndex(settings->getQSettings()->value(prefix+"imagemode", 0).toInt());
+    spinBins->setValue(settings->getQSettings()->value(prefix+"bins", 200).toInt());
+    loadSplitter(*(settings->getQSettings()), splitter, prefix);
+}
 
 
 void QFRDRImageStackDataEditor::writeSettings() {
@@ -171,13 +203,47 @@ void QFRDRImageStackDataEditor::writeSettings() {
     QString prefix="image_stack/";
     settings->getQSettings()->setValue(prefix+"player_fps", player->getFPS());
     settings->getQSettings()->setValue(prefix+"player_replay", player->getReplay());
-};
+    settings->getQSettings()->setValue(prefix+"imagemode", cmbChannelMode->currentIndex());
+    settings->getQSettings()->setValue(prefix+"bins", spinBins->value());
+    saveSplitter(*(settings->getQSettings()), splitter, prefix);
+}
+
+void QFRDRImageStackDataEditor::addDataHistogram(double *data, int size, const QString &title, const QString &colX, const QString &colY, QColor col, double shift, double width) {
+    JKQTPdatastore* dsData=pltData->getDatastore();
+
+    double* histX=(double*)calloc(spinBins->value(), sizeof(double));
+    double* histY=(double*)calloc(spinBins->value(), sizeof(double));
+
+    statisticsHistogram(data, size, histX, histY, spinBins->value(), false);
+    size_t chx=dsData->addCopiedColumn(histX, spinBins->value(), colX);
+    size_t chy=dsData->addCopiedColumn(histY, spinBins->value(), colY);
+
+    JKQTPbarHorizontalGraph* plteHistogram=new JKQTPbarHorizontalGraph(pltData->get_plotter());
+    plteHistogram->set_title(title);
+    plteHistogram->set_xColumn(chx);
+    plteHistogram->set_yColumn(chy);
+    plteHistogram->set_shift(shift);
+    plteHistogram->set_width(width);
+    plteHistogram->set_fillColor(col);
+    plteHistogram->set_color(col.darker());
+    pltData->addGraph(plteHistogram);
+
+    free(histX);
+    free(histY);
+}
 
 
 void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
     bool dd=pltImage->get_doDrawing();
     pltImage->set_doDrawing(false);
+    bool ddd=pltData->get_doDrawing();
+    pltData->set_doDrawing(false);
     current->setQFProperty("imstack_invrimgdisp_playpos", player->getPosition(), false, false);
+
+    pltImage->clearGraphs(false);
+    pltData->clearGraphs(true);
+    JKQTPdatastore* dsData=pltData->getDatastore();
+    dsData->clear();
 
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
     if (mv && cmbImageStack->currentIndex()<mv->getImageStackCount()) {
@@ -187,7 +253,6 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         int channel=cmbChannelR->currentIndex();
         int channelG=cmbChannelG->currentIndex();
         int channelB=cmbChannelB->currentIndex();
-        pltImage->clearGraphs(false);
         if (cmbChannelMode->currentIndex()==0) {
             double* ir=NULL;
 
@@ -198,6 +263,11 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
 
             image->set_data(ir, width, height, JKQTPMathImageBase::DoubleArray);
             pltImage->addGraph(image);
+
+
+            if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram && ir) {
+                addDataHistogram(ir, width*height, tr("full histogram"), tr("histogram_x"), tr("histogram_y"));
+            }
         } else {
             double* ir=NULL;
             double* ig=NULL;
@@ -212,6 +282,11 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             imageRGB->set_width(width);
             imageRGB->set_height(height);
             pltImage->addGraph(imageRGB);
+            if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram) {
+                if (ir) addDataHistogram(ir, width*height, tr("red histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
+                if (ig) addDataHistogram(ig, width*height, tr("green histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("darkgreen"),0.33, 0.3);
+                if (ib) addDataHistogram(ib, width*height, tr("blue histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("darkblue"), 0.66, 0.3);
+            }
         }
         emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
         labFrame->setText(tr("<b>frame:</b> %1/%2 (%3 %4)").arg(frame+1).arg(mv->getImageStackFrames(idx)).arg(frame*mv->getImageStackTUnitFactor(idx)).arg(mv->getImageStackTUnitName(idx)));
@@ -222,6 +297,10 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
     if (dd) {
         pltImage->update_plot();
         if (startPlayer) player->singleShotTimerStart();
+    }
+    pltData->set_doDrawing(ddd);
+    if (ddd) {
+        pltData->zoomToFit();
     }
 }
 
