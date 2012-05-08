@@ -4,7 +4,7 @@
 #include <iostream>
 #include "videocapture.h"
 #include "syscamconfigdialog.h"
-
+#include "qfmathtools.h"
 
 #define LOG_PREFIX QString("cam_systemcam >>> ").toUpper()
 
@@ -251,11 +251,27 @@ bool QFECamSystemcamera::acquire(unsigned int camera, uint32_t* data, uint64_t* 
     }
 
     uint8_t* img=(uint8_t*)calloc(getImageWidth(camera)*getImageHeight(camera)*3, sizeof(uint8_t));
+    int retry=0;
+    bool ok=false;
+    while (retry<40 && !ok) {
+        vids[camera]->captureFrame(img);
+        int w=getImageWidth(camera);
+        int h=getImageHeight(camera);
+        RGBToGray(img, data, w, h, toGrayMethod);
+        ok=true;
+        bool allZero=true;
+        for (int i=0; i<w*h; i++)  {
+            if (!QFFloatIsOK(data[i])) {
+                ok=false;
+                break;
+            }
+            allZero=allZero&&(data[i]==0);
+        }
+        if (allZero) ok=false;
+        retry++;
+    }
 
-    vids[camera]->captureFrame(img);
-
-    RGBToGray(img, data, getImageWidth(camera), getImageHeight(camera), toGrayMethod);
-
+    if (retry>5) log_warning(tr("retries for frame: %1\n").arg(retry));
     free(img);
     return true;
 }
