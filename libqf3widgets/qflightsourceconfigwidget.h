@@ -37,6 +37,9 @@
 #include "qflightsourcecombobox.h"
 #include "filters.h"
 #include "libwid_imexport.h"
+#include "qflightsourceconfigwidgetthread.h"
+
+
 
 
 /*! \brief QWidget with a set of controls that allow to control a LightSource
@@ -106,6 +109,8 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
         QString m_filterconfig;
+
+        QFLightSourceConfigWidgetThread* lsthread;
 
 
         void createWidgets();

@@ -652,6 +652,7 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
         actConnectZ->setChecked(false);
     }
     chkJoystick->setChecked(oldJoystick);
+    updateJoystick();
     updateStates();
     QApplication::restoreOverrideCursor();
     if (useThread) stageThread->start(QThread::LowPriority);

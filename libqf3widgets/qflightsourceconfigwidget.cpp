@@ -3,6 +3,7 @@
 QFLightSourceConfigWidget::QFLightSourceConfigWidget(QWidget *parent) :
     QFrame(parent)
 {
+    lsthread=new QFLightSourceConfigWidgetThread(this);
     setFrameStyle(QFrame::Panel|QFrame::Raised);
     setLineWidth(1);
     stateUpdateInterval=237;
@@ -461,3 +462,5 @@ void QFLightSourceConfigWidget::setLinePower(int line, double power) {
         }
     }
 }
+
+

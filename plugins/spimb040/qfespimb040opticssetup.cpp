@@ -660,7 +660,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         data["laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
         //qDebug()<<"laser2/shutter/state="<<data["laser2/shutter/state"]<<ui->shutterLaser2->getShutterState();
     }
-    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->getFilterChanger()->isFilterChangerConnected(ui->filtcDetection->getFilterChangerID()))
+    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected())
         data["detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
 
 }

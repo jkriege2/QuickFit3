@@ -9,6 +9,7 @@ QF3ComPortManager::~QF3ComPortManager()
     for (int i=0; i<coms.size(); i++) {
         coms[i].com->close();
         delete coms[i].com;
+        delete coms[i].mutex;
     }
     coms.clear();
 }
@@ -39,6 +40,7 @@ int QF3ComPortManager::addCOMPort(QSettings& settings, QString prefix) {
         portID=coms.size();
         COMPORTS p;
         p.com=new JKSerialConnection(port.toStdString(), speed, databits, parity, stopbits, handshaking);
+        p.mutex=new QMutex;
         coms.append(p);
     }
     coms[portID].com->set_baudrate(speed);
@@ -65,5 +67,10 @@ void QF3ComPortManager::storeCOMPort(int port, QSettings& settings, QString pref
 
 JKSerialConnection* QF3ComPortManager::getCOMPort(int port) const {
     if (port>=0 && port<coms.size()) return coms.at(port).com;
+    return NULL;
+}
+
+QMutex *QF3ComPortManager::getMutex(int port) const {
+    if (port>=0 && port<coms.size()) return coms.at(port).mutex;
     return NULL;
 }

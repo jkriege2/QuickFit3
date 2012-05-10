@@ -4,6 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QSettings>
+#include <QMutex>
 #include "../../../../../LIB/trunk/jkserialconnection.h"
 
 /*! \brief you may use this class to manage a list of COM ports.
@@ -22,10 +23,12 @@ class QF3ComPortManager {
         void storeCOMPort(int port, QSettings& settings, QString prefix=QString(""));
 
         JKSerialConnection* getCOMPort(int port) const;
+        QMutex* getMutex(int port) const;
     protected:
         struct COMPORTS {
             /** \brief serial connection object */
             JKSerialConnection* com;
+            QMutex* mutex;
         };
         QList<COMPORTS> coms;
 };
