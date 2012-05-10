@@ -79,12 +79,12 @@ void QFESPIMB040ImageStackConfigWidget2::loadSettings(QSettings& settings, QStri
     ui->chkStage2->setChecked(settings.value(prefix+"stage2", false).toBool());
     ui->chkStage3->setChecked(settings.value(prefix+"stage3", false).toBool());
 
-    ui->chkLightpath1->setChecked(settings.value(prefix+"lightath1", false).toBool());
-    ui->chkLightpath2->setChecked(settings.value(prefix+"lightath2", false).toBool());
-    ui->chkLightpath3->setChecked(settings.value(prefix+"lightath3", false).toBool());
-    ui->cmbLightpath1->setCurrentIndex(settings.value(prefix+"lightath1idx", -1).toInt());
-    ui->cmbLightpath2->setCurrentIndex(settings.value(prefix+"lightath2idx", -1).toInt());
-    ui->cmbLightpath3->setCurrentIndex(settings.value(prefix+"lightath3idx", -1).toInt());
+    ui->chkLightpath1->setChecked(settings.value(prefix+"lightpath1", false).toBool());
+    ui->chkLightpath2->setChecked(settings.value(prefix+"lightpath2", false).toBool());
+    ui->chkLightpath3->setChecked(settings.value(prefix+"lightpath3", false).toBool());
+    ui->cmbLightpath1->setCurrentIndex(settings.value(prefix+"lightpath1idx", -1).toInt());
+    ui->cmbLightpath2->setCurrentIndex(settings.value(prefix+"lightpath2idx", -1).toInt());
+    ui->cmbLightpath3->setCurrentIndex(settings.value(prefix+"lightpath3idx", -1).toInt());
 
     ui->spinImages->setValue(settings.value(prefix+"images", 1).toInt());
     on_chkUse1_clicked(true);

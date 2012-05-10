@@ -29,7 +29,7 @@ QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
     if (com->write(QString(command+"\n").toStdString())) {
         QTime t;
         t.start();
-        while (t.elapsed()<20);
+        //while (t.elapsed()<1);
         res=com->readUntil("\n\n");
         //std::cout<<" ... reading ... ";
     }
