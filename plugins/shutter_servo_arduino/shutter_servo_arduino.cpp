@@ -88,6 +88,8 @@ void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
     if (shutter<0 || shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
+    QMutex* mutex=ports.getMutex(shutters[shutter].port);
+    QMutexLocker locker(mutex);
     com->open();
     if (com->isConnectionOpen()) {
         QTime t;
@@ -113,6 +115,8 @@ void QFExtensionShutterServoArduino::shutterDisonnect(unsigned int shutter) {
     if (shutter<0 || shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return;
+    QMutex* mutex=ports.getMutex(shutters[shutter].port);
+    QMutexLocker locker(mutex);
     com->close();
 }
 
@@ -120,6 +124,8 @@ bool QFExtensionShutterServoArduino::isShutterConnected(unsigned int shutter) {
     if (shutter<0 || shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
+    QMutex* mutex=ports.getMutex(shutters[shutter].port);
+    QMutexLocker locker(mutex);
     return com->isConnectionOpen();
 }
 
@@ -127,6 +133,8 @@ bool QFExtensionShutterServoArduino::isShutterOpen(unsigned int shutter)  {
     if (shutter<0 || shutter>=getShutterCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return false;
+    QMutex* mutex=ports.getMutex(shutters[shutter].port);
+    QMutexLocker locker(mutex);
     if (!com->isConnectionOpen()) return false;
     QString result=shutters[shutter].serial->queryCommand(QString("Q")+QString::number(shutters[shutter].id));
     //qDebug()<<"shutter result: "<<result;
@@ -138,6 +146,8 @@ void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool 
     if (shutter<0 || shutter>=getShutterCount()) return;
     JKSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
     if (!com) return ;
+    QMutex* mutex=ports.getMutex(shutters[shutter].port);
+    QMutexLocker locker(mutex);
     if (!com->isConnectionOpen()) return ;
     if (opened) shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutters[shutter].id)+"1");
     else shutters[shutter].serial->sendCommand(QString("S")+QString::number(shutters[shutter].id)+"0");

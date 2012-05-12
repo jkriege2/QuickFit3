@@ -8,7 +8,7 @@ QFShutterConfigWidget::QFShutterConfigWidget(QWidget* parent):
 {
 
     shutterStateUpdateInterval=351;
-    iconOpened=QPixmap(":/libqf3widgets/shutter_opened.png");
+    iconOpened=QPixmap(":/libqf3widgets/shutter_open.png");
     iconClosed=QPixmap(":/libqf3widgets/shutter_closed.png");
 
     timUpdate=new QTimer(this);
@@ -296,7 +296,7 @@ void QFShutterConfigWidget::shutterActionClicked(bool opened) {
             moving=true;
             actState->setEnabled(false);
             QTime started=QTime::currentTime();
-            while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<20000)) {
+            while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<10000)) {
                 //qDebug()<<started.elapsed();
                 QApplication::processEvents();
             }
@@ -306,7 +306,11 @@ void QFShutterConfigWidget::shutterActionClicked(bool opened) {
 }
 
 void QFShutterConfigWidget::connectShutter() {
+    bool b=actConnect->signalsBlocked();
+    actConnect->blockSignals(true);
     actConnect->setChecked(true);
+    disConnect();
+    actConnect->blockSignals(b);
 }
 
 void QFShutterConfigWidget::disconnectShutter() {

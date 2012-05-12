@@ -23,6 +23,9 @@
     Each light source has (possibly) several lines (number is returned by  getLightSourceLineCount(), getLightSourceLineDescription() returns a description
     of the given line). Each line may be enabled or disabled using  setLightSourceLineEnabled(). Also it is possible to set the power of every line using
     setLightSourcePower() (out of the range, returned by getLightSourceLinePowerRange() ). The unit in which the power is set, is returned by getLightSourceLinePowerUnit().
+    
+        \note <b>Your implementation has to be thread-safe!!! So it can be called simultaneously from multiple threads, even when the invocations use shared data, because all references to the shared data are serialized</b>
+
  */
 class QFExtensionLightSource {
     public:

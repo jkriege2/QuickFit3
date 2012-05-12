@@ -9,6 +9,7 @@
 #include "../base_classes/qf3simpleb040serialprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
+#include "qfextensionshutter.h"
 
 #include "qfextensionlightsource.h"
 
@@ -20,9 +21,9 @@
 /*! \brief QFExtensionLightSource implementation to control the PCCP LED lightsource built in B040/DKFZ
     \ingroup qf3ext_lights_pccsled
  */
-class QFExtensionPCCSLED : public QObject, public QFExtensionBase, public QFExtensionLightSource {
+class QFExtensionPCCSLED : public QObject, public QFExtensionBase, public QFExtensionLightSource, public QFExtensionShutter {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionLightSource)
+        Q_INTERFACES(QFExtension QFExtensionLightSource QFExtensionShutter)
     public:
         /** Default constructor */
         QFExtensionPCCSLED(QObject* parent=NULL);
@@ -94,6 +95,52 @@ class QFExtensionPCCSLED : public QObject, public QFExtensionBase, public QFExte
         virtual QString getLightSourceShortName(unsigned int lightSource) ;
         /*! \copydoc QFExtensionLightSource::showLightSourceSettingsDialog() */
         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL);
+
+
+
+
+
+
+
+        virtual unsigned int  getShutterCount();
+        /** \brief connect to a shutter controller/driver/.... */
+        virtual void shutterConnect(unsigned int shutter);
+        /** \brief disconnect from a shutter controller/driver/.... */
+        virtual void shutterDisonnect(unsigned int shutter);
+        /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
+        virtual void setShutterLogging(QFPluginLogService* logService);
+
+        /** \brief returns \c true if the device is connected */
+        virtual bool isShutterConnected(unsigned int shutter) ;
+        /** \brief read the shutter state and return it.
+         *
+         *  \note that this might return wrong values during shutter movement, see: isLastShutterActionFinished()
+         *  \see isLastShutterActionFinished()
+         */
+        virtual bool isShutterOpen(unsigned int shutter) ;
+        /** \brief open or close the given shutter, use isLastShutterActionFinished() to check whether the instruction has been executed */
+        virtual void setShutterState(unsigned int shutter, bool opened);
+        /** \brief return \c true if the last command, sent to the given shutter was executet, i.e. the shutter has settled to its new position
+         *
+         *  \note Use this to check, whether the shutter has been closed/opened after a call to setShutterState(), not isShutterOpen(), as the second
+         *        one might not be defined (and return a wrong value) during the shutter movement!
+         */
+        virtual bool isLastShutterActionFinished(unsigned int shutter);
+        /** \brief return a human-readable description for the given shutter */
+        virtual QString getShutterDescription(unsigned int shutter) ;
+        /** \brief return a human-readable short name for the given shutter */
+        virtual QString getShutterShortName(unsigned int shutter) ;
+        /*! \brief displays a modal dialog which allows the user to set the configuration options
+                   of the controled shutter.
+
+            The options are stored internally and written/read using QFExtension::readSettings() and
+            QFExtension::writeSettings().
+
+            \param[in] shutter the shutter for which to display the dialog
+            \param[in] parent parent widget for the returned QWidget
+         */
+         virtual void showShutterSettingsDialog(unsigned int shutter, QWidget* parent=NULL);
+
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */

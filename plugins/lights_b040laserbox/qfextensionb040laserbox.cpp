@@ -3,7 +3,7 @@
 #include <QtPlugin>
 #include <iostream>
 
-#define LIGHTSOURCE_ACTION_DURATION 50
+#define LIGHTSOURCE_ACTION_DURATION 1
 #define LOG_PREFIX "[LightSourceB040LaserBox]: "
 #define GLOBAL_CONFIGFILE "lights_b040laserbox.ini"
 #define CONNECTION_DELAY_MS 200
@@ -89,6 +89,10 @@ void QFExtensionB040LaserBox::lightSourceConnect(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
+
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
+
     com->open();
     if (com->isConnectionOpen()) {
         QTime t;
@@ -114,6 +118,9 @@ void QFExtensionB040LaserBox::lightSourceDisonnect(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
+
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     com->close();
 }
 
@@ -125,6 +132,8 @@ bool QFExtensionB040LaserBox::isLightSourceConnected(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return false;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return com->isConnectionOpen();
 }
 
@@ -140,6 +149,8 @@ QString QFExtensionB040LaserBox::getLightSourceLineDescription(unsigned int ligh
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return QString("");
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return tr("line #%2: %1 nm").arg(serial->queryCommand("w").toDouble()).arg(wavelengthLine+1);
     //return tr("line #%1").arg(wavelengthLine+1);
 }
@@ -150,6 +161,8 @@ void QFExtensionB040LaserBox::getLightSourceLinePowerRange(unsigned int lightSou
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     minimum=0;
     //qDebug()<<"POWER_MAX = "<<serial->queryCommand("PMAX_POWER");
     maximum=serial->queryCommand("PMAX_POWER").toDouble();
@@ -164,6 +177,8 @@ void QFExtensionB040LaserBox::setLightSourcePower(unsigned int lightSource, unsi
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     serial->sendCommand(QString("p%1").arg(power,0,'f'));
     sources[lightSource].lastAction=QTime::currentTime();
 }
@@ -172,6 +187,8 @@ double QFExtensionB040LaserBox::getLightSourceCurrentSetPower(unsigned int light
     if (lightSource<0 || lightSource>=getLightSourceCount()) return 0;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     if (!com || !serial) return 0;
     return serial->queryCommand("g").toDouble();
 }
@@ -181,6 +198,8 @@ double QFExtensionB040LaserBox::getLightSourceCurrentMeasuredPower(unsigned int 
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return 0;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return serial->queryCommand("r").toDouble();
 
 }
@@ -190,6 +209,8 @@ void QFExtensionB040LaserBox::setLightSourceLineEnabled(unsigned int lightSource
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     if (enabled) serial->sendCommand("O1");
     else serial->sendCommand("O0");
     sources[lightSource].lastAction=QTime::currentTime();
@@ -200,6 +221,8 @@ bool QFExtensionB040LaserBox::getLightSourceLineEnabled(unsigned int lightSource
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return !serial->queryCommand("o").startsWith("0");
 }
 
@@ -208,6 +231,8 @@ bool QFExtensionB040LaserBox::isLastLightSourceActionFinished(unsigned int light
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return sources[lightSource].lastAction.elapsed()>LIGHTSOURCE_ACTION_DURATION;
 }
 
@@ -228,17 +253,17 @@ QString QFExtensionB040LaserBox::getLightSourceShortName(unsigned int lightSourc
 }
 
 void QFExtensionB040LaserBox::log_text(QString message) {
-	if (logService) logService->log_text(LOG_PREFIX+message);
-	else if (services) services->log_text(LOG_PREFIX+message);
+    if (logService) logService->log_text(LOG_PREFIX+message);
+    else if (services) services->log_text(LOG_PREFIX+message);
 }
 
 void QFExtensionB040LaserBox::log_warning(QString message) {
-	if (logService) logService->log_warning(LOG_PREFIX+message);
-	else if (services) services->log_warning(LOG_PREFIX+message);
+    if (logService) logService->log_warning(LOG_PREFIX+message);
+    else if (services) services->log_warning(LOG_PREFIX+message);
 }
 
 void QFExtensionB040LaserBox::log_error(QString message) {
-	if (logService) logService->log_error(LOG_PREFIX+message);
+    if (logService) logService->log_error(LOG_PREFIX+message);
     else if (services) services->log_error(LOG_PREFIX+message);
 }
 

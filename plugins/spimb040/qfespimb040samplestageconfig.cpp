@@ -957,18 +957,28 @@ void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z) {
 }
 
 void QFESPIMB040SampleStageConfig::connectStages() {
+    bool bx=actConnectX->signalsBlocked();
+    bool by=actConnectY->signalsBlocked();
+    bool bz=actConnectZ->signalsBlocked();
+    actConnectX->blockSignals(true);
+    actConnectY->blockSignals(true);
+    actConnectZ->blockSignals(true);
+
     if (!actConnectX->isChecked()) {
-        actConnectX->setChecked(false);
-        actConnectX->trigger();
+        actConnectX->setChecked(true);
+        disConnectX();
     }
     if (!actConnectY->isChecked()) {
-        actConnectY->setChecked(false);
-        actConnectY->trigger();
+        actConnectY->setChecked(true);
+        disConnectY();
     }
     if (!actConnectZ->isChecked()) {
-        actConnectZ->setChecked(false);
-        actConnectZ->trigger();
+        actConnectZ->setChecked(true);
+        disConnectZ();
     }
+    actConnectX->blockSignals(bx);
+    actConnectY->blockSignals(by);
+    actConnectZ->blockSignals(bz);
 }
 
 void QFESPIMB040SampleStageConfig::disconnectStages() {

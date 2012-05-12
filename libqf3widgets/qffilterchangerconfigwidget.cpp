@@ -396,7 +396,11 @@ void QFFilterChangerConfigWidget::FilterChangerNewFilterSelected(int index) {
 }
 
 void QFFilterChangerConfigWidget::connectFilterChanger() {
+    bool b=actConnect->signalsBlocked();
+    actConnect->blockSignals(true);
     actConnect->setChecked(true);
+    disConnect();
+    actConnect->blockSignals(b);
 }
 
 void QFFilterChangerConfigWidget::disconnectFilterChanger() {

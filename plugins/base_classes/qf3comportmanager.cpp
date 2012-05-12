@@ -40,7 +40,7 @@ int QF3ComPortManager::addCOMPort(QSettings& settings, QString prefix) {
         portID=coms.size();
         COMPORTS p;
         p.com=new JKSerialConnection(port.toStdString(), speed, databits, parity, stopbits, handshaking);
-        p.mutex=new QMutex;
+        p.mutex=new QMutex(QMutex::Recursive);
         coms.append(p);
     }
     coms[portID].com->set_baudrate(speed);

@@ -3,14 +3,15 @@
 QFLightSourceConfigWidget::QFLightSourceConfigWidget(QWidget *parent) :
     QFrame(parent)
 {
+    useThread=true;
     lsthread=new QFLightSourceConfigWidgetThread(this);
+    connect(lsthread, SIGNAL(linesChanged(QTime, QList<bool>,QList<double>,QList<double>,QStringList,QStringList,QList<bool>)), this, SLOT(linesChanged(QTime, QList<bool>,QList<double>,QList<double>,QStringList,QStringList,QList<bool>)));
     setFrameStyle(QFrame::Panel|QFrame::Raised);
     setLineWidth(1);
     stateUpdateInterval=237;
+    dontAccessWidgets=false;
 
     timUpdate=new QTimer(this);
-    timUpdate->setSingleShot(true);
-    timUpdate->setInterval(stateUpdateInterval);
 
     m_log=NULL;
     m_pluginServices=NULL;
@@ -23,8 +24,12 @@ QFLightSourceConfigWidget::QFLightSourceConfigWidget(QWidget *parent) :
     updateStates();
 
 
-    connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
-    timUpdate->start(stateUpdateInterval);
+    if (!useThread) {
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(stateUpdateInterval);
+        connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
+        timUpdate->start(stateUpdateInterval);
+    }
 }
 
 QFLightSourceConfigWidget::~QFLightSourceConfigWidget()
@@ -64,7 +69,11 @@ void QFLightSourceConfigWidget::saveSettings(QSettings &settings, QString prefix
 }
 
 void QFLightSourceConfigWidget::connectLightSource() {
+    bool b=actConnect->signalsBlocked();
+    actConnect->blockSignals(true);
     actConnect->setChecked(true);
+    disConnect();
+    actConnect->blockSignals(b);
 }
 
 void QFLightSourceConfigWidget::disconnectLightSource() {
@@ -74,16 +83,24 @@ void QFLightSourceConfigWidget::disconnectLightSource() {
 
 void QFLightSourceConfigWidget::lockLightSource() {
     locked=true;
-    disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
-    timUpdate->stop();
+    if (useThread)  {
+        lsthread->stopThread();
+    } else {
+        disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
+        timUpdate->stop();
+    }
 }
 
 void QFLightSourceConfigWidget::unlockLightSource() {
     locked=false;
-    connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
-    timUpdate->setSingleShot(true);
-    timUpdate->setInterval(stateUpdateInterval);
-    timUpdate->start(stateUpdateInterval);
+    if (useThread) {
+        lsthread->start();
+    } else {
+        connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(stateUpdateInterval);
+        timUpdate->start(stateUpdateInterval);
+    }
 }
 
 void QFLightSourceConfigWidget::createWidgets() {
@@ -237,6 +254,7 @@ void QFLightSourceConfigWidget::updateStates() {
 
     LightSource=getLightSource();
     LightSourceID=getLightSourceID();
+    //qDebug()<<"updateStates(    LightSource="<<LightSource<<", LightSourceID="<<LightSourceID<<")";
     conn=false;
     if (LightSource) {
         conn=LightSource->isLightSourceConnected(LightSourceID);
@@ -250,8 +268,8 @@ void QFLightSourceConfigWidget::updateStates() {
             actConnect->setText(tr("Connect from light source driver/hardware ..."));
         }
     }
-    actConfigure->setEnabled(LightSource!=NULL && LightSourceID>=0);
-    actConnect->setEnabled(LightSource!=NULL && LightSourceID>=0);
+    actConfigure->setEnabled((LightSource!=NULL) && (LightSourceID>=0));
+    actConnect->setEnabled(true);//(LightSource!=NULL) && (LightSourceID>=0));
     cmbLightSource->setEnabled(!conn);
 }
 
@@ -281,6 +299,7 @@ void QFLightSourceConfigWidget::disConnect() {
     bool conn=actConnect->isChecked();
     QFExtensionLightSource* LightSource=getLightSource();
     int LightSourceID=getLightSourceID();
+    bool gotConnection=false;
 
     if (LightSource) {
         //qDebug()<<"connecting "<<conn;
@@ -289,6 +308,7 @@ void QFLightSourceConfigWidget::disConnect() {
             LightSource->lightSourceConnect(LightSourceID);
             if (LightSource->isLightSourceConnected(LightSourceID)) {
                 m_log->log_text("connected to light source driver ...\n");
+                gotConnection=true;
             } else {
                 actConnect->setChecked(false);
                 LightSource->lightSourceDisonnect(LightSourceID);
@@ -301,8 +321,12 @@ void QFLightSourceConfigWidget::disConnect() {
     } else {
         actConnect->setChecked(false);
     }
-    updateLSLinesWidgets();
     updateStates();
+    updateLSLinesWidgets();
+    if (useThread) {
+        if (gotConnection) lsthread->start();
+        else lsthread->stopThread();
+    }
     QApplication::restoreOverrideCursor();
 }
 
@@ -315,6 +339,7 @@ void QFLightSourceConfigWidget::configure() {
 }
 
 void QFLightSourceConfigWidget::updateLSLinesWidgets() {
+    dontAccessWidgets=true;
     int oldLines=lineWidgets.size();
     int newLines=0;
     QFExtensionLightSource* lightSource=getLightSource();
@@ -371,7 +396,7 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
     }
 
     linesLayoutWidget->setVisible(newLines>0);
-
+    dontAccessWidgets=false;
 }
 
 int QFLightSourceConfigWidget::getLineByWidget(QObject *widget) {
@@ -385,6 +410,7 @@ int QFLightSourceConfigWidget::getLineByWidget(QObject *widget) {
 }
 
 void QFLightSourceConfigWidget::displayStates() {
+    if (useThread) return;
     if (locked) return;
     QFExtensionLightSource* LightSource;
     int LightSourceID;
@@ -418,9 +444,11 @@ void QFLightSourceConfigWidget::displayStates() {
 
     //QTimer::singleShot(stateUpdateInterval, this, SLOT(displayLightSourceStates()));
     if (!locked) {
-        timUpdate->setSingleShot(true);
-        timUpdate->setInterval(stateUpdateInterval);
-        timUpdate->start(stateUpdateInterval);
+        if (!useThread)  {
+            timUpdate->setSingleShot(true);
+            timUpdate->setInterval(stateUpdateInterval);
+            timUpdate->start(stateUpdateInterval);
+        }
 
     }
 }
@@ -461,6 +489,35 @@ void QFLightSourceConfigWidget::setLinePower(int line, double power) {
             moving=false;
         }
     }
+}
+
+void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled) {
+    if (dontAccessWidgets) return;
+    qDebug()<<"linesChanged("<< lineenabled<< setValues <<measuredValues<<")";
+    for (int i=0; i<lineWidgets.size(); i++) {
+        if (i<lineenabled.size()) {
+            disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
+            disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+
+            bool enabled=widgetsEnabled.value(i, false);
+
+            lineWidgets[i].chkEnable->setChecked(lineenabled.value(i, false));
+
+            double setP=setValues.value(i, lineWidgets[i].spinPower->value());
+            if (enabled && (lineWidgets[i].spinPower->value()!=setP)) lineWidgets[i].spinPower->setValue(setP);
+
+            lineWidgets[i].labPower->setText(QString("%1 %2").arg(measuredValues.value(i, 0.0)).arg(powerUnits.value(i, "")));
+            lineWidgets[i].chkEnable->setText(lineNames.value(i, tr("line #%1").arg(i+1)));
+
+            lineWidgets[i].spinPower->setEnabled(enabled);
+            lineWidgets[i].chkEnable->setEnabled(enabled);
+            lineWidgets[i].labPower->setEnabled(enabled);
+
+            connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
+            connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+        }
+    }
+    updateStates();
 }
 
 

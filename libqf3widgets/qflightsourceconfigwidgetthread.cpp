@@ -2,7 +2,7 @@
 #include "qfextensionlightsource.h"
 #include "qflightsourceconfigwidget.h"
 
-#define THREAD_TIMEOUT 113
+#define THREAD_TIMEOUT 233
 
 QFLightSourceConfigWidgetThread::QFLightSourceConfigWidgetThread(QFLightSourceConfigWidget *parent) :
     QThread(parent)
@@ -10,6 +10,8 @@ QFLightSourceConfigWidgetThread::QFLightSourceConfigWidgetThread(QFLightSourceCo
     m_parent=parent;
     InstructionMutex=new QMutex();
     stopped=false;
+    qRegisterMetaType<QList<bool> >("QList<bool>");
+    qRegisterMetaType<QList<double> >("QList<double>");
 }
 
 
@@ -58,7 +60,7 @@ void QFLightSourceConfigWidgetThread::stopThread() {
 
 void QFLightSourceConfigWidgetThread::nextInstruction() {
     if (!stopped) {
-        checkInstructions();
+        //checkInstructions();
         QFExtensionLightSource* LightSource;
         int LightSourceID;
         LightSource=m_parent->getLightSource();
@@ -71,7 +73,7 @@ void QFLightSourceConfigWidgetThread::nextInstruction() {
         QStringList lineNames;
         if (LightSource) {
             for (int i=0; i<LightSource->getLightSourceLineCount(LightSourceID); i++) {
-                checkInstructions();
+                //checkInstructions();
                 enabled.append(LightSource->getLightSourceLineEnabled(LightSourceID, i));
                 widgetsEnabled.append(LightSource->isLastLightSourceActionFinished(LightSourceID));
                 setValues.append(LightSource->getLightSourceCurrentSetPower(LightSourceID, i));
@@ -80,7 +82,7 @@ void QFLightSourceConfigWidgetThread::nextInstruction() {
                 lineNames.append(LightSource->getLightSourceLineDescription(LightSourceID, i));
             }
         }
-        emit linesChanged(enabled, setValues, measuredValues, powerUnits, lineNames, widgetsEnabled);
+        emit linesChanged(QTime::currentTime(), enabled, setValues, measuredValues, powerUnits, lineNames, widgetsEnabled);
     }
 
 }

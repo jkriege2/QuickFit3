@@ -58,7 +58,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidgetThread : public QThread {
         /** \brief set the given line power. While the widget is NOT locked, this function is blocking until the action completes  */
         void setLinePower(int line, double power);
     signals:
-        void linesChanged(QList<bool> enabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled);
+        void linesChanged(QTime time, QList<bool> enabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled);
     protected:
         virtual void run();
 

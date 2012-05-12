@@ -160,6 +160,9 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
 
         int getLineByWidget(QObject *widget);
 
+        bool useThread;
+        bool dontAccessWidgets;
+
 
     protected slots:
         void disConnect();
@@ -168,6 +171,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         void updateStates();
         void setPowerChanged(double value);
         void lineEnabledToggled(bool enabled);
+        void linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled);
 
         
 };

@@ -24,13 +24,13 @@ void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
-        //qDebug()<<"trying "<<fileName;
-        //if (!plugin) qDebug()<<"    error: "<<loader.errorString();
+        if (QApplication::arguments().contains("--verboseplugin")) qDebug()<<"trying "<<fileName;
+        if (QApplication::arguments().contains("--verboseplugin")) if (!plugin) qDebug()<<"    error: "<<loader.errorString();
         if (plugin) {
-            //qDebug()<<"instance OK";
+            if (QApplication::arguments().contains("--verboseplugin")) qDebug()<<"instance OK";
             QFExtension* iRecord = qobject_cast<QFExtension*>(plugin);
             if (iRecord) {
-                //qDebug()<<"QFExtension OK";
+                if (QApplication::arguments().contains("--verboseplugin")) qDebug()<<"QFExtension OK";
                 items[iRecord->getID()]=iRecord;
                 itemobjects[iRecord->getID()]=plugin;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);

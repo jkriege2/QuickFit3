@@ -3,7 +3,7 @@
 #include <QtPlugin>
 #include <iostream>
 
-#define LIGHTSOURCE_ACTION_DURATION 50
+#define LIGHTSOURCE_ACTION_DURATION 1
 #define LOG_PREFIX "[LightSourcePCCPLED]: "
 #define GLOBAL_CONFIGFILE "lights_pccsled.ini"
 #define CONNECTION_DELAY_MS 200
@@ -88,6 +88,8 @@ void QFExtensionPCCSLED::lightSourceConnect(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     com->open();
     if (com->isConnectionOpen()) {
         QTime t;
@@ -113,6 +115,8 @@ void QFExtensionPCCSLED::lightSourceDisonnect(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     com->close();
 }
 
@@ -124,6 +128,8 @@ bool QFExtensionPCCSLED::isLightSourceConnected(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     if (!com) return false;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return com->isConnectionOpen();
 }
 
@@ -139,6 +145,8 @@ QString QFExtensionPCCSLED::getLightSourceLineDescription(unsigned int lightSour
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return QString("");
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     QString led=serial->queryCommand("Y").trimmed();
     QString manufacturer=serial->queryCommand("q").trimmed();
     QString wavelength=serial->queryCommand("j").trimmed();
@@ -163,6 +171,8 @@ void QFExtensionPCCSLED::getLightSourceLinePowerRange(unsigned int lightSource, 
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     minimum=0;
     maximum=serial->queryCommand("X").toDouble();
 }
@@ -176,6 +186,8 @@ void QFExtensionPCCSLED::setLightSourcePower(unsigned int lightSource, unsigned 
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     serial->sendCommand(QString("I%1").arg((int)round(power)));
     sources[lightSource].lastAction=QTime::currentTime();
 }
@@ -185,6 +197,8 @@ double QFExtensionPCCSLED::getLightSourceCurrentSetPower(unsigned int lightSourc
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return 0;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return serial->queryCommand("G").toDouble();
 }
 
@@ -193,6 +207,8 @@ double QFExtensionPCCSLED::getLightSourceCurrentMeasuredPower(unsigned int light
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return 0;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return serial->queryCommand("C").toDouble();
 
 }
@@ -202,6 +218,8 @@ void QFExtensionPCCSLED::setLightSourceLineEnabled(unsigned int lightSource, uns
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return ;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     if (enabled) serial->sendCommand("L1");
     else serial->sendCommand("L0");
     sources[lightSource].lastAction=QTime::currentTime();
@@ -212,6 +230,8 @@ bool QFExtensionPCCSLED::getLightSourceLineEnabled(unsigned int lightSource, uns
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return !serial->queryCommand("N").startsWith("0");
 }
 
@@ -220,6 +240,8 @@ bool QFExtensionPCCSLED::isLastLightSourceActionFinished(unsigned int lightSourc
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return false;
+    QMutex* mutex=ports.getMutex(sources[lightSource].port);
+    QMutexLocker locker(mutex);
     return sources[lightSource].lastAction.elapsed()>LIGHTSOURCE_ACTION_DURATION;
 }
 
@@ -240,17 +262,17 @@ QString QFExtensionPCCSLED::getLightSourceShortName(unsigned int lightSource) {
 }
 
 void QFExtensionPCCSLED::log_text(QString message) {
-	if (logService) logService->log_text(LOG_PREFIX+message);
-	else if (services) services->log_text(LOG_PREFIX+message);
+    if (logService) logService->log_text(LOG_PREFIX+message);
+    else if (services) services->log_text(LOG_PREFIX+message);
 }
 
 void QFExtensionPCCSLED::log_warning(QString message) {
-	if (logService) logService->log_warning(LOG_PREFIX+message);
-	else if (services) services->log_warning(LOG_PREFIX+message);
+    if (logService) logService->log_warning(LOG_PREFIX+message);
+    else if (services) services->log_warning(LOG_PREFIX+message);
 }
 
 void QFExtensionPCCSLED::log_error(QString message) {
-	if (logService) logService->log_error(LOG_PREFIX+message);
+    if (logService) logService->log_error(LOG_PREFIX+message);
     else if (services) services->log_error(LOG_PREFIX+message);
 }
 
@@ -263,3 +285,48 @@ void QFExtensionPCCSLED::showLightSourceSettingsDialog(unsigned int lightSource,
 
 
 Q_EXPORT_PLUGIN2(lights_pccsled, QFExtensionPCCSLED)
+
+unsigned int QFExtensionPCCSLED::getShutterCount()
+{
+    return getLightSourceCount();
+}
+
+void QFExtensionPCCSLED::shutterConnect(unsigned int shutter) {
+    lightSourceConnect(shutter);
+}
+
+void QFExtensionPCCSLED::shutterDisonnect(unsigned int shutter) {
+    lightSourceDisonnect(shutter);
+}
+
+void QFExtensionPCCSLED::setShutterLogging(QFPluginLogService *logService) {
+    setLightSourceLogging(logService);
+}
+
+bool QFExtensionPCCSLED::isShutterConnected(unsigned int shutter) {
+    return isLightSourceConnected(shutter);
+}
+
+bool QFExtensionPCCSLED::isShutterOpen(unsigned int shutter) {
+    return getLightSourceLineEnabled(shutter, 0);
+}
+
+void QFExtensionPCCSLED::setShutterState(unsigned int shutter, bool opened) {
+    setLightSourceLineEnabled(shutter, 0, opened);
+}
+
+bool QFExtensionPCCSLED::isLastShutterActionFinished(unsigned int shutter) {
+    return isLastLightSourceActionFinished(shutter);
+}
+
+QString QFExtensionPCCSLED::getShutterDescription(unsigned int shutter) {
+    return tr("shutter for")+getLightSourceDescription(shutter);
+}
+
+QString QFExtensionPCCSLED::getShutterShortName(unsigned int shutter) {
+    return tr("shutter: ")+getLightSourceShortName(shutter);
+}
+
+void QFExtensionPCCSLED::showShutterSettingsDialog(unsigned int shutter, QWidget *parent) {
+    showLightSourceSettingsDialog(shutter, parent);
+}

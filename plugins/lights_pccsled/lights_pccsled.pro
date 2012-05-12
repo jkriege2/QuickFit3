@@ -17,7 +17,8 @@ HEADERS += \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionlightsource.h \
     ../../../../../LIB/trunk/jkserialconnection.h \
-    qfextensionpccsled.h
+    qfextensionpccsled.h \
+    ../interfaces/qfextensionshutter.h
 
 SOURCES += \
     ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
@@ -38,6 +39,3 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl
-
-
-

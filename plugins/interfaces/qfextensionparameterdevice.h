@@ -48,6 +48,8 @@
     necessary. So the using program will not expect that a device is disconnected at startup, but rather check it, using
     isParameterDeviceConnected().
 
+    \note <b>Your implementation has to be thread-safe!!! So it can be called simultaneously from multiple threads, even when the invocations use shared data, because all references to the shared data are serialized</b>
+
 
  */
 class QFExtensionParameterDevice {
