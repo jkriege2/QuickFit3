@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Andor Camera Extension</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	 <p>This plugin controls cameras connected to the computer and controlled by the <a href="http://www.andor.com/software/sdk/">Andor camera SDK</a>. 
+Note that you need to purchase the Andor SDK separately, as this driver will only work together with the SDK. 
+
+<p>On windows: make sure that the required SDK DLLs are in a directory where QUickFit will find them (either the QuickFit base directory, or a directory in the Windows PATH variable, or the Windows system directory!</p>
+<p>On Linux after installing the SDK you will have to make the camera known to the system using a udev rules file <code>/etc/udev/rules.d/99-spim.rules</code> with contents like this:
+	 <blockquote><tt>
+SUBSYSTEM=="pci", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005", RUN+="/usr/sbin/andordrvlx_load"
+	 </tt></blockquote> If QuickFit cannot connect to the camera (this might e.g. happen when the driver QuickFit crashed) it sometimes helps to reload the driver using:	 <blockquote><tt>
+rmmod andordrvlx<br>
+andordrvlx_load
+	 </tt></blockquote>
+The command <code>lsmod</code> shall return something like <code>andordrvlx</code> when the driver was loaded successfully.
+
+</p>
+
+<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+
+  </body>
+</html>

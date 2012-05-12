@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta name="qrichtext" content="1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit $$version$$ Configuring USB/TTY devices on Linux</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+<p>Many hardware devices can be controlled via simple serial ports, USB-to-serial converters, or other USB devices. It is convenient to map the file in <code>/dev/</code> used to access them to an arbitrary name, identifying a special device (e.g. <code>/dev/ttyUSB_PISTAGE</code>).
+On Linux this can be done using the udev system for USB device enumeration. Take these steps:
+<ol>
+  <li>create a udev rules file with a name like e.g.: <code>/etc/udev/rules.d/99-spim.rules</code></li>
+  <li>add a line like this:<blockquote><code>#B040SERVO<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{product}=="B040SERVO", SYMLINK+="ttyUSB_B040SERVO"
+</code></blockquote> which will map the ttyUSB device with the product name <code>B040SERVO</code> to the device file <code>/dev/ttyUSB_B040SERVO</code>in addition to its default file <code>/dev/ttyUSB<i>x</i></code>. 
+Instead of the product name you can also use any other USB device property, as reported by <blockquote><code>lsusb -v -s <i>bus</i>:<i>devnum</i></code></blockquote>Possible filters are e.g.: <blockquote><code>ATTRS{serial}=="A800dOBl", ATTRS{idVendor}=="1a72", ATTRS{idProduct}=="1007", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005"</code></blockquote></li>
+  <li>After saving the rules file you will have to tell udev that there are new/changed rules by executing <blockquote><code>/etc/init.d/udev restart</code></blockquote>The rules will be executed when the new device is connected to the computer. So if it's already connected: pull and reconnect the plug.</li>
+</ol>
+It is also possible to execute programs and scripts when a device is connected. To do so, add <code>RUN+="..."</code> to the rule. Here's an example:
+<blockquote><code>#B040SERVO#andor card<br>
+SUBSYSTEM=="pci", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005", RUN+="/usr/sbin/andordrvlx_load"
+</code></blockquote>
+</p>
+
+<p>Links with further information:<ul>
+<li><a href="http://www.reactivated.net/writing_udev_rules.html">Writing udev rules</a></li>
+</ul></p>
+
+$$qf_commondoc_footer.start$$ $$qf_commondoc_footer.end$$
+</body>
+</html>

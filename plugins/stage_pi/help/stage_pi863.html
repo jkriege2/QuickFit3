@@ -52,5 +52,26 @@ id=1<br>
 [axis2]<br>
 id=2<br>
 	 </tt></blockquote></p>
+
+
+<p>On Linux you have to make sure that the FTDI USB-to-serial converter inside the Mercury drivers is used with the correct drivers. This does not work with the default FTDI driver, as PI changed the device and vendor ID of the chip, so it is not recognized by Linux. 
+You can achieve the accessability of the MErcury USB converter by a udev rule like this:
+<blockquote><tt>
+#for the PI stage chain<br>
+#Product ID: 0x1007, Vendor ID: 0x1a72<br>
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="1007", ATTRS{idVendor}=="1a72", RUN+="/root/bin/pi_mercury.sh"<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1a72", ATTRS{idProduct}=="1007", ATTRS{product}=="PI C-863 Mercury", SYMLINK+="ttyUSB_PI"
+</tt></blockquote>
+This will call the  shell scrip <code>/root/bin/pi_mercury.sh</code> when the PI stage is connected. Finally the stage is connected to the device file <code>/dev/ttyUSB_PI</code>. the contents of <code>/root/bin/pi_mercury.sh</code> is:
+<blockquote><tt>
+#!/bin/bash<br>
+/bin/echo "1a72 1007" > /sys/bus/usb-serial/drivers/ftdi_sio/new_id<br>
+logger "STAGE ACTIVATED"
+</tt></blockquote>
+This will modify the list of devices that are recognized by the kernel driver ftdi_sio.
+</p>
+
+<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+
   </body>
 </html>
