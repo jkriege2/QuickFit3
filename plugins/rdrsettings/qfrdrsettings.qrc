@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="rdr_settings/qfrdrsettings.png">./images/qfrdrsettings.png</file>
+    <file alias="rdr_settings/qfrdrsettings_small.png">./images/qfrdrsettings_small.png</file>
+</qresource>
+</RCC>

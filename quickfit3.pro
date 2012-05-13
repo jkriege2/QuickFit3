@@ -84,6 +84,10 @@ SUBDIRS += plg_imagestack
 plg_imagestack.subdir=./plugins/imagestack
 plg_imagestack.depends = lib libqf3widgets
 
+SUBDIRS += plg_rdrsettings
+plg_rdrsettings.subdir=./plugins/rdrsettings
+plg_rdrsettings.depends = lib libqf3widgets
+
 
 !macx {
 

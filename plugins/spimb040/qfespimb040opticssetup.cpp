@@ -11,25 +11,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     QWidget(parent),
     ui(new Ui::QFESPIMB040OpticsSetup)
 {
-    QStringList lightpathlist;
-    lightpathlist<<tr("transmission illumintaion: source");
-    lightpathlist<<tr("transmission illumintaion: shutter");
-    lightpathlist<<tr("laser 1: source");
-    lightpathlist<<tr("laser 1: shutter");
-    lightpathlist<<tr("laser 2: source");
-    lightpathlist<<tr("laser 2: shutter");
-    lightpathlist<<tr("detection: filter changer");
     lightpathConfigModel=new QFTableModel(this);
-    lightpathConfigModel->setReadonly(false);
-    lightpathConfigModel->resize(lightpathlist.size(), 2);
-    lightpathConfigModel->setColumnTitle(1, tr("item"));
-    //lightpathConfigModel->setColumnTitle(2, tr("value"));
-    for (int i=0; i<lightpathlist.size(); i++) {
-        lightpathConfigModel->setCellCheckedRole(i, 0, Qt::Checked);
-        lightpathConfigModel->setCell(i, 1, lightpathlist[i]);
-        //lightpathConfigModel->setCell(i, 1, QString(""));
-    }
-    lightpathConfigModel->setReadonlyButStillCheckable(true);
 
 
     setting_lightpath=false;
@@ -629,6 +611,198 @@ QString QFESPIMB040OpticsSetup::getCurrentLightpathFilename() const {
 QString QFESPIMB040OpticsSetup::getCurrentLightpath() const {
     return ui->cmbLightpathConfig->currentText();
 }
+
+
+void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp) {
+    { // this block ensures that set is destroyed (and the file written) before updateItems() is called
+        QSettings set(filename, QSettings::IniFormat);
+        set.setValue("name", name);
+
+
+        QMap<QString, QVariant> data;
+        saveLightpathConfig(data, name, QString(""), saveProp);
+        QMap<QString, QVariant>::iterator i=data.begin();
+        for (i = data.begin(); i != data.end(); ++i) {
+            set.setValue(i.key(), i.value());
+        }
+
+    }
+    ui->cmbLightpathConfig->updateItems(name);
+}
+
+
+void QFESPIMB040OpticsSetup::deleteCurrentLightpatConfig() {
+    QString fn=ui->cmbLightpathConfig->currentConfigFilename();
+    QString name=ui->cmbLightpathConfig->currentConfig();
+    if (QFile::exists(fn)) {
+        if (QMessageBox::question(this, tr("B040 SPIM"), tr("Do you really want to delete lightpath '%1'?\nfile: '%2'").arg(name).arg(fn),
+                                  QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes)
+        {
+            QFile::remove(fn);
+            ui->cmbLightpathConfig->updateItems();
+        }
+    }
+}
+
+void QFESPIMB040OpticsSetup::emitLighpathesChanged() {
+    ui->cmbLightpathConfig->updateItems(ui->cmbLightpathConfig->currentText());
+}
+
+bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {
+    return ui->shutterMainIllumination->isShutterConnected();
+}
+
+
+void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
+    lockLightpath();
+    ui->cmbLightpathConfig->setEnabled(false);
+    loadLightpathConfig(filename, true);
+    ui->cmbLightpathConfig->setEnabled(true);
+    unlockLightpath();
+}
+
+void QFESPIMB040OpticsSetup::ensureLightpath() {
+    lockLightpath();
+    ui->cmbLightpathConfig->setEnabled(false);
+    loadLightpathConfig(getCurrentLightpathFilename(), true);
+    ui->cmbLightpathConfig->setEnabled(true);
+    unlockLightpath();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix, const QList<bool>& saveProp) {
+    data[prefix+"name"]=name;
+
+
+    // SAVE RELEVANT WIDGETS HERE
+    if (saveProp.value(0, true) && ui->lsTransmission->getLightSource() && ui->lsTransmission->isLightSourceConnected()) {
+        for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
+            data[prefix+QString("transmission/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
+            data[prefix+QString("transmission/line%1/power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
+        }
+    }
+    if (saveProp.value(1, true) && ui->shutterTransmission->getShutter() && ui->shutterTransmission->getShutter()->isShutterConnected(ui->shutterTransmission->getShutterID())) {
+        data[prefix+"transmission/shutter/state"]=ui->shutterTransmission->getShutterState();
+    }
+    if (saveProp.value(2, true) && ui->lsLaser1->getLightSource() && ui->lsLaser1->isLightSourceConnected()) {
+        for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
+            data[prefix+QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
+            data[prefix+QString("laser1/line%1/power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
+        }
+    }
+    if (saveProp.value(3, true) && ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) {
+        data[prefix+"laser1/shutter/state"]=ui->shutterLaser1->getShutterState();
+    }
+    if (saveProp.value(4, true) && ui->lsLaser2->getLightSource() && ui->lsLaser2->isLightSourceConnected()) {
+        for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
+            data[prefix+QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
+            data[prefix+QString("laser2/line%1/power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
+        }
+    }
+    if (saveProp.value(5, true) && ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
+        data[prefix+"laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
+    }
+    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected())
+        data[prefix+"detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
+
+}
+
+void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
+    bool dlgOK=true;
+    QString name=ui->cmbLightpathConfig->currentText();
+
+    QStringList lightpathlist;
+    lightpathlist<<tr("transmission illumintaion: source");
+    lightpathlist<<tr("transmission illumintaion: shutter");
+    lightpathlist<<tr("laser 1: source");
+    lightpathlist<<tr("laser 1: shutter");
+    lightpathlist<<tr("laser 2: source");
+    lightpathlist<<tr("laser 2: shutter");
+    lightpathlist<<tr("detection: filter changer");
+
+    lightpathConfigModel->setReadonly(false);
+    lightpathConfigModel->resize(lightpathlist.size(), 2);
+    lightpathConfigModel->setColumnTitle(1, tr("item"));
+    for (int i=0; i<lightpathlist.size(); i++) {
+        lightpathConfigModel->setCellCheckedRole(i, 0, Qt::Checked);
+        lightpathConfigModel->setCell(i, 1, lightpathlist[i]);
+    }
+
+    lightpathConfigModel->setCellCheckedRole(0, 0, (ui->lsTransmission->isLightSourceConnected())?Qt::Checked:Qt::Unchecked);
+    lightpathConfigModel->setCellCheckedRole(1, 0, (ui->shutterTransmission->isShutterConnected())?Qt::Checked:Qt::Unchecked);
+    lightpathConfigModel->setCellCheckedRole(2, 0, Qt::Unchecked);
+    lightpathConfigModel->setCellCheckedRole(3, 0, (ui->shutterLaser1->isShutterConnected())?Qt::Checked:Qt::Unchecked);
+    lightpathConfigModel->setCellCheckedRole(4, 0, Qt::Unchecked);
+    lightpathConfigModel->setCellCheckedRole(5, 0, (ui->shutterLaser2->isShutterConnected())?Qt::Checked:Qt::Unchecked);
+    lightpathConfigModel->setCellCheckedRole(6, 0, (ui->chkDetectionFilterWheel->isChecked()&&ui->filtcDetection->isFilterChangerConnected())?Qt::Checked:Qt::Unchecked);
+    lightpathConfigModel->setReadonlyButStillCheckable(true);
+
+
+    while (true) {
+        QStringList l=ui->cmbLightpathConfig->getConfigs();
+        int idx=-1;
+        if (!name.isEmpty() && !l.contains(name)) {
+            l.append(name);
+        }
+        idx=l.indexOf(name);
+        /*name=QInputDialog::getItem(this, tr("B040 SPIM"),
+                                      tr("Enter a name for the lightpath:"), l,idx, true, &dlgOK);*/
+        QFESPIMB040LightPathSaveDialog* dlg=new QFESPIMB040LightPathSaveDialog(name, l, lightpathConfigModel, this);
+        if (dlg->exec()==QDialog::Accepted) {
+            name=dlg->getName();
+            if (!name.isEmpty()) {
+                QString filename=m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/"+cleanStringForFilename(name)+".lpc";
+                if (QFile::exists(filename)) {
+                    QMessageBox::StandardButton res=QMessageBox::question(this, tr("B040 SPIM"),
+                                                                          tr("A lightpath config with the name '%1' already exists.\n  filename: '%2'\nOverwrite?").arg(name).arg(filename),
+                                                                          QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
+                    if (res==QMessageBox::Yes) {
+                        saveLightpathConfig(filename, name, dlg->getCheckedItems());
+                        ui->cmbLightpathConfig->setCurrentConfig(name);
+                        return;
+                    } else if (res==QMessageBox::Cancel) {
+                        return;
+                    }
+                } else {
+                    saveLightpathConfig(filename, name);
+                    ui->cmbLightpathConfig->setCurrentConfig(name);
+                    return;
+                }
+            }
+            delete dlg;
+        } else {
+            delete dlg;
+            return;
+        }
+
+    }
+}
+
 bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {
     if (setting_lightpath) {
         bool ok=true;
@@ -707,156 +881,6 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool w
 
 }
 
-void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp) {
-    { // this block ensures that set is destroyed (and the file written) before updateItems() is called
-        QSettings set(filename, QSettings::IniFormat);
-        set.setValue("name", name);
-
-
-        QMap<QString, QVariant> data;
-        saveLightpathConfig(data, name, QString(""), saveProp);
-        QMap<QString, QVariant>::iterator i=data.begin();
-        for (i = data.begin(); i != data.end(); ++i) {
-            set.setValue(i.key(), i.value());
-        }
-
-    }
-    ui->cmbLightpathConfig->updateItems(name);
-}
-
-void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix, const QList<bool>& saveProp) {
-    data[prefix+"name"]=name;
-
-    /*
-    0 lightpathlist<<tr("transmission illumintaion: source");
-    1 lightpathlist<<tr("transmission illumintaion: shutter");
-    2 lightpathlist<<tr("laser 1: source");
-    3 lightpathlist<<tr("laser 1: shutter");
-    4 lightpathlist<<tr("laser 2: source");
-    5 lightpathlist<<tr("laser 2: shutter");
-    6 lightpathlist<<tr("detection: filter changer");
-
-      */
-
-    // SAVE RELEVANT WIDGETS HERE
-    if (saveProp.value(0, true) && ui->lsTransmission->getLightSource() && ui->lsTransmission->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-            data[QString("transmission/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
-            data[QString("transmission/line%1/power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
-        }
-    }
-    if (saveProp.value(1, true) && ui->shutterTransmission->getShutter() && ui->shutterTransmission->getShutter()->isShutterConnected(ui->shutterTransmission->getShutterID())) {
-        data["transmission/shutter/state"]=ui->shutterTransmission->getShutterState();
-        //qDebug()<<"transmission/shutter/state="<<data["transmission/shutter/state"]<<ui->shutterTransmission->getShutterState();
-    }
-    if (saveProp.value(2, true) && ui->lsLaser1->getLightSource() && ui->lsLaser1->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-            data[QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
-            data[QString("laser1/line%1/power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
-        }
-    }
-    if (saveProp.value(3, true) && ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) {
-        data["laser1/shutter/state"]=ui->shutterLaser1->getShutterState();
-        //qDebug()<<"laser1/shutter/state="<<data["laser1/shutter/state"]<<ui->shutterLaser1->getShutterState();
-    }
-    if (saveProp.value(4, true) && ui->lsLaser2->getLightSource() && ui->lsLaser2->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-            data[QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
-            data[QString("laser2/line%1/power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
-        }
-    }
-    if (saveProp.value(5, true) && ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
-        data["laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
-        //qDebug()<<"laser2/shutter/state="<<data["laser2/shutter/state"]<<ui->shutterLaser2->getShutterState();
-    }
-    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected())
-        data["detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
-
-}
-
-void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
-    bool dlgOK=true;
-    QString name=ui->cmbLightpathConfig->currentText();
-    lightpathConfigModel->setReadonly(false);
-    /*
-    0 lightpathlist<<tr("transmission illumintaion: source");
-    1 lightpathlist<<tr("transmission illumintaion: shutter");
-    2 lightpathlist<<tr("laser 1: source");
-    3 lightpathlist<<tr("laser 1: shutter");
-    4 lightpathlist<<tr("laser 2: source");
-    5 lightpathlist<<tr("laser 2: shutter");
-    6 lightpathlist<<tr("detection: filter changer");
-
-      */
-    lightpathConfigModel->setCellCheckedRole(0, 0, (ui->lsTransmission->isLightSourceConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(1, 0, (ui->shutterTransmission->isShutterConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(2, 0, Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(3, 0, (ui->shutterLaser1->isShutterConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(4, 0, Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(5, 0, (ui->shutterLaser2->isShutterConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(6, 0, (ui->chkDetectionFilterWheel->isChecked()&&ui->filtcDetection->isFilterChangerConnected())?Qt::Checked:Qt::Unchecked);
-
-    lightpathConfigModel->setReadonlyButStillCheckable(true);
-    while (true) {
-        QStringList l=ui->cmbLightpathConfig->getConfigs();
-        int idx=-1;
-        if (!name.isEmpty() && !l.contains(name)) {
-            l.append(name);
-        }
-        idx=l.indexOf(name);
-        /*name=QInputDialog::getItem(this, tr("B040 SPIM"),
-                                      tr("Enter a name for the lightpath:"), l,idx, true, &dlgOK);*/
-        QFESPIMB040LightPathSaveDialog* dlg=new QFESPIMB040LightPathSaveDialog(name, l, lightpathConfigModel, this);
-        if (dlg->exec()==QDialog::Accepted) {
-            name=dlg->getName();
-            if (!name.isEmpty()) {
-                QString filename=m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/"+cleanStringForFilename(name)+".lpc";
-                if (QFile::exists(filename)) {
-                    QMessageBox::StandardButton res=QMessageBox::question(this, tr("B040 SPIM"),
-                                                                          tr("A lightpath config with the name '%1' already exists.\n  filename: '%2'\nOverwrite?").arg(name).arg(filename),
-                                                                          QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
-                    if (res==QMessageBox::Yes) {
-                        saveLightpathConfig(filename, name, dlg->getCheckedItems());
-                        ui->cmbLightpathConfig->setCurrentConfig(name);
-                        return;
-                    } else if (res==QMessageBox::Cancel) {
-                        return;
-                    }
-                } else {
-                    saveLightpathConfig(filename, name);
-                    ui->cmbLightpathConfig->setCurrentConfig(name);
-                    return;
-                }
-            }
-            delete dlg;
-        } else {
-            delete dlg;
-            return;
-        }
-
-    }
-}
-
-void QFESPIMB040OpticsSetup::deleteCurrentLightpatConfig() {
-    QString fn=ui->cmbLightpathConfig->currentConfigFilename();
-    QString name=ui->cmbLightpathConfig->currentConfig();
-    if (QFile::exists(fn)) {
-        if (QMessageBox::question(this, tr("B040 SPIM"), tr("Do you really want to delete lightpath '%1'?\nfile: '%2'").arg(name).arg(fn),
-                                  QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes)
-        {
-            QFile::remove(fn);
-            ui->cmbLightpathConfig->updateItems();
-        }
-    }
-}
-
-void QFESPIMB040OpticsSetup::emitLighpathesChanged() {
-    ui->cmbLightpathConfig->updateItems(ui->cmbLightpathConfig->currentText());
-}
-
-bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {
-    return ui->shutterMainIllumination->isShutterConnected();
-}
 
 void QFESPIMB040OpticsSetup::lockLightpath() {
     ui->shutterLaser1->lockShutters();
@@ -876,20 +900,4 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
     ui->lsLaser2->unlockLightSource();
     ui->lsTransmission->unlockLightSource();
     ui->filtcDetection->unlockFilterChangers();
-}
-
-void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
-    lockLightpath();
-    ui->cmbLightpathConfig->setEnabled(false);
-    loadLightpathConfig(filename, true);
-    ui->cmbLightpathConfig->setEnabled(true);
-    unlockLightpath();
-}
-
-void QFESPIMB040OpticsSetup::ensureLightpath() {
-    lockLightpath();
-    ui->cmbLightpathConfig->setEnabled(false);
-    loadLightpathConfig(getCurrentLightpathFilename(), true);
-    ui->cmbLightpathConfig->setEnabled(true);
-    unlockLightpath();
 }

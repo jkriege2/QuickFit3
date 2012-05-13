@@ -87,7 +87,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qffilterchangerconfigwidget.h \
     qflightsourceconfigwidget.h \
     qflightsourceconfigwidgetthread.h \
-    ../../../../LIB/trunk/qt/qprogresslistwidget.h
+    ../../../../LIB/trunk/qt/qprogresslistwidget.h \
+    ../../../../LIB/trunk/qt/qsettingsmodel.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -139,7 +140,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffilterchangerconfigwidget.cpp \
     qflightsourceconfigwidget.cpp \
     qflightsourceconfigwidgetthread.cpp \
-    ../../../../LIB/trunk/qt/qprogresslistwidget.cpp
+    ../../../../LIB/trunk/qt/qprogresslistwidget.cpp \
+    ../../../../LIB/trunk/qt/qsettingsmodel.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
