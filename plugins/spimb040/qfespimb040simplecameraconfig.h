@@ -89,6 +89,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
 
         void connectCamera();
         void disconnectCamera();
+        bool isCameraConnected() const;
 
         QFCameraComboBox* cameraComboBox() const { return cmbAcquisitionDevice; }
     public slots:

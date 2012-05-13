@@ -902,6 +902,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
     }
     optSetup->unlockStages();
     optSetup->unlockLightpath();
+    optSetup->ensureLightpath();
 
 }
 
@@ -1357,6 +1358,8 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
         if (ok) log_text(tr("image stack acquisition DONE!\n"));
     }
     optSetup->unlockLightpath();
+    optSetup->ensureLightpath();
+
 }
 
 
@@ -1975,6 +1978,8 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     if (ok && useCam1) log_text(tr("  - stored files with prefix 1: '%1'\n").arg(acquisitionPrefix1));
     if (ok && useCam2) log_text(tr("  - stored files with prefix 2: '%1'\n").arg(acquisitionPrefix2));
     log_text(tr("image series acquisition DONE!\n"));
+    optSetup->ensureLightpath();
+
 }
 
 

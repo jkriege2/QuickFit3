@@ -363,37 +363,146 @@ void QFESPIMB040OpticsSetup::releaseCamera(int setup_cam) {
 }
 
 void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
-    ui->shutterMainIllumination->connectShutter();
-    ui->shutterLaser1->connectShutter();
-    ui->shutterLaser2->connectShutter();
-    ui->shutterTransmission->connectShutter();
-    ui->lsLaser1->connectLightSource();
-    ui->lsLaser2->connectLightSource();
-    ui->lsTransmission->connectLightSource();
-    ui->stageSetup->connectStages();
-    if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->connectFilterChanger();
+    QProgressListDialog* dlg=new QProgressListDialog(this, Qt::Dialog|Qt::WindowStaysOnBottomHint);
+    dlg->setWindowModality(Qt::WindowModal);
+    dlg->setWindowIcon(windowIcon());
+    dlg->setWindowTitle(tr("Connecting devices ..."));
+    dlg->addItem(tr("shutter: main"));
+    dlg->addItem(tr("shutter: laser 1"));
+    dlg->addItem(tr("shutter: laser 2"));
+    dlg->addItem(tr("shutter: transmission illumination"));
+    dlg->addItem(tr("lightsource: laser 1"));
+    dlg->addItem(tr("lightsource: laser 2"));
+    dlg->addItem(tr("lightsource: transmission"));
+    dlg->addItem(tr("stage"));
+    dlg->addItem(tr("filterwheel: detection"));
+    dlg->setHasCancelButton(true);
+    dlg->show();
+    dlg->start();
+
+    if (!dlg->wasCanceled()) ui->shutterMainIllumination->connectShutter();
+    dlg->nextItem((ui->shutterMainIllumination->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->shutterLaser1->connectShutter();
+    dlg->nextItem((ui->shutterLaser1->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->shutterLaser2->connectShutter();
+    dlg->nextItem((ui->shutterLaser2->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->shutterTransmission->connectShutter();
+    dlg->nextItem((ui->shutterTransmission->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->lsLaser1->connectLightSource();
+    dlg->nextItem((ui->lsLaser1->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->lsLaser2->connectLightSource();
+    dlg->nextItem((ui->lsLaser2->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->lsTransmission->connectLightSource();
+    dlg->nextItem((ui->lsTransmission->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->stageSetup->connectStages();
+    dlg->nextItem((ui->stageSetup->isXStageConnected()||ui->stageSetup->isYStageConnected()||ui->stageSetup->isZStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->connectFilterChanger();
+    dlg->nextItem((ui->filtcDetection->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    dlg->close();
+    delete dlg;
 }
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
-    ui->stageSetup->disconnectStages();
+    QProgressListDialog* dlg=new QProgressListDialog(this, Qt::Dialog|Qt::WindowStaysOnBottomHint);
+    dlg->setWindowModality(Qt::WindowModal);
+    dlg->setWindowIcon(windowIcon());
+    dlg->setWindowTitle(tr("Disconnecting devices ..."));
+    dlg->addItem(tr("shutter: main"));
+    dlg->addItem(tr("shutter: laser 1"));
+    dlg->addItem(tr("shutter: laser 2"));
+    dlg->addItem(tr("shutter: transmission illumination"));
+    dlg->addItem(tr("lightsource: laser 1"));
+    dlg->addItem(tr("lightsource: laser 2"));
+    dlg->addItem(tr("lightsource: transmission"));
+    dlg->addItem(tr("stage"));
+    dlg->addItem(tr("filterwheel: detection"));
+    dlg->setHasCancelButton(false);
+    dlg->show();
+    dlg->start();
+
     ui->shutterMainIllumination->disconnectShutter();
+    dlg->nextItem();
+    QApplication::processEvents();
     ui->shutterLaser1->disconnectShutter();
+    dlg->nextItem();
+    QApplication::processEvents();
     ui->shutterLaser2->disconnectShutter();
+    dlg->nextItem();
+    QApplication::processEvents();
     ui->shutterTransmission->disconnectShutter();
+    dlg->nextItem();
+    QApplication::processEvents();
     ui->lsLaser1->disconnectLightSource();
+    dlg->nextItem();
+    QApplication::processEvents();
     ui->lsLaser2->disconnectLightSource();
+    dlg->nextItem();
+    QApplication::processEvents();
     ui->lsTransmission->disconnectLightSource();
+    dlg->nextItem();
+    QApplication::processEvents();
+    ui->stageSetup->disconnectStages();
+    dlg->nextItem();
+    QApplication::processEvents();
     if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->disconnectFilterChanger();
+    dlg->nextItem();
+    QApplication::processEvents();
+    dlg->close();
+    delete dlg;
 }
 void QFESPIMB040OpticsSetup::on_btnConnectCameras_clicked() {
-    ui->camConfig1->connectCamera();
-    ui->camConfig2->connectCamera();
+    QProgressListDialog* dlg=new QProgressListDialog(this, Qt::Dialog|Qt::WindowStaysOnBottomHint);
+    dlg->setWindowModality(Qt::WindowModal);
+    dlg->setWindowIcon(windowIcon());
+    dlg->setWindowTitle(tr("Connecting cameras ..."));
+    dlg->addItem(tr("camera 1"));
+    dlg->addItem(tr("camera 2"));
+    dlg->setHasCancelButton(true);
+    dlg->show();
+    dlg->start();
+
+    if (!dlg->wasCanceled()) ui->camConfig1->connectCamera();
+    dlg->nextItem((ui->camConfig1->isCameraConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->camConfig2->connectCamera();
+    dlg->nextItem((ui->camConfig2->isCameraConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+
+    dlg->close();
+    delete dlg;
+
 }
 
 
 void QFESPIMB040OpticsSetup::on_btnDisconnectCameras_clicked() {
-    ui->camConfig1->disconnectCamera();
-    ui->camConfig2->disconnectCamera();
+    QProgressListDialog* dlg=new QProgressListDialog(this, Qt::Dialog|Qt::WindowStaysOnBottomHint);
+    dlg->setWindowModality(Qt::WindowModal);
+    dlg->setWindowIcon(windowIcon());
+    dlg->setWindowTitle(tr("Disconnecting cameras ..."));
+    dlg->addItem(tr("camera 1"));
+    dlg->addItem(tr("camera 2"));
+    dlg->setHasCancelButton(true);
+    dlg->show();
+    dlg->start();
+
+    if (!dlg->wasCanceled()) ui->camConfig1->disconnectCamera();
+    dlg->nextItem();
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->camConfig2->disconnectCamera();
+    dlg->nextItem();
+    QApplication::processEvents();
+
+    dlg->close();
+    delete dlg;
+
 }
 
 void QFESPIMB040OpticsSetup::on_chkDetectionFilterWheel_toggled(bool checked) {
@@ -773,6 +882,14 @@ void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
     lockLightpath();
     ui->cmbLightpathConfig->setEnabled(false);
     loadLightpathConfig(filename, true);
+    ui->cmbLightpathConfig->setEnabled(true);
+    unlockLightpath();
+}
+
+void QFESPIMB040OpticsSetup::ensureLightpath() {
+    lockLightpath();
+    ui->cmbLightpathConfig->setEnabled(false);
+    loadLightpathConfig(getCurrentLightpathFilename(), true);
     ui->cmbLightpathConfig->setEnabled(true);
     unlockLightpath();
 }

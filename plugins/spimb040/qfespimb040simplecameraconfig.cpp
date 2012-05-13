@@ -614,14 +614,33 @@ void QFESPIMB040SimpleCameraConfig::previewCurrentIndexChanged(int index) {
 
 void QFESPIMB040SimpleCameraConfig::connectCamera() {
     if (!isChecked()) return;
+
+    bool b=actDisConnect->signalsBlocked();
+    actDisConnect->blockSignals(true);
     actDisConnect->setChecked(true);
+    disConnectAcquisitionDevice();
+    actDisConnect->blockSignals(b);
+
 }
 
 void QFESPIMB040SimpleCameraConfig::disconnectCamera() {
     if (!isChecked()) return;
+
+    bool b=actDisConnect->signalsBlocked();
+    actDisConnect->blockSignals(true);
     actDisConnect->setChecked(false);
+    disConnectAcquisitionDevice();
+    actDisConnect->blockSignals(b);
 }
 
 void QFESPIMB040SimpleCameraConfig::setReadOnly(bool readonly) {
     cmbAcquisitionDevice->setReadOnly(readonly);
+}
+
+bool QFESPIMB040SimpleCameraConfig::isCameraConnected() const {
+    if (viewData.camera) {
+        int camIdx=viewData.usedCamera;
+        return viewData.camera->isConnected(camIdx);
+    }
+    return false;
 }

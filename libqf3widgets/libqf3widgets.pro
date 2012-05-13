@@ -86,7 +86,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfshutterconfigwidget.h \
     qffilterchangerconfigwidget.h \
     qflightsourceconfigwidget.h \
-    qflightsourceconfigwidgetthread.h
+    qflightsourceconfigwidgetthread.h \
+    ../../../../LIB/trunk/qt/qprogresslistwidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -137,7 +138,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfshutterconfigwidget.cpp \
     qffilterchangerconfigwidget.cpp \
     qflightsourceconfigwidget.cpp \
-    qflightsourceconfigwidgetthread.cpp
+    qflightsourceconfigwidgetthread.cpp \
+    ../../../../LIB/trunk/qt/qprogresslistwidget.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
@@ -149,7 +151,8 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/libqt.qrc \
              ../../../../LIB/trunk/qt/qkeysequenceedit.qrc \
              ../../../../LIB/trunk/qt/numberedit.qrc \
-             libqf3widgets.qrc
+             libqf3widgets.qrc \
+    ../../../../LIB/trunk/qt/qprogresslistwidget.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 
@@ -159,16 +162,3 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
-
-
-
-
-
-
-
-
-
-
-
-
-

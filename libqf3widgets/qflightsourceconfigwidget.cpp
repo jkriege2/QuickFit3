@@ -77,7 +77,11 @@ void QFLightSourceConfigWidget::connectLightSource() {
 }
 
 void QFLightSourceConfigWidget::disconnectLightSource() {
+    bool b=actConnect->signalsBlocked();
+    actConnect->blockSignals(true);
     actConnect->setChecked(false);
+    disConnect();
+    actConnect->blockSignals(b);
 }
 
 
@@ -493,7 +497,7 @@ void QFLightSourceConfigWidget::setLinePower(int line, double power) {
 
 void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled) {
     if (dontAccessWidgets) return;
-    qDebug()<<"linesChanged("<< lineenabled<< setValues <<measuredValues<<")";
+    //qDebug()<<"linesChanged("<< lineenabled<< setValues <<measuredValues<<")";
     for (int i=0; i<lineWidgets.size(); i++) {
         if (i<lineenabled.size()) {
             disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));

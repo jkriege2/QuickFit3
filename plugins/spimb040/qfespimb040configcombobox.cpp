@@ -8,7 +8,7 @@ QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
     QEnhancedComboBox(parent)
 {
     updating=false;
-    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
+    connect(this, SIGNAL(activated(int)), this, SLOT(cmbCurrentIndexChanged(int)));
     baseDir=QApplication::applicationDirPath();
     m_ext="ini";
     icon=QIcon(":/spimb040/lightpath.png");
@@ -19,7 +19,7 @@ QFESPIMB040ConfigComboBox::QFESPIMB040ConfigComboBox(QWidget *parent) :
 
 QFESPIMB040ConfigComboBox::~QFESPIMB040ConfigComboBox()
 {
-    disconnect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCurrentIndexChanged(int)));
+    disconnect(this, SIGNAL(activated(int)), this, SLOT(cmbCurrentIndexChanged(int)));
 }
 
 QString QFESPIMB040ConfigComboBox::currentConfigFilename() const {

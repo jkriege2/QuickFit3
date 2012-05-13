@@ -24,6 +24,7 @@
 #include "qtriple.h"
 #include "qcheckablestringlistmodel.h"
 #include "qftablemodel.h"
+#include "qprogresslistwidget.h"
 
 
 class QFESPIMB040MainWindow; // forward
@@ -145,6 +146,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         bool lightpathLoaded(const QString &filename);
         QString getCurrentLightpath() const;
         QString getCurrentLightpathFilename() const;
+        void ensureLightpath();
     public slots:
         void loadLightpathConfig(const QString& filename, bool waiting=false);
         void saveLightpathConfig(const QString& filename, const QString &name, const QList<bool> &saveProp=QList<bool>());
