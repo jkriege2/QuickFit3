@@ -616,6 +616,7 @@ QString QFESPIMB040OpticsSetup::getCurrentLightpath() const {
 void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp) {
     { // this block ensures that set is destroyed (and the file written) before updateItems() is called
         QSettings set(filename, QSettings::IniFormat);
+        set.clear();
         set.setValue("name", name);
 
 

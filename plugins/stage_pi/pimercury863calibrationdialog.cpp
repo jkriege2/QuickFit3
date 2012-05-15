@@ -106,7 +106,7 @@ void PIMercury863CalibrationDialog::acceptCal() {
         stage->selectAxis(axis);
         stage->sendCommand("SI"+inttostr(i));
         stage->sendCommand("SJ"+inttostr(calX[i]));
-        stage->log_text(tr("  %1\t%2\n").arg(i).arg(calX[i]));
+        stage->log_text(tr("  %1\t%2\t%3\n").arg(i).arg(calX[i]).arg(stage->queryCommand("SJ?").c_str()));
     }
     accept();
 }
