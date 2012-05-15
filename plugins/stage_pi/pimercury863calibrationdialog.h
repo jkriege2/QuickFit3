@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <stdint.h>
-
+#include <QCheckBox>
 
 class QFExtensionLinearStagePI; // forward
 
@@ -35,6 +35,7 @@ class PIMercury863CalibrationDialog : public QDialog {
         QLabel* labX;
         QLabel* labMinX;
         QLabel* labMaxX;
+        QCheckBox* chkInvert;
 
         int32_t calX[256];
 

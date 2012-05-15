@@ -662,11 +662,17 @@ void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
 }
 
 void QFESPIMB040OpticsSetup::ensureLightpath() {
+   //qDebug()<<"ensureLightpath()";
     lockLightpath();
+   //qDebug()<<"ensureLightpath(): locked";
     ui->cmbLightpathConfig->setEnabled(false);
+   //qDebug()<<"ensureLightpath(): disabled";
     loadLightpathConfig(getCurrentLightpathFilename(), true);
+   //qDebug()<<"ensureLightpath(): load";
     ui->cmbLightpathConfig->setEnabled(true);
+   //qDebug()<<"ensureLightpath(): enabled";
     unlockLightpath();
+   //qDebug()<<"ensureLightpath(): unlocked";
 }
 
 
@@ -883,16 +889,25 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool w
 
 
 void QFESPIMB040OpticsSetup::lockLightpath() {
+   //qDebug()<<"locking lighpath 1";
     ui->shutterLaser1->lockShutters();
+   //qDebug()<<"locking lighpath 2";
     ui->shutterLaser2->lockShutters();
+   //qDebug()<<"locking lighpath 3";
     ui->shutterTransmission->lockShutters();
+   //qDebug()<<"locking lighpath 4";
     ui->lsLaser1->lockLightSource();
+   //qDebug()<<"locking lighpath 5";
     ui->lsLaser2->lockLightSource();
+   //qDebug()<<"locking lighpath 6";
     ui->lsTransmission->lockLightSource();
+   //qDebug()<<"locking lighpath 7";
     ui->filtcDetection->lockFilterChangers();
+   //qDebug()<<"locking lighpath done";
 }
 
 void QFESPIMB040OpticsSetup::unlockLightpath() {
+   //qDebug()<<"unlocking lightpath";
     ui->shutterLaser1->unlockShutters();
     ui->shutterLaser2->unlockShutters();
     ui->shutterTransmission->unlockShutters();
@@ -900,4 +915,5 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
     ui->lsLaser2->unlockLightSource();
     ui->lsTransmission->unlockLightSource();
     ui->filtcDetection->unlockFilterChangers();
+   //qDebug()<<"unlocking lightpath done";
 }

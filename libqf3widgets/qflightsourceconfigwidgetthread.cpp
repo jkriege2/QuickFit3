@@ -45,15 +45,22 @@ void QFLightSourceConfigWidgetThread::setLinePower(int line, double power) {
 
 void QFLightSourceConfigWidgetThread::run() {
     stopped=false;
+   //qDebug()<<this<<"FLightSourceConfigWidgetThread::run()";
     while (!stopped) {
         nextInstruction();
         msleep(THREAD_TIMEOUT);
     }
+   //qDebug()<<this<<"FLightSourceConfigWidgetThread::run() ... finished";
 }
 
 void QFLightSourceConfigWidgetThread::stopThread() {
     stopped=true;
-    if (isRunning()) wait();
+   //qDebug()<<this<<"waiting for thread to stop";
+    while (isRunning()) {
+        stopped=true;
+        wait(50);
+    }
+   //qDebug()<<this<<"waiting for thread to stop ... done";
     //qDebug()<<"thread stopped";
 }
 

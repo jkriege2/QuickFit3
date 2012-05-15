@@ -67,7 +67,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidgetThread : public QThread {
 
         QFLightSourceConfigWidget* m_parent;
         QMutex* InstructionMutex;
-        bool stopped;
+        volatile bool stopped;
         int readCounter;
 
         enum InstructionType { SetEnabled, SetPower };

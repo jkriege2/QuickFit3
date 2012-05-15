@@ -35,6 +35,10 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QF
 
     vbl->addLayout(grid);
 
+    chkInvert=new QCheckBox(tr("invert axis"), this);
+    chkInvert->setChecked(false);
+    vbl->addWidget(chkInvert);
+
     QHBoxLayout* hbl=new QHBoxLayout(this);
 
     btnResetCal=new QPushButton(tr("&Reset Calibration"), this);;
@@ -137,6 +141,9 @@ void PIMercury863CalibrationDialog::calibrate() {
         if (calX[i]>1000) calX[i]=1000;
         if (calX[i]<-1000) calX[i]=-1000;
         //qDebug()<<"x "<<i<<minX<<i<<maxX<<calX[i];
+    }
+    if (chkInvert->isChecked()) {
+        for (int i=0; i<256; i++) calX[i]=calX[i]*-1;
     }
 
 
