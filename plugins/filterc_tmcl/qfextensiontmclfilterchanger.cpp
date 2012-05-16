@@ -32,7 +32,20 @@ void QFExtensionTMCLFilterChanger::initExtension() {
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE);
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/%1").arg(GLOBAL_CONFIGFILE);
     QSettings inifile(ini, QSettings::IniFormat);
+
+
+
     int count=inifile.value("filterwheel_count", 0).toUInt();
+
+    QMenu* fcMenu=NULL;
+    if (count>0) {
+        QMenu* extm=services->getMenu("extensions");
+        //std::cout<<"extensions menu: "<<extm<<std::endl;
+        if (extm) {
+            fcMenu=extm->addMenu(QIcon(getIconFilename()), tr("TMCL filter wheels"));
+        }
+
+    }
     //qDebug()<<"FILTERWHEEL_COUNT = "<<count;
     for (int i=0; i<count; i++) {
         FILTERWHEEL s;
@@ -55,6 +68,10 @@ void QFExtensionTMCLFilterChanger::initExtension() {
         s.infoMessage="";
         s.lastAction=QTime::currentTime();
         s.tmcl=new QF3TMCLProtocolHandler(ports.getCOMPort(s.port), getName());
+        s.actRealign=new QAction(tr("realign filter changer #%1").arg(i+1), this);
+        connect(s.actRealign, SIGNAL(triggered()), this, SLOT(realignFW()));
+        s.actRealign->setEnabled(false);
+        if (fcMenu) fcMenu->addAction(s.actRealign);
         wheels.append(s);
         //qDebug()<<"FILTERWHEEL("<<i<<") ... id="<<s.id;
     }
@@ -116,6 +133,7 @@ void QFExtensionTMCLFilterChanger::deinit() {
                 ports.storeCOMPort(p, inifile, "filterwheel"+QString::number(i+1)+"/");
                 inifile.setValue("filterwheel"+QString::number(i+1)+"/id", wheels[i].id);
             }
+            delete wheels[i].actRealign;
         }
     }
 }
@@ -146,7 +164,10 @@ void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChang
     if (!com) return;
     com->set_binary(true);
     com->open();
+    wheels[filterChanger].actRealign->setEnabled(false);
     if (com->isConnectionOpen()) {
+        wheels[filterChanger].actRealign->setEnabled(true);
+
         QTime t;
         t.start();
         // wait CONNECTION_DELAY_MS ms for connection!
@@ -154,92 +175,11 @@ void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChang
             QApplication::processEvents();
         }
 
-        uint8_t status=0;
-        bool ok=true;
 
-        // reset position
-        wheels[filterChanger].currentFilter=0;
-
-        log_text(tr("  - port: %1   speed: %4   id: %2   axis: %3\n").arg(com->get_port().c_str()).arg(wheels[filterChanger].id).arg(wheels[filterChanger].motor).arg(com->get_baudrate()));
-        log_text(tr("  - firmware version: %1\n").arg(tmcl->getFirmwareVersion(wheels[filterChanger].id, wheels[filterChanger].motor)));
-        int32_t value=0;
-        /*tmcl->getAxisParameter(wheels[filterChanger].id, 4, value, 0); log_text(tr("  - maximum speed: %1\n").arg(value));
-        tmcl->getAxisParameter(wheels[filterChanger].id, 14, value, 0); log_text(tr("  - minimum speed: %1\n").arg(value));
-        tmcl->getAxisParameter(wheels[filterChanger].id, 5, value, 0); log_text(tr("  - maximum acceleration: %1\n").arg(value));
-        tmcl->getAxisParameter(wheels[filterChanger].id, 6, value, 0); log_text(tr("  - maximum current: %1\n").arg(value));
-        tmcl->getAxisParameter(wheels[filterChanger].id, 7, value, 0); log_text(tr("  - standby current: %1\n").arg(value));
-        tmcl->getAxisParameter(wheels[filterChanger].id, 194, value, 0); log_text(tr("  - slow reference speed: %1\n").arg(value));
-        tmcl->getAxisParameter(wheels[filterChanger].id, 195, value, 0); log_text(tr("  - fast reference speed: %1\n").arg(value));*/
-        log_text(tr("  - resetting position\n"));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position\n"));
-        log_text(tr("  - set fast referencing speed to %1\n").arg(wheels[filterChanger].fastRFSSpeed));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 195, wheels[filterChanger].fastRFSSpeed, wheels[filterChanger].motor), tr("error setting fast referencing speed"));
-        log_text(tr("  - set slow referencing speed to %1\n").arg(wheels[filterChanger].slowRFSSpeed));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 194, wheels[filterChanger].slowRFSSpeed, wheels[filterChanger].motor), tr("error setting slow referencing speed"));
-        log_text(tr("  - set max. acceleration to %1\n").arg(wheels[filterChanger].maximumAcceleration));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 5, wheels[filterChanger].maximumAcceleration, wheels[filterChanger].motor), tr("error setting max. acceleration"));
-        log_text(tr("  - set max. speed to %1\n").arg(wheels[filterChanger].maximumSpeed));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 4, wheels[filterChanger].maximumSpeed, wheels[filterChanger].motor), tr("error setting max. speed"));
-        log_text(tr("  - set standby current to %1\n").arg(wheels[filterChanger].standbyCurrent));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 7, wheels[filterChanger].standbyCurrent, wheels[filterChanger].motor), tr("error setting standby current"));
-        log_text(tr("  - set maximum current to %1\n").arg(wheels[filterChanger].maximumCurrent));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 6, wheels[filterChanger].maximumCurrent, wheels[filterChanger].motor), tr("error setting maximum current"));
-        log_text(tr("  - set acceleration with ramps\n"));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 15, 0, wheels[filterChanger].motor), tr("error setting acceleration with ramps"));
-
-        // move about a third rotation and wait until movement finished
-        com->clearBuffer();
-        log_text(tr("  - moving motor\n"));
-        TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_REL, wheels[filterChanger].motor, wheels[filterChanger].steps_per_revolution/3, &status), tr("error moving motor (status=%1)\n").arg(status), 100);
-        bool reached=false;
-        t.start();
-        while (ok && !reached) {
-            uint8_t rAddress;
-            int32_t value=0;
-            // read parameter 8 (target pos. reached) until it is 1
-            tmcl->queryCommand(wheels[filterChanger].id, TMCL_GAP, 8, wheels[filterChanger].motor, 1, &rAddress, &status, &value);
-            if (ok && status==100) {
-                reached=((value==0)&&(t.elapsed()>100));
-            }
-
-            if (t.elapsed()>MVP_TIMEOUT) {
-                log_error(tr("      timeout during move\n"));
-                ok=false;
-            }
-        }
-        ok=reached;
-
-        log_text(tr("  - performing reference search\n"));
-
-        // set the correct reference search algorithm (#1 in parameter 193)
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 193, 1, wheels[filterChanger].motor), tr("error setting reference search algorithm (status=%1)\n").arg(status));
-
-        // do a reference queryStatus
-        if (ok) {
-            TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_RFS, 0, wheels[filterChanger].motor, 0, &status), tr("error starting reference search (status=%1)\n").arg(status), 100);
-            reached=false;
-            t.start();
-            while (ok && !reached) {
-                uint8_t rAddress;
-                int32_t value=0;
-                // check whether RFS finished
-                tmcl->queryCommand(wheels[filterChanger].id, TMCL_RFS, 2, wheels[filterChanger].motor, 0, &rAddress, &status, &value);
-                if (ok && status==100) {
-                    reached=(value==0)&&(t.elapsed()>100);
-                }
-                if (t.elapsed()>RFS_TIMEOUT) {
-                    log_error(tr("      timeout during reference search\n"));
-                    ok=false;
-                }
-            }
-        }
-
-        // set the encoder position to 0
-        log_text(tr("  - reseting position\n"));
-        TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position (status=%1)\n").arg(status));
-        if (!ok) {
+        if (!TMCLRealignFW(filterChanger)) {
             com->close();
             log_error(tr("  - connection closed\n"));
+            wheels[filterChanger].actRealign->setEnabled(false);
         }
 
     } else {
@@ -253,6 +193,8 @@ void QFExtensionTMCLFilterChanger::filterChangerDisonnect(unsigned int filterCha
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return;
     com->close();
+    wheels[filterChanger].actRealign->setEnabled(true);
+
 }
 
 void QFExtensionTMCLFilterChanger::setFilterChangerLogging(QFPluginLogService *logService) {
@@ -264,7 +206,10 @@ bool QFExtensionTMCLFilterChanger::isFilterChangerConnected(unsigned int filterC
     if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     if (!com) return false;
-    return com->isConnectionOpen();
+    bool res= com->isConnectionOpen();
+    wheels[filterChanger].actRealign->setEnabled(res);
+    return res;
+
 }
 
 unsigned int QFExtensionTMCLFilterChanger::getFilterChangerFilterCount(unsigned int filterChanger) {
@@ -347,6 +292,121 @@ QString QFExtensionTMCLFilterChanger::getFilterChangerShortName(unsigned int fil
 
 void QFExtensionTMCLFilterChanger::showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget *parent) {
 }
+
+int QFExtensionTMCLFilterChanger::findActRealign(QAction *realign) {
+    for (int i=0; i<wheels.size(); i++) {
+        if (wheels[i].actRealign==realign) return i;
+    }
+    return -1;
+}
+
+
+void QFExtensionTMCLFilterChanger::realignFW() {
+    int i=findActRealign(qobject_cast<QAction*>(sender()));
+    if (i>=0 && i<wheels.size())  {
+        if (isFilterChangerConnected(i)) {
+            if (!TMCLRealignFW(i)) {
+                QMessageBox::critical(NULL, getName(), tr("Can not realign filter changer.\n reason: error during realignment.").arg(i+1));
+            }
+        } else {
+            QMessageBox::critical(NULL, getName(), tr("Can not realign filter changer.\n reason: Filter changer #%1 is not connected.").arg(i+1));
+        }
+    }
+}
+
+
+
+
+bool QFExtensionTMCLFilterChanger::TMCLRealignFW(int filterChanger) {
+    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return false;
+    JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
+    if (!com) return false;
+
+
+    QTime t;
+    t.start();
+
+    uint8_t status=0;
+    bool ok=true;
+
+    // reset position
+    wheels[filterChanger].currentFilter=0;
+
+    log_text(tr("  - port: %1   speed: %4   id: %2   axis: %3\n").arg(com->get_port().c_str()).arg(wheels[filterChanger].id).arg(wheels[filterChanger].motor).arg(com->get_baudrate()));
+    log_text(tr("  - firmware version: %1\n").arg(tmcl->getFirmwareVersion(wheels[filterChanger].id, wheels[filterChanger].motor)));
+    int32_t value=0;
+    log_text(tr("  - resetting position\n"));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position\n"));
+    log_text(tr("  - set fast referencing speed to %1\n").arg(wheels[filterChanger].fastRFSSpeed));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 195, wheels[filterChanger].fastRFSSpeed, wheels[filterChanger].motor), tr("error setting fast referencing speed"));
+    log_text(tr("  - set slow referencing speed to %1\n").arg(wheels[filterChanger].slowRFSSpeed));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 194, wheels[filterChanger].slowRFSSpeed, wheels[filterChanger].motor), tr("error setting slow referencing speed"));
+    log_text(tr("  - set max. acceleration to %1\n").arg(wheels[filterChanger].maximumAcceleration));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 5, wheels[filterChanger].maximumAcceleration, wheels[filterChanger].motor), tr("error setting max. acceleration"));
+    log_text(tr("  - set max. speed to %1\n").arg(wheels[filterChanger].maximumSpeed));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 4, wheels[filterChanger].maximumSpeed, wheels[filterChanger].motor), tr("error setting max. speed"));
+    log_text(tr("  - set standby current to %1\n").arg(wheels[filterChanger].standbyCurrent));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 7, wheels[filterChanger].standbyCurrent, wheels[filterChanger].motor), tr("error setting standby current"));
+    log_text(tr("  - set maximum current to %1\n").arg(wheels[filterChanger].maximumCurrent));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 6, wheels[filterChanger].maximumCurrent, wheels[filterChanger].motor), tr("error setting maximum current"));
+    log_text(tr("  - set acceleration with ramps\n"));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 15, 0, wheels[filterChanger].motor), tr("error setting acceleration with ramps"));
+
+    // move about a third rotation and wait until movement finished
+    com->clearBuffer();
+    log_text(tr("  - moving motor\n"));
+    TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_MVP, MVP_REL, wheels[filterChanger].motor, wheels[filterChanger].steps_per_revolution/3, &status), tr("error moving motor (status=%1)\n").arg(status), 100);
+    bool reached=false;
+    t.start();
+    while (ok && !reached) {
+        uint8_t rAddress;
+        int32_t value=0;
+        // read parameter 8 (target pos. reached) until it is 1
+        tmcl->queryCommand(wheels[filterChanger].id, TMCL_GAP, 8, wheels[filterChanger].motor, 1, &rAddress, &status, &value);
+        if (ok && status==100) {
+            reached=((value==0)&&(t.elapsed()>100));
+        }
+
+        if (t.elapsed()>MVP_TIMEOUT) {
+            log_error(tr("      timeout during move\n"));
+            ok=false;
+        }
+    }
+    ok=reached;
+
+    log_text(tr("  - performing reference search\n"));
+
+    // set the correct reference search algorithm (#1 in parameter 193)
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 193, 1, wheels[filterChanger].motor), tr("error setting reference search algorithm (status=%1)\n").arg(status));
+
+    // do a reference queryStatus
+    if (ok) {
+        TMCL_TESTOK_STATUS(tmcl->queryStatus(wheels[filterChanger].id, TMCL_RFS, 0, wheels[filterChanger].motor, 0, &status), tr("error starting reference search (status=%1)\n").arg(status), 100);
+        reached=false;
+        t.start();
+        while (ok && !reached) {
+            uint8_t rAddress;
+            int32_t value=0;
+            // check whether RFS finished
+            tmcl->queryCommand(wheels[filterChanger].id, TMCL_RFS, 2, wheels[filterChanger].motor, 0, &rAddress, &status, &value);
+            if (ok && status==100) {
+                reached=(value==0)&&(t.elapsed()>100);
+            }
+            if (t.elapsed()>RFS_TIMEOUT) {
+                log_error(tr("      timeout during reference search\n"));
+                ok=false;
+            }
+        }
+    }
+
+    // set the encoder position to 0
+    log_text(tr("  - reseting position\n"));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position (status=%1)\n").arg(status));
+    return ok;
+}
+
+
 
 
 

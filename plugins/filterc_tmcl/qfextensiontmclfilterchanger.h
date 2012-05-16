@@ -142,12 +142,18 @@ class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, pub
             int32_t fastRFSSpeed;
             int currentFilter;
             uint8_t motor;
+            QAction* actRealign;
         };
 
         QList<FILTERWHEEL> wheels;
 
+        int findActRealign(QAction* realign);
 
-	protected slots:
+        bool TMCLRealignFW(int filterChanger);
+
+    protected slots:
+        void realignFW();
+
 
 
 };
