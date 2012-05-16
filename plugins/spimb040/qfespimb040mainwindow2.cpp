@@ -1687,17 +1687,17 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             optSetup->saveLightpathConfig(backgroundDescription2, "", "lightpath/");
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-        // switch on light
-        //////////////////////////////////////////////////////////////////////////////////////
-        if (optSetup->isMainIlluminationShutterAvailable()) {
-            log_text(tr("  - switch main shutter back on!\n"));
-            ok=ok&setMainIlluminationShutter(true, true);
-        }
 
 
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // switch on light
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (optSetup->isMainIlluminationShutterAvailable()) {
+        log_text(tr("  - switch main shutter back on!\n"));
+        ok=ok&setMainIlluminationShutter(true, true);
+    }
 
 
 
