@@ -28,7 +28,6 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     N=0;
     width=0;
     height=0;
-    overview=NULL;
     overviewF=NULL;
     leaveout=NULL;
     statAvg=NULL;
@@ -300,7 +299,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
     bool ok=false;
 
-    if (!overview || !overviewF) return false;
+    if (!overviewF) return false;
 
     if (QFile::exists(filename)) {
         TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
@@ -316,7 +315,6 @@ bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
             if (width*height<=(int64_t)nx*(int64_t)ny) {
                 for (int32_t y=0; y<height; y++) {
                     for (int32_t x=0; x<width; x++) {
-                        overview[y*width+x]=ovw[y*nx+x];
                         overviewF[y*width+x]=ovw[y*nx+x];
                     }
 
@@ -330,9 +328,8 @@ bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
         }
     }
 
-    if (!ok && overview && overviewF) {
+    if (!ok && overviewF) {
         for (int i=0; i<width*height; i++) {
-            overview[i]=0;
             overviewF[i]=0;
         }
     }
@@ -623,17 +620,16 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     yaid_rh::corFileReader *cfr=new yaid_rh::corFileReader(filename.toLocal8Bit().constData(),width,height,steps);
     cfr->processFrames(1);
 
-    allocateContents(width,height,cfr->getTotalLagCount());
+    allocateContents(width,height,cfr->getTotalLagCount()-1);
     //load correlation data
     for(int i=0; i<width*height; i++) {
-        for (int j=0; j<cfr->getTotalLagCount(); j++) {
-            tau[j]=cfr->getTau(i,j)*1e-6;
-            correlations[i*cfr->getTotalLagCount()+j]=cfr->getVal(i,j);
-            sigmas[i*cfr->getTotalLagCount()+j]=0;
+        for (int j=1; j<cfr->getTotalLagCount(); j++) {
+            tau[j-1]=cfr->getTau(i,j)*1e-6;
+            correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j);
+            sigmas[i*(cfr->getTotalLagCount()-1)+j-1]=0;
         }
     }
     for(int i=0; i<width*height; i++) {
-        overview[i]=cfr->getRaw(i,0);
         overviewF[i]=cfr->getRaw(i,0);
     }
     delete cfr;
@@ -703,7 +699,6 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (correlationStdDev) free(correlationStdDev);
     if (sigmas) free(sigmas);
     if (tau) free(tau);
-    if (overview) free(overview);
     if (overviewF) free(overviewF);
     if (leaveout) free(leaveout);
     correlations=NULL;
@@ -711,7 +706,6 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
-    overview=NULL;
     overviewF=NULL;
     leaveout=NULL;
     if ((x>0) && (y>0) && (N>0)) {
@@ -719,7 +713,6 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
         sigmas=(double*)calloc(x*y*N,sizeof(double));
         correlationMean=(double*)calloc(N,sizeof(double));
         correlationStdDev=(double*)calloc(N,sizeof(double));
-        overview=(uint16_t*)calloc(x*y,sizeof(uint16_t));
         overviewF=(double*)calloc(x*y,sizeof(double));
         leaveout=(bool*)calloc(x*y,sizeof(bool));
         tau=(double*)calloc(N,sizeof(double));
@@ -940,8 +933,8 @@ int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
     return (y*width+x)*N;
 }
 
-uint16_t* QFRDRImagingFCSData::getImageFromRunsPreview() const {
-    return overview;
+double* QFRDRImagingFCSData::getImageFromRunsPreview() const {
+    return overviewF;
 }
 
 void QFRDRImagingFCSData::leaveoutClear() {

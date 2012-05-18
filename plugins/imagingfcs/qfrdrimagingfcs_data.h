@@ -198,7 +198,6 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double statSigmaCnt;
 
         /** \brief overview image */
-        uint16_t* overview;
         double* overviewF;
 
         struct ovrImageData {
@@ -248,7 +247,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \copydoc QFRDRImageToRunInterface::xyToIndex() */
         virtual int xyToIndex(int x, int y) const;
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsPreview() */
-        virtual uint16_t* getImageFromRunsPreview() const;
+        virtual double* getImageFromRunsPreview() const;
 
 
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageCount() */

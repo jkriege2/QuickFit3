@@ -1323,13 +1323,8 @@ void QFRDRImagingFCSImageEditor::excludeByIntensity() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
-        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
-        uint16_t* imageIn=m->getImageFromRunsPreview();
-        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
-            image[i]=imageIn[i];
-        }
+        double* image=m->getImageFromRunsPreview();
         excludeByImage(image);
-        free(image);
     }
 }
 
@@ -1439,7 +1434,7 @@ void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
     double value=0;
     if (sender()==pltOverview) {
         name=tr("overview");
-        uint16_t* ovr=m->getImageFromRunsPreview();
+        double* ovr=m->getImageFromRunsPreview();
         if (ovr) value =ovr[idx];
     }
     if (sender()==pltImage) {
@@ -2148,11 +2143,11 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
 
         if (m->getImageFromRunsPreview()) {
             plteOverview->set_autoImageRange(false);
-            uint16_t mi=0, ma=0;
+            double mi=0, ma=0;
             statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, plteImageSize, mi, ma, false);
             plteOverview->set_imageMin(mi);
             plteOverview->set_imageMax(ma);
-            plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+            plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
 
         } else plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
         plteOverview->set_width(w);
@@ -3172,7 +3167,7 @@ void QFRDRImagingFCSImageEditor::copyToMatlab() {
         JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        JKImage<uint16_t> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
         overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
@@ -3254,7 +3249,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
         JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        JKImage<uint16_t> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
         overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());

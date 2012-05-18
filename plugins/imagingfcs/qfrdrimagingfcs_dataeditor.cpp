@@ -327,7 +327,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         plteOverview->set_image(NULL, JKQTFP_uint16, 1, 1);
         plteOverviewSelected->set_data(NULL, 1, 1);
     } else {
-        uint16_t* ov=m->getImageFromRunsPreview();
+        double* ov=m->getImageFromRunsPreview();
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
         double dx=1;
@@ -353,7 +353,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverviewExcluded->set_xmax(w);
         plteOverviewExcluded->set_ymax(h);
-        plteOverview->set_image(ov, JKQTFP_uint16, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        plteOverview->set_image(ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
         if (plteOverviewSelectedData) {
