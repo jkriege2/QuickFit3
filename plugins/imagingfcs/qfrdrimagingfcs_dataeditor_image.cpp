@@ -890,11 +890,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     tbParameterImage->addAction(actImagesDrawCircle);
     tbParameterImage->addAction(actImagesDrawEllipse);
     labImagePositionDisplay=new QLabel(this);
+    labImageAvg=new QLabel(this);
     tbParameterImage->addSeparator();
     spacer=new QWidget(this);
     spacer->setMinimumWidth(20);
     tbParameterImage->addWidget(spacer);
     tbParameterImage->addWidget(labImagePositionDisplay);
+    tbParameterImage->addSeparator();
+    tbParameterImage->addWidget(labImageAvg);
     connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
     actImagesDrawPoints->setChecked(true);
     actImagesZoom->setChecked(true);
@@ -2039,6 +2042,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteGofImageExcluded->set_data(NULL, 1, 1);
         plteMask->set_data(NULL, 1, 1);
         plteMaskSelected->set_data(NULL, 1, 1);
+        labImageAvg->clear();
     } else {
         //uint16_t* ov=m->getDataImagePreview();
         double w=m->getImageFromRunsWidth();
@@ -2046,6 +2050,10 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         if ((w==0) || (h==0)) {
             w=h=1;
         }
+
+        double ovrAvg=0;
+        double ovrVar=0;
+        ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewSelectedData, m->getImageFromRunsPreview(), qMin(plteOverviewSize, plteImageSize));
 
         plteOverviewSelected->set_width(w);
         plteOverviewSelected->set_height(h);
@@ -2055,6 +2063,11 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteOverviewExcluded->set_width(w);
         plteOverviewExcluded->set_height(h);
         plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+
+
+        double imgAvg=0;
+        double imgVar=0;
+        imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewSelectedData, plteImageData, qMin(plteOverviewSize, plteImageSize));
 
         plteImageSelected->set_width(w);
         plteImageSelected->set_height(h);
@@ -2080,6 +2093,10 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteMask->set_width(w);
         plteMask->set_height(h);
         plteMask->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+
+
+        labImageAvg->setTextFormat(Qt::RichText);
+        labImageAvg->setText(tr("avg&plusmn;SD(param img) = %1 &plusmn; %2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avg&plusmn;SD(overview) = %3 &plusmn; %4").arg(imgAvg).arg(sqrt(imgVar)).arg(ovrAvg).arg(sqrt(ovrVar)));
 
 
     }

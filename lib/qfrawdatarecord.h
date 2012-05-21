@@ -198,6 +198,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             qfrdreBooleanMatrix,
             qfrdreInvalid
         };
+
+        static QString evaluationResultType2String(evaluationResultType type);
         /*! \brief this struct is used to store evaluation results associated with this data record
 
             Data is stored in different fields, according to the data type:

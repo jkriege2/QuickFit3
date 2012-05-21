@@ -297,9 +297,9 @@ protected:
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteMaskSelected;
 
-        /** \brief  plotter for overview image */
+        /** \brief  plotter for parameter image */
         JKQtPlotter* pltImage;
-        /** \brief plot for the overview image in pltImage */
+        /** \brief plot for the parameter image in pltImage */
         JKQTPMathImage* plteImage;
         double* plteImageData;
         int32_t plteImageSize;
@@ -350,6 +350,7 @@ protected:
         /** \brief toolbar to work with parameter images */
         QToolBar* tbParameterImage;
         QLabel* labImagePositionDisplay;
+        QLabel* labImageAvg;
         QActionGroup* agImageSelectionActions;
 
         QAction* actImagesZoom;

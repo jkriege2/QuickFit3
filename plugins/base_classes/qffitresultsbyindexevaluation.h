@@ -400,6 +400,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         using QFFitResultsEvaluation::getDefaultFitValue;
         using QFFitResultsEvaluation::getDefaultFitFix;
         using QFFitResultsEvaluation::resetAllFitResultsCurrent;
+        using QFFitResultsEvaluation::resetAllFitResults;
         using QFFitResultsEvaluation::setFitResultGroup;
         using QFFitResultsEvaluation::setFitResultLabel;
         using QFFitResultsEvaluation::setFitResultEvaluationGroup;

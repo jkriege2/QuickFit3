@@ -95,11 +95,16 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 QString en=lastResults[resI].second;
                 QString rname=lastResultNames[resNameI];
                 if (record) {
-                    /*if (record->resultsExists(en, rname)) {
-                        QFRawDataRecord::evaluationResult r=record->resultsGet(en, rname);
-                        return QVariant(record->resultsGetAsString(en, rname));
-                    }*/
-                    return (record->resultsGetAsStringVariant(en, rname));
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, lastResultNames[index.row()]);
+                    if ( (r.type!=QFRawDataRecord::qfrdreNumberVector) && (r.type!=QFRawDataRecord::qfrdreNumberMatrix) &&
+                         (r.type!=QFRawDataRecord::qfrdreNumberErrorVector) && (r.type!=QFRawDataRecord::qfrdreNumberErrorMatrix) &&
+                         (r.type!=QFRawDataRecord::qfrdreIntegerVector) && (r.type!=QFRawDataRecord::qfrdreIntegerMatrix) &&
+                         (r.type!=QFRawDataRecord::qfrdreStringVector) && (r.type!=QFRawDataRecord::qfrdreStringMatrix) &&
+                         (r.type!=QFRawDataRecord::qfrdreBooleanVector) && (r.type!=QFRawDataRecord::qfrdreBooleanMatrix) ) {
+                        return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                    } else {
+                        return QVariant(QString("<")+QFRawDataRecord::evaluationResultType2String(r.type)+QString(">"));
+                    }
                 }
             }else if (resI==lastResults.size()) {
                 double average=0;

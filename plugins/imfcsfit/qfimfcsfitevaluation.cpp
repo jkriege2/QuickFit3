@@ -173,6 +173,8 @@ double* QFImFCSFitEvaluation::allocWeights(bool* weightsOKK, QFRawDataRecord* re
     return weights;
 }
 
+
+
 void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFitFunction* ffunc=getFitFunction();
@@ -558,3 +560,4 @@ QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(QFFitFunction* ffunc, lo
 
     return result;
 }
+

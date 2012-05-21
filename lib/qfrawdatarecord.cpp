@@ -469,6 +469,29 @@ void QFRawDataRecord::readXML(QDomElement& e) {
     if (resultsmodel) resultsmodel->init(this);
 }
 
+QString QFRawDataRecord::evaluationResultType2String(QFRawDataRecord::evaluationResultType type) {
+    switch(type) {
+        case qfrdreNumber: return tr("number");
+        case qfrdreNumberError: return tr("number+error");
+        case qfrdreNumberVector: return tr("number vector");
+        case qfrdreNumberMatrix: return tr("number matrix");
+        case qfrdreNumberErrorVector: return tr("number+error vector");
+        case qfrdreNumberErrorMatrix: return tr("number+error matrix");
+        case qfrdreInteger: return tr("integer");
+        case qfrdreIntegerVector: return tr("integer vector");
+        case qfrdreIntegerMatrix: return tr("integer matrix");
+        case qfrdreString: return tr("string");
+        case qfrdreStringVector: return tr("string vector");
+        case qfrdreStringMatrix: return tr("string matrix");
+        case qfrdreBoolean: return tr("boolean");
+        case qfrdreBooleanVector: return tr("boolean vector");
+        case qfrdreBooleanMatrix: return tr("boolean matrix");
+        case qfrdreInvalid: return tr("invalid");
+    }
+
+    return tr("invalid");
+}
+
 
 void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
     w.writeStartElement("rawdataelement");
@@ -661,6 +684,7 @@ void QFRawDataRecord::resultsClearAll() {
 
 void QFRawDataRecord::resultsClear(const QString& name) {
     if (dstore->results.contains(name)) {
+        //qDebug()<<"resultsClear("<<name<<")";
         dstore->results[name]->results.clear();
         delete dstore->results[name];
         dstore->results.remove(name);

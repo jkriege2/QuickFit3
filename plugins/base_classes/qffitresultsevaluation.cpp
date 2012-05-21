@@ -955,6 +955,19 @@ bool QFFitResultsEvaluation::getDefaultFitFix(const QString& id) {
     return res;
 }
 
+void QFFitResultsEvaluation::resetAllFitResults(QFRawDataRecord *r, const QString &resultID) {
+    QFFitFunction* f=getFitFunction();
+    if (!f || !r) return ;
+    bool doEmit=r->isEmitResultsChangedEnabled();
+    r->disableEmitResultsChanged();
+    /*for (int i=0; i<f->paramCount(); i++) {
+        QString id=f->getParameterID(i);
+        resetDefaultFitValue(r, resultID, id);
+    }*/
+    r->resultsClear(resultID, "");
+    if (doEmit) r->enableEmitResultsChanged(true);
+}
+
 /*! \brief reset the given parameter \a id to the initial/global/default value */
 void QFFitResultsEvaluation::resetDefaultFitValue(const QString& id) {
     /*if (hasFit()) {

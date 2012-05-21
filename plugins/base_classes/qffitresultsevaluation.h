@@ -56,6 +56,7 @@ param_fix=<initial_fix>
 */
 class QFFitResultsEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
     Q_OBJECT
+    Q_INTERFACES(QFFitParameterBasicInterface)
 public:
     /*! \brief class conrtuctor
 
@@ -652,6 +653,8 @@ public:
     virtual double getDefaultFitValue(const QString& id);
     /*! \brief return the default/initial/global fix of a given parameter        */
     virtual bool getDefaultFitFix(const QString& id);
+    /*! \brief reset the all fit results in the given record and resultID therein */
+    virtual void resetAllFitResults(QFRawDataRecord *r, const QString& resultID);
     /*! \brief reset the all fit results to the initial/global/default value in the currently displayed curve/data */
     virtual void resetAllFitResultsCurrent();
     /*! \brief reset the all fit results to the initial/global/default value in all raw data records */
