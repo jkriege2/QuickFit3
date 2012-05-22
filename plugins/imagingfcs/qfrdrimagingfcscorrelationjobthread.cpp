@@ -1018,7 +1018,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         register uint32_t frame=0;
         //float sframe_min=0;
         //float sframe_max=0;
-        uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
+        float* frame_data=(float*)calloc(frame_width*frame_height,sizeof(float));
         for (register uint16 i=0; i<frame_width*frame_height; i++) {
             frame_data[i]=0;
             firstFrames[i]=0;
@@ -1035,7 +1035,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
         } else {
             do {
-                if (!reader->readFrameUINT16(frame_data)) {
+                if (!reader->readFrameFloat(frame_data)) {
                     m_status=-1; emit statusChanged(m_status);
                     emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
                 } else {
@@ -1043,7 +1043,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     float frame_max=frame_data[0];
 
                     for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                        register uint16_t v=frame_data[i];
+                        register float v=frame_data[i];
                         image_series[frame*frame_width*frame_height+i] = v;
                         frame_min=(v<frame_min)?v:frame_min;
                         frame_max=(v>frame_max)?v:frame_max;
@@ -1445,7 +1445,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
         register uint32_t frame=0;
-        uint16_t* frame_data=(uint16_t*)calloc(frame_width*frame_height,sizeof(uint16_t));
+        float* frame_data=(float*)calloc(frame_width*frame_height,sizeof(float));
         for (int64_t i=0; i<frame_width*frame_height; i++)  {
             frame_data[i]=0;
         }
@@ -1456,14 +1456,14 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         }
         frame=0;
         do {
-            if (!reader->readFrameUINT16(frame_data)) {
+            if (!reader->readFrameFloat(frame_data)) {
                 m_status=-1; emit statusChanged(m_status);
                 emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
             } else {
                 float frame_min=frame_data[0];
                 float frame_max=frame_data[0];
                 for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                    register uint16_t v=frame_data[i];
+                    register float v=frame_data[i];
                     frame_min=(v<frame_min)?v:frame_min;
                     frame_max=(v>frame_max)?v:frame_max;
                 }

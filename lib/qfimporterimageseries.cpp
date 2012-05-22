@@ -95,7 +95,8 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
     for (register int i=0; i<w*h; i++) data[i]=0;
     for (register int y=0; y<h*binning; y++) {
         for (register int x=0; x<w*binning; x++) {
-            data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+            const int idx=(y/binning)*w+(x/binning);
+            data[idx]=data[idx]+d1[y*ww+x];
         }
     }
 
