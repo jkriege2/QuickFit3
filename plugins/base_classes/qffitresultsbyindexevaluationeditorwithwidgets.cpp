@@ -1118,7 +1118,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsCurrent() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     dlgFitProgress->setAllowCancel(true);
     dlgFitProgress->display();
-    for (int run=runmin; run<runmax; run++) {
+    for (int run=runmin; run<=runmax; run++) {
         falg->setReporter(dlgFitProgressReporter);
         QString runname=tr("average");
         if (run>=0) runname=QString::number(run);
@@ -1186,7 +1186,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
 
         if (record) {
             //std::cout<<"   corrN="<<data->getCorrelationN()<<"   corrRuns="<<data->getCorrelationRuns()<<"\n";
-            if (run<runmax) {
+            if (run<=runmax) {
                 falg->setReporter(dlgFitProgressReporter);
                 dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
 
@@ -1259,7 +1259,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
             record->setEvaluationIDMetadataInitSize(1000);
             int runmax=eval->getIndexMax(record);
             int runmin=eval->getIndexMin(record);
-            for (int run=runmin; run<runmax; run++) {
+            for (int run=runmin; run<=runmax; run++) {
                 falg->setReporter(dlgFitProgressReporter);
                 QString runname=tr("average");
                 if (run>=0) runname=QString::number(run);
