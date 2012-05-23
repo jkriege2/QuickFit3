@@ -23,10 +23,11 @@ QFExtensionLinearStagePI::QFExtensionLinearStagePI(QObject* parent):
     lengthFactor=6.9e-3;
     velocityFactor=6.9e-3;
     accelerationFactor=6.9e-3;
+    mutexSerial=new QMutex(QMutex::Recursive);
 }
 
 QFExtensionLinearStagePI::~QFExtensionLinearStagePI() {
-
+    delete mutexSerial;
 }
 
 
@@ -198,6 +199,7 @@ void QFExtensionLinearStagePI::showSettingsDialog(unsigned int axis, QWidget* pa
 }
 
 void QFExtensionLinearStagePI::selectAxis(int i) {
+    QMutexLocker lock(mutexSerial);
     if ((i>=0)&&(i<axes.size())) {
         QChar IDx=axes[i].ID;
         if (currentID!=IDx) {
@@ -233,6 +235,7 @@ std::string QFExtensionLinearStagePI::queryCommand(std::string command) {
 }
 
 void QFExtensionLinearStagePI::checkComError() {
+    QMutexLocker lock(mutexSerial);
     if (com.hasErrorOccured()) {
         for (int i=0; i<axes.size(); i++) {
             axes[i].state=QFExtensionLinearStage::Error;
@@ -242,6 +245,7 @@ void QFExtensionLinearStagePI::checkComError() {
 }
 
 void QFExtensionLinearStagePI::calibrateJoysticks() {
+    QMutexLocker lock(mutexSerial);
 
     for (unsigned int axis=0; axis<getAxisCount(); axis++) {
         QMessageBox::StandardButton answer=QMessageBox::question(NULL, tr("PI Mercury C863 joystick calibration"), tr("Do you want to calibrate a joystick on axis %1?").arg(axis), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
@@ -260,6 +264,7 @@ void QFExtensionLinearStagePI::calibrateJoysticks() {
 }
 
 bool QFExtensionLinearStagePI::checkComConnected() {
+    QMutexLocker lock(mutexSerial);
     bool c=com.isConnectionOpen();
     if (!c) {
         log_error(tr(LOG_PREFIX " Could not connect to Mercury C-863 Motor Controller!!!\n"));
@@ -272,10 +277,12 @@ bool QFExtensionLinearStagePI::checkComConnected() {
 }
 
 bool QFExtensionLinearStagePI::isConnected(unsigned int axis) {
+    QMutexLocker lock(mutexSerial);
     return com.isConnectionOpen();
 }
 
 void QFExtensionLinearStagePI::connectDevice(unsigned int axis) {
+    QMutexLocker lock(mutexSerial);
     com.set_port(COMPort.toStdString());
     com.set_baudrate(COMPortSpeed);
     com.set_stopbits(JKSConeStopbit);
@@ -318,6 +325,7 @@ void QFExtensionLinearStagePI::connectDevice(unsigned int axis) {
 }
 
 void QFExtensionLinearStagePI::disconnectDevice(unsigned int axis) {
+    QMutexLocker lock(mutexSerial);
     com.close();
     for (int i=0; i<axes.size(); i++) {
         axes[i].state=QFExtensionLinearStage::Disconnected;
@@ -330,6 +338,7 @@ void QFExtensionLinearStagePI::setLogging(QFPluginLogService* logService) {
 }
 
 void QFExtensionLinearStagePI::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
+    QMutexLocker lock(mutexSerial);
     if (enabled) {
         selectAxis(axis);
         sendCommand("JN"+inttostr((long)round(maxVelocity/velocityFactor)));
@@ -346,6 +355,7 @@ bool QFExtensionLinearStagePI::isJoystickActive(unsigned int axis) {
 }
 
 QFExtensionLinearStage::AxisState QFExtensionLinearStagePI::getAxisState(unsigned int axis)  {
+    QMutexLocker lock(mutexSerial);
 
     std::string failedaxes="";
     if (com.isConnectionOpen()) {
@@ -416,6 +426,7 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI::getAxisState(unsigne
 }
 
 void QFExtensionLinearStagePI::stop(unsigned int axis) {
+    QMutexLocker lock(mutexSerial);
     if (com.isConnectionOpen()) {
         selectAxis(axis);
         sendCommand("AB");
@@ -423,6 +434,7 @@ void QFExtensionLinearStagePI::stop(unsigned int axis) {
 }
 
 double QFExtensionLinearStagePI::getSpeed(unsigned int axis) {
+    QMutexLocker lock(mutexSerial);
     if (com.isConnectionOpen()) {
         selectAxis(axis);
         std::string r=queryCommand("TV")+"\n";
@@ -439,6 +451,7 @@ double QFExtensionLinearStagePI::getSpeed(unsigned int axis) {
 }
 
 double QFExtensionLinearStagePI::getPosition(unsigned int axis) {
+    QMutexLocker lock(mutexSerial);
     if (com.isConnectionOpen()) {
         selectAxis(axis);
         std::string r=queryCommand("TP")+"\n";
@@ -455,6 +468,7 @@ double QFExtensionLinearStagePI::getPosition(unsigned int axis) {
 }
 
 void QFExtensionLinearStagePI::move(unsigned int axis, double newPosition) {
+    QMutexLocker lock(mutexSerial);
     if (com.isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
         long xx=(long)round(newPosition/lengthFactor);
         if (!com.hasErrorOccured()) {

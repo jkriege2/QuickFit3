@@ -162,6 +162,8 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         int COMPortSpeed;
         /** \brief serial connection object */
         JKSerialConnection com;
+
+        QMutex* mutexSerial;
         /** \brief settings of P-Term */
         unsigned int PTerm;
         /** \brief settings of i-Term */
