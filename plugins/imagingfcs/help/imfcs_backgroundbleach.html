@@ -32,7 +32,7 @@
 	  <li><b>cut data into segments:</b> This is the easiest way of reducing bleaching artefacts. Now the correlator cuts the input time series into few pieces of equal size and calculates a correlation function for each of them. The resulting correlation function is then the average over all the segment functions. This methods works, as the influence of bleaching on a shorter segment is smaller than on the whole series.</li>
 	  <li><b>subtract average:</b> This option normalizes the overall intensity of each frame to the average intensity of that pixel in the first 100 frames $$math:\langle I(x,y,t)\rangle_{t=0..100}$$:
 	  <blockquote>
-	    $$math:I(x,y,t)=I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\langle I(x,y,t)\rangle_{x,y}}=I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\overline{I}(t)}$$
+	    $$math:I(x,y,t) = I(x,y,t) \cdot \frac{\langle I(x,y,t)\rangle_{t=0..100}}{\langle I(x,y,t)\rangle_{x,y}} = I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\overline{I}(t)}$$
 	  </blockquote>
 	  See reference <a href="#references">[6]</a> for details on this method.
 	  </li>
@@ -42,7 +42,7 @@
 	  </blockquote>
 	  For each pixel, a fit to a subset of max. 500 frames from complete image series is performed to determine the parameters in the equation above. This fit is automated and unsupervised!!! The results will be stored as TIFF images when the correlation is done. Each pixel may then be corrected according to (See references <a href="#references">[5,6]</a> for details on this method):
 	  <blockquote>
-	    $$math:I(x,y,t)=\frac{I(x,y,t)}{\sqrt{f(t)/f(0)}}+f(0)\cdot\left[1-\sqrt{f(t)/f(0)}\right]$$
+	    $$math:I(x,y,t) = \frac{I(x,y,t)}{\sqrt{f(t)/f(0)}} + f(0) \cdot \left[1-\sqrt{f(t)/f(0)}\right]$$
 	  </blockquote>
       This correction may be used to remove artifacts due to depletion of the reservoir of fluorophores. See references <a href="#references">[5,6]</a> for details on this method.
 	  </li>
