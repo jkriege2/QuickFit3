@@ -26,3 +26,8 @@ INCLUDEPATH += ../../lib/
 
 QT += core
 CONFIG += exceptions rtti stl
+
+SRC_DISTRIBUTED.files = $$HEADERS \
+                        $$SOURCES \
+                        $$FORMS
+
