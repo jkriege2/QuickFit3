@@ -644,13 +644,13 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
     if (getCameraCount()>0) {
         selectCamera(camera);
         SetShutter(1,2,50,50);
-        /* wait for camera(s) temperature to rise up to 5°C */
-        services->log_global_text(tr("%1 heating cameras to 5°C ...\n").arg(LOG_PREFIX));
+        /* wait for camera(s) temperature to rise up to 5C */
+        services->log_global_text(tr("%1 heating cameras to 5C ...\n").arg(LOG_PREFIX));
 
         int temp=getTemperature(i);
         CoolerOFF();
-        services->log_global_text(tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp).arg(LOG_PREFIX).arg(i+1));
-        //std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
+        services->log_global_text(tr("%2 cameras #%3: cooler off, temperature = %1 C ...\n").arg(temp).arg(LOG_PREFIX).arg(i+1));
+        //std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 C ...\n").arg(temp).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
         bool tempOK=false;
 
         QModernProgressDialog progress(tr("\"Heating\" Andor Camera #%1").arg(camera+1), "", NULL);
@@ -661,8 +661,8 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
             tempOK=true;
             int temp1=getTemperature(i);
             //progress.setValue(33);
-            progress.setLabelText(tr("cameras #%2: temperature = %1 °C ...\n").arg(temp1).arg(i+1));
-            //std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 °C ...\n").arg(temp1).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
+            progress.setLabelText(tr("cameras #%2: temperature = %1 C ...\n").arg(temp1).arg(i+1));
+            //std::cout<<tr("%2 cameras #%3: cooler off, temperature = %1 C ...\n").arg(temp1).arg(LOG_PREFIX).arg(i+1).toStdString()<<std::endl;
             if ((temp1<5)&&(temp1!=-999)) tempOK=false;
             QApplication::processEvents();
             //progress.repaint();
@@ -676,8 +676,8 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
         //progress.setValue(100);
         progress.accept();
 
-        services->log_global_text(tr("%1 heating cameras to 5°C ... DONE\n").arg(LOG_PREFIX));
-        //std::cout<<tr("%1 heating cameras to 5°C ... DONE\n").arg(LOG_PREFIX).toStdString()<<std::endl;;
+        services->log_global_text(tr("%1 heating cameras to 5C ... DONE\n").arg(LOG_PREFIX));
+        //std::cout<<tr("%1 heating cameras to 5C ... DONE\n").arg(LOG_PREFIX).toStdString()<<std::endl;;
     }
 
 
@@ -1102,12 +1102,25 @@ int QFExtensionCameraAndor::getTemperature(int cam) {
         return -999;
     } else {
         GetTemperature(&temp1);
-        //std::cout<<tr("%2 cameras #%3: temperature = %1°C ...\n").arg(temp1).arg(LOG_PREFIX).arg(cam+1).toStdString()<<std::endl;
+        //std::cout<<tr("%2 cameras #%3: temperature = %1C ...\n").arg(temp1).arg(LOG_PREFIX).arg(cam+1).toStdString()<<std::endl;
         //if ((temp1<5)&&(temp1!=-999)) tempOK=false;
         return temp1;
     }
 }
 
+float QFExtensionCameraAndor::getTemperatureF(int cam) {
+    float temp1=-999;
+    if (!selectCamera(cam)) {
+        //services->log_global_error(tr("%2 cameras #%1: could not connect ...\n").arg(i+1).arg(LOG_PREFIX));
+        //std::cout<<tr("%2 cameras #%1: could not connect ...\n").arg(cam+1).arg(LOG_PREFIX).toStdString()<<std::endl;
+        return -999;
+    } else {
+        GetTemperatureF(&temp1);
+        //std::cout<<tr("%2 cameras #%3: temperature = %1C ...\n").arg(temp1).arg(LOG_PREFIX).arg(cam+1).toStdString()<<std::endl;
+        //if ((temp1<5)&&(temp1!=-999)) tempOK=false;
+        return temp1;
+    }
+}
 void QFExtensionCameraAndor::storeGlobalSettings() {
     QSettings inifile(GLOBAL_INI, QSettings::IniFormat);
     QMapIterator<int, CameraGlobalSettings> it(camGlobalSettings);
@@ -1274,63 +1287,65 @@ void QFExtensionCameraAndor::setShutterLogging(QFPluginLogService* logService) {
     setLogging(logService);
 }
 
-unsigned int QFExtensionCameraAndor::getMeasuremenDeviceCount()
+unsigned int QFExtensionCameraAndor::getMeasurementDeviceCount()
 {
     return getCameraCount();
 }
 
-void QFExtensionCameraAndor::showMeasuremenDeviceSettingsDialog(unsigned int measuremenDevice, QWidget *parent) {
+void QFExtensionCameraAndor::showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget *parent) {
     QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the camera as measurement device!"));
 }
 
-bool QFExtensionCameraAndor::isMeasuremenDeviceConnected(unsigned int measuremenDevice)
+bool QFExtensionCameraAndor::isMeasurementDeviceConnected(unsigned int measurementDevice)
 {
-    return isConnected(measuremenDevice);
+    return isConnected(measurementDevice);
 }
 
-void QFExtensionCameraAndor::connectMeasuremenDevice(unsigned int measuremenDevice)
+void QFExtensionCameraAndor::connectMeasurementDevice(unsigned int measurementDevice)
 {
 
 }
 
-void QFExtensionCameraAndor::disconnectMeasuremenDevice(unsigned int measuremenDevice)
+void QFExtensionCameraAndor::disconnectMeasurementDevice(unsigned int measurementDevice)
 {
 }
 
-void QFExtensionCameraAndor::setMeasuremenDeviceLogging(QFPluginLogService *logService)
+void QFExtensionCameraAndor::setMeasurementDeviceLogging(QFPluginLogService *logService)
 {
     setLogging(logService);
 }
 
-unsigned int QFExtensionCameraAndor::getMeasuremenDeviceValueCount(unsigned int measuremenDevice)
+unsigned int QFExtensionCameraAndor::getMeasurementDeviceValueCount(unsigned int measurementDevice)
 {
-    if (measuremenDevice<getMeasuremenDeviceCount()) {
+    if (measurementDevice<getMeasurementDeviceCount()) {
         return 1;
     }
     return 0;
 }
 
-QVariant QFExtensionCameraAndor::getMeasuremenDeviceValue(unsigned int measuremenDevice, unsigned int value)
+QVariant QFExtensionCameraAndor::getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value)
 {
-    if (measuremenDevice<getMeasuremenDeviceCount()) {
-        if (value==0)  return getTemperature(measuremenDevice);
+    if (measurementDevice<getMeasurementDeviceCount()) {
+        // WE HAVE TO CHECK WHETHER AN ACQUISITION IS CURRENTLY RUNNING; SO WE DON'T DISTURB THE THREAD!!!
+        CamAndorAcquisitionThread* thread=camThreads.value(measurementDevice, NULL);
+        if (thread && thread->isRunning()) {
+            if (value==0) return  thread->getTemperature();
+        } else {
+            if (value==0)  return double(getTemperatureF(measurementDevice));
+        }
     }
     return QVariant();
 }
 
-QString QFExtensionCameraAndor::getMeasuremenDeviceValueName(unsigned int measuremenDevice, unsigned int value)
+QString QFExtensionCameraAndor::getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value)
 {
-    if (measuremenDevice<getMeasuremenDeviceCount()) {
-        if (value==0)  return tr("Temperature [°C]");
-    }
+    if (value==0)  return tr("Temperature [C]");
     return QString();
 }
 
-QString QFExtensionCameraAndor::getMeasuremenDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
+QString QFExtensionCameraAndor::getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value)
 {
-    if (measuremenDevice<getMeasuremenDeviceCount()) {
-        if (value==0)  QString("temperature_degC");
-    }
+    if (value==0) return QString("temperature_degC");
     return QString();
 }
 

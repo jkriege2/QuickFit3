@@ -27,6 +27,8 @@ class CamAndorAcquisitionThread : public QThread {
         /** \brief duration of acquisition in milliseconds */
         double getDurationMilliseconds() { return duration_msecs; };
 
+        double getTemperature() const;
+
         QStringList getOutputFilenames() { return outputFilenames; }
         QStringList getOutputFilenameTypes() { return outputFilenameTypes; }
     public slots:
@@ -52,6 +54,7 @@ class CamAndorAcquisitionThread : public QThread {
         QString m_log_prefix;
         QStringList outputFilenames;
         QStringList outputFilenameTypes;
+        float temperature;
 
         TinyTIFFFile* tiff;
         QFile* raw;

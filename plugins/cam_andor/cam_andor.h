@@ -115,26 +115,26 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
     // QFExtensionMeasurementDevice routines
     /////////////////////////////////////////////////////////////////////////////
     public:
-        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceCount() */
-        virtual unsigned int getMeasuremenDeviceCount();
-        /** \copydoc QFExtensionMeasurementDevice::showMeasuremenDeviceSettingsDialog() */
-        virtual void showMeasuremenDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL);
-        /** \copydoc QFExtensionMeasurementDevice::isMeasuremenDeviceConnected() */
-        virtual bool isMeasuremenDeviceConnected(unsigned int measuremenDevice);
-        /** \copydoc QFExtensionMeasurementDevice::connectMeasuremenDevice() */
-        virtual void connectMeasuremenDevice(unsigned int measuremenDevice);
-        /** \copydoc QFExtensionMeasurementDevice::disconnectMeasuremenDevice() */
-        virtual void disconnectMeasuremenDevice(unsigned int measuremenDevice);
-        /** \copydoc QFExtensionMeasurementDevice::setMeasuremenDeviceLogging() */
-        virtual void setMeasuremenDeviceLogging(QFPluginLogService* logService);
-        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValueCount() */
-        virtual unsigned int getMeasuremenDeviceValueCount(unsigned int measuremenDevice);
-        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValue() */
-        virtual QVariant getMeasuremenDeviceValue(unsigned int measuremenDevice, unsigned int value);
-        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValueName() */
-        virtual QString getMeasuremenDeviceValueName(unsigned int measuremenDevice, unsigned int value);
-        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValueShortName() */
-        virtual QString getMeasuremenDeviceValueShortName(unsigned int measuremenDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceCount() */
+        virtual unsigned int getMeasurementDeviceCount();
+        /** \copydoc QFExtensionMeasurementDevice::showmeasurementDeviceSettingsDialog() */
+        virtual void showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget* parent=NULL);
+        /** \copydoc QFExtensionMeasurementDevice::ismeasurementDeviceConnected() */
+        virtual bool isMeasurementDeviceConnected(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::connectmeasurementDevice() */
+        virtual void connectMeasurementDevice(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::disconnectmeasurementDevice() */
+        virtual void disconnectMeasurementDevice(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::setmeasurementDeviceLogging() */
+        virtual void setMeasurementDeviceLogging(QFPluginLogService* logService);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueCount() */
+        virtual unsigned int getMeasurementDeviceValueCount(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValue() */
+        virtual QVariant getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueName() */
+        virtual QString getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueShortName() */
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value);
 
 
 
@@ -248,10 +248,10 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief cooler on/off  */
             bool coolerOn;
 
-            /** \brief wait for 5°C when switching off the camera */
+            /** \brief wait for 5C when switching off the camera */
             bool cooling_wait;
 
-            /** \brief set temperature °C */
+            /** \brief set temperature C */
             int setTemperature;
 
             /** \brief mode of the inertanl fan 0: full, 1: low, 2: off */
@@ -410,6 +410,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
         /** \brief get temperature from camera i */
         int getTemperature(int cam);
+        float getTemperatureF(int cam);
 
         /** \brief set the temperature and cooler of the given camera,
          *

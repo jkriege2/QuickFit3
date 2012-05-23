@@ -712,7 +712,9 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
             data[prefix+QString("transmission/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
             data[prefix+QString("transmission/line%1/power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
-            if (saveMeasured) data[prefix+QString("transmission/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
+            if (saveMeasured) {
+                data[prefix+QString("transmission/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
+            }
         }
     }
     if (saveProp.value(1, true) && ui->shutterTransmission->getShutter() && ui->shutterTransmission->getShutter()->isShutterConnected(ui->shutterTransmission->getShutterID())) {
@@ -722,7 +724,9 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
             data[prefix+QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
             data[prefix+QString("laser1/line%1/power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
-            if (saveMeasured) data[prefix+QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
+            if (saveMeasured) {
+                data[prefix+QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
+            }
         }
     }
     if (saveProp.value(3, true) && ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) {
@@ -732,14 +736,22 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
             data[prefix+QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
             data[prefix+QString("laser2/line%1/power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
-            if (saveMeasured) data[prefix+QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
+            if (saveMeasured) {
+                data[prefix+QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
+            }
         }
     }
     if (saveProp.value(5, true) && ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
         data[prefix+"laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
     }
-    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected())
+    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected()) {
         data[prefix+"detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
+        if (saveMeasured) {
+            data[prefix+"detection/filterchanger/filter_name"]=ui->filtcDetection->getCurrentFilter();
+            data[prefix+"detection/filterchanger/filter_manufacturer"]=ui->filtcDetection->getCurrentFilterDescription().manufacturer;
+            data[prefix+"detection/filterchanger/filter_type"]=ui->filtcDetection->getCurrentFilterDescription().type;
+        }
+    }
 
     if (saveMeasured) {
         QFESPIMB040OpticsSetup::measuredValues m=getMeasuredValues();

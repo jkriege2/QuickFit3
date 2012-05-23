@@ -124,6 +124,9 @@ bool CamAndorAcquisitionThread::init(int camera, QString filenamePrefix, int fil
 }
 
 void CamAndorAcquisitionThread::run() {
+
+    GetTemperatureF(&temperature);
+
     bool ok=true;
     selectCamera(m_camera);
     CHECK_NO_RETURN_OK(ok, StartAcquisition(), tr("error while starting acquisition"));
@@ -151,6 +154,7 @@ void CamAndorAcquisitionThread::run() {
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetSpoolProgress(&p), tr("error acquiring spool progress"));
                 progress=100.0*(double)p/(double)m_numKinetics;
+                GetTemperatureF(&temperature);
                 wait(qMin(1, (int)round(m_numKinetics/1000*m_exposureTime)));
             }
         } else {
@@ -166,6 +170,8 @@ void CamAndorAcquisitionThread::run() {
             uint16_t* imageBuffer=(uint16_t*)calloc(m_width*m_height, sizeof(uint16_t));
             QTime duration;
             duration.start();
+            QTime ttimer;
+            ttimer.start();
             while ((!canceled) && ok && (status==DRV_ACQUIRING)) {
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
@@ -182,6 +188,10 @@ void CamAndorAcquisitionThread::run() {
                     if (imageCount%(m_numKinetics/1000)==0) progress=100.0*(double)imageCount/(double)m_numKinetics;
                 } else {
                     progress=100.0*(double)imageCount/(double)m_numKinetics;
+                }
+                if (ttimer.elapsed()>500)  {
+                    GetTemperatureF(&temperature);
+                    ttimer.start();
                 }
             }
 
@@ -200,5 +210,9 @@ void CamAndorAcquisitionThread::run() {
         if (canceled) CHECK_NO_RETURN_OK(ok, AbortAcquisition(), tr("error while aborting acquisition"));
     }
 
+}
+
+double CamAndorAcquisitionThread::getTemperature() const {
+    return temperature;
 }
 

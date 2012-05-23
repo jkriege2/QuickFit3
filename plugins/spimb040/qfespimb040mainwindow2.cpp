@@ -1685,10 +1685,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                     time.start();
                 }
 
-                if (time1.elapsed()>500) {
-                    measured.append(optSetup->getMeasuredValues());
-                    time1.start();
-                }
+
 
                 QApplication::processEvents();
 
@@ -1715,13 +1712,13 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             ecamera1->getAcquisitionDescription(camera1, &backgroundFiles1, &backgroundDescription1);
             log_text(tr("  - acquired background image from camera 1!\n"));
             acquisitionDescription1["background_timestamp"]=time;
-            optSetup->saveLightpathConfig(backgroundDescription1, "", "lightpath/");
+            optSetup->saveLightpathConfig(backgroundDescription1, "", "lightpath/", QList<bool>(), true);
         }
         if (ok && useCam2) {
             ecamera2->getAcquisitionDescription(camera2, &backgroundFiles2, &backgroundDescription2);
             log_text(tr("  - acquired background image from camera 2!\n"));
             acquisitionDescription2["background_timestamp"]=time;
-            optSetup->saveLightpathConfig(backgroundDescription2, "", "lightpath/");
+            optSetup->saveLightpathConfig(backgroundDescription2, "", "lightpath/", QList<bool>(), true);
         }
 
 
@@ -1754,7 +1751,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription1["overview/image_height"]=ecamera1->getImageHeight(camera1);
                 acquisitionDescription1["overview/exposure_time"]=ecamera1->getExposureTime(camera1);
                 acquisitionDescription1["overview/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription1, "", "overview/lightpath/");
+                optSetup->saveLightpathConfig(acquisitionDescription1, "", "overview/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview before acquisition  with preview settings";
                 d.name=acquisitionPrefix1+"_overview.tif";
@@ -1782,7 +1779,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription2["overview/image_height"]=ecamera2->getImageHeight(camera2);
                 acquisitionDescription2["overview/exposure_time"]=ecamera2->getExposureTime(camera2);
                 acquisitionDescription2["overview/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription2, "", "overview/lightpath/");
+                optSetup->saveLightpathConfig(acquisitionDescription2, "", "overview/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview before acquisition  with preview settings";
                 d.name=acquisitionPrefix2+"_overview.tif";
@@ -1846,12 +1843,17 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             }
         }
         bool running=ok;
+        QTime time1;
+        time1.start();
         while (running) {
             int prog1=99, prog2=99;
             if (useCam1) prog1=ecamera1->getAcquisitionProgress(camera1);
             if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
             progress.setValue(qMin(prog1,prog2));
-
+            if (time1.elapsed()>500) {
+                measured.append(optSetup->getMeasuredValues());
+                time1.start();
+            }
             QApplication::processEvents();
 
             if (progress.wasCanceled()) {
@@ -1902,7 +1904,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription1["overview_after/image_height"]=ecamera1->getImageHeight(camera1);
                 acquisitionDescription1["overview_after/exposure_time"]=ecamera1->getExposureTime(camera1);
                 acquisitionDescription1["overview_after/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription1, "", "overview_after/lightpath/");
+                optSetup->saveLightpathConfig(acquisitionDescription1, "", "overview_after/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview with preview settings";
                 d.name=acquisitionPrefix1+"_overview_after.tif";
@@ -1930,7 +1932,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription2["overview_after/image_height"]=ecamera2->getImageHeight(camera2);
                 acquisitionDescription2["overview_after/exposure_time"]=ecamera2->getExposureTime(camera2);
                 acquisitionDescription2["overview_after/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription2, "", "overview_after/lightpath/");
+                optSetup->saveLightpathConfig(acquisitionDescription2, "", "overview_after/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview after acquisition with preview settings";
                 d.name=acquisitionPrefix2+"_overview_after.tif";
@@ -2229,7 +2231,7 @@ QString QFESPIMB040MainWindow2::saveMeasuredData(const QString& filenamePrefix, 
         out.setCodec(QTextCodec::codecForName("ISO-8859-1"));
         out.setLocale(QLocale::c());
         QStringList columns;
-        columns<<"time [s]"<<"time_absolute";
+        columns<<"time [s]";
         for (int i=0; i<data.size(); i++) {
             QMapIterator <QString, QVariant> it1(data[i].data);
             while (it1.hasNext()) {
@@ -2246,7 +2248,7 @@ QString QFESPIMB040MainWindow2::saveMeasuredData(const QString& filenamePrefix, 
         out<<"\n";
         for (int i=0; i<data.size(); i++) {
             out<<double(data[0].time.msecsTo(data[i].time))/1000.0;
-            out<<",\t\""<<data[0].time.toString("yyyy.MM.dd-hh:mm:ss.zzz")<<"\"";
+            //out<<",\t\""<<data[0].time.toString("yyyy.MM.dd-hh:mm:ss.zzz")<<"\"";
             for (int j=2; j<columns.size(); j++) {
                 QVariant v=data[i].data.value(columns[j], QVariant());
                 out<<",\t";

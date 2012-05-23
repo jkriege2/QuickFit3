@@ -17,6 +17,7 @@ void QFESPIMB040SimpleCameraConfig::viewDataStruct::reset() {
     usedCamera=0;
     timestamp=0;
     exposureTime=0;
+    measurementDevice=NULL;
 }
 
 
@@ -362,7 +363,7 @@ void QFESPIMB040SimpleCameraConfig::displayStates(QFESPIMB040SimpleCameraConfig:
 }
 
 
-bool QFESPIMB040SimpleCameraConfig::connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera) {
+bool QFESPIMB040SimpleCameraConfig::connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera, QObject* object) {
 
     viewData.reset();
 
@@ -373,7 +374,7 @@ bool QFESPIMB040SimpleCameraConfig::connectDevice(QFExtension* extension, QFExte
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         viewData.extension=extension;
         viewData.camera=cam;
-        viewData.measurementDevice=qobject_cast<QFExtensionMeasurementDevice*>(dynamic_cast<QObject*>(viewData.extension));
+        viewData.measurementDevice=qobject_cast<QFExtensionMeasurementDevice*>(object);
         viewData.usedCamera=camera;
         cam->setLogging(m_log);
         bool s=cam->connectDevice(camera);
@@ -446,7 +447,7 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
         if (actDisConnect->isChecked()) {
             // connect to a device
 
-            connectDevice(cmbAcquisitionDevice->currentExtension(), cmbAcquisitionDevice->currentExtensionCamera(), cmbAcquisitionDevice->currentCameraID());
+            connectDevice(cmbAcquisitionDevice->currentExtension(), cmbAcquisitionDevice->currentExtensionCamera(), cmbAcquisitionDevice->currentCameraID(), cmbAcquisitionDevice->currentCameraQObject());
             if (!cam->isConnected(camIdx)) {
                 displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
                 if (m_log) m_log->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
@@ -649,10 +650,12 @@ bool QFESPIMB040SimpleCameraConfig::isCameraConnected() const {
 void QFESPIMB040SimpleCameraConfig::storeMeasurements(QMap<QString, QVariant> &data, const QString &prefix) {
     QFExtensionMeasurementDevice* md=viewData.measurementDevice;
     int camIdx=viewData.usedCamera;
-
+    //qDebug()<<"camera   extension="<<viewData.extension<<"   md="<<viewData.measurementDevice<<"   camIdx="<<camIdx<<"    md="<<md;
     if (md) {
-        for (int i=0; i<md->getMeasuremenDeviceValueCount(camIdx); i++) {
-            data[prefix+md->getMeasuremenDeviceValueShortName(camIdx, i)]=md->getMeasuremenDeviceValue(camIdx, i);
+        //qDebug()<<"camera"<<camIdx<<" is measurement device connected: "<<md->isMeasurementDeviceConnected(camIdx);
+        for (unsigned int i=0; i<md->getMeasurementDeviceValueCount(camIdx); i++) {
+            data[prefix+md->getMeasurementDeviceValueShortName(camIdx, i)]=md->getMeasurementDeviceValue(camIdx, i);
+            //qDebug()<<"   "<<i+1<<"/"<<md->getMeasurementDeviceValueCount(camIdx)<<":   "<<prefix+md->getMeasurementDeviceValueShortName(camIdx, i)<<"="<<md->getMeasurementDeviceValue(camIdx, i);
         }
     }
 }

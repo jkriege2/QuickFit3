@@ -239,7 +239,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
             \param camera the camera inside \a device to connect to
             \return \c true on success
         */
-        bool connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera);
+        bool connectDevice(QFExtension* extension, QFExtensionCamera* cam, int camera, QObject* object);
         /*! \brief acquire a single image from the device connected to the fiven \a camView and store it in rawImages
 
             \param camView work with the given camera view

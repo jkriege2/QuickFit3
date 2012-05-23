@@ -19,7 +19,7 @@ class QFExtensionMeasurementDevice {
 
 
         /** \brief return the number of measurement devices */
-        virtual unsigned int getMeasuremenDeviceCount()=0;
+        virtual unsigned int getMeasurementDeviceCount()=0;
 
 
         /*! \brief displays a modal dialog which allows the user to set the configuration options
@@ -30,28 +30,28 @@ class QFExtensionMeasurementDevice {
             \param[in] measuremenDevice the measuremenDevice for which to display the dialog
             \param[in] parent parent widget for the returned QWidget
          */
-         virtual void showMeasuremenDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL)=0;
+         virtual void showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL)=0;
          /** \brief returns \c true if the measuremenDevice is connected */
-         virtual bool isMeasuremenDeviceConnected(unsigned int measuremenDevice)=0;
+         virtual bool isMeasurementDeviceConnected(unsigned int measuremenDevice)=0;
          /** \brief connect to the device/activate it */
-         virtual void connectMeasuremenDevice(unsigned int measuremenDevice)=0;
+         virtual void connectMeasurementDevice(unsigned int measuremenDevice)=0;
          /** \brief disconnect from the device/activate it */
-         virtual void disconnectMeasuremenDevice(unsigned int measuremenDevice)=0;
+         virtual void disconnectMeasurementDevice(unsigned int measuremenDevice)=0;
          /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
-         virtual void setMeasuremenDeviceLogging(QFPluginLogService* logService)=0;
+         virtual void setMeasurementDeviceLogging(QFPluginLogService* logService)=0;
 
 
         /** \brief return the number of measured values in a measurement devices */
-        virtual unsigned int getMeasuremenDeviceValueCount(unsigned int measuremenDevice)=0;
+        virtual unsigned int getMeasurementDeviceValueCount(unsigned int measuremenDevice)=0;
 
         /** \brief return a measured value from a specified measuremen devices */
-        virtual QVariant getMeasuremenDeviceValue(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)=0;
 
         /** \brief return a name for the specified measuremen devices (human-readable)  */
-        virtual QString getMeasuremenDeviceValueName(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QString getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)=0;
 
         /** \brief return a short name for the specified measuremen devices (for config-files etc. ... i.e. no space etc.)  */
-        virtual QString getMeasuremenDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)=0;
 
 
 };
