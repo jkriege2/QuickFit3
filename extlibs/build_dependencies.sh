@@ -105,8 +105,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf lmfit-3.2.tar -C ./build/
 	cd build/lmfit-3.2
-	
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit
+	export LDFLAGS="${LDFLAGS} -fPIC "
+        export CFLAGS="${CFLAGS} -fPIC "
+        export CPPFLAGS="${CPPFLAGS} -fPIC"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit 
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
