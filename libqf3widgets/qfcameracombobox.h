@@ -30,6 +30,7 @@ class QFWIDLIB_EXPORT QFCameraComboBox : public QEnhancedComboBox {
         QFExtension* currentExtension() const;
         /** \brief return the currently selected camera extension as QFExtensionCamera */
         QFExtensionCamera* currentExtensionCamera() const;
+        QObject* currentCameraQObject() const;
         /** \brief return the ID of the current camera device inside a QFExtensionCamera */
         int currentCameraID() const;
     public slots:

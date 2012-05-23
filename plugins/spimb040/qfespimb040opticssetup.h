@@ -25,6 +25,7 @@
 #include "qcheckablestringlistmodel.h"
 #include "qftablemodel.h"
 #include "qprogresslistwidget.h"
+#include "qfextensionmeasurementdevice.h"
 
 
 class QFESPIMB040MainWindow; // forward
@@ -147,10 +148,23 @@ class QFESPIMB040OpticsSetup : public QWidget {
         QString getCurrentLightpath() const;
         QString getCurrentLightpathFilename() const;
         void ensureLightpath();
+
+        struct measuredValues {
+            QDateTime time;
+            QMap<QString, QVariant> data;
+
+            measuredValues() {
+                time=QDateTime::currentDateTime();
+                data.clear();
+            }
+        };
+
+        /** \brief collect all available measureable values (laser powers etz.) */
+        measuredValues getMeasuredValues();
     public slots:
         void loadLightpathConfig(const QString& filename, bool waiting=false);
-        void saveLightpathConfig(const QString& filename, const QString &name, const QList<bool> &saveProp=QList<bool>());
-        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), const QList<bool>& saveProp=QList<bool>());
+        void saveLightpathConfig(const QString& filename, const QString &name, const QList<bool> &saveProp=QList<bool>(), bool saveMeasured=false);
+        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), const QList<bool>& saveProp=QList<bool>(), bool saveMeasured=false);
         void saveCurrentLightpatConfig();
         void deleteCurrentLightpatConfig();
         void emitLighpathesChanged();

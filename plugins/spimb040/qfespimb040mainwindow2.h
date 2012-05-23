@@ -126,7 +126,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
             \param files files that have been stored (see  QFExtensionCamera::AcquititonFileDescription)
             \return filename of the settings file
         */
-        QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime);
+        QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix=QString(""), const QString& prefix=QString(""));
+        QString saveMeasuredData(const QString &filenamePrefix, const QList<QFESPIMB040OpticsSetup::measuredValues> &data);
 
     protected slots:
         /*! \brief runs an image acquisition

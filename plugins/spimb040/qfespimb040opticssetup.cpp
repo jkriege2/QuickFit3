@@ -203,7 +203,7 @@ double QFESPIMB040OpticsSetup::getCameraMagnification(int setup_cam) const {
     return 1;
 }
 
-QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam ) const {
+QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
     QMap<QString, QVariant> setup;
 
     FilterDescription filter=ui->filtDetection->filter();
@@ -613,7 +613,7 @@ QString QFESPIMB040OpticsSetup::getCurrentLightpath() const {
 }
 
 
-void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp) {
+void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp, bool saveMeasured) {
     { // this block ensures that set is destroyed (and the file written) before updateItems() is called
         QSettings set(filename, QSettings::IniFormat);
         set.clear();
@@ -621,7 +621,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const 
 
 
         QMap<QString, QVariant> data;
-        saveLightpathConfig(data, name, QString(""), saveProp);
+        saveLightpathConfig(data, name, QString(""), saveProp, saveMeasured);
         QMap<QString, QVariant>::iterator i=data.begin();
         for (i = data.begin(); i != data.end(); ++i) {
             set.setValue(i.key(), i.value());
@@ -673,7 +673,7 @@ void QFESPIMB040OpticsSetup::ensureLightpath() {
     ui->cmbLightpathConfig->setEnabled(true);
    //qDebug()<<"ensureLightpath(): enabled";
     unlockLightpath();
-   //qDebug()<<"ensureLightpath(): unlocked";
+    //qDebug()<<"ensureLightpath(): unlocked";
 }
 
 
@@ -702,7 +702,8 @@ void QFESPIMB040OpticsSetup::ensureLightpath() {
 
 
 
-void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix, const QList<bool>& saveProp) {
+
+void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix, const QList<bool>& saveProp, bool saveMeasured) {
     data[prefix+"name"]=name;
 
 
@@ -711,6 +712,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
             data[prefix+QString("transmission/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
             data[prefix+QString("transmission/line%1/power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
+            if (saveMeasured) data[prefix+QString("transmission/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
         }
     }
     if (saveProp.value(1, true) && ui->shutterTransmission->getShutter() && ui->shutterTransmission->getShutter()->isShutterConnected(ui->shutterTransmission->getShutterID())) {
@@ -720,6 +722,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
             data[prefix+QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
             data[prefix+QString("laser1/line%1/power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
+            if (saveMeasured) data[prefix+QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
         }
     }
     if (saveProp.value(3, true) && ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) {
@@ -729,6 +732,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
         for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
             data[prefix+QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
             data[prefix+QString("laser2/line%1/power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
+            if (saveMeasured) data[prefix+QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
         }
     }
     if (saveProp.value(5, true) && ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
@@ -737,6 +741,17 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, 
     if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected())
         data[prefix+"detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
 
+    if (saveMeasured) {
+        QFESPIMB040OpticsSetup::measuredValues m=getMeasuredValues();
+        QMapIterator<QString, QVariant> it(m.data);
+        while (it.hasNext()) {
+            it.next();
+            if (!data.contains(prefix+it.key())) {
+                data[prefix+it.key()]=it.value();
+            }
+        }
+
+    }
 }
 
 void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
@@ -917,4 +932,35 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
     ui->lsTransmission->unlockLightSource();
     ui->filtcDetection->unlockFilterChangers();
    //qDebug()<<"unlocking lightpath done";
+}
+
+
+QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues() {
+    QFESPIMB040OpticsSetup::measuredValues m;
+    for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
+        m.data[QString("transmission/line%1/set_power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
+        m.data[QString("transmission/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
+    }
+
+    for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
+        m.data[QString("laser1/line%1/set_power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
+        m.data[QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
+    }
+
+    for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
+        m.data[QString("laser2/line%1/set_power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
+        m.data[QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
+    }
+
+    m.data["stagex/position"]=ui->stageSetup->getXStage()->getPosition(ui->stageSetup->getXStageAxis());
+    m.data["stagex/velocity"]=ui->stageSetup->getXStage()->getSpeed(ui->stageSetup->getXStageAxis());
+    m.data["stagey/position"]=ui->stageSetup->getYStage()->getPosition(ui->stageSetup->getYStageAxis());
+    m.data["stagey/velocity"]=ui->stageSetup->getYStage()->getSpeed(ui->stageSetup->getYStageAxis());
+    m.data["stagez/position"]=ui->stageSetup->getZStage()->getPosition(ui->stageSetup->getZStageAxis());
+    m.data["stagez/velocity"]=ui->stageSetup->getZStage()->getSpeed(ui->stageSetup->getZStageAxis());
+
+    ui->camConfig1->storeMeasurements(m.data, "camera1/");
+    ui->camConfig2->storeMeasurements(m.data, "camera2/");
+
+    return m;
 }

@@ -45,7 +45,8 @@ HEADERS += spimb040.h \
     qfespimb040filenametool.h \
     qfcameraconfigwidget.h \
     qfespimb040lightpathsavedialog.h \
-    ../base_classes/qftablemodel.h
+    ../base_classes/qftablemodel.h \
+    ../interfaces/qfextensionmeasurementdevice.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \

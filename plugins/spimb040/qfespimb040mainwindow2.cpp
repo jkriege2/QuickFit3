@@ -156,6 +156,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
     }
 
     QDateTime startDateTime=QDateTime::currentDateTime();
+    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
 
 
 
@@ -657,6 +658,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                         running=false;
                         log_warning(tr("  - acquisition canceled by user!\n"));
                     } else {
+                        measured.append(optSetup->getMeasuredValues());
                         for (int lp=0; lp<lightpathList.size(); lp++) {
                             if (lightpathList.size()>1 || lp==0) {
                                 if (!lightpathList[lp].isEmpty() && QFile::exists(lightpathList[lp])) {
@@ -665,7 +667,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                     log_text(tr(" DONE\n"));
                                 }
                                 if (posIdx<=0) {
-                                    optSetup->saveLightpathConfig(acquisitionDescription, lightpathNames[lp], QString("lightpath%1/").arg(lp+1));
+                                    optSetup->saveLightpathConfig(acquisitionDescription, lightpathNames[lp], QString("lightpath%1/").arg(lp+1), QList<bool>(), true);
                                 }
                             }
                             for (int img=0; img<widImageStack->images(); img++) {
@@ -847,6 +849,15 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 log_error(tr("  - could not write positions file '%1' for camera 1: %2 ...").arg(PositionsFilename).arg(posFile.errorString()));
             }
 
+            QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix1, measured);
+            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                QFExtensionCamera::AcquititonFileDescription d;
+                d.name=MeasurementsFilename;
+                d.description="measureable properties of setup";
+                d.type="CSV";
+                files.append(d);
+            }
+
             log_text(tr("  - writing acquisition description 1 ..."));
             savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files, startDateTime);
             log_text(tr(" DONE!\n"));
@@ -877,6 +888,14 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 log_error(tr("  - could not write positions file '%1' for camera 2: %2 ...").arg(PositionsFilename).arg(posFile.errorString()));
             }
 
+            QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix2, measured);
+            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                QFExtensionCamera::AcquititonFileDescription d;
+                d.name=MeasurementsFilename;
+                d.description="measureable properties of setup";
+                d.type="CSV";
+                files.append(d);
+            }
 
             log_text(tr("  - writing acquisition description 2 ..."));
             savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files, startDateTime);
@@ -919,6 +938,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
     }
 
     QDateTime startDateTime=QDateTime::currentDateTime();
+    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
 
 
     bool ok=true;
@@ -1177,6 +1197,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                             timAcquisition.start();
                             timStart=QDateTime::currentDateTime();
                         }
+                        measured.append(optSetup->getMeasuredValues());
                         if (useCam1) {
                             if (ecamera1->acquire(camera1, buffer1)) {
                                 TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
@@ -1334,6 +1355,15 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                 log_error(tr("  - could not write parameter values file '%1' for camera 2: %2 ...").arg(ParamValuesFilename).arg(posFile.errorString()));
             }
 
+            QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix2, measured);
+            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                QFExtensionCamera::AcquititonFileDescription d;
+                d.name=MeasurementsFilename;
+                d.description="measureable properties of setup";
+                d.type="CSV";
+                files.append(d);
+            }
+
 
             log_text(tr("  - writing acquisition description 2 ..."));
             savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files, startDateTime);
@@ -1452,6 +1482,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     if (!(widAcquisition->use1() || widAcquisition->use2())) return;
 
     QDateTime startDateTime=QDateTime::currentDateTime();
+    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
 
     bool ok=true;
     log_text(tr("starting image series acquisition:\n"));
@@ -1631,6 +1662,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             progress.setLabelText(tr("acquiring background images ..."));
             log_text(tr("  - acquiring background frames!\n"));
             QTime time=QTime::currentTime();
+            QTime time1=QTime::currentTime();
             if (useCam1) {
                 ok=ecamera1->startAcquisition(camera1);
                 if (!ok) {
@@ -1651,6 +1683,11 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                     if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
                     progress.setValue(qMin(prog1,prog2));
                     time.start();
+                }
+
+                if (time1.elapsed()>500) {
+                    measured.append(optSetup->getMeasuredValues());
+                    time1.start();
                 }
 
                 QApplication::processEvents();
@@ -1940,6 +1977,16 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription1["background/"+it.key()]=it.value();
             }
         }
+
+        QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix1, measured);
+        if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+            QFExtensionCamera::AcquititonFileDescription d;
+            d.name=MeasurementsFilename;
+            d.description="measureable properties of setup";
+            d.type="CSV";
+            moreFiles1.append(d);
+        }
+
         saveAcquisitionDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1, startDateTime, false);
         log_text(tr(" DONE!\n"));
     }
@@ -1957,6 +2004,14 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             if ( (!acquisitionDescription2.contains(it.key())) || (acquisitionDescription2.value(it.key(), it.value())!=it.value()) ) {
                 acquisitionDescription2["background/"+it.key()]=it.value();
             }
+        }
+        QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix2, measured);
+        if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+            QFExtensionCamera::AcquititonFileDescription d;
+            d.name=MeasurementsFilename;
+            d.description="measureable properties of setup";
+            d.type="CSV";
+            moreFiles2.append(d);
         }
         saveAcquisitionDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2, startDateTime, false);
         log_text(tr(" DONE!\n"));
@@ -2084,9 +2139,11 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 }
 
 
-QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime) {
+QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix, const QString& prefix) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
+
+    settings.beginGroup(prefix);
 
     double magnification=optSetup->getCameraMagnification(use_cam);
 
@@ -2124,9 +2181,9 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
             it.next();
             if (!it.value().toString().isEmpty()) {
                 if (it.value().type()==QVariant::List) {
-                    settings.setValue("setup/"+it.key(), jkVariantListToString(it.value().toList(), "; "));
+                    settings.setValue(lightpathPrefix+"setup/"+it.key(), jkVariantListToString(it.value().toList(), "; "));
                 } else {
-                    settings.setValue("setup/"+it.key(), it.value().toString());
+                    settings.setValue(lightpathPrefix+"setup/"+it.key(), it.value().toString());
                 }
 
             }
@@ -2160,6 +2217,63 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
 
     settings.sync();
     return iniFilename;
+}
+
+
+QString QFESPIMB040MainWindow2::saveMeasuredData(const QString& filenamePrefix, const QList<QFESPIMB040OpticsSetup::measuredValues>& data) {
+    QString csvFilename=filenamePrefix+".measured.dat";
+
+    QFile file(csvFilename);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out.setCodec(QTextCodec::codecForName("ISO-8859-1"));
+        out.setLocale(QLocale::c());
+        QStringList columns;
+        columns<<"time [s]"<<"time_absolute";
+        for (int i=0; i<data.size(); i++) {
+            QMapIterator <QString, QVariant> it1(data[i].data);
+            while (it1.hasNext()) {
+                it1.next();
+                if (!columns.contains(it1.key())) columns<<it1.key();
+            }
+        }
+
+        out<<"# ";
+        for (int c=0; c<columns.size(); c++) {
+            if (c>0) out<<",\t";
+            out<<columns[c];
+        }
+        out<<"\n";
+        for (int i=0; i<data.size(); i++) {
+            out<<double(data[0].time.msecsTo(data[i].time))/1000.0;
+            out<<",\t\""<<data[0].time.toString("yyyy.MM.dd-hh:mm:ss.zzz")<<"\"";
+            for (int j=2; j<columns.size(); j++) {
+                QVariant v=data[i].data.value(columns[j], QVariant());
+                out<<",\t";
+                if (   v.type()==QVariant::Bool
+                       || v.type()==QVariant::Char
+                       || v.type()==QVariant::Int
+                       || v.type()==QVariant::LongLong ) {
+                    out<<v.toLongLong();
+
+                } else if ( v.type()==QVariant::UInt || v.type()==QVariant::ULongLong ) {
+                    out<<v.toULongLong();
+                } else if ( v.type()==QVariant::Double ) {
+                    out<<v.toDouble();
+                } else if (v.canConvert(QVariant::String)) {
+                    out<<"\""<<v.toString()<<"\"";
+                }
+            }
+            out<<"\n";
+        }
+        file.close();
+
+    } else {
+        csvFilename="";
+    }
+
+
+    return csvFilename;
 }
 
 void QFESPIMB040MainWindow2::log_text(QString message) {

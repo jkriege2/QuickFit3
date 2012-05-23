@@ -25,7 +25,8 @@ HEADERS += cam_andor.h \
            andorsettingsdialog.h \
            andortools.h \
            ../../../../../LIB/trunk/tinytiffwriter.h \
-           ../interfaces/qfextensionshutter.h
+           ../interfaces/qfextensionshutter.h \
+    ../interfaces/qfextensionmeasurementdevice.h
 
 SOURCES += cam_andor.cpp \
            camandoracquisitionthread.cpp \

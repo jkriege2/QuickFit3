@@ -1274,6 +1274,66 @@ void QFExtensionCameraAndor::setShutterLogging(QFPluginLogService* logService) {
     setLogging(logService);
 }
 
+unsigned int QFExtensionCameraAndor::getMeasuremenDeviceCount()
+{
+    return getCameraCount();
+}
+
+void QFExtensionCameraAndor::showMeasuremenDeviceSettingsDialog(unsigned int measuremenDevice, QWidget *parent) {
+    QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the camera as measurement device!"));
+}
+
+bool QFExtensionCameraAndor::isMeasuremenDeviceConnected(unsigned int measuremenDevice)
+{
+    return isConnected(measuremenDevice);
+}
+
+void QFExtensionCameraAndor::connectMeasuremenDevice(unsigned int measuremenDevice)
+{
+
+}
+
+void QFExtensionCameraAndor::disconnectMeasuremenDevice(unsigned int measuremenDevice)
+{
+}
+
+void QFExtensionCameraAndor::setMeasuremenDeviceLogging(QFPluginLogService *logService)
+{
+    setLogging(logService);
+}
+
+unsigned int QFExtensionCameraAndor::getMeasuremenDeviceValueCount(unsigned int measuremenDevice)
+{
+    if (measuremenDevice<getMeasuremenDeviceCount()) {
+        return 1;
+    }
+    return 0;
+}
+
+QVariant QFExtensionCameraAndor::getMeasuremenDeviceValue(unsigned int measuremenDevice, unsigned int value)
+{
+    if (measuremenDevice<getMeasuremenDeviceCount()) {
+        if (value==0)  return getTemperature(measuremenDevice);
+    }
+    return QVariant();
+}
+
+QString QFExtensionCameraAndor::getMeasuremenDeviceValueName(unsigned int measuremenDevice, unsigned int value)
+{
+    if (measuremenDevice<getMeasuremenDeviceCount()) {
+        if (value==0)  return tr("Temperature [°C]");
+    }
+    return QString();
+}
+
+QString QFExtensionCameraAndor::getMeasuremenDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
+{
+    if (measuremenDevice<getMeasuremenDeviceCount()) {
+        if (value==0)  QString("temperature_degC");
+    }
+    return QString();
+}
+
 Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)
 
 

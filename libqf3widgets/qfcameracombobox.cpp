@@ -86,6 +86,21 @@ QFExtensionCamera* QFCameraComboBox::currentExtensionCamera() const {
     return cam;
 }
 
+QObject *QFCameraComboBox::currentCameraQObject() const {
+    if (currentIndex()<0) {
+        return NULL;
+    }
+
+    QPoint p = itemData(currentIndex()).toPoint();
+    QFExtension* extension=NULL;
+    QFExtensionCamera* cam=NULL;
+    //int camIdx=p.y();
+    if ((p.x()>=0)&&(p.x()<cameras.size())) {
+        return cameras[p.x()];
+    }
+    return NULL;
+}
+
 int QFCameraComboBox::currentCameraID() const {
     if (currentIndex()<0) {
         return -1;

@@ -32,6 +32,7 @@
 #include "tools.h"
 #include "qfcameracombobox.h"
 #include "qfcameraconfigcombobox.h"
+#include "qfextensionmeasurementdevice.h"
 
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
@@ -91,6 +92,12 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         void disconnectCamera();
         bool isCameraConnected() const;
 
+        /** \brief if the camera has measureable values, these are stored in the given array by this function
+         *
+         *  If the camera is locked: Make sure to only call this from the thread that locked the camera, as it may NOT be thread safe!!!
+         */
+        void storeMeasurements(QMap<QString, QVariant>& data, const QString& prefix=QString(""));
+
         QFCameraComboBox* cameraComboBox() const { return cmbAcquisitionDevice; }
     public slots:
         void setReadOnly(bool readonly);
@@ -144,6 +151,8 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
             QFExtension* extension;
             /** \brief typecast of extension to QFExtensionCamera */
             QFExtensionCamera* camera;
+            /** \brief typecast of extension to QFExtensionMeasurementDevice */
+            QFExtensionMeasurementDevice* measurementDevice;
             /** \brief which cmera of the QFExtensionCamera is used? */
             int usedCamera;
 

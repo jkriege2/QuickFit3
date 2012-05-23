@@ -17,6 +17,7 @@
 #include <QtPlugin>
 #include "andortools.h"
 #include "qfextensionshutter.h"
+#include "qfextensionmeasurementdevice.h"
 
 
 
@@ -33,9 +34,9 @@
     This class implements two interfaces: QFExtensionCamera to operate the camera and QFExtensionShutter to operate the shutter inside the camera.
 
  */
-class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter {
+class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter, public QFExtensionMeasurementDevice {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionShutter)
+        Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionShutter QFExtensionMeasurementDevice)
     public:
         /** Default constructor */
         QFExtensionCameraAndor(QObject* parent=NULL);
@@ -110,7 +111,30 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
 
 
-
+    /////////////////////////////////////////////////////////////////////////////
+    // QFExtensionMeasurementDevice routines
+    /////////////////////////////////////////////////////////////////////////////
+    public:
+        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceCount() */
+        virtual unsigned int getMeasuremenDeviceCount();
+        /** \copydoc QFExtensionMeasurementDevice::showMeasuremenDeviceSettingsDialog() */
+        virtual void showMeasuremenDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL);
+        /** \copydoc QFExtensionMeasurementDevice::isMeasuremenDeviceConnected() */
+        virtual bool isMeasuremenDeviceConnected(unsigned int measuremenDevice);
+        /** \copydoc QFExtensionMeasurementDevice::connectMeasuremenDevice() */
+        virtual void connectMeasuremenDevice(unsigned int measuremenDevice);
+        /** \copydoc QFExtensionMeasurementDevice::disconnectMeasuremenDevice() */
+        virtual void disconnectMeasuremenDevice(unsigned int measuremenDevice);
+        /** \copydoc QFExtensionMeasurementDevice::setMeasuremenDeviceLogging() */
+        virtual void setMeasuremenDeviceLogging(QFPluginLogService* logService);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValueCount() */
+        virtual unsigned int getMeasuremenDeviceValueCount(unsigned int measuremenDevice);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValue() */
+        virtual QVariant getMeasuremenDeviceValue(unsigned int measuremenDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValueName() */
+        virtual QString getMeasuremenDeviceValueName(unsigned int measuremenDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasuremenDeviceValueShortName() */
+        virtual QString getMeasuremenDeviceValueShortName(unsigned int measuremenDevice, unsigned int value);
 
 
 
