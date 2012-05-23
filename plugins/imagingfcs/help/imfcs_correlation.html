@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Imaging FCS Plugin: Image Correlators</title>
+	  <link rel="prev" href="imfcs_usage.html"> 
+	  <link rel="next" href="imfcs_backgroundbleach.html"> 
+	  <link rel="contents" href="imaging_fcs.html">     
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="#imagecorrelation"><h2>Image Correlation</h2>
+	<p>The imFCS plugin also provides a module that calculates auto- and crosscorrelation functions (ACFs, CCFs) from image series. The image series have to be available in one of these formats:
+	   <ul>
+	     <li>multi-frame <b>TIFF</b> file (with 8- or 16-bit greyscale frames that all have the same size)</li>
+		 <li><b>RadHard raw</b> format</li>
+	   </ul>
+	   Additional formats may be available, if reader plugins are installed for them. The imFCS plugin will read in the image series <i>I(x,y,t)</i> (<i>t=0..T-1, x=0..width-1, y=0..height-1</i>) and then calculate the ACFs/CCFs:
+	   <ul>
+	     <li><b>autocorrelation function <i>g<sub>x,y</sub>(&tau;)</i> (ACF)</b> for every pixel <i>(x,y)</i>
+		     <blockquote>
+               <img src="./pic/acf_int.png">
+             </blockquote>
+			 The result is saved in a comma-separated values (CSV) file <tt>basename.<i>autocorrelation.dat</i></tt>, as described <a href="imfcs_dataformats.html#formats_acf">here</a>. The pixels are ordered row-major, i.e. the order is
+			   <i>(0,0), (1,0), ...,(width-1,0), (0,1), (1,1), ..., (width-1,1), ..., (width-1, height-1). </i>
+			   
+		 </li>
+	     <li><b>crosscorrelation function <i>g<sub>(x,y)-(x',y')</sub>(&tau;) </i>(CCF)</b> for every pixel <i>(x,y)</i> to its neighbor pixels <i>(x',y')</i>
+		     <blockquote>
+               <img src="./pic/ccf_int.png">
+             </blockquote>
+			 Here the neighbors are the four directly neighboring pixels, i.e. <i>(x',y') = (x-1,y); (x+1,y); (x,y-1); (x,y+1)</i> If a neighboring pixel does not exist, the CCF equals 0 for all values of &tau;. The result is saved in a comma-separated values (CSV) file <tt>basename.<i>crosscorrelation.dat</i></tt>, as described <a href="imfcs_dataformats.html#formats_ccf">here</a>. The pixels are ordered row-major, i.e. the order is
+			   <i>(0,0), (1,0), ...,(width-1,0), (0,1), (1,1), ..., (width-1,1), ..., (width-1, height-1). </i>
+		 </li>
+	   </ul>
+	   In both cases the averaging operation is defined as:
+		 <blockquote>
+		   <img src="./pic/avg.png">
+		 </blockquote>
+	   In addition these properties are also calculated:
+       <ul>
+	     <li><b>average/overview image:</b> This 16-bit greyscale TIFF image <tt>basename.<i>overview.tif</i></tt> contains a per-pixel average over all frames in the image series. The average values are calculated as floating point numbers and then mapped to the range 0..65535 (the smallest average pixel will be 0 and the largest 65535) before saving it to the file.</li>
+	     <li><b>video:</b> This 16-bit greyscale multi-frame TIFF file <tt>basename.<i>video.tif</i></tt> contains a series of images where each image is the average over a given number of frames (parameter <tt>video_frames</tt>) from the image series. The video greyscale range is expanded to 0..65535, by the same method as above, but for the  whole series.</li>
+	     <li><b>statistics:</b> The correlator may calculate a set of statistical parameters from the image series. They are saved as a comma-separated values file <tt>basename.<i>statistics.dat</i></tt> of the format:
+		    <blockquote><tt>time [seconds], average, stddev, min, max</tt></blockquote>
+			Each property is calculated over a range of <tt>statistics_frames</tt> frames and eachpixel therein. The average averages over all pixels in all of these <tt>statistics_frames</tt> frames. 
+		 </li>
+	     <li><b>evaluation settings:</b> Finally a human (and computer) readable text file <tt>basename.<i>evalsettigs.txt</i></tt> is created. It contains the major settings used for the calculation. It also lists all files created by the evalution. For a detailed description of the file format, see <a href="imfcs_dataformats.html#formats_evalsettings">here</a></li>
+	   </ul>	   
+	</p>
+    <p></p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+		</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

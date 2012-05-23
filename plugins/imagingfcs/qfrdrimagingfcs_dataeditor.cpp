@@ -340,6 +340,8 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         pltOverview->set_xTickDistance(dx);
         pltOverview->set_yTickDistance(dy);
         pltOverview->set_aspectRatio(w/h);
+        plteOverviewSelected->set_data(NULL, 0, 0);
+        plteOverviewExcluded->set_data(NULL, 0, 0);
 
         if (plteOverviewSelectedSize<w*h) {
             plteOverviewSelectedSize=w*h;

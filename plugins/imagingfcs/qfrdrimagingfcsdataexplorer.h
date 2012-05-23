@@ -26,12 +26,7 @@ class QFRDRImagingFCSDataExplorer : public QDialog{
         void readSettings(QSettings& settings, QString prefix=QString(""));
         void writeSettings(QSettings& settings, QString prefix=QString(""));
 
-        void setBleachDecay(double frames);
-        double getBleachDecay() const;
-        void setBleachA(double A);
-        double getBleachA() const;
-        void setBleachB(double B);
-        double getBleachB() const;
+
 
         int getBinning() const;
         bool getUseCropping() const;
@@ -49,7 +44,7 @@ class QFRDRImagingFCSDataExplorer : public QDialog{
         int getCropX1() const;
         int getCropY0() const;
         int getCropY1() const;
-protected:
+    protected:
         Ui::QFRDRImagingFCSDataExplorer *ui;
         QFImporterImageSeries* reader;
         QFImporterImageSeries* readerRaw;
@@ -57,9 +52,11 @@ protected:
         uint32_t frames;
         QString fileFormat;
 
+
         double* avg;
         double* stddev;
         double* fit;
+        double* fit2;
         uint32_t Nfit;
         uint32_t N;
         uint32_t imgWidth;
@@ -68,6 +65,9 @@ protected:
         uint32_t imgRawHeight;
         int64_t currentFrame;
 
+        double statRangedMin;
+
+        float* frameBack;
         float* frame;
         float* frameRaw;
 
@@ -81,6 +81,7 @@ protected:
         JKQTPgeoRectangle* binRegion;
         JKQTPxyLineErrorGraph* avgGraph;
         JKQTPxyLineGraph* avgFit;
+        JKQTPxyLineGraph* avgFit2;
         JKQTPverticalRange* fitRange;
 
         void reallocStatistics(uint32_t N);
@@ -99,10 +100,12 @@ protected:
         void on_btnFirst_clicked();
         void rereadFrame();
         void on_btnFit_clicked();
+        void on_btnFit2_clicked();
         void calcFit();
         void updateRange(bool doReplot=true);
         void nextPlayFrame();
         void on_btnPlay_clicked();
+        void on_chkDisplaySD_toggled(bool checked);
 
 };
 

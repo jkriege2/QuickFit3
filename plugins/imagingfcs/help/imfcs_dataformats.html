@@ -10,19 +10,128 @@
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<a name="#formats"><h2>Fileformat Descriptions</h2>
-	<p>This plugin is designed to import imaging FCS data as output by the program <tt>video_correlator</tt> programmed by Jan Krieger in the group B040 at the German Camcer Research Center. It reads in a video (e.g. in the TIFF file format) and outputs several files that contain auto- and crosscorrelation functions of different type calculated from the video data. Usually if you input an image series <tt><i>BASENAME</i><b>.tiff</b></tt>, some of these files will be output:
+	<p>This plugin reads in a video (e.g. in the TIFF file format) and outputs several files that contain auto- and crosscorrelation functions of different type calculated from the video data. Also a variety of statistics are written to the harddisk. Usually if you input an image series <tt><i>BASENAME</i><b>.tiff</b></tt>, some of these files will be output:
 	<ul>
-	    <li><a name="#formats_acf"><tt><i>BASENAME</i><b>.autocorrelation.dat</b></tt>: contains the single-pixel autocorrelation functions.<br> They are stored as a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">comma-separated values file</a> with two or three columns. The first column contains the lag time <i>&tau;</i> in seconds, the second column the ACF amplitude <i>g(&tau;)</i>. These two columns are strictly required. If a third column is present, it is interpreted as measurement errors (e.g. the standard deviation) of the ACF <i>&Delta;g(&tau;)</i>:
+	    <li><a name="#formats_acf"><b>CSV autocorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.autocorrelation.dat</b></tt>: contains the single-pixel autocorrelation functions.<br> They are stored as a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">comma-separated values file</a> with two or three columns. The first column contains the lag time <i>&tau;</i> in seconds, the second column the ACF amplitude <i>g(&tau;)</i>. These two columns are strictly required. If a third column is present, it is interpreted as measurement errors (e.g. the standard deviation) of the ACF <i>&Delta;g(&tau;)</i>:
 		<blockquote><i>&tau;, g(&tau;), &Delta;g(&tau;)</i></blockquote>
-		The ACF of the single pixels are ordered into "datasets" separated by two empty lines. The datasets are ordered in row-major order, i.e. first of these datasets is assigned to pixel (x,y)=(0,0), the second to (1,0) and on until (width-1,0). Then comes pixels (0,1), (1,1), (2,1) ... (width-1, height-1). This format has the advantage, that it can be loaded conventiently using the <tt>index</tt> keyword of <a href="http://www.gnuplot.info">gnuplot</a>, but comes at the cost of repeating the lag times column for every dataset.
+		The ACF of the single pixels are ordered into "datasets" separated by two empty lines. The datasets are ordered in row-major order, i.e. first of these datasets is assigned to pixel (x,y)=(0,0), the second to (1,0) and on until (width-1,0). Then comes pixels (0,1), (1,1), (2,1) ... (width-1, height-1). This format has the advantage, that it can be loaded conventiently using the <tt>index</tt> keyword of <a href="http://www.gnuplot.info">gnuplot</a>, but comes at the cost of repeating the lag times column for every dataset. Also the single segments are not saved to this file, only the average and standard deviation calculated from these.
 		</li>
-		<li><a name="#formats_ccf"><tt><i>BASENAME</i><b>.crosscorrelation.dat</b></tt>: contains the pixel-pixel crosscorrelation functions.<br> It follows the same format, as above, but with several columns:
+		
+		
+		<li><a name="#formats_ccf"><b>CSV crosscorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.crosscorrelation.dat</b></tt>: contains the pixel-pixel crosscorrelation functions.<br> It follows the same format, as above, but with several columns:
 		<blockquote>
 		   <i>&tau;, g<sub>left</sub>(&tau;), g<sub>right</sub>(&tau;), g<sub>up</sub>(&tau;), g<sub>down</sub>(&tau;), &Delta;g<sub>left</sub>(&tau;), &Delta;g<sub>right</sub>(&tau;), &Delta;g<sub>up</sub>(&tau;), &Delta;g<sub>down</sub>(&tau;)</i>
 		</blockquote>
 		Here again the errors <i>&Delta;g(&tau;)</i> are optional.
 		</li>
-		<li><a name="#formats_evalsettings"><tt><i>BASENAME</i><b>.evalsettings.txt</b></tt>: contains the settings of the program that created the correlation data.<br>This file is again a text file and organized in a simple fashion. Every line of the format <blockquote><tt>DESCRIPTION : VALUE</tt></blockquote> is interpreted by this plugin. It looks for a certain <tt>DESCRIPTION</tt> and the used the supplied <tt>VALUE</tt>. Any additional whitespace characters will be ignored. These <tt>DESCRIPTION</tt>s are read and interpreted:  
+		
+	    <li><a name="#formats_binacf"><b>binary autocorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.autocorrelation.bin</b></tt>: also contains the single-pixel autocorrelation functions, like the CSV autocorrelation file, but including all segments' data.<br> They are stored as a binary file with this organization (<tt>cf[<i>i</i>]</tt> is the average correlation function at lag time $$math:\tau_i$$, <tt>errcf[<i>i</i>]</tt> is the standard deviation for <tt>cf[<i>i</i>]</tt>):
+ <pre>
+data                                                   size [bytes]                    datatype
++---------------------------------------------------+
+| "QF3.0imFCS"                    file id           |  10                              string
++---------------------------------------------------+
+| width                               width of image|  4                               uint
+| height                             height of image|  4                               uint
+| corrN                 correlation curves per pixel|  4                               uint
+| N                        datapoints/lags per curve|  4                               uint
+| sets 1: cfs only  2: cfs + errors                 |  4                               uint
++---------------------------------------------------+
+| lag times in seconds                              |  8*N                             double
++---------------------------------------------------+
+| cf[0] of pixel[0]                                 |  8*N                             double
+| cf[1] of pixel[0]                                 |  8*N                             double
+| ...                                               |
+| cf[corN-1] of pixel[0]                            |  8*N                             double
++---------------------------------------------------+     --+
+| errcf[0]  of pixel[0]                             |  8*N  |                          double
+| errcf[1]  of pixel[0]                             |  8*N  | only if sets==2          double
+| ...                                               |       | or sets==4               double
+| errcf[corN-1]  of pixel[0]                        |  8*N  |                          double
++---------------------------------------------------+     --+
++---------------------------------------------------+
+| cf[0] of pixel[1]                                 |  8*N                             double
+| cf[1] of pixel[1]                                 |  8*N                             double
+| ...                                               |
+| cf[corN-1] of pixel[1]                            |  8*N                             double
++---------------------------------------------------+     --+
+| errcf[0]  of pixel[1]                             |  8*N  |                          double
+| errcf[1]  of pixel[1]                             |  8*N  | only if sets==2          double
+| ...                                               |       | or sets==4               double
+| errcf[corN-1]  of pixel[1]                        |  8*N  |                          double
++---------------------------------------------------+     --+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| cf[0] of pixel[width*height-1]                    |  8*N                             double
+| cf[1] of pixel[width*height-1]                    |  8*N                             double
+| ...                                               |
+| cf[corN-1] of pixel[width*height-1]               |  8*N                             double
++---------------------------------------------------+     --+
+| errcf[0]  of pixel[width*height-1]                |  8*N  |                          double
+| errcf[1]  of pixel[width*height-1]                |  8*N  | only if sets==2          double
+| ...                                               |       | or sets==4               double
+| errcf[corN-1]  of pixel[width*height-1]           |  8*N  |                          double
++---------------------------------------------------+     --+
+</pre><p> This data format may also store each segment's correlation curves that are averaged to yield avg+/-stddev. These are stored after the above described data and their presence is indicated simply by an ongoing file.</p>
+<pre>
+data                                                   size [bytes]                    datatype
+.                                                   .
+. ...   START OF FILE                               .
+.                                                   .
++---------------------------------------------------+
+| segments                   segments/runs per pixel|  4
++---------------------------------------------------+
+| segment[0] cf[0] of pixel[0]                      |  8*N                             double
+| segment[1] cf[0] of pixel[0]                      |  8*N                             double
+| ...                                               |
+| segment[segments-1] cf[0] of pixel[0]             |  8*N                             double
++---------------------------------------------------+
+| segment[0] cf[1] of pixel[0]                      |  8*N                             double
+| segment[1] cf[1] of pixel[0]                      |  8*N                             double
+| ...                                               |
+| segment[segments-1] cf[1] of pixel[0]             |  8*N                             double
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| segment[0] cf[corN-1] of pixel[0]                 |  8*N                             double
+| segment[1] cf[corN-1] of pixel[0]                 |  8*N                             double
+| ...                                               |
+| segment[segments-1] cf[corN-1] of pixel[0]        |  8*N                             double
++---------------------------------------------------+
++---------------------------------------------------+
+| segment[0] cf[0] of pixel[1]                      |  8*N                             double
+| segment[1] cf[0] of pixel[1]                      |  8*N                             double
+| ...                                               |
+| segment[segments-1] cf[0] of pixel[1]             |  8*N                             double
++---------------------------------------------------+
+| segment[0] cf[1] of pixel[1]                      |  8*N                             double
+| segment[1] cf[1] of pixel[1]                      |  8*N                             double
+| ...                                               |
+| segment[segments-1] cf[1] of pixel[1]             |  8*N                             double
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| segment[0] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
+| segment[1] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
+| ...                                               |
+| segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N                       double
++---------------------------------------------------+
+</pre> <blockquote><b>Note:</b> All numbers are stored in little-endian form!!! and the pixel order is always row major! </blockquote>
+
+		</li>
+		
+		<li><a name="#formats_binccf"><b>binary crosscorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.crosscorrelation.bin</b></tt>: crosscorrelation data including all segments in the binary format describes above for autocorrelation data.</li>
+		
+		<li><a name="#formats_evalsettings"><b>evaluation settings report</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.evalsettings.txt</b></tt>: contains the settings of the program that created the correlation data.<br>This file is again a text file and organized in a simple fashion. Every line of the format <blockquote><tt>DESCRIPTION : VALUE</tt></blockquote> is interpreted by this plugin. It looks for a certain <tt>DESCRIPTION</tt> and the used the supplied <tt>VALUE</tt>. Any additional whitespace characters will be ignored. These <tt>DESCRIPTION</tt>s are read and interpreted:  
 		<table border="1" cellspacing="0">
 		  <tr><th align="left"><tt>DESCRIPTION</tt></th><th align="left">value/usage</th><th align="left">stored in property</th></tr>
 		  <tr><td align="left"><tt>width</tt></td><td align="left"> width of the imaging FCS data in pixels </td><td align="left"> WIDTH </td></tr>

@@ -48,6 +48,7 @@ protected slots:
     void on_spinS_valueChanged(int val);
     void on_spinM_valueChanged(int val);
     void on_spinDecay_valueChanged(double val);
+    void on_spinDecay2_valueChanged(double val);
     void on_cmbCorrelator_currentIndexChanged(int idx);
     void on_cmbBackground_currentIndexChanged(int idx);
     void on_cmbBleachType_currentIndexChanged(int idx);
@@ -90,6 +91,7 @@ private:
 
     int image_width;
     int image_height;
+    QString filenameDisplayed;
 
     int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
     int getLayoutIDForProgress(const QWidget* w) const;

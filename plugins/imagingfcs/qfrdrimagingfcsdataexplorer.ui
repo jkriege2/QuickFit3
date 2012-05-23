@@ -284,7 +284,7 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="layoutWidget1">
-      <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,1,0,0,0" columnstretch="0,1">
+      <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,1,0,0,0" columnstretch="0,1">
        <item row="0" column="1">
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -296,7 +296,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="JKQtPlotter" name="pltIntensity" native="true">
          <property name="minimumSize">
           <size>
@@ -306,107 +306,21 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QLabel" name="labIntensityInfo">
          <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QWidget" name="widBleach" native="true">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_39">
-            <property name="text">
-             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;exp. &amp;amp;decay time τ [pixels] =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>spinDecay</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <spacer name="horizontalSpacer_15">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="3">
-           <widget class="QPushButton" name="btnFit">
-            <property name="text">
-             <string>&amp;Fit</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Offset &lt;i&gt;B&lt;/i&gt; =</string>
-            </property>
-            <property name="buddy">
-             <cstring>edtOffset</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="JKDoubleEdit" name="edtOffset"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Amplitude &lt;span style=&quot; font-style:italic;&quot;&gt;A&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>edtAmplitude</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="JKDoubleEdit" name="edtAmplitude"/>
-          </item>
-          <item row="3" column="0" colspan="4">
-           <widget class="QLabel" name="labFitResult">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="JKDoubleEdit" name="spinDecay"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0" rowspan="5">
+       <item row="0" column="0" rowspan="6">
         <widget class="Line" name="line">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QCheckBox" name="chkFirst">
@@ -457,6 +371,16 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="chkDisplaySD">
+         <property name="text">
+          <string>display standard deviation</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -485,14 +409,6 @@ p, li { white-space: pre-wrap; }
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>JKDoubleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>jkdoubleedit.h</header>
-   <slots>
-    <signal>valueChanged(double)</signal>
-   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -628,66 +544,18 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>spinDecay</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>QFRDRImagingFCSDataExplorer</receiver>
-   <slot>calcFit()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>749</x>
-     <y>428</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>530</x>
-     <y>553</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>edtOffset</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>QFRDRImagingFCSDataExplorer</receiver>
-   <slot>calcFit()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>771</x>
-     <y>459</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>473</x>
-     <y>553</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>edtAmplitude</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>QFRDRImagingFCSDataExplorer</receiver>
-   <slot>calcFit()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>713</x>
-     <y>488</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>535</x>
-     <y>522</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>chkFirst</sender>
    <signal>toggled(bool)</signal>
    <receiver>spinFirst</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>581</x>
-     <y>410</y>
+     <x>594</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
-     <x>631</x>
-     <y>407</y>
+     <x>642</x>
+     <y>405</y>
     </hint>
    </hints>
   </connection>
@@ -698,12 +566,12 @@ p, li { white-space: pre-wrap; }
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>881</x>
-     <y>409</y>
+     <x>908</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
-     <x>930</x>
-     <y>409</y>
+     <x>956</x>
+     <y>405</y>
     </hint>
    </hints>
   </connection>
@@ -714,8 +582,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateRange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>572</x>
-     <y>412</y>
+     <x>594</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>545</x>
@@ -730,8 +598,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateRange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>616</x>
-     <y>417</y>
+     <x>642</x>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>586</x>
@@ -746,8 +614,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateRange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>876</x>
-     <y>404</y>
+     <x>908</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
      <x>633</x>
@@ -762,8 +630,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateRange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>931</x>
-     <y>414</y>
+     <x>956</x>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>727</x>

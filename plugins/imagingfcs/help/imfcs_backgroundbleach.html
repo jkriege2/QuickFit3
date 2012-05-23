@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Imaging FCS Plugin: Image Correlators</title>
+	  <link rel="prev" href="imfcs_correlation.html"> 
+	  <link rel="next" href="imfcs_correlator.html"> 
+	  <link rel="contents" href="imaging_fcs.html">     
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="#imagecorrelation"><h2>Image Correlation</h2>
+
+	
+	<a name="#background"><h2>Background Correction</h2>
+    <p>This plugin offers several options for the background correction. This is needed, as CCD-camera already ass a certain offset in order to prevent negativ readings. These possibilities are implemented:
+	<ul>
+	  <li><b>remove fixed offset:</b> subtracts only the given offset value from each pixel grey value</li>
+	  <li><b>remove fixed offset and minimum:</b> subtracts the given offset and the minimum grey value over the whole image series from each pixel grey value</li>
+	</ul>
+	Subtracting this background, improves the visibility of the correlation, But care must be taken to <u>not</u> remove part of the signal itself, as this may change the measured ACF/CCF amplitude and therefore the estimate of particle number.
+	</p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	
+	
+	<a name="#bleach"><h2>Bleaching Correction</h2>
+    <p>This plugin offers also a possibility to correct for bleaching of the sample before the correlation. This might help to get rid of artefacts caused by this. Currently these methods are supported:
+	<ul>
+	  <li><b>cut data into segments:</b> This is the easiest way of reducing bleaching artefacts. Now the correlator cuts the input time series into few pieces of equal size and calculates a correlation function for each of them. The resulting correlation function is then the average over all the segment functions. This methods works, as the influence of bleaching on a shorter segment is smaller than on the whole series.</li>
+	  <li><b>subtract average:</b> This option normalizes the overall intensity of each frame to the average intensity of that pixel in the first 100 frames $$math:\langle I(x,y,t)\rangle_{t=0..100}$$:
+	  <blockquote>
+	    $$math:I(x,y,t)=I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\langle I(x,y,t)\rangle_{x,y}}=I(x,y,t)\cdot\frac{\langle I(x,y,t)\rangle_{t=0..100}}{\overline{I}(t)}$$
+	  </blockquote>
+	  See reference <a href="#references">[6]</a> for details on this method.
+	  </li>
+	  <li><b>remove mono-exponential:</b> This method assumes that the intensity of every pixel decays with a mono-exponential function:
+	  <blockquote>
+	    $$math:f(t)=A\cdot\exp(-t/\tau_{bleach}) $$
+	  </blockquote>
+	  For each pixel, a fit to a subset of max. 500 frames from complete image series is performed to determine the parameters in the equation above. This fit is automated and unsupervised!!! The results will be stored as TIFF images when the correlation is done. Each pixel may then be corrected according to (See references <a href="#references">[5,6]</a> for details on this method):
+	  <blockquote>
+	    $$math:I(x,y,t)=\frac{I(x,y,t)}{\sqrt{f(t)/f(0)}}+f(0)\cdot\left[1-\sqrt{f(t)/f(0)}\right]$$
+	  </blockquote>
+      This correction may be used to remove artifacts due to depletion of the reservoir of fluorophores. See references <a href="#references">[5,6]</a> for details on this method.
+	  </li>
+
+	</ul>
+	Subtracting this background, improves the visibility of the correlation, But care must be taken to <u>not</u> remove part of the signal itself, as this may change the measured ACF/CCF amplitude and therefore the estimate of particle number.
+	</p>
+    <p>Here are some examples of the results of a bleach correction:
+	<table border="1">
+	  <tr><td><img src="./pic/corr_depletion.png"><br><img src="./pic/corr_depletion_cr.png"></td><td>no bleach correction</td></tr>
+	  <tr><td><img src="./pic/corr_depletion_seg5.png"><br><img src="./pic/corr_depletion_seg5_cr.png"></td><td>bleach correction by cutting into 5 segments</td></tr>
+	  <tr><td><img src="./pic/corr_depletion_seg10.png"><br><img src="./pic/corr_depletion_seg10_cr.png"></td><td>bleach correction by cutting into 10 segments</td></tr>
+	  <tr><td><img src="./pic/corr_depletion_remavgcorr.png"><br><img src="./pic/corr_depletion_remavgcorr_cr.png"></td><td>bleach correction by removing average</td></tr>
+	  <tr><td><img src="./pic/corr_depletion_expcorr.png"><br><img src="./pic/corr_depletion_expcorr_cr.png"></td><td>bleach correction by removing mono-exponential</td></tr>
+	</table></p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	
+	
+	<a name="#references"><h2>References:</h2><blockquote>
+	  [1]: K. Sch&auml;tzel (1985): <b>New concepts in correlator design</b>, <i>Institute of Physics Conference Series</i> <b>77</b>, 175-184.<br>
+	  [2]: K. Sch&auml;tzel (1990): <b>Noise on photon correlation data: I. Autocorrelation functions</b>, <i>Quantum Opt.</i> <b>2</b>, 287-305<br>
+	  [3]: J. Buchholz, J.W. Krieger, etal (2011): <b>FPGA implementation of a 32&times;32 autocorrelator array for analysis of fast image series</b>, <i>to be published</i><br>
+	  [4]: Z. Kojro, A. Riede, M. Schubert and W. Grill (1999): <b>Systematic and statistical errors in correlation estimators obtained from various digital correlators</b> <i>Review of Scientific Instruments</i> <b>70</b>, 4487-4496<br>
+	  [5]: J. Ries, S. Chiantia, P. Schwille (2009): <b>Accurate Determination of Membrane Dynamics with Line-Scan FCS</b>, <i>Biophysical Journal</i> <b>96</b>(5), 1999-2008<br>
+	  [6]: J. Sankaran, X. Shi, L.Y. Ho, E.H.K. Stelzer, T. Wohland (2010): <b>ImFCS: A software for Imaging FCS data analysis and visualization</b>, <i>Optics Express</i> <b>18</b>(25), 25468-25481<br>
+	</blockquote></p>
+
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

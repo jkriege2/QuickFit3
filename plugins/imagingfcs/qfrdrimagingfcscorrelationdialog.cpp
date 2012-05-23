@@ -18,6 +18,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     image_width=image_height=1;
     this->options=opt;
     lastImagefileDir="";
+    filenameDisplayed="";
     ui->setupUi(this);
     ui->edtFrameTime->setRange(1e-10,1e10);
     ui->edtFrameTime->setValue(10000);
@@ -25,12 +26,12 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->edtFrameRate->setValue(100);
     ui->edtOffset->setRange(-1e10,1e10);
     ui->edtOffset->setValue(0);
-    ui->edtDecayA->setCheckBounds(false, false);
-    ui->edtDecayB->setCheckBounds(false, false);
-    ui->spinDecay->setCheckBounds(false, false);
-    ui->edtDecayA->setValue(1000);
-    ui->edtDecayB->setValue(1000);
-    ui->spinDecay->setValue(10000);
+    //ui->edtDecayA->setCheckBounds(false, false);
+    //ui->edtDecayB->setCheckBounds(false, false);
+    //ui->spinDecay->setCheckBounds(false, false);
+    //ui->edtDecayA->setValue(1000);
+    //ui->edtDecayB->setValue(1000);
+    //ui->spinDecay->setValue(10000);
     ui->edtPostfix->addInsertContextMenuEntry(tr("insert %counter%"), QString("%counter%"));
     ui->edtPostfix->addInsertContextMenuEntry(tr("insert %s%"), QString("%s%"));
     ui->edtPostfix->addInsertContextMenuEntry(tr("insert %p%"), QString("%p%"));
@@ -95,20 +96,24 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
         readerRaw=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
     }
     if (reader) {
-        explorer->setBleachDecay(ui->spinDecay->value());
-        explorer->setBleachA(ui->edtDecayA->value());
-        explorer->setBleachB(ui->edtDecayB->value());
+        //explorer->setBleachDecay1(ui->spinDecay->value());
+        //explorer->setBleachDecay2(ui->spinDecay2->value());
+        //explorer->setBleachA1(ui->edtDecayA->value());
+        //explorer->setBleachA2(ui->edtDecayA2->value());
+        //explorer->setBleachB(ui->edtDecayB->value());
         explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkFirstFrame->isChecked(), ui->spinFirstFrame->value(), ui->chkLastFrame->isChecked(), ui->spinLastFrame->value(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value());
         if (explorer->exec()==QDialog::Accepted) {
-            ui->spinDecay->setValue(explorer->getBleachDecay());
+            //ui->spinDecay->setValue(explorer->getBleachDecay1());
+            //ui->spinDecay2->setValue(explorer->getBleachDecay2());
             ui->chkCrop->setChecked(explorer->getUseCropping());
             ui->spinXFirst->setValue(explorer->getCropX0());
             ui->spinXLast->setValue(explorer->getCropX1());
             ui->spinYFirst->setValue(explorer->getCropY0());
             ui->spinYLast->setValue(explorer->getCropY1());
             ui->spinBinning->setValue(explorer->getBinning());
-            ui->edtDecayA->setValue(explorer->getBleachA());
-            ui->edtDecayB->setValue(explorer->getBleachB());
+            //ui->edtDecayA->setValue(explorer->getBleachA1());
+            //ui->edtDecayA2->setValue(explorer->getBleachA2());
+            //ui->edtDecayB->setValue(explorer->getBleachB());
             ui->chkFirstFrame->setChecked(explorer->getUseFirst());
             ui->chkLastFrame->setChecked(explorer->getUseLast());
             ui->spinFirstFrame->setValue(explorer->getFirst());
@@ -234,6 +239,9 @@ void QFRDRImagingFCSCorrelationDialog::on_spinDecay_valueChanged(double val) {
     updateBleach();
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_spinDecay2_valueChanged(double val) {
+    updateBleach();
+}
 void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int idx) {
     updateCorrelator();
 }
@@ -247,7 +255,7 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int 
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_cmbBleachType_currentIndexChanged(int idx) {
-    ui->widBleach->setEnabled(ui->cmbBleachType->currentIndex()==2);
+    //ui->widBleach->setEnabled(ui->cmbBleachType->currentIndex()>=2);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
@@ -289,9 +297,10 @@ void QFRDRImagingFCSCorrelationDialog::on_btnHelp_clicked() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
+    QString oldFilename=filenameDisplayed;
     QString filename=ui->edtImageFile->text();
     if (QFile::exists(filename)) {
-        updateFromFile();
+        if (oldFilename!=filename) updateFromFile();
         setEditControlsEnabled(true);
     } else {
         setEditControlsEnabled(false);
@@ -325,13 +334,16 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleach_frames", ui->spinBleachAvgFrames->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex());
-    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value());
-    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachA", ui->edtDecayA->value());
-    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachA", ui->edtDecayA->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst2", ui->spinDecay2->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachA2", ui->edtDecayA2->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -360,13 +372,16 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinXLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value()).toInt());
     ui->spinYFirst->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value()).toInt());
     ui->spinYLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value()).toInt());
+    ui->spinBleachAvgFrames->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleach_frames", ui->spinBleachAvgFrames->value()).toInt());
     ui->spinDistanceCCFDeltaX->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value()).toInt());
     ui->spinDistanceCCFDeltaY->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value()).toInt());
     ui->chkDistanceCCD->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked()).toBool());
     ui->cmbBleachType->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex()).toInt());
-    ui->spinDecay->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value()).toDouble());
-    ui->edtDecayA->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachA", ui->edtDecayA->value()).toDouble());
-    ui->edtDecayB->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value()).toDouble());
+    //ui->spinDecay->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value()).toDouble());
+    //ui->edtDecayA->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachA", ui->edtDecayA->value()).toDouble());
+    //ui->spinDecay2->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst2", ui->spinDecay2->value()).toDouble());
+    //ui->edtDecayA2->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachA2", ui->edtDecayA2->value()).toDouble());
+    //ui->edtDecayB->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value()).toDouble());
 
 }
 
@@ -467,10 +482,13 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.DCCFDeltaX=ui->spinDistanceCCFDeltaX->value();
     job.DCCFDeltaY=ui->spinDistanceCCFDeltaY->value();
     job.bleach=ui->cmbBleachType->currentIndex();
-    job.bleachDecay=ui->spinDecay->value();
-    job.bleachA=ui->edtDecayA->value();
-    job.bleachB=ui->edtDecayB->value();
-    job.bleachAvgFrames=100;
+    job.bleachAvgFrames=ui->spinBleachAvgFrames->value();
+    //job.bleachDecay=ui->spinDecay->value();
+    //job.bleachA=ui->edtDecayA->value();
+    //job.bleachDecay2=ui->spinDecay2->value();
+    //job.bleachA2=ui->edtDecayA2->value();
+    //job.bleachB=0;//ui->edtDecayB->value();
+    //job.bleachAvgFrames=100;
     writeSettings();
 
     setEditControlsEnabled(false);
@@ -553,8 +571,9 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::updateBleach() {
-    ui->labDecay->setTextFormat(Qt::RichText);
-    ui->labDecay->setText(tr("&tau;<sub>Bleach</sub> = %1 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6));
+    //ui->labDecay->setTextFormat(Qt::RichText);
+    //ui->labDecay->setText(tr("&tau;<sub>Bleach,1</sub> = %1 s<br>&tau;<sub>Bleach,2</sub> = %2 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6).arg((double)ui->spinDecay2->value()*ui->edtFrameTime->value()/1e6));
+    //ui->labDecay->setText(tr("&tau;<sub>Bleach,1</sub> = %1 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6));
 }
 
 void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
@@ -603,7 +622,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     QApplication::processEvents();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    QString filename=QFileInfo(ui->edtImageFile->text()).absoluteFilePath();
+    filenameDisplayed=QFileInfo(ui->edtImageFile->text()).absoluteFilePath();
     double frametime=ui->edtFrameTime->value();
     double baseline_offset=ui->edtOffset->value();
     QString backgroundF=ui->edtBackgroundFile->text();
@@ -611,7 +630,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     //////////////////////////////////////////////////////////////////////////////////
     // now we search for a .configuration.ini file describing the selected file
     //////////////////////////////////////////////////////////////////////////////////
-    QDir d=QFileInfo(filename).absoluteDir();
+    QDir d=QFileInfo(filenameDisplayed).absoluteDir();
     QStringList nameFilters;
     nameFilters<<"*.ini";
     nameFilters<<"*.cfg";
@@ -641,10 +660,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                 if (!fn.isEmpty()) {
                     QString fnAbs=d.absoluteFilePath(fn);
                     //qDebug()<<"fn="<<fn<<"  fnAbs="<<fnAbs<<"  fn(filename)="<<QFileInfo(filename).fileName()<<"  fn(fnAbs)="<<QFileInfo(fnAbs).fileName();
-                    if (fnAbs==filename) {
+                    if (fnAbs==filenameDisplayed) {
                         hasFirst=true;
                         if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
-                    } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filename).fileName()) {
+                    } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filenameDisplayed).fileName()) {
                         foundSecond=true;
                         if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
                     }
@@ -667,7 +686,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     // basename + one of a set of extensions (newsuffix list) and try to read info from
     // that.
     if (!hasSecond) {
-        QString suffix=QFileInfo(filename).suffix();
+        QString suffix=QFileInfo(filenameDisplayed).suffix();
         QString cfgname;
 
         QStringList newsuffix;
@@ -677,7 +696,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                  <<"settings.txt"
                  <<"cfg";
         for (int i=0; i<newsuffix.size(); i++) {
-            cfgname=filename.left(filename.size()-suffix.size())+newsuffix[i];
+            cfgname=filenameDisplayed.left(filenameDisplayed.size()-suffix.size())+newsuffix[i];
             if (QFile::exists(cfgname)) {
                 QSettings set(cfgname, QSettings::IniFormat);
                 readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
@@ -720,7 +739,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
         }
         if (reader) {
-            OK=reader->open(filename);
+            OK=reader->open(filenameDisplayed);
             if (OK)  {
                 QApplication::processEvents();
                 image_width=reader->frameWidth();
@@ -733,6 +752,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                     ui->spinVideoFrames->setMaximum(frame_count-1);
                     ui->spinVideoFrames->setValue(qMax(2,frame_count/1000));
                     ui->spinStatistics->setMaximum(frame_count-1);
+                    ui->spinBleachAvgFrames->setValue(qMax(1,frame_count/2500));
                 } else {
                     ui->spinLastFrame->setMaximum(10000000);
                     ui->spinFirstFrame->setMaximum(10000000);

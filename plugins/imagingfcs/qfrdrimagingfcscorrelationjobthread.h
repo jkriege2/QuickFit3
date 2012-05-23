@@ -28,7 +28,6 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_NONE 0
 #define BLEACH_REMOVEAVG 1
 #define BLEACH_EXP 2
-#define BLEACH_2EXP 3
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -114,11 +113,15 @@ struct IMFCSJob {
     /** \brief bleach correction, 0: none, 1: remove frame average, 2: remove mono-exponential */
     int bleach;
     /** \brief bleach correction decay constant */
-    double bleachDecay;
+    //double bleachDecay;
+    /** \brief bleach correction amplitude  */
+    //double bleachA;
+    /** \brief bleach correction decay constant 2 */
+    //double bleachDecay2;
+    /** \brief bleach correction amplitude 2 */
+    //double bleachA2;
     /** \brief bleach correction offset */
-    double bleachA;
-    /** \brief bleach correction amplitude */
-    double bleachB;
+    //double bleachB;
     /** \brief number of frames to average over when determining the bleach correction parameters */
     uint32_t bleachAvgFrames;
 
@@ -169,12 +172,9 @@ struct IMFCSJob {
       .
     .
 
-    The \b bleaching \b correction subtracts a simple exponential model \f[ f(t)=A+B\cdot\exp\left(-t/\tau\right) \f] from every pixel's timeseries \f$ I(x,y,t) \f$.
-    The decay time \f$ \tau \f$ is given by the user and the paramaters \f$ A \f$ and \f$ B \f$  are extracted from  \f$ I(x,y,t) \f$.
-    The first few frames in  \f$ I(x,y,t) \f$ are averaged to yield \f$ I_0 \f$ and the last few frames yield \f$ I_1 \f$ respectively.
-    From these the parameters \f$ A \f$ and \f$ B \f$ may be deduced:
-    \f[ B=\frac{I_1-I_0}{1-\exp\left(-t/\tau\right)} \f]
-    \f[ A=I_1-B \f]
+    The \b bleaching \b correction fits a simple exponential model \f[ f(t)=A\cdot\exp\left(-t/\tau\right) \f] to  subset of every pixel's timeseries \f$ I(x,y,t) \f$. Before fitting the parameters are already guessed from the
+    first and last datapoint in the timeseries. The timeseries will contain roughly 500 equally spaced frames from the original series. Each of these frames
+    can be an average over IMFCSJob::bleachAvgFrames subsequent frames. A second possibility is to normalize all frames to a common intensity.
 
 
 */
@@ -235,7 +235,7 @@ protected:
     void correlate_loadsingle();
     /** \brief calculate the background correction from the data gathered from a first run through the data */
     void calcBackgroundCorrection();
-    void calcBleachCorrection(float* avgStart, float* avgEnd);
+    void calcBleachCorrection(float* fit_frames, double *fit_t, int NFitFrames=0);
 
     /*! \brief calculate the CCF between the given timeseries
 
@@ -259,94 +259,94 @@ protected:
 
         The binary file has this data layout:
 \verbatim
-data                                                   size [bytes]
+data                                                   size [bytes]                    datatype
 +---------------------------------------------------+
-| "QF3.0imFCS"                    file id           |  10
+| "QF3.0imFCS"                    file id           |  10                              string
 +---------------------------------------------------+
-| width                               width of image|  4
-| height                             height of image|  4
-| corrN                 correlation curves per pixel|  4
-| N                        datapoints/lags per curve|  4
-| sets 1: cfs only  2: cfs + errors                 |  4
+| width                               width of image|  4                               uint
+| height                             height of image|  4                               uint
+| corrN                 correlation curves per pixel|  4                               uint
+| N                        datapoints/lags per curve|  4                               uint
+| sets 1: cfs only  2: cfs + errors                 |  4                               uint
 +---------------------------------------------------+
-| lag times in seconds                              |  8*N
+| lag times in seconds                              |  8*N                             double
 +---------------------------------------------------+
-| cf[0] of pixel[0]                                 |  8*N
-| cf[1] of pixel[0]                                 |  8*N
+| cf[0] of pixel[0]                                 |  8*N                             double
+| cf[1] of pixel[0]                                 |  8*N                             double
 | ...                                               |
-| cf[corN-1] of pixel[0]                            |  8*N
+| cf[corN-1] of pixel[0]                            |  8*N                             double
 +---------------------------------------------------+     --+
-| errcf[0]  of pixel[0]                             |  8*N  |
-| errcf[1]  of pixel[0]                             |  8*N  | only if sets==2
-| ...                                               |       | or sets==4
-| errcf[corN-1]  of pixel[0]                        |  8*N  |
+| errcf[0]  of pixel[0]                             |  8*N  |                          double
+| errcf[1]  of pixel[0]                             |  8*N  | only if sets==2          double
+| ...                                               |       | or sets==4               double
+| errcf[corN-1]  of pixel[0]                        |  8*N  |                          double
 +---------------------------------------------------+     --+
 +---------------------------------------------------+
-| cf[0] of pixel[1]                                 |  8*N
-| cf[1] of pixel[1]                                 |  8*N
+| cf[0] of pixel[1]                                 |  8*N                             double
+| cf[1] of pixel[1]                                 |  8*N                             double
 | ...                                               |
-| cf[corN-1] of pixel[1]                            |  8*N
+| cf[corN-1] of pixel[1]                            |  8*N                             double
 +---------------------------------------------------+     --+
-| errcf[0]  of pixel[1]                             |  8*N  |
-| errcf[1]  of pixel[1]                             |  8*N  | only if sets==2
-| ...                                               |       | or sets==4
-| errcf[corN-1]  of pixel[1]                        |  8*N  |
+| errcf[0]  of pixel[1]                             |  8*N  |                          double
+| errcf[1]  of pixel[1]                             |  8*N  | only if sets==2          double
+| ...                                               |       | or sets==4               double
+| errcf[corN-1]  of pixel[1]                        |  8*N  |                          double
 +---------------------------------------------------+     --+
 .                                                   .
 .                                                   .
 .                                                   .
 +---------------------------------------------------+
-| cf[0] of pixel[width*height-1]                    |  8*N
-| cf[1] of pixel[width*height-1]                    |  8*N
+| cf[0] of pixel[width*height-1]                    |  8*N                             double
+| cf[1] of pixel[width*height-1]                    |  8*N                             double
 | ...                                               |
-| cf[corN-1] of pixel[width*height-1]               |  8*N
+| cf[corN-1] of pixel[width*height-1]               |  8*N                             double
 +---------------------------------------------------+     --+
-| errcf[0]  of pixel[width*height-1]                |  8*N  |
-| errcf[1]  of pixel[width*height-1]                |  8*N  | only if sets==2
-| ...                                               |       | or sets==4
-| errcf[corN-1]  of pixel[width*height-1]           |  8*N  |
+| errcf[0]  of pixel[width*height-1]                |  8*N  |                          double
+| errcf[1]  of pixel[width*height-1]                |  8*N  | only if sets==2          double
+| ...                                               |       | or sets==4               double
+| errcf[corN-1]  of pixel[width*height-1]           |  8*N  |                          double
 +---------------------------------------------------+     --+
 \endverbatim
         This data format may also store all the intermedate correlation curves that are averaged to yield avg+/-stddev. These are stored after the above
         described data and their presence is indicatedsimply by an ongoing file.
 
 \verbatim
-data                                                   size [bytes]
+data                                                   size [bytes]                   datatype
 .                                                   .
 . ...   START OF FILE                               .
 .                                                   .
 +---------------------------------------------------+
 | segments                   segments/runs per pixel|  4
 +---------------------------------------------------+
-| segment[0] cf[0] of pixel[0]                      |  8*N
-| segment[1] cf[0] of pixel[0]                      |  8*N
+| segment[0] cf[0] of pixel[0]                      |  8*N                             double
+| segment[1] cf[0] of pixel[0]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[0] of pixel[0]             |  8*N
+| segment[segments-1] cf[0] of pixel[0]             |  8*N                             double
 +---------------------------------------------------+
-| segment[0] cf[1] of pixel[0]                      |  8*N
-| segment[1] cf[1] of pixel[0]                      |  8*N
+| segment[0] cf[1] of pixel[0]                      |  8*N                             double
+| segment[1] cf[1] of pixel[0]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[1] of pixel[0]             |  8*N
+| segment[segments-1] cf[1] of pixel[0]             |  8*N                             double
 +---------------------------------------------------+
 .                                                   .
 .                                                   .
 .                                                   .
 +---------------------------------------------------+
-| segment[0] cf[corN-1] of pixel[0]                 |  8*N
-| segment[1] cf[corN-1] of pixel[0]                 |  8*N
+| segment[0] cf[corN-1] of pixel[0]                 |  8*N                             double
+| segment[1] cf[corN-1] of pixel[0]                 |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[corN-1] of pixel[0]        |  8*N
+| segment[segments-1] cf[corN-1] of pixel[0]        |  8*N                             double
 +---------------------------------------------------+
 +---------------------------------------------------+
-| segment[0] cf[0] of pixel[1]                      |  8*N
-| segment[1] cf[0] of pixel[1]                      |  8*N
+| segment[0] cf[0] of pixel[1]                      |  8*N                             double
+| segment[1] cf[0] of pixel[1]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[0] of pixel[1]             |  8*N
+| segment[segments-1] cf[0] of pixel[1]             |  8*N                             double
 +---------------------------------------------------+
-| segment[0] cf[1] of pixel[1]                      |  8*N
-| segment[1] cf[1] of pixel[1]                      |  8*N
+| segment[0] cf[1] of pixel[1]                      |  8*N                             double
+| segment[1] cf[1] of pixel[1]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[1] of pixel[1]             |  8*N
+| segment[segments-1] cf[1] of pixel[1]             |  8*N                             double
 +---------------------------------------------------+
 .                                                   .
 .                                                   .
@@ -355,10 +355,10 @@ data                                                   size [bytes]
 .                                                   .
 .                                                   .
 +---------------------------------------------------+
-| segment[0] cf[corN-1] of pixel[width*height-1]    |  8*N
-| segment[1] cf[corN-1] of pixel[width*height-1]    |  8*N
+| segment[0] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
+| segment[1] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N
+| segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N                       double
 +---------------------------------------------------+
 \endverbatim
         \note All numbers are stored in little-endian form!!! and the pixel order is always row major!
@@ -372,6 +372,7 @@ data                                                   size [bytes]
         float* video_frame;
         float sframe_max;
         float sframe_min;
+        uint64_t cnt;
     };
 
     void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max);
@@ -441,8 +442,13 @@ data                                                   size [bytes]
     float* backgroundImage;
     float* bleachOffset;
     float* bleachAmplitude;
+    float* bleachTime;
     float* firstFrames;
     float* lastFrames;
+
+    float* fit_frames;
+    double* fit_t;
+    int NFitFrames;
 
     static QMutex* mutexFilename;
 

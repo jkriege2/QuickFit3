@@ -194,9 +194,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         rect.title=tr("ROI");
                         rect.type=QFRDROverviewImageInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
-                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=fabs(getProperty("ROI_X_START").toDouble()-getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
-                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=fabs(getProperty("ROI_Y_START").toDouble()-getProperty("ROI_Y_END").toDouble());
                         img.geoElements.append(rect);;
                     }
                     ovrImages.append(img);
@@ -209,9 +209,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         rect.title=tr("ROI");
                         rect.type=QFRDROverviewImageInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
-                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=fabs(getProperty("ROI_X_START").toDouble()-getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
-                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=fabs(getProperty("ROI_Y_START").toDouble()-getProperty("ROI_Y_END").toDouble());
                         img.geoElements.append(rect);;
                     }
                     ovrImages.append(img);
@@ -224,9 +224,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         rect.title=tr("ROI");
                         rect.type=QFRDROverviewImageInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
-                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
-                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=fabs(getProperty("ROI_Y_START").toDouble()- getProperty("ROI_Y_END").toDouble());
                         img.geoElements.append(rect);;
                     }
                     ovrImages.append(img);
@@ -239,9 +239,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         rect.title=tr("ROI");
                         rect.type=QFRDROverviewImageInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
-                        rect.width=qMax(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
-                        rect.height=qMax(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=fabs(getProperty("ROI_Y_START").toDouble()- getProperty("ROI_Y_END").toDouble());
                         img.geoElements.append(rect);;
                     }
                     ovrImages.append(img);

@@ -10,6 +10,36 @@
 #include <typeinfo>
 
 
+
+
+static double QFRDRImagingFCSDataExplorer_fExp( double t, const double *par )
+{
+    const double tau=par[0];
+    const double A=par[1];
+    const double B=par[2];
+    return B+A*exp(-t/tau);
+
+}
+
+static double QFRDRImagingFCSDataExplorer_fExpLin( double t, const double *par )
+{
+    const double tau=par[0];
+    const double A=par[1];
+    return log(A)-t/tau;
+
+}
+
+static double QFRDRImagingFCSDataExplorer_fExp2( double t, const double *par )
+{
+    const double tau=par[0];
+    const double A=par[1];
+    const double tau2=par[1];
+    const double A2=par[2];
+    const double B=par[3];
+    return B+A*exp(-t/tau)+A2*exp(-t/tau2);
+
+}
+
 QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFRDRImagingFCSDataExplorer)
@@ -18,7 +48,9 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     initing=false;
     avg=NULL;
     fit=NULL;
+    fit2=NULL;
     frame=frameRaw=NULL;
+    statRangedMin=0;
     N=0;
     ui->setupUi(this);
     image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::FloatArray, NULL, 0, 0, JKQTPMathImage::GRAY, ui->pltImage->get_plotter());
@@ -41,12 +73,17 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     avgGraph->set_drawLine(true);
     avgGraph->set_symbol(JKQTPnoSymbol);
     avgFit=new JKQTPxyLineGraph(ui->pltIntensity->get_plotter());
-    avgFit->set_title(tr("fit"));
+    avgFit->set_title(tr("fit: 1-exp"));
     avgFit->set_drawLine(true);
     avgFit->set_symbol(JKQTPnoSymbol);
+    avgFit2=new JKQTPxyLineGraph(ui->pltIntensity->get_plotter());
+    avgFit2->set_title(tr("fit: 2-exp"));
+    avgFit2->set_drawLine(true);
+    avgFit2->set_symbol(JKQTPnoSymbol);
     ui->pltIntensity->addGraph(fitRange);
     ui->pltIntensity->addGraph(avgGraph);
-    ui->pltIntensity->addGraph(avgFit);
+    //ui->pltIntensity->addGraph(avgFit);
+    //ui->pltIntensity->addGraph(avgFit2);
     ui->pltImage->get_plotter()->set_maintainAspectRatio(true);
     ui->pltImageRaw->get_plotter()->set_maintainAspectRatio(true);
     ui->pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
@@ -55,9 +92,11 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     ui->pltImage->get_yAxis()->set_minTicks(5);
     ui->pltImageRaw->get_xAxis()->set_minTicks(5);
     ui->pltImageRaw->get_yAxis()->set_minTicks(5);
-    ui->spinDecay->setCheckBounds(false, false);
-    ui->edtOffset->setCheckBounds(false, false);
-    ui->edtAmplitude->setCheckBounds(false, false);
+    //ui->edtOffset->setCheckBounds(false, false);
+    //ui->spinDecay->setCheckBounds(false, false);
+    //ui->edtAmplitude->setCheckBounds(false, false);
+    //ui->spinDecay2->setCheckBounds(false, false);
+    //ui->edtAmplitude_2->setCheckBounds(false, false);
 
 }
 
@@ -67,6 +106,7 @@ QFRDRImagingFCSDataExplorer::~QFRDRImagingFCSDataExplorer()
     if (avg) free(avg);
     if (stddev) free(stddev);
     if (fit) free(fit);
+    if (fit2) free(fit2);
     if (frame) free(frame);
     if (frameRaw) free(frameRaw);
 }
@@ -76,6 +116,7 @@ void QFRDRImagingFCSDataExplorer::writeSettings(QSettings &settings, QString pre
     saveSplitter(settings, ui->splitter, prefix+"splitter/");
     settings.setValue(prefix+"play_frames", ui->spinPlay->value());
     settings.setValue(prefix+"play_delay", playDelay);
+    settings.setValue(prefix+"display_sd", ui->chkDisplaySD->isChecked());
 }
 
 void QFRDRImagingFCSDataExplorer::readSettings(QSettings &settings, QString prefix) {
@@ -83,31 +124,9 @@ void QFRDRImagingFCSDataExplorer::readSettings(QSettings &settings, QString pref
     loadSplitter(settings, ui->splitter, prefix+"splitter/");
     ui->spinPlay->setValue(settings.value(prefix+"play_frames", ui->spinPlay->value()).toInt());
     playDelay=settings.value(prefix+"play_delay", playDelay).toInt();
+    ui->chkDisplaySD->setChecked(settings.value(prefix+"display_sd", playDelay).toBool());
 }
 
-void QFRDRImagingFCSDataExplorer::setBleachDecay(double frames) {
-    ui->spinDecay->setValue(frames);
-}
-
-double QFRDRImagingFCSDataExplorer::getBleachDecay() const {
-    return ui->spinDecay->value();
-}
-
-void QFRDRImagingFCSDataExplorer::setBleachA(double A) {
-    ui->edtAmplitude->setValue(A);
-}
-
-double QFRDRImagingFCSDataExplorer::getBleachA() const {
-    return ui->edtAmplitude->value();
-}
-
-void QFRDRImagingFCSDataExplorer::setBleachB(double B) {
-    ui->edtOffset->setValue(B);
-}
-
-double QFRDRImagingFCSDataExplorer::getBleachB() const {
-    return ui->edtOffset->value();
-}
 
 
 int QFRDRImagingFCSDataExplorer::getBinning() const {
@@ -217,18 +236,25 @@ bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporter
         imgWidth=reader->frameWidth();
         imgHeight=reader->frameHeight();
         currentFrame=-1;
+
+
+
         reallocFrames();
         readStatistics(prg);
     }
 
     ok=ok && prg->wasCanceled();
+    ui->labInfo->setText(tr("filename: '%1'").arg(filename));
+    QApplication::processEvents();
+    ui->pltImage->zoomToFit();
+    QApplication::processEvents();
+    ui->pltImageRaw->zoomToFit();
+    QApplication::processEvents();
+    ui->pltIntensity->zoomToFit();
+    QApplication::processEvents();
+    initing=false;
     prg->close();
     delete prg;
-    ui->labInfo->setText(tr("filename: '%1'").arg(filename));
-    ui->pltImage->zoomToFit();
-    ui->pltImageRaw->zoomToFit();
-    ui->pltIntensity->zoomToFit();
-    initing=false;
     return ok;
 }
 
@@ -239,17 +265,21 @@ void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     avgGraph->set_yErrorColumn(-1);
     avgFit->set_xColumn(-1);
     avgFit->set_yColumn(-1);
+    avgFit2->set_xColumn(-1);
+    avgFit2->set_yColumn(-1);
 
     ds->clear();
     double* oldAvg=avg;
     double* oldStd=stddev;
     double* oldFit=fit;
+    double* oldFit2=fit2;
     this->N=0;
     this->Nfit=0;
     uint32_t NF=qMin((uint32_t)500, qMax((uint32_t)10, N/100));
     avg=(double*)malloc(N*sizeof(double));
     stddev=(double*)malloc(N*sizeof(double));
     fit=(double*)malloc(NF*sizeof(double));
+    fit2=(double*)malloc(NF*sizeof(double));
     this->N=N;
     this->Nfit=NF;
 
@@ -258,6 +288,7 @@ void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     size_t colS=ds->addColumn(stddev, N, "stddev");
     size_t colTF=ds->addLinearColumn(NF,0,N, "t_fit");
     size_t colF=ds->addColumn(fit, NF, "fit");
+    size_t colF2=ds->addColumn(fit2, NF, "fit2");
 
     avgGraph->set_xColumn(colT);
     avgGraph->set_yColumn(colA);
@@ -266,9 +297,14 @@ void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     avgFit->set_xColumn(colTF);
     avgFit->set_yColumn(colF);
 
+    avgFit2->set_xColumn(colTF);
+    avgFit2->set_yColumn(colF2);
+
+
     if (oldAvg) free(oldAvg);
     if (oldStd) free(oldStd);
     if (oldFit) free(oldFit);
+    if (oldFit2) free(oldFit2);
 
 }
 
@@ -366,12 +402,15 @@ bool QFRDRImagingFCSDataExplorer::readStatistics(QModernProgressDialog *prg) {
     reader->reset();
     readerRaw->reset();
     currentFrame=0;
+    statRangedMin=0;
     reallocStatistics(this->frames);
     if (prg) prg->setRange(0,this->frames);
     do {
         reader->readFrameFloat(frame);
         double var=0;
         avg[cnt]=statisticsAverageVariance(var, frame, imgWidth*imgHeight);
+        double m=statisticsMin(frame, imgWidth*imgHeight);
+        if ((cnt==0) || m<statRangedMin) statRangedMin=m;
         stddev[cnt]=sqrt(var);
         cnt++;
         if (prg && (this->frames>120)) {
@@ -410,6 +449,15 @@ void QFRDRImagingFCSDataExplorer::on_btnNext100_clicked() {
 
 void QFRDRImagingFCSDataExplorer::on_btnPlay_clicked() {
     nextPlayFrame();
+}
+
+void QFRDRImagingFCSDataExplorer::on_chkDisplaySD_toggled(bool checked) {
+    if (ui->chkDisplaySD->isChecked()) {
+        avgGraph->set_yErrorStyle(JKQTPerrorLines);
+    } else {
+        avgGraph->set_yErrorStyle(JKQTPnoError);
+    }
+    ui->pltIntensity->zoomToFit();
 }
 
 void QFRDRImagingFCSDataExplorer::nextPlayFrame() {
@@ -466,17 +514,23 @@ void QFRDRImagingFCSDataExplorer::getDataRange(uint32_t &start, uint32_t &end) {
 }
 
 void QFRDRImagingFCSDataExplorer::calcFit() {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double A=ui->edtAmplitude->value();
-    double B=ui->edtOffset->value();
-    double tau=ui->spinDecay->value();
+    /*QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+
+    uint32_t start, end;
+    getDataRange(start, end);
+
+    double par3[3]={ui->spinDecay->value(), ui->edtAmplitude->value(), 0}; //ui->edtOffset->value()};
+    double par5[5]={ui->spinDecay->value(), ui->edtAmplitude->value(), 1,0,0};//ui->spinDecay2->value(), ui->edtAmplitude_2->value(), 0}; //ui->edtOffset->value()};
     for (uint32_t i=0; i<Nfit; i++) {
         double t=(double)i/(double)Nfit*(double)N;
-        fit[i]=B+A*exp(-t/tau);
+        fit[i]=QFRDRImagingFCSDataExplorer_fExp(t-start, par3);
+        fit2[i]=QFRDRImagingFCSDataExplorer_fExp2(t-start, par5);
     }
     ui->pltIntensity->update_plot();
-    QApplication::restoreOverrideCursor();
+    QApplication::restoreOverrideCursor();*/
 }
+
 
 void QFRDRImagingFCSDataExplorer::updateRange(bool doReplot) {
     if (doReplot) QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -509,28 +563,8 @@ void QFRDRImagingFCSDataExplorer::updateRange(bool doReplot) {
 
 
 
-void fExpC( const double *par, int m_dat, const void *data,
-                       double *fvec, int *info )
-{
-    register int i;
-    const double* I=(double*)data;
-    const double tau=par[0];
-    const double A=par[1];
-    const double B=par[2];
-    for ( i = 0; i < m_dat; i++ ) fvec[i] = I[i]-(B+A*exp(-((double)i)/tau));
-}
-
-double fExp( double t, const double *par )
-{
-    const double tau=par[0];
-    const double A=par[1];
-    const double B=par[2];
-    return B+A*exp(-t/tau);
-
-}
-
 void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    /*QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     uint32_t start, end;
     getDataRange(start, end);
@@ -538,6 +572,7 @@ void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
 
 
     lm_control_struct control=lm_control_double;
+    control.maxcall=1000;
     lm_status_struct status;
     double dataI[500];
     double dataT[500];
@@ -548,25 +583,64 @@ void QFRDRImagingFCSDataExplorer::on_btnFit_clicked() {
         if (idx<0) idx=0;
         if (idx>=N) idx=N-1;
         dataT[i]=idx-start;
-        dataI[i]=avg[idx];
+        dataI[i]=log(avg[idx]);
     }
     srand(time(0));
-    double par[3]={ui->spinDecay->value(), ui->edtAmplitude->value(), ui->edtOffset->value()};
+    double par[3]={ui->spinDecay->value(), ui->edtAmplitude->value(), 0};//ui->edtOffset->value()};
     //lmmin( 3, par, end-start+1, (const void*) &avg[start], fExpC, &control, &status, NULL );
-    lmcurve_fit(3, par, 500, dataT, dataI, fExp, &control, &status);
+    lmcurve_fit(2, par, 500, dataT, dataI, QFRDRImagingFCSDataExplorer_fExpLin, &control, &status);
 
     //qDebug()<<par[0]<<par[1]<<par[2];
     ui->spinDecay->setValue(par[0]);
     ui->edtAmplitude->setValue(par[1]);
-    ui->edtOffset->setValue(par[2]);
+    //ui->edtOffset->setValue(par[2]);
 
     ui->labFitResult->setText(tr("fit result: %1<br>after %2 iterations, &chi;<sup>2</sup> = %3").arg(QString(lm_infmsg[status.info])).arg(status.nfev).arg(status.fnorm));
 
     calcFit();
-    QApplication::restoreOverrideCursor();
+    QApplication::restoreOverrideCursor();*/
 }
 
 
+void QFRDRImagingFCSDataExplorer::on_btnFit2_clicked() {
+    /*QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    uint32_t start, end;
+    getDataRange(start, end);
+    //qDebug()<<start<<end;
+
+
+    lm_control_struct control=lm_control_double;
+    control.maxcall=1000;
+    lm_status_struct status;
+    double dataI[500];
+    double dataT[500];
+    srand(123456);
+    for (int64_t i=0; i<500; i++) {
+        //int64_t idx=start+rand()*(int64_t)(end-start+1)/RAND_MAX;
+        int64_t idx=(int64_t)floor((double)start+(double)i/500.0*(double)(end-start+1));
+        if (idx<0) idx=0;
+        if (idx>=N) idx=N-1;
+        dataT[i]=idx-start;
+        dataI[i]=avg[idx];
+    }
+    srand(time(0));
+    double par[5]={ui->spinDecay->value(), ui->edtAmplitude->value(), 1,0,0};//ui->spinDecay2->value(), ui->edtAmplitude_2->value(), 0};//ui->edtOffset->value()};
+    //lmmin( 3, par, end-start+1, (const void*) &avg[start], fExpC, &control, &status, NULL );
+    lmcurve_fit(4, par, 500, dataT, dataI, QFRDRImagingFCSDataExplorer_fExp2, &control, &status);
+
+    //qDebug()<<par[0]<<par[1]<<par[2];
+    ui->spinDecay->setValue(par[0]);
+    ui->edtAmplitude->setValue(par[1]);
+    //ui->spinDecay2->setValue(par[2]);
+    //ui->edtAmplitude_2->setValue(par[3]);
+    //ui->edtOffset->setValue(par[4]);
+
+    ui->labFitResult->setText(tr("fit result: %1<br>after %2 iterations, &chi;<sup>2</sup> = %3").arg(QString(lm_infmsg[status.info])).arg(status.nfev).arg(status.fnorm));
+
+    calcFit();
+    QApplication::restoreOverrideCursor();*/
+}
 
 
 
