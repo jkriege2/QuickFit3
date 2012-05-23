@@ -113,6 +113,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
+		    mkdir ${CURRENTDIR}/lmfit/include
+		    cp ./lib/*.h ${CURRENTDIR}/lmfit/include
 			make -j${MAKE_PARALLEL_BUILDS} install
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
