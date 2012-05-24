@@ -720,6 +720,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             duration=timAcquisition.elapsed()/1000.0;
         }
         progress.setValue(100);
+        measured.append(optSetup->getMeasuredValues());
 
 
 
@@ -1197,7 +1198,6 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                             timAcquisition.start();
                             timStart=QDateTime::currentDateTime();
                         }
-                        measured.append(optSetup->getMeasuredValues());
                         if (useCam1) {
                             if (ecamera1->acquire(camera1, buffer1)) {
                                 TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
@@ -1219,6 +1219,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                         }
                         imageCnt++;
                     }
+                    measured.append(optSetup->getMeasuredValues());
                     //QApplication::processEvents();
                 }
                 if (!ok) running=false;
@@ -1234,6 +1235,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
         }
         progress.setValue(100);
+        measured.append(optSetup->getMeasuredValues());
 
         //////////////////////////////////////////////////////////////////////////////////////
         // collect lightpath data common to all cameras
@@ -1294,10 +1296,10 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
             if (useCam1) pf<<",   real value camera1";
             if (useCam2) pf<<",   real value camera2";
             pf<<"\n";
-            for (int i=0; i<qMin(scanVals.size(), qMin(realValues1.size(), realValues2.size())); i++) {
+            for (int i=0; i<qMin(scanVals.size(), qMax(realValues1.size(), realValues2.size())); i++) {
                 pf<<i<<", "<<CDoubleToQString(scanVals[i]);
-                if (useCam1) pf<<", "<<CDoubleToQString(realValues1[i].toDouble());
-                if (useCam2) pf<<", "<<CDoubleToQString(realValues2[i].toDouble());
+                if (useCam1 && i<realValues1.size()) pf<<", "<<CDoubleToQString(realValues1[i].toDouble());
+                if (useCam2 && i<realValues2.size()) pf<<", "<<CDoubleToQString(realValues2[i].toDouble());
                 pf<<"\n";
             }
         }
@@ -1326,6 +1328,15 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                 files.append(d);
             } else {
                 log_error(tr("  - could not write parameter values file '%1' for camera 1: %2 ...").arg(ParamValuesFilename).arg(posFile.errorString()));
+            }
+
+            QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix1, measured);
+            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                QFExtensionCamera::AcquititonFileDescription d;
+                d.name=MeasurementsFilename;
+                d.description="measureable properties of setup";
+                d.type="CSV";
+                files.append(d);
             }
 
             log_text(tr("  - writing acquisition description 1 ..."));
@@ -1850,7 +1861,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             if (useCam1) prog1=ecamera1->getAcquisitionProgress(camera1);
             if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
             progress.setValue(qMin(prog1,prog2));
-            if (time1.elapsed()>500) {
+            if (time1.elapsed()>200) {
                 measured.append(optSetup->getMeasuredValues());
                 time1.start();
             }
@@ -1871,6 +1882,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         }
     }
     progress.setValue(100);
+    measured.append(optSetup->getMeasuredValues());
 
 
 
@@ -2249,7 +2261,7 @@ QString QFESPIMB040MainWindow2::saveMeasuredData(const QString& filenamePrefix, 
         for (int i=0; i<data.size(); i++) {
             out<<double(data[0].time.msecsTo(data[i].time))/1000.0;
             //out<<",\t\""<<data[0].time.toString("yyyy.MM.dd-hh:mm:ss.zzz")<<"\"";
-            for (int j=2; j<columns.size(); j++) {
+            for (int j=1; j<columns.size(); j++) {
                 QVariant v=data[i].data.value(columns[j], QVariant());
                 out<<",\t";
                 if (   v.type()==QVariant::Bool

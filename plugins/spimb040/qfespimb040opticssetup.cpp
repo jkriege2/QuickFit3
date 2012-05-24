@@ -974,5 +974,7 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
     ui->camConfig1->storeMeasurements(m.data, "camera1/");
     ui->camConfig2->storeMeasurements(m.data, "camera2/");
 
+    //qDebug()<<"measuredValues(): "<<m.data;
+
     return m;
 }

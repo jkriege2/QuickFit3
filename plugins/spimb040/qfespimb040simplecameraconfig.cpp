@@ -654,8 +654,10 @@ void QFESPIMB040SimpleCameraConfig::storeMeasurements(QMap<QString, QVariant> &d
     if (md) {
         //qDebug()<<"camera"<<camIdx<<" is measurement device connected: "<<md->isMeasurementDeviceConnected(camIdx);
         for (unsigned int i=0; i<md->getMeasurementDeviceValueCount(camIdx); i++) {
-            data[prefix+md->getMeasurementDeviceValueShortName(camIdx, i)]=md->getMeasurementDeviceValue(camIdx, i);
+            QString n=md->getMeasurementDeviceValueShortName(camIdx, i);
+            data[prefix+n]=md->getMeasurementDeviceValue(camIdx, i);
             //qDebug()<<"   "<<i+1<<"/"<<md->getMeasurementDeviceValueCount(camIdx)<<":   "<<prefix+md->getMeasurementDeviceValueShortName(camIdx, i)<<"="<<md->getMeasurementDeviceValue(camIdx, i);
+            //qDebug()<<"   "<<i+1<<"/"<<md->getMeasurementDeviceValueCount(camIdx)<<":   "<<prefix+n<<"="<<data[prefix+n];
         }
     }
 }
