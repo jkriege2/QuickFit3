@@ -2374,4 +2374,27 @@ double QFRawDataRecord::resultsGetErrorInNumberErrorList(const QString &evaluati
     return defaultValue;
 }
 
+int QFRawDataRecord::evaluationResult::getVectorMatrixItems() const {
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumberVector:
+        case QFRawDataRecord::qfrdreNumberMatrix:
+            return dvec.size();
+        case QFRawDataRecord::qfrdreNumberErrorVector:
+        case QFRawDataRecord::qfrdreNumberErrorMatrix:
+            return qMin(dvec.size(), evec.size());
+        case QFRawDataRecord::qfrdreIntegerVector:
+        case QFRawDataRecord::qfrdreIntegerMatrix:
+            return ivec.size();
+        case QFRawDataRecord::qfrdreBooleanVector:
+        case QFRawDataRecord::qfrdreBooleanMatrix:
+            return bvec.size();
+        case QFRawDataRecord::qfrdreStringVector:
+        case QFRawDataRecord::qfrdreStringMatrix:
+            return svec.size();
+        default:
+            return 0;
+    }
+    return 0;
+}
+
 

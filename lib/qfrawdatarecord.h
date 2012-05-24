@@ -245,6 +245,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             QString label_rich; /**< a label describing the result (with richtext markup!) */
             QString group; /**< this result belongs to a group with the given name */
             bool sortPriority; /**< this result should appear towards the start of tables */
+
+            int getVectorMatrixItems() const;
         };
 
         /*! \brief initial size for results hash

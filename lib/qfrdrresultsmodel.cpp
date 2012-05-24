@@ -93,45 +93,120 @@ Qt::ItemFlags QFRDRResultsModel::flags(const QModelIndex &index) const {
 }
 
 QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
+    int resNameI=index.row();
+    int resI=index.column();
     if (!record || !index.isValid()) return QVariant();
     if (role==Qt::DisplayRole) {
-        if (index.row()<lastResultNames.size()) {
-            if (index.column()<lastResultSets.size()) { //record->resultsGetEvaluationCount()) {
-                QString en=lastResultSets[index.column()].first;
-                if (record->resultsExists(en, lastResultNames[index.row()])) {
-                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, lastResultNames[index.row()]);
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) { //record->resultsGetEvaluationCount()) {
+                QString en=lastResultSets[resI].first;
+                if (record->resultsExists(en, lastResultNames[resNameI])) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, lastResultNames[resNameI]);
                     if ( (r.type!=QFRawDataRecord::qfrdreNumberVector) && (r.type!=QFRawDataRecord::qfrdreNumberMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreNumberErrorVector) && (r.type!=QFRawDataRecord::qfrdreNumberErrorMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreIntegerVector) && (r.type!=QFRawDataRecord::qfrdreIntegerMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreStringVector) && (r.type!=QFRawDataRecord::qfrdreStringMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreBooleanVector) && (r.type!=QFRawDataRecord::qfrdreBooleanMatrix) ) {
-                        return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                        return QVariant(record->resultsGetAsString(en, lastResultNames[resNameI]).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
                     } else {
-                        return QVariant(QString("<")+QFRawDataRecord::evaluationResultType2String(r.type)+QString(">"));
+                        if (r.getVectorMatrixItems()<=10) return QVariant(record->resultsGetAsString(en, lastResultNames[resNameI]).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                        else {
+                            /*if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                                || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                                double var=0;
+                                double mean=qfstatisticsAverageVariance(var, r.dvec);
+                                return QVariant(QString("(%1 &plusmn; %2) %3 [").arg(mean).arg(sqrt(var)).arg(r.unit)+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                            } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                                double var=0;
+                                double mean=qfstatisticsAverageVariance(var, r.ivec);
+                                return QVariant(QString("(%1 &plusmn; %2) %3 [").arg(mean).arg(sqrt(var)).arg(r.unit)+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                            } else {*/
+                                return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                            //}
+                        }
                     }
                 }
-            } else if (index.column()==record->resultsGetEvaluationCount()) {
-                QString rname=lastResultNames[index.row()];
+            } else if (resI==record->resultsGetEvaluationCount()) {
+                QString rname=lastResultNames[resNameI];
                 double average=0;
                 double stddev=0;
                 calcStatistics(rname, average, stddev);
                 return QVariant(QString("%1 &plusmn; %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)));
             }
         }
+    } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) {
+                QString en=lastResultSets[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        double var=0;
+                        double mean=qfstatisticsAverageVariance(var, r.dvec);
+                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        double var=0;
+                        double mean=qfstatisticsAverageVariance(var, r.ivec);
+                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                    }
+                    return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                }
+            }
+        }
+
+    } else if ((role==AvgRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) {
+                QString en=lastResultSets[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return qfstatisticsAverage(r.dvec);
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return qfstatisticsAverage(r.ivec);
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        return record->resultsGetAsDouble(en, rname);
+                    }
+                }
+            }
+        }
+    } else if ((role==SDRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) {
+                QString en=lastResultSets[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return sqrt(qfstatisticsVariance(r.dvec));
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return sqrt(qfstatisticsAverage(r.ivec));
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        return 0;
+                    }
+                }
+            }
+        }
+
     } else if ((role==ValueRole)||(role==Qt::EditRole)) {
-        if (index.row()<lastResultNames.size()) {
-            //if (index.column()<record->resultsGetEvaluationCount()) {
-                //QString en=record->resultsGetEvaluationName(index.column());
-            if (index.column()<lastResultSets.size()) {
-                QString en=lastResultSets[index.column()].first;
-                if (record->resultsExists(en, lastResultNames[index.row()])) {
-                    return record->resultsGetAsQVariant(en, lastResultNames[index.row()]);
+        if (resNameI<lastResultNames.size()) {
+            //if (resI<record->resultsGetEvaluationCount()) {
+                //QString en=record->resultsGetEvaluationName(resI);
+            if (resI<lastResultSets.size()) {
+                QString en=lastResultSets[resI].first;
+                if (record->resultsExists(en, lastResultNames[resNameI])) {
+                    return record->resultsGetAsQVariant(en, lastResultNames[resNameI]);
                 }
             }
         }
     } else if (role==NameRole) {
-        if (index.row()<lastResultNames.size()) {
-            return QVariant(lastResultNames[index.row()]);
+        if (resNameI<lastResultNames.size()) {
+            return QVariant(lastResultNames[resNameI]);
         }
     }
 

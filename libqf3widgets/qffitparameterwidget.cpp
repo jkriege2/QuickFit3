@@ -1,4 +1,5 @@
 #include "qffitparameterwidget.h"
+#include <QApplication>
 #include "tools.h"
 
 #include <limits.h>
@@ -726,6 +727,9 @@ void QFFitParameterWidgetWrapper::setVisible(bool visible) {
 
 
 void QFFitParameterWidgetWrapper::pEnterPressed() {
+    QWidget* w=QApplication::focusWidget();
+    w->clearFocus();
+    w->setFocus(Qt::TabFocusReason);
     emit enterPressed(m_parameterID);
 }
 

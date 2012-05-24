@@ -35,7 +35,9 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
 
         enum {
             ValueRole=Qt::UserRole,
-            NameRole=Qt::UserRole+1
+            NameRole=Qt::UserRole+1,
+            AvgRole=Qt::UserRole+2,
+            SDRole=Qt::UserRole+3
         };
     public slots:
         void resultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));

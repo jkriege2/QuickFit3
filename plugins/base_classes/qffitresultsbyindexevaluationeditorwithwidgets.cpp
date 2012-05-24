@@ -1035,6 +1035,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterValueChanged() {
     replotData();
 }
 
+void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterValueEnterPressed() {
+
+}
+
 void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterFixChanged() {
     updateParameterValues();
 }

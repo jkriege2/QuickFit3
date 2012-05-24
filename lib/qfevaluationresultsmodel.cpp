@@ -95,15 +95,34 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 QString en=lastResults[resI].second;
                 QString rname=lastResultNames[resNameI];
                 if (record) {
-                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, lastResultNames[index.row()]);
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                     if ( (r.type!=QFRawDataRecord::qfrdreNumberVector) && (r.type!=QFRawDataRecord::qfrdreNumberMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreNumberErrorVector) && (r.type!=QFRawDataRecord::qfrdreNumberErrorMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreIntegerVector) && (r.type!=QFRawDataRecord::qfrdreIntegerMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreStringVector) && (r.type!=QFRawDataRecord::qfrdreStringMatrix) &&
                          (r.type!=QFRawDataRecord::qfrdreBooleanVector) && (r.type!=QFRawDataRecord::qfrdreBooleanMatrix) ) {
-                        return QVariant(record->resultsGetAsString(en, lastResultNames[index.row()]).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                        return QVariant(record->resultsGetAsString(en, rname).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
                     } else {
-                        return QVariant(QString("<")+QFRawDataRecord::evaluationResultType2String(r.type)+QString(">"));
+                        if (r.getVectorMatrixItems()<=10) {
+                            return QVariant(record->resultsGetAsString(en,rname).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                        } else {
+                            /*if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                                || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                                double var=0;
+                                double mean=qfstatisticsAverageVariance(var, r.dvec);
+                                return QVariant(QString("(%1 &plusmn; %2) %3<br>[").arg(mean).arg(sqrt(var)).arg(r.unit)+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                            } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                                double var=0;
+                                double mean=qfstatisticsAverageVariance(var, r.ivec);
+                                return QVariant(QString("(%1 &plusmn; %2) %3<br>[").arg(mean).arg(sqrt(var)).arg(r.unit)+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                            } else {*/
+                                return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                            //}
+                        }
+
+
+                        //QString s= QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]");
+                        //return s;
                     }
                 }
             }else if (resI==lastResults.size()) {
@@ -114,6 +133,67 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 return QVariant(QString("%1 %3 %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)).arg(QChar(0xB1)));
             }
         }
+    } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        double var=0;
+                        double mean=qfstatisticsAverageVariance(var, r.dvec);
+                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        double var=0;
+                        double mean=qfstatisticsAverageVariance(var, r.ivec);
+                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                    }
+                    return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                }
+            }
+        }
+    } else if ((role==AvgRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return qfstatisticsAverage(r.dvec);
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return qfstatisticsAverage(r.ivec);
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        return record->resultsGetAsDouble(en, rname);
+                    }
+                }
+            }
+        }
+    } else if ((role==SDRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return sqrt(qfstatisticsVariance(r.dvec));
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return sqrt(qfstatisticsAverage(r.ivec));
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        return 0;
+                    }
+                }
+            }
+        }
+
     } else if ((role==ValueRole)||(role==Qt::EditRole)) {
         if (resNameI<lastResultNames.size()) {
             if (resI<lastResults.size()) {

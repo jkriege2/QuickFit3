@@ -17,6 +17,76 @@
  */
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 
+/*! \brief calculate the average and variance of a given array
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
+
+*/
+template <class T>
+double qfstatisticsAverageVariance(double& var, const T value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    register double sum2=0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            sum2=sum2+(double)(value[i]*value[i]);
+            sum=sum+(double)(value[i]);
+            NN++;
+        }
+    }
+    var= ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    return sum/(double)NN;
+}
+
+/*! \brief calculate the average and variance of a given array
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
+
+*/
+template <class T>
+double qfstatisticsAverage(const T value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            sum=sum+(double)(value[i]);
+            NN++;
+        }
+    }
+    return sum/(double)NN;
+}
+
+/*! \brief calculate the average and variance of a given array
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
+
+*/
+template <class T>
+double qfstatisticsVariance(const T value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    register double sum2=0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            sum2=sum2+(double)(value[i]*value[i]);
+            sum=sum+(double)(value[i]);
+            NN++;
+        }
+    }
+    return ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+}
 /*! \brief round a value according to the error
     \ingroup qf3lib_mathtools
 

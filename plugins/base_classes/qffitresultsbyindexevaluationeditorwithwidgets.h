@@ -249,6 +249,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         void residualHistogramBinsChanged(int bins);
         /** \brief executed when a parameter is changed by the user */
         void parameterValueChanged();
+        /** \brief executed when the user presses enter in a parameter field */
+        void parameterValueEnterPressed();
         /** \brief executed when a parameter fix is changed by the user */
         void parameterFixChanged();
         /** \brief executed when a parameter range is changed by the user */
