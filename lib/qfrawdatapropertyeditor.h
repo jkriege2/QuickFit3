@@ -73,6 +73,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
 
         /** \brief display help dialog */
         void displayHelp();
+
+        void copyValErrResults();
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -126,6 +128,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QWidget* widResults;
         /** \brief button to display help */
         QPushButton* btnHelp;
+        /** \brief action used to copy selection in tvResults to clipbord */
+        QAction* actCopyValErrResults;
 
         QSortFilterProxyModel* paramFilterProxy;
 

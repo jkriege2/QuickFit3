@@ -39,6 +39,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
             AvgRole=Qt::UserRole+2,
             SDRole=Qt::UserRole+3
         };
+
     public slots:
         void resultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));
     protected:

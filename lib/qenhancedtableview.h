@@ -23,7 +23,8 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
     signals:
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:
-        void copySelectionToExcel();
+        void copySelectionToExcel(int copyrole=Qt::EditRole);
+        void copySelectionAsValueErrorToExcel(int valuerole=Qt::EditRole, int errorrole=Qt::EditRole, Qt::Orientation orientation=Qt::Horizontal);
     protected:
         virtual void keyPressEvent(QKeyEvent* event);
     private:

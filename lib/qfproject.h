@@ -15,6 +15,7 @@
 #include <QList>
 #include <QPointer>
 #include "qfproperties.h"
+#include "qtriple.h"
 
 // forward declaration
 class QFRawDataRecord;

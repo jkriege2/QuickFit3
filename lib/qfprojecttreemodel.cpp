@@ -170,13 +170,17 @@ QFEvaluationItem* QFProjectTreeModel::getEvaluationByIndex(const QModelIndex& in
    return NULL;
 }
 
+
 QModelIndex QFProjectTreeModel::index ( QFRawDataRecord* record, QFProjectTreeModelNode* folder) const {
     QModelIndex idx;
     if (folder) {
-        if (folder->rawDataRecord()==record) return createIndex(folder->row(), 0, folder);
+        if (folder->rawDataRecord()==record) {
+            //qDebug()<<"found record "<<record<<"   folder->row()="<<folder->row();
+            return createIndex(folder->row(), 0, folder);
+        }
         for (int i=0; i<folder->childCount(); i++) {
             idx=index(record, folder->child(i));
-            if (idx.isValid()) break;
+            if (idx.isValid()) return idx;
         }
     }
     return idx;
@@ -194,10 +198,12 @@ QModelIndex QFProjectTreeModel::index ( QFEvaluationItem* record, QFProjectTreeM
     return idx;
 }
 
-
 QModelIndex QFProjectTreeModel::index ( QFRawDataRecord* record ) const {
+    //qDebug()<<"index("<<record<<"):   current="<<current;
     if (!current || !record ) return QModelIndex();
+    //qDebug()<<"index("<<record<<"):   current->rawDataExists(record)="<<current->rawDataExists(record);
     if (!current->rawDataExists(record)) return QModelIndex();
+    //qDebug()<<"index("<<record<<"):   index="<<index(record, rdrFolderItem);
     return index(record, rdrFolderItem);
 }
 
@@ -213,6 +219,66 @@ QModelIndex QFProjectTreeModel::index ( QFProjectTreeModelNode* node ) const {
     }
     return QModelIndex();
 }
+
+QFRawDataRecord* QFProjectTreeModel::getNextRecord ( QFRawDataRecord* record, QFProjectTreeModelNode* folder, int t) const {
+    //qDebug()<<QString(t*2, ' ')<<"getNextRecord(RDR "<<record<<", "<<folder<<")";
+   QFRawDataRecord* last=NULL;
+    if (folder) {
+        for (int i=folder->childCount()-1; i>=0; i--) {
+            //qDebug()<<QString(t*2, ' ')<<"   getNextRecord(EV "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount()<<"  last="<<last;
+            if (folder->child(i)->rawDataRecord()) {
+                //qDebug()<<QString(t*2, ' ')<<"getNextRecord(RDR "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount();
+                if (folder->child(i)->rawDataRecord()==record) {
+                    //qDebug()<<QString(t*2, ' ')<<"getNextRecord(EV "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount()<<"  returning last="<<last;
+                    return last;
+                }
+                last=folder->child(i)->rawDataRecord();
+            } else {
+                QFRawDataRecord* idx=getNextRecord(record, folder->child(i), t+1);
+                //qDebug()<<QString(t*2, ' ')<<"getNextRecord(RDR "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount()<<"  returning idx?="<<idx;
+                if (idx) return idx;
+            }
+
+        }
+    }
+    return NULL;
+}
+
+QFEvaluationItem* QFProjectTreeModel::getNextRecord ( QFEvaluationItem* record, QFProjectTreeModelNode* folder, int t) const {
+    //qDebug()<<QString(t*2, ' ')<<"getNextRecord(EV "<<record<<", "<<folder<<")";
+    QFEvaluationItem* last=NULL;
+     if (folder) {
+         for (int i=folder->childCount()-1; i>=0; i--) {
+             //qDebug()<<QString(t*2, ' ')<<"getNextRecord(EV "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount()<<"  last="<<last;
+             if (folder->child(i)->evaluationItem()) {
+                 if (folder->child(i)->evaluationItem()==record) {
+                     //qDebug()<<QString(t*2, ' ')<<"getNextRecord(EV "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount()<<"  returning last="<<last;
+                     return last;
+                 }
+                 last=folder->child(i)->evaluationItem();
+             } else {
+                 QFEvaluationItem* idx=getNextRecord(record, folder->child(i), t+1);
+                 //qDebug()<<QString(t*2, ' ')<<"getNextRecord(EV "<<record<<", "<<folder<<"):   i="<<i+1<<"/"<<folder->childCount()<<"  returning idx?="<<idx;
+                 if (idx) return idx;
+             }
+
+         }
+     }
+     return NULL;
+}
+
+QFRawDataRecord *QFProjectTreeModel::getNextRecord(QFRawDataRecord *record) const {
+    //qDebug()<<"getNextRecord(RDR "<<record<<")";
+    if (!record) return NULL;
+    return getNextRecord(record, rootItem);
+}
+
+QFEvaluationItem *QFProjectTreeModel::getNextRecord(QFEvaluationItem *record) const {
+    //qDebug()<<"getNextRecord(EV "<<record<<")";
+    if (!record) return NULL;
+    return getNextRecord(record, rootItem);
+}
+
 
 
 QFProjectTreeModelNode::nodeType QFProjectTreeModel::classifyIndex(const QModelIndex& index) const {

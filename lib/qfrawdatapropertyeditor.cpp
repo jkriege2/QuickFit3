@@ -199,6 +199,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     rwvlayout->addWidget(tbResults);
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
+    actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs"), this);
+    tbResults->addAction(actCopyValErrResults);
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
@@ -220,6 +222,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     rwvlayout->addWidget(labAveragedresults);
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
 
@@ -381,6 +384,10 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
 void QFRawDataPropertyEditor::displayHelp() {
     QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
     services->displayHelpWindow(dll);
+}
+
+void QFRawDataPropertyEditor::copyValErrResults() {
+    tvResults->copySelectionAsValueErrorToExcel(QFRDRResultsModel::AvgRole, QFRDRResultsModel::SDRole, Qt::Vertical);
 }
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {

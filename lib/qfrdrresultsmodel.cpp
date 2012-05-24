@@ -170,6 +170,8 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                         return qfstatisticsAverage(r.ivec);
                     } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                         return record->resultsGetAsDouble(en, rname);
+                    } else {
+                        if (r.type==QFRawDataRecord::qfrdreString) return record->resultsGetAsString(en, rname);
                     }
                 }
             }
@@ -187,7 +189,7 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                     } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
                         return sqrt(qfstatisticsAverage(r.ivec));
                     } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
-                        return 0;
+                        return record->resultsGetErrorAsDouble(en, rname);
                     }
                 }
             }

@@ -586,6 +586,7 @@ void MainWindow::aboutPlugins() {
     widget->exec();
     delete widget;
 }
+
 void MainWindow::createWidgets() {
     spCenter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     spCenter->setOrientation(Qt::Horizontal);
@@ -595,6 +596,8 @@ void MainWindow::createWidgets() {
     tvMain->setHeaderHidden(true);
     connect(tvMain, SIGNAL(doubleClicked ( const QModelIndex &)), this, SLOT(projectElementDoubleClicked(const QModelIndex&)));
     spCenter->addWidget(tvMain);
+    QShortcut* shortcut = new QShortcut(QKeySequence(tr("Del")), tvMain);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteItem()));
     setCentralWidget(spMain);
 
     QWidget* w=new QWidget(spCenter);
@@ -715,6 +718,8 @@ void MainWindow::createActions() {
     delItemAct->setStatusTip(tr("delete the currently selected item (if deletable) ..."));
     connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
+    tvMain->addAction(delItemAct);
+
 
 }
 
@@ -774,6 +779,10 @@ void MainWindow::createMenus() {
     menus["data/eval"]=evaluationMenu;
     menus["extensions"]=extensionMenu;
     menus["help"]=helpMenu;
+
+    tvMain->addAction(insertItemMenu->menuAction());
+    tvMain->addAction(evaluationMenu->menuAction());
+
 }
 
 void MainWindow::insertRawData() {
@@ -811,6 +820,8 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(newProjectAct);
     fileToolBar->addAction(openProjectAct);
     fileToolBar->addAction(saveProjectAct);
+    fileToolBar->addSeparator();
+    fileToolBar->addAction(helpAct);
     dataToolBar = addToolBar(tr("Data"));
     QToolButton* tb=new QToolButton(dataToolBar);
     tb->setMenu(insertItemMenu);
@@ -1150,14 +1161,30 @@ void MainWindow::deleteItem() {
         if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
+                QFRawDataRecord* nrec=project->getTreeModel()->getNextRecord(rec);
+                //qDebug()<<"rec "<<rec<<"   next "<<nrec<<"   index "<<project->getTreeModel()->index(nrec);
                 project->deleteRawData(rec->getID());
+                QApplication::processEvents();
+                QApplication::processEvents();
                 tvMain->expandToDepth(2);
+                QApplication::processEvents();
+                QApplication::processEvents();
+                tvMain->setCurrentIndex(project->getTreeModel()->index(nrec));
+                //qDebug()<<"    index "<<project->getTreeModel()->index(nrec);
             }
         } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
+                QFEvaluationItem* nrec=project->getTreeModel()->getNextRecord(rec);
+                //qDebug()<<"rec "<<rec<<"   next "<<nrec<<"   index "<<project->getTreeModel()->index(nrec);
                 project->deleteEvaluation(rec->getID());
+                QApplication::processEvents();
+                QApplication::processEvents();
                 tvMain->expandToDepth(2);
+                QApplication::processEvents();
+                QApplication::processEvents();
+                tvMain->selectionModel()->select(project->getTreeModel()->index(nrec), QItemSelectionModel::Current|QItemSelectionModel::Select);
+                //qDebug()<<"    index "<<project->getTreeModel()->index(nrec);
             }
         }
     }

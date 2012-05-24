@@ -37,6 +37,10 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         /** \brief returns a QModelIndex which points to the specified record */
         QModelIndex index ( QFEvaluationItem* record, QFProjectTreeModelNode* folder) const;
 
+
+        QFEvaluationItem *getNextRecord(QFEvaluationItem *record, QFProjectTreeModelNode *folder, int t=0) const;
+        QFRawDataRecord *getNextRecord(QFRawDataRecord *record, QFProjectTreeModelNode *folder, int t=0) const;
+
     public:
         virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
         virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
@@ -54,6 +58,12 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
 
         /** \brief returns a QModelIndex which points to the specified record */
         QModelIndex index ( QFRawDataRecord* record) const;
+
+        /** \brief returns the next record in the tree */
+        QFRawDataRecord* getNextRecord(QFRawDataRecord* record) const;
+
+        /** \brief returns the next record in the tree */
+        QFEvaluationItem* getNextRecord(QFEvaluationItem* record) const;
 
         /** \brief returns a QModelIndex which points to the specified record */
         QModelIndex index ( QFEvaluationItem* record) const;

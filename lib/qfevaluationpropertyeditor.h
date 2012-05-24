@@ -124,6 +124,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief display the online help dialog for this plugin */
         void displayHelp();
 
+        void copyValErrResults();
+
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;
@@ -174,6 +176,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QToolBar* tbResults;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyResults;
+        /** \brief action used to copy selection in tvResults to clipbord */
+        QAction* actCopyValErrResults;
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
         QAction* actRefreshResults;

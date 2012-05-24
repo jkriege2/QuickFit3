@@ -270,6 +270,10 @@ void QFEvaluationPropertyEditor::displayHelp() {
     services->displayHelpWindow(dll);
 }
 
+void QFEvaluationPropertyEditor::copyValErrResults() {
+    tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole);
+}
+
 
 void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
     if (current) {
@@ -386,8 +390,10 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tbResults->addAction(actRefreshResults);
     tbResults->addSeparator();
 
-    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
+    actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs"), this);
+    tbResults->addAction(actCopyValErrResults);
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
@@ -409,6 +415,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     rwvlayout->addWidget(labAveragedresults);
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
 

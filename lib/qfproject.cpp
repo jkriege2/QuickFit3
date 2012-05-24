@@ -684,6 +684,14 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
     return true;
 }
 
+
+bool rdrCalcMatchingResults_compare(const QPair<QPointer<QFRawDataRecord>, QString> &s1, const QPair<QPointer<QFRawDataRecord>, QString> &s2) {
+    QString ss1=s1.first->getName()+": "+s1.second;
+    QString ss2=s2.first->getName()+": "+s2.second;
+    return ss1.toLower() < ss2.toLower();
+}
+
+
 QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResults(const QString& evalFilter) const {
     QList<QPair<QPointer<QFRawDataRecord>, QString> > l;
 
@@ -706,7 +714,10 @@ QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResu
     }
 
     if (l.size()>0) {
-        qSort(l.begin(), l.end(), QFProject_StringPairCaseInsensitiveCompareSecond<QPointer<QFRawDataRecord> > );
+        qDebug()<<"rdrCalcMatchingResults: qSort()";
+        for (int i=0; i<l.size(); i++) qDebug()<<"  "<<i<<l[i].second;
+        qSort(l.begin(), l.end(), rdrCalcMatchingResults_compare );
+        for (int i=0; i<l.size(); i++) qDebug()<<"  "<<i<<l[i].second;
     }
 
     return l;
