@@ -125,6 +125,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void displayHelp();
 
         void copyValErrResults();
+        void copyValErrResultsNoHead();
 
     protected:
         /** \brief points to the record currently displayed */
@@ -176,8 +177,10 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QToolBar* tbResults;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyResults;
+        QAction* actCopyResultsNoHead;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyValErrResults;
+        QAction* actCopyValErrResultsNoHead;
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
         QAction* actRefreshResults;

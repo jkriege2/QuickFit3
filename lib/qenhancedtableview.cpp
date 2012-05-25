@@ -17,7 +17,11 @@ QEnhancedTableView::~QEnhancedTableView()
 }
 
 
-void QEnhancedTableView::copySelectionToExcel(int copyrole) {
+void QEnhancedTableView::copySelectionToExcelNoHead(int copyrole) {
+    copySelectionToExcel(copyrole, false);
+}
+
+void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
     if (!model()) return;
     if (!selectionModel()) return;
     QModelIndexList sel=selectionModel()->selectedIndexes();
@@ -49,11 +53,13 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole) {
     //
     //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
     QStringList hrow;
-    hrow.append(""); // empty header for first column (vertical headers!)
-    for (int c=0; c<colcnt; c++) {
-        hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c], Qt::Horizontal).toString()));
+    if (storeHead) {
+        hrow.append(""); // empty header for first column (vertical headers!)
+        for (int c=0; c<colcnt; c++) {
+            hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c], Qt::Horizontal).toString()));
+        }
+        data.append(hrow);
     }
-    data.append(hrow);
 
     // now add dta rows:
     //
@@ -61,7 +67,7 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole) {
     //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
     for (int r=0; r<rowcnt; r++) {
         QStringList row;
-        row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r], Qt::Vertical).toString())); // vertical header
+        if (storeHead) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r], Qt::Vertical).toString())); // vertical header
         for (int c=0; c<colcnt; c++) {
             row.append(""); // empty columns for data
         }
@@ -90,7 +96,9 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole) {
                 txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
                 break;
         }
-        if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt))data[r+1][c+1]=txt;
+        int shift=0;
+        if (storeHead) shift=1;
+        if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt))data[r+shift][c+shift]=txt;
     }
 
     QString result="";
@@ -108,7 +116,7 @@ bool copySelectionAsValueErrorToExcelcompare(const QPair<int, int>& s1, const QP
     return false;
 }
 
-void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int errorrole, Qt::Orientation orientation) {
+void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int errorrole, bool storeHead, Qt::Orientation orientation) {
     if (valuerole==errorrole) {
         copySelectionToExcel(valuerole);
     } else {
@@ -146,12 +154,14 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
         //
         //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
         QStringList hrow;
-        hrow.append(""); // empty header for first column (vertical headers!)
-        for (int c=0; c<colcnt; c++) {
-            if (collist[c].second==valuerole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
-            else hrow.append(QString("\"error: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+        if (storeHead) {
+            hrow.append(""); // empty header for first column (vertical headers!)
+            for (int c=0; c<colcnt; c++) {
+                if (collist[c].second==valuerole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+                else hrow.append(QString("\"error: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+            }
+            data.append(hrow);
         }
-        data.append(hrow);
 
         // now add dta rows:
         //
@@ -159,8 +169,10 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
         //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
         for (int r=0; r<rowcnt; r++) {
             QStringList row;
-            if (rowlist[r].second==valuerole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
-            else row.append(QString("\"error: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+            if (storeHead) {
+                if (rowlist[r].second==valuerole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+                else row.append(QString("\"error: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+            }
             for (int c=0; c<colcnt; c++) {
                 row.append(""); // empty columns for data
             }
@@ -221,12 +233,14 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
                     etxt=QString("\"%1\"").arg(edata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
                     break;
             }
+            int shift=0;
+            if (storeHead) shift=1;
             if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) {
-                data[r+1][c+1]=txt;
+                data[r+shift][c+shift]=txt;
                 if (orientation==Qt::Horizontal) {
-                    if (c+1<=colcnt) data[r+1][c+1+1]=etxt;
+                    if (c+1<=colcnt) data[r+shift][c+1+shift]=etxt;
                 } else {
-                    if (r+1<=rowcnt) data[r+1+1][c+1]=etxt;
+                    if (r+1<=rowcnt) data[r+1+shift][c+shift]=etxt;
                 }
             }
         }

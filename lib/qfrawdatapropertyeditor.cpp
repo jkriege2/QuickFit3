@@ -199,8 +199,13 @@ void QFRawDataPropertyEditor::createWidgets() {
     rwvlayout->addWidget(tbResults);
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
+    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
+    tbResults->addAction(actCopyResultsNoHead);
+
     actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
+    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs, but without a header (so data only)"), this);
+    tbResults->addAction(actCopyValErrResultsNoHead);
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
@@ -221,8 +226,11 @@ void QFRawDataPropertyEditor::createWidgets() {
     labAveragedresults->setSizePolicy(QSizePolicy::Ignored, labAveragedresults->sizePolicy().verticalPolicy());
     rwvlayout->addWidget(labAveragedresults);
 
+
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actCopyResultsNoHead, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcelNoHead()));
     connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
+    connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
 
@@ -387,7 +395,10 @@ void QFRawDataPropertyEditor::displayHelp() {
 }
 
 void QFRawDataPropertyEditor::copyValErrResults() {
-    tvResults->copySelectionAsValueErrorToExcel(QFRDRResultsModel::AvgRole, QFRDRResultsModel::SDRole, Qt::Vertical);
+    tvResults->copySelectionAsValueErrorToExcel(QFRDRResultsModel::AvgRole, QFRDRResultsModel::SDRole, true, Qt::Vertical);
+}
+void QFRawDataPropertyEditor::copyValErrResultsNoHead() {
+    tvResults->copySelectionAsValueErrorToExcel(QFRDRResultsModel::AvgRole, QFRDRResultsModel::SDRole, false, Qt::Vertical);
 }
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {

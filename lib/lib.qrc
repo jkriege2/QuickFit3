@@ -35,6 +35,8 @@
         <file alias="savereport.png">icons/fcs_savereport.png</file>
         <file alias="importer_icon.png">icons/importer_icon.png</file>
         <file alias="copy16valerr.png">icons/copy16valerr.png</file>
+        <file alias="copy16valerr_nohead.png">icons/copy16valerr_nohead.png</file>
         <file alias="copy16.png">icons/copy16.png</file>
+        <file alias="copy16_nohead.png">icons/copy16_nohead.png</file>
     </qresource>
 </RCC>

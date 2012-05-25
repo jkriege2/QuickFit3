@@ -75,6 +75,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void displayHelp();
 
         void copyValErrResults();
+        void copyValErrResultsNoHead();
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -120,6 +121,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QToolBar* tbResults;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyResults;
+        QAction* actCopyResultsNoHead;
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
         /** \brief action used to delete selection in tvResults */
@@ -130,6 +132,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QPushButton* btnHelp;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyValErrResults;
+        QAction* actCopyValErrResultsNoHead;
 
         QSortFilterProxyModel* paramFilterProxy;
 

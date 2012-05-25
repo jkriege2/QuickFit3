@@ -274,6 +274,9 @@ void QFEvaluationPropertyEditor::copyValErrResults() {
     tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole);
 }
 
+void QFEvaluationPropertyEditor::copyValErrResultsNoHead() {
+    tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole, false);
+}
 
 void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
     if (current) {
@@ -392,8 +395,12 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
+    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without herader rows/columns"), this);
+    tbResults->addAction(actCopyResultsNoHead);
     actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
+    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs, but without a header (so data only)"), this);
+    tbResults->addAction(actCopyValErrResultsNoHead);
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
@@ -415,7 +422,9 @@ void QFEvaluationPropertyEditor::createWidgets() {
     rwvlayout->addWidget(labAveragedresults);
 
     connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    connect(actCopyResultsNoHead, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcelNoHead()));
     connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
+    connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
 

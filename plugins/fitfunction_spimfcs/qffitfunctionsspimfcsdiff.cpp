@@ -306,7 +306,7 @@ void QFFitFunctionsSPIMFCSDiff::calcParameter(double* data, double* error) const
     if (error) error[FCSSDiff_1n_particle]=fabs(eN/N/N);
 
     // calculate Veff = 2 * a^2 * sigmaz
-    data[FCSSDiff_focus_volume]=2*a*a*sigmaz;
+    data[FCSSDiff_focus_volume]=2.0*a*a*sigmaz;
     if (error) error[FCSSDiff_focus_volume]=sqrt(sqr(esigmaz*2.0*a*a)+sqr(ea*4.0*a*sigmaz));
 
     // calculate C = N / Veff
