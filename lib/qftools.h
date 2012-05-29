@@ -11,7 +11,7 @@
 #include <QFile>
 #include "lib_imexport.h"
 #include <QFileDialog>
-
+#include <QRegExp>
 
 /*! \brief store the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools

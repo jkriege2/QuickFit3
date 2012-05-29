@@ -348,11 +348,23 @@ QStringList	qfGetOpenFileNames ( QWidget * parent, const QString & caption, cons
 }
 
 QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options )  {
+    QString s="";
 #ifdef Q_OS_UNIX
-    return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
+    s= QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, QFileDialog::DontUseNativeDialog|options);
+    // this regexp recognizes the first file extension in filters like "Name File (*.cpw *.abc);; Filename 2 (*.txt)" then the first
+    // extension is appended to the filename, if it does not already contain a suffix
+    QRegExp rx(".*\\(\\*\\.(\\S+).*\\)\\w*[;;.]*", Qt::CaseInsensitive);
+    rx.setMinimal(true);
+    if (rx.indexIn(selectedFilter)!=-1) {
+        QString ext=rx.cap(1);
+        if (!QFileInfo(s).suffix().isEmpty()) {
+            s=s+"."+ext;
+        }
+    }
 #else
-    return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, options);
+    s= QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, options);
 #endif
+    return s;
 }
 
 int getApplicationBitDepth() {
