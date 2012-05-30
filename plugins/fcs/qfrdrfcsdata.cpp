@@ -767,7 +767,7 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
             data=csvReadline(f, ',', '#', 0);
             qDebug()<<"        "<<data;
             if (data.size()>0) datalist.append(data);
-        } while (data.size()<=0);
+        } while (data.size()>0);
         int runs=0;
         if (datalist.size()>0) {
             runs=datalist[0].size()-1;

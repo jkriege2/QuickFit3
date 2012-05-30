@@ -68,7 +68,7 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
     const double sqpi=sqrt(M_PI);
 
     if (comp>0) {
-        const double fac_z1=sqrt(1.0+D1*t/sqr(sigmaz));
+        const double fac_z1=sqrt(1.0+4.0*D1*t/sqr(sigmaz));
         const double dt_sigma2=4.0*D1*t+sqr(wxy);
         const double fac_xy1=sqpi*a*erf(a/sqrt(dt_sigma2))+sqrt(dt_sigma2)*(exp(-sqr(a)/dt_sigma2)-1.0);
         const double d1=1.0/fac_z1*sqr(fac_xy1);
@@ -76,7 +76,7 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
     }
 
     if (comp>1) {
-        const double fac_z2=sqrt(1.0+D2*t/sqr(sigmaz));
+        const double fac_z2=sqrt(1.0+4.0*D2*t/sqr(sigmaz));
         const double dt_sigma22=4.0*D2*t+sqr(wxy);
         const double fac_xy2=sqpi*a*erf(a/sqrt(dt_sigma22))+sqrt(dt_sigma22)*(exp(-sqr(a)/dt_sigma22)-1.0);
         const double d2=1.0/fac_z2*sqr(fac_xy2);
@@ -84,7 +84,7 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
     }
 
     if (comp>2) {
-        const double fac_z3=sqrt(1.0+D3*t/sqr(sigmaz));
+        const double fac_z3=sqrt(1.0+4.0*D3*t/sqr(sigmaz));
         const double dt_sigma23=4.0*D3*t+sqr(wxy);
         const double fac_xy3=sqpi*a*erf(a/sqrt(dt_sigma23))+sqrt(dt_sigma23)*(exp(-sqr(a)/dt_sigma23)-1.0);
         const double d3=1.0/fac_z3*sqr(fac_xy3);
