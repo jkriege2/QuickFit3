@@ -309,6 +309,10 @@ void QFRDRFCSData::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("list", l);
         w.writeEndElement();
     }
+    QString filetype=getProperty("FILETYPE", "unknown").toString();
+    if (filetype.toUpper()=="INTERNAL") {
+        saveInternal(w);
+    }
 }
 
 void QFRDRFCSData::intReadData(QDomElement* e) {
@@ -346,6 +350,8 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
             return;
         }
         loadCorrelationCurvesFromALBA(files[0]);
+    } else if (filetype.toUpper()=="INTERNAL") {
+        loadInternal(e);
     } else if (filetype.toUpper()=="CSV_CORR") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
@@ -718,12 +724,68 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
     return true;
 }
 
+
 QString QFRDRFCSData::getCorrelationRunName(int run) {
     //if (run<0) return tr("average");
     if (run<correlationRuns) return tr("run %1").arg(run);
     return QString("");
 }
 
+void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
+    w.writeStartElement("internal_correlations");
+    QString csv;
+    for (int i=0; i<correlationN; i++) {
+        csv=csv+CDoubleToQString(correlationT[i]);
+        for (int j=0; j<correlationRuns; j++) {
+            csv=csv+", "+CDoubleToQString(correlation[j*correlationN+i]);
+        }
+        csv=csv+"\n";
+    }
+    w.writeCDATA(csv);
+    w.writeEndElement();
+
+}
+
+bool QFRDRFCSData::loadInternal(QDomElement* e) {
+    QString csv=getProperty("INTERNAL_CSV", "").toString();
+    //qDebug()<<csv;
+    deleteProperty("INTERNAL_CSV");
+    if (e && csv.isEmpty()) {
+        QDomElement de=e->firstChildElement("internal_correlations");
+        if (!de.isNull()) {
+            csv=de.text();
+        }
+    }
+    //qDebug()<<csv;
+    if (!csv.isEmpty()) {
+        qDebug()<<"parsing csv: "<<csv;
+
+        QTextStream f(&csv);
+        QList<QVector<double> > datalist;
+        QVector<double> data;
+        do {
+            data=csvReadline(f, ',', '#', 0);
+            qDebug()<<"        "<<data;
+            if (data.size()>0) datalist.append(data);
+        } while (data.size()<=0);
+        int runs=0;
+        if (datalist.size()>0) {
+            runs=datalist[0].size()-1;
+        }
+        qDebug()<<"  -> "<<datalist.size()<<runs;
+        qDebug()<<"  -> "<<datalist;
+        resizeCorrelations(datalist.size(), runs);
+        for (int i=0; i<datalist.size(); i++) {
+            correlationT[i]=datalist[i].value(0,0.0);
+            for (int j=1; j<datalist[i].size(); j++) {
+                correlation[(j-1)*correlationN+i]=datalist[i].value(j,0.0);
+            }
+        }
+        recalculateCorrelations();
+        return true;
+    }
+    return false;
+}
 
 
 

@@ -735,12 +735,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         /////////////////////////////////////////////////////////////////////////////////////////////
         QFFitParameterWidgetWrapper* header=new QFFitParameterWidgetWrapper(eval, layParameters, 0, "", QFFitParameterWidgetWrapper::Header, true, true, QFFitFunction::DisplayError, true, this, tr("parameter"));
         m_fitParameters.append(header);
-        //connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(setEditRange(bool)));
-        //connect(btnEditRanges, SIGNAL(toggled(bool)), header, SLOT(unsetEditValues(bool)));
         connect(tbEditRanges, SIGNAL(currentChanged(int)), header, SLOT(setEditRange(int)));
         connect(tbEditRanges, SIGNAL(currentChanged(int)), header, SLOT(unsetEditValues(int)));
-        //header->setEditRange(btnEditRanges->isChecked());
-        //header->unsetEditValues(!btnEditRanges->isChecked());
         header->setEditRange(tbEditRanges->currentIndex());
         header->unsetEditValues(tbEditRanges->currentIndex());
 
@@ -777,8 +773,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
             if (falg) fpw->setRangeEnabled(falg->get_supportsBoxConstraints());
             fpw->setToolTip(d.name);
             m_fitParameters.append(fpw);
-            //connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(unsetEditValues(bool)));
-            //connect(btnEditRanges, SIGNAL(toggled(bool)), fpw, SLOT(setEditRange(bool)));
             connect(tbEditRanges, SIGNAL(currentChanged(int)), fpw, SLOT(unsetEditValues(int)));
             connect(tbEditRanges, SIGNAL(currentChanged(int)), fpw, SLOT(setEditRange(int)));
             connect(fpw, SIGNAL(valueChanged(QString, double)), this, SLOT(parameterValueChanged()));

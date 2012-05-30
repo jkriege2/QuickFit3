@@ -20,6 +20,9 @@
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "../interfaces/qfrdrcountratesinterface.h"
+#include "qftools.h"
+#include "csvtools.h"
+#include "qfrdrfcsfitfunctionsimulator.h"
 
 
 /*! \brief manages a FCS dataset (set of correlation curves with multiple runs)
@@ -327,6 +330,10 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          * and imports that channel. If this property is not present, the first channel (CH0) will be loaded.
          */
         bool loadFromALV5000(QString filename);
+        /** \brief initialisez the data from the project file
+         */
+        bool loadInternal(QDomElement* e);
+        void saveInternal(QXmlStreamWriter& w) const;
 
     private:
 };

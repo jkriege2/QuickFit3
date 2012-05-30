@@ -3,6 +3,8 @@
 
 #include "qfpluginfitfunction.h"
 #include "qffitfunctionsspimfcsdiff.h"
+#include "qffitfunctionsspimfcsdiffe2.h"
+#include "qffitfunctionsspimfcsadiff.h"
 #include <QStringList>
 
 /*!

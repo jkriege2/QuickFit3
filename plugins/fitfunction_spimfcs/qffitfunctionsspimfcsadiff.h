@@ -1,11 +1,11 @@
-#ifndef QFFITFUNCTIONSSPIMFCSDIFF_H
-#define QFFITFUNCTIONSSPIMFCSDIFF_H
+#ifndef QFFITFUNCTIONSSPIMFCSADIFF_H
+#define QFFITFUNCTIONSSPIMFCSADIFF_H
 #include "qfpluginfitfunction.h"
 
 
 
 
-/*! \brief QFFitFunction class for a SPIM-FCS fit model with pure diffusion and 1/sqrt(e) lateral width
+/*! \brief QFFitFunction class for a SPIM-FCS fit model with anomalous diffusion
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 
     \f[ g(\tau)=G_\infty+\frac{1}{N}\cdot\frac{1}{4a^2\sqrt{\pi}}\cdot\sum\limits_{i=1}^3\rho_i\cdot\left[2a\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{D_i\tau+\sigma_{xy}^2}}\right)+\frac{4\cdot\sqrt{D_i\tau+\sigma_{xy}^2}}{\sqrt{\pi}}\cdot\left(\exp\left(-\frac{a^2}{4\cdot(D_i\tau+\sigma_{xy}^2)}\right)-1\right)\right]^2\cdot\left[1+\frac{D_i\tau}{\sigma_z^2}\right]^{-1/2} \f]
@@ -15,16 +15,16 @@
     \f[ C=\frac{N}{V_{\text{eff}}}=\frac{N}{2\cdot a^2\cdot \sigma_z} \f]
     \f[ \Delta C=\sqrt{\left(\frac{\Delta N}{2a^2\cdot\sigma_z}\right)^2+\left(\frac{\Delta\sigma_z\cdot N}{2a^2\sigma_z^2}\right)^2+\left(\frac{\Delta a\cdot N}{a^3\cdot\sigma_z}\right)^2} \f]
 */
-class QFFitFunctionsSPIMFCSDiff: public QFFitFunction {
+class QFFitFunctionsSPIMFCSADiff: public QFFitFunction {
     public:
-        QFFitFunctionsSPIMFCSDiff();
-        virtual ~QFFitFunctionsSPIMFCSDiff() {}
+        QFFitFunctionsSPIMFCSADiff();
+        virtual ~QFFitFunctionsSPIMFCSADiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Diffusion"); };
+        virtual QString name() const { return QString("SPIM-FCS: Anomalous Diffusion"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion"); };
+        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Anomalous Diffusion"); };
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_spim_diff"); };
+        virtual QString id() const { return QString("fcs_spim_adiff"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -50,4 +50,4 @@ class QFFitFunctionsSPIMFCSDiff: public QFFitFunction {
         virtual void sortParameter(double* parameterValues, double* error=NULL) const;
 };
 
-#endif // QFFITFUNCTIONSSPIMFCSDIFF_H
+#endif // QFFITFUNCTIONSSPIMFCSADIFF_H

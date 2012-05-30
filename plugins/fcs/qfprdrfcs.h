@@ -57,6 +57,8 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
     protected slots:
         /** \brief insert FCS data from file*/
         void insertFCS();
+
+        void insertSimulated();
     protected:
         /*! \brief add a ALV5000 file to the current project
 

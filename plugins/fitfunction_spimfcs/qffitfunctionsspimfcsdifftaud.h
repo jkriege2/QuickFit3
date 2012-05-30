@@ -5,7 +5,7 @@
 
 
 
-/*! \brief QFFitFunction class for a SPIM-FCS fit model with pure diffusion and 1/sqrt(e) lateral width
+/*! \brief QFFitFunction class for a SPIM-FCS fit model with pure diffusion
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 
     \f[ g(\tau)=G_\infty+\frac{1}{N}\cdot\frac{1}{4a^2\sqrt{\pi}}\cdot\sum\limits_{i=1}^3\rho_i\cdot\left[2a\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{D_i\tau+\sigma_{xy}^2}}\right)+\frac{4\cdot\sqrt{D_i\tau+\sigma_{xy}^2}}{\sqrt{\pi}}\cdot\left(\exp\left(-\frac{a^2}{4\cdot(D_i\tau+\sigma_{xy}^2)}\right)-1\right)\right]^2\cdot\left[1+\frac{D_i\tau}{\sigma_z^2}\right]^{-1/2} \f]

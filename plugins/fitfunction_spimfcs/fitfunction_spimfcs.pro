@@ -9,10 +9,14 @@ DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfpfitfunctionsspimfcs.h \
-           qffitfunctionsspimfcsdiff.h
+           qffitfunctionsspimfcsdiff.h \
+    qffitfunctionsspimfcsadiff.h \
+    qffitfunctionsspimfcsdiffe2.h
 
 SOURCES += qfpfitfunctionsspimfcs.cpp\
-           qffitfunctionsspimfcsdiff.cpp
+           qffitfunctionsspimfcsdiff.cpp \
+    qffitfunctionsspimfcsadiff.cpp \
+    qffitfunctionsspimfcsdiffe2.cpp
 
 FORMS =
 

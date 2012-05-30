@@ -92,6 +92,7 @@ plg_rdrsettings.subdir=./plugins/rdrsettings
 plg_rdrsettings.depends = lib libqf3widgets
 
 
+
 !macx {
 
     SUBDIRS += plg_spimb040

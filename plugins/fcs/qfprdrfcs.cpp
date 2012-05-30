@@ -2,7 +2,7 @@
 #include <QtGui>
 #include "qfrdrfcsdata.h"
 #include "dlgcsvparameters.h"
-#include "dlgcsvparameters.h"
+#include "qfrdrfcsfitfunctionsimulator.h"
 #include <QtXml>
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
@@ -22,10 +22,14 @@ QFRawDataRecord* QFPRDRFCS::createRecord(QFProject* parent) {
 
 
 void QFPRDRFCS::registerToMenu(QMenu* menu) {
+    QMenu* smenu=menu->addMenu(QIcon(":/fcs_logo.png"), tr("FCS data"));
     QAction* actFCS=new QAction(QIcon(":/fcs_open.png"), tr("Open FCS Data from File"), parentWidget);
     actFCS->setStatusTip(tr("Insert a new FCS data item from a specified file (CSV or ALV-5000 format)"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCS()));
-    menu->addAction(actFCS);
+    smenu->addAction(actFCS);
+    QAction* actFCSSim=new QAction(QIcon(":/fcs_simulate.png"), tr("FCS Data from Fit Function"), parentWidget);
+    connect(actFCSSim, SIGNAL(triggered()), this, SLOT(insertSimulated()));
+    smenu->addAction(actFCSSim);
 }
 
 
@@ -156,6 +160,26 @@ void QFPRDRFCS::insertFCS() {
             //tvMain->expandToDepth(2);
         }
 
+    }
+}
+
+void QFPRDRFCS::insertSimulated() {
+    QFRDRFCSFitFunctionSimulator* dlg=new QFRDRFCSFitFunctionSimulator(services, NULL);
+    if (dlg->exec()) {
+        QString CSV=dlg->getCSV();
+
+        QMap<QString, QVariant> p;
+        p["FILETYPE"]="INTERNAL";
+        p["INTERNAL_CSV"]=CSV;
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE";
+        QFRawDataRecord* e=project->addRawData(getID(), tr("Simulated FCS Model"), QStringList(), p, paramsReadonly);
+        if (e->error()) {
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing simulated FCS curve:\n%1").arg(e->errorDescription()));
+            services->log_error(tr("Error while importing simulated FCS curve:\n    %1\n").arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
+        }
+        services->setProgress(0);
     }
 }
 
