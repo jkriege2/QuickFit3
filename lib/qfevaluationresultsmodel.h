@@ -56,6 +56,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         QStringList lastResultNames;
         QStringList lastResultLabels;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > lastResults;
+        QMap<QString, QString> resultGroups;
 };
 
 #endif // QFEVALUATIONRESULTSMODEL_H

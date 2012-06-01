@@ -50,11 +50,17 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
             QList<QPair<QString, QString> > l=evaluation->getProject()->rdrCalcMatchingResultsNamesAndLabels(evalFilter);
             lastResultNames.clear();
             lastResultLabels.clear();
+            resultGroups.clear();
             for (int i=0; i<l.size(); i++) {
                 lastResultNames.append(l[i].second);
                 if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
                 else lastResultLabels.append(l[i].first);
             }
+            /*for (int i=0; i<lastResults.size(); i++) {
+                if (lastResults[i].first) {
+                    lastResults[i].first->resultsGetGroup(lastResults[i].second, )
+                }
+            }*/
         } else {
             lastResultNames.clear();
             lastResultLabels.clear();

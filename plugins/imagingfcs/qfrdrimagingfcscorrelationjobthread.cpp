@@ -444,6 +444,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(10);
 
+                        double videoAvgMin=0;
+                        double videoAvgMax=(float)0xFFFF;
                         //************** SAVE VIDEO
                         if ((m_status==1) && !was_canceled && video && real_video_count>0 ) {
                             emit messageChanged(tr("saving video ..."));
@@ -473,6 +475,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (real_video_count/10<=0) progressIncrement(100);
                                 free(img);
                                 TinyTIFFWriter_close(tif);
+                                videoAvgMin = avgMin;
+                                videoAvgMax = avgMax;
                             } else {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create video '%1'!").arg(localFilename));
@@ -678,6 +682,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (video && job.video) {
                                     text<<"video sum up                : "<<outLocale.toString(job.video_frames) << "\n";
                                     text<<"video frames                : "<<outLocale.toString(real_video_count) << "\n";
+                                    text<<"video avgMin                : "<<outLocale.toString(videoAvgMin) << "\n";
+                                    text<<"video avgMax                : "<<outLocale.toString(videoAvgMax) << "\n";
                                 }
                                 if (job.statistics) {
                                     text<<"statistics over             : "<<outLocale.toString(job.statistics_frames) << "\n";

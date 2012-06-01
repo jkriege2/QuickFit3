@@ -6,6 +6,9 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     QDialog(parent),
     ui(new Ui::QFRDRFCSFitFunctionSimulator)
 {
+    tauN=0;
+    tau=NULL;
+    corr=NULL;
     this->services=services;
     ui->setupUi(this);
     ui->edtMinTau->setRange(1e-10, 1e10);
@@ -82,6 +85,8 @@ QFRDRFCSFitFunctionSimulator::~QFRDRFCSFitFunctionSimulator()
         delete i.value();
     }
     m_fitFunctions.clear();
+    if (tau) free(tau);
+    if (corr) free(corr);
 }
 
 void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value)

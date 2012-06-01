@@ -165,7 +165,7 @@ void QFPRDRFCS::insertFCS() {
 
 void QFPRDRFCS::insertSimulated() {
     QFRDRFCSFitFunctionSimulator* dlg=new QFRDRFCSFitFunctionSimulator(services, NULL);
-    if (dlg->exec()) {
+    if (dlg->exec()==QDialog::Accepted) {
         QString CSV=dlg->getCSV();
 
         QMap<QString, QVariant> p;
