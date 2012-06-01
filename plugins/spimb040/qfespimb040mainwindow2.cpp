@@ -7,6 +7,9 @@
 
 #define sqr(a) ((a)*(a))
 #define PROCESS_EVENTS_TIMEOUT_MS 20
+#define SPIMACQUISITION_ERROR(message, title) \
+    log_error(QString("  - ")+(message)+QString("\n")); \
+    QMessageBox::critical(this, title, (message));
 
 
 QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent):
@@ -158,10 +161,22 @@ void QFESPIMB040MainWindow2::doImageStack() {
     QDateTime startDateTime=QDateTime::currentDateTime();
     QList<QFESPIMB040OpticsSetup::measuredValues> measured;
 
+    QProgressListDialog progress(tr("Image Stack Acquisition"), tr("&Cancel"), 0, 100, this);
+    progress.setWindowModality(Qt::WindowModal);
+    //progress.setMinimumDuration(0);
+    progress.setValue(0);
+    progress.addItem(tr("initializing stages"));
+    progress.addItem(tr("preparing cameras"));
+    progress.addItem(tr("performing acquisition"));
+    progress.addItem(tr("storing data to disk"));
+    progress.addItem(tr("clean up"));
+    progress.setHasProgressBar(true);
+    progress.show();
 
 
     log_text(tr("starting image stack acquisition:\n"));
     log_text(tr("  - locking stages\n"));
+    progress.start();
     optSetup->lockStages();
     optSetup->lockLightpath();
 
@@ -174,7 +189,10 @@ void QFESPIMB040MainWindow2::doImageStack() {
     QFExtensionLinearStage* stage=widImageStack->stage();
     int stageAxis=widImageStack->currentAxisID();
     double stageInitialPos=0;
-    if (!stage) {
+    progress.setProgressText(tr("locking stage 1 ..."));
+    ok=connectStageForAcquisition(stage, stageAxis, stageInitialPos, tr("B040SPIM: Image Stack Acquisition"),1);
+
+    /*if (!stage) {
         IMAGESTACK_ERROR(tr("no stage selected"));
         QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage selected!"));
         optSetup->unlockStages();
@@ -192,7 +210,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
     if (ok) {
         stage->setJoystickActive(stageAxis, false);
         stageInitialPos=stage->getPosition(stageAxis);
-    }
+    }*/
 
     if (ok) {
 
@@ -203,7 +221,10 @@ void QFESPIMB040MainWindow2::doImageStack() {
         int stageAxis2=widImageStack->currentAxisID2();
         double stageInitialPos2=0;
         if (widImageStack->useStage2()) {
-            if (!stage2) {
+            progress.setProgressText(tr("locking stage 2 ..."));
+            ok=connectStageForAcquisition(stage2, stageAxis2, stageInitialPos2, tr("B040SPIM: Image Stack Acquisition"),2);
+
+/*            if (!stage2) {
                 IMAGESTACK_ERROR(tr("no stage 2 selected"));
                 QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 2 selected!"));
                 optSetup->unlockStages();
@@ -222,7 +243,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 stage2->setJoystickActive(stageAxis2, false);
                 axisCount++;
                 stageInitialPos2=stage2->getPosition(stageAxis2);
-            }
+            }*/
         }
 
         if (!ok) {
@@ -238,7 +259,10 @@ void QFESPIMB040MainWindow2::doImageStack() {
         int stageAxis3=widImageStack->currentAxisID3();
         double stageInitialPos3=0;
         if (widImageStack->useStage3()) {
-            if (!stage3) {
+            progress.setProgressText(tr("locking stage 3 ..."));
+            ok=connectStageForAcquisition(stage3, stageAxis3, stageInitialPos3, tr("B040SPIM: Image Stack Acquisition"),3);
+
+            /*if (!stage3) {
                 IMAGESTACK_ERROR(tr("no stage 3 selected"));
                 QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 3 selected!"));
                 optSetup->unlockStages();
@@ -257,7 +281,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 stage3->setJoystickActive(stageAxis3, false);
                 axisCount++;
                 stageInitialPos3=stage3->getPosition(stageAxis3);
-            }
+            }*/
         }
 
         if (!ok) {
@@ -266,6 +290,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
             return;
         }
 
+
+        progress.nextItem();
 
         //////////////////////////////////////////////////////////////////////////////////////
         // LOCK/INIT CAMERA 1
@@ -279,8 +305,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
         QStringList TIFFFIlename1;;
         QList<TIFF*> tiff1;
         if (widImageStack->use1()) {
+            progress.setProgressText(tr("locking camera 1 ..."));
             if (!(useCam1=optSetup->lockCamera(0, &extension1, &ecamera1, &camera1, &previewSettingsFilename1))) {
-                IMAGESTACK_ERROR(tr("error locking camer 1!\n"));
+                IMAGESTACK_ERROR(tr("error locking camera 1!\n"));
             }
         }
         if (QFile::exists(widImageStack->currentConfigFilename(0))) acquisitionSettingsFilename1=widImageStack->currentConfigFilename(0);
@@ -297,6 +324,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         QList<TIFF*> tiff2;
         int camera2=0;
         if (widImageStack->use2()) {
+            progress.setProgressText(tr("locking camera 2 ..."));
             if(!(useCam2=optSetup->lockCamera(1, &extension2, &ecamera2, &camera2, &previewSettingsFilename2))) {
                 IMAGESTACK_ERROR(tr("error locking camer 2!\n"));
             }
@@ -308,10 +336,6 @@ void QFESPIMB040MainWindow2::doImageStack() {
             ok=false;
         }
 
-        QProgressDialog progress(tr("Image Stack Acquisition"), tr("&Cancel"), 0, 100, this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setMinimumDuration(0);
-        progress.setValue(0);
         if (ok && useCam1) log_text(tr("  - storing files with prefix 1: '%1'\n").arg(acquisitionPrefix1));
         if (ok && useCam2) log_text(tr("  - storing files with prefix 2: '%1'\n").arg(acquisitionPrefix2));
 
@@ -322,7 +346,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
         uint32_t* buffer1=NULL;
         if (ok && useCam1) {
             progress.setLabelText(tr("preparing camera 1 ..."));
-            QApplication::processEvents();
+            ok=prepareCamera(1, camera1, ecamera1, acquisitionSettingsFilename1, width1, height1, &buffer1);
+            /*QApplication::processEvents();
             QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
             ecamera1->useCameraSettings(camera1, settings);
             log_text(tr("  - prepared camer 1!\n"));
@@ -332,7 +357,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             if (!buffer1) {
                 ok=false;
                 IMAGESTACK_ERROR(tr("could not allocate image buffer for camera 1!\n"));
-            }
+            }*/
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -342,7 +367,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
         uint32_t* buffer2=NULL;
         if (ok && useCam2) {
             progress.setLabelText(tr("preparing camera 2 ..."));
-            QApplication::processEvents();
+            ok=prepareCamera(2, camera2, ecamera2, acquisitionSettingsFilename2, width2, height2, &buffer2);
+
+            /*QApplication::processEvents();
             QSettings settings(acquisitionSettingsFilename2, QSettings::IniFormat);
             ecamera2->useCameraSettings(camera2, settings);
             log_text(tr("  - prepared camera 2!\n"));
@@ -353,9 +380,11 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 ok=false;
                 IMAGESTACK_ERROR(tr("could not allocate image buffer for camera 2!\n"));
             }
+            */
         }
 
 
+        progress.setLabelText(tr("preparing lightpathes ..."));
 
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -411,6 +440,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             tiff2.append(NULL);
         }
 
+        progress.setLabelText(tr("opening/creating output files ..."));
 
         //////////////////////////////////////////////////////////////////////////////////////
         // OPEN OUTPUT TIFF FILES
@@ -439,6 +469,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
         }
 
+        progress.setLabelText(tr("switching main shutter on ..."));
+
+
         //////////////////////////////////////////////////////////////////////////////////////
         // switch on light
         //////////////////////////////////////////////////////////////////////////////////////
@@ -454,9 +487,11 @@ void QFESPIMB040MainWindow2::doImageStack() {
             ok=false;
         }
 
+
         //////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE A LIST WITH ALL POSITIONS TO MOVE TO
         //////////////////////////////////////////////////////////////////////////////////////
+        progress.setLabelText(tr("preparing list of stage positions ..."));
         double stageStart=widImageStack->stackStart();
         double stageDelta=widImageStack->stackDelta();
         int stageCount=widImageStack->stackCount();
@@ -511,6 +546,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
         // ACQUIRE IMAGE, MOVE, ACQUIRE IMAGE, MOVE, ...
         //    images are stored in TIFF files using libtiff and they are (possibly) downscaled to 16-bit
         //////////////////////////////////////////////////////////////////////////////////////
+        progress.nextItem();
+
         QMap<QString, QVariant> acquisitionDescription;
         QList<QVariant> positions, positions2, positions3;
         QTime timAcquisition=QTime::currentTime();
@@ -636,6 +673,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                             progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
+                            t1.start();
                         }
                     }
                     if (ok) {
@@ -722,6 +760,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
         progress.setValue(100);
         measured.append(optSetup->getMeasuredValues());
 
+        progress.nextItem();
+        progress.setProgressText(tr("switching main shutter off ..."));
 
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -733,6 +773,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         }
 
 
+        progress.setProgressText(tr("closing TIF files ..."));
         //////////////////////////////////////////////////////////////////////////////////////
         // close tiff files and free buffers
         //////////////////////////////////////////////////////////////////////////////////////
@@ -746,6 +787,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         if (buffer2) free(buffer2);
         buffer1=buffer2=NULL;
 
+        progress.setProgressText(tr("collecting acquisition data ..."));
         //////////////////////////////////////////////////////////////////////////////////////
         // collect acquisition data common to all cameras
         //////////////////////////////////////////////////////////////////////////////////////
@@ -903,6 +945,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
             log_text(tr(" DONE!\n"));
         }
 
+        progress.nextItem();
+        progress.setProgressText(tr("releasing cameras ..."));
         //////////////////////////////////////////////////////////////////////////////////////
         // release cameras
         //////////////////////////////////////////////////////////////////////////////////////
@@ -920,10 +964,11 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
         if (ok) log_text(tr("image stack acquisition DONE!\n"));
     }
+    progress.setProgressText(tr("releasing stages and lightpath ..."));
     optSetup->unlockStages();
     optSetup->unlockLightpath();
     optSetup->ensureLightpath();
-
+    progress.close();
 }
 
 
@@ -2326,17 +2371,49 @@ bool QFESPIMB040MainWindow2::setMainIlluminationShutter(bool on_off, bool blocki
     return false;
 }
 
-bool QFESPIMB040MainWindow2::prepareCamera(int num, int camera, QFExtensionCamera *ecamera, const QString& acquisitionSettingsFilename, int &width, int &height, uint32_t **buffer) {
+bool QFESPIMB040MainWindow2::prepareCamera(int num, int camera, QFExtensionCamera *ecamera, const QString& acquisitionSettingsFilename, int &width, int &height, uint32_t **buffer, const QString& acquisitionTitle) {
     width=0;
     height=0;
     *buffer=NULL;
     QSettings settings(acquisitionSettingsFilename, QSettings::IniFormat);
     ecamera->useCameraSettings(camera, settings);
-    log_text(tr("  - prepared camera %1!\n").arg(num));
     width=ecamera->getImageWidth(camera);
     height=ecamera->getImageHeight(camera);
     *buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
+    if (!(*buffer)) {
+        SPIMACQUISITION_ERROR(tr("could not allocate image buffer for camera 1!\n"), acquisitionTitle);
+        return false;
+    }
+    log_text(tr("  - prepared camera %1!\n").arg(num));
     return true;
+}
+
+
+
+
+bool QFESPIMB040MainWindow2::connectStageForAcquisition(QFExtensionLinearStage* stage, int stageAxis, double& stageInitialPos, const QString& acquisitionTitle, int stageNum) {
+    bool ok=true;
+    stageInitialPos=0;
+    if (!stage) {
+
+        SPIMACQUISITION_ERROR(tr("no stage %1 selected").arg(stageNum), acquisitionTitle);
+        optSetup->unlockStages();
+        optSetup->unlockLightpath();
+        return false;
+    }
+    if (ok && (!stage->isConnected(stageAxis))) {
+        log_text(tr("  - connecting to stage %3: '%1', axis %2!\n").arg(widImageStack->stageExtension()->getName()).arg(stageAxis).arg(stageNum));
+        stage->connectDevice(stageAxis);
+    }
+    if (ok && (!stage->isConnected(stageAxis)))  {
+        ok=false;
+        SPIMACQUISITION_ERROR(tr("error connecting to stage %3: '%1', axis %2").arg(widImageStack->stageExtension()->getName()).arg(stageAxis).arg(stageNum), acquisitionTitle);
+    }
+    if (ok) {
+        stage->setJoystickActive(stageAxis, false);
+        stageInitialPos=stage->getPosition(stageAxis);
+    }
+    return ok;
 }
 
 
