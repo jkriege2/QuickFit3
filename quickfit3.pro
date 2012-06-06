@@ -48,6 +48,10 @@ SUBDIRS += plg_fcsmaxent
 plg_fcsmaxent.subdir = ./plugins/qffcsmaxentevaluation
 plg_fcsmaxent.depends = lib libqf3widgets
 
+SUBDIRS += plg_fcsmsdevaluation
+plg_fcsmsdevaluation.subdir = ./plugins/fcsmsdevaluation
+plg_fcsmsdevaluation.depends = lib libqf3widgets
+
 SUBDIRS += plg_fcs_fitfuctions
 plg_fcs_fitfuctions.subdir=./plugins/fcs_fitfuctions
 

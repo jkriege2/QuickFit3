@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Maximum-Entropy Fit Online-Help</title>
+  </head>
+  <body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>Introduction</h2>
+		Ths plugn implements the maximum entropy (MaxEnt) data fit method for fluorescence correlation spectroscopy (FCS) or dynamic lightscattering (DLS) data, as described in these references:
+		<ul>
+		  <li>R.K. Bryan (1990): <strong>"Maximum entropy analysis of oversampled data problems"</strong>, <i>European Biophysics Journal</i> <b>18</b>(3), 65-174, DOI: 10.1007/BF02427376</li>
+		  <li>Károly Módos, Rita Galántai, Irén Bárdos-Nagy, Malte Wachsmuth, Katalin Tóth, Judit Fidy und Jörg Langowski (2004): <strong><a href="http://www.dkfz.de/Macromol/publications/files/ModosFCS.pdf">"Maximum-entropy decomposition of fluorescence correlation spectroscopy data: application to liposome–human serum albumin association"</a></strong>, <i>European Biophysics Journal</i> <b>33</b>(1), 59-67, DOI: 10.1007/s00249-003-0343-6</li>
+		</ul>
+		
+		
+		<h2>Supported Models</h2>
+		This plugin supports several models that incorporate a MaxEnt distribution $$math:(\tau_i, p(\tau_i)=p_i)_{i=1...N}$$:
+		<ol>
+		  <li><b>FCS: 3D diffusion with Triplet</b>: This plugin may be used for FCS data from a confocal microscope with assumed 3D diffusion. The model is:
+		       $$bmath:g(\tau)=\left(\frac{1-\Theta_T+\Theta_T\cdot\exp(-tau/\tau_T)}{1-\Theta_T}\right)\cdot\sum_{i=1}^Np_i\cdot\left(1+\frac{\tau}{\tau_i}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\cdot\tau_i}\right)^{-1/2}$$
+			   Here $$math:\Theta_T$$ is the triplet fraction and $$math:\tau_T$$ is the triplet lifetime. The parameter $$math:\gamma$$ describes the axial ratio of the gaussian laser focus (a common value for confocal microscopes is $$math:\gamma\approx 6$$).
+		  </li>
+		</ol>
+		
+		
+		<h2>Implementation Details</h2>
+  </body>
+</html>
