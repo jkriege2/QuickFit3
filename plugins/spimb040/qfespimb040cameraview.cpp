@@ -680,7 +680,7 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
             double d=sqrt(dx*dx+dy*dy);
             double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
             double angle=atan(dy/dx)/M_PI*180.0;
-            labCurrentPos->setText(tr("<b></b>img(%1, %2) = img(%4&mu;m, %5&mu;m) = %3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>l</i><sub>meas</sub> = %6px = %7&mu;m&nbsp;&nbsp;&nbsp;&alpha;<sub>meas</sub> = %8°").arg(xx).arg(yy).arg(s).arg(xx*pixelW).arg(yy*pixelH).arg(d).arg(du).arg(angle));
+            labCurrentPos->setText(tr("<b></b>img(%1, %2) = img(%4&mu;m, %5&mu;m) = %3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>l</i><sub>meas</sub> = %6px = %7&mu;m&nbsp;&nbsp;&nbsp;&alpha;<sub>meas</sub> = %8").arg(xx).arg(yy).arg(s).arg(xx*pixelW).arg(yy*pixelH).arg(d).arg(du).arg(angle));
         } else {
             labCurrentPos->setText("");
         }
@@ -1605,7 +1605,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
             double d=sqrt(dx*dx+dy*dy);
             double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
             double angle=atan(dy/dx)/M_PI*180.0;
-            tabCursor.insertHtml(tr("<i>l</i><sub>meas</sub> = %1px = %2&mu;m   &alpha;<sub>meas</sub> = %3°").arg(d).arg(du).arg(angle));
+            tabCursor.insertHtml(tr("<i>l</i><sub>meas</sub> = %1px = %2&mu;m   &alpha;<sub>meas</sub> = %3").arg(d).arg(du).arg(angle));
         }
 
 
@@ -1901,7 +1901,7 @@ void QFESPIMB040CameraView::enableGraph(bool enabled) {
 void QFESPIMB040CameraView::updateGraph() {
     pltGraph->set_doDrawing(false);
 
-    while (plteGraphDataX.size()>2 && fabs(plteGraphDataX.last()-plteGraphDataX.first())>spinGraphWindow->value()) {
+    while ((plteGraphDataX.size()>10) && (fabs(plteGraphDataX.last()-plteGraphDataX.first())>spinGraphWindow->value())) {
         plteGraphDataX.pop_front();
         plteGraphDataY.pop_front();
     }
@@ -1913,23 +1913,24 @@ void QFESPIMB040CameraView::updateGraph() {
     pltGraph->set_xTickDistance(1);
     if (min<max) {
         double p=floor(log10(max-min));
-        if (p<0) p=p+1;
         pltGraph->set_xTickDistance(pow(10.0, p));
+        //qDebug()<<"X: min="<<min<<"  max="<<max<<"  delta="<<fabs(max-min)<<"  td="<<pow(10.0, p);
     }
     min=0;
     max=1;
     if (plteGraphDataY.size()>1) statisticsMinMax(plteGraphDataY.data(), plteGraphDataY.size(), min, max);
     pltGraph->setYRange(min, max);
-    pltGraph->set_xTickDistance(100);
+    pltGraph->set_yTickDistance(100);
     if (min<max) {
         double p=floor(log10(max-min));
-        if (p<0) p=p+1;
-        pltGraph->set_xTickDistance(pow(10.0, p));
+        pltGraph->set_yTickDistance(pow(10.0, p));
+        //qDebug()<<"Y: min="<<min<<"  max="<<max<<"  delta="<<fabs(max-min)<<"  td="<<pow(10.0, p);
     }
     pltGraph->set_xAxisLabel(tr("time [s]"));
     pltGraph->set_yAxisLabel(tr("intensity [AU]"));
+    pltGraph->set_drawGrid(true);
     pltGraph->set_doDrawing(true);
-    pltGraph->update_plot();
+    pltGraph->update_plot_immediate();
 }
 
 void QFESPIMB040CameraView::clearGraph() {
