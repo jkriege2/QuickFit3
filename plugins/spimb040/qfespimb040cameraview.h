@@ -259,6 +259,23 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief checkbox to switch image statistics with histogram on/off */
         QCheckBox* chkImageStatisticsHistogram;
 
+        /** \brief splitter on graph pane */
+        QVisibleHandleSplitter* gsplitter;
+        /** \brief plotter for the graph display */
+        JKQTFastPlotter* pltGraph;
+        /** \brief line plot for the graph display */
+        JKQTFPLinePlot* plteGraph;
+        /** \brief datavectors for the graph display */
+        QVector<double> plteGraphDataX;
+        QVector<double> plteGraphDataY;
+        /** \brief checkbox to switch graph display on/off */
+        QCheckBox* chkGraph;
+        /** \brief combobox that allows to select which parameter should be graphed */
+        QComboBox* cmbGraphParameter;
+        QTime graphTime;
+        QPushButton* btnClearGraph;
+        QDoubleSpinBox* spinGraphWindow;
+
 
 
 
@@ -421,7 +438,10 @@ class QFESPIMB040CameraView : public QWidget {
 
         void updateGrid();
 
-
+        void enableGraph(bool enabled);
+        void graphParameterChanged();
+        void updateGraph();
+        void clearGraph();
 
 
     protected:

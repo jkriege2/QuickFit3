@@ -1,4 +1,4 @@
-#include "qfespimb040cameraview.h"
+#include "qfespimb040cameraview.h" 
 #include "qftools.h"
 #include "statistics_tools.h"
 #include "lmcurve.h"
@@ -14,7 +14,7 @@ double fGauss( double t, const double *p )
     const double offset=p[0];
     const double A=p[1];
     const double avg=p[2];
-    const double var=p[3];
+    const double var=p[3]; 
     return offset+A*exp(-2.0*(t-avg)*(t-avg)/var);
 }
 
@@ -233,6 +233,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     plteMarginalFitLeft=new JKQTFPLinePlot(pltMarginalLeft, pltDataMarginalLeftN, pltDataMarginalLeftY, pltDataMarginalLeftX, QColor("blue"));
     pltMarginalLeft->addPlot(plteMarginalLeft);
 
+
     layPlt->setColumnStretch(0,2);
     layPlt->setColumnStretch(1,5);
     layPlt->setRowStretch(0,5);
@@ -364,10 +365,61 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
 
     /////////////////////////////////////////////////////////////////////
+    // image graph pane
+    /////////////////////////////////////////////////////////////////////
+    w=new QWidget(this);
+    QGridLayout* gvbl=new QGridLayout(w);
+    w->setLayout(gvbl);
+    chkGraph=new QCheckBox(tr("enable graph display"), w);
+    chkGraph->setChecked(false);
+    connect(chkGraph, SIGNAL(toggled(bool)), this, SLOT(enableGraph(bool)));
+    gvbl->addWidget(chkGraph, 0,0);
+    btnClearGraph=new QPushButton(tr("clear"), w);
+    gvbl->addWidget(btnClearGraph, 0,1);
+    connect(btnClearGraph, SIGNAL(clicked()), this, SLOT(clearGraph()));
+    gsplitter=new QVisibleHandleSplitter(Qt::Vertical, w);
+    gvbl->addWidget(gsplitter,1,0,1,2);
+    gvbl->setColumnStretch(0,1);
+    gvbl->setRowStretch(1,1);
+
+    pltGraph=new JKQTFastPlotter(gsplitter);
+    plteGraph=new JKQTFPLinePlot(pltGraph, &plteGraphDataX, &plteGraphDataY);
+    pltGraph->addPlot(plteGraph);
+    gsplitter->addWidget(pltGraph);
+
+    QWidget* wgset=new QWidget(w);
+    gsplitter->addWidget(wgset);
+    QFormLayout* fl=new QFormLayout(w);
+    wgset->setLayout(fl);
+
+    cmbGraphParameter=new QComboBox(w);
+    fl->addRow(tr("&parameter:"), cmbGraphParameter);
+    cmbGraphParameter->addItem(tr("average intensity"));
+    cmbGraphParameter->addItem(tr("maximum intensity"));
+    cmbGraphParameter->addItem(tr("intensity: stddev"));
+    connect(cmbGraphParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(graphParameterChanged()));
+
+    spinGraphWindow=new QDoubleSpinBox(w);
+    fl->addRow(tr("time &window:"), spinGraphWindow);
+    spinGraphWindow->setRange(0.1, 1e6);
+    spinGraphWindow->setSuffix(tr(" s"));
+    spinGraphWindow->setValue(60);
+
+    tabSettings->addTab(w, tr("Graph"));
+    gsplitter->setCollapsible(0,false);
+    gsplitter->setCollapsible(1,false);
+
+
+
+
+
+
+
+    /////////////////////////////////////////////////////////////////////
     // image settings pane
     /////////////////////////////////////////////////////////////////////
     w=new QWidget(this);
-    QFormLayout* fl=new QFormLayout(w);
+    fl=new QFormLayout(w);
     w->setLayout(fl);
     cmbColorscale=new QComboBox(w);
     cmbColorscale->setMaximumWidth(200);
@@ -558,6 +610,12 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
     cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
     cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
+
+
+    chkGraph->setChecked(settings.value(prefix+"graph", false).toBool());
+    cmbGraphParameter->setCurrentIndex(settings.value(prefix+"graph_parameter", 0).toInt());
+    spinGraphWindow->setValue(settings.value(prefix+"graph_window", 60).toDouble());
+    jkloadSplitter(settings, gsplitter, prefix+"split_graph/");
 }
 
 void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
@@ -594,6 +652,10 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
     settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
     settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
 
+    settings.setValue(prefix+"graph", chkGraph->isChecked());
+    settings.setValue(prefix+"graph_parameter", cmbGraphParameter->currentIndex());
+    settings.setValue(prefix+"graph_window", spinGraphWindow->value());
+    jksaveSplitter(settings, gsplitter, prefix+"split_graph/");
 
 }
 
@@ -618,7 +680,7 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
             double d=sqrt(dx*dx+dy*dy);
             double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
             double angle=atan(dy/dx)/M_PI*180.0;
-            labCurrentPos->setText(tr("<b></b>img(%1, %2) = img(%4&mu;m, %5&mu;m) = %3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>l</i><sub>meas</sub> = %6px = %7&mu;m&nbsp;&nbsp;&nbsp;&alpha;<sub>meas</sub> = %8°").arg(xx).arg(yy).arg(s).arg(xx*pixelW).arg(yy*pixelH).arg(d).arg(du).arg(angle));
+            labCurrentPos->setText(tr("<b></b>img(%1, %2) = img(%4&mu;m, %5&mu;m) = %3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>l</i><sub>meas</sub> = %6px = %7&mu;m&nbsp;&nbsp;&nbsp;&alpha;<sub>meas</sub> = %8Â°").arg(xx).arg(yy).arg(s).arg(xx*pixelW).arg(yy*pixelH).arg(d).arg(du).arg(angle));
         } else {
             labCurrentPos->setText("");
         }
@@ -1197,6 +1259,25 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
     if (chkCountsRangeAutoHigh->isChecked()) spinCountsUpper->setValue(cmax);
 
 
+
+
+    // update graph pane (if activated)
+    if (chkGraph->isChecked()) {
+        if (cmbGraphParameter->currentIndex()==0) {
+            plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
+            plteGraphDataY.append(imageMean);
+        } else if (cmbGraphParameter->currentIndex()==1) {
+            plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
+            plteGraphDataY.append(imageImax);
+        } else if (cmbGraphParameter->currentIndex()==2) {
+            plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
+            plteGraphDataY.append(imageStddev);
+        }
+
+        updateGraph();
+    }
+
+
     if (withHistogram && ((histogramUpdateTime.elapsed()>HISTOGRAM_UPDATE_INTERVAL_MS) || forceHistogram )) {
 
         // DISABLE UPDATING OF GRAPHS (we only want to do this once per function call!!!)
@@ -1524,7 +1605,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
             double d=sqrt(dx*dx+dy*dy);
             double du=sqrt(dx*dx*pixelW*pixelW+dy*dy*pixelH*pixelH);
             double angle=atan(dy/dx)/M_PI*180.0;
-            tabCursor.insertHtml(tr("<i>l</i><sub>meas</sub> = %1px = %2&mu;m   &alpha;<sub>meas</sub> = %3°").arg(d).arg(du).arg(angle));
+            tabCursor.insertHtml(tr("<i>l</i><sub>meas</sub> = %1px = %2&mu;m   &alpha;<sub>meas</sub> = %3Â°").arg(d).arg(du).arg(angle));
         }
 
 
@@ -1803,3 +1884,58 @@ void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_interna
 
 
 }
+
+void QFESPIMB040CameraView::graphParameterChanged() {
+    plteGraphDataX.clear();
+    plteGraphDataY.clear();
+    graphTime.start();
+    updateGraph();
+}
+
+void QFESPIMB040CameraView::enableGraph(bool enabled) {
+    if (enabled) {
+
+    }
+}
+
+void QFESPIMB040CameraView::updateGraph() {
+    pltGraph->set_doDrawing(false);
+
+    while (plteGraphDataX.size()>2 && fabs(plteGraphDataX.last()-plteGraphDataX.first())>spinGraphWindow->value()) {
+        plteGraphDataX.pop_front();
+        plteGraphDataY.pop_front();
+    }
+
+    double min=0;
+    double max=1;
+    if (plteGraphDataX.size()>1) statisticsMinMax(plteGraphDataX.data(), plteGraphDataX.size(), min, max);
+    pltGraph->setXRange(min, max);
+    pltGraph->set_xTickDistance(1);
+    if (min<max) {
+        double p=floor(log10(max-min));
+        if (p<0) p=p+1;
+        pltGraph->set_xTickDistance(pow(10.0, p));
+    }
+    min=0;
+    max=1;
+    if (plteGraphDataY.size()>1) statisticsMinMax(plteGraphDataY.data(), plteGraphDataY.size(), min, max);
+    pltGraph->setYRange(min, max);
+    pltGraph->set_xTickDistance(100);
+    if (min<max) {
+        double p=floor(log10(max-min));
+        if (p<0) p=p+1;
+        pltGraph->set_xTickDistance(pow(10.0, p));
+    }
+    pltGraph->set_xAxisLabel(tr("time [s]"));
+    pltGraph->set_yAxisLabel(tr("intensity [AU]"));
+    pltGraph->set_doDrawing(true);
+    pltGraph->update_plot();
+}
+
+void QFESPIMB040CameraView::clearGraph() {
+    plteGraphDataX.clear();
+    plteGraphDataY.clear();
+    graphTime.start();
+    updateGraph();
+}
+  
