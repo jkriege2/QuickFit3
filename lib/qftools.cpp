@@ -355,7 +355,7 @@ QString	qfGetSaveFileName ( QWidget * parent, const QString & caption, const QSt
     // extension is appended to the filename, if it does not already contain a suffix
     QRegExp rx(".*\\(\\*\\.(\\S+).*\\)\\w*[;;.]*", Qt::CaseInsensitive);
     rx.setMinimal(true);
-    if (rx.indexIn(selectedFilter)!=-1) {
+    if (rx.indexIn(*selectedFilter, 0)!=-1) {
         QString ext=rx.cap(1);
         if (!QFileInfo(s).suffix().isEmpty()) {
             s=s+"."+ext;
