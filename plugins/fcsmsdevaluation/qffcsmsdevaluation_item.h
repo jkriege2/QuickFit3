@@ -106,7 +106,15 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
 
         virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
-protected:
+
+        double getTheoryAlpha(int i) const;
+        double getTheoryD(int i) const;
+        double getTheoryPre(int i) const;
+        bool getTheoryEnabled(int i) const;
+        void setTheory(int i, bool enabled, double pre, double D, double alpha);
+        int getFitWidth() const;
+        void setFitWidth(int width);
+    protected:
         
         /** \brief write object contents into XML file
          *

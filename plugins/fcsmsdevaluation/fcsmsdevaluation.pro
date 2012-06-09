@@ -11,6 +11,7 @@ DESTDIR = $$QFOUTPUT/plugins
 
 include(../../libquickfitwidgets.pri)
 include(../../extlibs/gsl.pri)
+include(../../extlibs/lmfit.pri)
 
 # Input
 HEADERS += qffcsmsdevaluation.h \

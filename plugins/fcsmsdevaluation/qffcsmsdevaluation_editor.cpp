@@ -38,8 +38,68 @@ QFFCSMSDEvaluationEditor::~QFFCSMSDEvaluationEditor()
 {
 }
 
+QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
+    QWidget* w1=new QWidget(this);
+    QHBoxLayout* lay1=new QHBoxLayout(w1);
+    lay1->setContentsMargins(0,0,0,0);
+    w1->setLayout(lay1);
+    QWidget* w=new QWidget(this);
+    QHBoxLayout* lay=new QHBoxLayout(w);
+    lay->setContentsMargins(0,0,0,0);
+    w->setLayout(lay);
+    numPre[i]=new NumberEdit(this);
+    numPre[i]->setRange(0, DBL_MAX);
+    numPre[i]->setCheckBounds(true, false);
+    numPre[i]->setDecimals(1);
+    numPre[i]->setValue(6);
+    connect(numPre[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
+
+    numD[i]=new NumberEdit(this);
+    numD[i]->setRange(0, DBL_MAX);
+    numD[i]->setCheckBounds(true, false);
+    numD[i]->setDecimals(2);
+    numD[i]->setValue(10);
+    connect(numD[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
+
+    numAlpha[i]=new NumberEdit(this);
+    numAlpha[i]->setRange(0, DBL_MAX);
+    numAlpha[i]->setCheckBounds(true, false);
+    numAlpha[i]->setDecimals(2);
+    numAlpha[i]->setValue(1);
+    connect(numAlpha[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
+
+    lay1->addWidget(new QLabel(tr("<r²> = ")));
+    lay1->addWidget(numPre[i]);
+    lay1->addWidget(new QLabel("*"));
+    lay1->addWidget(numD[i]);
+    lay1->addWidget(new QLabel(tr("µm²/s t ^")));
+    lay1->addWidget(numAlpha[i]);
+    chkSlope[i]=new QCheckBox(this);
+    chkSlope[i]->setChecked(false);
+    w1->setEnabled(false);
+    connect(chkSlope[i], SIGNAL(toggled(bool)), w1, SLOT(setEnabled(bool)));
+    connect(chkSlope[i], SIGNAL(toggled(bool)), this, SLOT(theoryChanged()));
+
+    lay->addWidget(chkSlope[i]);
+    lay->addWidget(w1);
+
+    return w;
+}
+
 
 void QFFCSMSDEvaluationEditor::createWidgets() {
+
+
+    flAlgorithmParams->addRow(tr("Theory 1:"), createSlopeWidgets(0));
+    flAlgorithmParams->addRow(tr("Theory 2:"), createSlopeWidgets(1));
+    flAlgorithmParams->addRow(tr("Theory 3:"), createSlopeWidgets(2));
+
+    spinFitWidth=new QSpinBox(this);
+    spinFitWidth->setRange(5, INT_MAX);
+    spinFitWidth->setValue(10);
+    flAlgorithmParams->addRow(tr("fit width:"), spinFitWidth);
+
+
   /*  edtAlpha=new NumberEdit(this);
     edtAlpha->setRange(0, DBL_MAX);
     edtAlpha->setCheckBounds(true, false);
@@ -129,20 +189,77 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomIn());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomOut());
 
+    sliderDist=new DataCutSliders(this);
+
+
+    pltDistResults=new JKQtPlotter(true, this);
+    pltDistResults->useExternalDatastore(pltData->getDatastore());
+    pltDistResults->set_displayToolbar(false);
+    pltDistResults->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+    pltDistResults->getXAxis()->set_labelFontSize(11);
+    pltDistResults->getXAxis()->set_tickLabelFontSize(10);
+    pltDistResults->getXAxis()->set_logAxis(true);
+    pltDistResults->getYAxis()->set_axisLabel("");//tr("mean squared displacement $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
+    pltDistResults->getYAxis()->set_labelFontSize(11);
+    pltDistResults->getYAxis()->set_tickLabelFontSize(10);
+    pltDistResults->getYAxis()->set_logAxis(false);
+    pltDistResults->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    pltDistResults->get_plotter()->setBorder(1,1,1,1);
+    pltDistResults->get_plotter()->set_useAntiAliasingForSystem(true);
+    pltDistResults->get_plotter()->set_useAntiAliasingForGraphs(true);
+    pltDistResults->get_plotter()->set_keyFontSize(9);
+    pltDistResults->get_plotter()->set_keyXMargin(2);
+    pltDistResults->useExternalDatastore(pltDistribution->getDatastore());
+    pltDistResults->set_displayMousePosition(false);
+    pltDistResults->synchronizeToMaster(pltDistribution, true, false);
+
+    tbPlotDistResults=new QToolBar(QString("tbPlotDistributionResults"), this);
+    tbPlotDistResults->setIconSize(QSize(16,16));
+    tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actSavePlot());
+    pltDistResults->get_plotter()->get_actSavePlot()->setToolTip(tr("save the distribution plot as an image (PNG, JPEG, PDF, SVG, ...)"));
+    pltDistResults->addAction(pltDistResults->get_plotter()->get_actPrint());
+    pltDistribution->get_plotter()->get_actPrint()->setToolTip(tr("print the distribution plot "));
+    pltDistResults->addAction(pltDistResults->get_plotter()->get_actCopyPixelImage());
+    pltDistResults->get_plotter()->get_actCopyPixelImage()->setToolTip(tr("copy the distribution plot as an image to the system clipboard"));
+    tbPlotDistResults->addSeparator();
+    tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomAll());
+    tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomIn());
+    tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomOut());
+
+    splitterDist=new QVisibleHandleSplitter(Qt::Vertical, this);
+    QWidget* w=new QWidget(this);
+    QVBoxLayout* lay=new QVBoxLayout(w);
+    lay->setContentsMargins(0,0,0,0);
+    w->setLayout(lay);
+    lay->addWidget(tbPlotDistribution);
+    lay->addWidget(pltDistribution, 1);
+    splitterDist->addWidget(w);
+
+    w=new QWidget(this);
+    lay=new QVBoxLayout(w);
+    lay->setContentsMargins(0,0,0,0);
+    w->setLayout(lay);
+    lay->addWidget(tbPlotDistResults);
+    lay->addWidget(pltDistResults, 1);
+    lay->addWidget(sliderDist);
+    splitterDist->addWidget(w);
 
     QWidget* wPltDist=new QWidget(this);
     QVBoxLayout* layPltDist=new QVBoxLayout(this);
     wPltDist->setLayout(layPltDist);
     layPltDist->setContentsMargins(0,0,0,0);
-    layPltDist->addWidget(tbPlotDistribution);
-    layPltDist->addWidget(pltDistribution);
+    layPltDist->addWidget(splitterDist);
     splitMorePLot->addWidget(wPltDist);
 
-    splitMorePLot->setCollapsible(splitMorePLot->indexOf(pltDistribution), false);
+    //splitMorePLot->setCollapsible(splitMorePLot->indexOf(pltDistribution), false);
+    splitterDist->setCollapsible(splitterDist->indexOf(pltDistribution), false);
+    splitterDist->setCollapsible(splitterDist->indexOf(pltDistResults), false);
 
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
+    connect(pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+    connect(pltDistResults, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     /////
 
 }
@@ -151,9 +268,101 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
 
 
+int QFFCSMSDEvaluationEditor::getMSDMin(QFRawDataRecord* rec, int index, int defaultMin) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return defaultMin;
+    const QString resultID=data->getEvaluationResultID(index);
+    if (!rec) return defaultMin;
 
 
+    return rec->getProperty(resultID+"_msdcut_min", defaultMin).toInt();
+}
 
+int QFFCSMSDEvaluationEditor::getMSDMax(QFRawDataRecord* rec, int index, int defaultMax) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return defaultMax;
+    const QString resultID=data->getEvaluationResultID(index);
+
+    if (!rec) return defaultMax;
+
+    return rec->getProperty(resultID+"_msdcut_max", defaultMax).toInt();
+}
+
+
+int QFFCSMSDEvaluationEditor::getMSDMin(QFRawDataRecord* rec) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return 0;
+    return getMSDMin(rec, data->getCurrentIndex());
+}
+
+int QFFCSMSDEvaluationEditor::getMSDMax(QFRawDataRecord* rec) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return 0;
+    return getMSDMax(rec, data->getCurrentIndex());
+}
+
+
+int QFFCSMSDEvaluationEditor::getMSDMin(QFRawDataRecord* rec, int index) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return 0;
+    return getMSDMin(rec, index, 0);
+}
+
+int QFFCSMSDEvaluationEditor::getMSDMax(QFRawDataRecord* rec, int index) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return 0;
+    return getMSDMax(rec, index, data->getMSD(rec, index, data->getCurrentModel()).size());
+}
+
+void QFFCSMSDEvaluationEditor::setMSDMin(int MSDMin) {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return;
+    QFRawDataRecord* rdr=current->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex());
+    rdr->setQFProperty(resultID+"_msdcut_min", MSDMin, false, false);
+}
+
+void QFFCSMSDEvaluationEditor::setMSDMax(int MSDMax) {
+    if (!current) return;
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return;
+    QFRawDataRecord* rdr=current->getHighlightedRecord();
+    const QString resultID=data->getEvaluationResultID(data->getCurrentIndex());
+    rdr->setQFProperty(resultID+"_msdcut_max", MSDMax, false, false);
+}
+
+
+void QFFCSMSDEvaluationEditor::slidersDistChanged(int userMin, int userMax, int min, int max) {
+    if (!dataEventsEnabled) return;
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!data) return;
+    if (!current->getHighlightedRecord()) return;
+    setUserMinMax(userMin, userMax);
+    displayData();
+}
+
+void QFFCSMSDEvaluationEditor::updateSliders() {
+    bool en=false;
+    sliderDist->disableSliderSignals();
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    sliderDist->set_min(0);
+    if (data && current->getHighlightedRecord()) {
+        sliderDist->set_userMin(getMSDMin(current->getHighlightedRecord(), data->getCurrentIndex(), 0));
+        QFFCSMSDEvaluationItem* item=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+        if (item) {
+            QVector<double> msd=item->getMSD(current->getHighlightedRecord(), item->getCurrentIndex(), item->getCurrentModel());
+            if (msd.size()>0) {
+                en=true;
+                sliderDist->set_max(msd.size());
+                sliderDist->set_userMax(getMSDMax(current->getHighlightedRecord(), data->getCurrentIndex(), msd.size()));
+            }
+        }
+    }
+
+    sliderDist->setEnabled(en);
+    sliderDist->enableSliderSignals();
+
+}
 
 
 void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
@@ -162,7 +371,8 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
     if (old) {
         //disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
-        //disconnect(edtNdist, SIGNAL(valueChanged(int)),this,SLOT(NdistChanged(int)));
+        disconnect(sliderDist, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersDistChanged(int, int, int, int)));
+        disconnect(spinFitWidth, SIGNAL(valueChanged(int)),this,SLOT(fitWidthChanged(int)));
         //disconnect(edtNumIter, SIGNAL(valueChanged(int)),this,SLOT(NumIterChanged(int)));
     }
 
@@ -171,17 +381,25 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
     if (item) {
         dataEventsEnabled=false;
 
+        for (int i=0; i<3; i++)     {
+            chkSlope[i]->setChecked(item->getTheoryEnabled(i));
+            numPre[i]->setValue(item->getTheoryPre(i));
+            numD[i]->setValue(item->getTheoryD(i));
+            numAlpha[i]->setValue(item->getTheoryAlpha(i));
+        }
+
         /*edtAlpha->setValue(item->getAlpha());
         connect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
 
-        edtNdist->setValue(item->getNdist());
-        connect(edtNdist, SIGNAL(valueChanged(int)), this, SLOT(NdistChanged(int)));
 
         edtNumIter->setValue(item->getNumIter());
         connect(edtNumIter, SIGNAL(valueChanged(int)), this, SLOT(NumIterChanged(int)));*/
 
+        spinFitWidth->setValue(item->getFitWidth());
+        connect(spinFitWidth, SIGNAL(valueChanged(int)), this, SLOT(fitWidthChanged(int)));
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+        connect(sliderDist, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersDistChanged(int, int, int, int)));
 
 
 
@@ -221,10 +439,18 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         dataEventsEnabled=false;
         //edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
-        //edtNdist->setRange(10,data->getCorrelationN()); //qMax(0,data->getCorrelationN())
-        //edtNdist->setValue(eval->getNdist());
+        spinFitWidth->setValue(eval->getFitWidth());
         //edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         //edtNumIter->setValue(eval->getNumIter());
+        for (int i=0; i<3; i++)     {
+            chkSlope[i]->setChecked(eval->getTheoryEnabled(i));
+            numPre[i]->setValue(eval->getTheoryPre(i));
+            numD[i]->setValue(eval->getTheoryD(i));
+            numAlpha[i]->setValue(eval->getTheoryAlpha(i));
+        }
+
+        updateSliders();
+
         dataEventsEnabled=oldde;
     }
 
@@ -273,6 +499,9 @@ void QFFCSMSDEvaluationEditor::displayData() {
         pltDistribution->set_doDrawing(false);
         pltDistribution->set_emitSignals(false);
         pltDistribution->clearGraphs();
+        pltDistResults->set_doDrawing(false);
+        pltDistResults->set_emitSignals(false);
+        pltDistResults->clearGraphs();
         dsres->clear();
         ds->clear();
         dsresh->clear();
@@ -381,8 +610,10 @@ void QFFCSMSDEvaluationEditor::displayData() {
             pltData->zoomToFit(true, true);
             pltResiduals->zoomToFit(false, true);
             pltDistribution->zoomToFit(true, true);
+            pltDistResults->zoomToFit(false, true);
 
             pltResiduals->setX(pltData->getXMin(), pltData->getXMax());
+
 
             pltResidualHistogram->zoomToFit(true, true);
             pltResidualCorrelation->zoomToFit(true, true);
@@ -401,6 +632,8 @@ void QFFCSMSDEvaluationEditor::displayData() {
         pltResidualCorrelation->set_emitSignals(true);
         pltDistribution->set_doDrawing(true);
         pltDistribution->set_emitSignals(true);
+        pltDistResults->set_doDrawing(true);
+        pltDistResults->set_emitSignals(true);
         //qDebug()<<"   g "<<t.elapsed()<<" ms";
         t.start();
 
@@ -418,6 +651,9 @@ void QFFCSMSDEvaluationEditor::displayData() {
         t.start();
         pltDistribution->update_plot();
         //qDebug()<<"   l "<<t.elapsed()<<" ms";
+        t.start();
+        pltDistResults->update_plot();
+        //qDebug()<<"   m "<<t.elapsed()<<" ms";
         t.start();
         //qDebug()<<"  displayData end  runtime = "<<t1.elapsed()<<" ms";
 
@@ -636,28 +872,10 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 t.start();
 
 
+                updateDistribution();
 
-                /////////////////////////////////////////////////////////////////////////////////
-                // plot distribution
-                /////////////////////////////////////////////////////////////////////////////////
-                QVector<double> msd_tau=eval->getMSDTaus(record, index, model);
-                QVector<double> msd=eval->getMSD(record, index, model);
-                int c_disttau=-1;
-                int c_dist=-1;
-                if (msd_tau.size()>0 && msd.size()>0) {
-                    c_disttau=dsdist->addCopiedColumn(msd_tau.data(), msd_tau.size(), "msd_tau");
-                    c_dist=dsdist->addCopiedColumn(msd.data(), msd.size(), "masd");;
-                } else {
-                    pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
-                }
-                JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
-                g_dist->set_drawLine(true);
-                g_dist->set_title("mean squared displacement $\\langle r^2(\\tau)\\rangle");
-                g_dist->set_xColumn(c_disttau);
-                g_dist->set_yColumn(c_dist);
-                pltDistribution->addGraph(g_dist);
-                //qDebug()<<"    g "<<t.elapsed()<<" ms";
-                t.start();
+                updateDistributionResults();
+
 
 
 
@@ -753,7 +971,7 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
 
     bool oldde=dataEventsEnabled;
     dataEventsEnabled=false;
-    //edtNdist->setValue(eval->getNdist());
+    spinFitWidth->setValue(eval->getFitWidth());
     //edtNumIter->setValue(eval->getNumIter());
     dataEventsEnabled=oldde;
 
@@ -766,6 +984,14 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
         //edtNdist->setEnabled(true);
     }
 
+}
+
+void QFFCSMSDEvaluationEditor::distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
+    if (!dataEventsEnabled) return;
+    if (sender==pltDistribution) {
+        pltDistResults->setX(newxmin, newxmax);
+        pltDistResults->zoomToFit(false, true);
+    }
 }
 
 
@@ -977,32 +1203,204 @@ void QFFCSMSDEvaluationEditor::copyMoreDataToInitial() {
     eval->setInitFitValue("maxent_Ndist", eval->getNdist());*/
 }
 
-
-
-
-/*void QFFCSMSDEvaluationEditor::alphaChanged(double alpha) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
-    if (data) data->setAlpha(alpha);
+double fMSD( double t, const double *p )
+{
+    const double D=p[0];
+    const double a=p[1];
+    return 6.0*D*pow(t, a);
 }
 
-void QFFCSMSDEvaluationEditor::NdistChanged(int Ndist) {
-    if (!dataEventsEnabled) return;
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
-    if (data) data->setNdist(Ndist);
+void QFFCSMSDEvaluationEditor::updateDistributionResults() {
+    QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!eval) return;
+    QVector<double> distTau=eval->getMSDTaus(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+    QVector<double> dist=eval->getMSD(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+    int data_start=sliderDist->get_userMin();
+    int data_end=sliderDist->get_userMax();
+
+    JKQTPdatastore* dsdist=pltDistResults->get_plotter()->getDatastore();
+
+    bool updt=pltDistResults->get_doDrawing();
+    pltDistResults->set_doDrawing(false);
+    pltDistResults->clearGraphs();
+
+    dsdist->deleteAllColumns("msdfit_tau");
+    dsdist->deleteAllColumns("msdfit_D");
+    dsdist->deleteAllColumns("msdfit_alpha");
+
+    int wid=spinFitWidth->value();
+
+    QVector<double> fitTau;
+    QVector<double> fitD, fitA;
+    if (distTau.size()>1 && dist.size()>1 && spinFitWidth->value()>=3) {
+        for (int i=0; i<distTau.size(); i+=qMax(1,spinFitWidth->value()/5)) {
+        //for (int i=data_start; i<data_end; i+=qMax(1,spinFitWidth->value()/5)) {
+            double* t=(double*)calloc(spinFitWidth->value(), sizeof(double));
+            double* d=(double*)calloc(spinFitWidth->value(), sizeof(double));
+            int cnt=0;
+            for (int j=i; j<qMin(distTau.size(), i+spinFitWidth->value()); j++) {
+                t[cnt]=distTau[j];
+                d[cnt]=dist[j];
+                cnt++;
+            }
+
+            if (cnt>3) {
+                //qDebug()<<"fit "<<cnt<<" datapoints ...";
+                fitTau.append(t[cnt/2]);
+
+                double pout[2];
+                int n_par = 2; // number of parameters
+                int m_dat = cnt; // number of data pairs
+                pout[0]=eval->getTheoryD(0);
+                pout[1]=eval->getTheoryAlpha(0);
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, m_dat, t, d, fMSD, &control, &status );
+
+                fitD.append(pout[0]);
+                fitA.append(pout[1]);
+                //qDebug()<<"    fit results  D="<<pout[0]<<"  a="<<pout[1];
+            }
+
+            free(t);
+            free(d);
+        }
+        int c_msdtau=dsdist->addCopiedColumn(fitTau.data(), fitTau.size(), "msdfit_tau");
+        int c_msdD=dsdist->addCopiedColumn(fitD.data(), fitD.size(), "msdfit_D");
+        int c_msdA=dsdist->addCopiedColumn(fitA.data(), fitA.size(), "msdfit_alpha");
+
+        double t_start=distTau.value(data_start, distTau.first());
+        double t_end=distTau.value(data_end, distTau.last());
+        //qDebug()<<"t_start="<<t_start<<"   t_end="<<t_end;
+        //qDebug()<<"init: data_start="<<data_start<<"   data_end="<<data_end;
+
+        data_start=0;
+        data_end=fitTau.size();
+        for (int i=0; i<fitTau.size(); i++) {
+            //qDebug()<<"   "<<i<<": "<<fitTau[i];
+            if (fitTau[i]<=t_start) data_start=i;
+            if (fitTau[i]<=t_end) data_end=i;
+        }
+
+        //qDebug()<<"found: data_start="<<data_start<<"   data_end="<<data_end;
+
+        JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+        g_msdfit->set_drawLine(true);
+        g_msdfit->set_title("local \\alpha");
+        g_msdfit->set_xColumn(c_msdtau);
+        g_msdfit->set_yColumn(c_msdA);
+        g_msdfit->set_datarange_start(data_start);
+        g_msdfit->set_datarange_end(data_end);
+        g_msdfit->set_symbol(JKQTPcross);
+        g_msdfit->set_symbolSize(7);
+        pltDistResults->addGraph(g_msdfit);
+        pltDistResults->getYAxis()->set_axisLabel("local \\alpha");
+
+    }
+
+    if (updt) {
+        pltDistResults->set_doDrawing(true);
+        pltDistResults->zoomToFit(false, true);
+        pltDistResults->setX(pltDistribution->getXMin(), pltDistribution->getXMax());
+        pltDistribution->zoomToFit();
+    }
+    pltDistResults->zoomToFit(false, true);
+    pltDistResults->setX(pltDistribution->getXMin(), pltDistribution->getXMax());
+    pltDistribution->zoomToFit();
 }
 
-void QFFCSMSDEvaluationEditor::NumIterChanged(int NumIter) {
+void QFFCSMSDEvaluationEditor::updateDistribution() {
+    QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!eval) return;
+    QVector<double> distTau=eval->getMSDTaus(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+    QVector<double> dist=eval->getMSD(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+    int data_start=sliderDist->get_userMin();
+    int data_end=sliderDist->get_userMax();
+
+    JKQTPdatastore* dsdist=pltDistribution->get_plotter()->getDatastore();
+
+
+    bool updt=pltDistribution->get_doDrawing();
+    pltDistribution->set_doDrawing(false);
+    pltDistribution->clearGraphs();
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // plot distribution
+    /////////////////////////////////////////////////////////////////////////////////
+    int c_disttau=-1;
+    int c_dist=-1;
+    dsdist->deleteAllColumns("msd_tau");
+    dsdist->deleteAllColumns("msd");
+    if (distTau.size()>0 && dist.size()>0) {
+        c_disttau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msd_tau");
+        c_dist=dsdist->addCopiedColumn(dist.data(), dist.size(), "mad");
+    } else {
+        pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
+    }
+    JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+    g_dist->set_drawLine(true);
+    g_dist->set_title("mean squared displacement \\langle r^2(\\tau)\\rangle");
+    g_dist->set_xColumn(c_disttau);
+    g_dist->set_yColumn(c_dist);
+    g_dist->set_datarange_start(data_start);
+    g_dist->set_datarange_end(data_end);
+    pltDistribution->addGraph(g_dist);
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // plot theory curves
+    /////////////////////////////////////////////////////////////////////////////////
+    for (int i=0; i<3; i++)     {
+        QVector<double> theo;
+        if (chkSlope[i]->isChecked()) {
+            const double D=numPre[i]->value()*numD[i]->value();
+            const double a=numAlpha[i]->value();
+            for (int x=0; x<distTau.size(); x++) {
+                theo.append(D*pow(distTau[x], a));
+            }
+            dsdist->deleteAllColumns(QString("theory%1").arg(i+1));
+            int c_theo=dsdist->addCopiedColumn(theo.data(), theo.size(), QString("theory%1").arg(i+1));
+            JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+            g_dist->set_drawLine(true);
+            g_dist->set_title(tr("theory %1, D=%2µm²/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
+            g_dist->set_xColumn(c_disttau);
+            g_dist->set_yColumn(c_theo);
+            g_dist->set_datarange_start(sliderDist->get_userMin());
+            g_dist->set_datarange_end(sliderDist->get_userMax());
+            g_dist->set_lineWidth(1);
+            g_dist->set_style(Qt::DashLine);
+
+            pltDistribution->addGraph(g_dist);
+        }
+    }
+
+    if (updt) {
+        pltDistribution->set_doDrawing(true);
+        pltDistribution->zoomToFit();
+    }
+
+}
+
+
+void QFFCSMSDEvaluationEditor::fitWidthChanged(int width) {
     if (!dataEventsEnabled) return;
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
     QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
-    if (data) data->setNumIter(NumIter);
-}*/
+
+    bool rc=data->get_doEmitResultsChanged();
+    bool pc=data->get_doEmitPropertiesChanged();
+    data->set_doEmitResultsChanged(false);
+    data->set_doEmitPropertiesChanged(false);
+    if (data) data->setFitWidth(width);
+    data->set_doEmitResultsChanged(rc);
+    data->set_doEmitPropertiesChanged(pc);
+    updateDistributionResults();
+}
+
+
 
 
 void QFFCSMSDEvaluationEditor::weightsChanged(int weights) {
@@ -1017,6 +1415,24 @@ void QFFCSMSDEvaluationEditor::weightsChanged(int weights) {
     QApplication::restoreOverrideCursor();
 }
 
+
+void QFFCSMSDEvaluationEditor::theoryChanged() {
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!dataEventsEnabled) return;
+    if (!data) return;
+
+    bool rc=data->get_doEmitResultsChanged();
+    bool pc=data->get_doEmitPropertiesChanged();
+    data->set_doEmitResultsChanged(false);
+    data->set_doEmitPropertiesChanged(false);
+    for (int i=0; i<3; i++)     {
+        data->setTheory(i, chkSlope[i]->isChecked(), numPre[i]->value(), numD[i]->value(), numAlpha[i]->value());
+    }
+    data->set_doEmitResultsChanged(rc);
+    data->set_doEmitPropertiesChanged(pc);
+
+    updateDistribution();
+}
 
 
 

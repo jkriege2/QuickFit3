@@ -93,6 +93,36 @@ int QFFCSMSDEvaluationItem::getCurrentWeights() const
     return currentWeights;
 }
 
+void QFFCSMSDEvaluationItem::setTheory(int i, bool enabled, double pre, double D, double alpha) {
+    setFitValue(QString("msd_theory%1_en").arg(i), (enabled)?1:0);
+    setFitValue(QString("msd_theory%1_pre").arg(i), pre);
+    setFitValue(QString("msd_theory%1_d").arg(i), D);
+    setFitValue(QString("msd_theory%1_alpha").arg(i), alpha);
+}
+
+int QFFCSMSDEvaluationItem::getFitWidth() const {
+    return getFitValue(QString("msd_fitwidth"));
+}
+
+void QFFCSMSDEvaluationItem::setFitWidth(int width) {
+    setFitValue(QString("msd_fitwidth"), width);
+}
+
+bool QFFCSMSDEvaluationItem::getTheoryEnabled(int i) const {
+    return getFitValue(QString("msd_theory%1_en").arg(i))!=0;
+}
+
+double QFFCSMSDEvaluationItem::getTheoryPre(int i) const {
+    return getFitValue(QString("msd_theory%1_pre").arg(i));
+}
+
+double QFFCSMSDEvaluationItem::getTheoryD(int i) const {
+    return getFitValue(QString("msd_theory%1_d").arg(i));
+}
+
+double QFFCSMSDEvaluationItem::getTheoryAlpha(int i) const {
+    return getFitValue(QString("msd_theory%1_alpha").arg(i));
+}
 
 
 
@@ -301,7 +331,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
     if (model==0) { // simple 2D model without triplet
 
         // first we read the stored fit parameters:
-        double wxy=getFitValue(record, index, model, "focus_width");
+        double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
         double N_particle=getFitValue(record,index,model,"n_particle");;
 
         // now we evaluate the model
@@ -332,7 +362,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
 
         // first we read the stored fit parameters:
         double gamma=getFitValue(record, index, model, "focus_struct_fac");
-        double wxy=getFitValue(record, index, model, "focus_width");
+        double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
         double N_particle=getFitValue(record,index,model,"n_particle");;
 
         // now we evaluate the model
@@ -374,7 +404,34 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
     return "";
 }
 
+
 bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
+
+    for (int i=0; i<3; i++) {
+        if (parameterID==QString("msd_theory%1_en").arg(i)) {
+            defaultValue.value=0;
+            return true;
+        }
+        if (parameterID==QString("msd_theory%1_pre").arg(i)) {
+            defaultValue.value=6;
+            return true;
+        }
+        if (parameterID==QString("msd_theory%1_d").arg(i)) {
+            defaultValue.value=10;
+            return true;
+        }
+        if (parameterID==QString("msd_theory%1_alpha").arg(i)) {
+            defaultValue.value=1;
+            if (i==1) defaultValue.value=0.75;
+            if (i==2) defaultValue.value=0.5;
+            return true;
+        }
+    }
+    if (parameterID==QString("msd_fitwidth")) {
+        defaultValue.value=10;
+        return true;
+    }
+
     switch (currentModel) {
         case 0:
             if (parameterID=="n_particle") {
@@ -462,7 +519,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
 
         //////////Load Model Parameters//////////////////////////////////////////////////////
         double gamma=getFitValue(record, index, model, "focus_struct_fac");
-        double wxy=getFitValue(record, index, model, "focus_width");
+        double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
         double N_particle=getFitValue(record,index,model,"n_particle");;
 
 

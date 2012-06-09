@@ -5,7 +5,7 @@
 #include "qfrawdatarecord.h"
 #include <QProgressDialog>
 #include <QTextDocument>
-
+#include "statistics_tools.h"
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
 #include "qt/jkqtplotter.h"
@@ -40,7 +40,7 @@
 #include "qfsimplefitparameterswidget.h"
 #include "qfusesresultsbyindexevaluationeditor.h"
 #include "qffcsbyindexandmodelevaluationeditor.h"
-
+#include "lmcurve.h"
 
 /////////////
 #include <QGridLayout>
@@ -62,6 +62,8 @@
 ////////////
 
 
+
+
 /*! \brief editor for QFFCSMSDEvaluationItem
     \ingroup qf3rdrdp_GROUPNAME
 */
@@ -76,10 +78,10 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
 
 
     protected slots:
-        /*void alphaChanged(double alpha);
-        void NdistChanged(int Ndist);
-        void NumIterChanged(int NumIter);*/
+        void fitWidthChanged(int width);
         void weightsChanged(int weights);
+        void updateDistributionResults();
+        void updateDistribution();
 
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -91,6 +93,9 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
 
         /** \brief activated when the highlighted record changed */
         virtual void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
+        void slidersDistChanged(int userMin, int userMax, int min, int max);
+        void updateSliders();
+        void theoryChanged();
 
         /** \brief evaluate all files */
         virtual void fitRunsAll();
@@ -104,6 +109,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         virtual void displayData();
         virtual void updateFitFunctions();
         virtual void displayParameters();
+        void distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
 
     protected:       
         /*! \brief create an evaluation report for the current record */
@@ -112,6 +118,15 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         virtual void copyMoreData(QFRawDataRecord* record, int index, int model);
         /** \brief this may be overwritten to copy more than the enumerated fit parameters to the initial values */
         virtual void copyMoreDataToInitial();
+        void setMSDMax(int MSDMax);
+        void setMSDMin(int MSDMin);
+        int getMSDMax(QFRawDataRecord *rec, int index);
+        int getMSDMin(QFRawDataRecord *rec, int index);
+        int getMSDMax(QFRawDataRecord *rec);
+        int getMSDMin(QFRawDataRecord *rec);
+        int getMSDMax(QFRawDataRecord *rec, int index, int defaultMax);
+        int getMSDMin(QFRawDataRecord *rec, int index, int defaultMin);
+
 
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
@@ -119,10 +134,20 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         JKQtPlotter* pltDistribution;
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
+        QToolBar* tbPlotDistResults;
+        QVisibleHandleSplitter* splitterDist;
+        DataCutSliders* sliderDist;
+        JKQtPlotter* pltDistResults;
 
+        NumberEdit* numPre[3];
+        NumberEdit* numD[3];
+        NumberEdit* numAlpha[3];
+        QCheckBox* chkSlope[3];
+        QSpinBox* spinFitWidth;
 
     private:
         void createWidgets();
+        QWidget *createSlopeWidgets(int i);
 
 };
 
