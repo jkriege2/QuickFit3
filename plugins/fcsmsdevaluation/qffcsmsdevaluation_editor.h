@@ -138,6 +138,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QVisibleHandleSplitter* splitterDist;
         DataCutSliders* sliderDist;
         JKQtPlotter* pltDistResults;
+        QComboBox* cmbDistResultsMode;
 
         NumberEdit* numPre[3];
         NumberEdit* numD[3];

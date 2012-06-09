@@ -225,6 +225,13 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomAll());
     tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomIn());
     tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomOut());
+    cmbDistResultsMode=new QComboBox(this);
+    cmbDistResultsMode->addItem(tr("local alpha"));
+    cmbDistResultsMode->addItem(tr("local D"));
+    connect(cmbDistResultsMode, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDistributionResults()));
+    tbPlotDistResults->addSeparator();
+    tbPlotDistResults->addWidget(new QLabel(tr("   parameter: ")));
+    tbPlotDistResults->addWidget(cmbDistResultsMode);
 
     splitterDist=new QVisibleHandleSplitter(Qt::Vertical, this);
     QWidget* w=new QWidget(this);
@@ -1285,17 +1292,31 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
 
         //qDebug()<<"found: data_start="<<data_start<<"   data_end="<<data_end;
 
-        JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
-        g_msdfit->set_drawLine(true);
-        g_msdfit->set_title("local \\alpha");
-        g_msdfit->set_xColumn(c_msdtau);
-        g_msdfit->set_yColumn(c_msdA);
-        g_msdfit->set_datarange_start(data_start);
-        g_msdfit->set_datarange_end(data_end);
-        g_msdfit->set_symbol(JKQTPcross);
-        g_msdfit->set_symbolSize(7);
-        pltDistResults->addGraph(g_msdfit);
-        pltDistResults->getYAxis()->set_axisLabel("local \\alpha");
+        if (cmbDistResultsMode->currentIndex()==0) {
+            JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+            g_msdfit->set_drawLine(true);
+            g_msdfit->set_title("local \\alpha");
+            g_msdfit->set_xColumn(c_msdtau);
+            g_msdfit->set_yColumn(c_msdA);
+            g_msdfit->set_datarange_start(data_start);
+            g_msdfit->set_datarange_end(data_end);
+            g_msdfit->set_symbol(JKQTPcross);
+            g_msdfit->set_symbolSize(7);
+            pltDistResults->addGraph(g_msdfit);
+            pltDistResults->getYAxis()->set_axisLabel("local \\alpha");
+        } else {
+            JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+            g_msdfit->set_drawLine(true);
+            g_msdfit->set_title("local $D$");
+            g_msdfit->set_xColumn(c_msdtau);
+            g_msdfit->set_yColumn(c_msdD);
+            g_msdfit->set_datarange_start(data_start);
+            g_msdfit->set_datarange_end(data_end);
+            g_msdfit->set_symbol(JKQTPcross);
+            g_msdfit->set_symbolSize(7);
+            pltDistResults->addGraph(g_msdfit);
+            pltDistResults->getYAxis()->set_axisLabel("local $D$ [\\mu m^2/s]");
+        }
 
     }
 
