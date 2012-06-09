@@ -7,6 +7,9 @@
 
 /*! \brief this class manages the overall program options (and may also display an options Dialog
     \ingroup qf3lib_settings
+
+    This class is a singleton in the framework of a running QuickFit3 application. You can always get a pointer to the application's instance by
+    calling the static method getInstance().
  */
 class QFLIB_EXPORT ProgramOptions: public QObject {
         Q_OBJECT
@@ -129,6 +132,15 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString assetsDir;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString pluginsDir;
+
+       private:
+        static  ProgramOptions* inst;
+
+       public:
+        /** \brief returns an sinatnce to the main object of this type in the current QuickFit 3  instance */
+        static ProgramOptions* getInstance() {
+            return inst;
+        }
 
 };
 

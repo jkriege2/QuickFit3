@@ -106,7 +106,8 @@ SOURCES += dlgnewproperty.cpp \
     qfmathtools.cpp \
     qfimportermanager.cpp \
     qfimporterimageseries.cpp \
-    qftcspcreader.cpp
+    qftcspcreader.cpp \
+    qfpluginservices.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui

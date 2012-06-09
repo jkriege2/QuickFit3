@@ -85,6 +85,15 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
 
         /** \brief create a new fit algorithm object instance */
         QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;
+
+        /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
+        const QFFitAlgorithmManager* getInstance() {
+            if (QFPluginServices::getInstance()) {
+                return QFPluginServices::getInstance()->getFitAlgorithmManager();
+            }
+            return NULL;
+        }
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

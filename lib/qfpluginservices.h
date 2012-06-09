@@ -18,7 +18,7 @@ class QFImporterManager;
 /*! \brief wrapper class that allows plugins to access basic logging services
     \ingroup qf3plugintools
 */
-class QFPluginLogService {
+class QFLIB_EXPORT QFPluginLogService {
     public:
         /** Default destructor */
         virtual ~QFPluginLogService() {}
@@ -44,8 +44,11 @@ class QFPluginLogService {
 
 /*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
     \ingroup qf3plugintools
+
+    This class is a singleon in the context of QuickFit3, so only one instance exists per running QuickFit3 instance. You can get a
+    pointer to this instance using the static function getInstance().
 */
-class QFPluginServices {
+class QFLIB_EXPORT QFPluginServices {
     public:
         struct HelpDirectoryInfo {
             QString directory;
@@ -58,8 +61,10 @@ class QFPluginServices {
             QString pluginDLLSuffix;
         };
 
+        QFPluginServices();
+
         /** Default destructor */
-        virtual ~QFPluginServices() {}
+        virtual ~QFPluginServices();
 
         /** \brief indent all following lines in the logging pane */
         virtual void log_indent()=0;
@@ -182,7 +187,16 @@ class QFPluginServices {
          *  \param message the error message to log
          */
         virtual void log_global_error(QString message)=0;
+
+        /** \brief returns the application wide instance of the plugin services */
+        static QFPluginServices* getInstance()  {
+            return inst;
+        }
+
+    private:
+        static QFPluginServices* inst;
 };
+
 
 
 

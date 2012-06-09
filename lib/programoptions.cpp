@@ -21,9 +21,12 @@
 # endif
 #endif
 
+ProgramOptions* ProgramOptions::inst=NULL;
+
 ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app  ):
     QObject(parent)
 {
+    if (inst==NULL) inst=this;
     QFileInfo fi(QApplication::applicationFilePath());
     appDir=QApplication::applicationDirPath();
     #if defined(Q_OS_MAC)
@@ -77,6 +80,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
 ProgramOptions::~ProgramOptions()
 {
     writeSettings();
+    if (inst==this) inst=NULL;
 }
 
 

@@ -78,6 +78,15 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         int getMajorVersion(int i);
         /** \brief get plugins minor version number */
         int getMinorVersion(int i);
+
+        /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
+        const QFFitFunctionManager* getInstance() {
+            if (QFPluginServices::getInstance()) {
+                return QFPluginServices::getInstance()->getFitFunctionManager();
+            }
+            return NULL;
+        }
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

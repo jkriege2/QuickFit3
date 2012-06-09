@@ -82,6 +82,15 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         QString getPluginTutorial(QString ID);
         /** \brief returns the plugins copyright file (html) for a specified QFExtension ID. */
         QString getPluginCopyrightFile(QString ID);
+
+        /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
+        const QFExtensionManager* getInstance() {
+            if (QFPluginServices::getInstance()) {
+                return QFPluginServices::getInstance()->getExtensionManager();
+            }
+            return NULL;
+        }
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);
