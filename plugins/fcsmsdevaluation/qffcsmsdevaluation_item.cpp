@@ -409,6 +409,7 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
     switch(model) {
         case 0: return tr("FCS: simple 2D model");
         case 1: return tr("FCS: simple 3D model");
+        //case 2: return tr("FCS: simple 3D model as one optimization problem");
     }
 
     return "";
@@ -454,6 +455,7 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
             }
             break;
         case 1:
+        //case 2:
             if (parameterID=="n_particle") {
                 defaultValue.value=1;
                 return true;
@@ -480,51 +482,6 @@ struct msd_diff3d_params {
     double gmeasured;
 };
 
-double msd_diff3d(double x, void *params) {
-    msd_diff3d_params *p = (msd_diff3d_params *) params;
-
-    const double wxy2 = sqr(p->wxy);
-    const double gamma2 = sqr(p->gamma);
-    const double N = p->N;
-    const double gmeasured = p->gmeasured;
-
-    const double f1=1.0+2.0/3.0*x/wxy2;
-    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
-
-    return f1*sqrt(f2)-1.0/(N*gmeasured);
-}
-
-double msd_diff3d_deriv(double x, void *params) {
-    msd_diff3d_params *p = (msd_diff3d_params *) params;
-
-    const double wxy2 = sqr(p->wxy);
-    const double gamma2 = sqr(p->gamma);
-    const double N = p->N;
-    const double gmeasured = p->gmeasured;
-
-    const double f1=1.0+2.0/3.0*x/wxy2;
-    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
-
-    return f1*4.0/3.0*sqrt(x)/wxy2*sqrt(f2)+f1*0.5/sqrt(f2)*4.0/3.0*sqrt(x)/gamma2/wxy2;
-}
-
-void msd_diff3d_fdf(double x, void *params, double *y, double *d) {
-    msd_diff3d_params *p = (msd_diff3d_params *) params;
-
-    const double wxy2 = sqr(p->wxy);
-    const double gamma2 = sqr(p->gamma);
-    const double N = p->N;
-    const double gmeasured = p->gmeasured;
-
-    const double f1=1.0+2.0/3.0*x/wxy2;
-    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
-
-    *y = f1*sqrt(f2)-1.0/(N*gmeasured);
-    *d = f1*4.0/3.0*sqrt(x)/wxy2*sqrt(f2)+f1*0.5/sqrt(f2)*4.0/3.0*sqrt(x)/gamma2/wxy2;
-}
-
-
-
 
 void lmfit_msd_diff3d(const double *par, int m_dat, const void *data, double *fvec, int *info) {
     msd_diff3d_params* p=(msd_diff3d_params*)data;
@@ -542,7 +499,33 @@ void lmfit_msd_diff3d(const double *par, int m_dat, const void *data, double *fv
     *fvec = f1*sqrt(f2)-1.0/(N*gmeasured);
 }
 
+struct msd_diff3dall_params {
+    double wxy;
+    double gamma;
+    double N;
+    double* gmeasured;
+    int Nacf;
+};
 
+
+void lmfit_msd_diff3dall(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+    msd_diff3dall_params* p=(msd_diff3dall_params*)data;
+
+
+    const double wxy2 = sqr(p->wxy);
+    const double gamma2 = sqr(p->gamma);
+    const double N = p->N;
+    const double* gmeasured = p->gmeasured;
+    const int Nacf=p->Nacf;
+
+
+    for (int i=0; i<Nacf; i++) {
+        const double x = par[i];
+        const double f1=1.0+2.0/3.0*x/wxy2;
+        const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
+        *fvec = f1*sqrt(f2)-1.0/(N*gmeasured[i]);
+    }
+}
 
 void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange, int defaultMaxDatarange, int runAvgWidth, int residualHistogramBins) {
     bool doEmit=record->isEmitResultsChangedEnabled();
@@ -600,7 +583,9 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         //////////Load Model Parameters//////////////////////////////////////////////////////
         double gamma=getFitValue(record, index, model, "focus_struct_fac");
         double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-        double N_particle=getFitValue(record,index,model,"n_particle");;
+        double N_particle=getFitValue(record,index,model,"n_particle");
+        QVector<double> msd=getMSD(record, index, model);
+        QVector<double> msd_tau=getMSDTaus(record, index, model);
 
 
         QElapsedTimer time;
@@ -632,51 +617,34 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
 
                 msd_diff3d_params d = {wxy, gamma, N_particle, meas_acf};
                 double r=60.0*tau;
+                if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
+                    r=msd[i];
+                }
 
                 lmmin(1, &r, 1, &d, lmfit_msd_diff3d, &control, &status, NULL );
                 dist[i]=r;
 
-                /*int status;
-                int iter = 0, max_iter = 100;
-                const gsl_root_fsolver_type *T;
-                gsl_root_fsolver *s;
-                double r = 0;
-                double x_lo = 0, x_hi = 1e12;
-                gsl_function F;
-                msd_diff3d_params params = {wxy, gamma, N_particle, meas_acf};
-
-                F.function = &msd_diff3d;
-                F.params = &params;
-
-                T = gsl_root_fsolver_brent;
-                s = gsl_root_fsolver_alloc(T);
-                gsl_root_fsolver_set(s, &F, x_lo, x_hi);
-
-                printf ("point %d: using %s method\n",
-                       i, gsl_root_fsolver_name (s));
-
-                printf ("%5s [%9s, %9s] %9s %10s %9s\n",
-                       "iter", "lower", "upper", "root");
-
-                do {
-                   iter++;
-                   status = gsl_root_fsolver_iterate (s);
-                   r = gsl_root_fsolver_root (s);
-                   x_lo = gsl_root_fsolver_x_lower (s);
-                   x_hi = gsl_root_fsolver_x_upper (s);
-                   status = gsl_root_test_interval (x_lo, x_hi,
-                                                    0, 0.001);
-
-                   if (status == GSL_SUCCESS)
-                     printf ("Converged:\n");
-
-                   printf ("%5d [%.7f, %.7f] %.7f\n",  iter, x_lo, x_hi, r);
-                } while (status == GSL_CONTINUE && iter < max_iter);
-
-                gsl_root_fsolver_free (s);
-
-                dist[i]=r;*/
             }
+        /*} else if (model==2) {
+            for (int i=0; i<Ndist; i++) {
+                distTaus[i]=taus[rangeMinDatarange+i];
+                if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
+                    dist[i]=msd[i];
+                } else {
+                    dist[i]=60.0*distTaus[i];
+                }
+            }
+
+
+            lm_status_struct status;
+            lm_control_struct control = lm_control_double;
+            control.printflags = 0; // monitor status (+1) and parameters (+2)
+
+
+            msd_diff3dall_params d = {wxy, gamma, N_particle, &corrdata[rangeMinDatarange], Ndist};
+
+
+            lmmin(Ndist, dist, Ndist, &d, lmfit_msd_diff3dall, &control, &status, NULL );*/
         }
 
         fitSuccess=true;
@@ -786,12 +754,19 @@ QString QFFCSMSDEvaluationItem::getParameterName(int model, int id, bool html) c
         case 0: // simple 2D model
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
+            break;
         case 1: // simple 3D model
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
             if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            break;
+        /*case 2: // simple 3D model, one optimization problem
+            if (id==0) return (html)?tr("particle number N"):tr("particle number");
+            if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
+            if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            break;*/
     }
-        return QString();
+    return QString();
 }
 
 
@@ -801,6 +776,7 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
             if (id==0) return QString("");
             if (id==1) return tr("nm");
         case 1:
+        //case 2:
             if (id==0) return QString("");
             if (id==1) return tr("nm");
             if (id==2) return QString("");
@@ -809,8 +785,11 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
 }
 int QFFCSMSDEvaluationItem::getParameterCount(int model) const {
     switch (model) {
-        case 0: return 2;
-        case 1: return 3;
+        case 0:
+            return 2;
+        case 1:
+        //case 2:
+            return 3;
     }
     return 0;
 }
@@ -820,14 +799,17 @@ QString QFFCSMSDEvaluationItem::getParameterID(int model, int id) const {
         case 0:
             if (id==0) return tr("n_particle");
             if (id==1) return tr("focus_width");
+            break;
         case 1:
+        //case 2:
             if (id==0) return tr("n_particle");
             if (id==1) return tr("focus_width");
             if (id==2) return tr("focus_struct_fac");
+            break;
     }
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
 int QFFCSMSDEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 2;
+    return 3;
 }
