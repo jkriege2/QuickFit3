@@ -324,70 +324,80 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
     if (!taus || !modelEval) return;
     //qDebug()<<"evalModel(N="<<N<<"  distributionN="<<distributionN<<")";
 
+    bool ok=false;
+    int first=-1, last=-1;
+    double t_msdstart=0;
+    double t_msdend=0;
+    if (msdTaus && msd && Nmsd>1) {
+        ok=true;
+        t_msdstart=msdTaus[0];
+        t_msdend=msdTaus[Nmsd-1];
+        for (int i=0; i<N; i++) {
+            if (taus[i]==t_msdstart) {
+                first=i;
+                break;
+            }
+        }
+        for (int i=N-1; i>=0; i--) {
+            if (taus[i]==t_msdend) {
+                last=i;
+                break;
+            }
+        }
+        //qDebug()<<"" <<first<<" ... "<<last;
+        if (first>0 && last>0) {
+            int k=0;
+            for (int i=first; i<=last; i++) {
+                if (taus[i]!=msdTaus[k]) {
+                    ok=false;
+                    break;
+                }
+                k++;
+            }
+            //qDebug()<<first<<" ... "<<last<<"   ok="<<ok<<" @ k="<<k;
+        } else {
+            ok=false;
+        }
+    }
     for (uint32_t i=0; i<N; i++) {
         modelEval[i]=0;
     }
 
-    if (model==0) { // simple 2D model without triplet
+    if (ok) {
+        if (model==0) { // simple 2D model without triplet
 
-        // first we read the stored fit parameters:
-        double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-        double N_particle=getFitValue(record,index,model,"n_particle");;
+            // first we read the stored fit parameters:
+            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            double N_particle=getFitValue(record,index,model,"n_particle");;
 
-        // now we evaluate the model
-        /*if (msdTaus && msd && Nmsd>0) {
-            bool ok=(N==Nmsd);
-            if (ok) {
-                for (int i=0; i<Nmsd; i++) {
-                    if (msdTaus[i]!=taus[i]) {
-                        ok=false;
-                        break;
-                    }
+
+            // now we evaluate the model
+            if (msdTaus && msd && Nmsd>1) {
+
+                int k=0;
+                for (uint32_t i=first; i<=last; i++) {
+                    const double tau=msdTaus[k];
+                    const double ms=msd[k];
+                    modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy));
+                    k++;
                 }
             }
-            for (uint32_t i=0; i<N; i++) {
-                taus[i]=NAN;
-                modelEval[i]=NAN;
+        } else if (model==1) { // simple 3D model without triplet
+
+            // first we read the stored fit parameters:
+            double gamma=getFitValue(record, index, model, "focus_struct_fac");
+            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            double N_particle=getFitValue(record,index,model,"n_particle");;
+
+            int k=0;
+            for (uint32_t i=first; i<=last; i++) {
+                const double tau=msdTaus[k];
+                const double ms=msd[k];
+                modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))/sqrt(1.0+2.0/3.0*ms/sqr(wxy)/sqr(gamma));;
+                k++;
             }
 
-            if (ok) {
-                for (uint32_t i=0; i<qMin(N, Nmsd); i++) {
-                    taus[i]=msdTaus[i];
-                    modelEval[i]=0;//1.0/N_particle/(1.0+2.0/3.0*msd[i]/sqr(wxy));
-                }
-            } else {
-            }
-        }*/
-    } else if (model==1) { // simple 3D model without triplet
-
-        // first we read the stored fit parameters:
-        double gamma=getFitValue(record, index, model, "focus_struct_fac");
-        double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-        double N_particle=getFitValue(record,index,model,"n_particle");;
-
-        // now we evaluate the model
-        /*if (msdTaus && msd && Nmsd>0) {
-            bool ok=(N==Nmsd);
-            if (ok) {
-                for (int i=0; i<Nmsd; i++) {
-                    if (msdTaus[i]!=taus[i]) {
-                        ok=false;
-                        break;
-                    }
-                }
-            }
-            for (uint32_t i=0; i<N; i++) {
-                taus[i]=NAN;
-                modelEval[i]=NAN;
-            }
-            if (ok) {
-                for (uint32_t i=0; i<qMin(N, Nmsd); i++) {
-                    taus[i]=msdTaus[i];
-                    modelEval[i]=0;//1.0/N_particle/(1.0+2.0/3.0*msd[i]/sqr(wxy))/sqrt(1.0+2.0/3.0*msd[i]/sqr(wxy)/sqr(gamma));
-                }
-            } else {
-            }
-        }*/
+        }
     }
 }
 
@@ -397,8 +407,8 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
 
 QString QFFCSMSDEvaluationItem::getModelName(int model) const {
     switch(model) {
-        case 0: return tr("simple 2D model");
-        case 1: return tr("simple 3D model");
+        case 0: return tr("FCS: simple 2D model");
+        case 1: return tr("FCS: simple 3D model");
     }
 
     return "";
@@ -462,6 +472,76 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
 
     return false;
 }
+
+struct msd_diff3d_params {
+    double wxy;
+    double gamma;
+    double N;
+    double gmeasured;
+};
+
+double msd_diff3d(double x, void *params) {
+    msd_diff3d_params *p = (msd_diff3d_params *) params;
+
+    const double wxy2 = sqr(p->wxy);
+    const double gamma2 = sqr(p->gamma);
+    const double N = p->N;
+    const double gmeasured = p->gmeasured;
+
+    const double f1=1.0+2.0/3.0*x/wxy2;
+    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
+
+    return f1*sqrt(f2)-1.0/(N*gmeasured);
+}
+
+double msd_diff3d_deriv(double x, void *params) {
+    msd_diff3d_params *p = (msd_diff3d_params *) params;
+
+    const double wxy2 = sqr(p->wxy);
+    const double gamma2 = sqr(p->gamma);
+    const double N = p->N;
+    const double gmeasured = p->gmeasured;
+
+    const double f1=1.0+2.0/3.0*x/wxy2;
+    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
+
+    return f1*4.0/3.0*sqrt(x)/wxy2*sqrt(f2)+f1*0.5/sqrt(f2)*4.0/3.0*sqrt(x)/gamma2/wxy2;
+}
+
+void msd_diff3d_fdf(double x, void *params, double *y, double *d) {
+    msd_diff3d_params *p = (msd_diff3d_params *) params;
+
+    const double wxy2 = sqr(p->wxy);
+    const double gamma2 = sqr(p->gamma);
+    const double N = p->N;
+    const double gmeasured = p->gmeasured;
+
+    const double f1=1.0+2.0/3.0*x/wxy2;
+    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
+
+    *y = f1*sqrt(f2)-1.0/(N*gmeasured);
+    *d = f1*4.0/3.0*sqrt(x)/wxy2*sqrt(f2)+f1*0.5/sqrt(f2)*4.0/3.0*sqrt(x)/gamma2/wxy2;
+}
+
+
+
+
+void lmfit_msd_diff3d(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+    msd_diff3d_params* p=(msd_diff3d_params*)data;
+
+
+    const double wxy2 = sqr(p->wxy);
+    const double gamma2 = sqr(p->gamma);
+    const double N = p->N;
+    const double gmeasured = p->gmeasured;
+    const double x = par[0];
+
+    const double f1=1.0+2.0/3.0*x/wxy2;
+    const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
+
+    *fvec = f1*sqrt(f2)-1.0/(N*gmeasured);
+}
+
 
 
 void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange, int defaultMaxDatarange, int runAvgWidth, int residualHistogramBins) {
@@ -537,7 +617,65 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         } else if (model==1) {
             for (int i=0; i<Ndist; i++) {
                 distTaus[i]=taus[rangeMinDatarange+i];
-                dist[i]=6.0*10.0*distTaus[i];
+                const double meas_acf=corrdata[rangeMinDatarange+i];
+                const double tau=taus[rangeMinDatarange+i];
+
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                /*control.ftol=getParameter("ftol").toDouble();
+                control.xtol=getParameter("xtol").toDouble();
+                control.gtol=getParameter("gtol").toDouble();
+                control.epsilon=getParameter("epsilon").toDouble();
+                control.stepbound=getParameter("stepbound").toDouble();
+                control.maxcall=getParameter("max_iterations").toInt();*/
+
+                msd_diff3d_params d = {wxy, gamma, N_particle, meas_acf};
+                double r=60.0*tau;
+
+                lmmin(1, &r, 1, &d, lmfit_msd_diff3d, &control, &status, NULL );
+                dist[i]=r;
+
+                /*int status;
+                int iter = 0, max_iter = 100;
+                const gsl_root_fsolver_type *T;
+                gsl_root_fsolver *s;
+                double r = 0;
+                double x_lo = 0, x_hi = 1e12;
+                gsl_function F;
+                msd_diff3d_params params = {wxy, gamma, N_particle, meas_acf};
+
+                F.function = &msd_diff3d;
+                F.params = &params;
+
+                T = gsl_root_fsolver_brent;
+                s = gsl_root_fsolver_alloc(T);
+                gsl_root_fsolver_set(s, &F, x_lo, x_hi);
+
+                printf ("point %d: using %s method\n",
+                       i, gsl_root_fsolver_name (s));
+
+                printf ("%5s [%9s, %9s] %9s %10s %9s\n",
+                       "iter", "lower", "upper", "root");
+
+                do {
+                   iter++;
+                   status = gsl_root_fsolver_iterate (s);
+                   r = gsl_root_fsolver_root (s);
+                   x_lo = gsl_root_fsolver_x_lower (s);
+                   x_hi = gsl_root_fsolver_x_upper (s);
+                   status = gsl_root_test_interval (x_lo, x_hi,
+                                                    0, 0.001);
+
+                   if (status == GSL_SUCCESS)
+                     printf ("Converged:\n");
+
+                   printf ("%5d [%.7f, %.7f] %.7f\n",  iter, x_lo, x_hi, r);
+                } while (status == GSL_CONTINUE && iter < max_iter);
+
+                gsl_root_fsolver_free (s);
+
+                dist[i]=r;*/
             }
         }
 

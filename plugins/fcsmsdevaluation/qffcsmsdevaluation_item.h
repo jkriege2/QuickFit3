@@ -11,6 +11,8 @@
 #include "../base_classes/qfusesresultsbyindexevaluation.h"
 #include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
 
+
+
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
 

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Mean Squared Displacement (MSD) Online-Help</title>
+  </head>
+  <body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>Introduction</h2>
+		Ths plugn implements methods to extract the mean squared displacement (MSD) from fluorescence correlation spectroscopy (FCS) data, as described in these references:
+		<ul>
+		  <li>Roman Shusterman, Sergey Alon, Tatyana Gavrinyov, Oleg Krichevsky (2003): <strong>"Monomer Dynamics in Double- and Single-Stranded DNA Polymers"</strong>, <i>Physical review Letters</i> <b>92</b>(4), DOI: 10.1103/PhysRevLett.92.048303</li>
+		</ul>
+		
+
+		<h2>The Mean Squared Displacement (MSD)</h2>
+		The MSD describes the motion of diffusin particles. Roughly it is the variance of the random motion and can be interpreted as the area a particle has wandered over during a time $$math:\tau$$. It is defined for the trajectory of a single particle (random walker) $$math:\vec{r}(t)$$ as:
+		$$bmath:\langle r^2(\tau)\rangle=\left\langle (\vec{r}(t)-\vec{r}(t+\tau) )^2\right\rangle$$
+		where the averaging $$math:\langle\cdot\rangle$$ is a time-average over the trajectory. If we observe several particles the time-average may be replaced by an ensemble or a combined ensemble and time average. In FCS the average is usually the last of these, as we observe several particles during the measurement.
+		
+		<center>
+		  <img src="./pic/random_walk.png"><br>
+		  <b>Fig 1:</b> Four trajectories of random walks with different diffusion coefficients that increase (red, green, blue, magenta) by a factor of five between two subsequent walks. The circles show the root mean squared displacement $$math:\sqrt{\langle r^2(T)\rangle}$$ of the particle from its origin, a measure of the area, the particle covers during the simulation time $$math:T$$.
+		</center>
+		
+		For normal diffusion the dependence of the MSD on the time $$math:\tau$$ is known:
+		$$bmath:\langle r^2(\tau)\rangle=2d\cdot D\cdot\tau$$
+		where $$math:d$$ is the dimensionality of the motion ($$math:d=3$$ for 3D, $$math:d=2$$ for 2D and $$math:d=1$$ for 1D motion) and $$math:D$$ is the diffusion coefficient. In some cases this dependence does not hold, e.g.:
+		  <ul>
+		    <li>Due to crowding the diffusion inside the cellular nucleus is hindered</li>
+			<li>If only one segment on a long polymer is labeled and observed, we will see a different MSD for small timescales, as it represents here the internal motion of the segment inside the polymer chain and not the overall motion of the whole molecule.</li>
+		  </ul>
+		For both cases the dependence of the MSD on time $$math:\tau$$ is "subdiffusive" and we have instead of above's relation:
+		$$bmath:\langle r^2(\tau)\rangle=\Gamma\cdot\tau^\alpha$$
+		Here $$math:\alpha$$ represents the anomality of the random walk for subdiffusive motion we find $$math:\alpha<1$$, for normal diffusion we have $$math:\alpha=1$$ and the case $$math:\alpha>1$$ is called super-diffusion.
+		<center>
+		  <img src="./pic/anomdiff3.png"><br>
+		  <b>Fig 2:</b> Examples for anomalous subdiffusion
+		</center>
+		<center>
+		  <img src="./pic/anomdiff2.png"><br>
+		  <b>Fig 3:</b> Examples for anomalous superdiffusion
+		</center>
+		
+		
+		<h2>The Plugin</h2>
+		In many cases it is possible to write down a model ACF $$math:g(\langle r^2(\tau)\rangle)$$ for a given mean squared displacement $$math:\langle r^2(\tau)\rangle$$. If so it should also be possible to regain the MSD $$math:\langle r^2(\tau)\rangle$$ from the measured ACF $$math:g_m(\tau)$$ by solving:
+		$$bmath:g(\langle r^2(\tau)\rangle)-g_m(\tau)=0$$
+		for the MSD $$math:\langle r^2(\tau)\rangle$$. This equation (for details on the model functions, see next section) can either be solved analytically for simple cases or numerically for more complex situations. This plugin does exactly that:<ol>
+		  <li>First the user has to select a valid range from the measured ACF on which the MSD should be extracted. Take special care to avoid regions with e.g. triplet contributions if the selected model does not account for them.</li>
+		  <li>Then several model parameters (e.g. focal sizes, correlation amplitudes/particle numbers) have to be determined indepentendly and supplied to the plugin as "fit parameters".</li>
+		  <li>Finally a click on "fit" will extract the MSD for the given settinsg from the data. The MSD will be displayed in a double-logarithmic plot, in which the diffusion laws $$math:\propto\tau^\alpha$$ will appear as straight lines with slopes depending on $$math:\alpha$$ only.</li>
+		  <li>It is possible to display up to three "theory curves" alongside the extracted MSD with parameters electable by the user. This is handy to compare the extracted MSD to known or expected dependencies.</li>
+		  <li>From the MSD the plugin also calculates the local anomality "local &alpha;" and the local diffusion coefficient "local D" by cutting the MSD in several consecutive segments of "fit width" points. Then the model $$bmath:f(\tau)=6\cdot D\cdot\tau^\alpha$$ is fitted to each of these segments using the levenberg marquardt library <a href="copyright.html">lmfit by Joachim Wuttke</a>. The results of these fits are displayed below the MSD in a second plotting widget. <b>Note</b> that the unnit of $$math:D$$ is &mu;m<sup>2</sup>/s only, if $$math:\alpha=1$$. In any other case the unit is &mu;m<sup>2</sup>/s<sup>&alpha;</sup> and can no longer be interpreted a s a diffusion coefficient easily!</li>
+		</ol>
+
+		<h2>Supported Models</h2>
+		This plugin supports several models from which the MSD is extracted:
+		<ol>
+		  <li><b>FCS: simple 2D model</b>: The confocal FCS model function for 2D diffusion is very simple: 
+		  $$bmath:g(\tau)=\frac{1}{N}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}$$
+			   Here $$math:w_{xy}$$ is the axial 1/e2 radius of the laser focus and $$math:N$$ is the particle number.<br>This model can easily be inverted to yield the MSD from the memasured ACF $$math:g_m(\tau)$$:
+			   $$bmath:\langle r^2(\tau)\rangle=\frac{3\cdot w_{xy}^2}{2}\cdot\left(\frac{1}{N\cdot g_m(\tau)}-1\right)$$
+			   So only the focal parameter $$math:w_{xy}$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF.
+		  </li>
+		  <li><b>FCS: simple 3D model</b>: The confocal FCS model function for 3D diffusion is very similar to the 2D case: 
+		  $$bmath:g(\tau)=\frac{1}{N}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{-1/2}$$
+			   Here $$math:w_{xy}$$ is the axial 1/e2 radius of the laser focus, $$math:\gamma$$ is its axial ratio and $$math:N$$ is the particle number.<br>This model can not easily be inverted to find the MSD from the memasured ACF $$math:g_m(\tau)$$, so the inversion has to be done numerically using the Levenberg-Marquardt (LM) algorithm. The LM algorithm is then used to solve this equation for every pair $$math:\left(\tau_i, g_m(\tau_i)\right)$$ of estimates for different lag times of the ACF
+			   $$bmath:\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)\cdot\left(1+\frac{2}{3}\frac{\langle r^2(\tau)\rangle}{w_{xy}^2}\right)^{1/2}-\frac{1}{N\cdot g_m(\tau)}=0$$
+			   Here the focal parameters $$math:w_{xy}$$ and  $$math:\gamma$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF. 
+			   <br>This plugin uses the LM library <a href="copyright.html">lmfit by Joachim Wuttke</a>.
+		  </li>
+		</ol>
+		
+		
+		<h2>Implementation Details</h2>
+  </body>
+</html>

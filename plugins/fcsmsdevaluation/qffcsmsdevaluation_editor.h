@@ -145,6 +145,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         NumberEdit* numAlpha[3];
         QCheckBox* chkSlope[3];
         QSpinBox* spinFitWidth;
+        QCheckBox* chkShowKeyDist;
+        QCheckBox* chkShowKeyDistResults;
 
     private:
         void createWidgets();

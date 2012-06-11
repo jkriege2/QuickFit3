@@ -162,7 +162,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistribution->getXAxis()->set_labelFontSize(11);
     pltDistribution->getXAxis()->set_tickLabelFontSize(10);
     pltDistribution->getXAxis()->set_logAxis(true);
-    pltDistribution->getYAxis()->set_axisLabel(tr("mean squared displacement $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
+    pltDistribution->getYAxis()->set_axisLabel(tr("MSD $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
     pltDistribution->getYAxis()->set_labelFontSize(11);
     pltDistribution->getYAxis()->set_tickLabelFontSize(10);
     pltDistribution->getYAxis()->set_logAxis(true);
@@ -188,7 +188,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomAll());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomIn());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomOut());
-
+    tbPlotDistribution->addSeparator();
+    chkShowKeyDist=new QCheckBox(tr("show key"), this);
+    chkShowKeyDist->setChecked(true);
+    connect(chkShowKeyDist, SIGNAL(toggled(bool)), this, SLOT(updateDistribution()));
+    tbPlotDistribution->addWidget(chkShowKeyDist);
     sliderDist=new DataCutSliders(this);
 
 
@@ -199,7 +203,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistResults->getXAxis()->set_labelFontSize(11);
     pltDistResults->getXAxis()->set_tickLabelFontSize(10);
     pltDistResults->getXAxis()->set_logAxis(true);
-    pltDistResults->getYAxis()->set_axisLabel("");//tr("mean squared displacement $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
+    pltDistResults->getYAxis()->set_axisLabel("");//tr("MSD $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
     pltDistResults->getYAxis()->set_labelFontSize(11);
     pltDistResults->getYAxis()->set_tickLabelFontSize(10);
     pltDistResults->getYAxis()->set_logAxis(false);
@@ -232,6 +236,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tbPlotDistResults->addSeparator();
     tbPlotDistResults->addWidget(new QLabel(tr("   parameter: ")));
     tbPlotDistResults->addWidget(cmbDistResultsMode);
+    chkShowKeyDistResults=new QCheckBox(tr("show key"), this);
+    chkShowKeyDistResults->setChecked(true);
+    connect(chkShowKeyDistResults, SIGNAL(toggled(bool)), this, SLOT(updateDistributionResults()));
+    tbPlotDistResults->addSeparator();
+    tbPlotDistResults->addWidget(chkShowKeyDistResults);
 
     splitterDist=new QVisibleHandleSplitter(Qt::Vertical, this);
     QWidget* w=new QWidget(this);
@@ -773,6 +782,13 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 //qDebug()<<"    g "<<t.elapsed()<<" ms";
                 t.start();
 
+                double N_particle=eval->getFitValue("n_particle");
+                if (N_particle>0) {
+                    JKQTPgeoInfiniteLine* g_Nline=new JKQTPgeoInfiniteLine(pltData->get_plotter(), tauvals[datacut->get_userMin()], 1.0/N_particle, 1,0,QColor("orange"));
+                    pltData->addGraph(g_Nline);
+                }
+                //qDebug()<<"    g "<<t.elapsed()<<" ms";
+                t.start();
 
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals
@@ -877,6 +893,7 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 pltResidualCorrelation->addGraph(g_residualsCorrelation);
                 //qDebug()<<"    k "<<t.elapsed()<<" ms";
                 t.start();
+
 
 
                 updateDistribution();
@@ -1031,6 +1048,8 @@ void QFFCSMSDEvaluationEditor::fitCurrent() {
     eval->emitResultsChanged(record);
     record->emitResultsChanged();
 
+
+    updateSliders();
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);
@@ -1082,6 +1101,7 @@ void QFFCSMSDEvaluationEditor::fitRunsCurrent() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     dlgEvaluationProgress->setValue(recs.size());
+    updateSliders();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1133,6 +1153,7 @@ void QFFCSMSDEvaluationEditor::fitAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
+    updateSliders();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1186,6 +1207,7 @@ void QFFCSMSDEvaluationEditor::fitRunsAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
+    updateSliders();
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();
@@ -1230,6 +1252,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     bool updt=pltDistResults->get_doDrawing();
     pltDistResults->set_doDrawing(false);
     pltDistResults->clearGraphs();
+    pltDistResults->get_plotter()->set_showKey(chkShowKeyDistResults->isChecked());
 
     dsdist->deleteAllColumns("msdfit_tau");
     dsdist->deleteAllColumns("msdfit_D");
@@ -1302,6 +1325,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             g_msdfit->set_datarange_end(data_end);
             g_msdfit->set_symbol(JKQTPcross);
             g_msdfit->set_symbolSize(7);
+            g_msdfit->set_color(QColor("red"));
             pltDistResults->addGraph(g_msdfit);
             pltDistResults->getYAxis()->set_axisLabel("local \\alpha");
         } else {
@@ -1314,6 +1338,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             g_msdfit->set_datarange_end(data_end);
             g_msdfit->set_symbol(JKQTPcross);
             g_msdfit->set_symbolSize(7);
+            g_msdfit->set_color(QColor("red"));
             pltDistResults->addGraph(g_msdfit);
             pltDistResults->getYAxis()->set_axisLabel("local $D$ [\\mu m^2/s]");
         }
@@ -1361,12 +1386,16 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
     }
     JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
     g_dist->set_drawLine(true);
-    g_dist->set_title("mean squared displacement \\langle r^2(\\tau)\\rangle");
+    g_dist->set_title("MSD \\langle r^2(\\tau)\\rangle");
     g_dist->set_xColumn(c_disttau);
     g_dist->set_yColumn(c_dist);
     g_dist->set_datarange_start(data_start);
     g_dist->set_datarange_end(data_end);
     pltDistribution->addGraph(g_dist);
+    QColor cb("white");
+    cb.setAlphaF(0.5);
+    pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
+    pltDistribution->get_plotter()->set_showKey(chkShowKeyDist->isChecked());
 
 
 
@@ -1585,7 +1614,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
 
     fHeading1.setFontPointSize(2*fText.fontPointSize());
     fHeading1.setFontWeight(QFont::Bold);
-    cursor.insertText(tr("FCS Maxent Fit Report:\n\n"), fHeading1);
+    cursor.insertText(tr("FCS Mean Squared Displacement Fit Report:\n\n"), fHeading1);
     cursor.movePosition(QTextCursor::End);
 
 
@@ -1604,7 +1633,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(1, 1).firstCursorPosition().insertText(tr("%1 ... %2 / %3 ... %4").arg(datacut->get_userMin()).arg(datacut->get_userMax()).arg(datacut->get_min()).arg(datacut->get_max()), fText);
     table->cellAt(2, 0).firstCursorPosition().insertText(tr("physical model: "), fTextBold);
     //table->cellAt(2, 1).firstCursorPosition().insertText(ffunc->name(), fText);
-    table->cellAt(2, 1).firstCursorPosition().insertText("FCS 3D Diffusion with triplet", fText);
+    table->cellAt(2, 1).firstCursorPosition().insertText(eval->getModelName(eval->getCurrentModel()), fText);
     table->cellAt(2, 2).firstCursorPosition().insertText(tr("data weighting:"), fTextBold);
     table->cellAt(2, 3).firstCursorPosition().insertText(cmbWeights->currentText(), fText);
     cursor.movePosition(QTextCursor::End);
@@ -1621,15 +1650,16 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
     constraints << QTextLength(QTextLength::PercentageLength, 34);
     tableFormat1.setColumnWidthConstraints(constraints);
 
-    table = cursor.insertTable(2, 2, tableFormat1);
-    //table->mergeCells(0,0,2,1);
+    table = cursor.insertTable(4, 2, tableFormat1);
+    table->mergeCells(0,0,2,1);
+    table->mergeCells(2,1,2,1);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
         pltData->get_plotter()->draw(*painter, QRect(0,0,pltData->width(),pltData->width()));
         delete painter;
-        double scale=document->textWidth()*0.45/pic.boundingRect().width(); //0.62
+        double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation data, model and residuals:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
@@ -1642,33 +1672,66 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         QPainter* painter=new QPainter(&pic);
         pltDistribution->get_plotter()->draw(*painter, QRect(0,0,pltDistribution->width(),pltDistribution->width()));
         delete painter;
-        double scale=document->textWidth()*0.45/pic.boundingRect().width(); //0.62
+        double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
-        tabCursor.insertText(tr("Maximum Entropy Distribution:\n"), fTextBoldSmall);
+        tabCursor.insertText(tr("Mean Squared Displacement (MSD):\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    QApplication::processEvents();
+    int old_mode=cmbDistResultsMode->currentIndex();
+    {
+        QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        cmbDistResultsMode->setCurrentIndex(0);
+        QApplication::processEvents();
+        QApplication::processEvents();
+        pltDistResults->get_plotter()->draw(*painter, QRect(0,0,pltDistribution->width(),pltDistribution->width()));
+        delete painter;
+        double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("local anomality:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     QApplication::processEvents();
 
+    {
+        QTextCursor tabCursor=table->cellAt(2, 1).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        cmbDistResultsMode->setCurrentIndex(1);
+        QApplication::processEvents();
+        QApplication::processEvents();
+        pltDistResults->get_plotter()->draw(*painter, QRect(0,0,pltDistribution->width(),pltDistribution->width()));
+        delete painter;
+        double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("local diffusion coefficient:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+    }
+    cmbDistResultsMode->setCurrentIndex(old_mode);
+    QApplication::processEvents();
+
 
     {
-        QTextCursor tabCursor=table->cellAt(1, 0).firstCursorPosition();
+        QTextCursor tabCursor=table->cellAt(2, 0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
         pltResidualHistogram->get_plotter()->draw(*painter, QRect(0,0,pltResidualHistogram->width(),pltResidualHistogram->width()));
         delete painter;
-        double scale=document->textWidth()*0.45/pic.boundingRect().width();//0.3
+        double scale=document->textWidth()*0.4/pic.boundingRect().width();//0.3
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual histogram:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     QApplication::processEvents();
     {
-        QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
+        QTextCursor tabCursor=table->cellAt(3,0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
         pltResidualCorrelation->get_plotter()->draw(*painter, QRect(0,0,pltResidualCorrelation->width(),pltResidualCorrelation->width()));
         delete painter;
-        double scale=document->textWidth()*0.45/pic.boundingRect().width();//0.3
+        double scale=document->textWidth()*0.4/pic.boundingRect().width();//0.3
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual correlations:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
@@ -1713,7 +1776,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
     QTextTableFormat tableFormat2;
     tableFormat2.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat2.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    table = cursor.insertTable(6, 4, tableFormat2);
+    table = cursor.insertTable(qMax(6,2+eval->getParameterCount(eval->getCurrentModel())), 4, tableFormat2);
     //table = cursor.insertTable(ceil((double)fitParamCount/2.0)+1, 12, tableFormat2);
     QTextCursor tableCursor;
     QApplication::processEvents();
@@ -1721,10 +1784,11 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
 
     tableCursor=table->cellAt(0, 0).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
-    tableCursor.insertText(tr("Algorithm Parameters"), fTextBoldSmall);
+    tableCursor.insertText(tr("Evaluation Parameters"), fTextBoldSmall);
+
     tableCursor=table->cellAt(0, 2).firstCursorPosition();
     tableCursor.setBlockFormat(bfRight);
-    tableCursor.insertText(tr("LocalParameters"), fTextBoldSmall);
+    tableCursor.insertText(labFitParameters->text(), fTextBoldSmall);
 
     //if (algorithm->get_supportsBoxConstraints()) table->cellAt(0, 5).firstCursorPosition().insertText(tr("Range"), fTextBoldSmall);
     QApplication::processEvents();
@@ -1747,19 +1811,38 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableCursor=table->cellAt(2,0).firstCursorPosition();
     tableCursor.setBlockFormat(bfRightNB);
     tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr(" Alpha =  "), fTextSmall);
+    tableCursor.insertText(tr(" fit width =  "), fTextSmall);
 
-    tableCursor=table->cellAt(3, 0).firstCursorPosition();
-    tableCursor.setBlockFormat(bfRightNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr(" Ndist =  "), fTextSmall);
+    int k=0;
+    for (int i=0; i<3; i++) {
+        if (chkSlope[i]->isChecked()) {
+            tableCursor=table->cellAt(3+k, 0).firstCursorPosition();
+            tableCursor.setBlockFormat(bfRightNB);
+            tableCursor.setBlockCharFormat(fTextSmall);
+            tableCursor.insertText(tr(" theory %1 =  ").arg(i+1), fTextSmall);
 
-    tableCursor=table->cellAt(4, 0).firstCursorPosition();
-    tableCursor.setBlockFormat(bfRightNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr(" Iterations/Steps =  "), fTextSmall);
+            tableCursor=table->cellAt(3+k, 1).firstCursorPosition();
+            tableCursor.setBlockFormat(bfCenterNB);
+            tableCursor.setBlockCharFormat(fTextSmall);
+            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<font size=\"-1\"> %1 &middot; %2 &middot; &tau;<sup>%3</sup> [&mu;m<sup>2</sup>/s]</font>").arg(numPre[i]->value()).arg(numD[i]->value()).arg(numAlpha[i]->value())));
 
-    //table->cellAt(0, 3).firstCursorPosition().insertText(QString("%1 [%2]").arg((eval->getCurrentIndex()<0)?tr("average"):QString::number(eval->getCurrentIndex())).arg(fcs->getCorrelationRunName(eval->getCurrentIndex())), fText);
+            k++;
+        }
+    }
+
+    k=0;
+    for (int i=0; i<eval->getParameterCount(eval->getCurrentModel()); i++) {
+        tableCursor=table->cellAt(1+k, 2).firstCursorPosition();
+        tableCursor.setBlockFormat(bfRightNB);
+        tableCursor.setBlockCharFormat(fTextSmall);
+        tableCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<font size=\"-1\"> %1 =  </font>").arg(eval->getParameterName(eval->getCurrentModel(), i, true))));
+
+        tableCursor=table->cellAt(1+k, 3).firstCursorPosition();
+        tableCursor.setBlockFormat(bfCenterNB);
+        tableCursor.setBlockCharFormat(fTextSmall);
+        tableCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<font size=\"-1\"> %1</font>").arg(eval->getFitValue(eval->getParameterID(eval->getCurrentModel(), i)))));
+        k++;
+    }
 
 
     tableCursor=table->cellAt(1,1).firstCursorPosition();
@@ -1767,150 +1850,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
     tableCursor.setBlockCharFormat(fTextSmall);
     tableCursor.insertText(QString("%1 [%2]").arg((eval->getCurrentIndex()<0)?tr("average"):QString::number(eval->getCurrentIndex())).arg(fcs->getCorrelationRunName(eval->getCurrentIndex())), fTextSmall);
 
-    /*tableCursor=table->cellAt(2, 1).firstCursorPosition();
-    tableCursor.setBlockFormat(bfCenterNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr("%1").arg(eval->getAlpha()), fTextSmall);
 
-    tableCursor=table->cellAt(3, 1).firstCursorPosition();
-    tableCursor.setBlockFormat(bfCenterNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr("%1").arg(eval->getNdist()), fTextSmall);
-
-    tableCursor=table->cellAt(4, 1).firstCursorPosition();
-    tableCursor.setBlockFormat(bfCenterNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr("%1").arg(eval->getNumIter()), fTextSmall);*/
-
-    tableCursor=table->cellAt(1, 2).firstCursorPosition();
-    tableCursor.setBlockFormat(bfRightNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<font size=\"-1\">&tau;<sub>trip</sub></font> [&mu;s] = ")));
-
-    tableCursor=table->cellAt(2, 2).firstCursorPosition();
-    tableCursor.setBlockFormat(bfRightNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<font size=\"-1\">&theta;<sub>trip</sub></font> = ")));
-
-    tableCursor=table->cellAt(3, 2).firstCursorPosition();
-    tableCursor.setBlockFormat(bfRightNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("Axial ratio <font size=\"-5\">&gamma;</font> = ")));
-
-    tableCursor=table->cellAt(1, 3).firstCursorPosition();
-    tableCursor.setBlockFormat(bfCenterNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr("%1").arg(eval->getFitValue("trip_tau")), fTextSmall);
-
-    tableCursor=table->cellAt(2, 3).firstCursorPosition();
-    tableCursor.setBlockFormat(bfCenterNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr("%1").arg(eval->getFitValue("trip_theta")), fTextSmall);
-
-    tableCursor=table->cellAt(3, 3).firstCursorPosition();
-    tableCursor.setBlockFormat(bfCenterNB);
-    tableCursor.setBlockCharFormat(fTextSmall);
-    tableCursor.insertText(tr("%1").arg(eval->getFitValue("focus_struct_fac")), fTextSmall);
-
-
-
-
-
-
-    /*
-
-    int rowStart=1;
-    int colStart=0;
-    for (int i=0; i<eval->getParameterCount(eval->getCurrentModel()); i++) {
-        QApplication::processEvents();
-        QString id=eval->getParameterID(eval->getCurrentModel(),i);
-        double error=roundError(eval->getFitError(id),2);
-        double value=roundWithError(eval->getFitValue(id), error, 2);
-        QString value_string=floattohtmlstr(value, 5, true).c_str();
-        bool fix=eval->getFitFix(id);
-        QFFitFunction::ParameterDescription d=eval->getDescription(id); //ffunc->getDescription(id);
-
-        QString range=QString("%1...%2").arg(QString(floattohtmlstr(d.minValue, 5, true).c_str())).arg(QString(floattohtmlstr(d.maxValue, 5, true).c_str()));
-        if ((d.type==QFFitFunction::IntCombo)&&((int)value>=0)&&((int)value<d.comboItems.size())) {
-            value_string="<i>"+d.comboItems[(int)value]+"</i>";
-        }
-
-
-
-
-        if (ffunc->isParameterVisible(i, params))
-                {
-
-
-            QString err="";
-
-            if (d.displayError!=QFFitFunction::NoError) {
-                err=QString("&plusmn;&nbsp;%1").arg(QString(floattohtmlstr(error, 5, true).c_str()));
-            }
-
-
-            tableCursor=table->cellAt(rowStart, colStart).firstCursorPosition();
-            tableCursor.setBlockFormat(bfRightNB);
-            tableCursor.setBlockCharFormat(fTextSmall);
-            //tableCursor.insertFragment(QTextDocumentFragment::fromHtml(d.label));
-            tableCursor.insertText(" = ", fTextSmall);
-
-            tableCursor=table->cellAt(rowStart, colStart+1).firstCursorPosition();
-            tableCursor.setBlockFormat(bfLeftNB);
-            tableCursor.setBlockCharFormat(fTextSmall);
-
-            if (d.fit) {
-                tableCursor.insertText(tr("F"), fTextSmall);
-            }
-
-
-            if (!d.userEditable) {
-                tableCursor.insertText(tr("C"), fTextSmall);
-            }
-
-            if (fix) {
-                tableCursor.insertText(tr("X"), fTextSmall);
-            }
-
-
-            tableCursor=table->cellAt(rowStart, colStart+2).firstCursorPosition();
-            tableCursor.setBlockFormat(bfRightNB);
-            tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(value_string)));
-
-            tableCursor=table->cellAt(rowStart, colStart+3).firstCursorPosition();
-            tableCursor.setBlockFormat(bfLeftNB);
-            tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(err)));
-
-            tableCursor=table->cellAt(rowStart, colStart+4).firstCursorPosition();
-            tableCursor.setBlockFormat(bfLeftNB);
-            tableCursor.setBlockCharFormat(fTextSmall);
-            tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(d.unitLabel)));
-
-
-            if (algorithm->get_supportsBoxConstraints()) {
-                tableCursor=table->cellAt(rowStart, colStart+5).firstCursorPosition();
-                tableCursor.setBlockFormat(bfLeftNB);
-                tableCursor.setBlockCharFormat(fTextSmall);
-                tableCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<nobr>%1</nobr>").arg(range)));
-            }
-
-            rowStart++;
-        };
-        if (rowStart>=table->rows()) {
-            rowStart=1;
-            colStart+=6;
-        }
-    }
-    cursor.movePosition(QTextCursor::End);
-    cursor.insertBlock();
-    cursor.setBlockFormat(bfCenterNB);
-    cursor.setBlockCharFormat(fTextSmall);
-    cursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<i><u>legend:</u> <b>F</b>: fit parameter, <b>X</b>: fixed parameter, <b>C</b>: calculated parameter</i>")));
-    QApplication::processEvents();
-
-    */
     cursor.setBlockFormat(bfLeft);
     cursor.movePosition(QTextCursor::End);
     cursor.insertBlock(); cursor.insertBlock();

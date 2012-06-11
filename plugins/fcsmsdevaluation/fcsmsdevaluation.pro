@@ -10,7 +10,6 @@ include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 include(../../libquickfitwidgets.pri)
-include(../../extlibs/gsl.pri)
 include(../../extlibs/lmfit.pri)
 
 # Input
@@ -54,4 +53,6 @@ ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/testdata/
 
 INSTALLS += ASSETSTESTDATA_FILES
 
-
+SRC_DISTRIBUTED.files = $$HEADERS \
+                        $$SOURCES \
+                        $$FORMS
