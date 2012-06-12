@@ -559,6 +559,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             //double newPos=stageStart;
             int posIdx=0;
             int imageIdx=0;
+            measured.append(optSetup->getMeasuredValues());
             while (running && (posIdx<=moveTo.size())) {
                 double newPos=stageInitialPos;
                 double newPos2=stageInitialPos2;
@@ -696,7 +697,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                         running=false;
                         log_warning(tr("  - acquisition canceled by user!\n"));
                     } else {
-                        measured.append(optSetup->getMeasuredValues());
+                        if (widImageStack->saveMeasurements()) measured.append(optSetup->getMeasuredValues());
                         for (int lp=0; lp<lightpathList.size(); lp++) {
                             if (lightpathList.size()>1 || lp==0) {
                                 if (!lightpathList[lp].isEmpty() && QFile::exists(lightpathList[lp])) {
@@ -710,7 +711,19 @@ void QFESPIMB040MainWindow2::doImageStack() {
                             }
                             for (int img=0; img<widImageStack->images(); img++) {
                                 log_text(tr("  - acquiring images (%1/%2) ...\n").arg(imageIdx+1).arg(images));
-                                progress.setLabelText(tr("acquiring images (%1/%2) ...").arg(imageIdx+1).arg(images));
+                                QString estimation="";
+                                QString fps="";
+                                if (posIdx>3) {
+                                    double duration=double(timAcquisition.elapsed())/1000.0;
+                                    double eta=duration/double(posIdx+1.0)*double(moveTo.size());
+                                    double etc=eta-duration;
+                                    uint mini=floor(etc/60.0);
+                                    uint secs=round(etc-double(mini)*60.0);
+                                    estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
+
+                                    fps=tr("\nacquisition rate: %1fps").arg(double(imageIdx+1)/duration, 0, 'f', 2);
+                                }
+                                progress.setLabelText(tr("acquiring images (%1/%2) ...%3%4").arg(imageIdx+1).arg(images).arg(estimation).arg(fps));
                                 QApplication::processEvents();
                                 if (progress.wasCanceled()) {
                                     running=false;
@@ -758,7 +771,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             duration=timAcquisition.elapsed()/1000.0;
         }
         progress.setValue(100);
-        measured.append(optSetup->getMeasuredValues());
+        if (widImageStack->saveMeasurements()) measured.append(optSetup->getMeasuredValues());
 
         progress.nextItem();
         progress.setProgressText(tr("switching main shutter off ..."));
@@ -1165,6 +1178,9 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
             int width2=0, height2=0;
             uint32_t* buffer2=NULL;
             int imageCnt=0;
+
+            measured.append(optSetup->getMeasuredValues());
+
             while (running && (stackIdx<scanVals.size())) {
 
                 if (ok && useCam1) {
@@ -1264,7 +1280,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                         }
                         imageCnt++;
                     }
-                    measured.append(optSetup->getMeasuredValues());
+                    if (widCamParamScan->saveMeasurements()) measured.append(optSetup->getMeasuredValues());
                     //QApplication::processEvents();
                 }
                 if (!ok) running=false;

@@ -61,6 +61,7 @@ void QFESPIMB040CamParamStackConfigWidget2::loadSettings(QSettings& settings, QS
     ui->chkLightpath->setChecked(settings.value(prefix+"lightpath", false).toBool());
     ui->cmbLightpath->setCurrentIndex(settings.value(prefix+"lightpathidx", -1).toInt());
 
+    ui->chkSaveMeasurements->setChecked(settings.value(prefix+"savemeasurement", false).toBool());
     on_chkUse1_clicked(true);
     on_chkUse2_clicked(true);
 }
@@ -83,6 +84,7 @@ void QFESPIMB040CamParamStackConfigWidget2::storeSettings(QSettings& settings, Q
 
     settings.setValue(prefix+"lightpathidx", ui->cmbLightpath->currentIndex());
     settings.setValue(prefix+"lightpath", ui->chkLightpath->isChecked());
+    settings.setValue(prefix+"savemeasurement", ui->chkSaveMeasurements->isChecked());
 }
 
 
@@ -269,4 +271,8 @@ void QFESPIMB040CamParamStackConfigWidget2::lightpathesChanged(QFESPIMB040Optics
     }
     ui->cmbLightpath->setCurrentIndex(qMax(0, ui->cmbLightpath->findText(idx)));
 
+}
+
+bool QFESPIMB040CamParamStackConfigWidget2::saveMeasurements() const {
+    return ui->chkSaveMeasurements->isChecked();
 }

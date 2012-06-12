@@ -48,6 +48,7 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         QString prefix2() const;
         bool use1() const;
         bool use2() const;
+        bool saveMeasurements() const;
 
         int images() const;
 

@@ -86,6 +86,7 @@ void QFESPIMB040ImageStackConfigWidget2::loadSettings(QSettings& settings, QStri
     ui->cmbLightpath2->setCurrentIndex(settings.value(prefix+"lightpath2idx", -1).toInt());
     ui->cmbLightpath3->setCurrentIndex(settings.value(prefix+"lightpath3idx", -1).toInt());
 
+    ui->chkSaveMeasurements->setChecked(settings.value(prefix+"savemeasurements", false).toBool());
     ui->spinImages->setValue(settings.value(prefix+"images", 1).toInt());
     on_chkUse1_clicked(true);
     on_chkUse2_clicked(true);
@@ -130,6 +131,7 @@ void QFESPIMB040ImageStackConfigWidget2::storeSettings(QSettings& settings, QStr
     settings.setValue(prefix+"lightpath1", ui->chkLightpath1->isChecked());
     settings.setValue(prefix+"lightpath2", ui->chkLightpath2->isChecked());
     settings.setValue(prefix+"lightpath3", ui->chkLightpath3->isChecked());
+    settings.setValue(prefix+"savemeasurements", ui->chkSaveMeasurements->isChecked());
 }
 
 int QFESPIMB040ImageStackConfigWidget2::images() const {
@@ -593,4 +595,8 @@ void QFESPIMB040ImageStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSet
     ui->cmbLightpath2->setCurrentIndex(qMax(0, ui->cmbLightpath2->findText(idx2)));
     ui->cmbLightpath3->setCurrentIndex(qMax(0, ui->cmbLightpath3->findText(idx3)));
 
+}
+
+bool QFESPIMB040ImageStackConfigWidget2::saveMeasurements() const {
+    return ui->chkSaveMeasurements->isChecked();
 }

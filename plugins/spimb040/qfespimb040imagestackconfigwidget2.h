@@ -41,6 +41,8 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         void storeSettings(QSettings& settings, QString prefix) const;
 
 
+        bool saveMeasurements() const;
+
         int images() const;
         QString prefix1() const;
         QString prefix2() const;
