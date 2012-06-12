@@ -20,7 +20,14 @@
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
-////////////c
+////////////
+
+
+
+// TODO: save DataCutSliders for MSD plots
+// TODO: copy image buttons over MSD and MSDResults plots
+// TODO: make key in FCS plots togglable
+
 
 
 #include <QtGui>
