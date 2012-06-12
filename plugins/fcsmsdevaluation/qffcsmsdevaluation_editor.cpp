@@ -25,7 +25,7 @@
 
 
 // TODO: save DataCutSliders for MSD plots
-// TODO: copy image buttons over MSD and MSDResults plots
+// TODO: alter JKQtPlotter so that copying data opens a dialog where it is possible to select the columns to copy ... this should be saved, depending on the plotter's object name
 // TODO: make key in FCS plots togglable
 
 
@@ -228,9 +228,9 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tbPlotDistResults->setIconSize(QSize(16,16));
     tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actSavePlot());
     pltDistResults->get_plotter()->get_actSavePlot()->setToolTip(tr("save the distribution plot as an image (PNG, JPEG, PDF, SVG, ...)"));
-    pltDistResults->addAction(pltDistResults->get_plotter()->get_actPrint());
-    pltDistribution->get_plotter()->get_actPrint()->setToolTip(tr("print the distribution plot "));
-    pltDistResults->addAction(pltDistResults->get_plotter()->get_actCopyPixelImage());
+    tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actPrint());
+    pltDistResults->get_plotter()->get_actPrint()->setToolTip(tr("print the distribution plot "));
+    tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actCopyPixelImage());
     pltDistResults->get_plotter()->get_actCopyPixelImage()->setToolTip(tr("copy the distribution plot as an image to the system clipboard"));
     tbPlotDistResults->addSeparator();
     tbPlotDistResults->addAction(pltDistResults->get_plotter()->get_actZoomAll());
