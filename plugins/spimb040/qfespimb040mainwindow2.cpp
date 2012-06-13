@@ -552,6 +552,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
         QList<QVariant> positions, positions2, positions3;
         QTime timAcquisition=QTime::currentTime();
         QDateTime timStart;
+        QString estimation="";
+        QString fps="";
         double duration=0;
         if (ok) {
             progress.setLabelText(tr("acquiring images ..."));
@@ -576,7 +578,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                     t1.start();
                     while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
-                            progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
+                            progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...%3%4").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)).arg(estimation).arg(fps));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
                             t1.start();
@@ -590,7 +592,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                     t1.start();
                     while (t.elapsed()<DeltaT) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS)  {
-                            progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)));
+                            progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting%3%4").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)).arg(estimation).arg(fps));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
                             t1.start();
@@ -615,7 +617,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                     while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving || stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Moving) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos)+sqr(stage2->getPosition(stageAxis2)-newPos2));
-                            progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ...").arg(newPos).arg(newPos2).arg(dist));
+                            progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ...%4%5").arg(newPos).arg(newPos2).arg(dist).arg(estimation).arg(fps));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
                             t1.start();
@@ -630,7 +632,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                     while (t.elapsed()<DeltaT) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos)+sqr(stage2->getPosition(stageAxis2)-newPos2));
-                            progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ... waiting").arg(newPos).arg(newPos2).arg(dist));
+                            progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ... waiting%4%5").arg(newPos).arg(newPos2).arg(dist).arg(estimation).arg(fps));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
                             t1.start();
@@ -656,7 +658,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                     while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving || stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Moving || stage3->getAxisState(stageAxis3)==QFExtensionLinearStage::Moving) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos) + sqr(stage2->getPosition(stageAxis2)-newPos2) + sqr(stage3->getPosition(stageAxis3)-newPos3));
-                            progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ...").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
+                            progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ...%5%6").arg(newPos).arg(newPos2).arg(newPos3).arg(dist).arg(estimation).arg(fps));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
                             t1.start();
@@ -671,7 +673,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                     while (t.elapsed()<DeltaT) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(sqr(stage->getPosition(stageAxis)-newPos) + sqr(stage2->getPosition(stageAxis2)-newPos2) + sqr(stage3->getPosition(stageAxis3)-newPos3));
-                            progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting").arg(newPos).arg(newPos2).arg(newPos3).arg(dist));
+                            progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting%5%6").arg(newPos).arg(newPos2).arg(newPos3).arg(dist).arg(estimation).arg(fps));
                             QApplication::processEvents();
                             if (progress.wasCanceled()) break;
                             t1.start();
@@ -711,8 +713,6 @@ void QFESPIMB040MainWindow2::doImageStack() {
                             }
                             for (int img=0; img<widImageStack->images(); img++) {
                                 log_text(tr("  - acquiring images (%1/%2) ...\n").arg(imageIdx+1).arg(images));
-                                QString estimation="";
-                                QString fps="";
                                 if (posIdx>3) {
                                     double duration=double(timAcquisition.elapsed())/1000.0;
                                     double eta=duration/double(posIdx+1.0)*double(moveTo.size());
