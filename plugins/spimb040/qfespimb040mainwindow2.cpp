@@ -1917,11 +1917,24 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         bool running=ok;
         QTime time1;
         time1.start();
+        QTime timA;
+        timA.start();
         while (running) {
             int prog1=99, prog2=99;
             if (useCam1) prog1=ecamera1->getAcquisitionProgress(camera1);
             if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
             progress.setValue(qMin(prog1,prog2));
+
+            QString estimation;
+            if (qMin(prog1,prog2)>0) {
+                double duration=double(timA.elapsed())/1000.0;
+                double eta=duration/double(qMin(prog1,prog2))*100.0;
+                double etc=eta-duration;
+                uint mini=floor(etc/60.0);
+                uint secs=round(etc-double(mini)*60.0);
+                estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
+                progress.setLabelText(tr("acquiring images ...\n")+estimation);
+            }
             if (time1.elapsed()>200) {
                 measured.append(optSetup->getMeasuredValues());
                 time1.start();
