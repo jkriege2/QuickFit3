@@ -629,6 +629,7 @@ void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const 
 
     }
     ui->cmbLightpathConfig->updateItems(name);
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 
@@ -643,10 +644,12 @@ void QFESPIMB040OpticsSetup::deleteCurrentLightpatConfig() {
             ui->cmbLightpathConfig->updateItems();
         }
     }
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 void QFESPIMB040OpticsSetup::emitLighpathesChanged() {
     ui->cmbLightpathConfig->updateItems(ui->cmbLightpathConfig->currentText());
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 bool QFESPIMB040OpticsSetup::isMainIlluminationShutterAvailable()  {
@@ -660,6 +663,7 @@ void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
     loadLightpathConfig(filename, true);
     ui->cmbLightpathConfig->setEnabled(true);
     unlockLightpath();
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 void QFESPIMB040OpticsSetup::ensureLightpath() {
@@ -674,6 +678,7 @@ void QFESPIMB040OpticsSetup::ensureLightpath() {
    //qDebug()<<"ensureLightpath(): enabled";
     unlockLightpath();
     //qDebug()<<"ensureLightpath(): unlocked";
+    ui->cmbLightpathConfig->setEnabled(false);
 }
 
 
@@ -835,6 +840,7 @@ void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
         }
 
     }
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {

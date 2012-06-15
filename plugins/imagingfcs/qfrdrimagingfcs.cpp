@@ -462,9 +462,49 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 files_types<<"background";
             }
 
+            QString description;
             if (QFile::exists(filename_settings)) {
                 QSettings settings(filename_settings, QSettings::IniFormat);
                 appendCategorizedFilesFromB040SPIMConfig(settings, files, files_types, files_descriptions);
+
+                if (settings.contains("acquisition/exposure_time")) {
+                    initParams["EXPOSURE_TIME"]=settings.value("acquisition/exposure_time").toDouble();
+                    paramsReadonly<<"EXPOSURE_TIME";
+                }
+                if (settings.contains("acquisition/frame_time")) {
+                    initParams["FRAME_TIME"]=settings.value("acquisition/frame_time").toDouble();
+                    paramsReadonly<<"FRAME_TIME";
+                }
+                if (settings.contains("acquisition/pixel_height")) {
+                    initParams["PIXEL_HEIGHT"]=settings.value("acquisition/pixel_height").toDouble()*1000.0;
+                    paramsReadonly<<"PIXEL_HEIGHT";
+                }
+                if (settings.contains("acquisition/pixel_width")) {
+                    initParams["PIXEL_WIDTH"]=settings.value("acquisition/pixel_width").toDouble()*1000.0;
+                    paramsReadonly<<"PIXEL_WIDTH";
+                }
+                if (settings.contains("experiment/title")) {
+                    description=description+tr("%1:\n\n").arg(settings.value("experiment/title").toString());
+                }
+                if (settings.contains("experiment/experimenter")) {
+                    description=description+tr("- experimenter: %1\n").arg(settings.value("experiment/experimenter").toString());
+                }
+                if (settings.contains("experiment/labbook")) {
+                    description=description+tr("- labbook page: %1\n").arg(settings.value("experiment/labbook").toString());
+                }
+                if (settings.contains("experiment/id")) {
+                    description=description+tr("- ID: %1\n").arg(settings.value("experiment/id").toString());
+                }
+                if (settings.contains("experiment/start_time")) {
+                    description=description+tr("- date/time: %1\n").arg(settings.value("experiment/start_time").toString());
+                }
+                if (settings.contains("experiment/description")) {
+                    description=description+tr("- description: %1\n").arg(settings.value("experiment/description").toString());
+                }
+                if (settings.contains("experiment/sample")) {
+                    description=description+tr("- sample: %1\n").arg(settings.value("experiment/sample").toString());
+                }
+
             }
 
             initParams["WIDTH"]=width;
@@ -491,6 +531,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 if (!filename_acquisition.isEmpty()) {
                     e->setFolder(QFileInfo(filename_acquisition).baseName());
                 }
+                if (!description.isEmpty()) e->setDescription(description);
                 if (e->error()) { // when an error occured: remove record and output an error message
                     QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -509,6 +550,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     if (!filename_acquisition.isEmpty()) {
                         e->setFolder(QFileInfo(filename_acquisition).baseName());
                     }
+                    if (!description.isEmpty()) e->setDescription(description);
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -527,6 +569,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     if (!filename_acquisition.isEmpty()) {
                         e->setFolder(QFileInfo(filename_acquisition).baseName());
                     }
+                    if (!description.isEmpty()) e->setDescription(description);
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -545,6 +588,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 if (!filename_acquisition.isEmpty()) {
                     e->setFolder(QFileInfo(filename_acquisition).baseName());
                 }
+                if (!description.isEmpty()) e->setDescription(description);
                 if (e->error()) { // when an error occured: remove record and output an error message
                     QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
