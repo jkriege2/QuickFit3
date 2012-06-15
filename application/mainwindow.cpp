@@ -763,6 +763,7 @@ void MainWindow::createMenus() {
     dataMenu->addAction(delItemAct);
 
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
+    toolsMenu=menuBar()->addMenu(tr("&Tools"));
 
     menuBar()->addSeparator();
 
@@ -779,6 +780,7 @@ void MainWindow::createMenus() {
     menus["data/eval"]=evaluationMenu;
     menus["extensions"]=extensionMenu;
     menus["help"]=helpMenu;
+    menus["tools"]=toolsMenu;
 
     tvMain->addAction(insertItemMenu->menuAction());
     tvMain->addAction(evaluationMenu->menuAction());

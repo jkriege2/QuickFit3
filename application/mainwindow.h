@@ -219,6 +219,7 @@ protected:
 
         QTimer newProjectTimer;
 
+        QMenu *toolsMenu;
         QMenu *fileMenu;
         QMenu *dataMenu;
         QMenu *evaluationMenu;

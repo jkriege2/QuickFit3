@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgCalcDiffCoeff</class>
+ <widget class="QDialog" name="DlgCalcDiffCoeff">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>724</width>
+    <height>629</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Diffusion Coefficient Calculator</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="qfediffusioncoefficientcalculator.qrc">
+    <normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>2</number>
+       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Sphere</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>diameter:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="spinSPhereDiameter">
+           <property name="suffix">
+            <string> nm</string>
+           </property>
+           <property name="minimum">
+            <double>0.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>100000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>100.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>diffusion coefficient:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="labSphereD">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>given D</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>D [µm²/s] = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="JKDoubleEdit" name="edtGivenD"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>viscosity [mPa s]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="JKDoubleEdit" name="edtGivenDVisc"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>temperature [°C]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="spinGivenDT">
+           <property name="suffix">
+            <string> °C</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>-274.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>20.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>=&gt; D20,W [μm2/s] = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="labGivenDD20W">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="givenD20W">
+        <attribute name="title">
+         <string>given D[20,W]</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>D&lt;sub&gt;20,W&lt;/sub&gt; [&amp;mu;m&lt;sup&gt;2&lt;/sup&gt;/s] = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="spinGivenD20W">
+           <property name="maximum">
+            <double>10000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>100.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string> Solution </string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="6">
+         <widget class="QComboBox" name="cmbSolutionName">
+          <item>
+           <property name="text">
+            <string>water</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>temperature range:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string> ... </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QDoubleSpinBox" name="spinSolutionTemperatureEnd">
+          <property name="suffix">
+           <string> °C</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>-274.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>30.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>ΔTemp=</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="6">
+         <widget class="QDoubleSpinBox" name="spinSolutionTemperatureDelta">
+          <property name="suffix">
+           <string> °C</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>-274.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.500000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QDoubleSpinBox" name="spinSolutionTemperature">
+          <property name="suffix">
+           <string> °C</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>-274.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QVisibleHandleSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QTableView" name="tableView"/>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+       <item>
+        <widget class="QComboBox" name="cmbPlot">
+         <item>
+          <property name="text">
+           <string>diffusion coefficient</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>solution density</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>solution viscosity</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="JKQtPlotter" name="plotter" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>JKQtPlotter</class>
+   <extends>QWidget</extends>
+   <header>jkqtplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JKDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>jkdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>QVisibleHandleSplitter</class>
+   <extends>QSplitter</extends>
+   <header>qvisiblehandlesplitter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="qfediffusioncoefficientcalculator.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinSPhereDiameter</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>239</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbSolutionName</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>703</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinSolutionTemperature</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>481</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>132</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbPlot</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>713</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>721</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinSolutionTemperatureEnd</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>569</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>163</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinSolutionTemperatureDelta</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>703</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>211</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtGivenD</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>180</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtGivenDVisc</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinGivenDT</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>209</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinGivenD20W</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>724</x>
+     <y>168</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateD()</slot>
+  <slot>updatePlot()</slot>
+ </slots>
+</ui>

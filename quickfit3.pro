@@ -95,6 +95,10 @@ SUBDIRS += plg_rdrsettings
 plg_rdrsettings.subdir=./plugins/rdrsettings
 plg_rdrsettings.depends = lib libqf3widgets
 
+SUBDIRS += plg_calc_diffcoeff
+plg_calc_diffcoeff.subdir=./plugins/calc_diffcoeff
+plg_calc_diffcoeff.depends = lib libqf3widgets
+
 
 
 !macx {
