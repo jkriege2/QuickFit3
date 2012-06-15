@@ -678,7 +678,7 @@ void QFESPIMB040OpticsSetup::ensureLightpath() {
    //qDebug()<<"ensureLightpath(): enabled";
     unlockLightpath();
     //qDebug()<<"ensureLightpath(): unlocked";
-    ui->cmbLightpathConfig->setEnabled(false);
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 

@@ -1575,6 +1575,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     // SET LIGHTPATH
     //////////////////////////////////////////////////////////////////////////////////////
     QString oldLightpath=optSetup->getCurrentLightpathFilename();
+    QString lightpathName=widAcquisition->lightpath();
     if (widAcquisition->lightpathActivated()) {
         if (!QFile::exists(widAcquisition->lightpathFilename())) {
             ACQUISITION_ERROR(tr("  - acquisition lighpath configuration '%1' does not exist!\n").arg(widAcquisition->lightpath()));
@@ -1784,13 +1785,13 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             ecamera1->getAcquisitionDescription(camera1, &backgroundFiles1, &backgroundDescription1);
             log_text(tr("  - acquired background image from camera 1!\n"));
             acquisitionDescription1["background_timestamp"]=time;
-            optSetup->saveLightpathConfig(backgroundDescription1, "", "lightpath/", QList<bool>(), true);
+            optSetup->saveLightpathConfig(backgroundDescription1, lightpathName, "lightpath/", QList<bool>(), true);
         }
         if (ok && useCam2) {
             ecamera2->getAcquisitionDescription(camera2, &backgroundFiles2, &backgroundDescription2);
             log_text(tr("  - acquired background image from camera 2!\n"));
             acquisitionDescription2["background_timestamp"]=time;
-            optSetup->saveLightpathConfig(backgroundDescription2, "", "lightpath/", QList<bool>(), true);
+            optSetup->saveLightpathConfig(backgroundDescription2, lightpathName, "lightpath/", QList<bool>(), true);
         }
 
 
@@ -1823,7 +1824,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription1["overview/image_height"]=ecamera1->getImageHeight(camera1);
                 acquisitionDescription1["overview/exposure_time"]=ecamera1->getExposureTime(camera1);
                 acquisitionDescription1["overview/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription1, "", "overview/lightpath/", QList<bool>(), true);
+                optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, "overview/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview before acquisition  with preview settings";
                 d.name=acquisitionPrefix1+"_overview.tif";
@@ -1851,7 +1852,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription2["overview/image_height"]=ecamera2->getImageHeight(camera2);
                 acquisitionDescription2["overview/exposure_time"]=ecamera2->getExposureTime(camera2);
                 acquisitionDescription2["overview/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription2, "", "overview/lightpath/", QList<bool>(), true);
+                optSetup->saveLightpathConfig(acquisitionDescription2, lightpathName, "overview/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview before acquisition  with preview settings";
                 d.name=acquisitionPrefix2+"_overview.tif";
@@ -1965,11 +1966,11 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok && useCam1) {
         ecamera1->getAcquisitionDescription(camera1, &moreFiles1, &acquisitionDescription1);
-        optSetup->saveLightpathConfig(acquisitionDescription1, "", "lightpath/");
+        optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, "lightpath/");
     }
     if (ok && useCam2) {
         ecamera2->getAcquisitionDescription(camera2, &moreFiles2, &acquisitionDescription2);
-        optSetup->saveLightpathConfig(acquisitionDescription2, "", "lightpath/");
+        optSetup->saveLightpathConfig(acquisitionDescription2, lightpathName, "lightpath/");
     }
 
 
@@ -1990,7 +1991,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription1["overview_after/image_height"]=ecamera1->getImageHeight(camera1);
                 acquisitionDescription1["overview_after/exposure_time"]=ecamera1->getExposureTime(camera1);
                 acquisitionDescription1["overview_after/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription1, "", "overview_after/lightpath/", QList<bool>(), true);
+                optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, "overview_after/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview with preview settings";
                 d.name=acquisitionPrefix1+"_overview_after.tif";
@@ -2018,7 +2019,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 acquisitionDescription2["overview_after/image_height"]=ecamera2->getImageHeight(camera2);
                 acquisitionDescription2["overview_after/exposure_time"]=ecamera2->getExposureTime(camera2);
                 acquisitionDescription2["overview_after/timestamp"]=time;
-                optSetup->saveLightpathConfig(acquisitionDescription2, "", "overview_after/lightpath/", QList<bool>(), true);
+                optSetup->saveLightpathConfig(acquisitionDescription2, lightpathName, "overview_after/lightpath/", QList<bool>(), true);
                 QFExtensionCamera::AcquititonFileDescription d;
                 d.description="overview after acquisition with preview settings";
                 d.name=acquisitionPrefix2+"_overview_after.tif";
