@@ -6,6 +6,8 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     QAbstractTableModel(parent)
 {
     evaluation=NULL;
+    resultFilter="";
+    filesFilter="";
 }
 
 QFEvaluationResultsModel::~QFEvaluationResultsModel()
@@ -66,12 +68,62 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
             lastResultLabels.clear();
             lastResults.clear();
         }
+
+        if (!filesFilter.isEmpty()) {
+            QRegExp rx(filesFilter, Qt::CaseInsensitive, QRegExp::Wildcard);
+            for (int i=lastResults.size()-1; i>=0; i--) {
+                QString n=lastResults[i].first->getName()+": "+lastResults[i].second;
+                if (rx.indexIn(n)<0) {
+                    lastResults.removeAt(i);
+                }
+            }
+        }
+        if (!resultFilter.isEmpty()) {
+            QRegExp rx(resultFilter, Qt::CaseInsensitive, QRegExp::Wildcard);
+            for (int i=lastResultLabels.size()-1; i>=0; i--) {
+                if (rx.indexIn(lastResultLabels[i])<0) {
+                    lastResultNames.removeAt(i);
+                    lastResultLabels.removeAt(i);
+                }
+            }
+        }
+
         reset();
         //qDebug()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
     }
 
 }
 
+void QFEvaluationResultsModel::setResultFilter(QString filter)
+{
+    resultFilter=filter;
+    resultsChanged();
+}
+
+void QFEvaluationResultsModel::setFilesFilter(QString filter)
+{
+    filesFilter=filter;
+    resultsChanged();
+}
+
+QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (!evaluation) return QVariant();
+    if (role==Qt::DisplayRole) {
+        if (orientation==Qt::Vertical) {
+            if (section<lastResults.size()) {
+                if (lastResults[section].first) {
+                    return QVariant(lastResults[section].first->getName()+": "+lastResults[section].second);
+                } else {
+                    return QVariant();
+                }
+            } else return tr("Average %3 StdDev").arg(QChar(0xB1));
+        } else {
+            if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
+
+        }
+    }
+    return QVariant();
+}
 int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {
     if (!evaluation) {
         return 0;
@@ -222,24 +274,6 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
     return QVariant();
 }
 
-QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (!evaluation) return QVariant();
-    if (role==Qt::DisplayRole) {
-        if (orientation==Qt::Vertical) {
-            if (section<lastResults.size()) {
-                if (lastResults[section].first) {
-                    return QVariant(lastResults[section].first->getName()+": "+lastResults[section].second);
-                } else {
-                    return QVariant();
-                }
-            } else return tr("Average %3 StdDev").arg(QChar(0xB1));
-        } else {
-            if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
-
-        }
-    }
-    return QVariant();
-}
 
 
 

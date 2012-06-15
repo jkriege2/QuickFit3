@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>724</width>
-    <height>629</height>
+    <width>640</width>
+    <height>480</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>640</width>
+    <height>480</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Diffusion Coefficient Calculator</string>
@@ -23,7 +29,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -74,34 +80,34 @@
          <string>given D</string>
         </attribute>
         <layout class="QFormLayout" name="formLayout">
-         <item row="0" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_7">
            <property name="text">
             <string>D [µm²/s] = </string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="3" column="1">
           <widget class="JKDoubleEdit" name="edtGivenD"/>
          </item>
-         <item row="1" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>viscosity [mPa s]:</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="4" column="1">
           <widget class="JKDoubleEdit" name="edtGivenDVisc"/>
          </item>
-         <item row="2" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label_9">
            <property name="text">
             <string>temperature [°C]:</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="5" column="1">
           <widget class="QDoubleSpinBox" name="spinGivenDT">
            <property name="suffix">
             <string> °C</string>
@@ -120,17 +126,52 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="label_11">
            <property name="text">
             <string>=&gt; D20,W [μm2/s] = </string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="6" column="1">
           <widget class="QLabel" name="labGivenDD20W">
            <property name="text">
             <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QComboBox" name="cmbGivenDName">
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+             <property name="duplicatesEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSaveGivenD">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfediffusioncoefficientcalculator.qrc">
+               <normaloff>:/calc_diffcoeff/filesave.png</normaloff>:/calc_diffcoeff/filesave.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>name:</string>
            </property>
           </widget>
          </item>
@@ -391,8 +432,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>239</x>
-     <y>60</y>
+     <x>102</x>
+     <y>43</y>
     </hint>
     <hint type="destinationlabel">
      <x>1</x>
@@ -408,7 +449,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>703</x>
-     <y>71</y>
+     <y>52</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -424,7 +465,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>481</x>
-     <y>116</y>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -440,7 +481,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>713</x>
-     <y>173</y>
+     <y>215</y>
     </hint>
     <hint type="destinationlabel">
      <x>721</x>
@@ -456,7 +497,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>569</x>
-     <y>116</y>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -472,7 +513,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>703</x>
-     <y>116</y>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -487,8 +528,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>180</x>
-     <y>49</y>
+     <x>239</x>
+     <y>102</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
@@ -503,8 +544,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>78</y>
+     <x>239</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -519,8 +560,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>209</x>
-     <y>104</y>
+     <x>239</x>
+     <y>154</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -535,8 +576,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>186</x>
-     <y>49</y>
+     <x>102</x>
+     <y>52</y>
     </hint>
     <hint type="destinationlabel">
      <x>724</x>
@@ -544,9 +585,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cmbGivenDName</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateGivenD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>169</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>updateD()</slot>
   <slot>updatePlot()</slot>
+  <slot>updateGivenD()</slot>
  </slots>
 </ui>

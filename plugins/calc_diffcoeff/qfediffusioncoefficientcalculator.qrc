@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file alias="calc_diffcoeff/qfediffusioncoefficientcalculator.png">qfediffusioncoefficientcalculator.png</file>
     </qresource>
-    <qresource prefix="/calc_diffcoeff"/>
+    <qresource prefix="/calc_diffcoeff">
+        <file alias="filesave.png">images/filesave.png</file>
+    </qresource>
 </RCC>

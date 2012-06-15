@@ -404,6 +404,17 @@ void QFEvaluationPropertyEditor::createWidgets() {
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
 
+    tbResults->addSeparator();
+    tbResults->addWidget(new QLabel("  file filter: "));
+    edtFilterFiles=new QLineEdit(this);
+    connect(edtFilterFiles, SIGNAL(textChanged(QString)), resultsModel, SLOT(setFilesFilter(QString)));
+    tbResults->addWidget(edtFilterFiles);
+    tbResults->addSeparator();
+    tbResults->addWidget(new QLabel("  result filter: "));
+    edtFilterResults=new QLineEdit(this);
+    connect(edtFilterResults, SIGNAL(textChanged(QString)), resultsModel, SLOT(setResultFilter(QString)));
+    tbResults->addWidget(edtFilterResults);
+
 
 
     tvResults=new QEnhancedTableView(widResults);

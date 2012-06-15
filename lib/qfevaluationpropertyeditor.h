@@ -187,6 +187,9 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
 
+        QLineEdit* edtFilterFiles;
+        QLineEdit* edtFilterResults;
+
 
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;

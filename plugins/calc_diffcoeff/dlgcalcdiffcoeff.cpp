@@ -7,6 +7,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     QDialog(parent),
     ui(new Ui::DlgCalcDiffCoeff)
 {
+    updating=false;
     this->plugin=plg;
     tab=new QFTableModel(this);
     ui->setupUi(this);
@@ -21,8 +22,14 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     ui->edtGivenDVisc->setRange(0,1e10);
     ui->edtGivenDVisc->setValue(1);
     ui->spinGivenDT->setValue(20);
-    updateD();
+    ui->plotter->getYAxis()->set_labelDigits(4);
+    ui->plotter->getYAxis()->set_minTicks(5);
+    QList<int> s;
+    s<<ui->splitter->width()/2<<ui->splitter->width()/2;
+    ui->splitter->setSizes(s);
+    readSamples();
     readSettings();
+    updateD();
     QTimer::singleShot(10000, this, SLOT(writeSettings()));
 }
 
@@ -32,6 +39,7 @@ DlgCalcDiffCoeff::~DlgCalcDiffCoeff()
 }
 
 void DlgCalcDiffCoeff::updateD() {
+    if (updating) return;
     // calculate solution properties
     tab->setReadonly(false);
     tab->clear();
@@ -72,8 +80,63 @@ void DlgCalcDiffCoeff::updateD() {
     updatePlot();
 }
 
+void DlgCalcDiffCoeff::updateGivenD() {
+    QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
+    QSettings set(filename, QSettings::IniFormat);
+
+    updating=true;
+
+    QString name=ui->cmbGivenDName->currentText();
+    //ui->cmbGivenDName->clear();
+    // search for the name
+    QStringList groups=set.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        QString n=set.value(groups[i]+"/name", "").toString();
+        if (n==name) {
+            ui->spinGivenDT->setValue(set.value(groups[i]+"/temperature", 20).toDouble());
+            ui->edtGivenD->setValue(set.value(groups[i]+"/D", 10).toDouble());
+            ui->edtGivenDVisc->setValue(set.value(groups[i]+"/viscosity", 1).toDouble());
+            ui->cmbGivenDName->setToolTip(set.value(groups[i]+"/reference", "").toString());
+            break;
+        }
+    }
+
+    updating=false;
+    updateD();
+}
+
+void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
+    QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
+
+    QSettings set(filename, QSettings::IniFormat);
+
+    if (set.isWritable()) {
+
+        QString name=ui->cmbGivenDName->currentText();
+
+        // search for the name
+        QStringList groups=set.childGroups();
+        int idx_max=0;
+        for (int i=0; i<groups.size(); i++) {
+            QRegExp rx("sample(\\d+)", Qt::CaseInsensitive);
+            if (rx.indexIn(groups[i])>-1) {
+                idx_max=rx.cap(1).toInt();
+            }
+        }
+
+        idx_max++;
+        set.setValue(QString("sample%1/name").arg(idx_max), name);
+        set.setValue(QString("sample%1/D").arg(idx_max), ui->edtGivenD->value());
+        set.setValue(QString("sample%1/viscosity").arg(idx_max), ui->edtGivenDVisc->value());
+        set.setValue(QString("sample%1/temperature").arg(idx_max), ui->spinGivenDT->value());
+        ui->cmbGivenDName->addItem(name);
+    }
+
+}
+
 void DlgCalcDiffCoeff::updatePlot()
 {
+    if (updating) return;
     ui->plotter->set_doDrawing(false);
     ui->plotter->clearGraphs();
     ui->plotter->getDatastore()->clear();
@@ -156,4 +219,28 @@ void DlgCalcDiffCoeff::writeSettings() {
 
         }
     }
+}
+
+void DlgCalcDiffCoeff::readSamples() {
+    QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
+    //qDebug()<<"reading samples.ini: "<<filename;
+    QSettings set(filename, QSettings::IniFormat);
+
+    updating=true;
+
+
+    ui->cmbGivenDName->clear();
+    // search for the name
+    QStringList groups=set.childGroups();
+    qDebug()<<"reading samples.ini: groups: "<<groups;
+    for (int i=0; i<groups.size(); i++) {
+        set.beginGroup(groups[i]);
+        QString n=set.value("name", "").toString();
+        //qDebug()<<i<<n;
+        ui->cmbGivenDName->addItem(n);
+        set.endGroup();
+    }
+
+    updating=false;
+    updateD();
 }

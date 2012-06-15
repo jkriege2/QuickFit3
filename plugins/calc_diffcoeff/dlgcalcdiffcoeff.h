@@ -4,6 +4,9 @@
 #include <QDialog>
 #include "qftablemodel.h"
 #include "qftools.h"
+#include "qfpluginservices.h"
+#include <QSettings>
+#include <QRegExp>
 
 class QFEDiffusionCoefficientCalculator;
 
@@ -21,10 +24,12 @@ class DlgCalcDiffCoeff : public QDialog
 
     protected slots:
         void updateD();
-        
+        void updateGivenD();
+        void on_btnSaveGivenD_clicked();
         void updatePlot();
         void readSettings();
         void writeSettings();
+        void readSamples();
     private:
         Ui::DlgCalcDiffCoeff *ui;
         QFEDiffusionCoefficientCalculator *plugin;
@@ -32,6 +37,8 @@ class DlgCalcDiffCoeff : public QDialog
         QFTableModel* tab;
         int c_temp, c_D, c_visc, c_density;
         QVector<double> temp, D, visc, density;
+
+        bool updating;
 };
 
 #endif // DLGCALCDIFFCOEFF_H

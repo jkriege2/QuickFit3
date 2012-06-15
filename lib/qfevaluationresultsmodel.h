@@ -5,6 +5,7 @@
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QPointer>
+#include <QRegExp>
 
 // forward declaration
 class QFRawDataRecord;
@@ -40,8 +41,11 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
             SDRole=Qt::UserRole+3
         };
 
+
     public slots:
         void resultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));
+        void setResultFilter(QString filter);
+        void setFilesFilter(QString filter);
     protected:
         QFEvaluationItem* evaluation;
         QString evalFilter;
@@ -57,6 +61,9 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         QStringList lastResultLabels;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > lastResults;
         QMap<QString, QString> resultGroups;
+
+        QString resultFilter;
+        QString filesFilter;
 };
 
 #endif // QFEVALUATIONRESULTSMODEL_H
