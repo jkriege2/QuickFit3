@@ -72,6 +72,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         return true;
 
     } else if (paramid=="pixel_width") {
+        if (!r) return false;
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
         if (width<=0) return false;
@@ -79,6 +80,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         error=0;
         return true;
     } else if (paramid=="pixel_height") {
+        if (!r) return false;
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
         if (height<=0) return false;

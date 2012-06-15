@@ -672,6 +672,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="chkInterleavedBinning">
+             <property name="text">
+              <string>interleaved</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_29">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1654,8 +1661,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1040</width>
-           <height>199</height>
+           <width>1036</width>
+           <height>113</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1737,17 +1744,17 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qenhancedlineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>JKDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>jkdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
    </slots>
-  </customwidget>
-  <customwidget>
-   <class>QEnhancedLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1796,8 +1803,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrimagingfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

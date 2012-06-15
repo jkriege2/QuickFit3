@@ -1820,7 +1820,14 @@ void QFRDRImagingFCSImageEditor::resultsChanged() {
         if (p>=0) {
             cmbParameter->setCurrentIndex(p);
         } else if (cmbParameter->count()>0) {
-            cmbParameter->setCurrentIndex(0);
+            int dc=cmbParameter->findData("fitparam_diff_coeff1");
+            if (dc<0) dc=cmbParameter->findData("fitparam_diff_coeff");
+            if (dc<0) dc=cmbParameter->findData("fitparam_diff_tau1");
+            if (dc<0) dc=cmbParameter->findData("fitparam_diff_tau");
+            if (dc<0) dc=cmbParameter->findData("fitparam_diff_coeff2");
+
+            if (dc<0) dc=0;
+            cmbParameter->setCurrentIndex(dc);
         }
 
         p=cmbGofParameter->findData(gfp);
@@ -2657,6 +2664,11 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
             }
         }
         int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), ""));
+        if (d<0) d=cmbParameter->findData("fitparam_diff_coeff1");
+        if (d<0) d=cmbParameter->findData("fitparam_diff_coeff");
+        if (d<0) d=cmbParameter->findData("fitparam_diff_tau1");
+        if (d<0) d=cmbParameter->findData("fitparam_diff_tau");
+        if (d<0) d=cmbParameter->findData("fitparam_diff_coeff2");
         if (d>=0) cmbParameter->setCurrentIndex(d);
         d=cmbGofParameter->findData(current->getProperty(QString("imfcs_imed_gofparam_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
         if (d>=0) cmbGofParameter->setCurrentIndex(d);

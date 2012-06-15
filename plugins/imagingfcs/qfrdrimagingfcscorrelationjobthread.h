@@ -125,6 +125,8 @@ struct IMFCSJob {
     /** \brief number of frames to average over when determining the bleach correction parameters */
     uint32_t bleachAvgFrames;
 
+    bool interleaved_binning;
+
 };
 
 /*! \brief this thread does all the correlation work

@@ -101,7 +101,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
         //explorer->setBleachA1(ui->edtDecayA->value());
         //explorer->setBleachA2(ui->edtDecayA2->value());
         //explorer->setBleachB(ui->edtDecayB->value());
-        explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkFirstFrame->isChecked(), ui->spinFirstFrame->value(), ui->chkLastFrame->isChecked(), ui->spinLastFrame->value(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value());
+        explorer->init(reader, readerRaw, ui->edtImageFile->text(), ui->chkFirstFrame->isChecked(), ui->spinFirstFrame->value(), ui->chkLastFrame->isChecked(), ui->spinLastFrame->value(), ui->chkCrop->isChecked(), ui->spinXFirst->value(), ui->spinXLast->value(), ui->spinYFirst->value(), ui->spinYLast->value(), ui->spinBinning->value(), ui->chkInterleavedBinning->isChecked());
         if (explorer->exec()==QDialog::Accepted) {
             //ui->spinDecay->setValue(explorer->getBleachDecay1());
             //ui->spinDecay2->setValue(explorer->getBleachDecay2());
@@ -111,6 +111,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
             ui->spinYFirst->setValue(explorer->getCropY0());
             ui->spinYLast->setValue(explorer->getCropY1());
             ui->spinBinning->setValue(explorer->getBinning());
+            ui->chkInterleavedBinning->setChecked(explorer->getInterleavedBinning());
             //ui->edtDecayA->setValue(explorer->getBleachA1());
             //ui->edtDecayA2->setValue(explorer->getBleachA2());
             //ui->edtDecayB->setValue(explorer->getBleachB());
@@ -329,6 +330,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/binning", ui->spinBinning->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/interleavedbinning", ui->chkInterleavedBinning->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop", ui->chkCrop->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_x0", ui->spinXFirst->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value());
@@ -367,6 +369,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkCCF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked()).toBool());
     ui->spinSegments->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value()).toInt());
     ui->spinBinning->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/binning", ui->spinBinning->value()).toInt());
+    ui->chkInterleavedBinning->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/interleavedbinning", ui->chkInterleavedBinning->isChecked()).toBool());
     ui->chkCrop->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop", ui->chkCrop->isChecked()).toBool());
     ui->spinXFirst->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_x0", ui->spinXFirst->value()).toInt());
     ui->spinXLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_x1", ui->spinXLast->value()).toInt());
@@ -473,6 +476,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.statistics_frames=qMax(2, ui->spinStatistics->value());
     job.segments=ui->spinSegments->value();
     job.binning=ui->spinBinning->value();
+    job.interleaved_binning=ui->chkInterleavedBinning->isChecked();
     job.use_cropping=ui->chkCrop->isChecked();
     job.crop_x0=ui->spinXFirst->value();
     job.crop_x1=ui->spinXLast->value();
@@ -537,8 +541,13 @@ void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
         h=fabs(ui->spinYLast->value()-ui->spinYFirst->value())+1;
     }
 
-    w=w/ui->spinBinning->value();
-    h=h/ui->spinBinning->value();
+    if (ui->chkInterleavedBinning->isChecked()) {
+        w=w-(ui->spinBinning->value()-1);
+        h=h-(ui->spinBinning->value()-1);
+    } else {
+        w=w/ui->spinBinning->value();
+        h=h/ui->spinBinning->value();
+    }
     ui->labSize->setText(tr("input: %1&times;%2   output: %3&times;%4").arg(image_width).arg(image_height).arg(w).arg(h));
 }
 

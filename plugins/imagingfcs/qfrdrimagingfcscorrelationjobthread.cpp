@@ -126,7 +126,11 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     result=result.replace("%segments%", QString::number(job.segments), Qt::CaseInsensitive);
     result=result.replace("%backcorrectionid%", QString::number(job.backgroundCorrection), Qt::CaseInsensitive);
     result=result.replace("%correlatorid%", QString::number(job.correlator), Qt::CaseInsensitive);
-    result=result.replace("%binning%", QString::number(job.binning), Qt::CaseInsensitive);
+    if (job.interleaved_binning)  {
+        result=result.replace("%binning%", QString::number(job.binning)+"ib", Qt::CaseInsensitive);
+    } else {
+        result=result.replace("%binning%", QString::number(job.binning), Qt::CaseInsensitive);
+    }
 
     QString back="unknown";
     if (job.backgroundCorrection==0) back="none";
@@ -188,6 +192,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                 emit progressIncrement(10);
                 emit messageChanged(tr("counting frames ..."));
                 reader->setBinning(job.binning);
+                reader->setInterleavedBinning(job.interleaved_binning);
                 if (job.use_cropping) {
                     reader->setCropping(job.crop_x0, job.crop_x1, job.crop_y0, job.crop_y1);
                 } else {
@@ -654,6 +659,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"width                       : "<<outLocale.toString(frame_width) << "\n";
                                 text<<"height                      : "<<outLocale.toString(frame_height) << "\n";
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
+                                text<<"interleaved binning         : "<< QString((reader->getInterleavedBinning())?"true":"false") << "\n";
                                 if (reader->getUseCropping()) {
                                     text<<"crop x0                     : "<<outLocale.toString(reader->getCropX0()) << "\n";
                                     text<<"crop x1                     : "<<outLocale.toString(reader->getCropX1()) << "\n";
@@ -1160,6 +1166,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // NOW WE CREATE THE VIDEO AND THE STATISTICS (from the corrected sequence!!!)
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
         emit messageChanged(tr("calculating statistics/video ..."));
@@ -1859,6 +1866,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                     else emit messageChanged(tr("error opening background file '%1'").arg(job.filename));
                 } else {
                     reader->setBinning(job.binning);
+                    reader->setInterleavedBinning(job.interleaved_binning);
                     if (job.use_cropping) {
                         reader->setCropping(job.crop_x0, job.crop_x1, job.crop_y0, job.crop_y1);
                     } else {

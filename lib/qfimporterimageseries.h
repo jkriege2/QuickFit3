@@ -57,8 +57,10 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
 
 
         /** \brief set binning */
-        void setBinning(int bin) { binning=bin; }
+        void setBinning(int bin) { binning=bin; if (binning<1) binning=1; }
         int getBinning() const { return binning; }
+        void setInterleavedBinning(bool bin) { interleavedBinning=bin; }
+        bool getInterleavedBinning() const { return interleavedBinning; }
         /** \brief set cropping */
         void setCropping(int x0, int x1, int y0, int y1);
         void unsetCropping() { crop=false; }
@@ -89,6 +91,7 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         int y0;
         int y1;
         bool crop;
+        bool interleavedBinning;
 };
 
 

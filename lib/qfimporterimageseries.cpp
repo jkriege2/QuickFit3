@@ -10,9 +10,11 @@ QFImporterImageSeries::QFImporterImageSeries() {
     y0=0;
     y1=0;
     crop=false;
+    interleavedBinning=false;
 }
 
 uint16_t QFImporterImageSeries::frameWidth() {
+    if (binning<1) binning=1;
     int xx0=x0;
     int xx1=x1;
     if (!crop) {
@@ -25,10 +27,16 @@ uint16_t QFImporterImageSeries::frameWidth() {
     if (xx1>intFrameWidth()-1) xx1=intFrameWidth()-1;
 
     int w=abs(xx1-xx0)+1;
-    return w/binning;
+    if (!interleavedBinning) {
+        return w/binning;
+    } else {
+        if (binning>1) return w-(binning-1);
+    }
+    return w;
 }
 
 uint16_t QFImporterImageSeries::frameHeight() {
+    if (binning<1) binning=1;
     int yy0=y0;
     int yy1=y1;
     if (!crop) {
@@ -41,7 +49,12 @@ uint16_t QFImporterImageSeries::frameHeight() {
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
 
     int h=abs(yy1-yy0)+1;
-    return h/binning;
+    if (!interleavedBinning) {
+        return h/binning;
+    } else {
+        if (binning>1) return h-(binning-1);
+    }
+    return h;
 }
 
 bool QFImporterImageSeries::readFrameFloat(float* data) {
@@ -93,10 +106,24 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
-    for (register int y=0; y<h*binning; y++) {
-        for (register int x=0; x<w*binning; x++) {
-            const int idx=(y/binning)*w+(x/binning);
-            data[idx]=data[idx]+d1[y*ww+x];
+    if (!interleavedBinning) {
+        for (register int y=0; y<h*binning; y++) {
+            for (register int x=0; x<w*binning; x++) {
+                const int idx=(y/binning)*w+(x/binning);
+                data[idx]=data[idx]+d1[y*ww+x];
+            }
+        }
+    } else {
+        for (register int y=0; y<h; y++) {
+            for (register int x=0; x<w; x++) {
+                int idx=y*w+x;
+                data[idx]=0;
+                for (int bx=0; bx<binning; bx++) {
+                    for (int by=0; by<binning; by++) {
+                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx];
+                    }
+                }
+            }
         }
     }
 
@@ -154,9 +181,24 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
-    for (register int y=0; y<h*binning; y++) {
-        for (register int x=0; x<w*binning; x++) {
-            data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+
+    if (!interleavedBinning) {
+        for (register int y=0; y<h*binning; y++) {
+            for (register int x=0; x<w*binning; x++) {
+                data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+            }
+        }
+    } else {
+        for (register int y=0; y<h; y++) {
+            for (register int x=0; x<w; x++) {
+                int idx=y*w+x;
+                data[idx]=0;
+                for (int bx=0; bx<binning; bx++) {
+                    for (int by=0; by<binning; by++) {
+                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx];
+                    }
+                }
+            }
         }
     }
 
@@ -214,9 +256,24 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
-    for (register int y=0; y<h*binning; y++) {
-        for (register int x=0; x<w*binning; x++) {
-            data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+
+    if (!interleavedBinning) {
+        for (register int y=0; y<h*binning; y++) {
+            for (register int x=0; x<w*binning; x++) {
+                data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+            }
+        }
+    } else {
+        for (register int y=0; y<h; y++) {
+            for (register int x=0; x<w; x++) {
+                int idx=y*w+x;
+                data[idx]=0;
+                for (int bx=0; bx<binning; bx++) {
+                    for (int by=0; by<binning; by++) {
+                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx];
+                    }
+                }
+            }
         }
     }
 

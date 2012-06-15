@@ -170,7 +170,7 @@ int QFRDRImagingFCSDataExplorer::getCropY1() const {
     return ui->spinY1->value();
 }
 
-bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporterImageSeries* readerRaw, const QString& filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning) {
+bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporterImageSeries* readerRaw, const QString& filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning, bool interleavedBinning) {
     initing=true;
     this->reader=reader;
     this->readerRaw=readerRaw;
@@ -221,6 +221,7 @@ bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporter
         ui->spinBinning->setValue(binning);
 
         reader->setBinning(binning);
+        reader->setInterleavedBinning(interleavedBinning);
         reader->setCropping(x0,x1,y0,y1);
         if (!use) reader->unsetCropping();
 
@@ -343,6 +344,7 @@ void QFRDRImagingFCSDataExplorer::readFrames(bool next) {
     image->set_data(NULL, 0, 0);
     imageRaw->set_data(NULL, 0, 0);
     reader->setBinning(ui->spinBinning->value());
+    reader->setInterleavedBinning(ui->chkInterleaved->isChecked());
     reader->setCropping(ui->spinX0->value(), ui->spinX1->value(), ui->spinY0->value(), ui->spinY1->value());
     if (!ui->chkCropping->isChecked()) reader->unsetCropping();
 
@@ -640,6 +642,11 @@ void QFRDRImagingFCSDataExplorer::on_btnFit2_clicked() {
 
     calcFit();
     QApplication::restoreOverrideCursor();*/
+}
+
+bool QFRDRImagingFCSDataExplorer::getInterleavedBinning() const
+{
+    return ui->chkInterleaved->isChecked();
 }
 
 
