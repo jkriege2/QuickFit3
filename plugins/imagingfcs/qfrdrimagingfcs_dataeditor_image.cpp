@@ -412,6 +412,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltOverview=new QVBoxLayout();
     wpltOverview->setLayout(lpltOverview);
     pltOverview=new JKQtPlotter(wpltOverview);
+    pltOverview->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltOverview->setObjectName("pltOverview");
     lpltOverview->addWidget(new QLabel(tr("Overview:")));
     lpltOverview->addWidget(pltOverview, 1);
@@ -471,6 +472,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltMask=new QVBoxLayout();
     wpltMask->setLayout(lpltMask);
     pltMask=new JKQtPlotter(wpltMask);
+    pltMask->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltMask->setObjectName("pltMask");
 
     lpltMask->addWidget(new QLabel(tr("Mask/Selected:")));
@@ -530,6 +532,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltImage=new QVBoxLayout();
     wpltImage->setLayout(lpltImage);
     pltImage=new JKQtPlotter(wpltImage);
+    pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltImage->setObjectName("pltImage");
 
     lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
@@ -594,6 +597,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltGofImage=new QVBoxLayout();
     wpltGofImage->setLayout(lpltGofImage);
     pltGofImage=new JKQtPlotter(wpltGofImage);
+    pltGofImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltGofImage->setObjectName("pltGofImage");
 
     lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
@@ -654,10 +658,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
 
     plotter = new JKQtPlotter(true, this);
+    plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     plotter->setObjectName("plotter");
 
     plotter->get_plotter()->set_showKey(true);
     plotterResid = new JKQtPlotter(true, this);
+    plotterResid->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     plotterResid->setObjectName("plotterResid");
 
     plotterResid->get_plotter()->set_showKey(true);

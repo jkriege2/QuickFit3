@@ -158,6 +158,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     splitMorePLot->addWidget(splitPlot);
 
     pltData=new JKQtPlotter(true, this);
+    pltData->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltData->resize(300,200);
     plotLayout=new QVBoxLayout(this);
     wPlot=new QWidget(this);
@@ -177,6 +178,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     widgetResiduals->setLayout(vbl);
 
     pltResiduals=new JKQtPlotter(true, this);
+    pltResiduals->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltResiduals->resize(300,50);
     vbl->addWidget(pltResiduals,1);
 
@@ -227,6 +229,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     tabResidulas->setDocumentMode(true);
     splitFitStatistics->addWidget(tabResidulas);
     pltResidualHistogram=new JKQtPlotter(true, this);
+    pltResidualHistogram->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltResidualHistogram->resize(200,200);
     pltResidualHistogram->set_displayToolbar(false);
     pltResidualHistogram->getXAxis()->set_axisLabel(tr("residuals"));
@@ -251,6 +254,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
 
     pltResidualCorrelation=new JKQtPlotter(true, this);
+    pltResidualCorrelation->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltResidualCorrelation->resize(200,200);
     pltResidualCorrelation->set_displayToolbar(false);
     pltResidualCorrelation->getXAxis()->set_axisLabel(tr("lag [residual number]"));

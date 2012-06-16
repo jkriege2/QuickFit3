@@ -172,6 +172,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     QVBoxLayout* lp=new QVBoxLayout(this);
     wp->setLayout(lp);
     plotter = new JKQtPlotter(true, this);
+    plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     lp->addWidget(plotter);
 
     labRateData=new QLabel(this);

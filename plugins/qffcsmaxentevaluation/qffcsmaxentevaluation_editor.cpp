@@ -96,6 +96,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
 
     pltDistribution=new JKQtPlotter(true, this);
+    pltDistribution->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltDistribution->useExternalDatastore(pltData->getDatastore());
     pltDistribution->set_displayToolbar(false);
     pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));

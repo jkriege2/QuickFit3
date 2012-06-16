@@ -52,6 +52,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     mainLay->addWidget(toolbar);
 
     pltImage=new JKQtPlotter(this);
+    pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltImage->set_zoomByDoubleAndRightMouseClick(false);
     pltImage->set_displayMousePosition(true);
     pltImage->set_displayToolbar(false);
@@ -85,6 +86,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
 
 
     pltData=new JKQtPlotter(this);
+    pltData->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltData->get_plotter()->getXAxis()->set_minTicks(5);
     pltData->get_plotter()->getYAxis()->set_minTicks(5);
 

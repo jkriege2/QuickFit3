@@ -163,6 +163,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
 
     pltDistribution=new JKQtPlotter(true, this);
+    pltDistribution->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltDistribution->useExternalDatastore(pltData->getDatastore());
     pltDistribution->set_displayToolbar(false);
     pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
@@ -204,6 +205,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
 
     pltDistResults=new JKQtPlotter(true, this);
+    pltDistResults->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltDistResults->useExternalDatastore(pltData->getDatastore());
     pltDistResults->set_displayToolbar(false);
     pltDistResults->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));

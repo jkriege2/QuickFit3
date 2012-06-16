@@ -8,6 +8,7 @@
 #include "qftools.h"
 #include "lmcurve.h"
 #include <typeinfo>
+#include "programoptions.h"
 
 
 
@@ -97,6 +98,9 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     //ui->edtAmplitude->setCheckBounds(false, false);
     //ui->spinDecay2->setCheckBounds(false, false);
     //ui->edtAmplitude_2->setCheckBounds(false, false);
+    ui->pltIntensity->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
+    ui->pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
+    ui->pltImageRaw->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
 
 }
 

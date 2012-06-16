@@ -14,6 +14,7 @@
 #include <QTextTable>
 #include <QPicture>
 #include <QTextDocumentFragment>
+#include "programoptions.h"
 
 QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
@@ -65,6 +66,7 @@ void QFHistogramView::createWidgets() {
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
     pltParamHistogram=new JKQtPlotter(this);
+    pltParamHistogram->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     tvHistogramParameters=new QEnhancedTableView(this);
     tabHistogramParameters=new QFTableModel(this);
     tabHistogramParameters->setReadonly(false);

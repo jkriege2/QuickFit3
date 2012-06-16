@@ -24,6 +24,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     ui->spinGivenDT->setValue(20);
     ui->plotter->getYAxis()->set_labelDigits(4);
     ui->plotter->getYAxis()->set_minTicks(5);
+    ui->plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     QList<int> s;
     s<<ui->splitter->width()/2<<ui->splitter->width()/2;
     ui->splitter->setSizes(s);
