@@ -298,7 +298,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QStringList fonts=fontdb.families();
 
     JKQTmathText mathParser(this);
-    mathParser.set_fontSize(12);
+    mathParser.set_fontSize(13);
     if (fonts.contains("Times New Roman")) {
         //qDebug()<<"using Times New Roman";
         mathParser.set_fontRoman("Times New Roman");
@@ -617,7 +617,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 QString latex=rxLaTeX.cap(2).trimmed();
 
                 if (command=="math" || command=="bmath") {
-                    QPixmap pix(300,100);
+                    QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
                     QPainter p(&pix);
                     p.setRenderHint(QPainter::Antialiasing);
                     p.setRenderHint(QPainter::HighQualityAntialiasing);
@@ -634,7 +634,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     } else {
                         QSizeF size=mathParser.getSize(p);
                         p.end();
-                        pix=QPixmap(size.width()*1.2, size.height()*1.1);
+                        pix=QImage(size.width()*1.2, size.height()*1.1, QImage::Format_ARGB32_Premultiplied);
                         pix.fill(Qt::transparent);
                         p.begin(&pix);
                         p.setRenderHint(QPainter::Antialiasing);
