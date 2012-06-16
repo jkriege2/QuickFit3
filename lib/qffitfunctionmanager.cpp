@@ -19,9 +19,15 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
+        if (QApplication::arguments().contains("--verboseplugin")) {
+            QFPluginServices::getInstance()->log_global_text("fit function plugin manager:\n  trying "+fileName+"\n");
+            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+        }
         if (plugin) {
+            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFPluginFitFunction* iRecord = qobject_cast<QFPluginFitFunction*>(plugin);
             if (iRecord) {
+                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginFitFunction OK\n");
                 fitPlugins.append(iRecord);
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));

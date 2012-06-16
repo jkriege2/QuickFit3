@@ -233,7 +233,7 @@ void DlgCalcDiffCoeff::readSamples() {
     ui->cmbGivenDName->clear();
     // search for the name
     QStringList groups=set.childGroups();
-    qDebug()<<"reading samples.ini: groups: "<<groups;
+//    qDebug()<<"reading samples.ini: groups: "<<groups;
     for (int i=0; i<groups.size(); i++) {
         set.beginGroup(groups[i]);
         QString n=set.value("name", "").toString();

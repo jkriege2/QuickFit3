@@ -796,10 +796,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
 
 bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error) const {
-    qDebug()<<corrTau<<corrs<<correrrs<<corrN<<N<<width<<height<<input_length;
+   /* qDebug()<<corrTau<<corrs<<correrrs<<corrN<<N<<width<<height<<input_length;
     for (uint32_t j=0; j<corrN; j++) {
         qDebug()<<"corrs["<<j<<"] = "<<corrs[j];
-    }
+    }*/
     QFile f(filename);
     error="";
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {

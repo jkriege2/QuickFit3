@@ -102,7 +102,7 @@ void QFExtensionB040LaserBox::lightSourceConnect(unsigned int lightSource) {
             QApplication::processEvents();
         }
         sources[lightSource].infoMessage=sources[lightSource].serial->queryCommand("?");
-        qDebug()<<"infoMessage '"<<sources[lightSource].infoMessage<<"'";
+        //qDebug()<<"infoMessage '"<<sources[lightSource].infoMessage<<"'";
         if (!(sources[lightSource].infoMessage.toLower().contains("laser controller") && sources[lightSource].infoMessage.toLower().contains("jan krieger"))) {
             com->close();
             log_error(tr("%1 Could not connect to Light Source Driver [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));

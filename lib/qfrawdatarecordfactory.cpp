@@ -17,9 +17,15 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QList<QFPluginServ
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
+        if (QApplication::arguments().contains("--verboseplugin")) {
+            QFPluginServices::getInstance()->log_global_text("raw data record plugin manager:\n  trying "+fileName+"\n");
+            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+        }
         if (plugin) {
+            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFPluginRawDataRecord* iRecord = qobject_cast<QFPluginRawDataRecord*>(plugin);
             if (iRecord) {
+                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginRawDataRecord OK\n");
                 items[iRecord->getID()]=iRecord;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
                 emit showMessage(tr("loaded raw data plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));

@@ -366,7 +366,7 @@ void QFRDRPhotonCountsData::calcPhotonCountsBinned() {
         N=(long long)ceil((double)rateN/(double)d);
         if ((double)rateN/(double)autoCalcRateN<1) N=rateN;
         resizeBinnedRates(N);
-        qDebug()<<"rate N="<<N<<"    binnedRateN="<<binnedRateN;
+        //qDebug()<<"rate N="<<N<<"    binnedRateN="<<binnedRateN;
     //}
     if (binnedRateN>0) {
         //if (N!=binnedRateN) resizeBinnedRates(N);
@@ -383,7 +383,7 @@ void QFRDRPhotonCountsData::calcPhotonCountsBinned() {
                 binnedRateT[i]=rateT[jmin];
             }
             averageBinnedT=averageT*double(rateN)/double(binnedRateN);
-            qDebug()<<"averageT="<<averageT<<"   averageBinnedT="<<averageBinnedT;
+            //qDebug()<<"averageT="<<averageT<<"   averageBinnedT="<<averageBinnedT;
             for (long long i=0; i<binnedRateN; i++) {
                 binnedRate[channel*binnedRateN+i]=binnedRate[channel*binnedRateN+i]/averageBinnedT/1000.0;
             }
@@ -393,13 +393,13 @@ void QFRDRPhotonCountsData::calcPhotonCountsBinned() {
 }
 
 double QFRDRPhotonCountsData::getPhotonCountsUnit(QFRDRPhotonCountsInterface::PhotonCountsUnits unit) {
-    qDebug()<<"averageT="<<averageT;
+    //qDebug()<<"averageT="<<averageT;
     if (unit==QFRDRPhotonCountsInterface::KiloHertz) return 1.0/(averageT*1000.0);
     return 1.0;
 }
 
 double QFRDRPhotonCountsData::getPhotonCountsBinnedUnit(QFRDRPhotonCountsInterface::PhotonCountsUnits unit) {
-    qDebug()<<"averageBinnedT="<<averageBinnedT;
+    //qDebug()<<"averageBinnedT="<<averageBinnedT;
     if (unit==QFRDRPhotonCountsInterface::KiloHertz) return 1.0/(averageBinnedT*1000.0);
     return 1.0;
 

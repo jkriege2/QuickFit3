@@ -18,9 +18,15 @@ void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginSer
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
+        if (QApplication::arguments().contains("--verboseplugin")) {
+            QFPluginServices::getInstance()->log_global_text("evaluation plugin manager:\n  trying "+fileName+"\n");
+            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+        }
         if (plugin) {
             QFPluginEvaluationItem* iRecord = qobject_cast<QFPluginEvaluationItem*>(plugin);
+            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             if (iRecord) {
+                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginEvaluationItem OK\n");
                 items[iRecord->getID()]=iRecord;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
                 emit showMessage(tr("loaded evaluation plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));

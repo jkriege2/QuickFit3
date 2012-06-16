@@ -535,7 +535,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
     set_doEmitPropertiesChanged(false);
     record->disableEmitResultsChanged();
 
-    qDebug() << "START DEBUGGING 0: We enter the do fit Method with MODEL = " << model;
+   // qDebug() << "START DEBUGGING 0: We enter the do fit Method with MODEL = " << model;
 
 
 

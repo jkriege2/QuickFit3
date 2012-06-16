@@ -12,9 +12,15 @@ void QFImporterManager::searchPlugins(QString directory, QList<QFPluginServices:
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
+        if (QApplication::arguments().contains("--verboseplugin")) {
+            QFPluginServices::getInstance()->log_global_text("importer plugin manager:\n  trying "+fileName+"\n");
+            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+        }
         if (plugin) {
+            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFPluginImporters* iRecord = qobject_cast<QFPluginImporters*>(plugin);
             if (iRecord) {
+                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginImporters OK\n");
                 plugins.append(iRecord);
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded importer plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));

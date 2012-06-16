@@ -758,22 +758,22 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
     }
     //qDebug()<<csv;
     if (!csv.isEmpty()) {
-        qDebug()<<"parsing csv: "<<csv;
+       // qDebug()<<"parsing csv: "<<csv;
 
         QTextStream f(&csv);
         QList<QVector<double> > datalist;
         QVector<double> data;
         do {
             data=csvReadline(f, ',', '#', 0);
-            qDebug()<<"        "<<data;
+           // qDebug()<<"        "<<data;
             if (data.size()>0) datalist.append(data);
         } while (data.size()>0);
         int runs=0;
         if (datalist.size()>0) {
             runs=datalist[0].size()-1;
         }
-        qDebug()<<"  -> "<<datalist.size()<<runs;
-        qDebug()<<"  -> "<<datalist;
+       // qDebug()<<"  -> "<<datalist.size()<<runs;
+       // qDebug()<<"  -> "<<datalist;
         resizeCorrelations(datalist.size(), runs);
         for (int i=0; i<datalist.size(); i++) {
             correlationT[i]=datalist[i].value(0,0.0);

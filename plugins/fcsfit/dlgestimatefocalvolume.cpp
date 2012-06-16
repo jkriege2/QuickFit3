@@ -58,7 +58,7 @@ void dlgEstimateFocalVolume::init(double particles, double particles_error, bool
     calc_from_D();
     tabWidget->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/estimate_focal_volume.last_tab", 1).toInt());
 
-    qDebug()<<QFExtensionManager::getInstance()->getIDList();
+   // qDebug()<<QFExtensionManager::getInstance()->getIDList();
     toolDCalc=qobject_cast<QFExtensionTool*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
     btnDCalculator->setEnabled(toolDCalc!=NULL);
 

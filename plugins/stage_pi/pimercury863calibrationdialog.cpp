@@ -107,7 +107,7 @@ void PIMercury863CalibrationDialog::acceptCal() {
         stage->sendCommand("SI"+inttostr(i));
         stage->sendCommand("SJ"+inttostr(calX[i]));
         stage->log_text(tr("  %1\t%2\n").arg(i).arg(calX[i]));
-        qDebug()<<stage->queryCommand("SI?").c_str()<<stage->queryCommand("SJ?").c_str();
+        //qDebug()<<stage->queryCommand("SI?").c_str()<<stage->queryCommand("SJ?").c_str();
     }
     accept();
 }

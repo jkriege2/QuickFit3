@@ -502,8 +502,8 @@ void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* curr
         */
 
         cmbModel->setCurrentIndex(item->getCurrentModel());
-        qDebug() << "THE CURRENT MODEL IS: ";
-        qDebug() << item->getCurrentModel();
+//        qDebug() << "THE CURRENT MODEL IS: ";
+//        qDebug() << item->getCurrentModel();
         /* connect widgets and fill with data from item here */
         connect(item, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
 
