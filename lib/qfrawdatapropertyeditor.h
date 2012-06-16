@@ -134,6 +134,11 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actCopyValErrResults;
         QAction* actCopyValErrResultsNoHead;
 
+        QLineEdit* edtFilterEvaluation;
+        QLineEdit* edtFilterResults;
+        QCheckBox* chkFilterEvaluationRegExp;
+        QCheckBox* chkFilterResultsRegExp;
+
         QSortFilterProxyModel* paramFilterProxy;
 
         QList<QPointer<QFRawDataEditor> > editorList;

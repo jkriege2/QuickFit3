@@ -23,7 +23,8 @@ HEADERS +=  qfpevalfcsfit.h \
             ../base_classes/qffitresultsevaluationeditorbase.h \
             ../base_classes/qffitresultsbyindexevaluationeditorbase.h \
             ../interfaces/qfrdrsimplecountrateinterface.h \
-    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
+    ../interfaces/qfextensiontool.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \

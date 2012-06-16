@@ -5,6 +5,7 @@
 #include <QObject>
 #include "qfextension.h"
 #include "dlgcalcdiffcoeff.h"
+#include "qfextensiontool.h"
 
 /*!
     \defgroup qf3ext_qfe_calc_diffcoeff QFExtension implementation
@@ -14,9 +15,9 @@
 /*! \brief QFExtension implementation
     \ingroup qf3ext_qfe_calc_diffcoeff
  */
-class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase {
+class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase, public QFExtensionTool {
         Q_OBJECT
-        Q_INTERFACES(QFExtension)
+        Q_INTERFACES(QFExtension QFExtensionTool)
     public:
         /** Default constructor */
         QFEDiffusionCoefficientCalculator(QObject* parent=NULL);
@@ -55,6 +56,8 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K);
         double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K);
 
+        virtual QAction* getToolStartAction();
+        virtual void startTool();
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -83,6 +86,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
 	protected:
         QFPluginLogService* logService;
         DlgCalcDiffCoeff* dlg;
+        QAction* actStartPlugin;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */

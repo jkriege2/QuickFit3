@@ -15,7 +15,8 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfediffusioncoefficientcalculator.h \
     dlgcalcdiffcoeff.h \
-    ../base_classes/qftablemodel.h
+    ../base_classes/qftablemodel.h \
+    ../interfaces/qfextensiontool.h
 
 SOURCES += qfediffusioncoefficientcalculator.cpp \
     dlgcalcdiffcoeff.cpp \

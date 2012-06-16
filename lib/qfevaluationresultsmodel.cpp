@@ -8,6 +8,8 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     evaluation=NULL;
     resultFilter="";
     filesFilter="";
+    resultFilterRegExp=false;
+    filesFilterRegExp=false;
 }
 
 QFEvaluationResultsModel::~QFEvaluationResultsModel()
@@ -70,7 +72,7 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
         }
 
         if (!filesFilter.isEmpty()) {
-            QRegExp rx(filesFilter, Qt::CaseInsensitive, QRegExp::Wildcard);
+            QRegExp rx(filesFilter, Qt::CaseInsensitive, (filesFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
             for (int i=lastResults.size()-1; i>=0; i--) {
                 QString n=lastResults[i].first->getName()+": "+lastResults[i].second;
                 if (rx.indexIn(n)<0) {
@@ -79,7 +81,7 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
             }
         }
         if (!resultFilter.isEmpty()) {
-            QRegExp rx(resultFilter, Qt::CaseInsensitive, QRegExp::Wildcard);
+            QRegExp rx(resultFilter, Qt::CaseInsensitive, (resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
             for (int i=lastResultLabels.size()-1; i>=0; i--) {
                 if (rx.indexIn(lastResultLabels[i])<0) {
                     lastResultNames.removeAt(i);
@@ -103,6 +105,18 @@ void QFEvaluationResultsModel::setResultFilter(QString filter)
 void QFEvaluationResultsModel::setFilesFilter(QString filter)
 {
     filesFilter=filter;
+    resultsChanged();
+}
+
+void QFEvaluationResultsModel::setFilesFilterUsesRegExp(bool use)
+{
+    filesFilterRegExp=use;
+    resultsChanged();
+}
+
+void QFEvaluationResultsModel::setResultFilterUsesRegExp(bool use)
+{
+    resultFilterRegExp=use;
     resultsChanged();
 }
 

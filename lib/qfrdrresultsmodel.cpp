@@ -6,6 +6,10 @@ QFRDRResultsModel::QFRDRResultsModel(QObject* parent):
     QAbstractTableModel(parent)
 {
     record=NULL;
+    resultFilter="";
+    evaluationFilter="";
+    resultFilterRegExp=false;
+    evaluationFilterRegExp=false;
 }
 
 QFRDRResultsModel::~QFRDRResultsModel()
@@ -53,11 +57,41 @@ void QFRDRResultsModel::resultsChanged() {
         if (lastResultSets.size()>0) {
             qSort(lastResultSets.begin(), lastResultSets.end(), QFRDRResultsModel_StringPairCaseInsensitiveCompareSecond<QString>);
         }
-    } else {
-        //qDebug()<<"--- QFRDRResultsModel (rec:"<<record<<")";
+
+        if (!evaluationFilter.isEmpty()) {
+            QRegExp rx(evaluationFilter, Qt::CaseInsensitive, (evaluationFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            for (int i=lastResultSets.size()-1; i>=0; i--) {
+                QString n=lastResultSets[i].second;
+                if (rx.indexIn(n)<0) {
+                    lastResultSets.removeAt(i);
+                }
+            }
+        }
+        if (!resultFilter.isEmpty()) {
+            QRegExp rx(resultFilter, Qt::CaseInsensitive,(resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            for (int i=lastResultLabels.size()-1; i>=0; i--) {
+                if (rx.indexIn(lastResultLabels[i])<0) {
+                    lastResultNames.removeAt(i);
+                    lastResultLabels.removeAt(i);
+                }
+            }
+        }
     }
     reset();
     //qDebug()<<"--- QFRDRResultsModel ... done "<<t.elapsed();
+}
+
+QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (!record) return QVariant();
+    if (role==Qt::DisplayRole) {
+        if (orientation==Qt::Horizontal) {
+            if (section<lastResultSets.size()) return QVariant(lastResultSets[section].second);
+            else return tr("Avg %1 StdDev").arg(QChar(0xB1)); //tr("&lang;val&rang; &plusmn; &sigma<sub>val</sub>");
+        } else {
+            if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
+        }
+    }
+    return QVariant();
 }
 
 void QFRDRResultsModel::init(QFRawDataRecord* record) {
@@ -215,17 +249,29 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-QVariant QFRDRResultsModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (!record) return QVariant();
-    if (role==Qt::DisplayRole) {
-        if (orientation==Qt::Horizontal) {
-            if (section<lastResultSets.size()) return QVariant(lastResultSets[section].second);
-            else return tr("Avg %1 StdDev").arg(QChar(0xB1)); //tr("&lang;val&rang; &plusmn; &sigma<sub>val</sub>");
-        } else {
-            if (section<lastResultLabels.size()) return QVariant(lastResultLabels[section]);
-        }
-    }
-    return QVariant();
+
+void QFRDRResultsModel::setResultFilter(QString filter)
+{
+    resultFilter=filter;
+    resultsChanged();
+}
+
+void QFRDRResultsModel::setEvaluationFilter(QString filter)
+{
+    evaluationFilter=filter;
+    resultsChanged();
+}
+
+void QFRDRResultsModel::setEvaluationFilterUsesRegExp(bool use)
+{
+    evaluationFilterRegExp=use;
+    resultsChanged();
+}
+
+void QFRDRResultsModel::setResultFilterUsesRegExp(bool use)
+{
+    resultFilterRegExp=use;
+    resultsChanged();
 }
 
 void QFRDRResultsModel::calcStatistics(QString resultName, double& average, double& stddev) const {

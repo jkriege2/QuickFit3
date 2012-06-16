@@ -4,7 +4,10 @@
 #include <QDialog>
 #include "ui_estimatefocalvolumedlg.h"
 #include "programoptions.h"
-
+#include "qfpluginservices.h"
+#include "qfextensiontool.h"
+#include "qfextension.h"
+#include "qfextensionmanager.h"
 
 /*! \brief estimates the focal parameter \f$ w_{xy} \f$ from a given diffusion coefficient or concentration
     \ingroup qf3evalp_fcsfit
@@ -27,7 +30,7 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         virtual ~dlgEstimateFocalVolume();
 
         void init(double particles, double particles_error, bool has_nparticles, double tauD, double tauD_error, bool has_tauD, double gamma, double gamma_error, bool has_gamma);
-        double get_wxy() { return wxy; };
+        double get_wxy() { return wxy; }
         double get_wxyerror() { return wxy_error; }
 
     protected:
@@ -43,6 +46,7 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         double wxy;
         double wxy_error;
         ProgramOptions* settings;
+        QFExtensionTool* toolDCalc;
 
         void calc_from_C();
         void calc_from_D();
@@ -53,6 +57,8 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         void on_spinCError_valueChanged(double d);
         void on_spinD_valueChanged(double d);
         void on_spinDError_valueChanged(double d);
+        void on_btnHelp_clicked();
+        void on_btnDCalculator_clicked();
     private:
 };
 

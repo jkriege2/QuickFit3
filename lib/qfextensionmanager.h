@@ -84,7 +84,7 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         QString getPluginCopyrightFile(QString ID);
 
         /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
-        const QFExtensionManager* getInstance() {
+        static QFExtensionManager* getInstance() {
             if (QFPluginServices::getInstance()) {
                 return QFPluginServices::getInstance()->getExtensionManager();
             }

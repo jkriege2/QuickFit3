@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta name="qrichtext" content="1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit $$version$$ Regular Expressions</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+<p>The regular expressions used by QuickFit are thos implemented by the Qt library. Here is a short overview:
+<ul>
+	<li><strong>Sets of characters:</strong> aquare brackets match any character contained in them (e.g. <tt>[abc]</tt> matched a, b or c). The special combination with ^ (e.g. <tt>[^abc]</tt>) matches any character NOT in the brackets. It is also possible to define character ranges with a - (e.g. <tt>[a-z]</tt> matches any lower case letter).</li>
+	<li><strong>Quantifiers:</strong> you can quantify how often an expression <tt>E</tt> should be matched:
+	<table border="1" cellspacing="0" cellpadding="1" bgcolor="#f6f6f6"><thead>
+<tr>
+<td >
+<p align="center"><strong>Quantifier</strong></p></td>
+<td >
+<p align="center"><strong>Meaning</strong></p></td></tr></thead>
+<tr><td bgcolor="#f6f6f6"><tt>E?</tt></td>
+<td bgcolor="#f6f6f6">matches zero or one occurence</td></tr>
+<tr><td bgcolor="#ffffff"><tt>E+</tt></td>
+<td bgcolor="#ffffff">matches at least one occurence</td></tr>		
+<tr><td bgcolor="#f6f6f6"><tt>E*</tt></td>
+<td bgcolor="#f6f6f6">matches any number (also none) of occurences</td></tr>
+<tr><td bgcolor="#ffffff"><tt>E{n}</tt></td>
+<td bgcolor="#ffffff">matches exactly n occurences</td></tr>		
+<tr><td bgcolor="#f6f6f6"><tt>E{n,}</tt></td>
+<td bgcolor="#f6f6f6">matches at least n occurences</td></tr>
+<tr><td bgcolor="#ffffff"><tt>E{,m}</tt></td>
+<td bgcolor="#ffffff">matches at most m occurences</td></tr>		
+<tr><td bgcolor="#f6f6f6"><tt>E{n,m}</tt></td>
+<td bgcolor="#f6f6f6">matches between n and m occurences</td></tr>
+</table>
+You may also apply quantifiers to whole sub-expressions, if they are grouped by parantheses, e.g. <tt>(\wabd)?</tt>
+	</li>
+	<!--<li><strong></strong></li>
+	<li><strong></strong></li>
+	<li><strong></strong></li>-->
+
+	<li><b>special characters/character groups:</b>
+
+	<table border="1" cellspacing="0" cellpadding="1" bgcolor="#f6f6f6"><thead>
+<tr>
+<td >
+<strong>Element</strong></td>
+<td >
+<strong>Meaning</strong></td></tr></thead>
+<tr>
+<td bgcolor="#f6f6f6">
+c</td>
+<td bgcolor="#f6f6f6">A character represents itself unless it has a special regexp meaning. e.g. c matches the character c.</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\c</td>
+<td bgcolor="#ffffff">
+A character that follows a backslash matches the character itself, except as specified below. e.g., To match a literal caret at the beginning of a string, write \^.</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\a</td>
+<td bgcolor="#f6f6f6">
+Matches the ASCII bell (BEL, 0x07).</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\f</td>
+<td bgcolor="#ffffff">
+Matches the ASCII form feed (FF, 0x0C).</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\n</td>
+<td bgcolor="#f6f6f6">
+Matches the ASCII line feed (LF, 0x0A, Unix newline).</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\r</td>
+<td bgcolor="#ffffff">
+Matches the ASCII carriage return (CR, 0x0D).</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\t</td>
+<td bgcolor="#f6f6f6">
+Matches the ASCII horizontal tab (HT, 0x09).</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\v</td>
+<td bgcolor="#ffffff">
+Matches the ASCII vertical tab (VT, 0x0B).</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\xhhhh</td>
+<td bgcolor="#f6f6f6">
+Matches the Unicode character corresponding to the hexadecimal number hhhh (between 0x0000 and 0xFFFF).</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\0ooo (i.e., \zero ooo)</td>
+<td bgcolor="#ffffff">
+matches the ASCII/Latin1 character for the octal number ooo (between 0 and 0377).</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+. (dot)</td>
+<td bgcolor="#f6f6f6">
+Matches any character (including newline).</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\d</td>
+<td bgcolor="#ffffff">
+Matches a digit.</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\D</td>
+<td bgcolor="#f6f6f6">
+Matches a non-digit.</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\s</td>
+<td bgcolor="#ffffff">
+Matches a whitespace character.</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\S</td>
+<td bgcolor="#f6f6f6">
+Matches a non-whitespace character.</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\w</td>
+<td bgcolor="#ffffff">
+Matches a word character.</td></tr>
+<tr>
+<td bgcolor="#f6f6f6">
+\W</td>
+<td bgcolor="#f6f6f6">
+Matches a non-word character.</td></tr>
+<tr>
+<td bgcolor="#ffffff">
+\n</td>
+<td bgcolor="#ffffff">
+The n-th backreference, e.g. \1, \2, etc.</td></tr></table>
+</li>
+</ul>
+</p>
+
+</body>
+</html>

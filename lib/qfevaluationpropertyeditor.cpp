@@ -266,8 +266,13 @@ void QFEvaluationPropertyEditor::refreshResults()
 }
 
 void QFEvaluationPropertyEditor::displayHelp() {
-    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
-    services->displayHelpWindow(dll);
+    if (tabMain->currentIndex()==0 || tabMain->currentIndex()==tabMain->count()-1) {
+        QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
+        services->displayHelpWindow(dll);
+    } else {
+        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
+        services->displayHelpWindow(dll);
+    }
 }
 
 void QFEvaluationPropertyEditor::copyValErrResults() {
@@ -409,12 +414,34 @@ void QFEvaluationPropertyEditor::createWidgets() {
     edtFilterFiles=new QLineEdit(this);
     connect(edtFilterFiles, SIGNAL(textChanged(QString)), resultsModel, SLOT(setFilesFilter(QString)));
     tbResults->addWidget(edtFilterFiles);
+    chkFilterFilesRegExp=new QCheckBox(tr("RegExp"), this);
+    chkFilterFilesRegExp->setChecked(false);
+    tbResults->addWidget(chkFilterFilesRegExp);
+    connect(chkFilterFilesRegExp, SIGNAL(clicked(bool)), resultsModel, SLOT(setFilesFilterUsesRegExp(bool)));
+    edtFilterFiles->setToolTip(tr("use this to filter the contents of the results table<br><br>"
+                                       "Simply enter a filter string and the table will only display those<br>"
+                                       "rows where the raw data record name matches (contains) the filter string.<br>"
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use<br>"
+                                       "either simple text + the wildcards * (match any characters) and ?<br>"
+                                       "(match a single character), or full regular expressions in the <br>"
+                                       "filter string."));
+
     tbResults->addSeparator();
     tbResults->addWidget(new QLabel("  result filter: "));
     edtFilterResults=new QLineEdit(this);
+    edtFilterResults->setToolTip(tr("use this to filter the contents of the results table<br><br>"
+                                       "Simply enter a filter string and the table will only display those<br>"
+                                       "columns where the result name matches (contains) the filter string.<br>"
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use<br>"
+                                       "either simple text + the wildcards * (match any characters) and ?<br>"
+                                       "(match a single character), or full regular expressions in the <br>"
+                                       "filter string."));
     connect(edtFilterResults, SIGNAL(textChanged(QString)), resultsModel, SLOT(setResultFilter(QString)));
     tbResults->addWidget(edtFilterResults);
-
+    chkFilterResultsRegExp=new QCheckBox(tr("RegExp"), this);
+    chkFilterResultsRegExp->setChecked(false);
+    tbResults->addWidget(chkFilterResultsRegExp);
+    connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), resultsModel, SLOT(setResultFilterUsesRegExp(bool)));
 
 
     tvResults=new QEnhancedTableView(widResults);
@@ -423,6 +450,13 @@ void QFEvaluationPropertyEditor::createWidgets() {
     QFontMetrics fm(font());
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     tvResults->setModel(resultsModel);
+    tvResults->setContextMenuPolicy(Qt::ActionsContextMenu);
+    tvResults->addAction(actCopyResults);
+    tvResults->addAction(actCopyResultsNoHead);
+    tvResults->addAction(actCopyValErrResults);
+    tvResults->addAction(actCopyValErrResultsNoHead);
+    tvResults->addAction(actSaveResults);
+    tvResults->addAction(actRefreshResults);
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);

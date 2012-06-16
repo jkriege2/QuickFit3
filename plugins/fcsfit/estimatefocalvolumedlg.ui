@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>581</width>
-    <height>286</height>
+    <height>282</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,7 +23,7 @@
    <string>Estimate Focal Volume</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qfevalfcsfit.qrc">
+   <iconset>
     <normaloff>:/fcs_focalvolume.png</normaloff>:/fcs_focalvolume.png</iconset>
   </property>
   <property name="modal">
@@ -31,19 +31,45 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+     <item>
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/lib/help.png&quot; /&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Help: &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline;&quot;&gt;Estimate Focus Parameter (width):&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline;&quot;&gt;Estimate Focus Parameter (width):&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Please supply the known diffusion coefficient of your sample, or the known concentration. Then this tool will calculate the focus parameter &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;w&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-style:italic; vertical-align:sub;&quot;&gt;xy&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; of your microscope setup. After a click on &amp;quot;OK&amp;quot; This value will be stored as a fit parameter for further processing.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="btnHelp">
+         <property name="text">
+          <string>&amp;Help</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnDCalculator">
+         <property name="text">
+          <string>&amp;D Calculator</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -343,7 +369,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="qfevalfcsfit.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>

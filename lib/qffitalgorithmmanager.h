@@ -87,7 +87,7 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;
 
         /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
-        const QFFitAlgorithmManager* getInstance() {
+        static QFFitAlgorithmManager* getInstance() {
             if (QFPluginServices::getInstance()) {
                 return QFPluginServices::getInstance()->getFitAlgorithmManager();
             }

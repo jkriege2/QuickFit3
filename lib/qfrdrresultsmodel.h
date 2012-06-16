@@ -38,6 +38,11 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
             AvgRole=Qt::UserRole+2,
             SDRole=Qt::UserRole+3
         };
+    public slots:
+        void setResultFilter(QString filter);
+        void setEvaluationFilter(QString filter);
+        void setEvaluationFilterUsesRegExp(bool use);
+        void setResultFilterUsesRegExp(bool use);
     private slots:
         void resultsChanged();
     protected:
@@ -53,6 +58,11 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         QStringList lastResultLabels;
         /** \brief list of all columns/evaluation result sets in the model (as they are unsorted in the QFRawDataRecord), where one string is the ID and the second the label */
         QList<QPair<QString, QString> > lastResultSets;
+
+        QString resultFilter;
+        QString evaluationFilter;
+        bool resultFilterRegExp;
+        bool evaluationFilterRegExp;
 };
 
 #endif // QFRDRRESULTSMODEL_H

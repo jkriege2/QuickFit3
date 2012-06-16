@@ -80,7 +80,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         int getMinorVersion(int i);
 
         /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
-        const QFFitFunctionManager* getInstance() {
+        static QFFitFunctionManager* getInstance() {
             if (QFPluginServices::getInstance()) {
                 return QFPluginServices::getInstance()->getFitFunctionManager();
             }

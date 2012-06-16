@@ -189,6 +189,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         QLineEdit* edtFilterFiles;
         QLineEdit* edtFilterResults;
+        QCheckBox* chkFilterFilesRegExp;
+        QCheckBox* chkFilterResultsRegExp;
 
 
         /** \brief points to a settings object that is used to store application settings */

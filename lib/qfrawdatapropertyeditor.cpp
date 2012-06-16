@@ -213,11 +213,51 @@ void QFRawDataPropertyEditor::createWidgets() {
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete Selection"), this);
     tbResults->addAction(actDeleteResults);
 
+    tbResults->addSeparator();
+    tbResults->addWidget(new QLabel("  evaluation filter: "));
+    edtFilterEvaluation=new QLineEdit(this);
+    edtFilterEvaluation->setToolTip(tr("use this to filter the contents of the results table<br><br>"
+                                       "Simply enter a filter string and the table will only display those<br>"
+                                       "items where the evaluation matches (contains) the filter string.<br>"
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use<br>"
+                                       "either simple text + the wildcards * (match any characters) and ?<br>"
+                                       "(match a single character), or full regular expressions in the <br>"
+                                       "filter string."));
+    tbResults->addWidget(edtFilterEvaluation);
+    chkFilterEvaluationRegExp=new QCheckBox(tr("RegExp"), this);
+    chkFilterEvaluationRegExp->setChecked(false);
+    tbResults->addWidget(chkFilterEvaluationRegExp);
+
+
+    tbResults->addSeparator();
+    tbResults->addWidget(new QLabel("  result filter: "));
+    edtFilterResults=new QLineEdit(this);
+    tbResults->addWidget(edtFilterResults);
+    chkFilterResultsRegExp=new QCheckBox(tr("RegExp"), this);
+    chkFilterResultsRegExp->setChecked(false);
+    tbResults->addWidget(chkFilterResultsRegExp);
+    edtFilterResults->setToolTip(tr("use this to filter the contents of the results table<br><br>"
+                                       "Simply enter a filter string and the table will only display those<br>"
+                                       "rows where the result name matches (contains) the filter string.<br>"
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use<br>"
+                                       "either simple text + the wildcards * (match any characters) and ?<br>"
+                                       "(match a single character), or full regular expressions in the <br>"
+                                       "filter string."));
+
+
+
 
     tvResults=new QEnhancedTableView(widResults);
     tvResults->setAlternatingRowColors(true);
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
+    tvResults->setContextMenuPolicy(Qt::ActionsContextMenu);
+    tvResults->addAction(actCopyResults);
+    tvResults->addAction(actCopyResultsNoHead);
+    tvResults->addAction(actCopyValErrResults);
+    tvResults->addAction(actCopyValErrResultsNoHead);
+    tvResults->addAction(actSaveResults);
+    tvResults->addAction(actDeleteResults);
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -270,6 +310,12 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         disconnect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesTable()));
         disconnect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
         disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
+
+        disconnect(edtFilterResults, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilter(QString)));
+        disconnect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), tvResults->model(), SLOT(setResultFilterUsesRegExp(bool)));
+        disconnect(edtFilterEvaluation, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilter(QString)));
+        disconnect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), tvResults->model(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+
         if (c) {
             if (c->getType()!=oldType) {
                 for (int i=editorList.size()-1; i>=0; i--) {
@@ -353,6 +399,11 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         connect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
         connect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeRowsToContents()));
 
+        connect(edtFilterResults, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilter(QString)));
+        connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
+        connect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
+        connect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+
         /*QPoint pos;
         pos.setX(current->getProject()->getProperty(QString("rawdatapropeditor%1/posx").arg(id), 20).toInt());
         pos.setY(current->getProject()->getProperty(QString("rawdatapropeditor%1/posy").arg(id), 20).toInt());
@@ -390,8 +441,13 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
 }
 
 void QFRawDataPropertyEditor::displayHelp() {
-    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
-    services->displayHelpWindow(dll);
+    if (tabMain->currentIndex()==0 || tabMain->currentIndex()==tabMain->count()-1) {
+        QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_rdrscreen.html");
+        services->displayHelpWindow(dll);
+    } else {
+        QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
+        services->displayHelpWindow(dll);
+    }
 }
 
 void QFRawDataPropertyEditor::copyValErrResults() {

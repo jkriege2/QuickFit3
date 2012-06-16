@@ -2,9 +2,38 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Extension qfe_calc_diffcoeff Help</title>
+		<title>Diffusion Coefficient Calculator</title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>Description &amp; Usage</h2>
+		<p>This plugin allows to calculate the diffusion coefficient of a sample in a given solution. Simply select the sample on the left and the solution on the right. The table and graph will show the solution properties and the diffusion coefficient over the specified temperature range.</p>
+		
+		<h2>Calculating the Diffusion Coefficient models</h2>
+		<p>The plugin uses several approximations to calculate the properties (especially the dynamic viscosity $$math:\eta$$) of a solution, which are described in the next section. Then the diffusion coefficient $$math:D$$ may be calculated as follows:
+		<ul>
+		  <li><b>Sphere of given Diameter $$math:d$$:</b> The diffusion coefficient is given by the relation 
+		    $$bmath:D=\frac{k_B T}{6\pi\eta R_0}$$
+			where $$math:k_B=1.3806488\cdot 10^{-23}\rm{J/K}$$ is the Boltzman constant, $$math:T$$ is the absolute temperature in Kelvin, $$math:\eta$$ is the viscosity of the solution at the temperatur $$math:T$$ and $$math:R_0=d/2$$ is the hydrodynamic radius of the sphere.
+		  </li>
+		  <li><b>from given $$math:D_{20,W}$$:</b> If the diffusion coefficient in water at the temperature of 20°C=293.15K (viscosity of water at 20°C is $$math:\eta_{20,W}=1.002 \rm{mPa\cdot s}$$) is known ($$math:D_{20,W}$$), this value can be used to calculate $$math:D$$ at any (absolute) tenmperature $$math:T$$:
+		  $$bmath:D=D_{20,W}\cdot\frac{T}{293.15 \rm{K}}\cdot\frac{\eta_{20,W}}{\eta}$$
+		  The same definitions as above apply and this formula may be easily derived using aboves equation for the diffusion coefficient of a sphere.
+		  </li>
+		  <li><b>from any given diffusion coefficient $$math:D_R$$ at reference conditions $$math:T_R$$ and $$math:\eta_R$$:</b> The same as inthe case of given $$math:D_{20,W}$$:
+		  $$bmath:D=D_R\cdot\frac{T}{T_R}\cdot\frac{\eta_R}{\eta}$$
+		  </li>
+		</ul>
+		</p>
+
+		<h2>Solutin Models</h2>
+		<p>The plugin uses several approximations to calculate the properties (especially the dynamic viscosity $$math:\eta$$) of a solution:
+		<ul>
+		  <li><b>water:</b> The dynamic viscosity of water between 0°C and 100°C can be estimated using the empirical formula:
+		    $$bmath:\eta(T)=A\cdot10^{B/(T-C)}$$
+			where $$math:T$$ is the absolute temperature in Kelvin and $$math:A=2.41\cdot10^{-5} \rm{Pa\cdot s}$$, $$math:B=247.8 \rm{K}$$ and $$math:C=140 \rm{K}$$.
+		  </li>
+		</ul>
+		</p>
 	</body>
 </html>

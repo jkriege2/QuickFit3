@@ -13,6 +13,7 @@ QFEDiffusionCoefficientCalculator::QFEDiffusionCoefficientCalculator(QObject* pa
 {
 	logService=NULL;
     dlg=NULL;
+    actStartPlugin=NULL;
 }
 
 QFEDiffusionCoefficientCalculator::~QFEDiffusionCoefficientCalculator() {
@@ -53,12 +54,17 @@ double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double d
 }
 
 double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K) {
-    return getDCoeff_from_D(solution, D20W, 1, 20.0+273.15, at_temperature_K);
+    return getDCoeff_from_D(solution, D20W, 1.002e-3, 20.0+273.15, at_temperature_K);
 }
 
 double QFEDiffusionCoefficientCalculator::getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K) {
     double eta=getSolutionViscosity(solution, at_temperature_K);
     return D*(at_temperature_K/temp_K)*viscosity/eta;
+}
+
+QAction *QFEDiffusionCoefficientCalculator::getToolStartAction()
+{
+    return actStartPlugin;
 }
 
 void QFEDiffusionCoefficientCalculator::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -70,7 +76,7 @@ void QFEDiffusionCoefficientCalculator::projectChanged(QFProject* oldProject, QF
 void QFEDiffusionCoefficientCalculator::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Diffusion Coefficient Calculator"), this);
+    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Diffusion Coefficient Calculator"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {
@@ -117,7 +123,12 @@ void QFEDiffusionCoefficientCalculator::log_warning(QString message) {
 
 void QFEDiffusionCoefficientCalculator::log_error(QString message) {
 	if (logService) logService->log_error(LOG_PREFIX+message);
-	else if (services) services->log_error(LOG_PREFIX+message);
+    else if (services) services->log_error(LOG_PREFIX+message);
+}
+
+void QFEDiffusionCoefficientCalculator::startTool()
+{
+    startPlugin();
 }
 
 

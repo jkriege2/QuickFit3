@@ -20,6 +20,8 @@ dlgEstimateFocalVolume::dlgEstimateFocalVolume(ProgramOptions* settings, QWidget
     has_tauD=false;
     wxy=250;
     wxy_error=0;
+    toolDCalc=NULL;
+
 }
 
 dlgEstimateFocalVolume::~dlgEstimateFocalVolume()
@@ -56,6 +58,10 @@ void dlgEstimateFocalVolume::init(double particles, double particles_error, bool
     calc_from_D();
     tabWidget->setCurrentIndex(settings->getQSettings()->value("fcsfitevaleditor/estimate_focal_volume.last_tab", 1).toInt());
 
+    qDebug()<<QFExtensionManager::getInstance()->getIDList();
+    toolDCalc=qobject_cast<QFExtensionTool*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
+    btnDCalculator->setEnabled(toolDCalc!=NULL);
+
 }
 
 void dlgEstimateFocalVolume::on_buttonBox_accepted() {
@@ -83,6 +89,14 @@ void dlgEstimateFocalVolume::on_spinD_valueChanged(double d) {
 
 void dlgEstimateFocalVolume::on_spinDError_valueChanged(double d) {
     calc_from_D();
+}
+
+void dlgEstimateFocalVolume::on_btnHelp_clicked() {
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs_fit")+"/estimate_focus.html");
+}
+
+void dlgEstimateFocalVolume::on_btnDCalculator_clicked() {
+    if (toolDCalc) toolDCalc->startTool();
 }
 
 void dlgEstimateFocalVolume::calc_from_C() {
