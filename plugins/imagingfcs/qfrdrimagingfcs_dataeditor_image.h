@@ -46,7 +46,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
     public:
 
         /** Default constructor */
-        QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSImageEditor();
 protected:

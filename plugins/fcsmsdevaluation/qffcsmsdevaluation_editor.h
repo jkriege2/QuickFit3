@@ -71,7 +71,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFFCSMSDEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFFCSMSDEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFFCSMSDEvaluationEditor();
 

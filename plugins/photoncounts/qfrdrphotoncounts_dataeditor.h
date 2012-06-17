@@ -41,7 +41,7 @@ class QFRDRPhotonCountsDataEditor : public QFRawDataEditor {
 
     public:
         /** Default constructor */
-        QFRDRPhotonCountsDataEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRPhotonCountsDataEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRPhotonCountsDataEditor();
 protected slots:

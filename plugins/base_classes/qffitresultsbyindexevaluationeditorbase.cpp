@@ -1,7 +1,7 @@
 #include "qffitresultsbyindexevaluationeditorbase.h"
 
-QFFitResultsByIndexEvaluationEditorBase::QFFitResultsByIndexEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QWidget *parent) :
-    QFFitResultsEvaluationEditorBase(iniPrefix, services, parent)
+QFFitResultsByIndexEvaluationEditorBase::QFFitResultsByIndexEvaluationEditorBase(QString iniPrefix, QFEvaluationPropertyEditor *propEditor, QFPluginServices *services, QWidget *parent) :
+    QFFitResultsEvaluationEditorBase(iniPrefix, services, propEditor, parent)
 {
 }
 

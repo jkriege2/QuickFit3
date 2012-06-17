@@ -191,7 +191,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
             //for (int i=0; i<current->getEditorCount(); i++) {
                 QString n=current->getEditorName();
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... \n";
-                QFEvaluationEditor* e=current->createEditor(services, this);
+                QFEvaluationEditor* e=current->createEditor(services, this, this);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... reading settings\n";
                 e->setSettings(settings, id);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... setting current\n";
@@ -332,6 +332,10 @@ void QFEvaluationPropertyEditor::createWidgets() {
     labTop=new QLabel(this);
     vl->addWidget(labTop);
     vl->addStretch();*/
+
+    menuBar=new QMenuBar(this);
+    menuBar->setVisible(false);
+    ml->addWidget(menuBar);
 
     tabMain=new QTabWidget(this);
     ml->addWidget(tabMain);
@@ -540,6 +544,16 @@ void QFEvaluationPropertyEditor::deselectCurrent() {
             close();
         }
     }
+}
+
+QMenuBar *QFEvaluationPropertyEditor::getMenuBar() const
+{
+    return menuBar;
+}
+
+void QFEvaluationPropertyEditor::setMenuBarVisible(bool visible)
+{
+    menuBar->setVisible(visible);
 }
 
 void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {

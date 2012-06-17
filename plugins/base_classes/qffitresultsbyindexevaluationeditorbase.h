@@ -18,7 +18,7 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
         Q_OBJECT
     public:
         /** \brief class constructor */
-        explicit QFFitResultsByIndexEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QWidget *parent = 0);
+        explicit QFFitResultsByIndexEvaluationEditorBase(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0);
 
 
         /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */

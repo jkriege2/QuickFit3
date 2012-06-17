@@ -11,6 +11,7 @@
 
 // forward declaration
 class QFRawDataRecord;
+class QFRawDataPropertyEditor;
 
 /*! \brief base class for all raw data editors used to display/edit the raw data within QFRawDataPropertyEditor window
     \ingroup qf3lib_project
@@ -20,7 +21,7 @@ class QFLIB_EXPORT QFRawDataEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRawDataEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFRawDataEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFRawDataEditor();
         /** \brief set the current record */
@@ -49,6 +50,8 @@ class QFLIB_EXPORT QFRawDataEditor : public QWidget {
         int peID;
         /** \brief pointer that allows for access to central QuickFit services */
         QFPluginServices* services;
+        /** \brief the propertyEditor class holding this widget */
+        QFRawDataPropertyEditor* propertyEditor;
     private:
 };
 

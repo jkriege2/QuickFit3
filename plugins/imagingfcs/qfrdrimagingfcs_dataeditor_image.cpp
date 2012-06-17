@@ -20,8 +20,8 @@
 
 #define OverlayRectanglesAsImageOverlay true
 
-QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     m_fitFunctions=services->getFitFunctionManager()->getModels("", this);
     plteOverviewSelectedData=NULL;

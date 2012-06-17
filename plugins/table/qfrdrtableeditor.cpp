@@ -3,8 +3,8 @@
 #include "dlgcsvparameters.h"
 
 
-QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     //std::cout<<"QFRDRTableEditor() ...\n";
     createWidgets();
@@ -20,96 +20,163 @@ void QFRDRTableEditor::createWidgets() {
     QVBoxLayout* l=new QVBoxLayout(this);
     setLayout(l);
 
-    QHBoxLayout* hbl=new QHBoxLayout(this);
-    l->addLayout(hbl);
-    hbl->setContentsMargins(0,5,5,5);
-    hbl->setSpacing(0);
-
-    btnLoadTable=new QPushButton(QIcon(":/table_open.png"), "", this);
-    btnLoadTable->setToolTip(tr("Load table ..."));
-    btnLoadTable->resize(24,24);
-    connect(btnLoadTable, SIGNAL(clicked()), this, SLOT(slLoadTable()));
-    hbl->addWidget(btnLoadTable);
-
-    btnSaveTable=new QPushButton(QIcon(":/table_save.png"), "", this);
-    btnSaveTable->setToolTip(tr("Save table ...")); btnSaveTable->resize(24,24);
-    connect(btnSaveTable, SIGNAL(clicked()), this, SLOT(slSaveTable()));
-    hbl->addWidget(btnSaveTable);
-
-    hbl->addSpacing(5);
-
-    btnClear=new QPushButton(QIcon(":/table_clear.png"), "", this);
-    btnClear->setToolTip(tr("Clear table ...")); btnClear->resize(24,24);
-    connect(btnClear, SIGNAL(clicked()), this, SLOT(slClear()));
-    hbl->addWidget(btnClear);
-
-    btnInsertRow=new QPushButton(QIcon(":/row_insert.png"), "", this);
-    btnInsertRow->setToolTip(tr("Insert a row above of the currently selected cell ...")); btnInsertRow->resize(24,24);
-    connect(btnInsertRow, SIGNAL(clicked()), this, SLOT(slInsertRow()));
-    hbl->addWidget(btnInsertRow);
-
-    btnAppendRow=new QPushButton(QIcon(":/row_append.png"), "", this);
-    btnAppendRow->setToolTip(tr("Append a row to the table ...")); btnAppendRow->resize(24,24);
-    connect(btnAppendRow, SIGNAL(clicked()), this, SLOT(slAppendRow()));
-    hbl->addWidget(btnAppendRow);
-
-    btnDeleteRow=new QPushButton(QIcon(":/row_delete.png"), "", this);
-    btnDeleteRow->setToolTip(tr("Delete the currenty selected row(s) ...")); btnDeleteRow->resize(24,24);
-    connect(btnDeleteRow, SIGNAL(clicked()), this, SLOT(slDeleteRow()));
-    hbl->addWidget(btnDeleteRow);
-
-    btnInsertColumn=new QPushButton(QIcon(":/column_insert.png"), "", this);
-    btnInsertColumn->setToolTip(tr("Insert a column left of the currently selected cell ...")); btnInsertColumn->resize(24,24);
-    connect(btnInsertColumn, SIGNAL(clicked()), this, SLOT(slInsertColumn()));
-    hbl->addWidget(btnInsertColumn);
-
-    btnAppendColumn=new QPushButton(QIcon(":/column_append.png"), "", this);
-    btnAppendColumn->setToolTip(tr("Append a column to the table ...")); btnAppendColumn->resize(24,24);
-    connect(btnAppendColumn, SIGNAL(clicked()), this, SLOT(slAppendColumn()));
-    hbl->addWidget(btnAppendColumn);
-
-    btnDeleteColumn=new QPushButton(QIcon(":/column_delete.png"), "", this);
-    btnDeleteColumn->setToolTip(tr("Delete the currenty selected column(s) ...")); btnDeleteColumn->resize(24,24);
-    connect(btnDeleteColumn, SIGNAL(clicked()), this, SLOT(slDeleteColumn()));
-    hbl->addWidget(btnDeleteColumn);
-
-    hbl->addSpacing(5);
-
-    btnSetDatatype=new QPushButton(QIcon(":/cell_type.png"), "", this);
-    btnSetDatatype->setToolTip(tr("cell the datatype of the currently selected cells ...")); btnSetDatatype->resize(24,24);
-    connect(btnSetDatatype, SIGNAL(clicked()), this, SLOT(slSetDatatype()));
-    hbl->addWidget(btnSetDatatype);
-
-    hbl->addSpacing(5);
-
-    btnSetColumnTitle=new QPushButton(QIcon(":/column_title.png"), "", this);
-    btnSetColumnTitle->setToolTip(tr("Set column title ...")); btnSetColumnTitle->resize(24,24);
-    connect(btnSetColumnTitle, SIGNAL(clicked()), this, SLOT(slSetColumnTitle()));
-    hbl->addWidget(btnSetColumnTitle);
 
 
-
-    hbl->addStretch();
-    tvMain=new QTableView(this);
+    tvMain=new QEnhancedTableView(this);
     QFontMetrics fm(font());
     tvMain->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
+    tvMain->setContextMenuPolicy(Qt::ActionsContextMenu);
+    tvMain->setItemDelegate(new QFRDRTableDelegate(tvMain));
+
+    tbMain=new QToolBar("tbtablemain", this);
+    l->addWidget(tbMain);
+
+    actLoadTable=new QAction(QIcon(":/table/table_open.png"), "load table", this);
+    actLoadTable->setToolTip(tr("Load table ..."));
+    connect(actLoadTable, SIGNAL(triggered()), this, SLOT(slLoadTable()));
+    tbMain->addAction(actLoadTable);
+
+    actSaveTable=new QAction(QIcon(":/table/table_save.png"), "save table", this);
+    actSaveTable->setToolTip(tr("Save table ..."));
+    connect(actSaveTable, SIGNAL(triggered()), this, SLOT(slSaveTable()));
+    tbMain->addAction(actSaveTable);
+
+    tbMain->addSeparator();
+
+    actCopy=new QAction(QIcon(":/table/copy.png"), tr("Copy"), this);
+    actCopy->setShortcut(QKeySequence::Copy);
+    connect(actCopy, SIGNAL(triggered()), this, SLOT(slCopy()));
+    tbMain->addAction(actCopy);
+    actCut=new QAction(QIcon(":/table/cut.png"), tr("Cut"), this);
+    actCut->setShortcut(QKeySequence::Cut);
+    connect(actCut, SIGNAL(triggered()), this, SLOT(slCut()));
+    tbMain->addAction(actCut);
+    actPaste=new QAction(QIcon(":/table/paste.png"), tr("Paste"), this);
+    actPaste->setShortcut(QKeySequence::Paste);
+    connect(actPaste, SIGNAL(triggered()), this, SLOT(slPaste()));
+    tbMain->addAction(actPaste);
+
+
+    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy selection for clipboard (for Excel ...)"), this);
+    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy selection to clipboard (for Excel ...) without herader rows/columns"), this);
+    connect(actCopyResults, SIGNAL(triggered()), tvMain, SLOT(copySelectionToExcel()));
+    connect(actCopyResultsNoHead, SIGNAL(triggered()), tvMain, SLOT(copySelectionToExcelNoHead()));
+
+    tbMain->addSeparator();
+
+    actClear=new QAction(QIcon(":/table/table_clear.png"), "clear", this);
+    actClear->setToolTip(tr("Clear table ..."));
+    connect(actClear, SIGNAL(triggered()), this, SLOT(slClear()));
+    tbMain->addAction(actClear);
+
+    tbMain->addSeparator();
+
+    actResize=new QAction(QIcon(":/table/table_resize.png"), "resize table", this);
+    actResize->setToolTip(tr("Resize the table to a new size"));
+    connect(actResize, SIGNAL(triggered()), this, SLOT(slResize()));
+    tbMain->addAction(actResize);
+
+    actInsertRow=new QAction(QIcon(":/table/row_insert.png"), "insert row", this);
+    actInsertRow->setToolTip(tr("Insert a row above of the currently selected cell ..."));
+    connect(actInsertRow, SIGNAL(triggered()), this, SLOT(slInsertRow()));
+    tbMain->addAction(actInsertRow);
+
+    actAppendRow=new QAction(QIcon(":/table/row_append.png"), "append row", this);
+    actAppendRow->setToolTip(tr("Append a row to the table ..."));
+    connect(actAppendRow, SIGNAL(triggered()), this, SLOT(slAppendRow()));
+    tbMain->addAction(actAppendRow);
+
+    actDeleteRow=new QAction(QIcon(":/table/row_delete.png"), "delete row", this);
+    actDeleteRow->setToolTip(tr("Delete the currenty selected row(s) ..."));
+    connect(actDeleteRow, SIGNAL(triggered()), this, SLOT(slDeleteRow()));
+    tbMain->addAction(actDeleteRow);
+
+    actInsertColumn=new QAction(QIcon(":/table/column_insert.png"), "insert column", this);
+    actInsertColumn->setToolTip(tr("Insert a column left of the currently selected cell ..."));
+    connect(actInsertColumn, SIGNAL(triggered()), this, SLOT(slInsertColumn()));
+    tbMain->addAction(actInsertColumn);
+
+    actAppendColumn=new QAction(QIcon(":/table/column_append.png"), "append column", this);
+    actAppendColumn->setToolTip(tr("Append a column to the table ..."));
+    connect(actAppendColumn, SIGNAL(triggered()), this, SLOT(slAppendColumn()));
+    tbMain->addAction(actAppendColumn);
+
+    actDeleteColumn=new QAction(QIcon(":/table/column_delete.png"), "delete column", this);
+    actDeleteColumn->setToolTip(tr("Delete the currenty selected column(s) ..."));
+    connect(actDeleteColumn, SIGNAL(triggered()), this, SLOT(slDeleteColumn()));
+    tbMain->addAction(actDeleteColumn);
+
+    tbMain->addSeparator();
+
+    actSetDatatype=new QAction(QIcon(":/table/cell_type.png"), "set datatype", this);
+    actSetDatatype->setToolTip(tr("set the datatype of the currently selected cells ..."));
+    connect(actSetDatatype, SIGNAL(triggered()), this, SLOT(slSetDatatype()));
+    tbMain->addAction(actSetDatatype);
+
+    tbMain->addSeparator();
+
+    actSetColumnTitle=new QAction(QIcon(":/table/column_title.png"), "set column title", this);
+    actSetColumnTitle->setToolTip(tr("Set column title ..."));
+    connect(actSetColumnTitle, SIGNAL(triggered()), this, SLOT(slSetColumnTitle()));
+    tbMain->addAction(actSetColumnTitle);
+
+    tvMain->addAction(actCopy);
+    tvMain->addAction(actCut);
+    tvMain->addAction(actPaste);
+    QAction* actSep=new QAction(this);
+    actSep->setSeparator(true);
+    tvMain->addAction(actSep);
+    tvMain->addAction(actCopyResults);
+    tvMain->addAction(actCopyResultsNoHead);
+
     l->addWidget(tvMain);
+
+    propertyEditor->setMenuBarVisible(true);
+    QMenu* menuFile=propertyEditor->getMenuBar()->addMenu("&File");
+    menuFile->addAction(actLoadTable);
+    menuFile->addAction(actSaveTable);
+    QMenu* menuEdit=propertyEditor->getMenuBar()->addMenu("&Edit");
+    menuEdit->addAction(actCopy);
+    menuEdit->addAction(actCut);
+    menuEdit->addAction(actPaste);
+    menuEdit->addSeparator();
+    menuEdit->addAction(actCopyResults);
+    menuEdit->addAction(actCopyResultsNoHead);
+
+    QMenu* menuTab=propertyEditor->getMenuBar()->addMenu("&Table");
+    menuTab->addAction(actAppendRow);
+    menuTab->addAction(actInsertRow);
+    menuTab->addAction(actAppendColumn);
+    menuTab->addAction(actInsertColumn);
+    menuTab->addSeparator();
+    menuTab->addAction(actDeleteRow);
+    menuTab->addAction(actDeleteColumn);
+    menuTab->addSeparator();
+    menuTab->addAction(actSetDatatype);
+    menuTab->addAction(actSetColumnTitle);
+    menuTab->addSeparator();
+    menuTab->addAction(actClear);
+    menuTab->addAction(actResize);
 }
 
 void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
         QFRDRTable* m=qobject_cast<QFRDRTable*>(old);
         if (m && m->model()) {
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnLoadTable, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnClear, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnSetColumnTitle, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnAppendRow, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnAppendColumn, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnInsertRow, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnInsertColumn, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnDeleteColumn, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnDeleteRow, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnSetDatatype, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actLoadTable, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actClear, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendRow, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendColumn, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertRow, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertColumn, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteRow, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetDatatype, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actResize, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCopy, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCut, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
         }
     }
     //std::cout<<"qobject_cast ... ";
@@ -118,16 +185,20 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
     //if (m) std::cout<<m->model()<<" ... ";
     if (m && m->model()) {
         tvMain->setModel(m->model());
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnLoadTable, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnClear, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnSetColumnTitle, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnAppendRow, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnAppendColumn, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnInsertRow, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnInsertColumn, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnDeleteColumn, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnDeleteRow, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), btnSetDatatype, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actLoadTable, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actClear, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendRow, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendColumn, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertRow, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertColumn, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteRow, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetDatatype, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actResize, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCopy, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCut, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
         m->model()->setReadonly(m->model()->isReadonly());
     } else {
         tvMain->setModel(NULL);
@@ -390,6 +461,43 @@ void QFRDRTableEditor::slSetColumnTitle() {
             }
         }
     }
+}
+
+void QFRDRTableEditor::slResize() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            TableResizeDialog* dlg=new TableResizeDialog(this);
+            dlg->init(m->model()->columnCount(), m->model()->rowCount());
+            if (dlg->exec()==QDialog::Accepted) {
+                m->model()->resize(dlg->newHeight(), dlg->newWidth());
+            }
+            delete dlg;
+        }
+    }
+}
+
+void QFRDRTableEditor::slCopy() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            m->model()->copy(tvMain->selectionModel()->selectedIndexes());
+        }
+    }
+}
+
+void QFRDRTableEditor::slPaste() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QModelIndex c=tvMain->selectionModel()->currentIndex();
+            m->model()->paste(c.row(), c.column());
+        }
+    }
+}
+
+void QFRDRTableEditor::slCut()
+{
 }
 
 

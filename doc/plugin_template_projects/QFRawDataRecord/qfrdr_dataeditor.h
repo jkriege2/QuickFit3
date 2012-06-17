@@ -11,7 +11,7 @@ class QFRDRDataEditor : public QFRawDataEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRDRDataEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRDataEditor();
     protected slots:

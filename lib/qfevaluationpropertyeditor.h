@@ -85,6 +85,11 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void setCurrent(QFEvaluationItem* c);
         /** \brief deselect the currently highlighted record and choose another one from the available records! */
         void deselectCurrent();
+        /** \brief returns the menubar of this widget */
+        QMenuBar* getMenuBar() const;
+        /** \brief chages the visiblity of the menubar */
+        void setMenuBarVisible(bool visible);
+
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);
@@ -205,7 +210,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QPushButton* btnHelp;
 
         QString currentSaveDir;
-
+        QMenuBar* menuBar;
 };
 
 #endif // QFEVALUATIONPROPERTYEDITOR_H

@@ -79,7 +79,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         Q_OBJECT
     public:
         /** Default constructor */
-        QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFFCSFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFFCSFitEvaluationEditor();
 

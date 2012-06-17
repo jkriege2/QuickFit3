@@ -81,8 +81,8 @@ int QFRDRFCSCorrelationEditorRunsModel::columnCount(const QModelIndex &parent) c
 
 
 
-QFRDRFCSCorrelationEditor::QFRDRFCSCorrelationEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRFCSCorrelationEditor::QFRDRFCSCorrelationEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     createWidgets();
 }

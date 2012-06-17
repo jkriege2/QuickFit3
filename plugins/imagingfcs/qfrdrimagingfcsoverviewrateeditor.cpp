@@ -1,7 +1,7 @@
 #include "qfrdrimagingfcsoverviewrateeditor.h"
 
-QFRDRImagingFCSOverviewRateEditor::QFRDRImagingFCSOverviewRateEditor(QFPluginServices *services, QWidget *parent) :
-    QFRawDataEditor(services, parent)
+QFRDRImagingFCSOverviewRateEditor::QFRDRImagingFCSOverviewRateEditor(QFPluginServices *services, QFRawDataPropertyEditor *propEditor, QWidget *parent) :
+    QFRawDataEditor(services, propEditor, parent)
 {
     createWidgets();
 }

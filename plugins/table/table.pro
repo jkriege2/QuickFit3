@@ -15,15 +15,20 @@ HEADERS += dlgcsvparameters.h \
            qfrdrtable.h \
            qfrdrtableeditor.h \
            ../base_classes/qftablemodel.h \
-           qfprdrtable.h
+           qfprdrtable.h \
+    tableresizedialog.h \
+    qfrdrtabledelegate.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
            qfrdrtableeditor.cpp \
            ../base_classes/qftablemodel.cpp \
-           qfprdrtable.cpp
+           qfprdrtable.cpp \
+    tableresizedialog.cpp \
+    qfrdrtabledelegate.cpp
 
-FORMS = dlg_csvparameters.ui
+FORMS = dlg_csvparameters.ui \
+    tableresizedialog.ui
 
 RESOURCES += qfrdrtable.qrc
 

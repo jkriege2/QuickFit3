@@ -1,13 +1,15 @@
 #include "qfrawdataeditor.h"
 #include "qfrawdatarecord.h"
+#include "qfrawdatapropertyeditor.h"
 #include <QCloseEvent>
 
-QFRawDataEditor::QFRawDataEditor(QFPluginServices* services, QWidget* parent):
+QFRawDataEditor::QFRawDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QWidget(parent)
 {
     current=NULL;
     peID=0;
     this->services=services;
+    this->propertyEditor=propEditor;
 }
 
 QFRawDataEditor::~QFRawDataEditor()

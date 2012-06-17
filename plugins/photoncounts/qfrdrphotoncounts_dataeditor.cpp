@@ -61,8 +61,8 @@ int QFRDRPhotonCountsDataEditorChannelsModel::columnCount(const QModelIndex &par
 
 
 
-QFRDRPhotonCountsDataEditor::QFRDRPhotonCountsDataEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRPhotonCountsDataEditor::QFRDRPhotonCountsDataEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     createWidgets();
 }

@@ -49,7 +49,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         Q_OBJECT
     public:
         /** Default constructor */
-        QFImFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFImFCSFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFImFCSFitEvaluationEditor();
 

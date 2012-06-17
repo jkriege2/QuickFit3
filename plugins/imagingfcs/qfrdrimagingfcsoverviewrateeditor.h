@@ -13,7 +13,7 @@ class QFRDRImagingFCSOverviewRateEditor : public QFRawDataEditor
 {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCSOverviewRateEditor(QFPluginServices* services, QWidget *parent = 0);
+        explicit QFRDRImagingFCSOverviewRateEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget *parent = 0);
         virtual ~QFRDRImagingFCSOverviewRateEditor();
 
     protected slots:

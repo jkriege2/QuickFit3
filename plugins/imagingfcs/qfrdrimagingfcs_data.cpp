@@ -63,10 +63,10 @@ QString QFRDRImagingFCSData::getEditorName(int i) {
     return QString("");
 };
 
-QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services, int i, QWidget* parent) {
-    if (i==0) return new QFRDRImagingFCSImageEditor(services, parent);
-    if (i==1) return new QFRDRImagingFCSDataEditor(services, parent);
-    if (i==2) return new QFRDRImagingFCSOverviewRateEditor(services, parent);
+QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i, QWidget* parent) {
+    if (i==0) return new QFRDRImagingFCSImageEditor(services, propEditor, parent);
+    if (i==1) return new QFRDRImagingFCSDataEditor(services, propEditor, parent);
+    if (i==2) return new QFRDRImagingFCSOverviewRateEditor(services, propEditor, parent);
     return NULL;
 };
 

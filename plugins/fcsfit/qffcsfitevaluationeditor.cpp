@@ -23,8 +23,8 @@
 
 
 
-QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
-    QFFitResultsByIndexEvaluationEditorWithWidgets("fcsfitevaleditor/", services, parent)
+QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent):
+    QFFitResultsByIndexEvaluationEditorWithWidgets("fcsfitevaleditor/", propEditor, services, parent)
 {
     createWidgets();
 }

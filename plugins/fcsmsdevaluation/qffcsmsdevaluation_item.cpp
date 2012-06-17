@@ -45,8 +45,8 @@ void QFFCSMSDEvaluationItem::intReadData(QDomElement* e) {
 
 
 
-QFEvaluationEditor* QFFCSMSDEvaluationItem::createEditor(QFPluginServices* services, QWidget* parent) {
-    return new QFFCSMSDEvaluationEditor(services, parent);
+QFEvaluationEditor* QFFCSMSDEvaluationItem::createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent) {
+    return new QFFCSMSDEvaluationEditor(services, propEditor, parent);
 }
 
 bool QFFCSMSDEvaluationItem::isApplicable(QFRawDataRecord* record) {

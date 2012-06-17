@@ -38,7 +38,7 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
         runsModel runs;
     public:
         /** Default constructor */
-        QFRDRFCSRateEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRFCSRateEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRFCSRateEditor();
     protected slots:

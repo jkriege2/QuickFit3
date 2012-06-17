@@ -505,3 +505,60 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
     return true;
 
 }
+
+void QFTableModel::copy(QModelIndexList selection) {
+    QString xml;
+    {
+        QXmlStreamWriter w(&xml);
+        w.writeStartElement("qfrdrtable");
+        w.writeStartElement("columns");
+        int smallestRow=rowCount();
+        int smallestColumn=columnCount();
+        for (int i=0; i<selection.size(); i++) {
+            if (selection[i].column()<smallestColumn) smallestColumn=selection[i].column();
+            if (selection[i].row()<smallestRow) smallestRow=selection[i].row();
+        }
+        for (int c=0; c<columnCount(); c++) {
+            bool used=false;
+            for (int i=0; i<selection.size(); i++) {
+                if (selection[i].column()==c) {
+                    used=true;
+                    break;
+                }
+            }
+            if (used) {
+                w.writeStartElement("col");
+                w.writeAttribute("col", QString::number(c-smallestColumn));
+                w.writeAttribute("name", columnTitle(c));
+                w.writeEndElement();
+            }
+        }
+        w.writeStartElement("data");
+        w.writeEndElement();
+        for (int r=0; r<rowCount(); r++) {
+            for (int c=0; c<columnCount(); c++) {
+                if (selection.isEmpty() || selection.contains(index(r, c))) {
+                    w.writeStartElement("cell");
+                    w.writeAttribute("row", QString::number(r-smallestRow));
+                    w.writeAttribute("col", QString::number(c-smallestColumn));
+                    QVariant check=data(index(r, c), Qt::CheckStateRole);
+                    if (check.isValid()) w.writeAttribute("check", QString::number(check.toInt()));
+                    QVariant d=cell(r,c);
+                    w.writeAttribute("type", getQVariantType(d));
+                    w.writeCharacters(getQVariantData(d));
+                    w.writeEndElement();
+                }
+            }
+        }
+        w.writeEndElement();
+        w.writeEndElement();
+    }
+    QMimeData* mime=new QMimeData();
+    mime->setData("quickfit3/qfrdrtable", xml.toUtf8());
+    mime->setText(xml);
+    QApplication::clipboard()->setMimeData(mime);
+}
+
+void QFTableModel::paste(int row, int column)
+{
+}

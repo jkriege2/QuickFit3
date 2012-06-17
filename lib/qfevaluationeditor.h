@@ -10,6 +10,7 @@
 
 // forward declaration
 class QFEvaluationItem;
+class QFEvaluationPropertyEditor;
 
 /*! \brief base class for all evaluation widgets
     \ingroup qf3lib_project
@@ -18,7 +19,7 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFEvaluationEditor();
         /** \brief set the current record */
@@ -61,6 +62,9 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
         QAction* actPrintReport;
         /** \brief button to save report */
         QAction* actSaveReport;
+
+        /** \brief the property editor holfing this widget */
+        QFEvaluationPropertyEditor* propertyEditor;
 
 
 };

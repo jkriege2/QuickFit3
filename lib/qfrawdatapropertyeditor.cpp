@@ -62,6 +62,11 @@ void QFRawDataPropertyEditor::createWidgets() {
     QLabel* l;
     QVBoxLayout* ml=new QVBoxLayout(this);
     setLayout(ml);
+
+    menuBar=new QMenuBar(this);
+    menuBar->setVisible(false);
+    ml->addWidget(menuBar);
+
     ml->setContentsMargins(2,2,2,2);
     QHBoxLayout* vl=new QHBoxLayout(this);
     ml->addLayout(vl);
@@ -346,7 +351,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
             editorList.clear();
             for (int i=0; i<current->getEditorCount(); i++) {
                 QString n=current->getEditorName(i);
-                QFRawDataEditor* e=current->createEditor(services, i, NULL);
+                QFRawDataEditor* e=current->createEditor(services, this, i, NULL);
                 if (e) {
                     e->setSettings(settings, id);
                     e->setCurrent(current, id);
@@ -460,6 +465,16 @@ void QFRawDataPropertyEditor::copyValErrResultsNoHead() {
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
     labAveragedresults->setMaximumWidth(event->size().width());
     QWidget::resizeEvent(event);
+}
+
+QMenuBar *QFRawDataPropertyEditor::getMenuBar() const
+{
+    return menuBar;
+}
+
+void QFRawDataPropertyEditor::setMenuBarVisible(bool visible)
+{
+    menuBar->setVisible(visible);
 }
 
 void QFRawDataPropertyEditor::nameChanged(const QString& text) {

@@ -36,8 +36,8 @@ void QFRDRImagingFCSDataEditor::includeRuns() {
 
 
 
-QFRDRImagingFCSDataEditor::QFRDRImagingFCSDataEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRImagingFCSDataEditor::QFRDRImagingFCSDataEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     createWidgets();
 }

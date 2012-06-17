@@ -7,8 +7,8 @@
 #include <QtGui>
 #include <QtCore>
 
-QFEVALEditor::QFEVALEditor(QFPluginServices* services, QWidget* parent):
-    QFEvaluationEditor(services, parent),
+QFEVALEditor::QFEVALEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
+    QFEvaluationEditor(services, propEditor, parent),
     ui(new Ui::QFEVALEditor)
 {
     updatingData=true;

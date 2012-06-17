@@ -7,8 +7,8 @@
 // CONSTRUCTOR/DESTRUCTOR/INITIALISATION
 /////////////////////////////////////////////////////////////////////
 
-QFFitResultsEvaluationEditorBase::QFFitResultsEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QWidget* parent) :
-    QFEvaluationEditor(services, parent)
+QFFitResultsEvaluationEditorBase::QFFitResultsEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent) :
+    QFEvaluationEditor(services, propEditor, parent)
 {
     m_iniPrefix=iniPrefix;
     m_currentFPSSaveDir="";

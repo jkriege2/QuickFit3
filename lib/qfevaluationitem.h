@@ -201,7 +201,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName() { return QString(""); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QWidget* parent=NULL) { return NULL; };
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL) { return NULL; };
         /** \brief write object contents into XML file */
         virtual void writeXML(QXmlStreamWriter& w);
 

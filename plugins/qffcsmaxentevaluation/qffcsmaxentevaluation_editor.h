@@ -69,7 +69,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         Q_OBJECT
     public:
         /** Default constructor */
-        QFFCSMaxEntEvaluationEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFFCSMaxEntEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFFCSMaxEntEvaluationEditor();
 

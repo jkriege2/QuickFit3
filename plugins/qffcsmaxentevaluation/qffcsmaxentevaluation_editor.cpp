@@ -26,8 +26,8 @@
 #include <QtGui>
 #include <QtCore>
 
-QFFCSMaxEntEvaluationEditor::QFFCSMaxEntEvaluationEditor(QFPluginServices* services, QWidget* parent):
-    QFFCSByIndexAndModelEvaluationEditor(services, parent)
+QFFCSMaxEntEvaluationEditor::QFFCSMaxEntEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
+    QFFCSByIndexAndModelEvaluationEditor(services, propEditor, parent)
 {
     dataEventsEnabled=false;
     createWidgets();

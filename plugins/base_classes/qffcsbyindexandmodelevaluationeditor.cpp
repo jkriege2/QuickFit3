@@ -3,8 +3,8 @@
 #include "qfusesresultsbyindexandmodelevaluation.h"
 
 
-QFFCSByIndexAndModelEvaluationEditor::QFFCSByIndexAndModelEvaluationEditor(QFPluginServices *services, QWidget *parent) :
-    QFUsesResultsByIndexEvaluationEditor(services, parent)
+QFFCSByIndexAndModelEvaluationEditor::QFFCSByIndexAndModelEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent) :
+    QFUsesResultsByIndexEvaluationEditor(services, propEditor, parent)
 {
     dataEventsEnabled=false;
     cmbModel=NULL;

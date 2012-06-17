@@ -1,8 +1,8 @@
 #include "qfrdr_dataeditor.h"
 #include "qfrdr_data.h"
 
-QFRDRDataEditor::QFRDRDataEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRDataEditor::QFRDRDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* QWidget* parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     createWidgets();
 }

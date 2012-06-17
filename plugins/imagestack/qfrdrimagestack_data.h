@@ -52,8 +52,8 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             return QString("");
         }
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) {
-            if (i==0) return new QFRDRImageStackDataEditor(services, parent);
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) {
+            if (i==0) return new QFRDRImageStackDataEditor(services, propEditor, parent);
             return NULL;
         };
         /** \brief export the raw data into the specified format */

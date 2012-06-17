@@ -33,6 +33,10 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void setSettings(ProgramOptions* settings);
         /** \brief write the settings */
         void writeSettings();
+        /** \brief returns the menubar of this widget */
+        QMenuBar* getMenuBar() const;
+        /** \brief chages the visiblity of the menubar */
+        void setMenuBarVisible(bool visible);
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFRawDataRecord> current;
@@ -130,6 +134,9 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QWidget* widResults;
         /** \brief button to display help */
         QPushButton* btnHelp;
+
+        QMenuBar* menuBar;
+
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyValErrResults;
         QAction* actCopyValErrResultsNoHead;

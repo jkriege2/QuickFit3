@@ -39,9 +39,9 @@ QFRDRPhotonCountsData::~QFRDRPhotonCountsData()
 
 }
 
-QFRawDataEditor *QFRDRPhotonCountsData::createEditor(QFPluginServices *services, int i, QWidget *parent)
+QFRawDataEditor *QFRDRPhotonCountsData::createEditor(QFPluginServices *services,  QFRawDataPropertyEditor *propEditor, int i, QWidget *parent)
 {
-    if (i==0) return new QFRDRPhotonCountsDataEditor(services, parent);
+    if (i==0) return new QFRDRPhotonCountsDataEditor(services, propEditor, parent);
     return NULL;
 }
 

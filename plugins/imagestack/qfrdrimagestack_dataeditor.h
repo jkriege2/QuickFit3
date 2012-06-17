@@ -26,7 +26,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRDRImageStackDataEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRImageStackDataEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImageStackDataEditor();
     protected slots:

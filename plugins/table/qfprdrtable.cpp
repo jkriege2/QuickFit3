@@ -20,16 +20,16 @@ QFRawDataRecord* QFPRDRTable::createRecord(QFProject* parent) {
 
 
 void QFPRDRTable::registerToMenu(QMenu* menu) {
-    QAction* insertRDTableFileAct = new QAction(QIcon(":/table_open.png"), tr("Table from File"), parentWidget);
+    QAction* insertRDTableFileAct = new QAction(QIcon(":/table/table_open.png"), tr("Table from File"), parentWidget);
     insertRDTableFileAct->setStatusTip(tr("Insert a new table raw data item from a specified file"));
     connect(insertRDTableFileAct, SIGNAL(triggered()), this, SLOT(insertTableFile()));
 
-    QAction* insertRDTableAct = new QAction(QIcon(":/table_insert.png"), tr("Editable Table"), parentWidget);
+    QAction* insertRDTableAct = new QAction(QIcon(":/table/table_insert.png"), tr("Editable Table"), parentWidget);
     insertRDTableAct->setStatusTip(tr("Insert a new table raw data item, which may be edited in QuickFit 3.0 and is not connected to a file."));
     connect(insertRDTableAct, SIGNAL(triggered()), this, SLOT(insertTable()));
 
     QMenu* m=new QMenu(tr("&Table"), menu);
-    m->setIcon(QIcon(":/projecttree_tablefile.png"));
+    m->setIcon(QIcon(":/table/projecttree_tablefile.png"));
     m->addAction(insertRDTableAct);
     m->addAction(insertRDTableFileAct);
     menu->addMenu(m);
@@ -38,7 +38,11 @@ void QFPRDRTable::registerToMenu(QMenu* menu) {
 
 void QFPRDRTable::insertTable() {
     if (project) {
-        project->addRawData("table", tr("NEW_TABLE"));
+        QFRawDataRecord* rec=project->addRawData("table", tr("NEW_TABLE"));
+        QFRDRTable* tab=qobject_cast<QFRDRTable*>(rec);
+        if (tab) {
+            tab->model()->resize(10,10);
+        }
     }
 }
 

@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QTableView>
-#include <QPushButton>
+#include <QAction>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLayout>
@@ -12,6 +12,12 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include "qfrawdataeditor.h"
+#include "qenhancedtableview.h"
+#include "qfrawdatapropertyeditor.h"
+#include "tableresizedialog.h"
+#include "qfrdrtabledelegate.h"
+
+
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
 */
@@ -19,7 +25,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFRDRTableEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFRDRTableEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent=NULL);
         /** Default destructor */
         virtual ~QFRDRTableEditor();
     protected slots:
@@ -45,25 +51,38 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slSaveTable();
         void slLoadTable();
         void slSetColumnTitle();
+        void slResize();
+        void slCopy();
+        void slPaste();
+        void slCut();
 
     protected:
         /** \brief table view for the contents */
-        QTableView* tvMain;
+        QEnhancedTableView* tvMain;
 
         QString currentTableDir;
 
 
-        QPushButton* btnSaveTable;
-        QPushButton* btnLoadTable;
-        QPushButton* btnAppendRow;
-        QPushButton* btnAppendColumn;
-        QPushButton* btnInsertRow;
-        QPushButton* btnInsertColumn;
-        QPushButton* btnClear;
-        QPushButton* btnDeleteRow;
-        QPushButton* btnDeleteColumn;
-        QPushButton* btnSetDatatype;
-        QPushButton* btnSetColumnTitle;
+        QAction* actSaveTable;
+        QAction* actLoadTable;
+        QAction* actAppendRow;
+        QAction* actAppendColumn;
+        QAction* actInsertRow;
+        QAction* actInsertColumn;
+        QAction* actClear;
+        QAction* actDeleteRow;
+        QAction* actDeleteColumn;
+        QAction* actSetDatatype;
+        QAction* actSetColumnTitle;
+        QAction* actCopyResults;
+        QAction* actCopyResultsNoHead;
+        QAction* actResize;
+
+        QAction* actCopy;
+        QAction* actCut;
+        QAction* actPaste;
+
+        QToolBar* tbMain;
     private:
 };
 

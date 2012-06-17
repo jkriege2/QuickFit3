@@ -17,7 +17,7 @@ class QFEVALEditor : public QFEvaluationEditor {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFEVALEditor(QFPluginServices* services, QWidget* parent=NULL);
+        QFEVALEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFEVALEditor();
     protected slots:

@@ -23,8 +23,8 @@ void QFEVALItem::intReadData(QDomElement* e) {
 }
 
 
-QFEvaluationEditor* QFEVALItem::createEditor(QFPluginServices* services, QWidget* parent) {
-    return new QFEVALEditor(services, parent);
+QFEvaluationEditor* QFEVALItem::createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent) {
+    return new QFEVALEditor(services, propEditor, parent);
 };
 
 bool QFEVALItem::isApplicable(QFRawDataRecord* record) {

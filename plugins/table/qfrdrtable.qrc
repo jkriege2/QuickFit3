@@ -1,26 +1,22 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-
-    <file alias="copy.png">./icons/edit_copy.png</file>
-    <file alias="cut.png">./icons/edit_cut.png</file>
-    <file alias="paste.png">./icons/edit_paste.png</file>
-    <file alias="print.png">./icons/document_print.png</file>
-
-    <file alias="projecttree_tablefile.png">./icons/table.png</file>
-
-    <file alias="table_clear.png">./icons/table_clear.png</file>
-    <file alias="table_open.png">./icons/table_open.png</file>
-    <file alias="table_save.png">./icons/table_save.png</file>
-    <file alias="row_insert.png">./icons/row_insert.png</file>
-    <file alias="row_append.png">./icons/row_append.png</file>
-    <file alias="row_delete.png">./icons/row_delete.png</file>
-    <file alias="column_insert.png">./icons/column_insert.png</file>
-    <file alias="column_append.png">./icons/column_append.png</file>
-    <file alias="column_delete.png">./icons/column_delete.png</file>
-    <file alias="column_title.png">./icons/column_title.png</file>
-    <file alias="cell_type.png">./icons/cell_type.png</file>
-
-
-    <file alias="table_insert.png">./icons/table_insert_22.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/table">
+        <file alias="copy.png">icons/edit_copy.png</file>
+        <file alias="cut.png">icons/edit_cut.png</file>
+        <file alias="paste.png">icons/edit_paste.png</file>
+        <file alias="print.png">icons/document_print.png</file>
+        <file alias="projecttree_tablefile.png">icons/table.png</file>
+        <file alias="table_clear.png">icons/table_clear.png</file>
+        <file alias="table_open.png">icons/table_open.png</file>
+        <file alias="table_save.png">icons/table_save.png</file>
+        <file alias="row_insert.png">icons/row_insert.png</file>
+        <file alias="row_append.png">icons/row_append.png</file>
+        <file alias="row_delete.png">icons/row_delete.png</file>
+        <file alias="column_insert.png">icons/column_insert.png</file>
+        <file alias="column_append.png">icons/column_append.png</file>
+        <file alias="column_delete.png">icons/column_delete.png</file>
+        <file alias="column_title.png">icons/column_title.png</file>
+        <file alias="cell_type.png">icons/cell_type.png</file>
+        <file alias="table_insert.png">icons/table_insert_22.png</file>
+        <file alias="table_resize.png">icons/table_resize.png</file>
+    </qresource>
 </RCC>

@@ -42,8 +42,8 @@ void QFImFCSFitEvaluation::intReadDataAlgorithm(QDomElement& e) {
     }
 }
 
-QFEvaluationEditor* QFImFCSFitEvaluation::createEditor(QFPluginServices* services, QWidget* parent) {
-    return new QFImFCSFitEvaluationEditor(services, parent);
+QFEvaluationEditor* QFImFCSFitEvaluation::createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent) {
+    return new QFImFCSFitEvaluationEditor(services, propEditor, parent);
 };
 
 bool QFImFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {

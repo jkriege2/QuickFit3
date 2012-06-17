@@ -49,7 +49,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName() { return QString("Fit"); }
         /** \brief create an object for the i-th editor pane */
-        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QWidget* parent=NULL);
+        virtual QFEvaluationEditor* createEditor(QFPluginServices* services, QFEvaluationPropertyEditor *propEditor, QWidget *parent=NULL);
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(QFRawDataRecord* record);

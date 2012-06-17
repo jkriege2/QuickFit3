@@ -42,17 +42,17 @@ class QFPRDRTable : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getAuthor() const  { return tr("Jan Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2010 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010-2012 by Jan Krieger"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr(""); };
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
-        virtual QString getIconFilename() const  { return QString(":/table_insert.png"); };
+        virtual QString getIconFilename() const  { return QString(":/table/table_insert.png"); };
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
     protected slots:

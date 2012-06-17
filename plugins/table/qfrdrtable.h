@@ -34,18 +34,18 @@ class QFRDRTable : public QFRawDataRecord {
         /** \brief return type (longer type string, user readable) */
         virtual QString getTypeName() const { return tr("Data Table"); };
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/projecttree_tablefile.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/table/projecttree_tablefile.png"); };
         /** \brief return type description */
         virtual QString getTypeDescription() const { return tr("data table"); };
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/projecttree_tablefile.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/table/projecttree_tablefile.png"); };
         /** \brief returns the number of additional editor panes for this record */
         virtual int getEditorCount() { return 1; };
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i) { return tr("Table Editor"); };
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(QFPluginServices* services, int i=0, QWidget* parent=NULL) {
-            return new QFRDRTableEditor(services, parent);
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) {
+            return new QFRDRTableEditor(services, propEditor, parent);
         };
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;

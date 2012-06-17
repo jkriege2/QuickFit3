@@ -13,6 +13,13 @@
 #include <cmath>
 #include <QDateTime>
 #include <iostream>
+#include <QModelIndexList>
+#include <QXmlStreamWriter>
+#include <QtXml>
+#include "qftools.h"
+#include <QApplication>
+#include <QMimeData>
+#include <QClipboard>
 
 /*! \brief this class is used to manage a table of values (QVariant)
     \ingroup qf3rdrdp_table
@@ -143,6 +150,9 @@ class QFTableModel : public QAbstractTableModel {
          */
         bool readCSV(const QString& filename, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#');
         //bool readCSV(const QString& filename, const QString& column_separator, const QString& decimal_separator, const QString& header_start, const QString& comment_start);
+
+        void copy(QModelIndexList selection=QModelIndexList());
+        void paste(int row=-1, int column=-1);
     public slots:
         /** \brief append a new row */
         inline void appendRow() { resize(rows+1, columns); }

@@ -95,7 +95,7 @@ PARAMID2/max = PARMVALUERANGEMAX
 class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
         Q_OBJECT
     public:
-        QFFitResultsEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QWidget* parent=NULL);
+        QFFitResultsEvaluationEditorBase(QString iniPrefix, QFPluginServices* services, QFEvaluationPropertyEditor *propEditor, QWidget *parent=NULL);
         virtual ~QFFitResultsEvaluationEditorBase();
 
         void setIniPrefix(QString p);

@@ -27,7 +27,7 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         QFRDRImagingFCSRunsModel runs;
     public:
         /** Default constructor */
-        QFRDRImagingFCSDataEditor(QFPluginServices* services, QWidget* parent);
+        QFRDRImagingFCSDataEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSDataEditor();
     protected slots:

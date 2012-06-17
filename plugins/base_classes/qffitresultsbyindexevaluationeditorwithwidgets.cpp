@@ -16,8 +16,8 @@
 #include "qffitalgorithmmanager.h"
 
 
-QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFPluginServices* services, QWidget *parent) :
-    QFFitResultsByIndexEvaluationEditorBase(iniPrefix, services, parent)
+QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent) :
+    QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
 {
     cmbModel=NULL;
     dataEventsEnabled=true;

@@ -23,8 +23,8 @@
 
 
 
-QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices* services, QWidget* parent):
-    QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", services, parent)
+QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
+    QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", propEditor, services, parent)
 {
     createWidgets();
 }

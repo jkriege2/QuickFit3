@@ -5,8 +5,8 @@
 #include <QtGui>
 #include <QtCore>
 
-QFUsesResultsByIndexEvaluationEditor::QFUsesResultsByIndexEvaluationEditor(QFPluginServices* services, QWidget *parent) :
-    QFEvaluationEditor(services, parent)
+QFUsesResultsByIndexEvaluationEditor::QFUsesResultsByIndexEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent) :
+    QFEvaluationEditor(services, propEditor, parent)
 {
 }
 

@@ -33,8 +33,8 @@
 #include <QtGui>
 #include <QtCore>
 
-QFFCSMSDEvaluationEditor::QFFCSMSDEvaluationEditor(QFPluginServices* services, QWidget* parent):
-    QFFCSByIndexAndModelEvaluationEditor(services, parent)
+QFFCSMSDEvaluationEditor::QFFCSMSDEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
+    QFFCSByIndexAndModelEvaluationEditor(services, propEditor, parent)
 {
     dataEventsEnabled=false;
     createWidgets();

@@ -7,7 +7,7 @@
 class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT
     public:
-        explicit QFUsesResultsByIndexEvaluationEditor(QFPluginServices* services, QWidget *parent = 0);
+        explicit QFUsesResultsByIndexEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget *parent = 0);
         /** \brief read the settings */
         virtual void readSettings();
         /** \brief write the settings */

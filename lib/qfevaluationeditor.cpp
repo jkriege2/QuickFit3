@@ -1,12 +1,14 @@
 #include "qfevaluationeditor.h"
 #include "qfevaluationitem.h"
+#include "qfevaluationpropertyeditor.h"
 #include <QCloseEvent>
 #include <QDebug>
 
-QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QWidget* parent):
+QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
     QWidget(parent)
 {
     current=NULL;
+    this->propertyEditor=propEditor;
     peID=0;
     this->services=services;
     actSaveReport=new QAction(QIcon(":/lib/savereport.png"), tr("Save &Report"), this);

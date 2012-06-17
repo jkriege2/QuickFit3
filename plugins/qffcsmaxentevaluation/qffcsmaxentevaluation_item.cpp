@@ -45,8 +45,8 @@ void QFFCSMaxEntEvaluationItem::intReadData(QDomElement* e) {
 
 
 
-QFEvaluationEditor* QFFCSMaxEntEvaluationItem::createEditor(QFPluginServices* services, QWidget* parent) {
-    return new QFFCSMaxEntEvaluationEditor(services, parent);
+QFEvaluationEditor* QFFCSMaxEntEvaluationItem::createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent) {
+    return new QFFCSMaxEntEvaluationEditor(services, propEditor, parent);
 }
 
 bool QFFCSMaxEntEvaluationItem::isApplicable(QFRawDataRecord* record) {

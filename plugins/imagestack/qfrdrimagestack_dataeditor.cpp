@@ -1,8 +1,8 @@
 #include "qfrdrimagestack_dataeditor.h"
 #include "qfrdrimagestack_data.h"
 
-QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services, QWidget* parent):
-    QFRawDataEditor(services, parent)
+QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
+    QFRawDataEditor(services, propEditor, parent)
 {
     dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
     createWidgets();

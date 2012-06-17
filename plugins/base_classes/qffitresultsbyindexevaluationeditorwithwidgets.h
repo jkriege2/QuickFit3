@@ -51,7 +51,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFPluginServices* services, QWidget *parent = 0);
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0);
         
     protected slots:
         /** \brief connect widgets to current data record */
