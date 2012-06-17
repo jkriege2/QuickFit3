@@ -89,7 +89,12 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QMenuBar* getMenuBar() const;
         /** \brief chages the visiblity of the menubar */
         void setMenuBarVisible(bool visible);
-
+        /** \brief add a new menu to te menubar that is visible for the specified editor only, if editor>=0 or always, if editor<0 */
+        QMenu* addMenu(const QString &title, int editor=-1);
+        /** \brief tells the editor to switch the visibility of the specified menu according to the set editor (see addMenu() ), but does not add the menu to the main menu bar */
+        void registerMenu(QMenu* menu, int editor=-1);
+        /** \brief returns a pointer to the help menu of this editor */
+        QMenu* getHelpMenu() const;
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);
@@ -129,9 +134,22 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief display the online help dialog for this plugin */
         void displayHelp();
 
+        /** \brief display help dialog with the plugin help */
+        void displayHelpPlugin();
+
+        /** \brief display help dialog with the plugin tutorial */
+        void displayHelpPluginTutorial();
+
+        /** \brief display help dialog with the plugin copyright note */
+        void displayHelpPluginCopyright();
+
+        /** \brief display help dialog with the common RDR help */
+        void displayHelpEval();
         void copyValErrResults();
         void copyValErrResultsNoHead();
 
+        void currentTabChanged(int tab);
+        void checkHelpAvailable();
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;
@@ -207,10 +225,20 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief pointer that allows for access to central QuickFit services */
         QFPluginServices* services;
         /** \brief button to diaply online-help */
-        QPushButton* btnHelp;
+        QToolButton* btnHelp;
 
         QString currentSaveDir;
         QMenuBar* menuBar;
+
+        QAction* actHelp;
+        QAction* actHelpPlugin;
+        QAction* actHelpPluginTutorial;
+        QAction* actHelpPluginCopyright;
+        QAction* actHelpEval;
+        QMenu* menuHelp;
+        QMenu* menuResults;
+        QList<QPair<int, QMenu*> > menus;
+
 };
 
 #endif // QFEVALUATIONPROPERTYEDITOR_H

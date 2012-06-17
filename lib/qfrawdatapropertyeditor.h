@@ -12,6 +12,10 @@
 #include "qftools.h"
 #include "qenhancedtableview.h"
 #include "lib_imexport.h"
+#include <QMenu>
+#include <QAction>
+#include <QList>
+#include <QPair>
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -37,6 +41,12 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QMenuBar* getMenuBar() const;
         /** \brief chages the visiblity of the menubar */
         void setMenuBarVisible(bool visible);
+        /** \brief add a new menu to te menubar that is visible for the specified editor only, if editor>=0 or always, if editor<0 */
+        QMenu* addMenu(const QString &title, int editor=-1);
+        /** \brief tells the editor to switch the visibility of the specified menu according to the set editor (see addMenu() ), but does not add the menu to the main menu bar */
+        void registerMenu(QMenu* menu, int editor=-1);
+        /** \brief returns a pointer to the help menu of this editor */
+        QMenu* getHelpMenu() const;
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFRawDataRecord> current;
@@ -78,8 +88,23 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief display help dialog */
         void displayHelp();
 
+        /** \brief display help dialog with the plugin help */
+        void displayHelpPlugin();
+
+        /** \brief display help dialog with the plugin tutorial */
+        void displayHelpPluginTutorial();
+
+        /** \brief display help dialog with the plugin copyright note */
+        void displayHelpPluginCopyright();
+
+        /** \brief display help dialog with the common RDR help */
+        void displayHelpRDR();
+
         void copyValErrResults();
         void copyValErrResultsNoHead();
+
+        void currentTabChanged(int tab);
+        void checkHelpAvailable();
     private:
         /** \brief create all widgets needed to display data */
         void createWidgets();
@@ -106,15 +131,15 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief tabel view for the properties */
         QEnhancedTableView* tvProperties;
         /** \brief button to switch to next record */
-        QPushButton* btnNext;
+        QToolButton* btnNext;
         /** \brief button to insert a new property */
         QPushButton* btnNewProperty;
         /** \brief button to delete a property */
         QPushButton* btnDeleteProperty;
         /** \brief button to switch to previous record */
-        QPushButton* btnPrevious;
+        QToolButton* btnPrevious;
         /** \brief button to delete the current record */
-        QPushButton* btnDeleteReord;
+        QToolButton* btnDeleteReord;
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief tabel display the evaluation results associated with this file  */
@@ -123,6 +148,32 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QLabel* labAveragedresults;
         /** \brief toolbar to access functions of tvResults */
         QToolBar* tbResults;
+
+        /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
+        QWidget* widResults;
+        /** \brief button to display help */
+        QToolButton* btnHelp;
+        QAction* actHelp;
+        QAction* actHelpPlugin;
+        QAction* actHelpPluginTutorial;
+        QAction* actHelpPluginCopyright;
+        QAction* actHelpRDR;
+        QAction* actPrevious;
+        QAction* actNext;
+        QAction* actDelete;
+        QAction* actClose;
+
+
+        QMenuBar* menuBar;
+
+        QMenu* menuRDR;
+        QMenu* menuHelp;
+        QMenu* menuResults;
+        QList<QPair<int, QMenu*> > menus;
+
+        /** \brief action used to copy selection in tvResults to clipbord */
+        QAction* actCopyValErrResults;
+        QAction* actCopyValErrResultsNoHead;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyResults;
         QAction* actCopyResultsNoHead;
@@ -130,16 +181,6 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actSaveResults;
         /** \brief action used to delete selection in tvResults */
         QAction* actDeleteResults;
-        /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
-        QWidget* widResults;
-        /** \brief button to display help */
-        QPushButton* btnHelp;
-
-        QMenuBar* menuBar;
-
-        /** \brief action used to copy selection in tvResults to clipbord */
-        QAction* actCopyValErrResults;
-        QAction* actCopyValErrResultsNoHead;
 
         QLineEdit* edtFilterEvaluation;
         QLineEdit* edtFilterResults;

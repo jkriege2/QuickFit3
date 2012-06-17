@@ -55,6 +55,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slCopy();
         void slPaste();
         void slCut();
+        void slDelete();
 
     protected:
         /** \brief table view for the contents */
@@ -77,6 +78,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCopyResults;
         QAction* actCopyResultsNoHead;
         QAction* actResize;
+        QAction* actDelete;
 
         QAction* actCopy;
         QAction* actCut;

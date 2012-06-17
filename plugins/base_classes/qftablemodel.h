@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QMimeData>
 #include <QClipboard>
+#include <QModelIndex>
 
 /*! \brief this class is used to manage a table of values (QVariant)
     \ingroup qf3rdrdp_table
@@ -112,18 +113,28 @@ class QFTableModel : public QAbstractTableModel {
         bool changeDatatype(quint16 row, quint16 column, QVariant::Type newType);
         /** \brief set the given cell to the supplied value */
         void setCell(quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value, if the cell is outside the table size, the table is resized accordingly */
+        void setCellCreate(quint16 row, quint16 column, QVariant value);
         /** \brief returns the value in the supplied cell */
         QVariant cell(quint16 row, quint16 column) const;
         /** \brief set the given cell to the supplied value in EditRole */
         void setCellEditRole(quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value in EditRole */
+        void setCellEditRoleCreate(quint16 row, quint16 column, QVariant value);
         /** \brief set the given cell to the supplied value in Background */
         void setCellBackgroundRole(quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value in Background */
+        void setCellBackgroundRoleCreate(quint16 row, quint16 column, QVariant value);
         /** \brief set the given cell to the supplied value in Checked */
         void setCellCheckedRole(quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value in Checked */
+        void setCellCheckedRoleCreate(quint16 row, quint16 column, QVariant value);
         /** \brief returns the value in the supplied cell in EditRole */
         QVariant cellEditRole(quint16 row, quint16 column) const;
         /** \brief set the column title */
         void setColumnTitle(quint16 column, QString name);
+        /** \brief set the column title */
+        void setColumnTitleCreate(quint16 column, QString name);
         /** \brief return the column title */
         QString columnTitle(quint16 column) const;
         /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
@@ -138,21 +149,61 @@ class QFTableModel : public QAbstractTableModel {
         /** \brief save the contents in a Comma-Separated-Values file
          *
          * \return \c true on success and \c false on error (e.g. couldn't open file ...)
-         *
-         *
          */
-        bool saveCSV(const QString& filename, QString column_separator=QString(", "), char decimal_separator='.', QString header_start=QString("#!"), char format = 'g', int precision = 6);
+        bool saveCSV(const QString& filename, QString column_separator=QString(", "), char decimal_separator='.', QString header_start=QString("#!"), char format = 'g', int precision = 6, QModelIndexList selection=QModelIndexList());
+        /** \brief save the contents as Comma-Separated-Values into a QTextStream
+         *
+         * \return \c true on success and \c false on error (e.g. couldn't open file ...)
+         */
+        bool saveCSV(QTextStream& out, QString column_separator=QString(", "), char decimal_separator='.', QString header_start=QString("#!"), char format = 'g', int precision = 6, bool setCodecAndEncoding=true, QModelIndexList selection=QModelIndexList());
         /** \brief read the contents in a Comma-Separated-Values file into the current model (if it is not readonly!)
          *
          * \return \c true on success and \c false on error (e.g. couldn't open file ...)
-         *
-         *
          */
         bool readCSV(const QString& filename, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#');
-        //bool readCSV(const QString& filename, const QString& column_separator, const QString& decimal_separator, const QString& header_start, const QString& comment_start);
+        /** \brief read CSV from a QTextStream and write it into the table (may be resized) starting from ( \a start_row, \a start_col ) */
+        bool readCSV(QTextStream& in, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#', int start_row=0, int start_col=0, bool clearTable=false);
 
-        void copy(QModelIndexList selection=QModelIndexList());
-        void paste(int row=-1, int column=-1);
+        /*! \brief saves the given selection (or all cells, if the selection is empty) as XML
+
+            \param selection copy only these cells, or all if this is empty (default)
+            \param createXMLFragment if this is \c true, the output will not be a complete XML document (incl. header etc.), but only a raw fragment
+            \returns the selection as XML
+
+            The format in the clipboard is XML and the MIME type is called \c quickfit3/qfrdrtable, the encoding is UTF-8:
+\verbatim
+<qfrdrtable>
+  <columns> <!-- names for all columns used in the data section -->
+    <col col="0" name="0"/>
+    <col col="1" name="1"/>
+    <col col="2" name="2"/>
+  </columns>
+  <data><!-- the actual data, each cell separately, the first cell is always (0,0)
+             no matter where it was before -->
+    <cell row="0" col="0" type="string">a</cell>
+    <cell row="0" col="1" type="double">1.26</cell>
+    <cell row="0" col="2" type="string">So Jan 1 2012</cell>
+    <cell row="1" col="0" type="string">b</cell>
+    <cell row="1" col="1" type="double">1.2586</cell>
+    <cell row="1" col="2" type="bool">true</cell>
+    <cell row="2" col="0" type="string">c</cell>
+    <cell row="2" col="1" type="double">1.587e-05</cell>
+    <cell row="2" col="2" type="int">1234</cell>
+  </data>
+</qfrdrtable>
+\endverbatim
+          */
+        QString saveXML(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false);
+        /** \brief saves the given \a selection as XML into a file \a filename */
+        bool saveXML(const QString& filename, QModelIndexList selection=QModelIndexList());
+        /** \brief reads an XML-encoded table (see saveXML() ) from the string \a data and inserts it ito the table, starting at \a start_row, \a start_col */
+        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false);
+        /** \brief reads an XML-encoded table (see saveXML() ) from the file \a filename */
+        bool readXML(const QString& filename);
+        /** \brief copies the given selection (or all cells, if the selection is empty) to the clipboard in an XML format (see saveXML() ) */
+        void copy(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false);
+        /*! \brief pastes data from the cklipboard into the table, starting from the given position ... the table is resized if needed */
+        void paste(int row_start=0, int column_start=0);
     public slots:
         /** \brief append a new row */
         inline void appendRow() { resize(rows+1, columns); }
@@ -168,7 +219,10 @@ class QFTableModel : public QAbstractTableModel {
         void deleteRow(quint16 r);
         /** \brief remove the given column */
         void deleteColumn(quint16 c);
-
+        /** \brief delete all contents from the given cell */
+        void deleteCell(quint16 r, quint16 column);
+        /** \brief delete all contents from the given cells */
+        void deleteCells(QModelIndexList selection);
 
     signals:
         /** \brief emitted when the readonly status changes (may be used to en-/disable widgets */

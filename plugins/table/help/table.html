@@ -5,7 +5,23 @@
   <title>Data Table Online-Help</title>
   </head>
   <body>
-          $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<h2>Description</h2>
+	<p>This plugin allows the user to view/edit a table of values. It implements these features:
+      <ul>
+	    <li>The values may be of diferent datatypes (integer or floating point number, text, ...).</li>
+	    <li>Data may be loaded from or saved to external files.</li>
+		<li>Data exchange with other applications (Excel, Origin, ...) and other QuickFit plugins is usually possible via the clipboard.</li>
+		<li>Many common table editing functions are implemented (insert/delete rows/cols, table resize, ...).</li>
+		<li>There is some support for gathering data from the results and properties of other raw data records.</li>
+		<li>It is possible to create plots of the data in the table. Each column is seen as a single dataseries for the plot.</li>
+	  </ul>  
+	</p>
+	
+	<h2>Usage Notes & Hints</h2>
+	<p><ul>
+	  <li>You may insert either an <strong>"Editable Table"</strong> or a <strong>"Table From File"</strong> into a QuickFit project. The lather one may NOT be edited by the user, as it simply represents the contents of a file. If you want to edit the contents of a file insert an "Editable Table" and then load the file using <img src=":/table/table_open.png">. The data of an Editable Table is stored inside the QuickFit project file, so such a raw data record does NOT depend on any external file.</li>
+	  
+	</ul></p>
   </body>
 </html>

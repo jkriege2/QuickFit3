@@ -251,6 +251,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         rdrModel->setProject(NULL);
 
     }
+    checkHelpAvailable();
 }
 
 void QFEvaluationPropertyEditor::resultsChanged() {
@@ -267,12 +268,35 @@ void QFEvaluationPropertyEditor::refreshResults()
 
 void QFEvaluationPropertyEditor::displayHelp() {
     if (tabMain->currentIndex()==0 || tabMain->currentIndex()==tabMain->count()-1) {
-        QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
-        services->displayHelpWindow(dll);
+        displayHelpEval();
     } else {
-        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
-        services->displayHelpWindow(dll);
+        displayHelpPlugin();
     }
+
+}
+
+void QFEvaluationPropertyEditor::displayHelpPlugin()
+{
+    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
+    services->displayHelpWindow(dll);
+}
+
+void QFEvaluationPropertyEditor::displayHelpPluginTutorial()
+{
+    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginTutorial(current->getType());
+    services->displayHelpWindow(dll);
+}
+
+void QFEvaluationPropertyEditor::displayHelpPluginCopyright()
+{
+    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginCopyrightFile(current->getType());
+    services->displayHelpWindow(dll);
+}
+
+void QFEvaluationPropertyEditor::displayHelpEval()
+{
+    QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
+    services->displayHelpWindow(dll);
 }
 
 void QFEvaluationPropertyEditor::copyValErrResults() {
@@ -281,6 +305,36 @@ void QFEvaluationPropertyEditor::copyValErrResults() {
 
 void QFEvaluationPropertyEditor::copyValErrResultsNoHead() {
     tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole, false);
+}
+
+void QFEvaluationPropertyEditor::currentTabChanged(int tab)
+{
+    int idx=tab-1;
+    for (int i=0; i<menus.size(); i++) {
+        if (menus[i].first==-1 || (idx>=0 && menus[i].first==idx)) {
+            menus[i].second->menuAction()->setVisible(true);
+        } else {
+            menus[i].second->menuAction()->setVisible(false);
+        }
+    }
+    menuResults->menuAction()->setVisible(tab==tabMain->count()-1);
+}
+
+void QFEvaluationPropertyEditor::checkHelpAvailable()
+{
+    if (!current) {
+        actHelpPlugin->setVisible(false);
+        actHelpPluginTutorial->setVisible(false);
+        actHelpPluginCopyright->setVisible(false);
+    } else {
+        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
+        actHelpPlugin->setVisible(QFile::exists(dll));
+        dll=current->getProject()->getEvaluationItemFactory()->getPluginTutorial(current->getType());
+        actHelpPluginTutorial->setVisible(QFile::exists(dll));
+        dll=current->getProject()->getEvaluationItemFactory()->getPluginCopyrightFile(current->getType());
+        actHelpPluginCopyright->setVisible(QFile::exists(dll));
+    }
+
 }
 
 void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
@@ -334,8 +388,10 @@ void QFEvaluationPropertyEditor::createWidgets() {
     vl->addStretch();*/
 
     menuBar=new QMenuBar(this);
-    menuBar->setVisible(false);
+    menuBar->setVisible(true);
     ml->addWidget(menuBar);
+    menuResults=menuBar->addMenu("&Results");
+    menuHelp=menuBar->addMenu("&Help");
 
     tabMain=new QTabWidget(this);
     ml->addWidget(tabMain);
@@ -479,10 +535,50 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
-    btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("&Help"), this);
-    btnHelp->setToolTip(tr("display online help dialog"));
-    tabMain->setCornerWidget(btnHelp, Qt::TopRightCorner);
-    connect(btnHelp, SIGNAL(clicked()), this, SLOT(displayHelp()));
+
+    actHelp=new QAction(QIcon(":/lib/help.png"), tr("&Help"), this);
+    actHelp->setToolTip(tr("display online-help"));
+    connect(actHelp, SIGNAL(triggered()), this, SLOT(displayHelp()));
+
+    actHelpPlugin=new QAction(QIcon(":/lib/help.png"), tr("&Plugin Help"), this);
+    actHelpPlugin->setToolTip(tr("display online-help for the specific plugin"));
+    connect(actHelpPlugin, SIGNAL(triggered()), this, SLOT(displayHelpPlugin()));
+
+    actHelpPluginTutorial=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), this);
+    actHelpPluginTutorial->setToolTip(tr("display the tutorial for the specific plugin"));
+    connect(actHelpPluginTutorial, SIGNAL(triggered()), this, SLOT(displayHelpPluginTutorial()));
+
+    actHelpPluginCopyright=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), this);
+    actHelpPluginCopyright->setToolTip(tr("display copyright note for the specific plugin"));
+    connect(actHelpPluginCopyright, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
+
+    actHelpEval=new QAction(QIcon(":/lib/help_rdr.png"), tr("&Evaluation item help"), this);
+    actHelpEval->setToolTip(tr("display online-help common to all plugins, i.e. for the basic evaluation editor dialog"));
+    connect(actHelpEval, SIGNAL(triggered()), this, SLOT(displayHelpEval()));
+
+    menuHelp->addAction(actHelpEval);
+    menuHelp->addAction(actHelpPlugin);
+    menuHelp->addAction(actHelpPluginTutorial);
+    menuHelp->addAction(actHelpPluginCopyright);
+
+    btnHelp=new QToolButton(this);
+    btnHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnHelp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnHelp->setDefaultAction(actHelp);
+    tabMain->setCornerWidget(btnHelp);
+
+    connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
+
+    menuResults->addAction(actRefreshResults);
+    menuResults->addSeparator();
+    menuResults->addAction(actSaveResults);
+    menuResults->addSeparator();
+    menuResults->addAction(actCopyResults);
+    menuResults->addAction(actCopyResultsNoHead);
+    menuResults->addAction(actCopyValErrResults);
+    menuResults->addAction(actCopyValErrResultsNoHead);
+
+    currentTabChanged(0);
 }
 
 void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
@@ -554,6 +650,27 @@ QMenuBar *QFEvaluationPropertyEditor::getMenuBar() const
 void QFEvaluationPropertyEditor::setMenuBarVisible(bool visible)
 {
     menuBar->setVisible(visible);
+}
+
+QMenu *QFEvaluationPropertyEditor::addMenu(const QString &title, int editor)
+{
+    menuBar->removeAction(menuHelp->menuAction());
+    QMenu* m=menuBar->addMenu(title);
+    menuBar->addAction(menuHelp->menuAction());
+    menus.append(qMakePair(editor, m));
+    currentTabChanged(tabMain->currentIndex());
+    return m;
+}
+
+void QFEvaluationPropertyEditor::registerMenu(QMenu *menu, int editor)
+{
+    menus.append(qMakePair(editor, menu));
+    currentTabChanged(tabMain->currentIndex());
+}
+
+QMenu *QFEvaluationPropertyEditor::getHelpMenu() const
+{
+    return menuHelp;
 }
 
 void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {

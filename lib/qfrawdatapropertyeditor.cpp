@@ -64,21 +64,34 @@ void QFRawDataPropertyEditor::createWidgets() {
     setLayout(ml);
 
     menuBar=new QMenuBar(this);
-    menuBar->setVisible(false);
+    menuBar->setVisible(true);
     ml->addWidget(menuBar);
+    menuRDR=menuBar->addMenu("Recor&d");
+    menuResults=menuBar->addMenu("&Results");
+    menuHelp=menuBar->addMenu("&Help");
 
     ml->setContentsMargins(2,2,2,2);
     QHBoxLayout* vl=new QHBoxLayout(this);
     ml->addLayout(vl);
-    btnPrevious=new QPushButton(QIcon(":/lib/prop_previous.png"), tr("&previous"), this);
+    actPrevious=new QAction(QIcon(":/lib/prop_previous.png"), tr("&previous"), this);
+    actPrevious->setToolTip(tr("move to previous record"));
+
+    btnPrevious=new QToolButton(this);
+    btnPrevious->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    btnPrevious->setToolTip(tr("move to previous record"));
+    btnPrevious->setDefaultAction(actPrevious);
     vl->addWidget(btnPrevious);
-    connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previousPressed()));
-    btnNext=new QPushButton(QIcon(":/lib/prop_next.png"), tr("&next"), this);
+    connect(actPrevious, SIGNAL(triggered()), this, SLOT(previousPressed()));
+
+    actNext=new QAction(QIcon(":/lib/prop_next.png"), tr("&next"), this);
+    actNext->setToolTip(tr("move to next record"));
+
+    btnNext=new QToolButton(this);
+    btnNext->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    btnNext->setToolTip(tr("move to next record"));
-    connect(btnNext, SIGNAL(clicked()), this, SLOT(nextPressed()));
+    btnNext->setDefaultAction(actNext);
+
+    connect(actNext, SIGNAL(triggered()), this, SLOT(nextPressed()));
     vl->addWidget(btnNext);
     labTopIcon=new QLabel(this);
     vl->addWidget(labTopIcon);
@@ -86,19 +99,59 @@ void QFRawDataPropertyEditor::createWidgets() {
     vl->addWidget(labTop);
     vl->addStretch();
 
-    btnDeleteReord=new QPushButton(QIcon(":/lib/item_delete.png"), tr("&Remove Record"), this);
-    btnDeleteReord->setToolTip(tr("removes the currently displayed record from the project"));
+    actDelete=new QAction(QIcon(":/lib/item_delete.png"), tr("&Remove Record"), this);
+    actDelete->setToolTip(tr("removes the currently displayed record from the project"));
+    btnDeleteReord=new QToolButton(this);
+    btnDeleteReord->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnDeleteReord->setDefaultAction(actDelete);
     btnDeleteReord->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     vl->addWidget(btnDeleteReord);
-    connect(btnDeleteReord, SIGNAL(clicked()), this, SLOT(deleteRecord()));
-    btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("&Help"), this);
+    connect(actDelete, SIGNAL(triggered()), this, SLOT(deleteRecord()));
+
+    actClose=new QAction(QIcon(":/lib/exit.png"), tr("&Close Window"), this);
+    connect(actClose, SIGNAL(triggered()), this, SLOT(close()));
+    menuRDR->addAction(actPrevious);
+    menuRDR->addAction(actNext);
+    menuRDR->addSeparator();
+    menuRDR->addAction(actDelete);
+    menuRDR->addSeparator();
+    menuRDR->addAction(actClose);
+
+    actHelp=new QAction(QIcon(":/lib/help.png"), tr("&Help"), this);
+    actHelp->setToolTip(tr("display online-help"));
+    connect(actHelp, SIGNAL(triggered()), this, SLOT(displayHelp()));
+
+    actHelpPlugin=new QAction(QIcon(":/lib/help.png"), tr("&Plugin Help"), this);
+    actHelpPlugin->setToolTip(tr("display online-help for the specific plugin"));
+    connect(actHelpPlugin, SIGNAL(triggered()), this, SLOT(displayHelpPlugin()));
+
+    actHelpPluginTutorial=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), this);
+    actHelpPluginTutorial->setToolTip(tr("display the tutorial for the specific plugin"));
+    connect(actHelpPluginTutorial, SIGNAL(triggered()), this, SLOT(displayHelpPluginTutorial()));
+
+    actHelpPluginCopyright=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), this);
+    actHelpPluginCopyright->setToolTip(tr("display copyright note for the specific plugin"));
+    connect(actHelpPluginCopyright, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
+
+    actHelpRDR=new QAction(QIcon(":/lib/help_rdr.png"), tr("&Raw data record help"), this);
+    actHelpRDR->setToolTip(tr("display online-help common to all plugins, i.e. for the basic record editor dialog"));
+    connect(actHelpRDR, SIGNAL(triggered()), this, SLOT(displayHelpRDR()));
+
+    menuHelp->addAction(actHelpRDR);
+    menuHelp->addAction(actHelpPlugin);
+    menuHelp->addAction(actHelpPluginTutorial);
+    menuHelp->addAction(actHelpPluginCopyright);
+
+    btnHelp=new QToolButton(this);
+    btnHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnHelp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    btnHelp->setToolTip(tr("display online-help"));
+    btnHelp->setDefaultAction(actHelp);
+
     vl->addWidget(btnHelp);
-    connect(btnHelp, SIGNAL(clicked()), this, SLOT(displayHelp()));
 
     tabMain=new QTabWidget(this);
     ml->addWidget(tabMain);
+    connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     QWidget* w=new QWidget(tabMain);
     QGridLayout* fl=new QGridLayout(w);
@@ -279,8 +332,17 @@ void QFRawDataPropertyEditor::createWidgets() {
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
 
-    tabMain->addTab(widResults, tr("Evaluation &Results"));
+    menuResults->addAction(actSaveResults);
+    menuResults->addAction(actDeleteResults);
+    menuResults->addSeparator();
+    menuResults->addAction(actCopyResults);
+    menuResults->addAction(actCopyResultsNoHead);
+    menuResults->addAction(actCopyValErrResults);
+    menuResults->addAction(actCopyValErrResultsNoHead);
 
+
+    tabMain->addTab(widResults, tr("Evaluation &Results"));
+    currentTabChanged(0);
 
 
 }
@@ -442,17 +504,37 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         paramFilterProxy->setSourceModel(NULL);
         tvProperties->setEnabled(false);
     }
+    checkHelpAvailable();
     //std::cout<<"creating new editors ... DONE!\n";
 }
 
+
 void QFRawDataPropertyEditor::displayHelp() {
     if (tabMain->currentIndex()==0 || tabMain->currentIndex()==tabMain->count()-1) {
-        QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_rdrscreen.html");
-        services->displayHelpWindow(dll);
+        displayHelpRDR();
     } else {
-        QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
-        services->displayHelpWindow(dll);
+        displayHelpPlugin();
     }
+}
+
+void QFRawDataPropertyEditor::displayHelpRDR() {
+    QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_rdrscreen.html");
+    services->displayHelpWindow(dll);
+}
+
+void QFRawDataPropertyEditor::displayHelpPlugin() {
+    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
+    services->displayHelpWindow(dll);
+}
+
+void QFRawDataPropertyEditor::displayHelpPluginTutorial() {
+    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginTutorial(current->getType());
+    services->displayHelpWindow(dll);
+}
+
+void QFRawDataPropertyEditor::displayHelpPluginCopyright() {
+    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginCopyrightFile(current->getType());
+    services->displayHelpWindow(dll);
 }
 
 void QFRawDataPropertyEditor::copyValErrResults() {
@@ -460,6 +542,33 @@ void QFRawDataPropertyEditor::copyValErrResults() {
 }
 void QFRawDataPropertyEditor::copyValErrResultsNoHead() {
     tvResults->copySelectionAsValueErrorToExcel(QFRDRResultsModel::AvgRole, QFRDRResultsModel::SDRole, false, Qt::Vertical);
+}
+
+void QFRawDataPropertyEditor::currentTabChanged(int tab) {
+    int idx=tab-1;
+    for (int i=0; i<menus.size(); i++) {
+        if (menus[i].first==-1 || (idx>=0 && menus[i].first==idx)) {
+            menus[i].second->menuAction()->setVisible(true);
+        } else {
+            menus[i].second->menuAction()->setVisible(false);
+        }
+    }
+    menuResults->menuAction()->setVisible(tab==tabMain->count()-1);
+}
+
+void QFRawDataPropertyEditor::checkHelpAvailable() {
+    if (!current) {
+        actHelpPlugin->setVisible(false);
+        actHelpPluginTutorial->setVisible(false);
+        actHelpPluginCopyright->setVisible(false);
+    } else {
+        QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
+        actHelpPlugin->setVisible(QFile::exists(dll));
+        dll=current->getProject()->getRawDataRecordFactory()->getPluginTutorial(current->getType());
+        actHelpPluginTutorial->setVisible(QFile::exists(dll));
+        dll=current->getProject()->getRawDataRecordFactory()->getPluginCopyrightFile(current->getType());
+        actHelpPluginCopyright->setVisible(QFile::exists(dll));
+    }
 }
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
@@ -475,6 +584,21 @@ QMenuBar *QFRawDataPropertyEditor::getMenuBar() const
 void QFRawDataPropertyEditor::setMenuBarVisible(bool visible)
 {
     menuBar->setVisible(visible);
+}
+
+QMenu *QFRawDataPropertyEditor::addMenu(const QString& title, int editor)
+{
+    menuBar->removeAction(menuHelp->menuAction());
+    QMenu* m=menuBar->addMenu(title);
+    menuBar->addAction(menuHelp->menuAction());
+    menus.append(qMakePair(editor, m));
+    currentTabChanged(tabMain->currentIndex());
+    return m;
+}
+
+void QFRawDataPropertyEditor::registerMenu(QMenu *menu, int editor) {
+    menus.append(qMakePair(editor, menu));
+    currentTabChanged(tabMain->currentIndex());
 }
 
 void QFRawDataPropertyEditor::nameChanged(const QString& text) {
@@ -796,5 +920,10 @@ void QFRawDataPropertyEditor::saveResults() {
             currentSaveDir=QFileInfo(fileName).absolutePath();
         }
     }
+}
+
+QMenu *QFRawDataPropertyEditor::getHelpMenu() const
+{
+    return menuHelp;
 }
 

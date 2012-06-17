@@ -33,11 +33,13 @@ void QFRDRTableEditor::createWidgets() {
 
     actLoadTable=new QAction(QIcon(":/table/table_open.png"), "load table", this);
     actLoadTable->setToolTip(tr("Load table ..."));
+    actLoadTable->setShortcut(QKeySequence::Open);
     connect(actLoadTable, SIGNAL(triggered()), this, SLOT(slLoadTable()));
     tbMain->addAction(actLoadTable);
 
     actSaveTable=new QAction(QIcon(":/table/table_save.png"), "save table", this);
     actSaveTable->setToolTip(tr("Save table ..."));
+    actSaveTable->setShortcut(QKeySequence::SaveAs);
     connect(actSaveTable, SIGNAL(triggered()), this, SLOT(slSaveTable()));
     tbMain->addAction(actSaveTable);
 
@@ -67,12 +69,13 @@ void QFRDRTableEditor::createWidgets() {
     actClear=new QAction(QIcon(":/table/table_clear.png"), "clear", this);
     actClear->setToolTip(tr("Clear table ..."));
     connect(actClear, SIGNAL(triggered()), this, SLOT(slClear()));
-    tbMain->addAction(actClear);
+
 
     tbMain->addSeparator();
 
     actResize=new QAction(QIcon(":/table/table_resize.png"), "resize table", this);
     actResize->setToolTip(tr("Resize the table to a new size"));
+    actResize->setShortcut(tr("Ctrl+R"));
     connect(actResize, SIGNAL(triggered()), this, SLOT(slResize()));
     tbMain->addAction(actResize);
 
@@ -83,6 +86,7 @@ void QFRDRTableEditor::createWidgets() {
 
     actAppendRow=new QAction(QIcon(":/table/row_append.png"), "append row", this);
     actAppendRow->setToolTip(tr("Append a row to the table ..."));
+    actAppendRow->setShortcut(tr("Ctrl++"));
     connect(actAppendRow, SIGNAL(triggered()), this, SLOT(slAppendRow()));
     tbMain->addAction(actAppendRow);
 
@@ -98,6 +102,7 @@ void QFRDRTableEditor::createWidgets() {
 
     actAppendColumn=new QAction(QIcon(":/table/column_append.png"), "append column", this);
     actAppendColumn->setToolTip(tr("Append a column to the table ..."));
+    actAppendRow->setShortcut(tr("Ctrl+I"));
     connect(actAppendColumn, SIGNAL(triggered()), this, SLOT(slAppendColumn()));
     tbMain->addAction(actAppendColumn);
 
@@ -108,8 +113,17 @@ void QFRDRTableEditor::createWidgets() {
 
     tbMain->addSeparator();
 
+    actDelete=new QAction(QIcon(":/table/cell_clear.png"), "delete contents", this);
+    actDelete->setToolTip(tr("Delete contents from selected cells ..."));
+    actDelete->setShortcut(QKeySequence::Delete);
+    connect(actDelete, SIGNAL(triggered()), this, SLOT(slDelete()));
+    tbMain->addAction(actDelete);
+
+    tbMain->addSeparator();
+
     actSetDatatype=new QAction(QIcon(":/table/cell_type.png"), "set datatype", this);
     actSetDatatype->setToolTip(tr("set the datatype of the currently selected cells ..."));
+    actSetDatatype->setShortcut(tr("Ctrl+T"));
     connect(actSetDatatype, SIGNAL(triggered()), this, SLOT(slSetDatatype()));
     tbMain->addAction(actSetDatatype);
 
@@ -132,18 +146,21 @@ void QFRDRTableEditor::createWidgets() {
     l->addWidget(tvMain);
 
     propertyEditor->setMenuBarVisible(true);
-    QMenu* menuFile=propertyEditor->getMenuBar()->addMenu("&File");
+    QMenu* menuFile=propertyEditor->addMenu("&File", 0);
     menuFile->addAction(actLoadTable);
     menuFile->addAction(actSaveTable);
-    QMenu* menuEdit=propertyEditor->getMenuBar()->addMenu("&Edit");
+    QMenu* menuEdit=propertyEditor->addMenu("&Edit", 0);
     menuEdit->addAction(actCopy);
     menuEdit->addAction(actCut);
     menuEdit->addAction(actPaste);
     menuEdit->addSeparator();
     menuEdit->addAction(actCopyResults);
     menuEdit->addAction(actCopyResultsNoHead);
+    menuEdit->addSeparator();
+    menuEdit->addAction(actDelete);
+    menuEdit->addAction(actSetDatatype);
 
-    QMenu* menuTab=propertyEditor->getMenuBar()->addMenu("&Table");
+    QMenu* menuTab=propertyEditor->addMenu("&Table", 0);
     menuTab->addAction(actAppendRow);
     menuTab->addAction(actInsertRow);
     menuTab->addAction(actAppendColumn);
@@ -174,7 +191,6 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteRow, SLOT(setEnabled(bool)));
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetDatatype, SLOT(setEnabled(bool)));
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actResize, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCopy, SLOT(setEnabled(bool)));
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCut, SLOT(setEnabled(bool)));
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
         }
@@ -196,7 +212,6 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteRow, SLOT(setEnabled(bool)));
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetDatatype, SLOT(setEnabled(bool)));
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actResize, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCopy, SLOT(setEnabled(bool)));
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCut, SLOT(setEnabled(bool)));
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
         m->model()->setReadonly(m->model()->isReadonly());
@@ -423,19 +438,52 @@ void QFRDRTableEditor::slSetDatatype() {
             if (!sm->hasSelection()) {
             } else {
                 QStringList items;
-                items << tr("string") << tr("double") << tr("integer") << tr("date") << tr("bool");
+                items << tr("text") << tr("floating point number") << tr("integer number") << tr("date & time") << tr("boolean value");
+                QModelIndexList l=sm->selectedIndexes();
+                int type=-1;
+                bool first=true;
+                for (int i=0; i<l.size(); i++) {
+                    int t=-1;
+                    if (l[i].data().isValid()) {
+                        switch(l[i].data().type()) {
+                            case QVariant::String: t=0; break;
+                            case QVariant::Double: t=1; break;
+                            case QVariant::LongLong:
+                            case QVariant::Int:
+                            case QVariant::ULongLong:
+                            case QVariant::UInt:
+                                t=2; break;
+                            case QVariant::Date:
+                            case QVariant::Time:
+                            case QVariant::DateTime:
+                                t=3; break;
+                            case QVariant::Bool:
+                                t=4; break;
+                        }
+
+                        if (first) {
+                            type=t;
+                            first=false;
+                        } else {
+                            if (type!=t) {
+                                type=-1;
+                                break;
+                            }
+                        }
+                    }
+                }
                 bool ok;
-                QString item = QInputDialog::getItem(this, tr("Change cell types ..."), tr("Select a new datatype:"), items, 0, false, &ok);
-                if (ok) {
+                QString item = QInputDialog::getItem(this, tr("Change cell types ..."), tr("Select a new datatype:"), items, type, false, &ok);
+                if (ok && items.indexOf(item)>=0) {
                     QVariant::Type t=QVariant::String;
                     switch (items.indexOf(item)) {
                         case 0: t=QVariant::String; break;
                         case 1: t=QVariant::Double; break;
                         case 2: t=QVariant::LongLong; break;
-                        case 3: t=QVariant::Date; break;
+                        case 3: t=QVariant::DateTime; break;
                         case 4: t=QVariant::Bool; break;
                     }
-                    QModelIndexList l=sm->selectedIndexes();
+
                     for (int i=0; i<l.size(); i++) {
                         m->model()->changeDatatype(l[i].row(), l[i].column(), t);
                     }
@@ -496,8 +544,18 @@ void QFRDRTableEditor::slPaste() {
     }
 }
 
-void QFRDRTableEditor::slCut()
-{
+void QFRDRTableEditor::slCut() {
+    slCopy();
+    slDelete();
+}
+
+void QFRDRTableEditor::slDelete() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            m->model()->deleteCells(tvMain->selectionModel()->selectedIndexes());
+        }
+    }
 }
 
 
