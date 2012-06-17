@@ -19,5 +19,7 @@
         <file alias="cell_clear.png">icons/cell_clear.png</file>
         <file alias="table_insert.png">icons/table_insert_22.png</file>
         <file alias="table_resize.png">icons/table_resize.png</file>
+        <file alias="plot_add.png">icons/plot_add.png</file>
+        <file alias="plot_delete.png">icons/plot_delete.png</file>
     </qresource>
 </RCC>

@@ -1,8 +1,8 @@
 #include "qfrdrtable.h"
 #include "dlgcsvparameters.h"
 #include <QtXml>
-
-
+#include "qfrdrtableeditor.h"
+#include "qfrdrploteditor.h"
 
 
 
@@ -38,6 +38,25 @@ QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
     return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
+}
+
+int QFRDRTable::getEditorCount()
+{
+    return 2;
+}
+
+QString QFRDRTable::getEditorName(int i)
+{
+    if (i==0) return tr("Data Table");
+    if (i==1) return tr("Plots");
+    return QString("");
+}
+
+QFRawDataEditor *QFRDRTable::createEditor(QFPluginServices *services, QFRawDataPropertyEditor *propEditor, int i, QWidget *parent)
+{
+    if (i==0) return new QFRDRTableEditor(services, propEditor, parent);
+    if (i==1) return new QFRDRPlotEditor(services, propEditor, parent);
+    return NULL;
 };
 
 

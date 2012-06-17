@@ -2,7 +2,7 @@
 #define QFRDRTABLE_H
 
 #include "../base_classes/qftablemodel.h"
-#include "qfrdrtableeditor.h"
+
 #include "qfrawdatarecord.h"
 #include "qfrawdatarecordfactory.h"
 
@@ -40,13 +40,11 @@ class QFRDRTable : public QFRawDataRecord {
         /** \brief return a large icon (32x32) */
         virtual QIcon getLargeIcon() const { return QIcon(":/table/projecttree_tablefile.png"); };
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 1; };
+        virtual int getEditorCount();
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName(int i) { return tr("Table Editor"); };
+        virtual QString getEditorName(int i);
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) {
-            return new QFRDRTableEditor(services, propEditor, parent);
-        };
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL);
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
