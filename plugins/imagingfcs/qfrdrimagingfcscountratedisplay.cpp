@@ -398,11 +398,11 @@ void QFRDRImagingFCSCountrateDisplay::updateFitFuncPlot() {
         avgFit->set_plotFunction(fExpPlot);
         avgFit->set_params(expParam);
     } else if (func=="2exp") {
-        expParam[0]=current->getProperty("imfcs_crddisplay_fitparam_2exp_0", 0).toDouble();
-        expParam[1]=current->getProperty("imfcs_crddisplay_fitparam_2exp_1", 0).toDouble();
-        expParam[2]=current->getProperty("imfcs_crddisplay_fitparam_2exp_2", 1).toDouble();
-        expParam[3]=current->getProperty("imfcs_crddisplay_fitparam_2exp_3", 0).toDouble();
-        expParam[4]=current->getProperty("imfcs_crddisplay_fitparam_2exp_4", 1).toDouble();
+        exp2Param[0]=current->getProperty("imfcs_crddisplay_fitparam_2exp_0", 0).toDouble();
+        exp2Param[1]=current->getProperty("imfcs_crddisplay_fitparam_2exp_1", 0).toDouble();
+        exp2Param[2]=current->getProperty("imfcs_crddisplay_fitparam_2exp_2", 1).toDouble();
+        exp2Param[3]=current->getProperty("imfcs_crddisplay_fitparam_2exp_3", 0).toDouble();
+        exp2Param[4]=current->getProperty("imfcs_crddisplay_fitparam_2exp_4", 1).toDouble();
         avgFit->set_plotFunction(fExp2Plot);
         avgFit->set_params(exp2Param);
     } else {

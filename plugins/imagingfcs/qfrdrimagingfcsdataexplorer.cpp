@@ -12,7 +12,7 @@
 
 
 
-
+/*
 static double QFRDRImagingFCSDataExplorer_fExp( double t, const double *par )
 {
     const double tau=par[0];
@@ -39,7 +39,7 @@ static double QFRDRImagingFCSDataExplorer_fExp2( double t, const double *par )
     const double B=par[3];
     return B+A*exp(-t/tau)+A2*exp(-t/tau2);
 
-}
+}*/
 
 QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     QDialog(parent),

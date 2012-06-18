@@ -120,16 +120,16 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     result=result.replace("%m%", QString::number(job.m), Qt::CaseInsensitive);
     result=result.replace("%framerate%", QString::number(1.0/job.frameTime), Qt::CaseInsensitive);
     result=result.replace("%frametime%", QString::number(job.frameTime*1e6), Qt::CaseInsensitive);
-    result=result.replace("%first%", QString::number(job.range_min), Qt::CaseInsensitive);
-    result=result.replace("%last%", QString::number(job.range_max), Qt::CaseInsensitive);
+    result=result.replace("%first%", QString("%1").arg(job.range_min,2,10,QChar('0')), Qt::CaseInsensitive);
+    result=result.replace("%last%", QString("%1").arg(job.range_max,2,10,QChar('0')), Qt::CaseInsensitive);
     result=result.replace("%backoffset%", QString::number(job.backgroundOffset), Qt::CaseInsensitive);
     result=result.replace("%segments%", QString::number(job.segments), Qt::CaseInsensitive);
     result=result.replace("%backcorrectionid%", QString::number(job.backgroundCorrection), Qt::CaseInsensitive);
     result=result.replace("%correlatorid%", QString::number(job.correlator), Qt::CaseInsensitive);
     if (job.interleaved_binning)  {
-        result=result.replace("%binning%", QString::number(job.binning)+"ib", Qt::CaseInsensitive);
+        result=result.replace("%binning%", QString("%1").arg(job.binning,2,10,QChar('0'))+"ib", Qt::CaseInsensitive);
     } else {
-        result=result.replace("%binning%", QString::number(job.binning), Qt::CaseInsensitive);
+        result=result.replace("%binning%", QString("%1").arg(job.binning,2,10,QChar('0')), Qt::CaseInsensitive);
     }
 
     QString back="unknown";
