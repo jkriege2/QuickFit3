@@ -658,6 +658,26 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 pos += rxLaTeX.matchedLength();
             }
 
+
+
+            // interpret $$plugin_info:<name>:<id>$$ items
+            QRegExp rxPluginInfo("\\$\\$plugin_info\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            rxPluginInfo.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxPluginInfo.indexIn(result, pos)) != -1) {
+                QString name=rxPluginInfo.cap(1).toLower().trimmed();
+                QString id=rxPluginInfo.cap(2).trimmed().toLower();
+
+                if (m_pluginServices) {
+                    if (name=="help") result=result.replace(rxPluginInfo.cap(0), m_pluginServices->getPluginHelp(id));
+                    if (name=="tutorial") result=result.replace(rxPluginInfo.cap(0), m_pluginServices->getPluginTutorial(id));
+                }
+
+                ++count;
+                pos += rxPluginInfo.matchedLength();
+            }
+
             cnt++;
         }
 

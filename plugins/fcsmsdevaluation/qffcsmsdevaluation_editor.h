@@ -147,6 +147,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QSpinBox* spinFitWidth;
         QCheckBox* chkShowKeyDist;
         QCheckBox* chkShowKeyDistResults;
+        QCheckBox* chkShowKey;
 
     private:
         void createWidgets();

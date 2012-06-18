@@ -7,7 +7,7 @@
 class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT
     public:
-        explicit QFUsesResultsByIndexEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget *parent = 0);
+        explicit QFUsesResultsByIndexEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget *parent = 0, const QString& iniPrefix=QString("QFUsesResultsByIndexEvaluationEditor/"));
         /** \brief read the settings */
         virtual void readSettings();
         /** \brief write the settings */
@@ -34,6 +34,8 @@ class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor {
         
     protected:
         virtual int getUserMinAbsMax(QFRawDataRecord *rec, int index);
+
+        QString m_iniPrefix;
         
 };
 

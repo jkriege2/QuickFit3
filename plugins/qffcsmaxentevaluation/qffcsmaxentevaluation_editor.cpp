@@ -27,7 +27,7 @@
 #include <QtCore>
 
 QFFCSMaxEntEvaluationEditor::QFFCSMaxEntEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
-    QFFCSByIndexAndModelEvaluationEditor(services, propEditor, parent)
+    QFFCSByIndexAndModelEvaluationEditor(services, propEditor, parent, "fcsmaxentdistribution/")
 {
     dataEventsEnabled=false;
     createWidgets();

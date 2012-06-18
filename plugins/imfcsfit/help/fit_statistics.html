@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Fit: Explanation of Fit Statistics</title>
+  <style type="text/css">
+	p.formulaDsp {
+	  margin-left: 64px;
+	}
+
+	img.formulaInl {
+		vertical-align: middle;
+	}
+  </style>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+	 <p>This plugin outputs a variety of fit statistics, that allow to 
+evaluate the goodnes of fit (GoF). All of these parameters are 
+calculated for the range of <img class="formulaInl" alt="$ K $" src="./pic/form_168.png"> datapoints <img class="formulaInl" alt="$ (\tilde{\tau}_k, \tilde{g}_k, \tilde{\sigma}_k),\ \ k\in [k_0 .. k_1] $" src="./pic/form_169.png"> selected by the user. First we define from these datapoints the residuals <img class="formulaInl" alt="$ \tilde{E}_k=\tilde{g}_k-g(\tilde{\tau}_k, \vec{p}) $" src="./pic/form_170.png"> and weighted residuals <img class="formulaInl" alt="$ \tilde{E}_{\text{weighted},k}=\frac{\tilde{g}_k-g(\tilde{\tau}_k, \vec{p})}{\tilde{\sigma}_k^2} $" src="./pic/form_171.png">. Then we can further note down these statistics (the weighted variants use <img class="formulaInl" alt="$\tilde{E}_{\text{weighted},k}$" src="./pic/form_172.png"> instead of <img class="formulaInl" alt="$\tilde{E}_k$" src="./pic/form_173.png"></p>
+<ul>
+<li>sum of squared resdiuals (sometimes also called the residual sum of squares, RSS): <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \chi^2 = \sum\limits_{k=k_0}^{k_1}\tilde{E}_k^2 \]" src="./pic/form_174.png">
+</p>
+</li>
+<li>residual average: <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \langle E\rangle= \frac{1}{K}\cdot\sum\limits_{k=k_0}^{k_1}\tilde{E}_{k} \]" src="./pic/form_175.png">
+</p>
+</li>
+<li>residual standard deviation: <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \sqrt{\langle E^2\rangle}= \sqrt{ \frac{1}{K}\cdot\sum\limits_{k=k_0}^{k_1}\tilde{E}_{k}^2 - \frac{1}{K^2}\cdot\left[\sum\limits_{k=k_0}^{k_1}\tilde{E}_{k}\right]^2 }=\sqrt{ \left\langle\left[\tilde{E}_{k}-\langle E\rangle\right]^2\right\rangle} \]" src="./pic/form_176.png">
+</p>
+</li>
+<li>total sum of squares (TSS): <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ TSS = \langle g^2\rangle= K\cdot\sum\limits_{k=k_0}^{k_1}\tilde{g}_{k}^2 - \frac{1}{K}\cdot\left[\sum\limits_{k=k_0}^{k_1}\tilde{g}_{k}\right]^2 \]" src="./pic/form_177.png">
+</p>
+</li>
+<li>number of fit parameters <em>NP</em>: number of free parameters in the parameter vector <img class="formulaInl" alt="$ \vec{p}$" src="./pic/form_178.png"> of the model <img class="formulaInl" alt="$ g(\tilde{\tau}_k, \vec{p}) $" src="./pic/form_179.png"></li>
+<li>number of datapoints <em>NR = K</em></li>
+<li>degrees of freedom <img class="formulaInl" alt="$ \mbox{DF}= \mbox{NR}-\mbox{NP}-1$" src="./pic/form_180.png"></li>
+<li>coefficient of determination <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ R^2=1-\frac{\mbox{RSS}}{\mbox{TSS}}=1-\frac{\chi^2}{\langle E^2\rangle} \]" src="./pic/form_181.png">
+</p>
+</li>
+</ul>
+<p>Finally also the <b>residual correlation function <img class="formulaInl" alt="$\hat{\gamma}(k)$" src="./pic/form_182.png"></b>,
+ i.e. the autocorrelation function of the index-ordered residuals is 
+calculated. This function gives hints on whether there are any 
+non-random structures in the fit values, which might not be visible in 
+the residuals plots: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \hat{\gamma}(k)=\frac{1}{K}\cdot\sum\limits_{i=k_0}^{k_1-k-1}(\tilde{E}_{i}-\langle E\rangle)\cdot(\tilde{E}_{i+k}-\langle E\rangle) \]" src="./pic/form_183.png">
+</p>
+<p>The residuals are displayed together with their running average, 
+where the average over the 10 surrounding values is calculated: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \overline{E}^{(10)}(\tilde{\tau}_k)=\frac{1}{11}\sum\limits_{i=k-5}^{k+5}\tilde{E}_i \]" src="./pic/form_184.png">
+</p>
+  </body>
+</html>

@@ -196,6 +196,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets() {
     pltResiduals->get_plotter()->set_keyXMargin(2);
     pltResiduals->get_plotter()->set_keyYMargin(2);
     pltResiduals->useExternalDatastore(pltData->getDatastore());
+    pltResiduals->setMinimumHeight(75);
 
 
     datacut=new DataCutSliders(this);
@@ -818,6 +819,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::zoomChangedLocally(double n
     if (!dataEventsEnabled) return;
     if (sender==pltData) {
         pltResiduals->setX(newxmin, newxmax);
+        pltResiduals->update_plot();
     }
 }
 

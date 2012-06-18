@@ -5,9 +5,10 @@
 #include <QtGui>
 #include <QtCore>
 
-QFUsesResultsByIndexEvaluationEditor::QFUsesResultsByIndexEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent) :
+QFUsesResultsByIndexEvaluationEditor::QFUsesResultsByIndexEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent, const QString& iniPrefix) :
     QFEvaluationEditor(services, propEditor, parent)
 {
+    m_iniPrefix=iniPrefix;
 }
 
 void QFUsesResultsByIndexEvaluationEditor::readSettings()

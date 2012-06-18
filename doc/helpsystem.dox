@@ -54,6 +54,11 @@
          - \c $$local_plugin_typehelp_link$$ link to a helppage covering the basic plugin type
          - \c $$local_plugin_typehelp_file$$ file containing a helppage covering the basic plugin type
         .
+	  - other plugins info:
+         - \c $$plugin_info:help:PLUGINID$$ the path of the help file for plugin with ID <i>PLUGINID</i>
+         - \c $$plugin_info:tutorial:PLUGINID$$ the path of the tutorial file for plugin with ID <i>PLUGINID</i>
+        .		 
+		
       - lists of available plugins
          - \verbatim $$list:extension:INTERFACENAME$$ \endverbatim makes a list (unordered HTML list) of all available extensions of type \c INTERFACENAME (can also be empty, then the list contains all extensions)
          - \verbatim $$list:fitfunc:STARTSWITH$$ \endverbatim makes a list (unordered HTML list) of all fit functions that start with \c STARTSWITH (can also be empty, then the list contains all fit functions)

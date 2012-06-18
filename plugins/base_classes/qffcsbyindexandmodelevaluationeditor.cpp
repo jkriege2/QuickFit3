@@ -3,8 +3,8 @@
 #include "qfusesresultsbyindexandmodelevaluation.h"
 
 
-QFFCSByIndexAndModelEvaluationEditor::QFFCSByIndexAndModelEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent) :
-    QFUsesResultsByIndexEvaluationEditor(services, propEditor, parent)
+QFFCSByIndexAndModelEvaluationEditor::QFFCSByIndexAndModelEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent, const QString& iniPrefix) :
+    QFUsesResultsByIndexEvaluationEditor(services, propEditor, parent, iniPrefix)
 {
     dataEventsEnabled=false;
     cmbModel=NULL;
@@ -37,17 +37,17 @@ QFFCSByIndexAndModelEvaluationEditor::~QFFCSByIndexAndModelEvaluationEditor()
 void QFFCSByIndexAndModelEvaluationEditor::readSettings() {
     QFUsesResultsByIndexEvaluationEditor::readSettings();
     if (cmbModel && settings) {
-        pltData->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltdata/");
-        pltResiduals->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltresiduals/");
-        pltResidualHistogram->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltresidualhistogram/");
-        pltResidualCorrelation->loadSettings(*settings->getQSettings(), "fcsmaxentevaleditor/pltresidualcorrelation/");
-        loadSplitter(*(settings->getQSettings()), splitMorePLot, "fcsmaxentevaleditor/splitter_more_plot");
-        loadSplitter(*(settings->getQSettings()), splitPlot, "fcsmaxentevaleditor/splitter_plot");
-        loadSplitter(*(settings->getQSettings()), splitPlots, "fcsmaxentevaleditor/splitter_plots");
-        loadSplitter(*(settings->getQSettings()), splitModel, "fcsmaxentevaleditor/splitter_model");
-        loadSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsmaxentevaleditor/splitter_fitstatistics");
-        spinResidualHistogramBins->setValue(settings->getQSettings()->value("fcsmaxentevaleditor/residual_histogram_bins", 25).toInt());
-        tabResidulas->setCurrentIndex(settings->getQSettings()->value("fcsmaxentevaleditor/residual_toolbox_current", 0).toInt());
+        pltData->loadSettings(*settings->getQSettings(), m_iniPrefix+"pltdata/");
+        pltResiduals->loadSettings(*settings->getQSettings(), m_iniPrefix+"pltresiduals/");
+        pltResidualHistogram->loadSettings(*settings->getQSettings(), m_iniPrefix+"pltresidualhistogram/");
+        pltResidualCorrelation->loadSettings(*settings->getQSettings(), m_iniPrefix+"pltresidualcorrelation/");
+        loadSplitter(*(settings->getQSettings()), splitMorePLot, m_iniPrefix+"splitter_more_plot");
+        loadSplitter(*(settings->getQSettings()), splitPlot, m_iniPrefix+"splitter_plot");
+        loadSplitter(*(settings->getQSettings()), splitPlots, m_iniPrefix+"splitter_plots");
+        loadSplitter(*(settings->getQSettings()), splitModel, m_iniPrefix+"splitter_model");
+        loadSplitter(*(settings->getQSettings()), splitFitStatistics, m_iniPrefix+"splitter_fitstatistics");
+        spinResidualHistogramBins->setValue(settings->getQSettings()->value(m_iniPrefix+"residual_histogram_bins", 25).toInt());
+        tabResidulas->setCurrentIndex(settings->getQSettings()->value(m_iniPrefix+"residual_toolbox_current", 0).toInt());
 
     }
 
@@ -56,13 +56,13 @@ void QFFCSByIndexAndModelEvaluationEditor::readSettings() {
 void QFFCSByIndexAndModelEvaluationEditor::writeSettings() {
     QFUsesResultsByIndexEvaluationEditor::writeSettings();
     if (cmbModel) {
-        saveSplitter(*(settings->getQSettings()), splitMorePLot, "fcsmaxentevaleditor/splitter_more_plot");
-        saveSplitter(*(settings->getQSettings()), splitPlot, "fcsmaxentevaleditor/splitter_plot");
-        saveSplitter(*(settings->getQSettings()), splitPlots, "fcsmaxentevaleditor/splitter_plots");
-        saveSplitter(*(settings->getQSettings()), splitModel, "fcsmaxentevaleditor/splitter_model");
-        saveSplitter(*(settings->getQSettings()), splitFitStatistics, "fcsmaxentevaleditor/splitter_fitstatistics");
-        settings->getQSettings()->setValue("fcsmaxentevaleditor/residual_histogram_bins", spinResidualHistogramBins->value());
-        settings->getQSettings()->setValue("fcsmaxentevaleditor/residual_toolbox_current", tabResidulas->currentIndex());
+        saveSplitter(*(settings->getQSettings()), splitMorePLot, m_iniPrefix+"splitter_more_plot");
+        saveSplitter(*(settings->getQSettings()), splitPlot, m_iniPrefix+"splitter_plot");
+        saveSplitter(*(settings->getQSettings()), splitPlots, m_iniPrefix+"splitter_plots");
+        saveSplitter(*(settings->getQSettings()), splitModel, m_iniPrefix+"splitter_model");
+        saveSplitter(*(settings->getQSettings()), splitFitStatistics, m_iniPrefix+"splitter_fitstatistics");
+        settings->getQSettings()->setValue(m_iniPrefix+"residual_histogram_bins", spinResidualHistogramBins->value());
+        settings->getQSettings()->setValue(m_iniPrefix+"residual_toolbox_current", tabResidulas->currentIndex());
     }
 }
 
@@ -215,6 +215,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     pltResiduals->get_plotter()->set_keyXMargin(2);
     pltResiduals->get_plotter()->set_keyYMargin(2);
     pltResiduals->useExternalDatastore(pltData->getDatastore());
+    pltResiduals->setMinimumHeight(75);
 
 
     datacut=new DataCutSliders(this);
@@ -674,6 +675,7 @@ void QFFCSByIndexAndModelEvaluationEditor::zoomChangedLocally(double newxmin, do
     if (!dataEventsEnabled) return;
     if (sender==pltData) {
         pltResiduals->setX(newxmin, newxmax);
+        pltResiduals->update_plot();
     }
 }
 

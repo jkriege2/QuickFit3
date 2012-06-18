@@ -98,6 +98,22 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
             //qDebug()<<"getRateMean(run="<<run<<", ch=1) = "<<value<<" +/- "<<error;
             return true;
         }
+    } else if (paramid=="pixel_width") {
+        if (!r) return false;
+        double bin=r->getProperty("BINNING", 1.0).toDouble();
+        double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
+        if (width<=0) return false;
+        value=bin*width;
+        error=0;
+        return true;
+    } else if (paramid=="pixel_height") {
+        if (!r) return false;
+        double bin=r->getProperty("BINNING", 1.0).toDouble();
+        double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
+        if (height<=0) return false;
+        value=bin*height;
+        error=0;
+        return true;
     }
 
     return false;

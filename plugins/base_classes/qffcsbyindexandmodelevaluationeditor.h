@@ -44,7 +44,7 @@
 class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluationEditor {
         Q_OBJECT
     public:
-        explicit QFFCSByIndexAndModelEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget *parent = 0);
+        explicit QFFCSByIndexAndModelEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget *parent = 0, const QString& iniPrefix=QString("/QFFCSByIndexAndModelEvaluationEditor"));
         ~QFFCSByIndexAndModelEvaluationEditor();
 
 

@@ -24,9 +24,6 @@
 
 
 
-// TODO: save DataCutSliders for MSD plots
-// TODO: alter JKQtPlotter so that copying data opens a dialog where it is possible to select the columns to copy ... this should be saved, depending on the plotter's object name
-// TODO: make key in FCS plots togglable
 
 
 
@@ -34,7 +31,7 @@
 #include <QtCore>
 
 QFFCSMSDEvaluationEditor::QFFCSMSDEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
-    QFFCSByIndexAndModelEvaluationEditor(services, propEditor, parent)
+    QFFCSByIndexAndModelEvaluationEditor(services, propEditor, parent, "fcsmsdevaleditor/")
 {
     dataEventsEnabled=false;
     createWidgets();
@@ -152,6 +149,10 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     tbPlot->addAction(pltData->get_plotter()->get_actZoomAll());
     tbPlot->addAction(pltData->get_plotter()->get_actZoomIn());
     tbPlot->addAction(pltData->get_plotter()->get_actZoomOut());
+    chkShowKey=new QCheckBox(tr("show key"), this);
+    tbPlot->addSeparator();
+    tbPlot->addWidget(chkShowKey);
+    connect(chkShowKey, SIGNAL(toggled(bool)), this, SLOT(displayData()));
 
     toolbar->removeAction(pltData->get_plotter()->get_actSavePlot());
     toolbar->removeAction(pltData->get_plotter()->get_actPrint());
@@ -284,6 +285,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
     connect(pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+    connect(pltDistResults, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltDistResults, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     /////
 
@@ -362,7 +364,8 @@ void QFFCSMSDEvaluationEditor::slidersDistChanged(int userMin, int userMax, int 
     QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
     if (!data) return;
     if (!current->getHighlightedRecord()) return;
-    setUserMinMax(userMin, userMax);
+    setMSDMax(userMax);
+    setMSDMin(userMin);
     displayData();
 }
 
@@ -443,11 +446,18 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
 void QFFCSMSDEvaluationEditor::readSettings() {
     QFFCSByIndexAndModelEvaluationEditor::readSettings();
-};
+    chkShowKey->setChecked(settings->getQSettings()->value("fcsmsdevaleditor/showkey", true).toBool());
+    chkShowKeyDist->setChecked(settings->getQSettings()->value("fcsmsdevaleditor/showkeydist", true).toBool());
+    chkShowKeyDistResults->setChecked(settings->getQSettings()->value("fcsmsdevaleditor/showkeydistresults", true).toBool());
+    cmbDistResultsMode->setCurrentIndex(settings->getQSettings()->value("fcsmsdevaleditor/distresultmode", true).toBool());
+
+}
 
 void QFFCSMSDEvaluationEditor::writeSettings() {
     QFFCSByIndexAndModelEvaluationEditor::writeSettings();
-
+    settings->getQSettings()->setValue("fcsmsdevaleditor/showkey", chkShowKey->isChecked());
+    settings->getQSettings()->setValue("fcsmsdevaleditor/showkeydist", chkShowKeyDist->isChecked());
+    settings->getQSettings()->setValue("fcsmsdevaleditor/showkeydistresults", chkShowKeyDistResults->isChecked());
 }
 
 
@@ -551,6 +561,7 @@ void QFFCSMSDEvaluationEditor::displayData() {
         pltData->getYAxis()->set_drawGrid(chkGrid->isChecked());
         pltData->getYAxis()->set_minTicks(5);
         pltResiduals->getYAxis()->set_minTicks(5);
+        pltData->get_plotter()->set_showKey(chkShowKey->isChecked());
 
         //qDebug()<<"   b "<<t.elapsed()<<" ms";
         t.start();
@@ -1022,8 +1033,18 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
 void QFFCSMSDEvaluationEditor::distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
     if (!dataEventsEnabled) return;
     if (sender==pltDistribution) {
+        disconnect(pltDistResults, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+
         pltDistResults->setX(newxmin, newxmax);
         pltDistResults->zoomToFit(false, true);
+        connect(pltDistResults, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+
+    }
+    if (sender==pltDistResults) {
+        disconnect(pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+        pltDistribution->setX(newxmin, newxmax);
+        pltDistribution->zoomToFit(false, true);
+        connect(pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     }
 }
 
@@ -1354,15 +1375,16 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
 
     }
 
-    if (updt) {
-        pltDistResults->set_doDrawing(true);
-        pltDistResults->zoomToFit(false, true);
-        pltDistResults->setX(pltDistribution->getXMin(), pltDistribution->getXMax());
-        pltDistribution->zoomToFit();
-    }
-    pltDistResults->zoomToFit(false, true);
-    pltDistResults->setX(pltDistribution->getXMin(), pltDistribution->getXMax());
+    // ensure that distribution and this plot are synched on x-axis
     pltDistribution->zoomToFit();
+    pltDistResults->setX(pltDistribution->getXMin(), pltDistribution->getXMax());
+    // zoom y-axis
+    pltDistResults->zoomToFit(false, true);
+    if (updt) {
+        // ensure replot, if we have to
+        pltDistResults->set_doDrawing(true);
+        pltDistResults->update_plot();
+    }
 }
 
 void QFFCSMSDEvaluationEditor::updateDistribution() {
@@ -1389,7 +1411,7 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
     dsdist->deleteAllColumns("msd");
     if (distTau.size()>0 && dist.size()>0) {
         c_disttau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msd_tau");
-        c_dist=dsdist->addCopiedColumn(dist.data(), dist.size(), "mad");
+        c_dist=dsdist->addCopiedColumn(dist.data(), dist.size(), "msd");
     } else {
         pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
     }
@@ -1436,8 +1458,9 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
     }
 
     if (updt) {
-        pltDistribution->set_doDrawing(true);
         pltDistribution->zoomToFit();
+        pltDistribution->set_doDrawing(true);
+        pltDistribution->update_plot();
     }
 
 }
