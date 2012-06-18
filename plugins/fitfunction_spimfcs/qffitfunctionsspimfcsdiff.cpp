@@ -11,7 +11,7 @@ QFFitFunctionsSPIMFCSDiff::QFFitFunctionsSPIMFCSDiff() {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      1,            1,        3,        1,   1,      2);
     #define FCSSDiff_n_components 0
-    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 100,          1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-10,    1e5,      1,   0);
     #define FCSSDiff_n_particle 1
     addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.01,         1e-10,    1e5,      0.1, 0);
     #define FCSSDiff_1n_particle 2
@@ -31,7 +31,7 @@ QFFitFunctionsSPIMFCSDiff::QFFitFunctionsSPIMFCSDiff() {
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 0,            -10,      10,       0.1  );
     #define FCSSDiff_offset 9
-    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/sqrt(e))",                         "&sigma;<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    620,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e^2)",                             "&sigma;<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    620,         0.01,     1e5,      10  );
     #define FCSSDiff_focus_height 10
     addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/sqrt(e))",                       "&sigma;<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    300,          0,        1e4,      10    );
     #define FCSSDiff_focus_width 11

@@ -912,9 +912,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
             if (job.segments<=1) {
                 if (x1>=0 && x1<(int32_t)frame_width && y1>=0 && y1<(int32_t)frame_height) {
                     if (job.correlator==CORRELATOR_DIRECT) {
-                        statisticsCrosscorrelateMultiTauSymmetricMemOptimized(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                        statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float, double>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, ccf_t, ccf_N, frame_width*frame_height);
                     } else if (job.correlator==CORRELATOR_DIRECTAVG) {
-                        statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                        statisticsCrosscorrelateMultiTauAvgSymmetric<float, double>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, job.S, job.m, job.P, frame_width*frame_height);
                     }
                 }
             } else {
@@ -930,9 +930,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
                     for (register uint32_t ct=0; ct<ccf_N; ct++) cftemp[ct]=0;
                     if (x1>=0 && x1<(int32_t)frame_width && y1>=0 && y1<(int32_t)frame_height) {
                         if (job.correlator==CORRELATOR_DIRECT) {
-                            statisticsCrosscorrelateMultiTauSymmetricMemOptimized(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                            statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float, double>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
                         } else if (job.correlator==CORRELATOR_DIRECTAVG) {
-                            statisticsCrosscorrelateMultiTauAvgSymmetric<float, float>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                            statisticsCrosscorrelateMultiTauAvgSymmetric<float, double>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
                         }
                         if (ccf_segments_io) {
                             for (register uint32_t ct=0; ct<ccf_N; ct++) {
