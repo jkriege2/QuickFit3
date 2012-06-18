@@ -162,6 +162,10 @@ double CQStringToDouble(QString value) {
     return loc.toDouble(value) ;
 }
 
+QString boolToQString(bool data) {
+    if (data) return QString("true");
+    return QString("false");
+}
 
 bool QStringToBool(const QString& data){
     QString d=data.toLower();

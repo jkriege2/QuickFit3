@@ -8,17 +8,23 @@
 namespace Ui {
     class QFRDRTablePlotWidget;
 }
-
+class QFRDRTable;
 class QFRDRTablePlotWidget : public QWidget
 {
         Q_OBJECT
         
     public:
-        explicit QFRDRTablePlotWidget(QFRawDataPropertyEditor *propEditor, QFRawDataRecord* record, QWidget *parent = 0);
+        explicit QFRDRTablePlotWidget(QFRDRTable* record, int plot, QWidget *parent = 0);
         ~QFRDRTablePlotWidget();
+
+        void setRecord(QFRDRTable* record, int plot);
         
     private:
         Ui::QFRDRTablePlotWidget *ui;
+
+        QFRDRTable* current;
+        int plot;
+        bool updating;
 };
 
 #endif // QFRDRTABLEPLOTWIDGET_H

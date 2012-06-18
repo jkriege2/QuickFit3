@@ -82,6 +82,39 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>T&amp;itle:</string>
+           </property>
+           <property name="buddy">
+            <cstring>edtTitle</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="edtTitle"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>X axis label:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Y axis label:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="edtXLabel"/>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="edtYLabel"/>
+         </item>
         </layout>
        </item>
        <item>

@@ -5,7 +5,9 @@
 
 #include "qfrawdatarecord.h"
 #include "qfrawdatarecordfactory.h"
-
+#include "jkqtplotter.h"
+#include "jkqtptools.h"
+#include "qftools.h"
 
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -17,6 +19,74 @@
 class QFRDRTable : public QFRawDataRecord {
         Q_OBJECT
     public:
+        enum GraphType {
+            gtLines,
+            gtImpulsesVertical,
+            gtImpulsesHorizontal,
+            gtFilledCurveX,
+            gtFilledCurveY,
+            gtStepsHorizontal,
+            gtStepsVertical,
+            gtbarsHorizontal,
+            gtbarsVertical
+        };
+
+        static QString GraphType2String(GraphType type) {
+            switch(type) {
+                case gtLines: return QString("lines");
+                case gtImpulsesVertical: return QString("impulsesv");
+                case gtImpulsesHorizontal: return QString("impulsesh");
+                case gtFilledCurveX: return QString("filledx");
+                case gtFilledCurveY: return QString("filledy");
+                case gtStepsHorizontal: return QString("stepsh");
+                case gtStepsVertical: return QString("stepsv");
+                case gtbarsHorizontal: return QString("barsh");
+                case gtbarsVertical: return QString("barsv");
+            }
+            return QString("");
+        }
+
+        static GraphType String2GraphType(QString type) {
+            QString s=type.trimmed().toLower();
+            if (s=="lines") return gtLines;
+            if (s=="impulsesv") return gtImpulsesVertical;
+            if (s=="impulsesh") return gtImpulsesHorizontal;
+            if (s=="filledx") return gtFilledCurveX;
+            if (s=="filledy") return gtFilledCurveY;
+            if (s=="stepsh") return gtStepsHorizontal;
+            if (s=="stepsv") return gtStepsVertical;
+            if (s=="barsh") return gtbarsHorizontal;
+            if (s=="barsv") return gtbarsVertical;
+            return gtLines;
+        }
+
+        struct GraphInfo {
+            GraphInfo();
+            QString title;
+            int xcolumn;
+            int ycolumn;
+            int xerrorcolumn;
+            int yerrorcolumn;
+            Qt::PenStyle style;
+            QColor color;
+            QColor errorcolor;
+            double linewidth;
+            JKQTPgraphSymbols symbol;
+            double symbolSize;
+            JKQTPerrorPlotstyle errorStyle;
+        };
+
+        struct PlotInfo {
+            PlotInfo();
+            QString title;
+            QString xlabel;
+            QString ylabel;
+            double xmin, xmax, ymin, ymax;
+            bool xlog, ylog;
+            QList<GraphInfo> graphs;
+        };
+
+
         /** \brief class constructor, initialises as specified, the ID is obtained from the parent project */
         QFRDRTable(QFProject* parent);
 
@@ -27,6 +97,13 @@ class QFRDRTable : public QFRawDataRecord {
         QFTableModel* model() ;
         /** \brief returns the table contents at the given position */
         QVariant getModelData(quint16 row, quint16 column);
+
+        int getPlotCount() const;
+        PlotInfo getPlot(int i) const;
+        void addPlot();
+        void addPlot(PlotInfo plotInfo);
+        void setPlot(int i, PlotInfo plotInfo);
+        void deletePlot(int i);
 
 
         /** \brief return type (short type string) */
@@ -75,6 +152,7 @@ class QFRDRTable : public QFRawDataRecord {
 
         /** \brief stores a table of QVariants */
         QFTableModel* datamodel;
+        QList<PlotInfo> plots;
     private:
 };
 

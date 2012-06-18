@@ -17,6 +17,9 @@
 #include "jkqtplotter.h"
 #include "qfrdrtableplotwidget.h"
 
+
+class QFRDRTable; // forward
+
 /*! \brief editor class for plots from data in the associated table
     \ingroup qf3rdrdp_table
 */
@@ -42,8 +45,11 @@ class QFRDRPlotEditor : public QFRawDataEditor {
         void addPlot();
         void deleteCurrentPlot();
         void deletePlot(int i);
-        void rebuildPlotWidgets();
+        void rebuildPlotWidgets(bool keepPosition=false);
+        void clearPlotWidgets();
     protected:
+
+        QPointer<QFRDRTable> current;
         QTabWidget* tabPlots;
         QAction* actAddPlot;
         QAction* actDeletePlot;
@@ -51,7 +57,9 @@ class QFRDRPlotEditor : public QFRawDataEditor {
         QToolBar* tbMain;
         QMenu* menuEdit;
         QMenu* menuPlot;
-        QList<QFRDRTablePlotWidget*> plotWidgets;
+        QList<QPointer<QFRDRTablePlotWidget> > plotWidgets;
+
+        bool updating;
     private:
 };
 

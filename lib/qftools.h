@@ -126,6 +126,11 @@ QFLIB_EXPORT double CQStringToDouble(QString value);
 */
 QFLIB_EXPORT bool QStringToBool(const QString& data);
 
+/*! \brief convert a bool \a data to a string
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString boolToQString(bool data);
 /*! \brief make sure the given file exists (creates an empty file)
     \ingroup qf3lib_tools
 
