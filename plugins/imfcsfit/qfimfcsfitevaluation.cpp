@@ -578,3 +578,23 @@ QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(QFFitFunction* ffunc, lo
     return result;
 }
 
+bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &value) {
+    if (paramid=="focus_width") {
+        if (propertyExists("PRESET_FOCUS_WIDTH")) {
+            double fw=getProperty("PRESET_FOCUS_WIDTH", 0).toDouble();
+            if (fw<=0) return false;
+            value=fw;
+            return true;
+        }
+    }
+    if (paramid=="focus_height" || paramid=="focus_hieght") {
+        if (propertyExists("PRESET_FOCUS_HEIGHT")) {
+            double fw=getProperty("PRESET_FOCUS_HEIGHT", 0).toDouble();
+            if (fw<=0) return false;
+            value=fw;
+            return true;
+        }
+    }
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);
+}
+

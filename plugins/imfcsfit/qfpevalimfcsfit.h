@@ -62,6 +62,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase {
     protected slots:
         /** \brief insert FCS data from file*/
         void insertFCSFit();
+        void insertFCSFitForCalibration();
 
     private:
 };

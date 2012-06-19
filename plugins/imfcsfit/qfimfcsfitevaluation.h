@@ -97,6 +97,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         /** \brief type of data weighting */
         DataWeight m_weighting;
 
+        virtual bool overrideFitFunctionPreset(QString paramName, double &value);
 
     public:
 

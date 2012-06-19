@@ -1561,8 +1561,16 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     optSetup->lockLightpath();
 
     int repeatCnt=0;
-    while (ok && repeatCnt<widAcquisition->repeats()) {
+    bool userCanceled=false;
+    QProgressDialog progress(tr("Image Series Acquisition"), tr("&Cancel"), 0, 100, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setLabelText(tr("setting up acquisition ..."));
+    progress.setMinimumDuration(0);
+    progress.show();
 
+    while (ok && repeatCnt<widAcquisition->repeats() && !userCanceled) {
+
+        progress.setLabelText(tr("setting up acquisition %1/%2 ...").arg(repeatCnt+1).arg(widAcquisition->repeats()));
         ok=true;
         //////////////////////////////////////////////////////////////////////////////////////
         // collect common acquisition data
@@ -1646,9 +1654,6 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             backgroundFrames2=widAcquisition->currentBackgroundFrames(1);
         }
 
-        QProgressDialog progress(tr("Image Series Acquisition"), tr("&Cancel"), 0, 100, this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setMinimumDuration(0);
         progress.setValue(0);
 
 
@@ -1768,6 +1773,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 
                     if (progress.wasCanceled()) {
                         running=false;
+                        userCanceled=true;
                         if (useCam1) ecamera1->cancelAcquisition(camera1);
                         if (useCam2) ecamera2->cancelAcquisition(camera2);
                         log_warning(tr("  - background acquisition canceled by user!\n"));
@@ -1947,6 +1953,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                 QApplication::processEvents();
 
                 if (progress.wasCanceled()) {
+                    userCanceled=true;
                     running=false;
                     if (useCam1) ecamera1->cancelAcquisition(camera1);
                     if (useCam2) ecamera2->cancelAcquisition(camera2);

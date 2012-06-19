@@ -604,6 +604,10 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, co
         QString fpid=getFitParamID(parameterID);
 
         if (pid>-1) res=f->getDescription(pid).initialValue;
+
+        double value=0;
+        if (overrideFitFunctionPreset(parameterID, value)) res=value;
+
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         QString psID=getParameterStoreID(parameterID);
@@ -648,6 +652,10 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, co
         QString fpid=getFitParamID(parameterID);
 
         if (pid>-1) res=f->getDescription(pid).initialValue;
+
+        double value=0;
+        if (overrideFitFunctionPreset(parameterID, value)) res=value;
+
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         QString psID=getParameterStoreID(parameterID);

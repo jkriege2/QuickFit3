@@ -3087,6 +3087,9 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* 
         errs[i]=0;
         fixs[i]=false;
         params[i]=ff->getDescription(id).initialValue;
+        /*double value=0;
+        if (overrideFitFunctionPreset(id, value)) params[i]=value;*/
+
         if (!isMatrixResults) {
             if (current->resultsExists(evaluation, "fitparam_"+id)) {
                 params[i]=current->resultsGetAsDouble(evaluation, "fitparam_"+id);

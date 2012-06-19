@@ -24,7 +24,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
     ../interfaces/qfrdrimagetoruninterface.h \
     ../base_classes/qffitresultsbyindexasvectorevaluation.h \
-    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
+    imfcscalibrationdialog.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -36,10 +37,12 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp \
     ../base_classes/qffitresultsevaluation.cpp \
     ../base_classes/qffitresultsbyindexasvectorevaluation.cpp \
-    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp \
+    imfcscalibrationdialog.cpp
 
 
-FORMS =    
+FORMS = \    
+    imfcscalibrationdialog.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc
@@ -53,8 +56,3 @@ INCLUDEPATH += ../../lib/ \
 
 QT += gui xml svg core
 CONFIG += exceptions rtti stl
-
-
-
-
-

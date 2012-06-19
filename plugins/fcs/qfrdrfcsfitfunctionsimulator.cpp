@@ -106,6 +106,9 @@ double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id)
                 if (params.contains(id)) {
                     if (params[id].valueset) return params[id].value;
                 }
+                /*double value=0;
+                if (overrideFitFunctionPreset(id, value)) return value;*/
+
                 return d.initialValue;
             }
         }
@@ -163,12 +166,11 @@ double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id) {
         for (int p=0; p<ffunc->paramCount(); p++) {
             QFFitFunction::ParameterDescription d=ffunc->getDescription(p);
             if (d.id==id) {
+                /*double value=0;
+                if (overrideFitFunctionPreset(id, value)) return value;*/
+
                 return d.initialValue;
-                /*if (params.contains(id)) {
-                    fullParams[p]=params[id].value;
-                } else {
-                    fullParams[p]=d.initialValue;
-                }*/
+
             }
         }
     }
@@ -342,6 +344,9 @@ void QFRDRFCSFitFunctionSimulator::updateParameterValues() {
             errors[p]=params[id].error;
         } else {
             fullParams[p]=d.initialValue;
+            /*double value=0;
+            if (overrideFitFunctionPreset(d.id, value)) fullParams[p]=value;*/
+
             errors[p]=0;
         }
     }
@@ -452,6 +457,9 @@ void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
                     errors[p]=params[id].error;
                 } else {
                     fullParams[p]=d.initialValue;
+                    /*double value=0;
+                    if (overrideFitFunctionPreset(id, value)) d.initialValue=value;*/
+
                     errors[p]=0;
                 }
             }

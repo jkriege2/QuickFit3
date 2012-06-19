@@ -549,6 +549,9 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
     int pid=f->getParameterNum(parameterID);
     double res=0;
     if (pid>-1) res=f->getDescription(pid).initialValue;
+    double value=0;
+    if (overrideFitFunctionPreset(parameterID, value)) res=value;
+
     res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
     QString psID=getParameterStoreID(parameterID);
@@ -928,6 +931,9 @@ double QFFitResultsEvaluation::getDefaultFitValue(const QString& id) {
     int pid=f->getParameterNum(id);
     double res=0;
     if (pid>-1) res=f->getDescription(pid).initialValue;
+    /*double value=0;
+    if (overrideFitFunctionPreset(id, value)) res=value;*/
+
     res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+id), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+id), res).toDouble();
     QString psID=getParameterStoreID(id);
@@ -1184,5 +1190,10 @@ double QFFitResultsEvaluation::getFitMax(const QString& id) {
     }
     //std::cout<<"getFitMax("<<id.toStdString()<<") = "<<res<<"\n";
     return res;
+}
+
+bool QFFitResultsEvaluation::overrideFitFunctionPreset(QString paramName, double &value)
+{
+    return false;
 }
 

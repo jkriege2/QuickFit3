@@ -694,11 +694,17 @@ public:
     virtual void resetDefaultFitValue(QFRawDataRecord *r, const QString &resultID, const QString &id);
     /*! \brief reset the given parameter fix (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
     virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
+
+
 signals:
 
 public slots:
 
 protected:
+    /*! \brief implement this function and return \c true, if you want to override the fit functions preset */
+    virtual bool overrideFitFunctionPreset(QString paramName, double&value);
+
+
     /*! \brief struct used to locally store fit parameter properties
 
         For each parameter that is stored in parameterStore this saves also whether it is really set, so each

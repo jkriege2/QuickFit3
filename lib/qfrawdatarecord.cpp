@@ -736,6 +736,7 @@ void QFRawDataRecord::resultsClear(const QString& name, const QString& postfix) 
             //cout << i.key() << ": " << i.value() << endl;
             if (i.key().endsWith(postfix)) dstore->results[name]->results.remove(i.key());
         }
+        if (dstore->results[name]->results.isEmpty()) dstore->results.remove(name);
         emitResultsChanged();
     }
 }

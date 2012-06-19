@@ -1,6 +1,7 @@
 #include "qfpevalimfcsfit.h"
 #include <QtGui>
 #include "qfimfcsfitevaluation.h"
+#include "imfcscalibrationdialog.h"
 
 QFPEvalIMFCSFit::QFPEvalIMFCSFit(QObject* parent):
     QObject(parent)
@@ -23,6 +24,13 @@ void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
     actFCS->setStatusTip(tr("Insert a new imagingFCS least-squares fit evaluation"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCSFit()));
     menu->addAction(actFCS);
+
+    QAction* actFCSCalib=new QAction(QIcon(":/imfcs_fit.png"), tr("imagingFCS Calibration"), parentWidget);
+    actFCSCalib->setStatusTip(tr("Insert a set of imagingFCS least-squares fit evaluations for a SPIM calibration"));
+    connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
+    menu->addAction(actFCSCalib);
+
+
 }
 
 
@@ -34,4 +42,19 @@ void QFPEvalIMFCSFit::insertFCSFit() {
     }
 }
 
+void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
+    if (project) {
+
+        ImFCSCalibrationDialog* dlg=new ImFCSCalibrationDialog(NULL);
+        if (dlg->exec()) {
+            QList<double> vals=dlg->getValues();
+            for (int i=0; i<vals.size(); i++) {
+                QFEvaluationItem* e=project->addEvaluation(getID(), "imagingFCS Fit");
+                e->setQFProperty("PRESET_FOCUS_WIDTH", vals[i], false, false);
+                e->setName(tr("wxy=%1 nm").arg(vals[i]));
+            }
+         }
+        delete dlg;
+    }
+}
 Q_EXPORT_PLUGIN2(imfcsfit, QFPEvalIMFCSFit)
