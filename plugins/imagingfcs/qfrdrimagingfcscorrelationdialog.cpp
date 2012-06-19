@@ -155,6 +155,7 @@ int QFRDRImagingFCSCorrelationDialog::waitingThreads() const  {
     return cnt;
 }
 
+
 void QFRDRImagingFCSCorrelationDialog::startNextWaitingThread()   {
     for (int i=0; i<jobs.size(); i++) {
         if (jobs[i].thread->status()==0) {
@@ -436,17 +437,13 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
+
+
+IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
     IMFCSJob job;
-    job.progress=new QFRDRImagingFCSThreadProgress(this);
-    job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
-    connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
-    connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
-    connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
-    connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
-    connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
-    connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
+    job.progress=NULL;
+    job.thread=NULL;
     job.filename=ui->edtImageFile->text();
     job.descriptionFilename=inputconfigfile;
     job.correlator=ui->cmbCorrelator->currentIndex();
@@ -498,6 +495,21 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     //job.bleachB=0;//ui->edtDecayB->value();
     //job.bleachAvgFrames=100;
     writeSettings();
+    return job;
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
+    IMFCSJob job=initJob();
+
+    job.progress=new QFRDRImagingFCSThreadProgress(this);
+    job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
+    connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
+    connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
+    connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
+    connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
+    connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
+    connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
+
 
     setEditControlsEnabled(false);
     ui->layProgress->insertWidget(0, job.progress);
@@ -505,6 +517,41 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     job.progress->setName(tr("correlating '%1'").arg(job.filename));
     job.thread->init(job);
     jobs.append(job);
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked() {
+    IMFCSJob job=initJob();
+
+    QFRDRImagingFCSSeriesDialog* dlg=new QFRDRImagingFCSSeriesDialog(this);
+
+    if (dlg->exec()) {
+        QList<double> vals=dlg->getValues();
+
+        setEditControlsEnabled(false);
+        for (int i=0; i<vals.size(); i++) {
+            if (dlg->getParameter()==0) { //binning
+                job.binning=vals[i];
+            }
+
+
+            job.progress=new QFRDRImagingFCSThreadProgress(this);
+            job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
+            connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
+            connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
+            connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
+            connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
+            connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
+            connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
+
+            ui->layProgress->insertWidget(0, job.progress);
+
+            job.progress->setName(tr("correlating '%1'").arg(job.filename));
+            job.thread->init(job);
+            jobs.append(job);
+        }
+    }
+    delete dlg;
+
 }
 
 void QFRDRImagingFCSCorrelationDialog::frameTimeChanged(double value) {

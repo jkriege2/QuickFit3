@@ -1538,7 +1538,39 @@
             <widget class="QPushButton" name="btnAddJob">
              <property name="minimumSize">
               <size>
+               <width>120</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
                <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>execute the correlation job, as defined above</string>
+             </property>
+             <property name="text">
+              <string>&amp;add job</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfrdrimagingfcs.qrc">
+               <normaloff>:/imaging_fcs/add_job.png</normaloff>:/imaging_fcs/add_job.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnAddSeriesJob">
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
                <height>35</height>
               </size>
              </property>
@@ -1552,7 +1584,7 @@
               <string>execute the correlation job, as defined above</string>
              </property>
              <property name="text">
-              <string>&amp;add job</string>
+              <string>add &amp;series job</string>
              </property>
              <property name="icon">
               <iconset resource="qfrdrimagingfcs.qrc">

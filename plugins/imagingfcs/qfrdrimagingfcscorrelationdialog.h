@@ -6,6 +6,7 @@
 #include "programoptions.h"
 #include "qfrdrimagingfcsthreadprogress.h"
 #include "qfpluginservices.h"
+#include "qfrdrimagingfcsseriesdialog.h"
 #include <stdint.h>
 
 class QFRDRImagingFCSCorrelationJobThread; // forward
@@ -42,6 +43,7 @@ protected slots:
     void on_btnSelectImageFile_clicked();
     void on_btnSelectBackgroundFile_clicked();
     void on_btnAddJob_clicked();
+    void on_btnAddSeriesJob_clicked();
     void on_btnLoad_clicked();
     void on_btnHelp_clicked();
     void on_spinP_valueChanged(int val);
@@ -71,6 +73,7 @@ protected:
     bool allThreadsDone() const;
     int runningThreads() const;
     int waitingThreads() const;
+    IMFCSJob initJob();
 private:
     QFPluginServices* pluginServices;
     Ui::QFRDRImagingFCSCorrelationDialog *ui;

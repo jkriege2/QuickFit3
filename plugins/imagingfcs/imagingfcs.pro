@@ -41,7 +41,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcstools.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
-    ../../../../../LIB/trunk/yaid_rh.h
+    ../../../../../LIB/trunk/yaid_rh.h \
+    qfrdrimagingfcsseriesdialog.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -62,14 +63,16 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcscountratedisplay.cpp \
     qfrdrimagingfcsoverviewimagedisplay.cpp \
     qfrdrimagingfcsoverviewrateeditor.cpp \
-    qfrdrimagingfcstools.cpp
+    qfrdrimagingfcstools.cpp \
+    qfrdrimagingfcsseriesdialog.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
     qfrdrimagingfcsthreadprogress.ui \
     qfrdrimagingfcsdataexplorer.ui \
     qfrdrimagingfcsmaskbyintensity.ui \
-    qfrdrimagingfcscountratedisplay.ui
+    qfrdrimagingfcscountratedisplay.ui \
+    qfrdrimagingfcsseriesdialog.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 
