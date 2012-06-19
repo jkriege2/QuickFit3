@@ -21,9 +21,11 @@ class QFRDRImagingFCSThreadProgress; // forward
 class QFRDRImagingFCSCorrelationJobThread; // forward
 
 #define CORRELATOR_DIRECT 0
-#define CORRELATOR_DIRECTAVG 1
-#define CORRELATOR_MTAUALLMON 2
-#define CORRELATOR_MTAUONEMON 3
+#define CORRELATOR_DIRECT_INT 1
+#define CORRELATOR_DIRECTAVG 2
+#define CORRELATOR_DIRECTAVG_INT 3
+#define CORRELATOR_MTAUALLMON 4
+#define CORRELATOR_MTAUONEMON 5
 
 #define BLEACH_NONE 0
 #define BLEACH_REMOVEAVG 1
@@ -94,6 +96,8 @@ struct IMFCSJob {
     int32_t segments;
     /** \brief binning factor */
     int binning;
+    /** \brief average instead of sum in binning? */
+    bool binAverage;
     /** \brief en-/disables cropping */
     bool use_cropping;
     /** \brief for cropping mode: first x-value */
@@ -124,7 +128,7 @@ struct IMFCSJob {
     //double bleachB;
     /** \brief number of frames to average over when determining the bleach correction parameters */
     uint32_t bleachAvgFrames;
-
+    /** ßbrief use interleaved binning */
     bool interleaved_binning;
 
 };

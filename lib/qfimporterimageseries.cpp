@@ -11,6 +11,7 @@ QFImporterImageSeries::QFImporterImageSeries() {
     y1=0;
     crop=false;
     interleavedBinning=false;
+    averageBinning=false;
 }
 
 uint16_t QFImporterImageSeries::frameWidth() {
@@ -106,11 +107,13 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
+    float binAvg=1.0;
+    if (averageBinning) binAvg=binning*binning;
     if (!interleavedBinning) {
         for (register int y=0; y<h*binning; y++) {
             for (register int x=0; x<w*binning; x++) {
                 const int idx=(y/binning)*w+(x/binning);
-                data[idx]=data[idx]+d1[y*ww+x];
+                data[idx]=data[idx]+d1[y*ww+x]/binAvg;
             }
         }
     } else {
@@ -120,7 +123,7 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
                 data[idx]=0;
                 for (int bx=0; bx<binning; bx++) {
                     for (int by=0; by<binning; by++) {
-                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx];
+                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx]/binAvg;
                     }
                 }
             }
@@ -181,11 +184,13 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
+    double binAvg=1.0;
+    if (averageBinning) binAvg=binning*binning;
 
     if (!interleavedBinning) {
         for (register int y=0; y<h*binning; y++) {
             for (register int x=0; x<w*binning; x++) {
-                data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+                data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x]/binAvg;
             }
         }
     } else {
@@ -195,7 +200,7 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
                 data[idx]=0;
                 for (int bx=0; bx<binning; bx++) {
                     for (int by=0; by<binning; by++) {
-                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx];
+                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx]/binAvg;
                     }
                 }
             }
@@ -256,11 +261,13 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
+    uint16_t binAvg=1.0;
+    if (averageBinning) binAvg=binning*binning;
 
     if (!interleavedBinning) {
         for (register int y=0; y<h*binning; y++) {
             for (register int x=0; x<w*binning; x++) {
-                data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x];
+                data[(y/binning)*w+(x/binning)]=data[(y/binning)*w+(x/binning)]+d1[y*ww+x]/binAvg;
             }
         }
     } else {
@@ -270,7 +277,7 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
                 data[idx]=0;
                 for (int bx=0; bx<binning; bx++) {
                     for (int by=0; by<binning; by++) {
-                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx];
+                        data[idx]=data[idx]+d1[(y+by)*ww+x+bx]/binAvg;
                     }
                 }
             }

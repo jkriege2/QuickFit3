@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Imaging FCS Plugin: Image Binning and Cropping</title>
+	  <link rel="prev" href="imfcs_correlation.html"> 
+	  <link rel="next" href="imfcs_backgroundbleach.html"> 
+	  <link rel="contents" href="imaging_fcs.html">     
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="#cropping"><h2>Image Cropping</h2>
+    <p>You can select a sub-region (region of interest, ROI) in your image series for which to do the correlation. All pixels outside the ROI will be ignored during processing. The ROI is specified by the first and last USED pixels (0-indexed) in both directions. So a range of x=0..3, y=2..5 will result in a 4&times;4 image.
+		<blockquote><img src="./pic/cropping.png"></blockquote>
+	</p>
+	$$qf_commondoc_backtop$$
+    <p></p>
+    <p></p>
+    <p></p>
+	<a name="#binnning"><h2>Image Binning</h2>
+    <p>This plugin supports two modes of binning:
+	<ol>
+	  <li><strong>"normal" binning:</strong> The plugin will sum up the values from regions of n<sub>binning</sub>&times;n<sub>binning</sub> pixels. The regions are positioned non-overlapping on the input image (see image below). Note that in this mode some piixels at the right and bottom border of the image might be omitted! </li>
+	  <li><strong>"interleaved" binning:</strong> The plugin will also sum up the values from regions of n<sub>binning</sub>&times;n<sub>binning</sub> pixels. The regions are positioned overlapping on the input image as shown in the figure below. This results in more correlation functions calculated from the same input image, but they are no longer statistically independent over several pixels, as they are calculated from input data that is in parts common to several neighboring pixels. </li>
+	</ol>
+	<i>Note:</i> It is possible to change the functionality from binning, i.e. summing up neighboring pixels: $$bmath:I_{ROI}(x,y)=\sum_{\xi=0..n_{binning}-1}\sum_{\mu=0..n_{binning}-1}I_{in}(x+\xi, y+\mu).$$ to averaging $$bmath:I_{ROI}(x,y)=\frac{1}{n_{binning}\cdot n_{binning}}\sum_{\xi=0..n_{binning}-1}\sum_{\mu=0..n_{binning}-1}I_{in}(x+\xi, y+\mu).$$ This might improve the correlation accuracy for high input values per pixel, as overflow/data representation errors in the correlators is reduced, see also <a href="imfcs_correlator.html#correlators">notes on correlator types</a>.
+		<blockquote><img src="./pic/binning.png"></blockquote>
+	</p>
+	
+    <p></p>
+    <p></p>
+    <p></p>
+		</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

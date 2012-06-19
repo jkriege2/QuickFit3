@@ -679,6 +679,16 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="chkAverageBinning">
+             <property name="toolTip">
+              <string>if this is activated the binning does not simply sum up the pixels, but averages them</string>
+             </property>
+             <property name="text">
+              <string>average</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_29">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1161,7 +1171,17 @@
                </item>
                <item>
                 <property name="text">
+                 <string>Direct Correlation, integers</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>Direct Correlation, with Averaging</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Direct Correlation, with Averaging, integers</string>
                 </property>
                </item>
                <item>
@@ -1661,8 +1681,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1036</width>
-           <height>113</height>
+           <width>1040</width>
+           <height>199</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1803,8 +1823,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>
-  <include location="qfrdrimagingfcs.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrimagingfcs.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

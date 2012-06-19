@@ -174,7 +174,7 @@ int QFRDRImagingFCSDataExplorer::getCropY1() const {
     return ui->spinY1->value();
 }
 
-bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporterImageSeries* readerRaw, const QString& filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning, bool interleavedBinning) {
+bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporterImageSeries* readerRaw, const QString& filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning, bool interleavedBinning, bool binAverage) {
     initing=true;
     this->reader=reader;
     this->readerRaw=readerRaw;
@@ -223,9 +223,12 @@ bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporter
         ui->spinY0->setValue(y0);
         ui->spinY1->setValue(y1);
         ui->spinBinning->setValue(binning);
+        ui->chkBinAverage->setChecked(binAverage);
+        ui->chkInterleaved->setChecked(interleavedBinning);
 
         reader->setBinning(binning);
         reader->setInterleavedBinning(interleavedBinning);
+        reader->setAverageBinning(binAverage);
         reader->setCropping(x0,x1,y0,y1);
         if (!use) reader->unsetCropping();
 
@@ -349,6 +352,7 @@ void QFRDRImagingFCSDataExplorer::readFrames(bool next) {
     imageRaw->set_data(NULL, 0, 0);
     reader->setBinning(ui->spinBinning->value());
     reader->setInterleavedBinning(ui->chkInterleaved->isChecked());
+    reader->setAverageBinning(ui->chkBinAverage->isChecked());
     reader->setCropping(ui->spinX0->value(), ui->spinX1->value(), ui->spinY0->value(), ui->spinY1->value());
     if (!ui->chkCropping->isChecked()) reader->unsetCropping();
 
@@ -651,6 +655,11 @@ void QFRDRImagingFCSDataExplorer::on_btnFit2_clicked() {
 bool QFRDRImagingFCSDataExplorer::getInterleavedBinning() const
 {
     return ui->chkInterleaved->isChecked();
+}
+
+bool QFRDRImagingFCSDataExplorer::getBinAverage() const
+{
+    return ui->chkBinAverage->isChecked();
 }
 
 

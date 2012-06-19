@@ -126,10 +126,12 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     result=result.replace("%segments%", QString::number(job.segments), Qt::CaseInsensitive);
     result=result.replace("%backcorrectionid%", QString::number(job.backgroundCorrection), Qt::CaseInsensitive);
     result=result.replace("%correlatorid%", QString::number(job.correlator), Qt::CaseInsensitive);
+    QString bpre="";
+    if (job.binAverage) bpre="avg";
     if (job.interleaved_binning)  {
-        result=result.replace("%binning%", QString("%1").arg(job.binning,2,10,QChar('0'))+"ib", Qt::CaseInsensitive);
+        result=result.replace("%binning%", bpre+QString("%1").arg(job.binning,2,10,QChar('0'))+"ib", Qt::CaseInsensitive);
     } else {
-        result=result.replace("%binning%", QString("%1").arg(job.binning,2,10,QChar('0')), Qt::CaseInsensitive);
+        result=result.replace("%binning%", bpre+QString("%1").arg(job.binning,2,10,QChar('0')), Qt::CaseInsensitive);
     }
 
     QString back="unknown";
@@ -140,6 +142,8 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     QString corr="unknown";
     if (job.correlator==CORRELATOR_DIRECT) corr="direct";
     if (job.correlator==CORRELATOR_DIRECTAVG) corr="directavg";
+    if (job.correlator==CORRELATOR_DIRECT_INT) corr="directint";
+    if (job.correlator==CORRELATOR_DIRECTAVG_INT) corr="directavgint";
     if (job.correlator==CORRELATOR_MTAUALLMON) corr="mtauallmon";
     if (job.correlator==CORRELATOR_MTAUONEMON) corr="mtauonemon";
     QString bleach="none";
@@ -193,6 +197,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                 emit messageChanged(tr("counting frames ..."));
                 reader->setBinning(job.binning);
                 reader->setInterleavedBinning(job.interleaved_binning);
+                reader->setAverageBinning(job.binAverage);
                 if (job.use_cropping) {
                     reader->setCropping(job.crop_x0, job.crop_x1, job.crop_y0, job.crop_y1);
                 } else {
@@ -660,6 +665,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"height                      : "<<outLocale.toString(frame_height) << "\n";
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
                                 text<<"interleaved binning         : "<< QString((reader->getInterleavedBinning())?"true":"false") << "\n";
+                                text<<"averaging binning           : "<< QString((reader->getAverageBinning())?"true":"false") << "\n";
                                 if (reader->getUseCropping()) {
                                     text<<"crop x0                     : "<<outLocale.toString(reader->getCropX0()) << "\n";
                                     text<<"crop x1                     : "<<outLocale.toString(reader->getCropX1()) << "\n";
@@ -678,6 +684,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 switch(job.correlator) {
                                     case CORRELATOR_DIRECT:      text<<"direct\n"; break;
                                     case CORRELATOR_DIRECTAVG:   text<<"direct with averaging\n"; break;
+                                    case CORRELATOR_DIRECT_INT:    text<<"direct, integer\n"; break;
+                                    case CORRELATOR_DIRECTAVG_INT: text<<"direct with averaging, integer\n"; break;
                                     case CORRELATOR_MTAUALLMON:  text<<"multi-tau with monitors for all channels\n"; break;
                                     case CORRELATOR_MTAUONEMON:  text<<"multi-tau with a single monitor\n"; break;
 
@@ -914,7 +922,11 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
                     if (job.correlator==CORRELATOR_DIRECT) {
                         statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float, double>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, ccf_t, ccf_N, frame_width*frame_height);
                     } else if (job.correlator==CORRELATOR_DIRECTAVG) {
-                        statisticsCrosscorrelateMultiTauAvgSymmetric<float, double>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                        statisticsCrosscorrelateMultiTauAvgSymmetric<float, double, double>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, job.S, job.m, job.P, frame_width*frame_height);
+                    } else if (job.correlator==CORRELATOR_DIRECT_INT) {
+                        statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float,  uint64_t>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, ccf_t, ccf_N, frame_width*frame_height);
+                    } else if (job.correlator==CORRELATOR_DIRECTAVG_INT) {
+                        statisticsCrosscorrelateMultiTauAvgSymmetric<float, double, uint64_t>(&(ccf[p*ccf_N]), &(image_series[p]), &(image_series[p2]), frames, job.S, job.m, job.P, frame_width*frame_height);
                     }
                 }
             } else {
@@ -930,9 +942,13 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
                     for (register uint32_t ct=0; ct<ccf_N; ct++) cftemp[ct]=0;
                     if (x1>=0 && x1<(int32_t)frame_width && y1>=0 && y1<(int32_t)frame_height) {
                         if (job.correlator==CORRELATOR_DIRECT) {
-                            statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float, double>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                            statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float,  double>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
                         } else if (job.correlator==CORRELATOR_DIRECTAVG) {
-                            statisticsCrosscorrelateMultiTauAvgSymmetric<float, double>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                            statisticsCrosscorrelateMultiTauAvgSymmetric<float, double, double>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
+                        } else if (job.correlator==CORRELATOR_DIRECT_INT) {
+                            statisticsCrosscorrelateMultiTauSymmetricMemOptimized<float,  uint64_t>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, ccf_t, ccf_N, frame_width*frame_height);
+                        } else if (job.correlator==CORRELATOR_DIRECTAVG_INT) {
+                            statisticsCrosscorrelateMultiTauAvgSymmetric<float, double, uint64_t>(cftemp, &(image_series[seg*segment_frames*frame_width*frame_height+p]), &(image_series[seg*segment_frames*frame_width*frame_height+p2]), segment_frames, job.S, job.m, job.P, frame_width*frame_height);
                         }
                         if (ccf_segments_io) {
                             for (register uint32_t ct=0; ct<ccf_N; ct++) {
@@ -1214,7 +1230,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE THE ACFs
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (job.acf && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
+        if (job.acf) {
             emit messageChanged(tr("calculating autocorrelations ..."));
 
             correlate_series(image_series, frame_width, frame_height, 0,0, frames, &acf_tau, &acf, &acf_std, acf_N, tr("calculating autocorrelation"), 1000, &acf_segments);
@@ -1229,7 +1245,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE THE CCFs
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (job.ccf && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
+        if (job.ccf) {
             emit messageChanged(tr("calculating crosscorrelations ..."));
 
             correlate_series(image_series, frame_width, frame_height, -1,0, frames, &ccf_tau, &ccf1, &ccf1_std, ccf_N, tr("calculating left crosscorrelation"), 250, &ccf1_segments);
@@ -1249,7 +1265,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATE THE DCCFs
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (job.distanceCCF && (job.correlator==CORRELATOR_DIRECT || job.correlator==CORRELATOR_DIRECTAVG)) {
+        if (job.distanceCCF) {
             emit messageChanged(tr("calculating distance crosscorrelations ..."));
 
 
@@ -1867,6 +1883,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                 } else {
                     reader->setBinning(job.binning);
                     reader->setInterleavedBinning(job.interleaved_binning);
+                    reader->setAverageBinning(job.binAverage);
                     if (job.use_cropping) {
                         reader->setCropping(job.crop_x0, job.crop_x1, job.crop_y0, job.crop_y1);
                     } else {

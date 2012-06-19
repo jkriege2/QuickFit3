@@ -40,11 +40,12 @@ class QFRDRImagingFCSDataExplorer : public QDialog{
 
 
         /** \brief initializes the data explorer */
-        bool init(QFImporterImageSeries *reader, QFImporterImageSeries *readerRaw, const QString &filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning, bool interleavedBinning);
+        bool init(QFImporterImageSeries *reader, QFImporterImageSeries *readerRaw, const QString &filename, bool useFirst, uint32_t first, bool useLast, uint32_t last, bool use, int x0, int x1, int y0, int y1, int binning, bool interleavedBinning, bool binAverage);
         int getCropX1() const;
         int getCropY0() const;
         int getCropY1() const;
         bool getInterleavedBinning() const;
+        bool getBinAverage() const;
     protected:
         Ui::QFRDRImagingFCSDataExplorer *ui;
         QFImporterImageSeries* reader;

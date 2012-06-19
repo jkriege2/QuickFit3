@@ -19,7 +19,7 @@
 	 </blockquote>	
 	 This section will describe the different types of correlators, available in this plugin, that calculate an ACF/CCF from one/two given discrete timeseries <i>I<sub>n</sub></i> (and <i>J<sub>n</sub></i> ). The integration or frame time is specified by <i>&tau;<sub>min</sub></i>:
 	<ul>
-	  <li><b>Direct Estimation:</b><br>This correlator directly estimates the above given correlation function by replacing the integrals with sums (only the CCF of two signals <i>I<sub>n</sub></i> and <i>J<sub>n</sub></i> is shown, the ACF is given by the CCF of the signal with itself, i.e. <i><i>J<sub>n</sub></i>=<i>I<sub>n</sub></i></i>):
+	  <li><b>Direct Correlation:</b><br>This correlator directly estimates the above given correlation function by replacing the integrals with sums (only the CCF of two signals <i>I<sub>n</sub></i> and <i>J<sub>n</sub></i> is shown, the ACF is given by the CCF of the signal with itself, i.e. <i><i>J<sub>n</sub></i>=<i>I<sub>n</sub></i></i>):
 	     <blockquote>
 		   <img src="./pic/acf_direct.png">
 		 </blockquote>
@@ -29,7 +29,8 @@
 		   &tau;<sub>s,p</sub> = &tau;<sub>s-1,P-1</sub> + p&middot;m<sup>s</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>with<i> s=0..S-1 </i>and</i> p=0..P-1
 		 </i></blockquote>
 	  This recursive formula leads to <i>S</i> blocks of <i>P</i> linearly spaces lags. The difference between two subsequent lags increases exponentially (<i>m<sup>s</sup></i>) from block to block.
-	  The normalization is explained in more detail below.
+	  The normalization is explained in more detail below.<br>
+	  <i>normal/"integer" correlators:</i> There are two varieties of this correlator implemented in QuickFit, the first one uses double-precision floating point numbers (64-bit IEEE floats) for calculating the sums and products in the correlations. This limits the range of representable numbers to about 15-16 decimal significant digits (correspond to 52 binary digits). The second version uses 64-bit unsigned integers (~19 decimal digits) for the products and sums. This increases the accuracy at high input-countrates, but at the cost of a rounding error when converting the floating point input value (including background and bleach corrections, which are non-integer) back to an integer number. So if you measured high count rates per pixel or use high non-averaging binning, this variant may be beneficial. On the other hand for low input values, the floating-point correlators are beneficial, as the rounding errors play a larger role.
 	  </li>
 
 	  <li><b>Direct Correlation, with Averaging:</b><br>This correlator yields the same results as the <b>Direct Estimation</b>, but intrinsically averages the calculated correlation function (with a triangular kernel, see below). The width of the averaging increases from decade to decade of the quasi-logarithmically spaced &tau;-values at which the correlation function is evaluated. The correlation works like this:
@@ -48,6 +49,7 @@
 		   <img src="./pic/acf_directavg.png">
 		 </blockquote>		
 
+	  <i>normal/"integer" correlators:</i> There are two varieties of this correlator implemented in QuickFit, the first one uses double-precision floating point numbers (64-bit IEEE floats) for calculating the sums and products in the correlations. This limits the range of representable numbers to about 15-16 decimal significant digits (correspond to 52 binary digits). The second version uses 64-bit unsigned integers (~19 decimal digits) for the products and sums. This increases the accuracy at high input-countrates, but at the cost of a rounding error when converting the floating point input value (including background and bleach corrections, which are non-integer) back to an integer number. So if you measured high count rates per pixel or use high non-averaging binning, this variant may be beneficial.
 	  </li>
 
 	  <li><b>Multi-&tau; Correlator:</b><br>
