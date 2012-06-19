@@ -34,7 +34,7 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* 
         ui->cmbCam2Settings->setStopResume(opticsSetup->getStopRelease(1));
         ui->cmbCam2Settings->connectTo(opticsSetup->cameraComboBox(1));
     }
-
+    updateReplaces();
     bindLineEdit(ui->edtPrefix1);
     bindLineEdit(ui->edtPrefix2);
 
@@ -137,16 +137,26 @@ void QFESPIMB040ImageStackConfigWidget2::storeSettings(QSettings& settings, QStr
 int QFESPIMB040ImageStackConfigWidget2::images() const {
     return ui->spinImages->value();
 }
+void QFESPIMB040ImageStackConfigWidget2::updateReplaces()
+{
+    QString stack="";
+    stack=opticsSetup->getAxisNameForStage(ui->cmbStage->currentExtensionLinearStage(), ui->cmbStage->currentAxisID());
+    if (ui->chkStage2->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage2->currentExtensionLinearStage(), ui->cmbStage2->currentAxisID());
+    if (ui->chkStage3->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage3->currentExtensionLinearStage(), ui->cmbStage3->currentAxisID());
+    setReplaceValue("stack", stack);
+}
 
 
-QString QFESPIMB040ImageStackConfigWidget2::prefix1() const {
+QString QFESPIMB040ImageStackConfigWidget2::prefix1()  {
     QString filename= ui->edtPrefix1->text();
+    updateReplaces();
     filename=transformFilename(filename);
     return filename;
 }
 
-QString QFESPIMB040ImageStackConfigWidget2::prefix2() const {
+QString QFESPIMB040ImageStackConfigWidget2::prefix2()  {
     QString filename= ui->edtPrefix2->text();
+    updateReplaces();
     filename=transformFilename(filename);
     return filename;
 }
@@ -600,3 +610,4 @@ void QFESPIMB040ImageStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSet
 bool QFESPIMB040ImageStackConfigWidget2::saveMeasurements() const {
     return ui->chkSaveMeasurements->isChecked();
 }
+

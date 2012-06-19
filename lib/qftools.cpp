@@ -391,8 +391,8 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
     t="";
     //qDebug()<<"cleanStringForFilename("<<text<<")   t1 = "<<t1;
     for (int i=0; i<t1.size(); i++) {
-        if (t1[i]>'0' && t1[i]<'9') t=t+t1[i];
-        else if (t1[i]>'A' && t1[i]<'z') t=t+t1[i];
+        if (t1[i]>='0' && t1[i]<='9') t=t+t1[i];
+        else if (t1[i]>='A' && t1[i]<='z') t=t+t1[i];
         else {
             switch(t1[i].toAscii()) {
                 case 'ä': t=t+"ae"; break;

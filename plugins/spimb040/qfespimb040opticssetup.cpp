@@ -984,3 +984,11 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
 
     return m;
 }
+
+QString QFESPIMB040OpticsSetup::getAxisNameForStage(QFExtensionLinearStage *stage, int axis)
+{
+    if (ui->stageSetup->getXStage()==stage && ui->stageSetup->getXStageAxis()==axis) return "x";
+    if (ui->stageSetup->getYStage()==stage && ui->stageSetup->getYStageAxis()==axis) return "y";
+    if (ui->stageSetup->getZStage()==stage && ui->stageSetup->getZStageAxis()==axis) return "z";
+    return "";
+}

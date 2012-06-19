@@ -61,6 +61,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool lightpathActivated() const;
         QString lightpathFilename() const;
         QString lightpath() const;
+        int repeats() const;
 
 
     protected slots:
@@ -69,6 +70,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void on_chkUse2_toggled(bool enabled);
         void on_chkBackground_toggled(bool enabled);
         void updateBackgroundWidgets();
+        void updateReplaces();
     private:
         QFPluginServices* m_pluginServices;
         Ui::QFESPIMB040AcquisitionConfigWidget2 *ui;

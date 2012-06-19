@@ -32,6 +32,8 @@ QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QWidget
         ui->cmbPreviewSettings2->setStopResume(opticsSetup->getStopRelease(1));
         ui->cmbPreviewSettings2->connectTo(opticsSetup->cameraComboBox(1));
     }
+
+    updateReplaces();
     bindLineEdit(ui->edtPrefix1);
     bindLineEdit(ui->edtPrefix2);
 
@@ -125,6 +127,7 @@ QString QFESPIMB040AcquisitionConfigWidget2::lightpath() const {
 }
 
 void QFESPIMB040AcquisitionConfigWidget2::on_btnAcquire_clicked() {
+
     emit doAcquisition();
 }
 
@@ -206,4 +209,14 @@ void QFESPIMB040AcquisitionConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSe
         ui->cmbLightpath->addItem(p.first, p.second, p.third);
     }
     ui->cmbLightpath->setCurrentIndex(qMax(0, ui->cmbLightpath->findText(idx)));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::updateReplaces()
+{
+
+}
+
+int QFESPIMB040AcquisitionConfigWidget2::repeats() const
+{
+    return ui->spinRepeat->value();
 }

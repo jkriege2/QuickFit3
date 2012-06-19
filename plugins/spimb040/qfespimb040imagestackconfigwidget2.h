@@ -44,8 +44,8 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         bool saveMeasurements() const;
 
         int images() const;
-        QString prefix1() const;
-        QString prefix2() const;
+        QString prefix1() ;
+        QString prefix2() ;
         bool use1() const;
         bool use2() const;
 
@@ -122,6 +122,8 @@ public slots:
 
         void checkStage();
         void updateLabel();
+
+        void updateReplaces();
     private:
         Ui::QFESPIMB040ImageStackConfigWidget2 *ui;
         QFPluginServices* m_pluginServices;

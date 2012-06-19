@@ -121,6 +121,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         bool isYStageConnected() const;
         bool isZStageConnected() const;
 
+        QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis);
+
         bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
 
         QFCameraComboBox* cameraComboBox(int camera) const;
