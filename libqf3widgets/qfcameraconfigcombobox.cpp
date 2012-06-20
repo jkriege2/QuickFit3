@@ -102,7 +102,10 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
         addItem(QIcon(":/libqf3widgets/camera_config.png"), fn, filenames[i]);
     }
 
-
+    model()->sort(0);
+    for (int i=0; i<count(); i++) {
+        qDebug()<<itemText(i)<<itemData(i);
+    }
     // FINALLY: make sure the combo boxes have their values set.
     int configidx=findText(ac);
     if (configidx<0) configidx=0;
@@ -154,11 +157,12 @@ void QFCameraConfigComboBox::deleteCurrent() {
 void QFCameraConfigComboBox::saveAsCurrent() {
     if (m_stopresume) m_stopresume->stop();
     QString filename=currentConfigFilename();
+    QString configname=currentText();
     if (filename.size()>0) {
         bool ok;
         QString newshowname = QInputDialog::getText(this, tr("Save Camera Configurtion As ..."),
                                           tr("New Name:"), QLineEdit::Normal,
-                                          QFileInfo(filename).baseName(), &ok);
+                                          configname/*QFileInfo(filename).baseName()*/, &ok);
         QString newname=cleanStringForFilename(newshowname);
         if (ok && !newname.isEmpty()) {
             QString newfilename=QFileInfo(filename).absolutePath()+"/"+newname+".ccf";
@@ -173,8 +177,9 @@ void QFCameraConfigComboBox::saveAsCurrent() {
                 QFile::copy(filename, newfilename);
                 QSettings set(newfilename, QSettings::IniFormat);
                 set.setValue("camconfigname", newshowname);
+                rereadConfigFiles();
+                setCurrentConfig(newshowname);
                 if (m_notifier) m_notifier->emitUpdate();
-                setCurrentConfig(newname);
             }
         }
     }
@@ -184,11 +189,12 @@ void QFCameraConfigComboBox::saveAsCurrent() {
 void QFCameraConfigComboBox::renameCurrent() {
     if (m_stopresume) m_stopresume->stop();
     QString filename=currentConfigFilename();
+    QString configname=currentText();
     if (filename.size()>0) {
         bool ok;
         QString newshowname = QInputDialog::getText(this, tr("Rename Camera Configurtion As ..."),
                                           tr("New Name:"), QLineEdit::Normal,
-                                          QFileInfo(filename).baseName(), &ok);
+                                          configname/*QFileInfo(filename).baseName()*/, &ok);
         QString newname=cleanStringForFilename(newshowname);
         if (ok && !newname.isEmpty()) {
             QString newfilename=QFileInfo(filename).absolutePath()+"/"+newname+".ccf";
@@ -206,8 +212,9 @@ void QFCameraConfigComboBox::renameCurrent() {
                 }
                 QSettings set(newfilename, QSettings::IniFormat);
                 set.setValue("camconfigname", newshowname);
+                rereadConfigFiles();
+                setCurrentConfig(newshowname);
                 if (m_notifier) m_notifier->emitUpdate();
-                setCurrentConfig(newname);
             }
         }
     }
@@ -253,8 +260,9 @@ void QFCameraConfigComboBox::addNew() {
             QFile::remove(tempFile);
             QSettings set(newfilename, QSettings::IniFormat);
             set.setValue("camconfigname", newshowname);
+            rereadConfigFiles();
+            setCurrentConfig(newshowname);
             if (m_notifier) m_notifier->emitUpdate();
-            setCurrentConfig(newname);
         }
     }
     if (m_stopresume) m_stopresume->resume();
