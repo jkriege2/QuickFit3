@@ -76,5 +76,8 @@
         <file alias="connect_lightsource.png">icons/connect_lightsource.png</file>
         <file alias="disconnect_lightsource.png">icons/disconnect_lightsource.png</file>
         <file alias="filterchanger_selectfilters.png">icons/filterchanger_selectfilters.png</file>
+        <file alias="template_save.png">icons/filesave.png</file>
+        <file alias="template_open.png">icons/fileopen.png</file>
+        <file alias="clear_all.png">icons/clear_all.png</file>
     </qresource>
 </RCC>

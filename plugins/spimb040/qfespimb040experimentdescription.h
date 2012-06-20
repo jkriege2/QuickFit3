@@ -26,6 +26,8 @@ class QFESPIMB040ExperimentDescription : public QWidget {
     protected slots:
         void updateTime();
         void on_btnClearAll_clicked();
+        void on_btnSaveTemplate_clicked();
+        void on_btnLoadTemplate_clicked();
     private:
         Ui::QFESPIMB040ExperimentDescription *ui;
 };

@@ -70,11 +70,55 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>&amp;Clear All</string>
        </property>
+       <property name="icon">
+        <iconset resource="spimb040.qrc">
+         <normaloff>:/spimb040/clear_all.png</normaloff>:/spimb040/clear_all.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSaveTemplate">
+       <property name="text">
+        <string>&amp;save as template</string>
+       </property>
+       <property name="icon">
+        <iconset resource="spimb040.qrc">
+         <normaloff>:/spimb040/template_save.png</normaloff>:/spimb040/template_save.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLoadTemplate">
+       <property name="text">
+        <string>&amp;load template</string>
+       </property>
+       <property name="icon">
+        <iconset resource="spimb040.qrc">
+         <normaloff>:/spimb040/template_open.png</normaloff>:/spimb040/template_open.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>&lt;b&gt;&amp;Title:&lt;/b&gt;</string>
@@ -84,7 +128,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
     <widget class="QLineEdit" name="edtTitle">
      <property name="font">
       <font>
@@ -94,7 +138,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>&amp;Experimenter(s):</string>
@@ -104,10 +148,10 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="4" column="1">
     <widget class="QLineEdit" name="edtExperimenter"/>
    </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Lab-Book &amp;page:</string>
@@ -117,7 +161,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLineEdit" name="edtLabBook">
@@ -226,14 +270,14 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="6" column="0" colspan="2">
     <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>&amp;Sample:</string>
@@ -243,17 +287,17 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="7" column="1">
     <widget class="QPlainTextEdit" name="edtSample"/>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
     <widget class="Line" name="line_3">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>&amp;Description:</string>
@@ -263,10 +307,10 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="9" column="1">
     <widget class="QPlainTextEdit" name="edtDescription"/>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -283,6 +327,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>edtDate</tabstop>
   <tabstop>edtTime</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="spimb040.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,6 +1,9 @@
 #include "qfespimb040experimentdescription.h"
 #include "ui_qfespimb040experimentdescription.h"
 #include <QTimer>
+#include "qfpluginservices.h"
+#include "programoptions.h"
+#include "qftools.h"
 
 QFESPIMB040ExperimentDescription::QFESPIMB040ExperimentDescription(QWidget *parent) :
     QWidget(parent),
@@ -61,4 +64,36 @@ void QFESPIMB040ExperimentDescription::updateTime() {
     ui->edtTime->setTime(QTime::currentTime());
     ui->edtDate->setDate(QDate::currentDate());
     QTimer::singleShot(1013, this, SLOT(updateTime()));
+}
+
+void QFESPIMB040ExperimentDescription::on_btnSaveTemplate_clicked() {
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/").toString();
+    QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("exp. description template (*.edt)"))    ;
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        if (QFile::exists(filename)) {
+            ok=false;
+            if (QMessageBox::question(this, tr("save as template ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                ok=true;
+            }
+        }
+        if (ok) {
+            QSettings set(filename, QSettings::IniFormat);
+            storeSettings(set, "experiment_settings/");
+        }
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lasttemplatedir", dir);
+}
+
+void QFESPIMB040ExperimentDescription::on_btnLoadTemplate_clicked() {
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/ed_templates/").toString();
+    QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("exp. description template (*.edt)"))    ;
+    if (!filename.isEmpty()) {
+        QSettings set(filename, QSettings::IniFormat);
+        loadSettings(set, "experiment_settings/");
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lasttemplatedir", dir);
+
 }
