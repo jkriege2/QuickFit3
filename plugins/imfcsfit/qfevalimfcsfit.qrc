@@ -3,7 +3,7 @@
         <file alias="imfcs_fit.png">icons/imfcs_fit.png</file>
         <file alias="imfcs_fit_logo.png">icons/imfcs_fit_22.png</file>
     </qresource>
-    <qresource prefix="imfcsfit/">
+    <qresource prefix="/imfcsfit">
         <file alias="fit.png">icons/imfcs_fit.png</file>
         <file alias="fit_logo.png">icons/imfcs_fit_22.png</file>
         <file alias="fit_config.png">icons/fcsfit_configure.png</file>
@@ -28,5 +28,6 @@
         <file alias="fit_fitall.png">icons/fit_fitall.png</file>
         <file alias="param_load.png">icons/fileopen.png</file>
         <file alias="param_save.png">icons/filesave.png</file>
+        <file alias="imfcs_fitcalib.png">icons/imfcs_fitcalib.png</file>
     </qresource>
 </RCC>
