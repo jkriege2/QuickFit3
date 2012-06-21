@@ -3,6 +3,7 @@
 #include "ui_about.h"
 #include "ui_aboutplugins.h"
 #include "qftools.h"
+#include "qfrdrreplacedialog.h"
 
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     settings=s;
@@ -720,6 +721,12 @@ void MainWindow::createActions() {
 
     tvMain->addAction(delItemAct);
 
+    actRDRReplace=new QAction(tr("find/replace in raw data record names/folders"), this);
+    connect(actRDRReplace, SIGNAL(triggered()), this, SLOT(rdrReplace()));
+    actRDRUndoReplace=new QAction(tr("undo last find/replace"), this);
+    connect(actRDRUndoReplace, SIGNAL(triggered()), this, SLOT(rdrUndoReplace()));
+
+
 
 }
 
@@ -764,6 +771,9 @@ void MainWindow::createMenus() {
 
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
+    toolsMenu->addAction(actRDRReplace);
+    toolsMenu->addAction(actRDRUndoReplace);
+    toolsMenu->addSeparator();
 
     menuBar()->addSeparator();
 
@@ -1406,6 +1416,37 @@ void MainWindow::saveProjectFirstTime() {
                                 QMessageBox::Yes | QMessageBox::No,
                                 QMessageBox::Yes);
         if (ret==QMessageBox::Yes) saveProject();
+    }
+}
+
+void MainWindow::rdrReplace() {
+    QFRDRReplaceDialog* dlg=new QFRDRReplaceDialog(this);
+    if (dlg->exec() && project) {
+        for (int i=0; i<project->getRawDataCount(); i++) {
+            QFRawDataRecord* rec=project->getRawDataByNum(i);
+            if (dlg->getReplaceName()) {
+                rec->setQFProperty("LAST_REPLACENAME", rec->getName(), false, false);
+                QString n=rec->getName().replace(dlg->getFindString(), dlg->getReplaceString(), (dlg->getCaseSensitivity())?Qt::CaseSensitive:Qt::CaseInsensitive);
+                rec->setName(n);
+            } else {
+                rec->setQFProperty("LAST_REPLACENAME", "", false, false);
+            }
+            if (dlg->getReplaceFolder()) {
+                rec->setQFProperty("LAST_REPLACEFOLDER", rec->getFolder(), false, false);
+                QString n=rec->getFolder().replace(dlg->getFindString(), dlg->getReplaceString(), (dlg->getCaseSensitivity())?Qt::CaseSensitive:Qt::CaseInsensitive);
+                rec->setFolder(n);
+            } else {
+                rec->setQFProperty("LAST_REPLACEFOLDER", "", false, false);
+            }
+        }
+    }
+    delete dlg;
+}
+void MainWindow::rdrUndoReplace() {
+    for (int i=0; i<project->getRawDataCount(); i++) {
+        QFRawDataRecord* rec=project->getRawDataByNum(i);
+        rec->setName(rec->getProperty("LAST_REPLACENAME", rec->getName()).toString());
+        rec->setFolder(rec->getProperty("LAST_REPLACEFOLDER", rec->getFolder()).toString());
     }
 }
 

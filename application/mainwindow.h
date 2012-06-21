@@ -123,7 +123,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief QFPluginServices::getPluginHelpDirectory() */
         virtual QString getPluginHelpDirectory(const QString& pluginID);
-protected:
+    protected:
         void closeEvent(QCloseEvent *event);
 
     private slots:
@@ -189,6 +189,9 @@ protected:
 
         /** \brief whenever a new project is created this is called every 500ms, until the project has been save at least once. This function asks the suer to save the project when he adds the first items */
         void saveProjectFirstTime();
+
+        void rdrReplace();
+        void rdrUndoReplace();
     private:
         void createWidgets();
         void createActions();
@@ -239,6 +242,8 @@ protected:
         QAction *aboutPluginsAct;
         QAction* helpAct;
         QAction* optionsAct;
+        QAction* actRDRReplace;
+        QAction* actRDRUndoReplace;
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */

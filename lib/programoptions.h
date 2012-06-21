@@ -142,6 +142,20 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
             return inst;
         }
 
+        /** \brief read a value from the main QSettings object */
+        static QVariant getConfigValue(const QString& name, QVariant defaultValue=QVariant()) {
+            if (!inst) return QVariant();
+            if (!inst->getQSettings()) return QVariant();
+            return inst->getQSettings()->value(name, defaultValue);
+        }
+
+        /** \brief set a value in the main QSettings object */
+        static void setConfigValue(const QString& name, QVariant value) {
+            if (!inst) return ;
+            if (!inst->getQSettings()) return;
+            return inst->getQSettings()->setValue(name, value);
+        }
+
 };
 
 #endif // PROGRAMOPTIONS_H

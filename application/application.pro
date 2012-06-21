@@ -34,15 +34,18 @@ QMAKE_RPATHDIR += $$DESTDIR
 # Input
 HEADERS += mainwindow.h \
            optionsdialog.h \
-    ../version.h
+    ../version.h \
+    qfrdrreplacedialog.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
-           optionsdialog.cpp
+           optionsdialog.cpp \
+    qfrdrreplacedialog.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
-           aboutplugins.ui
+           aboutplugins.ui \
+    qfrdrreplacedialog.ui
 
 RESOURCES += quickfit3.qrc
 
