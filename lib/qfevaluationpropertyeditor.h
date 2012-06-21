@@ -13,6 +13,9 @@
 #include "qfevaluationresultsmodel.h"
 #include "qenhancedtableview.h"
 #include "qvisiblehandlesplitter.h"
+#include "qfenhancedlineedit.h"
+#include "qfstyledbutton.h"
+#include "qfcompleterfromfile.h"
 
 class QFEvaluationPropertyEditor; // forward
 
@@ -148,6 +151,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void copyValErrResults();
         void copyValErrResultsNoHead();
 
+        void filterFilesTextChanged(const QString &text);
+        void filterResultsTextChanged(const QString &text);
         void currentTabChanged(int tab);
         void checkHelpAvailable();
     protected:
@@ -210,8 +215,14 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
 
-        QLineEdit* edtFilterFiles;
-        QLineEdit* edtFilterResults;
+        QFEnhancedLineEdit* edtFilterFiles;
+        QFEnhancedLineEdit* edtFilterResults;
+        QFEnhancedLineEdit* edtFilterFilesNot;
+        QFEnhancedLineEdit* edtFilterResultsNot;
+        QFCompleterFromFile* compFilterFiles;
+        QFCompleterFromFile* compFilterResults;
+        QFCompleterFromFile* compFilterFilesNot;
+        QFCompleterFromFile* compFilterResultsNot;
         QCheckBox* chkFilterFilesRegExp;
         QCheckBox* chkFilterResultsRegExp;
 

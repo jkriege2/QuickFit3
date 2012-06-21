@@ -41,6 +41,8 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
     public slots:
         void setResultFilter(QString filter);
         void setEvaluationFilter(QString filter);
+        void setResultFilterNot(QString filter);
+        void setEvaluationFilterNot(QString filter);
         void setEvaluationFilterUsesRegExp(bool use);
         void setResultFilterUsesRegExp(bool use);
     private slots:
@@ -61,6 +63,8 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
 
         QString resultFilter;
         QString evaluationFilter;
+        QString resultFilterNot;
+        QString evaluationFilterNot;
         bool resultFilterRegExp;
         bool evaluationFilterRegExp;
 };

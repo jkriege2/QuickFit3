@@ -16,6 +16,9 @@
 #include <QAction>
 #include <QList>
 #include <QPair>
+#include "qfenhancedlineedit.h"
+#include "qfstyledbutton.h"
+#include "qfcompleterfromfile.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -54,6 +57,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void readSettings();
         void closeEvent( QCloseEvent * event );
         void resizeEvent ( QResizeEvent * event );
+
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);
@@ -103,6 +107,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void copyValErrResults();
         void copyValErrResultsNoHead();
 
+        void filterEvaluationTextChanged(const QString& text);
+        void filterResultsTextChanged(const QString& text);
         void currentTabChanged(int tab);
         void checkHelpAvailable();
     private:
@@ -182,8 +188,14 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief action used to delete selection in tvResults */
         QAction* actDeleteResults;
 
-        QLineEdit* edtFilterEvaluation;
-        QLineEdit* edtFilterResults;
+        QFEnhancedLineEdit* edtFilterEvaluation;
+        QFEnhancedLineEdit* edtFilterResults;
+        QFEnhancedLineEdit* edtFilterEvaluationNot;
+        QFEnhancedLineEdit* edtFilterResultsNot;
+        QFCompleterFromFile* compFilterEvaluation;
+        QFCompleterFromFile* compFilterResults;
+        QFCompleterFromFile* compFilterEvaluationNot;
+        QFCompleterFromFile* compFilterResultsNot;
         QCheckBox* chkFilterEvaluationRegExp;
         QCheckBox* chkFilterResultsRegExp;
 

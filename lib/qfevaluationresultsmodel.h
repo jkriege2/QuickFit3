@@ -46,6 +46,8 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         void resultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));
         void setResultFilter(QString filter);
         void setFilesFilter(QString filter);
+        void setResultFilterNot(QString filter);
+        void setFilesFilterNot(QString filter);
         void setFilesFilterUsesRegExp(bool use);
         void setResultFilterUsesRegExp(bool use);
     protected:
@@ -66,6 +68,8 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
 
         QString resultFilter;
         QString filesFilter;
+        QString resultFilterNot;
+        QString filesFilterNot;
         bool resultFilterRegExp;
         bool filesFilterRegExp;
 };

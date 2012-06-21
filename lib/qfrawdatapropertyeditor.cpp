@@ -273,35 +273,68 @@ void QFRawDataPropertyEditor::createWidgets() {
 
     tbResults->addSeparator();
     tbResults->addWidget(new QLabel("  evaluation filter: "));
-    edtFilterEvaluation=new QLineEdit(this);
+    edtFilterEvaluation=new QFEnhancedLineEdit(this);
+    edtFilterEvaluation->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterEvaluation, edtFilterEvaluation));
     edtFilterEvaluation->setToolTip(tr("use this to filter the contents of the results table<br><br>"
-                                       "Simply enter a filter string and the table will only display those<br>"
-                                       "items where the evaluation matches (contains) the filter string.<br>"
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use<br>"
-                                       "either simple text + the wildcards * (match any characters) and ?<br>"
-                                       "(match a single character), or full regular expressions in the <br>"
-                                       "filter string."));
+                                       "Simply enter a filter string and the table will only display those"
+                                       "items where the evaluation contains a match to the filter string."
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
+                                        "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
+                                       "(match a single character), or full regular expressions in the filter string.<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
+    compFilterEvaluation=new QFCompleterFromFile(this);
+    edtFilterEvaluation->setCompleter(compFilterEvaluation);
+
     tbResults->addWidget(edtFilterEvaluation);
+    tbResults->addWidget(new QLabel(tr("  and not contains: "), this));
+    edtFilterEvaluationNot=new QFEnhancedLineEdit(this);
+    edtFilterEvaluationNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterEvaluationNot, edtFilterEvaluationNot));
+    edtFilterEvaluationNot->setToolTip(tr("use this to filter the contents of the results table<br><br>"
+                                       "Simply enter a filter string and the table will only display those"
+                                       "items where the evaluation does NOT containa match to the filter string."
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
+                                        "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
+                                       "(match a single character), or full regular expressions in the filter string."
+                                       "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
+    compFilterEvaluationNot=new QFCompleterFromFile(this);
+    edtFilterEvaluationNot->setCompleter(compFilterEvaluationNot);
+    tbResults->addWidget(edtFilterEvaluationNot);
     chkFilterEvaluationRegExp=new QCheckBox(tr("RegExp"), this);
     chkFilterEvaluationRegExp->setChecked(false);
     tbResults->addWidget(chkFilterEvaluationRegExp);
+    connect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), this, SLOT(filterEvaluationTextChanged(QString)));
+    connect(edtFilterEvaluation, SIGNAL(textChanged(QString)), this, SLOT(filterEvaluationTextChanged(QString)));
 
 
     tbResults->addSeparator();
-    tbResults->addWidget(new QLabel("  result filter: "));
-    edtFilterResults=new QLineEdit(this);
+    tbResults->addWidget(new QLabel("  result filter (contains): "));
+    edtFilterResults=new QFEnhancedLineEdit(this);
+    edtFilterResults->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterResults, edtFilterResults));
     tbResults->addWidget(edtFilterResults);
+    tbResults->addWidget(new QLabel(tr("  and not contains: "), this));
+    edtFilterResultsNot=new QFEnhancedLineEdit(this);
+    edtFilterResultsNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterResultsNot, edtFilterResultsNot));
+    tbResults->addWidget(edtFilterResultsNot);
     chkFilterResultsRegExp=new QCheckBox(tr("RegExp"), this);
     chkFilterResultsRegExp->setChecked(false);
     tbResults->addWidget(chkFilterResultsRegExp);
     edtFilterResults->setToolTip(tr("use this to filter the contents of the results table<br><br>"
-                                       "Simply enter a filter string and the table will only display those<br>"
-                                       "rows where the result name matches (contains) the filter string.<br>"
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use<br>"
-                                       "either simple text + the wildcards * (match any characters) and ?<br>"
-                                       "(match a single character), or full regular expressions in the <br>"
-                                       "filter string."));
-
+                                    "Simply enter a filter string and the table will only display those"
+                                    "rows where the result name contains a match to the filter string."
+                                    "Depending on whether <i>RegExp</i> is checked or not, you can use"
+                                    "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
+                                    "(match a single character), or full regular expressions in the filter string.<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
+    compFilterResults=new QFCompleterFromFile(this);
+    edtFilterResults->setCompleter(compFilterResults);
+    edtFilterResultsNot->setToolTip(tr("use this to filter the contents of the results table<br><br>"
+                                    "Simply enter a filter string and the table will only display those"
+                                    "rows where the result name contains NO match to the filter string."
+                                    "Depending on whether <i>RegExp</i> is checked or not, you can use"
+                                    "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
+                                    "(match a single character), or full regular expressions in the filter string.<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
+    compFilterResultsNot=new QFCompleterFromFile(this);
+    edtFilterResultsNot->setCompleter(compFilterResultsNot);
+    connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), this, SLOT(filterResultsTextChanged(QString)));
+    connect(edtFilterResults, SIGNAL(textChanged(QString)), this, SLOT(filterResultsTextChanged(QString)));
 
 
 
@@ -382,6 +415,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         disconnect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), tvResults->model(), SLOT(setResultFilterUsesRegExp(bool)));
         disconnect(edtFilterEvaluation, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilter(QString)));
         disconnect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), tvResults->model(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+        disconnect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
+        disconnect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
 
         if (c) {
             if (c->getType()!=oldType) {
@@ -470,6 +505,13 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
         connect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
         connect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+        connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
+        connect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
+        QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
+        compFilterEvaluation->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterevals.txt");
+        compFilterEvaluationNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterevalsnot.txt");
+        compFilterResults->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterresults.txt");
+        compFilterResultsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterresults_not.txt");
 
         /*QPoint pos;
         pos.setX(current->getProject()->getProperty(QString("rawdatapropeditor%1/posx").arg(id), 20).toInt());
@@ -503,7 +545,10 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         lstFiles->setEnabled(false);
         paramFilterProxy->setSourceModel(NULL);
         tvProperties->setEnabled(false);
-    }
+        compFilterEvaluation->setFilename("");
+        compFilterEvaluationNot->setFilename("");
+        compFilterResults->setFilename("");
+        compFilterResultsNot->setFilename("");    }
     checkHelpAvailable();
     //std::cout<<"creating new editors ... DONE!\n";
 }
@@ -574,6 +619,44 @@ void QFRawDataPropertyEditor::checkHelpAvailable() {
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
     labAveragedresults->setMaximumWidth(event->size().width());
     QWidget::resizeEvent(event);
+}
+
+void QFRawDataPropertyEditor::filterEvaluationTextChanged(const QString &text)
+{
+    bool error=false;
+    if (chkFilterEvaluationRegExp->isChecked()) {
+        QRegExp rx(text);
+        error=!rx.isValid();
+    }
+    QWidget* s=qobject_cast<QWidget*>(sender());
+    if (s) {
+       QPalette p=s->palette();
+       if (error) {
+           p.setColor(QPalette::Text, QColor("darkred"));
+       } else {
+           p.setColor(QPalette::Text, edtName->palette().color(QPalette::Text));
+       }
+       s->setPalette(p);
+    }
+}
+
+void QFRawDataPropertyEditor::filterResultsTextChanged(const QString &text)
+{
+    bool error=false;
+    if (chkFilterResultsRegExp->isChecked()) {
+        QRegExp rx(text);
+        error=!rx.isValid();
+    }
+    QWidget* s=qobject_cast<QWidget*>(sender());
+    if (s) {
+       QPalette p=s->palette();
+       if (error) {
+           p.setColor(QPalette::Text, QColor("darkred"));
+       } else {
+           p.setColor(QPalette::Text, edtName->palette().color(QPalette::Text));
+       }
+       s->setPalette(p);
+    }
 }
 
 QMenuBar *QFRawDataPropertyEditor::getMenuBar() const

@@ -8,6 +8,8 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     evaluation=NULL;
     resultFilter="";
     filesFilter="";
+    resultFilterNot="";
+    filesFilterNot="";
     resultFilterRegExp=false;
     filesFilterRegExp=false;
 }
@@ -71,19 +73,34 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
             lastResults.clear();
         }
 
-        if (!filesFilter.isEmpty()) {
+        if ((!filesFilter.isEmpty()) || (!filesFilterNot.isEmpty())) {
+            bool usefilt=!filesFilter.isEmpty();
+            bool usefiltN=!filesFilterNot.isEmpty();
             QRegExp rx(filesFilter, Qt::CaseInsensitive, (filesFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            QRegExp rxN(filesFilterNot, Qt::CaseInsensitive, (filesFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
             for (int i=lastResults.size()-1; i>=0; i--) {
                 QString n=lastResults[i].first->getName()+": "+lastResults[i].second;
-                if (rx.indexIn(n)<0) {
+                bool filt=rx.indexIn(n)>=0;
+                bool filtN=rxN.indexIn(n)>=0;
+                bool ok=(filt||(!usefilt)) && ((!filtN)||(!usefiltN));
+
+                if (!ok) {
                     lastResults.removeAt(i);
                 }
             }
         }
-        if (!resultFilter.isEmpty()) {
+        if ((!resultFilter.isEmpty()) || (!resultFilterNot.isEmpty())) {
+            bool usefilt=!resultFilter.isEmpty();
+            bool usefiltN=!resultFilterNot.isEmpty();
             QRegExp rx(resultFilter, Qt::CaseInsensitive, (resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            QRegExp rxN(resultFilterNot, Qt::CaseInsensitive, (resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
             for (int i=lastResultLabels.size()-1; i>=0; i--) {
-                if (rx.indexIn(lastResultLabels[i])<0) {
+                QString n=lastResultLabels[i];
+                bool filt=rx.indexIn(n)>=0;
+                bool filtN=rxN.indexIn(n)>=0;
+                bool ok=(filt||(!usefilt)) && ((!filtN)||(!usefiltN));
+
+                if (!ok) {
                     lastResultNames.removeAt(i);
                     lastResultLabels.removeAt(i);
                 }
@@ -105,6 +122,18 @@ void QFEvaluationResultsModel::setResultFilter(QString filter)
 void QFEvaluationResultsModel::setFilesFilter(QString filter)
 {
     filesFilter=filter;
+    resultsChanged();
+}
+
+void QFEvaluationResultsModel::setResultFilterNot(QString filter)
+{
+    resultFilterNot=filter;
+    resultsChanged();
+}
+
+void QFEvaluationResultsModel::setFilesFilterNot(QString filter)
+{
+    filesFilterNot=filter;
     resultsChanged();
 }
 

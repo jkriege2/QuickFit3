@@ -8,6 +8,8 @@ QFRDRResultsModel::QFRDRResultsModel(QObject* parent):
     record=NULL;
     resultFilter="";
     evaluationFilter="";
+    resultFilterNot="";
+    evaluationFilterNot="";
     resultFilterRegExp=false;
     evaluationFilterRegExp=false;
 }
@@ -58,7 +60,7 @@ void QFRDRResultsModel::resultsChanged() {
             qSort(lastResultSets.begin(), lastResultSets.end(), QFRDRResultsModel_StringPairCaseInsensitiveCompareSecond<QString>);
         }
 
-        if (!evaluationFilter.isEmpty()) {
+        /*if (!evaluationFilter.isEmpty()) {
             QRegExp rx(evaluationFilter, Qt::CaseInsensitive, (evaluationFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
             for (int i=lastResultSets.size()-1; i>=0; i--) {
                 QString n=lastResultSets[i].second;
@@ -71,6 +73,39 @@ void QFRDRResultsModel::resultsChanged() {
             QRegExp rx(resultFilter, Qt::CaseInsensitive,(resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
             for (int i=lastResultLabels.size()-1; i>=0; i--) {
                 if (rx.indexIn(lastResultLabels[i])<0) {
+                    lastResultNames.removeAt(i);
+                    lastResultLabels.removeAt(i);
+                }
+            }
+        }*/
+        if ((!evaluationFilter.isEmpty()) || (!evaluationFilterNot.isEmpty())) {
+            bool usefilt=!evaluationFilter.isEmpty();
+            bool usefiltN=!evaluationFilterNot.isEmpty();
+            QRegExp rx(evaluationFilter, Qt::CaseInsensitive, (evaluationFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            QRegExp rxN(evaluationFilterNot, Qt::CaseInsensitive, (evaluationFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            for (int i=lastResultSets.size()-1; i>=0; i--) {
+                QString n=lastResultSets[i].second;
+                bool filt=rx.indexIn(n)>=0;
+                bool filtN=rxN.indexIn(n)>=0;
+                bool ok=(filt||(!usefilt)) && ((!filtN)||(!usefiltN));
+
+                if (!ok) {
+                    lastResultSets.removeAt(i);
+                }
+            }
+        }
+        if ((!resultFilter.isEmpty()) || (!resultFilterNot.isEmpty())) {
+            bool usefilt=!resultFilter.isEmpty();
+            bool usefiltN=!resultFilterNot.isEmpty();
+            QRegExp rx(resultFilter, Qt::CaseInsensitive, (resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            QRegExp rxN(resultFilterNot, Qt::CaseInsensitive, (resultFilterRegExp)?(QRegExp::RegExp):(QRegExp::Wildcard));
+            for (int i=lastResultLabels.size()-1; i>=0; i--) {
+                QString n=lastResultLabels[i];
+                bool filt=rx.indexIn(n)>=0;
+                bool filtN=rxN.indexIn(n)>=0;
+                bool ok=(filt||(!usefilt)) && ((!filtN)||(!usefiltN));
+
+                if (!ok) {
                     lastResultNames.removeAt(i);
                     lastResultLabels.removeAt(i);
                 }
@@ -262,6 +297,18 @@ void QFRDRResultsModel::setEvaluationFilter(QString filter)
     resultsChanged();
 }
 
+void QFRDRResultsModel::setResultFilterNot(QString filter)
+{
+    resultFilterNot=filter;
+    resultsChanged();
+}
+
+void QFRDRResultsModel::setEvaluationFilterNot(QString filter)
+{
+    evaluationFilterNot=filter;
+    resultsChanged();
+}
+
 void QFRDRResultsModel::setEvaluationFilterUsesRegExp(bool use)
 {
     evaluationFilterRegExp=use;
@@ -300,3 +347,4 @@ void QFRDRResultsModel::calcStatistics(QString resultName, double& average, doub
         }
     }
 }
+

@@ -64,7 +64,7 @@ class QFPFitFunctionsFCSDistribution : public QObject, public QFPluginFitFunctio
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
         /** \brief return list of plugin IDs */

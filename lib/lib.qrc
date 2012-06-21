@@ -43,4 +43,27 @@
         <file alias="help_rdr.png">icons/help_rdr.png</file>
         <file alias="help_eval.png">icons/help_eval.png</file>
     </qresource>
+
+
+    <qresource prefix="/lib/qfstyledbutton">
+        <file alias="network.png">icons/network.png</file>
+        <file alias="network_disabled.png">icons/network_disabled.png</file>
+        <file alias="network_hover.png">icons/network_hover.png</file>
+        <file alias="network_pressed.png">icons/network_active.png</file>
+
+        <file alias="execute.png">icons/execute.png</file>
+        <file alias="execute_disabled.png">icons/execute_disabled.png</file>
+        <file alias="execute_hover.png">icons/execute_hover.png</file>
+        <file alias="execute_pressed.png">icons/execute_active.png</file>
+
+        <file alias="openfile.png">icons/fileopen.png</file>
+        <file alias="openfile_disabled.png">icons/fileopen_disabled.png</file>
+        <file alias="openfile_hover.png">icons/fileopen_hover.png</file>
+        <file alias="openfile_pressed.png">icons/fileopen_active.png</file>
+
+        <file alias="clear_edt.png">icons/clear_edt.png</file>
+        <file alias="clear_edt_disabled.png">icons/clear_edt_disabled.png</file>
+        <file alias="clear_edt_hover.png">icons/clear_edt_hover.png</file>
+        <file alias="clear_edt_pressed.png">icons/clear_edt_pressed.png</file>
+    </qresource>
 </RCC>
