@@ -9,26 +9,26 @@
 
 
 QFFitFunctionDLSG2::QFFitFunctionDLSG2() {
-    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      1,            1,        3,        1,   1,      2);
+    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialFix, initialValue, minValue, maxValue, inc, absMin, absMax
+    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            1,        3,        1,   1,      2);
     #define DLSG2_n_components 0
-    addParameter(FloatNumber,  "epsilon",                    "baseline",                                              "&epsilon;",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0,            -1e50,    1e50,     0.01);
+    addParameter(FloatNumber,  "epsilon",                 "baseline",                                              "&epsilon;",                "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0,            -1e50,    1e50,     0.01);
     #define DLSG2_epsilon 1
 
-    addParameter(FloatNumber,  "frac1",                   "fraction of component 1",                               "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            0,        1e10,     0.1, 0 );
+    addParameter(FloatNumber,  "frac1",                   "fraction of component 1",                               "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0 );
     #define DLSG2_frac1 2
-    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, 100,          1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
     #define DLSG2_tau1 3
-    addParameter(FloatNumber,  "frac2",                   "fraction of component 2",                               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            0,        1e10,     0.1, 0);
+    addParameter(FloatNumber,  "frac2",                   "fraction of component 2",                               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0);
     #define DLSG2_frac2 4
-    addParameter(FloatNumber,  "tau2",                    "correlation time 2",                                    "&tau;<sub>2</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, 1000,         1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau2",                    "correlation time 2",                                    "&tau;<sub>2</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
     #define DLSG2_tau2 5
-    addParameter(FloatNumber,  "frac3",                   "fraction of component 3",                               "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            0,        1e10,     0.1, 0);
+    addParameter(FloatNumber,  "frac3",                   "fraction of component 3",                               "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0);
     #define DLSG2_frac3 6
-    addParameter(FloatNumber,  "tau3",                    "correlation time 3",                                    "&tau;<sub>3</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, 10000,        1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau3",                    "correlation time 3",                                    "&tau;<sub>3</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 10000,        1e-10,    1e50,     1    );
     #define DLSG2_tau3 7
 
-    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, 1,            -10,      10,       0.1  );
+    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -10,      10,       0.1  );
     #define DLSG2_offset 8
 }
 

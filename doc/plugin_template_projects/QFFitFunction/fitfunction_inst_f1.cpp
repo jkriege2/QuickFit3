@@ -8,10 +8,10 @@
 
 
 QFFitAlgorithmInst_F1::QFFitAlgorithmInst_F1() {
-    //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(FloatNumber,  "p1",                      "",                                                      "",                                "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 0.0,          -10,      10,       1,   -100,    100  );
+    //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
+    addParameter(FloatNumber,  "p1",                      "",                                                      "",                                "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 0.0,          -10,      10,       1,   -100,    100  );
     #define PARAM1 0
-    addParameter(FloatNumber,  "p2",                      "",                                                      "",                                "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, 0.0,          -10,      10,       1,   -100,    100  );
+    addParameter(FloatNumber,  "p2",                      "",                                                      "",                                "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       true, 0.0,          -10,      10,       1,   -100,    100  );
     #define PARAM2 1
 
 }

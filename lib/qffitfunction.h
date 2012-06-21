@@ -97,6 +97,8 @@ class QFLIB_EXPORT QFFitFunction {
             bool userRangeEditable;
             /** \brief an initial value for the parameter */
             double initialValue;
+            /** \brief initial fix state of parameter */
+            bool initialFix;
             /** \brief minimum value of the parameter range (if supported by algorithm) */
             double minValue;
             /** \brief maximum value of the parameter range (if supported by algorithm) */
@@ -117,6 +119,7 @@ class QFLIB_EXPORT QFFitFunction {
                 label="";
                 unit="";
                 fit=false;
+                initialFix=false;
                 userEditable=false;
                 displayError=NoError;
                 userRangeEditable=false;
@@ -273,7 +276,7 @@ class QFLIB_EXPORT QFFitFunction {
             used in the constructor to define the model parameters
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, QStringList comboItems=QStringList()) {
+        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue, double maxValue, double inc, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, QStringList comboItems=QStringList()) {
             ParameterDescription d;
             d.type=type;
             d.id=id;
@@ -292,6 +295,7 @@ class QFLIB_EXPORT QFFitFunction {
             d.absMaxValue=absMaxValue;
             d.absMinValue=absMinValue;
             d.comboItems=comboItems;
+            d.initialFix=initialFix;
 
             return addParameter(d);
         }

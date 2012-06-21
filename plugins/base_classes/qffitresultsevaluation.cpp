@@ -631,6 +631,10 @@ bool QFFitResultsEvaluation::getFitFix(QFRawDataRecord* r, const QString& result
     QFFitFunction* f=getFitFunction();
     if (f==NULL) return 0;
     bool res=false;
+
+    int pid=f->getParameterNum(parameterID);
+    if (pid>-1) res=f->getDescription(pid).initialFix;
+
     res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
     QString psID=getParameterStoreID(parameterID);

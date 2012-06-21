@@ -638,7 +638,7 @@ void QFRDRImagingFCSCorrelationDialog::updateBleach() {
 
 void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     int corrType=ui->cmbCorrelator->currentIndex();
-    if (corrType==2) {
+    if (corrType==CORRELATOR_MTAUONEMON) {
         ui->spinM->setEnabled(false);
         ui->labM->setEnabled(false);
         ui->spinM->setValue(2);
@@ -653,7 +653,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     double taumin=ui->edtFrameTime->value();
     double taumax=taumin;
 
-    if (corrType==4) {
+    if (corrType==CORRELATOR_MTAUALLMON) {
         taumax=0;
         for (int s=0; s<S; s++) {
             if (s==0) {

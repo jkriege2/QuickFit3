@@ -699,6 +699,8 @@ bool QFFitResultsByIndexAsVectorEvaluation::getFitFix(QFRawDataRecord* r, const 
         }
         if (!f->hasParameter(parameterID)) return false;
         QString fpid=getFitParamFixID(parameterID);
+        int pid=f->getParameterNum(parameterID);
+        if (pid>-1) res=f->getDescription(pid).initialFix;
 
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();

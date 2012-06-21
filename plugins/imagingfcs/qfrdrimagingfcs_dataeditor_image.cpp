@@ -3085,7 +3085,7 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* 
         QString id=ff->getParameterID(i);
         pids.append(id);
         errs[i]=0;
-        fixs[i]=false;
+        fixs[i]=ff->getDescription(id).initialFix;
         params[i]=ff->getDescription(id).initialValue;
         /*double value=0;
         if (overrideFitFunctionPreset(id, value)) params[i]=value;*/

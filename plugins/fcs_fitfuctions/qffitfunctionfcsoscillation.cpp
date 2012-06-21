@@ -7,13 +7,13 @@
 
 QFFitFunctionFCSOscillation::QFFitFunctionFCSOscillation() {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(FloatNumber,  "amplitude",               "amplitude of oscillation",                              "A",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            1e-10,    1e10,      0.1, 0);
+    addParameter(FloatNumber,  "amplitude",               "amplitude of oscillation",                              "A",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            1e-10,    1e10,      0.1, 0);
     #define FCSOSC_AMPLITUDE 0
-    addParameter(FloatNumber,  "frequency",               "frequency of oscillation",                              "f",                        "Hz",          "Hz",                    true,      true,         true,              QFFitFunction::DisplayError, 50,           1e-10,    1e10,      1,   0);
+    addParameter(FloatNumber,  "frequency",               "frequency of oscillation",                              "f",                        "Hz",          "Hz",                    true,      true,         true,              QFFitFunction::DisplayError, false, 50,           1e-10,    1e10,      1,   0);
     #define FCSOSC_freq 1
-    addParameter(FloatNumber,  "period",                  "oscillation period",                                    "T",                        "ms",          "ms",                    false,    false,        false,              QFFitFunction::DisplayError, (1000.0/50.0),1e-20,    1e20,      1    );
+    addParameter(FloatNumber,  "period",                  "oscillation period",                                    "T",                        "ms",          "ms",                    false,    false,        false,              QFFitFunction::DisplayError, false, (1000.0/50.0),1e-20,    1e20,      1    );
     #define FCSOSC_period 2
-    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, 1,            -10,      10,        0.1  );
+    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            -10,      10,        0.1  );
     #define FCSOSC_offset 3
 
 }
