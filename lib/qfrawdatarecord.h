@@ -15,6 +15,9 @@
 #include "qfproperties.h"
 #include "lib_imexport.h"
 #include <stdint.h>
+#include <QReadLocker>
+#include <QWriteLocker>
+#include <QReadWriteLock>
 
 
 class QDomElement; // forward
@@ -153,6 +156,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(const QString& message) { setError(message); }
+
+        mutable QReadWriteLock* lock;
 
         /** \brief a model used to access the properties */
         QFRDRPropertyModel* propModel;

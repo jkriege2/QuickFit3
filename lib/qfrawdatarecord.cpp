@@ -4,6 +4,7 @@
 #include "qtriple.h"
 #include "binarydatatools.h"
 
+//#define DEBUG_THREAN
 
 class QFRawDataRecordPrivate {
     public:
@@ -57,6 +58,7 @@ QFRawDataRecordPrivate::evaluationIDMetadata::evaluationIDMetadata(int initsize)
 QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     QObject(parent), QFProperties()
 {
+    lock=new QReadWriteLock(QReadWriteLock::Recursive);
     project=parent;
     errorOcc=false;
     errorDesc="";
@@ -70,6 +72,14 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     evaluationIDMetadataInitSize=100;
     dstore=new QFRawDataRecordPrivate();
     setResultsInitSize(100);
+}
+
+
+QFRawDataRecord::~QFRawDataRecord() {
+    delete dstore;
+    delete lock;
+    //std::cout<<"deleting QFRawDataRecord\n";
+    //std::cout<<"deleting QFRawDataRecord ... OK\n";
 }
 
 void QFRawDataRecord::setResultsInitSize(int initSize) {
@@ -135,342 +145,395 @@ QStringList QFRawDataRecord::getFilesForType(const QString &type) {
     return result;
 }
 
-QFRawDataRecord::~QFRawDataRecord() {
-    delete dstore;
-    //std::cout<<"deleting QFRawDataRecord\n";
-    //std::cout<<"deleting QFRawDataRecord ... OK\n";
-}
 
 void QFRawDataRecord::setName(const QString &n) {
-    if (n!=name) {
-        name=n;
-        //emitPropertiesChanged();
-        emit basicPropertiesChanged();
+    bool em=false;
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (n!=name) {
+            name=n;
+            em=true;
+        }
     }
+    if (em)  emit basicPropertiesChanged();
+
 }
 /** \brief set the folder */
 void QFRawDataRecord::setFolder(const QString& n) {
-    if (folder!=n) {
-        folder=n;
-        //emitPropertiesChanged();
-        emit basicPropertiesChanged();
-        //if (project) project->setStructureChanged();
+    bool em=false;
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (folder!=n) {
+            folder=n;
+            em=true;
+        }
     }
+    if (em) emit basicPropertiesChanged();
 }
 /** \brief set the description  */
 void QFRawDataRecord::setDescription(const QString& d) {
-    if (description!=d) {
-        description=d;
-        emit basicPropertiesChanged();
-        //emitPropertiesChanged();
+    bool em=false;
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (description!=d) {
+            description=d;
+            em=true;
+        }
     }
+    if (em) emit basicPropertiesChanged();
 };
 
 void QFRawDataRecord::readXML(QDomElement& e) {
-    bool ok=true;
-    name=e.attribute("name", "rawdatarecord");
-    ID=e.attribute("id", "-1").toInt(&ok);
-    if (ID==-1) { setError(tr("invalid ID in <rawdatarecord name=\"%1\" ...>!").arg(name)); return; }
-    if (!project->checkID(ID)) {
-        setError(tr("ID %1 in <rawdatarecord name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
-        return;
-    }
-    folder=e.attribute("folder", "");
-    QDomElement te=e.firstChildElement("description");
-    if (te.isNull()) { description=""; } else { description=te.text(); }
-    //std::cout<<"    reading XML: properties\n";
-    props.clear();
-    te=e.firstChildElement("properties");
-    readProperties(te);
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        bool ok=true;
+        name=e.attribute("name", "rawdatarecord");
+        ID=e.attribute("id", "-1").toInt(&ok);
+        if (ID==-1) { setError(tr("invalid ID in <rawdatarecord name=\"%1\" ...>!").arg(name)); return; }
+        if (!project->checkID(ID)) {
+            setError(tr("ID %1 in <rawdatarecord name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
+            return;
+        }
+        folder=e.attribute("folder", "");
+        QDomElement te=e.firstChildElement("description");
+        if (te.isNull()) { description=""; } else { description=te.text(); }
+        //std::cout<<"    reading XML: properties\n";
+        props.clear();
+        te=e.firstChildElement("properties");
+        readProperties(te);
+        #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
 
-    resultsClearAll();
-    te=e.firstChildElement("results");
-    if (!te.isNull()) {
-        te=te.firstChildElement("evaluation");
-        while (!te.isNull()) {
-            QString en=te.attribute("name");
-            QString group=te.attribute("group");
-            int groupIndex=te.attribute("groupindex", "0").toInt();
-            QString description=te.attribute("description");
-            QDomElement re=te.firstChildElement("result");
-            dstore->results[en]=new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-            dstore->results[en]->group=group;
-            dstore->results[en]->groupIndex=groupIndex;
-            dstore->results[en]->description=description;
-            QLocale loc=QLocale::c();
-            loc.setNumberOptions(QLocale::OmitGroupSeparator);
-            while (!re.isNull()) {
-                QString n=re.attribute("name", "");
-                QString t=re.attribute("type", "invalid");
-                evaluationResult r;
-                r.group=re.attribute("group", "");
-                r.label=re.attribute("label", "");
-                r.label_rich=re.attribute("labelrich", "");
-                r.sortPriority=QVariant(re.attribute("sortprior", "false")).toBool();
-                //r.name=n;
-                r.type=qfrdreInvalid;
-                if (t=="boolean"  || t=="bool") {
-                    r.type=qfrdreBoolean;
-                    r.bvalue=QVariant(re.attribute("value", "false")).toBool();
-                } else if (t=="integer" || t=="int") {
-                    r.type=qfrdreInteger;
-                    r.ivalue=loc.toInt(re.attribute("value", "0"));
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="string" || t=="str") {
-                    r.type=qfrdreString;
-                    r.svalue=re.attribute("value", "");
-                } else if (t=="number" || t=="num") {
-                    r.type=qfrdreNumber;
-                    r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="numberlist" || t=="numlst") {
-                    r.type=qfrdreNumberVector;
-                    r.dvec.clear();
-                    r.evec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0.0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="base64") {
-                        r.dvec=stringToDoubleArray_base64(data);
-                    } else if (storage=="hex") {
-                        r.dvec=stringToDoubleArray_hex(data);
-                    } else {
-                        QStringList s=data.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            bool ok=false;
-                            double d=loc.toDouble(s[i], &ok);
-                            if (ok) { r.dvec.append(d); }
-                            else { r.dvec.append(0); }
+        resultsClearAll();
+        #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"relock";
+#endif
+ locker.relock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  relocked";
+#endif
+        te=e.firstChildElement("results");
+        if (!te.isNull()) {
+            te=te.firstChildElement("evaluation");
+            while (!te.isNull()) {
+                QString en=te.attribute("name");
+                QString group=te.attribute("group");
+                int groupIndex=te.attribute("groupindex", "0").toInt();
+                QString description=te.attribute("description");
+                QDomElement re=te.firstChildElement("result");
+                dstore->results[en]=new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+                dstore->results[en]->group=group;
+                dstore->results[en]->groupIndex=groupIndex;
+                dstore->results[en]->description=description;
+                QLocale loc=QLocale::c();
+                loc.setNumberOptions(QLocale::OmitGroupSeparator);
+                while (!re.isNull()) {
+                    QString n=re.attribute("name", "");
+                    QString t=re.attribute("type", "invalid");
+                    evaluationResult r;
+                    r.group=re.attribute("group", "");
+                    r.label=re.attribute("label", "");
+                    r.label_rich=re.attribute("labelrich", "");
+                    r.sortPriority=QVariant(re.attribute("sortprior", "false")).toBool();
+                    //r.name=n;
+                    r.type=qfrdreInvalid;
+                    if (t=="boolean"  || t=="bool") {
+                        r.type=qfrdreBoolean;
+                        r.bvalue=QVariant(re.attribute("value", "false")).toBool();
+                    } else if (t=="integer" || t=="int") {
+                        r.type=qfrdreInteger;
+                        r.ivalue=loc.toInt(re.attribute("value", "0"));
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="string" || t=="str") {
+                        r.type=qfrdreString;
+                        r.svalue=re.attribute("value", "");
+                    } else if (t=="number" || t=="num") {
+                        r.type=qfrdreNumber;
+                        r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="numberlist" || t=="numlst") {
+                        r.type=qfrdreNumberVector;
+                        r.dvec.clear();
+                        r.evec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0.0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="base64") {
+                            r.dvec=stringToDoubleArray_base64(data);
+                        } else if (storage=="hex") {
+                            r.dvec=stringToDoubleArray_hex(data);
+                        } else {
+                            QStringList s=data.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                bool ok=false;
+                                double d=loc.toDouble(s[i], &ok);
+                                if (ok) { r.dvec.append(d); }
+                                else { r.dvec.append(0); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="numbermatrix" || t=="nummtrx") {
-                    r.type=qfrdreNumberMatrix;
-                    r.dvec.clear();
-                    r.evec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0.0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="base64") {
-                        r.dvec=stringToDoubleArray_base64(data);
-                    } else if (storage=="hex") {
-                        r.dvec=stringToDoubleArray_hex(data);
-                    } else {
-                        QStringList s=data.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            bool ok=false;
-                            double d=loc.toDouble(s[i], &ok);
-                            if (ok) { r.dvec.append(d); }
-                            else { r.dvec.append(0); }
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="numbermatrix" || t=="nummtrx") {
+                        r.type=qfrdreNumberMatrix;
+                        r.dvec.clear();
+                        r.evec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0.0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="base64") {
+                            r.dvec=stringToDoubleArray_base64(data);
+                        } else if (storage=="hex") {
+                            r.dvec=stringToDoubleArray_hex(data);
+                        } else {
+                            QStringList s=data.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                bool ok=false;
+                                double d=loc.toDouble(s[i], &ok);
+                                if (ok) { r.dvec.append(d); }
+                                else { r.dvec.append(0); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                    r.columns=loc.toInt(re.attribute("columns", "0"));
+                        r.unit=re.attribute("unit", "");
+                        r.columns=loc.toInt(re.attribute("columns", "0"));
 
 
-                } else if (t=="stringlist" || t=="strlst") {
-                    r.type=qfrdreStringVector;
-                    QString data="";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    r.svec=deescapifyList(data);
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="stringmatrix" || t=="strmtrx") {
-                    r.type=qfrdreStringMatrix;
-                    QString data="";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    r.svec=deescapifyList(data);
-                    r.unit=re.attribute("unit", "");
-                    r.columns=loc.toInt(re.attribute("columns", "0"));
+                    } else if (t=="stringlist" || t=="strlst") {
+                        r.type=qfrdreStringVector;
+                        QString data="";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        r.svec=deescapifyList(data);
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="stringmatrix" || t=="strmtrx") {
+                        r.type=qfrdreStringMatrix;
+                        QString data="";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        r.svec=deescapifyList(data);
+                        r.unit=re.attribute("unit", "");
+                        r.columns=loc.toInt(re.attribute("columns", "0"));
 
 
-                } else if (t=="numbererrorlist" || t=="numerrlst") {
-                    r.type=qfrdreNumberErrorVector;
-                    r.dvec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0.0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    QString error=re.attribute("error", "");
-                    if (storage=="base64") {
-                        r.dvec=stringToDoubleArray_base64(data);
-                        r.evec=stringToDoubleArray_base64(error);
-                    } else if (storage=="hex") {
-                        r.dvec=stringToDoubleArray_hex(data);
-                        r.evec=stringToDoubleArray_hex(error);
-                    } else {
-                        QStringList s=data.split(";");
-                        QStringList s1=error.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            bool ok=false;
-                            double d=loc.toDouble(s[i], &ok);
-                            if (ok) { r.dvec.append(d); }
-                            else { r.dvec.append(0); }
-                            double e;
-                            if (i<s1.size()) e=loc.toDouble(s1[i], &ok);
-                            if (ok) { r.evec.append(d); }
-                            else { r.evec.append(0); }
+                    } else if (t=="numbererrorlist" || t=="numerrlst") {
+                        r.type=qfrdreNumberErrorVector;
+                        r.dvec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0.0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        QString error=re.attribute("error", "");
+                        if (storage=="base64") {
+                            r.dvec=stringToDoubleArray_base64(data);
+                            r.evec=stringToDoubleArray_base64(error);
+                        } else if (storage=="hex") {
+                            r.dvec=stringToDoubleArray_hex(data);
+                            r.evec=stringToDoubleArray_hex(error);
+                        } else {
+                            QStringList s=data.split(";");
+                            QStringList s1=error.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                bool ok=false;
+                                double d=loc.toDouble(s[i], &ok);
+                                if (ok) { r.dvec.append(d); }
+                                else { r.dvec.append(0); }
+                                double e;
+                                if (i<s1.size()) e=loc.toDouble(s1[i], &ok);
+                                if (ok) { r.evec.append(d); }
+                                else { r.evec.append(0); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="numbererrormatrix" || t=="numerrmtrx") {
-                    r.type=qfrdreNumberErrorMatrix;
-                    r.dvec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString error=re.attribute("error", "");
-                    QString data="0.0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="base64") {
-                        r.dvec=stringToDoubleArray_base64(data);
-                        r.evec=stringToDoubleArray_base64(error);
-                    } else if (storage=="hex") {
-                        r.dvec=stringToDoubleArray_hex(data);
-                        r.evec=stringToDoubleArray_hex(error);
-                    } else {
-                        QStringList s=data.split(";");
-                        QStringList s1=error.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            bool ok=false;
-                            double d=loc.toDouble(s[i], &ok);
-                            if (ok) { r.dvec.append(d); }
-                            else { r.dvec.append(0); }
-                            double e;
-                            if (i<s1.size()) e=loc.toDouble(s1[i], &ok);
-                            if (ok) { r.evec.append(d); }
-                            else { r.evec.append(0); }
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="numbererrormatrix" || t=="numerrmtrx") {
+                        r.type=qfrdreNumberErrorMatrix;
+                        r.dvec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString error=re.attribute("error", "");
+                        QString data="0.0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0.0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="base64") {
+                            r.dvec=stringToDoubleArray_base64(data);
+                            r.evec=stringToDoubleArray_base64(error);
+                        } else if (storage=="hex") {
+                            r.dvec=stringToDoubleArray_hex(data);
+                            r.evec=stringToDoubleArray_hex(error);
+                        } else {
+                            QStringList s=data.split(";");
+                            QStringList s1=error.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                bool ok=false;
+                                double d=loc.toDouble(s[i], &ok);
+                                if (ok) { r.dvec.append(d); }
+                                else { r.dvec.append(0); }
+                                double e;
+                                if (i<s1.size()) e=loc.toDouble(s1[i], &ok);
+                                if (ok) { r.evec.append(d); }
+                                else { r.evec.append(0); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                    r.columns=loc.toInt(re.attribute("columns", "0"));
-                } else if (t=="integerlist" || t=="intlst") {
-                    r.type=qfrdreIntegerVector;
-                    r.ivec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="base64") {
-                        r.ivec=stringToQlonglongArray_base64(data);
-                    } else if (storage=="hex") {
-                        r.ivec=stringToQlonglongArray_hex(data);
-                    } else {
-                        QStringList s=data.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            bool ok=false;
-                            qlonglong d=loc.toLongLong(s[i], &ok);
-                            if (ok) { r.ivec.append(d); }
-                            else { r.ivec.append(0); }
+                        r.unit=re.attribute("unit", "");
+                        r.columns=loc.toInt(re.attribute("columns", "0"));
+                    } else if (t=="integerlist" || t=="intlst") {
+                        r.type=qfrdreIntegerVector;
+                        r.ivec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="base64") {
+                            r.ivec=stringToQlonglongArray_base64(data);
+                        } else if (storage=="hex") {
+                            r.ivec=stringToQlonglongArray_hex(data);
+                        } else {
+                            QStringList s=data.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                bool ok=false;
+                                qlonglong d=loc.toLongLong(s[i], &ok);
+                                if (ok) { r.ivec.append(d); }
+                                else { r.ivec.append(0); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="integermatrix" || t=="intmtrx") {
-                    r.type=qfrdreIntegerMatrix;
-                    r.ivec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="base64") {
-                        r.ivec=stringToQlonglongArray_base64(data);
-                    } else if (storage=="hex") {
-                        r.ivec=stringToQlonglongArray_hex(data);
-                    } else {
-                        QStringList s=data.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            bool ok=false;
-                            qlonglong d=loc.toLongLong(s[i], &ok);
-                            if (ok) { r.ivec.append(d); }
-                            else { r.ivec.append(0); }
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="integermatrix" || t=="intmtrx") {
+                        r.type=qfrdreIntegerMatrix;
+                        r.ivec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="base64") {
+                            r.ivec=stringToQlonglongArray_base64(data);
+                        } else if (storage=="hex") {
+                            r.ivec=stringToQlonglongArray_hex(data);
+                        } else {
+                            QStringList s=data.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                bool ok=false;
+                                qlonglong d=loc.toLongLong(s[i], &ok);
+                                if (ok) { r.ivec.append(d); }
+                                else { r.ivec.append(0); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                    r.columns=loc.toInt(re.attribute("columns", "0"));
-                } else if (t=="booleanlist" || t=="boollst") {
-                    r.type=qfrdreBooleanVector;
-                    r.bvec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="hex") {
-                        r.bvec=stringToBoolArray(data);
-                    } else {
-                        QStringList s=data.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            if (s[i]!="0") { r.bvec.append(true); }
-                            else { r.bvec.append(false); }
+                        r.unit=re.attribute("unit", "");
+                        r.columns=loc.toInt(re.attribute("columns", "0"));
+                    } else if (t=="booleanlist" || t=="boollst") {
+                        r.type=qfrdreBooleanVector;
+                        r.bvec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="hex") {
+                            r.bvec=stringToBoolArray(data);
+                        } else {
+                            QStringList s=data.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                if (s[i]!="0") { r.bvec.append(true); }
+                                else { r.bvec.append(false); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                } else if (t=="booleanmatrix" || t=="boolmtrx") {
-                    r.type=qfrdreBooleanMatrix;
-                    r.bvec.clear();
-                    QString storage=re.attribute("storage", "ascii").toLower().trimmed();
-                    QString data="0";
-                    if (re.hasAttribute("value")) data=re.attribute("value", "0");
-                    else if (!re.text().isEmpty()) data=re.text();
-                    if (storage=="hex") {
-                        r.bvec=stringToBoolArray(data);
-                    } else {
-                        QStringList s=data.split(";");
-                        for (int i=0; i<s.size(); i++) {
-                            if (s[i]!="0") { r.bvec.append(true); }
-                            else { r.bvec.append(false); }
+                        r.unit=re.attribute("unit", "");
+                    } else if (t=="booleanmatrix" || t=="boolmtrx") {
+                        r.type=qfrdreBooleanMatrix;
+                        r.bvec.clear();
+                        QString storage=re.attribute("storage", "ascii").toLower().trimmed();
+                        QString data="0";
+                        if (re.hasAttribute("value")) data=re.attribute("value", "0");
+                        else if (!re.text().isEmpty()) data=re.text();
+                        if (storage=="hex") {
+                            r.bvec=stringToBoolArray(data);
+                        } else {
+                            QStringList s=data.split(";");
+                            for (int i=0; i<s.size(); i++) {
+                                if (s[i]!="0") { r.bvec.append(true); }
+                                else { r.bvec.append(false); }
+                            }
                         }
-                    }
-                    r.unit=re.attribute("unit", "");
-                    r.columns=loc.toInt(re.attribute("columns", "0"));
+                        r.unit=re.attribute("unit", "");
+                        r.columns=loc.toInt(re.attribute("columns", "0"));
 
-                } else if (t=="numbererror" || t=="numerr") {
-                    r.type=qfrdreNumberError;
-                    r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
-                    r.derror=loc.toDouble(re.attribute("error", "0.0"));
-                    r.unit=re.attribute("unit", "");
+                    } else if (t=="numbererror" || t=="numerr") {
+                        r.type=qfrdreNumberError;
+                        r.dvalue=loc.toDouble(re.attribute("value", "0.0"));
+                        r.derror=loc.toDouble(re.attribute("error", "0.0"));
+                        r.unit=re.attribute("unit", "");
+                    }
+                    if (!n.isEmpty() && !en.isEmpty()) dstore->results[en]->results.insert(n, r);
+                    re=re.nextSiblingElement("result");
                 }
-                if (!n.isEmpty() && !en.isEmpty()) dstore->results[en]->results.insert(n, r);
-                re=re.nextSiblingElement("result");
+
+                te = te.nextSiblingElement("evaluation");
             }
-
-            te = te.nextSiblingElement("evaluation");
         }
-    }
 
-    //std::cout<<"    reading XML: files\n";
-    te=e.firstChildElement("evalgrouplabels");
-    dstore->evalGroupLabels.clear();
-    if (!te.isNull()) {
-        QDomElement fe=te.firstChildElement("group");
-        while (!fe.isNull()) {
-            dstore->evalGroupLabels[fe.attribute("id")]=fe.attribute("label");
-            fe=fe.nextSiblingElement("group");
+        //std::cout<<"    reading XML: files\n";
+        te=e.firstChildElement("evalgrouplabels");
+        dstore->evalGroupLabels.clear();
+        if (!te.isNull()) {
+            QDomElement fe=te.firstChildElement("group");
+            while (!fe.isNull()) {
+                dstore->evalGroupLabels[fe.attribute("id")]=fe.attribute("label");
+                fe=fe.nextSiblingElement("group");
+            }
         }
-    }
 
 
-    te=e.firstChildElement("files");
-    files.clear();
-    if (!te.isNull()) {
-        QDomElement fe=te.firstChildElement("file");
-        while (!fe.isNull()) {
-            QString filexml=fe.text();
-            QString typexml=fe.attribute("type", "");
-            QFileInfo fi(project->getFile());
-            //std::cout<<"file = "<<filexml.toStdString()<<"\n";
-            //std::cout<<"  project-absolute path = "<<fi.absoluteDir().absolutePath().toStdString()<<"\n";
-            //std::cout<<"  file-absolute path = "<<fi.absoluteDir().absoluteFilePath(filexml).toStdString()<<"\n";
+        te=e.firstChildElement("files");
+        files.clear();
+        if (!te.isNull()) {
+            QDomElement fe=te.firstChildElement("file");
+            while (!fe.isNull()) {
+                QString filexml=fe.text();
+                QString typexml=fe.attribute("type", "");
+                QFileInfo fi(project->getFile());
+                //std::cout<<"file = "<<filexml.toStdString()<<"\n";
+                //std::cout<<"  project-absolute path = "<<fi.absoluteDir().absolutePath().toStdString()<<"\n";
+                //std::cout<<"  file-absolute path = "<<fi.absoluteDir().absoluteFilePath(filexml).toStdString()<<"\n";
 
-            files.push_back(fi.absoluteDir().absoluteFilePath(filexml));
-            files_types.append(typexml);
-            fe=fe.nextSiblingElement("file");
+                files.push_back(fi.absoluteDir().absoluteFilePath(filexml));
+                files_types.append(typexml);
+                fe=fe.nextSiblingElement("file");
+            }
         }
+        //std::cout<<"    reading XML: data\n";
+        te=e.firstChildElement("data");
+        intReadData(&te);
+
     }
-    //std::cout<<"    reading XML: data\n";
-    te=e.firstChildElement("data");
-    intReadData(&te);
     //std::cout<<"reading XML: done!\n";
     if (!errorOcc) {
         emit propertiesChanged("", true);
@@ -505,6 +568,14 @@ QString QFRawDataRecord::evaluationResultType2String(QFRawDataRecord::evaluation
 
 
 void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     w.writeStartElement("rawdataelement");
     w.writeAttribute("type", getType());
     w.writeAttribute("id", QString::number(ID));
@@ -684,75 +755,169 @@ void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
 
 
 void QFRawDataRecord::resultsClearAll() {
-    QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
-    while (j.hasNext()) {
-        j.next();
-        delete j.value();
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        QFRawDataRecordPrivate::ResultsIterator j(dstore->results);
+        while (j.hasNext()) {
+            j.next();
+            delete j.value();
+        }
+        dstore->results.clear();
     }
-    dstore->results.clear();
     emitResultsChanged();
 }
 
 void QFRawDataRecord::resultsClear(const QString& name) {
-    if (dstore->results.contains(name)) {
-        //qDebug()<<"resultsClear("<<name<<")";
-        dstore->results[name]->results.clear();
-        delete dstore->results[name];
-        dstore->results.remove(name);
-        emitResultsChanged(name, "", true);
+    bool em=false;
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        if (dstore->results.contains(name)) {
+            //qDebug()<<"resultsClear("<<name<<")";
+            dstore->results[name]->results.clear();
+            delete dstore->results[name];
+            dstore->results.remove(name);
+            em=true;
+
+        }
     }
-};
+    if (em) emitResultsChanged(name, "", true);
+}
 
 int QFRawDataRecord::resultsGetCount(const QString& evalName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evalName)) return dstore->results[evalName]->results.size();
     return 0;
 };
 
 int QFRawDataRecord::resultsGetEvaluationCount() const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return dstore->results.size();
 };
 
 QString QFRawDataRecord::resultsGetEvaluationName(int i) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if ((long)i<dstore->results.size()) return dstore->results.keys().at(i);
     return QString("");
 };
 
 void QFRawDataRecord::resultsSetNumber(const QString& evaluationName, const QString& resultName, double value, const QString& unit) {
-    evaluationResult r;
-    r.type=qfrdreNumber;
-    r.dvalue=value;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreNumber;
+        r.dvalue=value;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 };
 
 void QFRawDataRecord::resultsRemove(const QString& evalName, const QString& resultName, bool emitChangedSignal) {
-    if (dstore->results.contains(evalName)) {
-        bool changed=false;
-        if (dstore->results[evalName]->results.remove(resultName)>0) changed=true;
-        if (dstore->results[evalName]->results.isEmpty()) {
-            resultsClear(evalName);
-            changed=true;
+    bool changed=false;
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (dstore->results.contains(evalName)) {
+            if (dstore->results[evalName]->results.remove(resultName)>0) changed=true;
+            if (dstore->results[evalName]->results.isEmpty()) {
+                #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
+                resultsClear(evalName);
+                changed=true;
+            }
         }
-        if (changed && emitChangedSignal && doEmitResultsChanged) emit resultsChanged(evalName, resultName, true);
     }
+    if (changed && emitChangedSignal && doEmitResultsChanged) emit resultsChanged(evalName, resultName, true);
 }
 
 void QFRawDataRecord::resultsClear(const QString& name, const QString& postfix) {
-    if (dstore->results.contains(name)) {
-        QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[name]->results);
-        while (i.hasNext()) {
-            i.next();
-            //cout << i.key() << ": " << i.value() << endl;
-            if (i.key().endsWith(postfix)) dstore->results[name]->results.remove(i.key());
+    bool em=false;
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (dstore->results.contains(name)) {
+            QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[name]->results);
+            while (i.hasNext()) {
+                i.next();
+                //cout << i.key() << ": " << i.value() << endl;
+                if (i.key().endsWith(postfix)) dstore->results[name]->results.remove(i.key());
+            }
+            if (dstore->results[name]->results.isEmpty()) dstore->results.remove(name);
+            em=true;
+
         }
-        if (dstore->results[name]->results.isEmpty()) dstore->results.remove(name);
-        emitResultsChanged(name, "", true);
     }
+    if (em) emitResultsChanged(name, "", true);
 }
 
 bool QFRawDataRecord::resultsExists(const QString& evalName, const QString& resultName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evalName)) {
         return dstore->results[evalName]->results.contains(resultName);
     }
@@ -760,27 +925,55 @@ bool QFRawDataRecord::resultsExists(const QString& evalName, const QString& resu
 }
 
 bool QFRawDataRecord::resultsExistsFromEvaluation(const QString& evalName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return dstore->results.contains(evalName);
 }
 
 void QFRawDataRecord::resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit) {
-    evaluationResult r;
-    r.type=qfrdreNumberVector;
-    r.dvec=value;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreNumberVector;
+        r.dvec=value;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, const QVector<double>& value, int columns, const QString& unit) {
-    evaluationResult r;
-    r.type=qfrdreNumberMatrix;
-    r.dvec=value;
-    r.unit=unit;
-    r.columns=columns;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        evaluationResult r;
+        r.type=qfrdreNumberMatrix;
+        r.dvec=value;
+        r.unit=unit;
+        r.columns=columns;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
@@ -801,25 +994,46 @@ void QFRawDataRecord::resultsSetNumberMatrix(const QString& evaluationName, cons
 }
 
 void QFRawDataRecord::resultsSetNumberErrorList(const QString& evaluationName, const QString& resultName, const QVector<double> &value, const QVector<double> &error, const QString& unit) {
-    evaluationResult r;
-    r.type=qfrdreNumberErrorVector;
-    r.dvec=value;
-    r.evec=error;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreNumberErrorVector;
+        r.dvec=value;
+        r.evec=error;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetNumberErrorMatrix(const QString& evaluationName, const QString& resultName, const QVector<double> &value, const QVector<double> &error, int columns, const QString& unit) {
-    evaluationResult r;
-    r.type=qfrdreNumberErrorMatrix;
-    r.dvec=value;
-    r.evec=error;
-    r.unit=unit;
-    r.columns=columns;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        evaluationResult r;
+        r.type=qfrdreNumberErrorMatrix;
+        r.dvec=value;
+        r.evec=error;
+        r.unit=unit;
+        r.columns=columns;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
@@ -843,238 +1057,378 @@ void QFRawDataRecord::resultsSetNumberErrorMatrix(const QString& evaluationName,
 
 
 void QFRawDataRecord::resultsSetInNumberList(const QString &evaluationName, const QString &resultName, int position, double value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreNumberVector;
-    r.unit=unit;
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberVector;
+        r.unit=unit;
 
-    if (position>=r.dvec.size()) {
-        for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        if (position>=r.dvec.size()) {
+            for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        }
+        r.dvec[position]=value;
     }
-    r.dvec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreNumberMatrix;
-    r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    int position=column+row*r.columns;
-    if (position>=r.dvec.size()) {
-        for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberMatrix;
+        r.unit=unit;
+
+        int position=column+row*r.columns;
+        if (position>=r.dvec.size()) {
+            for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        }
+        r.dvec[position]=value;
     }
-    r.dvec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double value, double error, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreNumberErrorVector;
-    r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    if (position>=r.dvec.size()) {
-        for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberErrorVector;
+        r.unit=unit;
+
+        if (position>=r.dvec.size()) {
+            for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        }
+        if (position>=r.evec.size()) {
+            for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
+        }
+        r.dvec[position]=value;
+        r.evec[position]=error;
     }
-    if (position>=r.evec.size()) {
-        for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
-    }
-    r.dvec[position]=value;
-    r.evec[position]=error;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double error) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+     {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreNumberErrorVector;
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberErrorVector;
 
-    if (position>=r.evec.size()) {
-        for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
+        if (position>=r.evec.size()) {
+            for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
+        }
+        r.evec[position]=error;
     }
-    r.evec[position]=error;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, double error, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {   
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreNumberErrorMatrix;
-    r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    int position=column+row*r.columns;
-    if (position>=r.dvec.size()) {
-        for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberErrorMatrix;
+        r.unit=unit;
+
+        int position=column+row*r.columns;
+        if (position>=r.dvec.size()) {
+            for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        }
+        if (position>=r.evec.size()) {
+            for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
+        }
+        r.dvec[position]=value;
+        r.evec[position]=error;
     }
-    if (position>=r.evec.size()) {
-        for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
-    }
-    r.dvec[position]=value;
-    r.evec[position]=error;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreIntegerVector;
-    r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    if (position>=r.ivec.size()) {
-        for (int i=r.ivec.size(); i<=position; i++) r.ivec.append(0);
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreIntegerVector;
+        r.unit=unit;
+
+        if (position>=r.ivec.size()) {
+            for (int i=r.ivec.size(); i<=position; i++) r.ivec.append(0);
+        }
+        r.ivec[position]=value;
     }
-    r.ivec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {     
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreNumberMatrix;
-    r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    int position=column+row*r.columns;
-    if (position>=r.ivec.size()) {
-        for (int i=r.ivec.size(); i<=position; i++) r.ivec.append(0);
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberMatrix;
+        r.unit=unit;
+
+        int position=column+row*r.columns;
+        if (position>=r.ivec.size()) {
+            for (int i=r.ivec.size(); i<=position; i++) r.ivec.append(0);
+        }
+        r.ivec[position]=value;
     }
-    r.ivec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {     
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreBooleanVector;
-    r.unit=unit;
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreBooleanVector;
+        r.unit=unit;
 
-    if (position>=r.bvec.size()) {
-        for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(0);
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(0);
+        }
+        r.bvec[position]=value;
     }
-    r.bvec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreBooleanMatrix;
-    r.unit=unit;
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreBooleanMatrix;
+        r.unit=unit;
 
-    int position=column+row*r.columns;
-    if (position>=r.bvec.size()) {
-        for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(0);
+        int position=column+row*r.columns;
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(0);
+        }
+        r.bvec[position]=value;
     }
-    r.bvec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {     
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreStringVector;
-    r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    if (position>=r.svec.size()) {
-        for (int i=r.svec.size(); i<=position; i++) r.svec.append("");
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreStringVector;
+        r.unit=unit;
+
+        if (position>=r.svec.size()) {
+            for (int i=r.svec.size(); i<=position; i++) r.svec.append("");
+        }
+        r.svec[position]=value;
     }
-    r.svec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &value, const QString &unit) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+    {     
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-    r.type=qfrdreStringMatrix;
-    r.unit=unit;
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreStringMatrix;
+        r.unit=unit;
 
-    int position=column+row*r.columns;
-    if (position>=r.svec.size()) {
-        for (int i=r.svec.size(); i<=position; i++) r.svec.append(0);
+        int position=column+row*r.columns;
+        if (position>=r.svec.size()) {
+            for (int i=r.svec.size(); i<=position; i++) r.svec.append(0);
+        }
+        r.svec[position]=value;
     }
-    r.svec[position]=value;
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsResetInMatrix(const QString &evaluationName, const QString &resultName, int row, int column) {
-    if (!dstore->results.contains(evaluationName)) return;
-    if (!dstore->results[evaluationName]->results.contains(resultName)) return;
+    {   
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) return;
+        if (!dstore->results[evaluationName]->results.contains(resultName)) return;
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
-
-    resultsResetInList(evaluationName, resultName, column+row*r.columns);
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
+        resultsResetInList(evaluationName, resultName, column+row*r.columns);
+    }
 }
 
 void QFRawDataRecord::resultsResetInList(const QString &evaluationName, const QString &resultName, int position) {
-    if (!dstore->results.contains(evaluationName)) return;
-    if (!dstore->results[evaluationName]->results.contains(resultName)) return;
+    {    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        if (!dstore->results.contains(evaluationName)) return;
+        if (!dstore->results[evaluationName]->results.contains(resultName)) return;
 
-    switch(r.type) {
-        case qfrdreStringVector:
-        case qfrdreStringMatrix:
-            if (position<r.svec.size()) {
-                r.svec[position]="";
-            }
-            break;
-        case qfrdreIntegerVector:
-        case qfrdreIntegerMatrix:
-            if (position<r.ivec.size()) {
-                r.ivec[position]=0;
-            }
-            break;
-        case qfrdreBooleanVector:
-        case qfrdreBooleanMatrix:
-            if (position<r.bvec.size()) {
-                r.bvec[position]=false;
-            }
-            break;
-        case qfrdreNumberVector:
-        case qfrdreNumberMatrix:
-            if (position<r.dvec.size()) {
-                r.dvec[position]=0;
-            }
-            break;
-        case qfrdreNumberErrorVector:
-        case qfrdreNumberErrorMatrix:
-            if (position<r.dvec.size()) {
-                r.dvec[position]=0;
-            }
-            if (position<r.evec.size()) {
-                r.evec[position]=0;
-            }
-            break;
-        default: break;
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+
+        switch(r.type) {
+            case qfrdreStringVector:
+            case qfrdreStringMatrix:
+                if (position<r.svec.size()) {
+                    r.svec[position]="";
+                }
+                break;
+            case qfrdreIntegerVector:
+            case qfrdreIntegerMatrix:
+                if (position<r.ivec.size()) {
+                    r.ivec[position]=0;
+                }
+                break;
+            case qfrdreBooleanVector:
+            case qfrdreBooleanMatrix:
+                if (position<r.bvec.size()) {
+                    r.bvec[position]=false;
+                }
+                break;
+            case qfrdreNumberVector:
+            case qfrdreNumberMatrix:
+                if (position<r.dvec.size()) {
+                    r.dvec[position]=0;
+                }
+                break;
+            case qfrdreNumberErrorVector:
+            case qfrdreNumberErrorMatrix:
+                if (position<r.dvec.size()) {
+                    r.dvec[position]=0;
+                }
+                if (position<r.evec.size()) {
+                    r.evec[position]=0;
+                }
+                break;
+            default: break;
+        }
     }
-
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
@@ -1085,23 +1439,42 @@ double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, co
 }
 
 void QFRawDataRecord::resultsSetIntegerList(const QString &evaluationName, const QString &resultName, const QVector<qlonglong> &value, const QString &unit) {
-    evaluationResult r;
-    r.type=qfrdreIntegerVector;
-    r.ivec=value;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreIntegerVector;
+        r.ivec=value;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetIntegerMatrix(const QString &evaluationName, const QString &resultName, const QVector<qlonglong> &value, int columns, const QString &unit) {
-    evaluationResult r;
-    r.type=qfrdreIntegerMatrix;
-    r.ivec=value;
-    r.unit=unit;
-    r.columns=columns;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreIntegerMatrix;
+        r.ivec=value;
+        r.unit=unit;
+        r.columns=columns;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
@@ -1122,23 +1495,41 @@ void QFRawDataRecord::resultsSetIntegerMatrix(const QString &evaluationName, con
 }
 
 void QFRawDataRecord::resultsSetBooleanList(const QString &evaluationName, const QString &resultName, const QVector<bool> &value, const QString &unit) {
-    evaluationResult r;
-    r.type=qfrdreBooleanVector;
-    r.bvec=value;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreBooleanVector;
+        r.bvec=value;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetBooleanMatrix(const QString &evaluationName, const QString &resultName, const QVector<bool> &value, int columns, const QString &unit) {
-    evaluationResult r;
-    r.type=qfrdreBooleanMatrix;
-    r.bvec=value;
-    r.unit=unit;
-    r.columns=columns;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreBooleanMatrix;
+        r.bvec=value;
+        r.unit=unit;
+        r.columns=columns;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
@@ -1159,106 +1550,206 @@ void QFRawDataRecord::resultsSetBooleanMatrix(const QString &evaluationName, con
 }
 
 void QFRawDataRecord::resultsSetStringList(const QString &evaluationName, const QString &resultName, const QVector<QString> &value, const QString &unit) {
-    evaluationResult r;
-    r.type=qfrdreStringVector;
-    r.svec=value.toList();
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreStringVector;
+        r.svec=value.toList();
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetStringMatrix(const QString &evaluationName, const QString &resultName, const QVector<QString> &value, int columns, const QString &unit) {
-    evaluationResult r;
-    r.type=qfrdreStringMatrix;
-    r.svec=value.toList();
-    r.unit=unit;
-    r.columns=columns;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreStringMatrix;
+        r.svec=value.toList();
+        r.unit=unit;
+        r.columns=columns;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 
 
 void QFRawDataRecord::resultsSetNumberError(const QString& evaluationName, const QString& resultName, double value, double error, const QString& unit)  {
-    evaluationResult r;
-    r.type=qfrdreNumberError;
-    r.dvalue=value;
-    r.derror=error;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreNumberError;
+        r.dvalue=value;
+        r.derror=error;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetNumberErrorError(const QString &evaluationName, const QString &resultName, double error) {
-    evaluationResult r;
-    r.type=qfrdreNumberError;
-    r.derror=error;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreNumberError;
+        r.derror=error;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetInteger(const QString& evaluationName, const QString& resultName, int64_t value, const QString& unit) {
-    evaluationResult r;
-    r.type=qfrdreInteger;
-    r.ivalue=value;
-    r.unit=unit;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreInteger;
+        r.ivalue=value;
+        r.unit=unit;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetString(const QString& evaluationName, const QString& resultName, const QString& value) {
-    evaluationResult r;
-    r.type=qfrdreString;
-    r.svalue=value;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreString;
+        r.svalue=value;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QString& resultName, const QString& label, const QString& label_rich) {
-    if (!resultsExists(evaluationName, resultName)) return;
-    evaluationResult r=resultsGet(evaluationName, resultName);
-    r.label=label;
-    r.label_rich=label_rich;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results[resultName]=r;
+    {
+        if (!resultsExists(evaluationName, resultName)) return;
+        evaluationResult r=resultsGet(evaluationName, resultName);
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        r.label=label;
+        r.label_rich=label_rich;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results[resultName]=r;
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QString& resultName, const QString& group) {
-    if (!resultsExists(evaluationName, resultName)) return;
-    evaluationResult r=resultsGet(evaluationName, resultName);
-    r.group=group;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results[resultName]=r;
+        if (!resultsExists(evaluationName, resultName)) return;
+        evaluationResult r=resultsGet(evaluationName, resultName);
+        r.group=group;
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results[resultName]=r;
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr) {
-    if (!resultsExists(evaluationName, resultName)) return;
-    evaluationResult r=resultsGet(evaluationName, resultName);
-    r.sortPriority=pr;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results[resultName]=r;
+    {
+        if (!resultsExists(evaluationName, resultName)) return;
+        evaluationResult r=resultsGet(evaluationName, resultName);
+
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        r.sortPriority=pr;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results[resultName]=r;
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 bool QFRawDataRecord::resultsGetSortPriority(const QString& evaluationName, const QString& resultName) const {
-    const evaluationResult& r=resultsGet(evaluationName, resultName);
+    const evaluationResult r=resultsGet(evaluationName, resultName);
     return r.sortPriority;
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroupIndex(const QString& evaluationName, int64_t groupIndex) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
     dstore->results[evaluationName]->groupIndex=groupIndex;
 }
 
 int64_t QFRawDataRecord::resultsGetEvaluationGroupIndex(const QString& evaluationName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evaluationName)) {
         return dstore->results[evaluationName]->groupIndex;
     }
@@ -1266,10 +1757,26 @@ int64_t QFRawDataRecord::resultsGetEvaluationGroupIndex(const QString& evaluatio
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroupLabel(const QString& evalGroup, const QString& label) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     dstore->evalGroupLabels[evalGroup]=label;
 }
 
 QString QFRawDataRecord::resultsGetLabelForEvaluationGroup(const QString& evalGroup) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->evalGroupLabels.contains(evalGroup)) {
         return dstore->evalGroupLabels[evalGroup];
     } else {
@@ -1278,11 +1785,27 @@ QString QFRawDataRecord::resultsGetLabelForEvaluationGroup(const QString& evalGr
 }
 
 void QFRawDataRecord::resultsSetEvaluationGroup(const QString& evaluationName, const QString& group) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
     dstore->results[evaluationName]->group=group;
 }
 
 QString QFRawDataRecord::resultsGetEvaluationGroup(const QString& evaluationName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evaluationName)) {
         return dstore->results[evaluationName]->group;
     }
@@ -1290,18 +1813,50 @@ QString QFRawDataRecord::resultsGetEvaluationGroup(const QString& evaluationName
 }
 
 QString QFRawDataRecord::resultsGetEvaluationGroupLabel(const QString& evaluationName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evaluationName)) {
-        return resultsGetLabelForEvaluationGroup(dstore->results[evaluationName]->group);
+        QString g=dstore->results[evaluationName]->group;
+        #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
+        return resultsGetLabelForEvaluationGroup(g);
     }
     return "";
 }
 
 void QFRawDataRecord::resultsSetEvaluationDescription(const QString& evaluationName, const QString& description) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
     dstore->results[evaluationName]->description=description;
 }
 
 QString QFRawDataRecord::resultsGetEvaluationDescription(const QString& evaluationName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evaluationName)) {
         QString g=dstore->results[evaluationName]->description;
         if (g.isEmpty()) return evaluationName;
@@ -1311,17 +1866,35 @@ QString QFRawDataRecord::resultsGetEvaluationDescription(const QString& evaluati
 }
 
 void QFRawDataRecord::resultsSetBoolean(const QString& evaluationName, const QString& resultName, bool value) {
-    evaluationResult r;
-    r.type=qfrdreBoolean;
-    r.bvalue=value;
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, r);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.type=qfrdreBoolean;
+        r.bvalue=value;
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 };
 
 void QFRawDataRecord::resultsSet(const QString& evaluationName, const QString& resultName, const evaluationResult& result) {
-    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-    dstore->results[evaluationName]->results.insert(resultName, result);
+    { 
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, result);
+    }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
@@ -1329,6 +1902,14 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
 {
     evaluationResult r;
     if (resultsExists(evalName, resultName)) {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
         return dstore->results[evalName]->results.value(resultName);
     }
     return r;
@@ -1336,6 +1917,14 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
 
 QFRawDataRecord::evaluationResultType QFRawDataRecord::resultsGetType(const QString& evalName, const QString& resultName) const {
     if (resultsExists(evalName, resultName)) {
+        
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
         return dstore->results[evalName]->results.value(resultName).type;
     }
     return qfrdreInvalid;
@@ -1888,6 +2477,14 @@ QString QFRawDataRecord::resultsGetLabelRichtext(const QString& evaluationName, 
 
 
 QString QFRawDataRecord::resultsGetResultName(const QString& evaluationName, int i) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (dstore->results.contains(evaluationName)) {
         QList<QString> r=dstore->results[evaluationName]->results.keys();
         if (i<r.size()) {
@@ -1899,11 +2496,21 @@ QString QFRawDataRecord::resultsGetResultName(const QString& evaluationName, int
 
 void QFRawDataRecord::resultsCopy(const QString& oldEvalName, const QString& newEvalName) {
     if (resultsExistsFromEvaluation(oldEvalName)) {
-        QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[oldEvalName]->results);
-        while (i.hasNext()) {
-            i.next();
-            if (!dstore->results.contains(newEvalName)) dstore->results[newEvalName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-            dstore->results[newEvalName]->results.insert(i.key(), i.value());
+        {     
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+            QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[oldEvalName]->results);
+            while (i.hasNext()) {
+                i.next();
+                if (!dstore->results.contains(newEvalName)) dstore->results[newEvalName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+                dstore->results[newEvalName]->results.insert(i.key(), i.value());
+            }
         }
         emitResultsChanged(newEvalName, "", false);
     }
@@ -2080,6 +2687,14 @@ bool QFRawDataRecord_StringTripleCaseInsensitiveCompareThird(const QTriple<QStri
 
 
 QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const QString& group, const QString& evalgroup) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList l, lp;
 
     QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
@@ -2108,6 +2723,14 @@ QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const 
 
 
 QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList l;
     QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
     while (i.hasNext()) {
@@ -2131,6 +2754,14 @@ QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const
 
 
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const QString& evalName, const QString& group, const QString& evalgroup) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList l;
     QList<QPair<QString, QString> > list, listp;
     QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
@@ -2144,10 +2775,12 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const
                 j.next();
                 QString rn=j.key();
                 QString g=j.value().group;
-                QString lab=resultsGetLabel(en, rn);
+                QString lab=j.value().label;
+                if (lab.isEmpty()) lab=rn;
+                //resultsGetLabel(en, rn);
                 if ((group.isEmpty() || (group==g)) && (!l.contains(lab))) {
                     l.append(lab);
-                    if (resultsGetSortPriority(en, rn)) {
+                    if (j.value().sortPriority) {
                         if (g.isEmpty()) listp.append(qMakePair(lab, rn));
                         else listp.append(qMakePair(g+QString(": ")+lab, rn));
                     } else {
@@ -2172,6 +2805,14 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const
 
 
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichtext(const QString& evalName, const QString& group, const QString& evalgroup) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList l;
     /*
        This function first creates a list of the triple <label, richtext_label, result_id> that matches the given filters. Then this list
@@ -2190,11 +2831,13 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
             while (j.hasNext()) {
                 j.next();
                 QString rn=j.key();
-                QString lab=resultsGetLabel(en, rn);
-                QString labrt=resultsGetLabelRichtext(en, rn);
-                if ((group.isEmpty() || (group==resultsGetGroup(en, rn))) && (!l.contains(lab))) {
+                QString lab=j.value().label;
+                if (lab.isEmpty()) lab=rn; //resultsGetLabel(en, rn);
+                QString labrt=j.value().label;
+                if (labrt.isEmpty()) labrt=lab; //resultsGetLabelRichtext(en, rn);
+                if ((group.isEmpty() || (group==j.value().group)) && (!l.contains(lab))) {
                     l.append(lab);
-                    if (resultsGetSortPriority(en, rn)) listp.append(qMakeTriple(lab, labrt, rn));
+                    if (j.value().sortPriority) listp.append(qMakeTriple(lab, labrt, rn));
                     else list.append(qMakeTriple(lab, labrt, rn));
                 }
             }
@@ -2217,6 +2860,14 @@ QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichte
 
 
 QList<QString> QFRawDataRecord::resultsCalcEvaluationsInGroup(const QString& evalGroup) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList l;
 
 
@@ -2233,6 +2884,14 @@ QList<QString> QFRawDataRecord::resultsCalcEvaluationsInGroup(const QString& eva
 
 
 QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup) const {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList l;
 
     QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
@@ -2309,22 +2968,60 @@ bool QFRawDataRecord::isEmitPropertiesChangedEnabled() const {
 }
 
 QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
     return resultsGetInStringList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
 bool QFRawDataRecord::resultsGetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
     return resultsGetInBooleanList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
 QString QFRawDataRecord::resultsGetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
@@ -2335,14 +3032,37 @@ QString QFRawDataRecord::resultsGetInStringList(const QString &evaluationName, c
 }
 
 qlonglong QFRawDataRecord::resultsGetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
     return resultsGetInIntegerList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
 bool QFRawDataRecord::resultsGetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
@@ -2353,14 +3073,37 @@ bool QFRawDataRecord::resultsGetInBooleanList(const QString &evaluationName, con
 }
 
 double QFRawDataRecord::resultsGetErrorInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
     return resultsGetErrorInNumberErrorList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
 qlonglong QFRawDataRecord::resultsGetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
@@ -2371,14 +3114,37 @@ qlonglong QFRawDataRecord::resultsGetInIntegerList(const QString &evaluationName
 }
 
 double QFRawDataRecord::resultsGetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
     evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    #ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"unlock";
+#endif
+ locker.unlock();
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  unlocked";
+#endif
     return resultsGetInNumberList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
 double QFRawDataRecord::resultsGetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) {
+    
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
     if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 

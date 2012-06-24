@@ -235,7 +235,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             }
         }
     } else if (role==Qt::BackgroundColorRole) {
-        if (resNameI==lastResultNames.size()) {
+        if (resI==lastResults.size()) {
             return QColor("lightsteelblue");
         }
     } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {

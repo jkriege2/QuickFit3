@@ -197,6 +197,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets() {
     pltResiduals->get_plotter()->set_keyYMargin(2);
     pltResiduals->useExternalDatastore(pltData->getDatastore());
     pltResiduals->setMinimumHeight(75);
+    pltData->setMinimumHeight(75);
 
 
     datacut=new DataCutSliders(this);

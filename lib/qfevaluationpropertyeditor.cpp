@@ -158,7 +158,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(current, SIGNAL(propertiesChanged(const QString&,bool)), this, SLOT(propsChanged(QString,bool)));
         disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        disconnect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
+        disconnect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
         disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         if (c) {
             if (c->getType()!=oldType) {

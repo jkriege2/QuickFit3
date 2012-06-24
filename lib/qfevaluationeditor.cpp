@@ -27,14 +27,14 @@ void QFEvaluationEditor::setCurrent(QFEvaluationItem* c, int peID) {
     if (current) saveSettings();
     QFEvaluationItem* old=current;
     if (current) {
-        disconnect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
+        disconnect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
     }
     current=c;
     this->peID=peID;
     //std::cout<<"connecting widgets ... \n";
     connectWidgets(current, old);
     //std::cout<<"connecting widgets ... done\n";
-    connect(c, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QString,QString,bool)));
+    connect(c, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
 }
 
 void QFEvaluationEditor::closeEvent( QCloseEvent * event ) {

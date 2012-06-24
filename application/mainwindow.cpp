@@ -996,14 +996,14 @@ void MainWindow::readSettings() {
         timerAutosave->start();
     }
 
-    if (settings->getProjectWindowsStayOnTop()) setWindowFlags(Qt::Window/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint */);
-    else setWindowFlags(Qt::Window);
-    show();
+    //if (settings->getProjectWindowsStayOnTop()) setWindowFlags(Qt::Window/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint */);
+    //else setWindowFlags(Qt::Window);
+    //show();
 
-    if (helpWindow) {
-        if (settings->getHelpWindowsStayOnTop()) helpWindow->setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
-        else helpWindow->setWindowFlags(Qt::Tool);
-    }
+    //if (helpWindow) {
+    //    if (settings->getHelpWindowsStayOnTop()) helpWindow->setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
+    //    else helpWindow->setWindowFlags(Qt::Tool);
+    //}
 
 }
 
