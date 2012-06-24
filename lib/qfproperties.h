@@ -6,6 +6,9 @@
 #include <QHash>
 #include <QVariant>
 #include <QStringList>
+#include <QReadLocker>
+#include <QWriteLocker>
+#include <QReadWriteLock>
 #include "lib_imexport.h"
 
 class QDomElement; // forward
@@ -23,46 +26,33 @@ class QFLIB_EXPORT QFProperties {
         virtual ~QFProperties();
 
         /** \brief clear all properties */
-        inline void clearProperties() { props.clear(); emitPropertiesChanged(); }
+        void clearProperties() ;
         /** \brief return the value of the specified property */
         QVariant getProperty( const QString& p) const ;
         /** \brief return the value of the specified property or the supplied default value */
         QVariant getProperty(const QString& p, const QVariant& defaultValue) const;
         /** \brief return the number of properties in the object */
-        inline unsigned int getPropertyCount() const { return props.size(); };
+        unsigned int getPropertyCount() const;
         /** \brief return the number of visible properties in the object */
         unsigned int getVisiblePropertyCount() const;
         /** \brief get the name of the i-th visible property */
         QString getVisibleProperty(unsigned int i) const;
         /** \brief returns a QStringList which contains the names of all properties */
-        inline QStringList getPropertyNames() const { return props.keys(); };
+        QStringList getPropertyNames() const ;
         /** \brief returns the name of the i-th property */
-        inline QString getPropertyName(int i) const { return props.keys().at(i); };
+        QString getPropertyName(int i) const ;
         /** \brief returns whether the given property is visible */
-        inline bool isPropertyVisible(QString property) const {
-            if (!props.contains(property)) return false;
-            return props[property].visible;
-        };
+        bool isPropertyVisible(QString property) const;
         /** \brief returns whether the given property is user editable */
-        inline bool isPropertyUserEditable(QString property) const {
-            if (!props.contains(property)) return false;
-            return props[property].usereditable;
-        };
+        bool isPropertyUserEditable(QString property) const ;
         /** \brief delete the given property */
-        inline void deleteProperty(const QString& n) { props.remove(n); emitPropertiesChanged(); };
+        void deleteProperty(const QString& n);
 
         /** \brief returns true if the specified property exists */
-        inline bool propertyExists(const QString& p) const { return props.contains(p); };
+        bool propertyExists(const QString& p) const;
 
-/** \brief set property to the specified value */
-        inline void setQFProperty(const QString& p, QVariant value, bool usereditable=true, bool visible=true) {
-            propertyItem i;
-            i.data=value;
-            i.usereditable=usereditable;
-            i.visible=visible;
-            props[p]=i;
-            emitPropertiesChanged();
-        }
+        /** \brief set property to the specified value */
+        void setQFProperty(const QString& p, QVariant value, bool usereditable=true, bool visible=true);
         /** \brief set property to the specified value */
         inline void setDoubleProperty(const QString& p, double value, bool usereditable=true, bool visible=true) {
             setQFProperty(p, QVariant(value), usereditable, visible);
@@ -89,6 +79,8 @@ class QFLIB_EXPORT QFProperties {
         /** \brief internal store for the objectproperties */
         QHash<QString, propertyItem> props;
 
+        mutable QReadWriteLock* propertyLocker;
+
         /** \brief called when the project properties (name, description, ...) changed
          *
          *  As there are problems when deriving from two classes with the same base class
@@ -97,7 +89,7 @@ class QFLIB_EXPORT QFProperties {
          *  signals, we have to use a method that will then be implemented by the inheriting
          *  class.
          */
-        virtual void emitPropertiesChanged() {};
+        virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true ) {};
         /** \brief issue an error report/set object into error state
          *
          * This should be reimplemented by the inheriting object, to comply woth its error

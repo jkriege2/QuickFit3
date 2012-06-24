@@ -6,6 +6,7 @@ QFRDRPropertyModel::QFRDRPropertyModel():
     QAbstractTableModel()
 {
     record=NULL;
+    props.clear();
 }
 
 QFRDRPropertyModel::~QFRDRPropertyModel()
@@ -14,23 +15,58 @@ QFRDRPropertyModel::~QFRDRPropertyModel()
 }
 
 
-void QFRDRPropertyModel::propertiesChanged() {
-    //qDebug()<<"QFRDRPropertyModel::propertiesChanged()";
-    reset();
+void QFRDRPropertyModel::propertiesChanged(const QString &property, bool visible) {
+    qDebug()<<"QFRDRPropertyModel::propertiesChanged()   porperty="<<property<<"   visible="<<visible;
+    if (visible) {
+        if (property.isEmpty()){
+            qDebug()<<"QFRDRPropertyModel::propertiesChanged: updateModel()";
+            updateModel();
+        } else {
+            int row=props.indexOf(property);
+            if (row<0) {
+                //updateModel();
+                int i=0;
+                while (i<props.size() && property<=props[i]) {
+                    i++;
+                }
+                qDebug()<<"QFRDRPropertyModel::propertiesChanged: insert i="<<i<<"   props.size()="<<props.size();
+                beginInsertRows(QModelIndex(), i, i);
+                props.insert(i, property);
+                endInsertRows();
+                //emit dataChanged(index(i, 0), index(i, columnCount()-1));
+            } else {
+                qDebug()<<"QFRDRPropertyModel::propertiesChanged: data changed row="<<row;
+                emit dataChanged(index(row, 0), index(row, columnCount()-1));
+            }
+        }
+    }
     //qDebug()<<"QFRDRPropertyModel::propertiesChanged() ... done";
+}
+
+void QFRDRPropertyModel::updateModel(bool doReset)
+{
+    int count=record->getVisiblePropertyCount();
+    props.clear();
+    for (int i=0; i<count; i++) {
+        props.append(record->getVisibleProperty(i));
+    }
+    props.sort();
+    if (doReset) reset();
 }
 
 void QFRDRPropertyModel::init(QFRawDataRecord* record) {
     setParent(record);
     this->record=record;
     disconnect();
-    connect(record, SIGNAL(propertiesChanged()), this, SLOT(propertiesChanged()));
+    props.clear();
+    if (record) updateModel();
+    connect(record, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(propertiesChanged(QString,bool)));
 }
 
 int QFRDRPropertyModel::rowCount(const QModelIndex &parent ) const {
     if (!record) return 0;
     //std::cout<<"getVisiblePropertyCount() = "<<record->getVisiblePropertyCount()<<"\n";
-    return record->getVisiblePropertyCount();
+    return props.size();
 }
 
 int QFRDRPropertyModel::columnCount(const QModelIndex &parent) const {
@@ -48,13 +84,16 @@ Qt::ItemFlags QFRDRPropertyModel::flags(const QModelIndex &index) const {
 bool QFRDRPropertyModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (!record || !index.isValid()) return false;
     if (index.isValid() && index.column()==2 && role == Qt::EditRole) {
-        QString p=record->getVisibleProperty(index.row());
-        if (!record->isPropertyUserEditable(p)) return false;
-        record->setQFProperty(p, value);
-        return true;
+        QString p=props.value(index.row(), "");
+        if (!p.isEmpty()) {
+            if (!record->isPropertyUserEditable(p)) return false;
+            record->setQFProperty(p, value);
+            return true;
+        }
     }
     return false;
 }
+
 
 QVariant QFRDRPropertyModel::data(const QModelIndex &index, int role) const {
     if (!record || !index.isValid()) return QVariant();
@@ -76,10 +115,12 @@ QVariant QFRDRPropertyModel::data(const QModelIndex &index, int role) const {
             }
         }
     } else if (role==Qt::DisplayRole || role==Qt::EditRole) {
-        QString p=record->getVisibleProperty(index.row());
-        if (index.column()==0) return p;
-        if (index.column()==1) return record->getProperty(p).typeName();
-        if (index.column()==2) return record->getProperty(p);
+        QString p=props.value(index.row(), "");
+        if (!p.isEmpty()) {
+            if (index.column()==0) return p;
+            if (index.column()==1) return record->getProperty(p).typeName();
+            if (index.column()==2) return record->getProperty(p);
+        }
     }
     return QVariant();
 }

@@ -25,7 +25,7 @@ void QFCompleterFromFile::setFilename(QString val) {
     disconnect(model(), SIGNAL(modelReset ()), this, SLOT(modelReset()));
     if (m_filename.size()>0) {
         //std::cout<<"opening for reading '"<<m_filename.toStdString()<<"' ... ";
-        qDebug()<<"opening for reading: "<<m_filename;
+        //qDebug()<<"opening for reading: "<<m_filename;
         QFile f(m_filename);
         if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
             //std::cout<<"OK\n";
@@ -44,7 +44,7 @@ void QFCompleterFromFile::modelDataChanged ( const QModelIndex & topLeft, const 
     //std::cout<<"model changed\n";
     if (m_filename.size()>0) {
         QFile f(m_filename);
-        qDebug()<<"opening for writing: "<<m_filename;
+        //qDebug()<<"opening for writing: "<<m_filename;
         if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
             //std::cout<<"OK\n";
             QStringList sl=m_stringlist->stringList();

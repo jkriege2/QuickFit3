@@ -509,7 +509,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValues(QFRawDataRecord* 
                 }
                 if (doEmit) r->enableEmitResultsChanged(true);
                 doEmitResultsChanged=thisDoEmit;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
                 emitResultsChanged();
             }
         }
@@ -537,7 +537,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisible(QFRawDataR
                 }
                 if (doEmit) r->enableEmitResultsChanged(true);
                 doEmitResultsChanged=thisDoEmit;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
                 emitResultsChanged();
             }
         }
@@ -580,7 +580,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAn
                 }
                 if (doEmit) r->enableEmitResultsChanged(true);
                 doEmitResultsChanged=thisDoEmit;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
                 emitResultsChanged();
             }
         }

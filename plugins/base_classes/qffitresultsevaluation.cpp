@@ -132,7 +132,8 @@ void QFFitResultsEvaluation::setFitFunction(QString fitFunction) {
                 if (params[pid].max!=getFitMax(pid)) setFitMax(pid, params[pid].max);
             }
         }
-        emitPropertiesChanged();
+        //emitPropertiesChanged();
+        project->setDataChanged();
     }
 }
 
@@ -143,7 +144,8 @@ void QFFitResultsEvaluation::storeQFFitAlgorithmParameters(QFFitAlgorithm* algor
         QString pid=params[i];
         algorithm_parameterstore[aid].insert(pid, algorithm->getParameter(pid));
     }
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFFitResultsEvaluation::restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) {
@@ -416,7 +418,8 @@ void QFFitResultsEvaluation::setFitValue(QFRawDataRecord* r, const QString& resu
                 if (d.userEditable) {
                     parameterStore[getParameterStoreID(parameterID)].value=value;
                     parameterStore[getParameterStoreID(parameterID)].valueSet=true;
-                    emitPropertiesChanged();
+                    //emitPropertiesChanged();
+                    project->setDataChanged();
                 }
             }
         }
@@ -436,7 +439,8 @@ void QFFitResultsEvaluation::setFitError(QFRawDataRecord* r, const QString& resu
                 if (d.userEditable) {
                     parameterStore[getParameterStoreID(parameterID)].error=error;
                     parameterStore[getParameterStoreID(parameterID)].errorSet=true;
-                    emitPropertiesChanged();
+                    //emitPropertiesChanged();
+                    project->setDataChanged();
                 }
             }
         }
@@ -480,7 +484,6 @@ void QFFitResultsEvaluation::setFitResultValues(QFRawDataRecord* r, const QStrin
                 QString unit=f->getDescription(pid).unit;
                 r->resultsSetNumberError(transformResultID(resultID), getFitParamID(pid), values[i], errors[i], unit);
             }
-            emitPropertiesChanged();
             emitResultsChanged();
         }
 
@@ -499,7 +502,6 @@ void QFFitResultsEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, const
                     r->resultsSetNumberError(transformResultID(resultID), getFitParamID(pid), values[i], errors[i], unit);
                 }
             }
-            emitPropertiesChanged();
             emitResultsChanged();
         }
 
@@ -529,7 +531,6 @@ void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDat
                     }
                 }
             }
-            emitPropertiesChanged();
             emitResultsChanged();
         }
 
@@ -606,7 +607,8 @@ void QFFitResultsEvaluation::setFitFix(QFRawDataRecord* r, const QString& result
                 if (d.userEditable) {
                     parameterStore[getParameterStoreID(parameterID)].fix=fix;
                     parameterStore[getParameterStoreID(parameterID)].fixSet=true;
-                    emitPropertiesChanged();
+                    //emitPropertiesChanged();
+                    project->setDataChanged();
                 }
             }
         }
@@ -1089,7 +1091,8 @@ void QFFitResultsEvaluation::setInitFitValue(const QString& id, double value, do
                     parameterStore[getParameterStoreID(id)].error=0;
                     parameterStore[getParameterStoreID(id)].errorSet=false;
                 }
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
+                project->setDataChanged();
             }
         }
     }
@@ -1104,7 +1107,8 @@ void QFFitResultsEvaluation::setInitFitFix(const QString& id, bool fix) {
             if (d.userEditable) {
                 parameterStore[getParameterStoreID(id)].fix=fix;
                 parameterStore[getParameterStoreID(id)].fixSet=true;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
+                project->setDataChanged();
             }
         }
     }
@@ -1122,7 +1126,8 @@ void QFFitResultsEvaluation::setFitRange(const QString& id, double min, double m
                 parameterStore[getParameterStoreID(id)].minSet=true;
                 parameterStore[getParameterStoreID(id)].max=max;
                 parameterStore[getParameterStoreID(id)].maxSet=true;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
+                project->setDataChanged();
             }
         }
     }
@@ -1137,7 +1142,8 @@ void QFFitResultsEvaluation::setFitMin(const QString& id, double min) {
             if (d.userEditable && d.userRangeEditable) {
                 parameterStore[getParameterStoreID(id)].min=min;
                 parameterStore[getParameterStoreID(id)].minSet=true;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
+                project->setDataChanged();
             }
         }
     }
@@ -1152,7 +1158,8 @@ void QFFitResultsEvaluation::setFitMax(const QString& id, double max) {
             if (d.userEditable && d.userRangeEditable) {
                 parameterStore[getParameterStoreID(id)].max=max;
                 parameterStore[getParameterStoreID(id)].maxSet=true;
-                emitPropertiesChanged();
+                //emitPropertiesChanged();
+                project->setDataChanged();
             }
         }
     }

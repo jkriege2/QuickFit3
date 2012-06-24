@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 #include "lib_imexport.h"
+#include <QStringList>
 
 
 // forward declaration
@@ -33,9 +34,13 @@ class QFLIB_EXPORT QFRDRPropertyModel : public QAbstractTableModel {
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     private slots:
-        void propertiesChanged();
+        void propertiesChanged(const QString& property, bool visible);
     protected:
         QFRawDataRecord* record;
+
+        void updateModel(bool doReset=true);
+
+        QStringList props;
 };
 
 #endif // QFRDRPROPERTYMODEL_H

@@ -4,6 +4,7 @@
 #include "ui_aboutplugins.h"
 #include "qftools.h"
 #include "qfrdrreplacedialog.h"
+#include "statistics_tools.h"
 
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     settings=s;
@@ -726,6 +727,8 @@ void MainWindow::createActions() {
     actRDRUndoReplace=new QAction(tr("undo last find/replace"), this);
     connect(actRDRUndoReplace, SIGNAL(triggered()), this, SLOT(rdrUndoReplace()));
 
+    actPerformanceTest=new QAction(tr("test QFProject performance"), this);
+    connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
 
 
 }
@@ -773,6 +776,8 @@ void MainWindow::createMenus() {
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
     toolsMenu->addAction(actRDRReplace);
     toolsMenu->addAction(actRDRUndoReplace);
+    toolsMenu->addSeparator();
+    toolsMenu->addAction(actPerformanceTest);
     toolsMenu->addSeparator();
 
     menuBar()->addSeparator();
@@ -1318,7 +1323,6 @@ void MainWindow::autosaveProject() {
     QString autosaveFilename=curFile;
     if (autosaveFilename.isEmpty()) autosaveFilename="untitled.qfp";
     autosaveFilename=autosaveFilename+".autosave";
-    autosaveFilename=autosaveFilename+".autosave";
 
     statusBar()->showMessage(tr("autosaving project file '%1' ...").arg(autosaveFilename), 500);
     logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
@@ -1447,6 +1451,187 @@ void MainWindow::rdrUndoReplace() {
         QFRawDataRecord* rec=project->getRawDataByNum(i);
         rec->setName(rec->getProperty("LAST_REPLACENAME", rec->getName()).toString());
         rec->setFolder(rec->getProperty("LAST_REPLACEFOLDER", rec->getFolder()).toString());
+    }
+}
+
+void MainWindow::projectPerformanceTest() {
+    if (project) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        log_text(tr("\n\n-----------------------------------------------------------------\n-- PERFORMING QFProject PERFORMANCE TEST ...\n-----------------------------------------------------------------\n"));
+        log_text(tr("  * adding new record for test ... "));
+        QFRawDataRecord* record=project->addRawData("table", tr("performance test table"));
+        QFRawDataPropertyEditor* edt=NULL;
+        if (record) {
+            log_text(tr("OK\n"));
+            QElapsedTimer timer;
+
+            for (int s=0; s<2; s++) {
+                int propCnt=200;
+                int repeats=50;
+                double durW[repeats], durR[repeats];
+                if (s==1) {
+                    log_text(tr("  * opening raw data record editor\n"));
+                    edt=new QFRawDataPropertyEditor(this, settings, record, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
+                    edt->setAttribute(Qt::WA_DeleteOnClose);
+                    rawDataPropEditors.append(edt);
+                    edt->show();
+                    repeats=10;
+                    QApplication::processEvents();
+                    QApplication::processEvents();
+                    QApplication::processEvents();
+                    QApplication::processEvents();
+                }
+
+
+                log_text(tr("  * writing/reading properties with signals test (operations=%1  repeats=%2): ").arg(propCnt).arg(repeats));
+                for (int r=0; r<repeats; r++) {
+                    record->clearProperties();
+                    //log_text(tr("    * writing %1 properties ... ").arg(propCnt));
+                    timer.start();
+                    for (int i=0; i<propCnt; i++) {
+                        record->setQFProperty(QString("testprop%1").arg(i), i);
+                    }
+                    double duration=double(timer.nsecsElapsed())/1.0e6;
+                    durW[r]=duration;
+                    //log_text(tr("OK [%1 ms]\n").arg(duration));
+
+                    //log_text(tr("    * reading %1 properties ... ").arg(propCnt));
+                    timer.start();
+                    for (int i=0; i<propCnt; i++) {
+                        int ii=record->getProperty(QString("testprop%1").arg(i), i).toInt();
+                        ii=i+1;
+                    }
+                    duration=double(timer.nsecsElapsed())/1.0e6;
+                    durR[r]=duration;
+                    //log_text(tr("OK [%1 ms]\n").arg(duration));
+                    log_text(".");
+                    QApplication::processEvents();
+                }
+                log_text("\n");
+                log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+
+
+                propCnt=200;
+                repeats=50;
+
+                log_text(tr("  * writing/reading properties without signals test (operations=%1  repeats=%2): ").arg(propCnt).arg(repeats));
+                record->disableEmitPropertiesChanged();
+                for (int r=0; r<repeats; r++) {
+                    //log_text(tr("    * writing %1 properties ... ").arg(propCnt));
+                    record->clearProperties();
+                    timer.start();
+                    for (int i=0; i<propCnt; i++) {
+                        record->setQFProperty(QString("testprop%1").arg(i), i);
+                    }
+                    double duration=double(timer.nsecsElapsed())/1.0e6;
+                    durW[r]=duration;
+                    //log_text(tr("OK [%1 ms]\n").arg(duration));
+
+                    //log_text(tr("    * reading %1 properties ... ").arg(propCnt));
+                    timer.start();
+                    for (int i=0; i<propCnt; i++) {
+                        int ii=record->getProperty(QString("testprop%1").arg(i), i).toInt();
+                        ii=ii+i;
+                    }
+                    duration=double(timer.nsecsElapsed())/1.0e6;
+                    durR[r]=duration;
+                    //log_text(tr("OK [%1 ms]\n").arg(duration));
+                    log_text(".");
+                    QApplication::processEvents();
+                }
+                log_text("\n");
+                record->enableEmitPropertiesChanged();
+                log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                QApplication::processEvents();
+
+
+                if (s==0) {
+                    log_text(tr("  * writing/reading simple results (operations=%1  repeats=%2): ").arg(propCnt).arg(repeats));
+                    record->disableEmitPropertiesChanged();
+                    for (int r=0; r<repeats; r++) {
+                        //log_text(tr("    * writing %1 results ... ").arg(propCnt));
+                        record->resultsClearAll();
+                        timer.start();
+                        for (int i=0; i<propCnt; i++) {
+                            record->resultsSetNumberError("testeval", QString("testprop%1").arg(i), i, double(i)/10.0, "unit");
+                        }
+                        double duration=double(timer.nsecsElapsed())/1.0e6;
+                        durW[r]=duration;
+                        //log_text(tr("OK [%1 ms]\n").arg(duration));
+
+                        //log_text(tr("    * reading %1 results ... ").arg(propCnt));
+                        timer.start();
+                        for (int i=0; i<propCnt; i++) {
+                            double ii=record->resultsGetAsDouble("testeval", QString("testprop%1").arg(i));
+                            ii=ii+i;
+                        }
+                        duration=double(timer.nsecsElapsed())/1.0e6;
+                        durR[r]=duration;
+                        //log_text(tr("OK [%1 ms]\n").arg(duration));
+                        log_text(".");
+                        QApplication::processEvents();
+                    }
+                    log_text("\n");
+                    record->enableEmitPropertiesChanged();
+                    log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                    QApplication::processEvents();
+
+
+
+                    log_text(tr("  * writing/reading array results (operations=%1  repeats=%2): ").arg(propCnt).arg(repeats));
+                    record->disableEmitPropertiesChanged();
+                    for (int r=0; r<repeats; r++) {
+                        //log_text(tr("    * writing %1 results ... ").arg(propCnt));
+                        record->resultsClearAll();
+                        timer.start();
+                        QVector<double> v(100, M_PI);
+                        QVector<double> e(100, M_PI/2.0);
+                        for (int i=0; i<propCnt; i++) {
+                            record->resultsSetNumberErrorList("testeval", QString("testprop%1").arg(i), v, e, "unit");
+                        }
+                        double duration=double(timer.nsecsElapsed())/1.0e6;
+                        durW[r]=duration;
+                        //log_text(tr("OK [%1 ms]\n").arg(duration));
+
+                        //log_text(tr("    * reading %1 results ... ").arg(propCnt));
+                        timer.start();
+                        for (int i=0; i<propCnt; i++) {
+                            QVector<double> vv=record->resultsGetAsDoubleList("testeval", QString("testprop%1").arg(i));
+                            vv.append(1);
+                        }
+                        duration=double(timer.nsecsElapsed())/1.0e6;
+                        durR[r]=duration;
+                        //log_text(tr("OK [%1 ms]\n").arg(duration));
+                        log_text(".");
+                        QApplication::processEvents();
+                    }
+                    log_text("\n");
+                    record->enableEmitPropertiesChanged();
+                    log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                    QApplication::processEvents();
+                }
+
+                if (edt) {
+                    edt->close();
+                    edt=NULL;
+                }
+            }
+
+
+
+
+
+        } else {
+            log_text(tr("ERROR ... could not add record\n"));
+        }
+
+
+        log_text(tr("\n\n-----------------------------------------------------------------\n-- QFProject PERFORMANCE TEST FINISHED\n-----------------------------------------------------------------\n"));
+        QApplication::restoreOverrideCursor();
     }
 }
 

@@ -112,7 +112,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QFRDRPropertyModel* getPropertyModel();
     signals:
         /** \brief emitted whenever at least one of the properties changes */
-        void propertiesChanged();
+        void propertiesChanged(const QString& property, bool visible);
+        /** \brief basic properties changed (i.e. name, description and folder) */
+        void basicPropertiesChanged();
         /** \brief emitted whenever at least one of the results changes */
         void resultsChanged();
         /** \brief emitted whenever the data in this object changes */
@@ -121,7 +123,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void folderChanged();
     public:
         /** \copydoc QFProperties::emitPropertiesChanged() */
-        virtual void emitPropertiesChanged();
+        virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true);
         /** \brief this function emits a resultsChanged() signal. */
         virtual void emitResultsChanged();
         /** \brief this function emits a rawDataChanged() signal. */

@@ -198,7 +198,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
                 stack.height=reader->frameHeight();
                 stack.frames=reader->countFrames();
             } else {
-                int i=0;
+                uint32_t i=0;
                 do {
                     double* d=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
                     reader->readFrameDouble(d);

@@ -245,10 +245,13 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         void emitResultsChanged(QFRawDataRecord* record=NULL, const QString& evaluationName=QString(""), const QString& resultName=QString(""));
 
         /** \brief emits propertiesChanged(), only if doEmitPropertiesChanged is \c true */
-        void emitPropertiesChanged();
+        void emitPropertiesChanged(const QString &property=QString(""), bool visible=true);
     signals:
-        /** \brief emitted whenever at least one of the properties changes */
-        void propertiesChanged();
+        /** \brief emitted whenever at least one of the properties changes
+         *
+         *  \note \a property may be empty, signalling that no special properties, but possible multiple have changed
+         */
+        void propertiesChanged(const QString& property, bool visible);
         /** \brief emitted whenever the evaluation results change */
         void resultsChanged();
         /** \brief emitted whenever the evaluation results change, if both arguments are empty, the changes are larger than just the given result */
@@ -257,6 +260,8 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
         /** \brief signal emitted when the selection changed */
         void selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords);
+        /** \brief basic properties changed (i.e. name, description and folder) */
+        void basicPropertiesChanged();
 
     protected slots:
         /** \brief called when a record is going to be deleted in the project, so we can savely hide it in an editor or so! */

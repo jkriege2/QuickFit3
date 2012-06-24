@@ -14,6 +14,10 @@ QFRawDataPropertyEditor::QFRawDataPropertyEditor(QFPluginServices* services, Pro
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
 
+    timerResizeProps=new QTimer(this);
+    timerResizeProps->setSingleShot(true);
+    timerResizeProps->setInterval(500);
+    connect(timerResizeProps, SIGNAL(timeout()), this, SLOT(resizePropertiesTable()));
     currentSaveDir="";
     //std::cout<<"creating QFRawDataPropertyEditor ...\n";
     this->current=NULL;
@@ -221,12 +225,14 @@ void QFRawDataPropertyEditor::createWidgets() {
     //tvProperties->setSizePolicy(tvProperties->sizePolicy().horizontalPolicy(), QSizePolicy::Expanding);
     tvProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tvProperties->setItemDelegate(new QFItemDelegate(tvProperties));
-    paramFilterProxy=new QSortFilterProxyModel(this);
+    /*paramFilterProxy=new QSortFilterProxyModel(this);
     paramFilterProxy->setDynamicSortFilter(false);
     paramFilterProxy->setFilterKeyColumn(0);
     paramFilterProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
     paramFilterProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    tvProperties->setModel(paramFilterProxy);
+    tvProperties->setModel(paramFilterProxy);*/
+    tvProperties->setModel(NULL);
+
 
     QWidget* widProperties=new QWidget(this);
     QHBoxLayout* pl1=new QHBoxLayout(this);
@@ -387,12 +393,11 @@ void QFRawDataPropertyEditor::closeEvent ( QCloseEvent * event ) {
 
 void QFRawDataPropertyEditor::resizePropertiesTable() {
     if (!current || !tvProperties) return;
-    //std::cout<<"starting resizePropertiesTable() ...";
-    tvProperties->resizeColumnsToContents();
-    /*for (int i=0; i<current->getPropertyModel()->rowCount(); i++) {
-        tvProperties->setRowHeight(i, tvProperties->fontMetrics().height());
-    }*/
-    //std::cout<<" DONE!\n";
+
+    tvProperties->resizeColumnToContents(0);
+    tvProperties->resizeColumnToContents(1);
+    tvProperties->resizeRowsToContents();
+    tvProperties->horizontalHeader()->setStretchLastSection(true);
 }
 
 void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
@@ -402,21 +407,27 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
     if (current) {
         oldType=current->getType();
         oldEditorCount=current->getEditorCount();
-        disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
+        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
+        disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         disconnect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         disconnect(edtFolder, SIGNAL(textChanged(const QString&)), this, SLOT(folderChanged(const QString&)));
-        disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
-        disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
-        disconnect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesTable()));
+        disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
+        disconnect(current, SIGNAL(basicPropertiesChanged()), this, SLOT(basicPropsChanged()));
+        disconnect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesLater()));
         disconnect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
-        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
+        disconnect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeRowsToContents()));
 
-        disconnect(edtFilterResults, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilter(QString)));
-        disconnect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), tvResults->model(), SLOT(setResultFilterUsesRegExp(bool)));
-        disconnect(edtFilterEvaluation, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilter(QString)));
-        disconnect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), tvResults->model(), SLOT(setEvaluationFilterUsesRegExp(bool)));
+        disconnect(edtFilterResults, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilter(QString)));
+        disconnect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
+        disconnect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
+        disconnect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
         disconnect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
         disconnect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
+
+
+
+
+
 
         if (c) {
             if (c->getType()!=oldType) {
@@ -486,8 +497,9 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         }
         lstFiles->addItems(f);
         lstFiles->setEnabled(true);
-        paramFilterProxy->setSourceModel(current->getPropertyModel());
-        paramFilterProxy->sort(0);
+        //paramFilterProxy->setSourceModel();
+        //paramFilterProxy->sort(0);
+        tvProperties->setModel(current->getPropertyModel());
         tvProperties->setEnabled(true);
         tvResults->setModel(current->resultsGetModel());
         connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
@@ -495,12 +507,10 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         connect(edtFolder, SIGNAL(textChanged(const QString&)), this, SLOT(folderChanged(const QString&)));
         connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
-        connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
-        connect(current->getPropertyModel(), SIGNAL(modelReset()), tvProperties, SLOT(resizeColumnsToContents()));
-        connect(current->getPropertyModel(), SIGNAL(modelReset()), tvProperties, SLOT(resizeRowsToContents()));
+        connect(current, SIGNAL(basicPropertiesChanged()), this, SLOT(basicPropsChanged()));
+        connect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesLater()));
         connect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeColumnsToContents()));
         connect(current->resultsGetModel(), SIGNAL(modelReset()), tvResults, SLOT(resizeRowsToContents()));
-
         connect(edtFilterResults, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilter(QString)));
         connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
         connect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
@@ -543,7 +553,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         labTypeIcon->setText("");
         lstFiles->clear();
         lstFiles->setEnabled(false);
-        paramFilterProxy->setSourceModel(NULL);
+        //paramFilterProxy->setSourceModel(NULL);
+        tvProperties->setModel(NULL);
         tvProperties->setEnabled(false);
         compFilterEvaluation->setFilename("");
         compFilterEvaluationNot->setFilename("");
@@ -615,6 +626,7 @@ void QFRawDataPropertyEditor::checkHelpAvailable() {
         actHelpPluginCopyright->setVisible(QFile::exists(dll));
     }
 }
+
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
     labAveragedresults->setMaximumWidth(event->size().width());
@@ -745,9 +757,9 @@ void QFRawDataPropertyEditor::deleteRecord() {
         }
     }
 }
-
-void QFRawDataPropertyEditor::propsChanged() {
-    if (current) {
+/*
+void QFRawDataPropertyEditor::propsChanged(const QString& property, bool visible) {
+    if (current && (visible || property.isEmpty())) {
         if (current->getName()!=edtName->text()) {
             edtName->setText(current->getName());
         }
@@ -771,11 +783,35 @@ void QFRawDataPropertyEditor::propsChanged() {
             }
         }
         lstFiles->addItems(f);
-        paramFilterProxy->sort(0);
+        //paramFilterProxy->sort(0);
     }
 }
-
-
+*/
+void QFRawDataPropertyEditor::basicPropsChanged() {
+    if (current->getName()!=edtName->text()) {
+        edtName->setText(current->getName());
+    }
+    if (current->getFolder()!=edtFolder->text()) {
+        edtFolder->setText(current->getFolder());
+    }
+    if (current->getDescription()!=pteDescription->toPlainText()) {
+        pteDescription->setPlainText(current->getDescription());
+    }
+    labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
+    labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));
+    labID->setText(QString::number(current->getID()));
+    labType->setText(current->getTypeDescription());
+    labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
+    lstFiles->clear();
+    QStringList f=current->getFiles();
+    QStringList t=current->getFilesTypes();
+    for (int i=0; i<f.size(); i++) {
+        if (i<t.size()) {
+            if (!t[i].isEmpty()) f[i]=f[i]+QString(" [%1]").arg(t[i]);
+        }
+    }
+    lstFiles->addItems(f);
+}
 
 void QFRawDataPropertyEditor::newPropClicked() {
     if (current) {
@@ -808,7 +844,11 @@ void QFRawDataPropertyEditor::newPropClicked() {
                 case 4: v.convert(QVariant::DateTime); break;
                 default: break;
             }
-            current->setQFProperty(d->propertyName(), v);
+            bool ok=true;
+            if (current->propertyExists(d->propertyName())) {
+                ok=current->isPropertyUserEditable(d->propertyName());
+            }
+            if (ok) current->setQFProperty(d->propertyName(), v);
         }
 
         delete d;
@@ -823,7 +863,7 @@ void QFRawDataPropertyEditor::deletePropClicked() {
         for (int i=0; i<l.size(); i++) {
             int row=l[i].row();
             QString prop=current->getVisibleProperty(row);
-            if ((!prop.isEmpty()) && current->propertyExists(prop)) {
+            if ((!prop.isEmpty()) && current->propertyExists(prop) && current->isPropertyUserEditable(prop)) {
                 props.append(prop);
             }
         }
@@ -1008,5 +1048,10 @@ void QFRawDataPropertyEditor::saveResults() {
 QMenu *QFRawDataPropertyEditor::getHelpMenu() const
 {
     return menuHelp;
+}
+
+void QFRawDataPropertyEditor::resizePropertiesLater() {
+    timerResizeProps->setSingleShot(true);
+    timerResizeProps->start(150);
 }
 

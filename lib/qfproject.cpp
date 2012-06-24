@@ -10,7 +10,8 @@
 
 #include <QTemporaryFile>
 #include <QElapsedTimer>
-#define DEBUG_TIMING
+//#define DEBUG_TIMING
+#undef DEBUG_TIMING
 
 QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent), QFProperties()
@@ -150,7 +151,7 @@ QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType(QFEvaluationItem* c
 }
 
 void QFProject::projectChanged() {
-    dataChange=true;
+    setDataChanged();
 }
 
 
@@ -169,8 +170,8 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     IDs.insert(newID);
     dataChange=true;
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(projectChanged()));
-    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
-    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setStructureChanged()));
+    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(projectChanged()));
+    connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
@@ -188,10 +189,10 @@ bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
     evaluations.insert(newID, rec);
     IDs.insert(newID);
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
-    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(projectChanged()));
-    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setStructureChanged()));
+    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(projectChanged()));
+    connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
-    connect(rec, SIGNAL(propertiesChanged()), this, SLOT(setDataChanged()));
+    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setDataChanged()));
     emitStructureChanged();
     return true;
 }
@@ -714,10 +715,10 @@ QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResu
     }
 
     if (l.size()>0) {
-        qDebug()<<"rdrCalcMatchingResults: qSort()";
-        for (int i=0; i<l.size(); i++) qDebug()<<"  "<<i<<l[i].second;
+        //qDebug()<<"rdrCalcMatchingResults: qSort()";
+        //for (int i=0; i<l.size(); i++) qDebug()<<"  "<<i<<l[i].second;
         qSort(l.begin(), l.end(), rdrCalcMatchingResults_compare );
-        for (int i=0; i<l.size(); i++) qDebug()<<"  "<<i<<l[i].second;
+        //for (int i=0; i<l.size(); i++) qDebug()<<"  "<<i<<l[i].second;
     }
 
     return l;
@@ -725,6 +726,7 @@ QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResu
 
 
 void QFProject::setDataChanged() {
+    if (dataChange) return;
     dataChange=true;
     //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
     emit wasChanged(dataChange);

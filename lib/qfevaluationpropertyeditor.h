@@ -104,7 +104,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief called when the description editor changes its contents */
         void descriptionChanged();
         /** \brief emitted when the raw data record data changes (i.e. ID, name, description, ...) */
-        void propsChanged();
+        void propsChanged(const QString &property, bool visible);
         /** \brief this will be connected to the project to indicate when  the currently
          *         displayed evaluation item should be deleted */
         void evaluationAboutToBeDeleted(QFEvaluationItem* r);

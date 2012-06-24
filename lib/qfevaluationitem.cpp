@@ -80,7 +80,7 @@ void QFEvaluationItem::readXML(QDomElement& e) {
     intReadData(&te);
     //std::cout<<"reading XML: done!\n";
     if (!errorOcc) {
-        emitPropertiesChanged();
+        emitPropertiesChanged("", true);
         emitResultsChanged();
     }
 }
@@ -234,13 +234,17 @@ void QFEvaluationItem::recordAboutToBeDeleted(QFRawDataRecord* r) {
 }
 
 void QFEvaluationItem::setName(const QString n) {
-    name=n;
-    emitPropertiesChanged();
+    if (name!=n) {
+        name=n;
+        emit basicPropertiesChanged();
+    }
 }
 
 void QFEvaluationItem::setDescription(const QString& d) {
-    description=d;
-    emitPropertiesChanged();
+    if (description!=d) {
+        description=d;
+        emit basicPropertiesChanged();
+    }
 };
 
 void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName) {
@@ -251,9 +255,9 @@ void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString
     }
 }
 
-void QFEvaluationItem::emitPropertiesChanged() {
+void QFEvaluationItem::emitPropertiesChanged(const QString& property, bool visible) {
     if (doEmitPropertiesChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits propertiesChanged()";
-        emit propertiesChanged();
+        emit propertiesChanged(property, visible);
     }
 }

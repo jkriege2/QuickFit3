@@ -141,19 +141,28 @@ QFRawDataRecord::~QFRawDataRecord() {
 }
 
 void QFRawDataRecord::setName(const QString &n) {
-    name=n;
-    emitPropertiesChanged();
+    if (n!=name) {
+        name=n;
+        //emitPropertiesChanged();
+        emit basicPropertiesChanged();
+    }
 }
 /** \brief set the folder */
 void QFRawDataRecord::setFolder(const QString& n) {
-    folder=n;
-    emitPropertiesChanged();
-    if (project) project->setStructureChanged();
+    if (folder!=n) {
+        folder=n;
+        //emitPropertiesChanged();
+        emit basicPropertiesChanged();
+        //if (project) project->setStructureChanged();
+    }
 }
 /** \brief set the description  */
 void QFRawDataRecord::setDescription(const QString& d) {
-    description=d;
-    emitPropertiesChanged();
+    if (description!=d) {
+        description=d;
+        emit basicPropertiesChanged();
+        //emitPropertiesChanged();
+    }
 };
 
 void QFRawDataRecord::readXML(QDomElement& e) {
@@ -463,7 +472,8 @@ void QFRawDataRecord::readXML(QDomElement& e) {
     intReadData(&te);
     //std::cout<<"reading XML: done!\n";
     if (!errorOcc) {
-        emit propertiesChanged();
+        emit propertiesChanged("", true);
+        emit basicPropertiesChanged();
         emit rawDataChanged();
     }
     if (resultsmodel) resultsmodel->init(this);
@@ -2243,10 +2253,10 @@ QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup)
 }
 
 
-void QFRawDataRecord::emitPropertiesChanged() {
+void QFRawDataRecord::emitPropertiesChanged(const QString &property, bool visible) {
     if (doEmitPropertiesChanged) {
         //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
-        emit propertiesChanged();
+        emit propertiesChanged(property, visible);
 
     }
 }
@@ -2287,7 +2297,7 @@ void QFRawDataRecord::enableEmitPropertiesChanged(bool emitnow) {
     doEmitPropertiesChanged=true;
     if (emitnow) {
         //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
-        emit  propertiesChanged();
+        emit  propertiesChanged("", true);
     }
 }
 

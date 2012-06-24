@@ -16,6 +16,7 @@
 #include <QAction>
 #include <QList>
 #include <QPair>
+#include <QTimer>
 #include "qfenhancedlineedit.h"
 #include "qfstyledbutton.h"
 #include "qfcompleterfromfile.h"
@@ -73,7 +74,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief emitted when the "previous" button is pressed */
         void previousPressed();
         /** \brief emitted when the raw data record data changes (i.e. ID, name, description, ...) */
-        void propsChanged();
+        //void propsChanged(const QString &property=QString(""), bool visible=true);
+        void basicPropsChanged();
         /** \brief insert a new property */
         void newPropClicked();
         /** \brief delete a property */
@@ -111,7 +113,10 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void filterResultsTextChanged(const QString& text);
         void currentTabChanged(int tab);
         void checkHelpAvailable();
+        void resizePropertiesLater();
     private:
+        QTimer* timerResizeProps;
+
         /** \brief create all widgets needed to display data */
         void createWidgets();
         /** \brief QLineEdit for the name */
@@ -199,7 +204,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QCheckBox* chkFilterEvaluationRegExp;
         QCheckBox* chkFilterResultsRegExp;
 
-        QSortFilterProxyModel* paramFilterProxy;
+        //QSortFilterProxyModel* paramFilterProxy;
 
         QList<QPointer<QFRawDataEditor> > editorList;
         int id;

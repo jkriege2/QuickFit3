@@ -120,7 +120,8 @@ void QFUsesResultsEvaluation::setFitValue(QFRawDataRecord *r, const QString &res
         } else {
             parameterStore[getParameterStoreID(parameterID)].value=value;
             parameterStore[getParameterStoreID(parameterID)].valueSet=true;
-            emitPropertiesChanged();
+            //emitPropertiesChanged();
+            project->setDataChanged();
         }
 
     }
@@ -130,7 +131,8 @@ void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double
     const QString dsid=getParameterStoreID(parameterID);
     parameterStore[dsid].value=value;
     parameterStore[dsid].valueSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value, double error) {
@@ -139,7 +141,8 @@ void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double
     parameterStore[dsid].valueSet=true;
     parameterStore[dsid].error=error;
     parameterStore[dsid].errorSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value, double error, bool fix) {
@@ -150,7 +153,8 @@ void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double
     parameterStore[dsid].errorSet=true;
     parameterStore[dsid].fix=fix;
     parameterStore[dsid].fixSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double value, bool fix) {
@@ -159,35 +163,40 @@ void QFUsesResultsEvaluation::setInitFitValue(const QString &parameterID, double
     parameterStore[dsid].valueSet=true;
     parameterStore[dsid].fix=fix;
     parameterStore[dsid].fixSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitValueError(const QString &parameterID, double error) {
     const QString dsid=getParameterStoreID(parameterID);
     parameterStore[dsid].error=error;
     parameterStore[dsid].errorSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitFix(const QString &parameterID, bool fix) {
     const QString dsid=getParameterStoreID(parameterID);
     parameterStore[dsid].fix=fix;
     parameterStore[dsid].fixSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitValueMin(const QString &parameterID, double min) {
     const QString dsid=getParameterStoreID(parameterID);
     parameterStore[dsid].min=min;
     parameterStore[dsid].minSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setInitFitValueMax(const QString &parameterID, double max) {
     const QString dsid=getParameterStoreID(parameterID);
     parameterStore[dsid].max=max;
     parameterStore[dsid].maxSet=true;
-    emitPropertiesChanged();
+    //emitPropertiesChanged();
+    project->setDataChanged();
 }
 
 void QFUsesResultsEvaluation::setFitValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value) {
@@ -198,7 +207,8 @@ void QFUsesResultsEvaluation::setFitValue(QFRawDataRecord *r, const QString &res
         } else {
             parameterStore[dsid].value=value;
             parameterStore[dsid].valueSet=true;
-            emitPropertiesChanged();
+            //emitPropertiesChanged();
+            project->setDataChanged();
         }
 
     }
@@ -375,7 +385,8 @@ void QFUsesResultsEvaluation::setFitError(QFRawDataRecord *r, const QString &res
         } else {
             parameterStore[dsid].error=error;
             parameterStore[dsid].errorSet=true;
-            emitPropertiesChanged();
+            //emitPropertiesChanged();
+            project->setDataChanged();
         }
     }
 }
@@ -388,7 +399,8 @@ void QFUsesResultsEvaluation::setFitFix(QFRawDataRecord *r, const QString &resul
         } else {
             parameterStore[dsid].fix=fix;
             parameterStore[dsid].fixSet=true;
-            emitPropertiesChanged();
+            //emitPropertiesChanged();
+            project->setDataChanged();
         }
 
     }

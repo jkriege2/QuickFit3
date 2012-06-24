@@ -5,29 +5,49 @@
 #include <QDebug>
 
 
-QFProperties::QFProperties() {
-    //ctor
+QFProperties::QFProperties()
+{
+    propertyLocker=new QReadWriteLock();
 }
 
 QFProperties::~QFProperties() {
     props.clear();
+    delete propertyLocker;
+}
+
+void QFProperties::clearProperties()
+{
+    {
+        QWriteLocker lock();
+        props.clear();
+    }
+    emitPropertiesChanged();
+
 }
 
 QVariant QFProperties::getProperty(const QString &p) const
 {
+    QReadLocker lock(propertyLocker);
     if (props.contains(p)) return props[p].data; else return QVariant();
 }
 
 QVariant QFProperties::getProperty(const QString &p, const QVariant &defaultValue) const
 {
+    QReadLocker lock(propertyLocker);
     if (props.contains(p)) return props[p].data;
     return defaultValue;
 
 }
 
+unsigned int QFProperties::getPropertyCount() const
+{
+    QReadLocker lock(propertyLocker); return props.size();
+}
+
 
 
 unsigned int QFProperties::getVisiblePropertyCount() const {
+    QReadLocker lock(propertyLocker);
     unsigned int c=0;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
@@ -40,6 +60,7 @@ unsigned int QFProperties::getVisiblePropertyCount() const {
 }
 
 QString QFProperties::getVisibleProperty(unsigned int j) const {
+    QReadLocker lock(propertyLocker);
     unsigned int c=0;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
@@ -54,7 +75,57 @@ QString QFProperties::getVisibleProperty(unsigned int j) const {
     return QString("");
 }
 
+QStringList QFProperties::getPropertyNames() const
+{
+    QReadLocker lock(propertyLocker);
+    return props.keys();
+}
+
+QString QFProperties::getPropertyName(int i) const
+{
+    QReadLocker lock(propertyLocker);
+    return props.keys().at(i);
+}
+
+bool QFProperties::isPropertyVisible(QString property) const {
+    QReadLocker lock(propertyLocker);
+    if (!props.contains(property)) return false;
+    return props[property].visible;
+}
+
+bool QFProperties::isPropertyUserEditable(QString property) const{
+    QReadLocker lock(propertyLocker);
+    if (!props.contains(property)) return false;
+    return props[property].usereditable;
+}
+
+void QFProperties::deleteProperty(const QString &n) {
+    {
+        QWriteLocker lock(propertyLocker);
+        props.remove(n);
+    }
+    emitPropertiesChanged();
+}
+
+bool QFProperties::propertyExists(const QString &p) const {
+    QReadLocker lock(propertyLocker);
+    return props.contains(p);
+}
+
+void QFProperties::setQFProperty(const QString &p, QVariant value, bool usereditable, bool visible) {
+    {
+        QWriteLocker lock(propertyLocker);
+        propertyItem i;
+        i.data=value;
+        i.usereditable=usereditable;
+        i.visible=visible;
+        props[p]=i;
+    }
+    emitPropertiesChanged(p,visible);
+}
+
 void QFProperties::storeProperties(QXmlStreamWriter& w) const {
+    QReadLocker lock(propertyLocker);
     QHashIterator<QString, propertyItem> i(props);
     while (i.hasNext()) {
         i.next();
@@ -103,49 +174,52 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) const {
 }
 
 void QFProperties::readProperties(QDomElement& e) {
-    QDomElement te=e.firstChildElement("property");
-    props.clear();
-    while (!te.isNull()) {
-        QString n=te.attribute("name", "");
-        /*QString t=te.attribute("type", "string").toLower();
-        QVariant d=te.attribute("data", "");
-        //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
-        bool c=false;
-        if (t=="bool") { c=d.convert(QVariant::Bool); }
-        else if (t=="char") { c=d.convert(QVariant::Char); }
-        else if (t=="date") { c=d.convert(QVariant::Date); }
-        else if (t=="datetime") { c=d.convert(QVariant::DateTime); }
-        else if (t=="double") { c=d.convert(QVariant::Double); }
-        else if (t=="int") { c=d.convert(QVariant::Int); }
-        else if (t=="longlong") { c=d.convert(QVariant::LongLong); }
-        else if (t=="string") { c=d.convert(QVariant::String); }
-        else if (t=="stringlist") { c=d.convert(QVariant::StringList); }
-        else if (t=="uint") { c=d.convert(QVariant::UInt); }
-        else if (t=="ulonglong") { c=d.convert(QVariant::ULongLong); }
-        else if (t=="time") { c=d.convert(QVariant::Time); }
-        else if (t=="bytearray") { c=d.convert(QVariant::ByteArray); }
-        else if (t=="color") { c=d.convert(QVariant::Color); }
-        else {
-            setPropertiesError(QString("Property '%1' has an unsupported type (%2)!\n Value is \"%3\".").arg(n).arg(t).arg(te.attribute("data", "")));
-            //return;
-        }
-        if (!c) {
-            setPropertiesError(QString("The value of property '%1' (%2) could not be converted to type %3!").arg(n).arg(te.attribute("data", "")).arg(t));
-            //return;
-        }*/
-        QString t=te.attribute("type", "string").toLower();
-        QString pd=te.attribute("data", "");
-        QVariant d=getQVariantFromString(t, pd);
-        if (!d.isValid()) {
-            setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
-        }
+    {
+        QWriteLocker lock(propertyLocker);
+        QDomElement te=e.firstChildElement("property");
+        props.clear();
+        while (!te.isNull()) {
+            QString n=te.attribute("name", "");
+            /*QString t=te.attribute("type", "string").toLower();
+            QVariant d=te.attribute("data", "");
+            //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
+            bool c=false;
+            if (t=="bool") { c=d.convert(QVariant::Bool); }
+            else if (t=="char") { c=d.convert(QVariant::Char); }
+            else if (t=="date") { c=d.convert(QVariant::Date); }
+            else if (t=="datetime") { c=d.convert(QVariant::DateTime); }
+            else if (t=="double") { c=d.convert(QVariant::Double); }
+            else if (t=="int") { c=d.convert(QVariant::Int); }
+            else if (t=="longlong") { c=d.convert(QVariant::LongLong); }
+            else if (t=="string") { c=d.convert(QVariant::String); }
+            else if (t=="stringlist") { c=d.convert(QVariant::StringList); }
+            else if (t=="uint") { c=d.convert(QVariant::UInt); }
+            else if (t=="ulonglong") { c=d.convert(QVariant::ULongLong); }
+            else if (t=="time") { c=d.convert(QVariant::Time); }
+            else if (t=="bytearray") { c=d.convert(QVariant::ByteArray); }
+            else if (t=="color") { c=d.convert(QVariant::Color); }
+            else {
+                setPropertiesError(QString("Property '%1' has an unsupported type (%2)!\n Value is \"%3\".").arg(n).arg(t).arg(te.attribute("data", "")));
+                //return;
+            }
+            if (!c) {
+                setPropertiesError(QString("The value of property '%1' (%2) could not be converted to type %3!").arg(n).arg(te.attribute("data", "")).arg(t));
+                //return;
+            }*/
+            QString t=te.attribute("type", "string").toLower();
+            QString pd=te.attribute("data", "");
+            QVariant d=getQVariantFromString(t, pd);
+            if (!d.isValid()) {
+                setPropertiesError(QString("Property '%1' has an unsupported type (%2) or a conversion error occured (data invalid)!\n Value is \"%3\".").arg(n).arg(t).arg(pd));
+            }
 
-        propertyItem pi;
-        pi.data=d;
-        pi.usereditable=QVariant(te.attribute("usereditable", "true")).toBool();
-        pi.visible=QVariant(te.attribute("visible", "true")).toBool();
-        props[n]=pi;
-        te = te.nextSiblingElement("property");
+            propertyItem pi;
+            pi.data=d;
+            pi.usereditable=QVariant(te.attribute("usereditable", "true")).toBool();
+            pi.visible=QVariant(te.attribute("visible", "true")).toBool();
+            props[n]=pi;
+            te = te.nextSiblingElement("property");
+        }
     }
     emitPropertiesChanged();
 

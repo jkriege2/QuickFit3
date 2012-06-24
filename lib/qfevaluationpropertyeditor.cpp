@@ -155,7 +155,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
         disconnect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
-        disconnect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
+        disconnect(current, SIGNAL(propertiesChanged(const QString&,bool)), this, SLOT(propsChanged(QString,bool)));
         disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         disconnect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
@@ -222,7 +222,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
         connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
-        connect(current, SIGNAL(propertiesChanged()), this, SLOT(propsChanged()));
+        connect(current, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(propsChanged(QString,bool)));
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         connect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
@@ -365,7 +365,7 @@ void QFEvaluationPropertyEditor::evaluationAboutToBeDeleted(QFEvaluationItem* r)
 }
 
 
-void QFEvaluationPropertyEditor::propsChanged() {
+void QFEvaluationPropertyEditor::propsChanged(const QString& property, bool visible) {
     if (current) {
         if (current->getName()!=edtName->text()) {
             edtName->setText(current->getName());
