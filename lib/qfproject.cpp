@@ -29,7 +29,6 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     errorDesc="";
     rdModel=NULL;
     treeModel=NULL;
-
 }
 
 
@@ -150,10 +149,6 @@ QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType(QFEvaluationItem* c
     return current;
 }
 
-void QFProject::projectChanged() {
-    setDataChanged();
-}
-
 
 int QFProject::getNewID() {
     highestID++;
@@ -169,12 +164,10 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     rawData.insert(newID, rec);
     IDs.insert(newID);
     dataChange=true;
-    connect(rec, SIGNAL(rawDataChanged()), this, SLOT(projectChanged()));
-    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(projectChanged()));
+    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
-    connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
-    connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
+    connect(rec, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(setDataChanged()));
     emitStructureChanged();
 
     return true;
@@ -188,10 +181,8 @@ bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
     //evaluations[rec->getID()]=rec;
     evaluations.insert(newID, rec);
     IDs.insert(newID);
-    connect(rec, SIGNAL(resultsChanged()), this, SLOT(projectChanged()));
-    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(projectChanged()));
     connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
-    connect(rec, SIGNAL(resultsChanged()), this, SLOT(setDataChanged()));
+    connect(rec, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setDataChanged()));
     emitStructureChanged();
     return true;

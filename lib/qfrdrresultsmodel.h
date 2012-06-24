@@ -36,7 +36,10 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
             ValueRole=Qt::UserRole,
             NameRole=Qt::UserRole+1,
             AvgRole=Qt::UserRole+2,
-            SDRole=Qt::UserRole+3
+            SDRole=Qt::UserRole+3,
+            SumRole=Qt::UserRole+4,
+            Sum2Role=Qt::UserRole+5,
+            CountRole=Qt::UserRole+6
         };
     public slots:
         void setResultFilter(QString filter);
@@ -46,7 +49,7 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         void setEvaluationFilterUsesRegExp(bool use);
         void setResultFilterUsesRegExp(bool use);
     private slots:
-        void resultsChanged();
+        void resultsChanged(const QString &evalName=QString(""), const QString &resultName=QString(""), bool deleted=false);
     protected:
         QFRawDataRecord* record;
     private:
@@ -67,6 +70,9 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         QString evaluationFilterNot;
         bool resultFilterRegExp;
         bool evaluationFilterRegExp;
+
+        /** ßbrief checks whether the specified result is visible, also returns (optionally) the row/column header label for the result */
+        bool fulfillsFilters(const QString& en, const QString& resultName, QString* enLabel=NULL, QString* rnLabel=NULL);
 };
 
 #endif // QFRDRRESULTSMODEL_H

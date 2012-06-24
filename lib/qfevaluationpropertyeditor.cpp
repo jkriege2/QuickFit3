@@ -158,7 +158,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(current, SIGNAL(propertiesChanged(const QString&,bool)), this, SLOT(propsChanged(QString,bool)));
         disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        disconnect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+        disconnect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
         disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         if (c) {
             if (c->getType()!=oldType) {
@@ -225,7 +225,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(current, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(propsChanged(QString,bool)));
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        connect(current, SIGNAL(resultsChanged()), this, SLOT(resultsChanged()));
+        connect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
         connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
         selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
@@ -263,7 +263,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
     checkHelpAvailable();
 }
 
-void QFEvaluationPropertyEditor::resultsChanged() {
+void QFEvaluationPropertyEditor::resultsChanged(QFRawDataRecord* record, const QString& evalName, const QString& resultName) {
     if (!resultsModel) return;
     //resultsModel->resultsChanged();
     if (tvResults->model()->columnCount()*tvResults->model()->rowCount()<10000) tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
@@ -755,11 +755,26 @@ void QFEvaluationPropertyEditor::tvResultsSelectionChanged(const QItemSelection&
     for (int i=0; i<sel.size(); i++) {
         //int c=sel[i].row();
         int r=sel[i].column();
-        QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
-        QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
+        QVariant dataS=sel[i].data(QFEvaluationResultsModel::SumRole);
+        QVariant dataS2=sel[i].data(QFEvaluationResultsModel::Sum2Role);
+        QVariant dataC=sel[i].data(QFEvaluationResultsModel::CountRole);
+        QString name=sel[i].data(QFEvaluationResultsModel::NameRole).toString();
         double d=0;
         bool ok=false;
-        if (data.canConvert(QVariant::Double)) {
+        if (dataS.canConvert(QVariant::Double) && dataS2.canConvert(QVariant::Double) && dataC.canConvert(QVariant::LongLong)) {
+            if (names.contains(r)) {
+                sum[r] = sum[r]+dataS.toDouble();
+                sum2[r] = sum2[r]+dataS2.toDouble();
+                count[r] = count[r]+dataC.toLongLong();
+            } else {
+                sum[r] = dataS.toDouble();
+                sum2[r] = dataS2.toDouble();
+                count[r] = dataC.toLongLong();
+                names[r] = name;
+            }
+
+        }
+        /*if (data.canConvert(QVariant::Double)) {
             d=data.toDouble();
             ok=true;
         }
@@ -779,7 +794,7 @@ void QFEvaluationPropertyEditor::tvResultsSelectionChanged(const QItemSelection&
                 count[r] = 1;
                 names[r] = name;
             }
-        }
+        }*/
     }
 
     int lineHeight=labAveragedresults->fontMetrics().lineSpacing();

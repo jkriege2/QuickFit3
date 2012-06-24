@@ -45,9 +45,7 @@ double qfstatisticsAverageVariance(double& var, const T value) {
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
 
-    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
-    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
-
+    \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
 double qfstatisticsAverage(const T value) {
@@ -62,6 +60,61 @@ double qfstatisticsAverage(const T value) {
         }
     }
     return sum/(double)NN;
+}
+
+
+/*! \brief calculate the sum of data
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i \f]
+*/
+template <class T>
+long long qfstatisticsCount(const T value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            NN++;
+        }
+    }
+    return NN;
+}
+
+
+/*! \brief calculate the sum of data
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i \f]
+*/
+template <class T>
+double qfstatisticsSum(const T value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            sum=sum+(double)(value[i]);
+        }
+    }
+    return sum;
+}
+/*! \brief calculate the sum of data squares
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i^2 \f]
+*/
+template <class T>
+double qfstatisticsSum2(const T value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            sum=sum+(double)(value[i])*(double)(value[i]);
+        }
+    }
+    return sum;
 }
 
 /*! \brief calculate the average and variance of a given array

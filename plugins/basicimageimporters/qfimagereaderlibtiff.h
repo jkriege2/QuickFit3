@@ -4,6 +4,7 @@
 #include "qfimporter.h"
 #include "qfimporterimageseries.h"
 #include <tiffio.h>
+#include <QMutex>
 
 
 
@@ -52,6 +53,38 @@ class QFImageReaderLIBTIFF: public QFImporterImageSeries {
         uint16_t height;
         TIFF* tif;
         QString filename;
+
+    public:
+        static FILE* fLibTIFFLog;
+        static QString fLibTIFFLogFilename;
+        static QMutex* mutex;
+
+        static void libTIFFErrorHandler(const char* module, const char* fmt, va_list ap) {
+            QMutexLocker lock(mutex);
+            if (fLibTIFFLog) {
+                fprintf(fLibTIFFLog, "error (%s): ", module);
+                fprintf(fLibTIFFLog, fmt, ap);
+                fflush(fLibTIFFLog);
+            }
+        }
+
+        static void libTIFFWarningHandler(const char* module, const char* fmt, va_list ap) {
+            QMutexLocker lock(mutex);
+            if (fLibTIFFLog) {
+                fprintf(fLibTIFFLog, "warning (%s): ", module);
+                fprintf(fLibTIFFLog, fmt, ap);
+                fflush(fLibTIFFLog);
+            }
+        }
+
+        static void libTIFFMessageHandler(const char* module, const char* fmt, va_list ap) {
+            QMutexLocker lock(mutex);
+            if (fLibTIFFLog) {
+                fprintf(fLibTIFFLog, "message (%s): ", module);
+                fprintf(fLibTIFFLog, fmt, ap);
+                fflush(fLibTIFFLog);
+            }
+        }
 };
 
 #endif // QFIMAGEREADERLIBTIFF_H

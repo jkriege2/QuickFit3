@@ -2,10 +2,11 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Importer imageimporter_libtiff</title>
+		<title>Basic Image readers: libTIFF </title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<p>Description</p>
+		<p>This plugin allows to read image series from TIFF files. To open and read these it uses the open source library <a href="http://www.libtiff.org/">libtiff</a>. </p>
+		<p><strong>Limitations:</strong> libTIFF is able to read many different types of TIFF images, also many different types of compressions, but it has one internal limitation: It is not possible to read more than around 60000 images from one single file.</p>
 	</body>
 </html>

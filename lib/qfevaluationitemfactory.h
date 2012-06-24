@@ -82,6 +82,8 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFEvaluationItem ID. */
         QString getPluginTutorial(QString ID);
+        /** \brief returns the plugins settings file (html) for a specified QFEvaluationItem ID. */
+        QString getPluginSettings(QString ID);
         /** \brief returns the plugins copyright file (html) for a specified QFEvaluationItem ID. */
         QString getPluginCopyrightFile(QString ID);
 

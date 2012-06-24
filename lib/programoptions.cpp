@@ -27,6 +27,11 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     QObject(parent)
 {
     if (inst==NULL) inst=this;
+    userSaveAfterFirstEdit=true;
+    childWindowsStayOnTop=true;
+    helpWindowsStayOnTop=true;
+    projectWindowStayOnTop=false;
+
     QFileInfo fi(QApplication::applicationFilePath());
     appDir=QApplication::applicationDirPath();
     #if defined(Q_OS_MAC)
@@ -91,6 +96,10 @@ void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/max_threads", maxThreads);
     settings->setValue("quickfit/autosave", autosave);
     settings->setValue("quickfit/current_raw_data_dir", currentRawDataDir);
+    settings->setValue("quickfit/userSaveAfterFirstEdit", userSaveAfterFirstEdit);
+    settings->setValue("quickfit/childWindowsStayOnTop", childWindowsStayOnTop);
+    settings->setValue("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop);
+    settings->setValue("quickfit/projectWindowStayOnTop", projectWindowStayOnTop);
 }
 
 
@@ -108,6 +117,10 @@ void ProgramOptions::readSettings() {
     maxThreads=settings->value("quickfit/max_threads", maxThreads).toInt();
     autosave=settings->value("quickfit/autosave", autosave).toInt();
     currentRawDataDir=settings->value("quickfit/current_raw_data_dir", currentRawDataDir).toString();
+    userSaveAfterFirstEdit=settings->value("quickfit/userSaveAfterFirstEdit", userSaveAfterFirstEdit).toBool();
+    childWindowsStayOnTop=settings->value("quickfit/childWindowsStayOnTop", childWindowsStayOnTop).toBool();
+    helpWindowsStayOnTop=settings->value("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop).toBool();
+    projectWindowStayOnTop=settings->value("quickfit/projectWindowStayOnTop", projectWindowStayOnTop).toBool();
 
     languageID=settings->value("quickfit/language", languageID).toString();
     if (languageID != "en") { // english is default
@@ -171,6 +184,46 @@ QString ProgramOptions::getAssetsDirectory() const {
 
 QString ProgramOptions::getApplicationDirectory() const {
     return appDir;
+}
+
+bool ProgramOptions::getUserSaveAfterFirstEdit() const
+{
+    return userSaveAfterFirstEdit;
+}
+
+void ProgramOptions::setUserSaveAfterFirstEdit(bool set)
+{
+    userSaveAfterFirstEdit=set;
+}
+
+bool ProgramOptions::getChildWindowsStayOnTop() const
+{
+    return childWindowsStayOnTop;
+}
+
+void ProgramOptions::setChildWindowsStayOnTop(bool set)
+{
+    childWindowsStayOnTop=set;
+}
+
+bool ProgramOptions::getHelpWindowsStayOnTop() const
+{
+    return helpWindowsStayOnTop;
+}
+
+void ProgramOptions::setHelpWindowsStayOnTop(bool set)
+{
+    helpWindowsStayOnTop=set;
+}
+
+bool ProgramOptions::getProjectWindowsStayOnTop() const
+{
+    return projectWindowStayOnTop;
+}
+
+void ProgramOptions::setProjectWindowsStayOnTop(bool set)
+{
+    projectWindowStayOnTop=set;
 }
 
 void ProgramOptions::setLanguageID(QString id) {

@@ -32,8 +32,10 @@ void QFImporterManager::searchPlugins(QString directory, QList<QFPluginServices:
                     info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
                     info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                     info.tutorial=info.directory+QString("tutorial.html");
+                    info.settings=info.directory+QString("settings.html");
                     if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
+                    if (!QFile::exists(info.settings)) info.settings="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
                     info.plugintypename=tr("Importer Plugins");
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
@@ -56,6 +58,12 @@ QFImporter *QFImporterManager::createImporter(const QString &id) const {
 }
 
 
+bool QFImporterManager::contains(const QString &ID)
+{
+    for (int i=0; i<plugins.size(); i++)
+        if (plugins[i]->getID()==ID) return true;
+    return false;
+}
 
 QString QFImporterManager::getName(int i) const {
     if ((i<0) || (i>=plugins.size())) return "";
@@ -155,6 +163,16 @@ QString QFImporterManager::getPluginTutorial(int ID) {
     return "";
 }
 
+QString QFImporterManager::getPluginSettings(int ID) {
+    if ((ID>=0) && (ID<plugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/settings.html").arg(basename);
+    }
+    return "";
+}
 QString QFImporterManager::getPluginCopyrightFile(int ID) {
     if ((ID>=0) && (ID<plugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();

@@ -11,6 +11,7 @@
 #include "qffitalgorithm.h"
 #include "qffitfunction.h"
 #include "jkqtmathtext.h"
+#include "programoptions.h"
 
 QString removeHTMLComments(const QString& data) {
      QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
@@ -35,30 +36,105 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
 
     labelTitle=new QLabel(this);
     descriptionBrowser=new QTextBrowser(this);
+    QPalette p=descriptionBrowser->palette();
+    p.setColor(QPalette::Inactive, QPalette::Highlight, p.color(QPalette::Active,  QPalette::Highlight));
+    p.setColor(QPalette::Inactive, QPalette::HighlightedText, p.color(QPalette::Active,  QPalette::HighlightedText));
+    descriptionBrowser->setPalette(p);
     connect(descriptionBrowser, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
 
     QVBoxLayout* layout=new QVBoxLayout;//(this);
+    layout->setContentsMargins(0,0,0,0);
+
+    menuBar=new QMenuBar(this);
+    menuPage=menuBar->addMenu(tr("&Page"));
+    menuContents=menuBar->addMenu(tr("&Help Contents"));
+    layout->addWidget(menuBar);
 
     QHBoxLayout* layButtons=new QHBoxLayout;//(this);
 
-    btnPrevious=new QPushButton(QIcon(":/lib/help_previous.png"), tr("&Previous"), this);
-    //connect(descriptionBrowser, SIGNAL(backwardAvailable(bool)), btnPrevious, SLOT(setEnabled(bool)));
-    //connect(btnPrevious, SIGNAL(clicked()), descriptionBrowser, SLOT(backward()));
-    connect(btnPrevious, SIGNAL(clicked()), this, SLOT(previous()));
+
+    actPrevious=menuPage->addAction(tr("&Previous"), this, SLOT(previous()));
+    actPrevious->setIcon(QIcon(":/lib/help_previous.png"));
+    actPrevious->setShortcut(QKeySequence::Back);
+    btnPrevious=new QToolButton(this);
+    btnPrevious->setDefaultAction(actPrevious);
     layButtons->addWidget(btnPrevious);
-    btnHome=new QPushButton(QIcon(":/lib/help_home.png"), tr("&Home"), this);
+
+
+    btnHome=new QToolButton(this);
     layButtons->addWidget(btnHome);
-    //connect(btnHome, SIGNAL(clicked()), descriptionBrowser, SLOT(home()));
-    connect(btnHome, SIGNAL(clicked()), this, SLOT(home()));
-    btnNext=new QPushButton(QIcon(":/lib/help_next.png"), tr("&Next"), this);
-    //connect(descriptionBrowser, SIGNAL(forwardAvailable(bool)), btnNext, SLOT(setEnabled(bool)));
-    //connect(btnNext, SIGNAL(clicked()), descriptionBrowser, SLOT(forward()));
-    connect(btnNext, SIGNAL(clicked()), this, SLOT(next()));
+
+
+    actNext=menuPage->addAction(tr("&Next"), this, SLOT(next()));
+    actNext->setIcon(QIcon(":/lib/help_next.png"));
+    actNext->setShortcut(QKeySequence::NextChild);
+    btnNext=new QToolButton(this);
+    btnNext->setDefaultAction(actNext);
     layButtons->addWidget(btnNext);
 
-    btnPrint=new QPushButton(QIcon(":/lib/print.png"), tr("&Print this help page"), this);
+    actHome=menuPage->addAction(tr("&Home"), this, SLOT(home()));
+    actHome->setIcon(QIcon(":/lib/help_home.png"));
+    btnHome->setDefaultAction(actHome);
+    menuPage->addSeparator();
+
+    actPrint=menuPage->addAction(tr("&Print"), this, SLOT(print()));
+    actPrint->setIcon(QIcon(":/lib/help_print.png"));
+    actPrint->setShortcut(QKeySequence::Print);
+    actPrint->setToolTip(tr("Print this help page"));
+    menuPage->addSeparator();
+    btnPrint=new QToolButton(this);
+    btnPrint->setDefaultAction(actPrint);
     layButtons->addWidget(btnPrint);
-    connect(btnPrint, SIGNAL(clicked()), this, SLOT(print()));
+
+    actFind=menuPage->addAction(tr("&Find in current page"));
+    actFind->setCheckable(true);
+    actFind->setShortcut(QKeySequence::Find);
+    actFind->setChecked(false);
+    connect(actFind, SIGNAL(triggered(bool)), this, SLOT(find(bool)));
+    actFind->setIcon(QIcon(":/lib/help_find.png"));
+    btnFind=new QToolButton(this);
+    btnFind->setDefaultAction(actFind);
+    layButtons->addWidget(btnFind);
+
+    menuPage->addSeparator();
+    actClose=menuPage->addAction(tr("&Close"));
+    actClose->setShortcut(QKeySequence::Close);
+    actClose->setIcon(QIcon(":/lib/exit.png"));
+    connect(actClose, SIGNAL(triggered()), this, SLOT(close()));
+
+
+
+    widFind=new QWidget(this);
+    QHBoxLayout* layFind=new QHBoxLayout;
+    widFind->setLayout(layFind);
+    layFind->addWidget(new QLabel(tr("     phrase: ")));
+    edtFind=new QFEnhancedLineEdit(this);
+    edtFind->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFind, edtFind));
+    edtFind->setMinimumWidth(150);
+    edtFind->setToolTip(tr("simply enter a search phrase\n\nthe search in the currently displayed help page begins immediately after typing the first letter. If no match was found, the field will change its background color to a light red."));
+    layFind->addWidget(edtFind);
+    connect(edtFind, SIGNAL(textEdited(QString)), this, SLOT(findNext()));
+    btnFindNext=new  QToolButton(this);
+    btnFindNext->setIcon(QIcon(":/lib/help_findnext.png"));
+    btnFindNext->setText(tr("&find next"));
+    connect(btnFindNext, SIGNAL(clicked()), this, SLOT(findNext()));
+    layFind->addWidget(btnFindNext);
+    btnFindPrev=new  QToolButton(this);
+    btnFindPrev->setIcon(QIcon(":/lib/help_findprev.png"));
+    btnFindPrev->setText(tr("&find previous"));
+    connect(btnFindPrev, SIGNAL(clicked()), this, SLOT(findPrev()));
+    layFind->addWidget(btnFindPrev);
+    chkCaseSensitive=new QCheckBox(tr("case-sensitive"), this);
+    chkCaseSensitive->setChecked(false);
+    connect(chkCaseSensitive, SIGNAL(toggled(bool)), this, SLOT(findNext()));
+    layFind->addWidget(chkCaseSensitive);
+    chkFindWholeWord=new QCheckBox(tr("whole word"), this);
+    chkFindWholeWord->setChecked(false);
+    connect(chkFindWholeWord, SIGNAL(toggled(bool)), this, SLOT(findNext()));
+    layFind->addWidget(chkFindWholeWord);
+
+    widFind->setVisible(false);
+    layButtons->addWidget(widFind);
 
 
     layButtons->addStretch();
@@ -73,6 +149,9 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     setWindowFlags(flags);
     setWindowTitle(tr("QuickFit Online-Help"));
     setWindowIcon(QIcon(":/lib/help.png"));
+
+    if (ProgramOptions::getInstance()->getHelpWindowsStayOnTop()) setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
+    else setWindowFlags(Qt::Tool);
 }
 
 void QFHTMLHelpWindow::readSettings(QSettings& settings, QString prefix) {
@@ -101,6 +180,7 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
     disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
+    actHome->setText(tr("&Home: '%1'").arg(title));
     labelTitle->setVisible(!title.isEmpty());
     descriptionBrowser->setOpenLinks(false);
     descriptionBrowser->setOpenExternalLinks(true);
@@ -158,6 +238,7 @@ void QFHTMLHelpWindow::updateHelp(QString filename1) {
     QString title=descriptionBrowser->documentTitle();
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
+    actHome->setText(tr("&Home: '%1'").arg(title));
     labelTitle->setVisible(!title.isEmpty());
     if (!fragment.isEmpty()) {
         descriptionBrowser->scrollToAnchor(QString("#")+fragment);
@@ -168,6 +249,7 @@ void QFHTMLHelpWindow::updateHelp(QString filename1) {
 
 void QFHTMLHelpWindow::clear() {
     labelTitle->setText("");
+    actHome->setText(tr("&Home"));
     descriptionBrowser->clear();
     updateButtons();
 }
@@ -176,6 +258,7 @@ void QFHTMLHelpWindow::displayTitle() {
     QString title=descriptionBrowser->documentTitle();
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
+    actHome->setText(tr("&Home: '%1'").arg(title));
     labelTitle->setVisible(!title.isEmpty());
     updateButtons();
     //QStringList sp;
@@ -395,6 +478,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     } else {
         fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), QString(" ")));
     }
+
 
     // collectspecial replaces based on current directory
     bool foundPlugin=false;
@@ -722,33 +806,91 @@ void QFHTMLHelpWindow::initFromPluginServices(QFPluginServices* services) {
     setPluginDirList(services->getPluginHelpList());
 }
 
+void QFHTMLHelpWindow::setContentsMenuActions(const QList<QAction *> &items)
+{
+    menuContents->clear();
+    menuContents->addAction(actHome);
+    menuContents->addSeparator();
+    menuContents->addActions(items);
+}
+
 void QFHTMLHelpWindow::updateButtons() {
     //std::cout<<"updateButtons():  history_idx="<<history_idx<<"   history.size()="<<history.size()<<std::endl;
     if(history_idx<history.size()-1) {
-        btnNext->setEnabled(true);
-        btnNext->setWhatsThis("");
-        btnNext->setToolTip("");
+        actNext->setEnabled(true);
+        actNext->setWhatsThis("");
+        actNext->setToolTip("");
         if (history_idx>=0) {
-            btnNext->setWhatsThis(tr("move on to help page: \"%1\"").arg(history[history_idx+1].name));
-            btnNext->setToolTip(tr("move on to help page: \"%1\"").arg(history[history_idx+1].name));
+            actNext->setWhatsThis(tr("move on to help page: \"%1\"").arg(history[history_idx+1].name));
+            actNext->setToolTip(tr("move on to help page: \"%1\"").arg(history[history_idx+1].name));
         }
     } else {
-        btnNext->setEnabled(false);
-        btnNext->setWhatsThis("");
-        btnNext->setToolTip("");
+        actNext->setEnabled(false);
+        actNext->setWhatsThis("");
+        actNext->setToolTip("");
     }
 
     if(history_idx>0) {
-        btnPrevious->setEnabled(true);
-        btnPrevious->setWhatsThis("");
-        btnPrevious->setToolTip("");
+        actPrevious->setEnabled(true);
+        actPrevious->setWhatsThis("");
+        actPrevious->setToolTip("");
         if (history_idx<history.size()) {
-            btnPrevious->setWhatsThis(tr("move back to help page: \"%1\"").arg(history[history_idx-1].name));
-            btnPrevious->setToolTip(tr("move back to help page: \"%1\"").arg(history[history_idx-1].name));
+            actPrevious->setWhatsThis(tr("move back to help page: \"%1\"").arg(history[history_idx-1].name));
+            actPrevious->setToolTip(tr("move back to help page: \"%1\"").arg(history[history_idx-1].name));
         }
     } else {
-        btnPrevious->setEnabled(false);
-        btnPrevious->setWhatsThis("");
-        btnPrevious->setToolTip("");
+        actPrevious->setEnabled(false);
+        actPrevious->setWhatsThis("");
+        actPrevious->setToolTip("");
+    }
+}
+
+void QFHTMLHelpWindow::find(bool checked) {
+    widFind->setVisible(checked);
+    if (checked) {
+        edtFind->setFocus();
+        edtFind->selectAll();
+    }
+}
+
+void QFHTMLHelpWindow::findNext()
+{
+    QString phrase=edtFind->text();
+    QTextDocument::FindFlags options;
+    if (chkCaseSensitive->isChecked()) options=options|QTextDocument::FindCaseSensitively;
+    if (chkFindWholeWord->isChecked()) options=options|QTextDocument::FindWholeWords;
+    if (phrase.isEmpty()) {
+        descriptionBrowser->moveCursor(QTextCursor::Start);
+    } else {
+        bool found=descriptionBrowser->find(phrase, options);
+        if (!found) {
+            descriptionBrowser->moveCursor(QTextCursor::Start);
+            found=descriptionBrowser->find(phrase, options);
+        }
+        QPalette p=edtFind->palette();
+        if (!found) p.setColor(QPalette::Base, QColor("mistyrose"));
+        else p.setColor(QPalette::Base, palette().color(QPalette::Base));
+        edtFind->setPalette(p);
+    }
+}
+
+void QFHTMLHelpWindow::findPrev()
+{
+    QString phrase=edtFind->text();
+    QTextDocument::FindFlags options=QTextDocument::FindBackward;
+    if (chkCaseSensitive->isChecked()) options=options|QTextDocument::FindCaseSensitively;
+    if (chkFindWholeWord->isChecked()) options=options|QTextDocument::FindWholeWords;
+    if (phrase.isEmpty()) {
+        descriptionBrowser->moveCursor(QTextCursor::End);
+    } else {
+        bool found=descriptionBrowser->find(phrase, options);
+        if (!found) {
+            descriptionBrowser->moveCursor(QTextCursor::End);
+            found=descriptionBrowser->find(phrase, options);
+        }
+        QPalette p=edtFind->palette();
+        if (!found) p.setColor(QPalette::Base, QColor("mistyrose"));
+        else p.setColor(QPalette::Base, palette().color(QPalette::Base));
+        edtFind->setPalette(p);
     }
 }

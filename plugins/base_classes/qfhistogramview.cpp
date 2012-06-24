@@ -302,7 +302,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 int32_t datasize=0;
                 double mmin=edtHistogramMin->value();
                 double mmax=edtHistogramMax->value();
-                if (chkHistogramRangeAuto->isChecked()) {
+                if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     for (register int32_t i=0; i<imageSize; i++) {
                         datahist[i]=hist.data[i];
                         datasize++;
@@ -336,7 +336,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 tabHistogramParameters->setCell(7, hh+1, dmax);
                 tabHistogramParameters->setColumnTitle(hh+1, hist.name);
 
-                if (chkHistogramRangeAuto->isChecked()) {
+                if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     connectParameterWidgets(false);
                     edtHistogramMin->setValue(dmin);
                     edtHistogramMax->setValue(dmax);
@@ -348,7 +348,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 double* histY=(double*)malloc(histBins*sizeof(double));
 
 
-                if (chkHistogramRangeAuto->isChecked()) {
+                if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 } else {
                     statisticsHistogramRanged<double, double>(datahist, datasize, edtHistogramMin->value(), edtHistogramMax->value(), histX, histY, histBins, chkNormalizedHistograms->isChecked());

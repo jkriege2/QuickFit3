@@ -234,6 +234,10 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 return QVariant(QString("%1 %3 %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)).arg(QChar(0xB1)));
             }
         }
+    } else if (role==Qt::BackgroundColorRole) {
+        if (resNameI==lastResultNames.size()) {
+            return QColor("lightsteelblue");
+        }
     } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
         if (resNameI<lastResultNames.size()) {
             if (resI<lastResults.size()) {
@@ -251,6 +255,8 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                         double var=0;
                         double mean=qfstatisticsAverageVariance(var, r.ivec);
                         return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                    } else if ((r.type==QFRawDataRecord::qfrdreString)) {
+                        return QVariant(tr("contents: %2<br><i>&nbsp;&nbsp;&nbsp;%1</i>").arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(data(index, Qt::DisplayRole).toString()));
                     }
                     return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
                 }
@@ -271,6 +277,70 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                         return qfstatisticsAverage(r.ivec);
                     } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                         return record->resultsGetAsDouble(en, rname);
+                    }
+                }
+            }
+        }
+    } else if ((role==SumRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return qfstatisticsSum(r.dvec);
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return qfstatisticsSum(r.ivec);
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        return record->resultsGetAsDouble(en, rname);
+                    } else {
+                        return 0.0;
+                    }
+                }
+            }
+        }
+    } else if ((role==Sum2Role)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return qfstatisticsSum2(r.dvec);
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return qfstatisticsSum2(r.ivec);
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        double v= record->resultsGetAsDouble(en, rname);
+                        return v*v;
+                    } else {
+                        return 0.0;
+                    }
+                }
+            }
+        }
+    } else if ((role==CountRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                if (record) {
+                    const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                        || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                        return qfstatisticsCount(r.dvec);
+                    } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
+                        return qfstatisticsCount(r.ivec);
+                    } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
+                        return 1;
+                    } else {
+                        return 0;
                     }
                 }
             }
@@ -331,13 +401,27 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
         QFRawDataRecord* record=lastResults[i].first;
         QString en=lastResults[i].second;
         if (record) {
-            bool ok=false;
-            double value=record->resultsGetAsDouble(en, resultName, &ok);
-            if (ok) {
-                sum=sum+value;
-                sum2=sum2+value*value;
-                count=count+1;
+            QFRawDataRecord::evaluationResultType t=record->resultsGetType(en, resultName);
+            if (t==QFRawDataRecord::qfrdreNumberVector||t==QFRawDataRecord::qfrdreNumberMatrix||t==QFRawDataRecord::qfrdreNumberErrorVector||t==QFRawDataRecord::qfrdreNumberErrorMatrix
+                ||t==QFRawDataRecord::qfrdreIntegerVector||t==QFRawDataRecord::qfrdreIntegerMatrix) {
+
+                QVector<double> d=record->resultsGetAsDoubleList(en, resultName);
+                for (int di=0; di<d.size(); di++) {
+                    sum=sum+d[di];
+                    sum2=sum2+d[di]*d[di];
+                }
+                count=count+d.size();
+
+            } else {
+                bool ok=false;
+                double value=record->resultsGetAsDouble(en, resultName, &ok);
+                if (ok) {
+                    sum=sum+value;
+                    sum2=sum2+value*value;
+                    count=count+1;
+                }
             }
+
         }
 
     }

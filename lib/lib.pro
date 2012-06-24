@@ -71,7 +71,8 @@ HEADERS += dlgnewproperty.h \
     qftcspcreader.h \
     qfenhancedlineedit.h \
     qfstyledbutton.h \
-    qfcompleterfromfile.h
+    qfcompleterfromfile.h \
+    qfpluginoptionsdialog.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -113,7 +114,8 @@ SOURCES += dlgnewproperty.cpp \
     qfpluginservices.cpp \
     qfenhancedlineedit.cpp \
     qfstyledbutton.cpp \
-    qfcompleterfromfile.cpp
+    qfcompleterfromfile.cpp \
+    qfpluginoptionsdialog.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui

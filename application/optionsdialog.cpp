@@ -1,4 +1,5 @@
 #include "optionsdialog.h"
+#include "qfpluginservices.h"
 #include <iostream>
 
 OptionsDialog::OptionsDialog(QWidget* parent):
@@ -23,16 +24,25 @@ void OptionsDialog::on_cmbStylesheet_currentIndexChanged( const QString & text )
 }
 
 void OptionsDialog::on_cmbStylesheet_highlighted( const QString & text ) {
-    on_cmbStylesheet_currentIndexChanged(text);
+    //on_cmbStylesheet_currentIndexChanged(text);
 }
 
 void OptionsDialog::on_cmbStyle_currentIndexChanged( const QString & text ) {
 //        QStyle* s=QStyleFactory::create(text);
 //        if (s!=NULL) this->setStyle(s);
+
+    QApplication::setStyle(QStyleFactory::create(text));
+
+    QApplication::setPalette(QApplication::style()->standardPalette());
 }
 
 void OptionsDialog::on_cmbStyle_highlighted( const QString & text ) {
     on_cmbStyle_currentIndexChanged(text);
+}
+
+void OptionsDialog::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(ProgramOptions::getInstance()->getAssetsDirectory()+QString("/help/qf3_settings.html"));
 }
 
 
@@ -59,6 +69,10 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbStyle->addItems(QStyleFactory::keys());
     cmbStyle->setCurrentIndex(cmbStyle->findText(options->getStyle(), Qt::MatchContains));
     spinAutosave->setValue(options->getAutosave());
+    chkChildWindowsStayOnTop->setChecked(options->getChildWindowsStayOnTop());
+    chkUserSaveAfterFirstEdit->setChecked(options->getUserSaveAfterFirstEdit());
+    chkProjectWindowsStayOnTop->setChecked(options->getProjectWindowsStayOnTop());
+    chkHelpWindowsStayOnTop->setChecked(options->getHelpWindowsStayOnTop());
 
 
     // find all available stylesheets
@@ -72,12 +86,32 @@ void OptionsDialog::open(ProgramOptions* options) {
     }
     cmbStylesheet->setCurrentIndex( cmbStylesheet->findText(options->getStylesheet()));
 
+    for (int i=0; i<m_plugins.size(); i++) {
+        m_plugins[i]->readSettings(options);
+    }
+
     if (exec() == QDialog::Accepted ){
         options->setMaxThreads(spnMaxThreads->value());
         options->setLanguageID(cmbLanguage->currentText());
         options->setStylesheet(cmbStylesheet->currentText());
         options->setStyle(cmbStyle->currentText());
         options->setAutosave(spinAutosave->value());
+        options->setChildWindowsStayOnTop(chkChildWindowsStayOnTop->isChecked());
+        options->setUserSaveAfterFirstEdit(chkUserSaveAfterFirstEdit->isChecked());
+        options->setHelpWindowsStayOnTop(chkHelpWindowsStayOnTop->isChecked());
+        options->setProjectWindowsStayOnTop(chkProjectWindowsStayOnTop->isChecked());
+        for (int i=0; i<m_plugins.size(); i++) {
+            m_plugins[i]->writeSettings(options);
+        }
     }
+}
 
+void OptionsDialog::setPlugins(const QList<QFPluginOptionsDialogInterface *> &plugins)
+{
+    m_plugins.clear();
+    for (int i=0; i<plugins.size(); i++) {
+        QFPluginOptionsWidget* w=plugins[i]->createOptionsWidget(this);
+        tabWidget->addTab(w, QIcon(plugins[i]->pluginOptionsIcon()), plugins[i]->pluginOptionsName());
+        m_plugins.append(w);
+    }
 }

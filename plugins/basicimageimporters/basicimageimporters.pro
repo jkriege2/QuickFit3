@@ -16,14 +16,17 @@ HEADERS += qfbasicimageimporters.h \
     qfimagereaderradhard.h \
     ../../../../../LIB/trunk/crc_ccitt.h \
     ../../../../../LIB/trunk/crc.h \
-    ../../../../../LIB/trunk/frame.h
+    ../../../../../LIB/trunk/frame.h \
+    qfbasicimageimportersoptionswidget.h
 
 SOURCES += qfbasicimageimporters.cpp\
            qfimagereaderlibtiff.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
-    qfimagereaderradhard.cpp
+    qfimagereaderradhard.cpp \
+    qfbasicimageimportersoptionswidget.cpp
 
-FORMS =
+FORMS = \
+    qfbasicimageimportersoptionswidget.ui
 
 RESOURCES +=
 

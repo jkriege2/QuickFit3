@@ -32,7 +32,7 @@
 */
 class MainWindow : public QMainWindow, public QFPluginServices {
         Q_OBJECT
-
+        Q_INTERFACES(QFPluginServices)
     public:
         /** \brief class constructor
          *  \param splash a splash screen to use for status output during startup/construction
@@ -121,8 +121,14 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         /** \brief QFPluginServices::getPluginTutorial() */
         virtual QString getPluginTutorial(const QString& pluginID);
 
+        /** \brief QFPluginServices::getPluginSettings() */
+        virtual QString getPluginSettings(const QString& pluginID);
+
         /** \brief QFPluginServices::getPluginHelpDirectory() */
         virtual QString getPluginHelpDirectory(const QString& pluginID);
+
+        /** \brief register a configuration pane for a plugin in the main options dialog */
+        virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
     protected:
         void closeEvent(QCloseEvent *event);
 
@@ -186,6 +192,14 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief display help */
         void displayHelp();
+        /** \brief display copyright help */
+        void displayHelpCopyright();
+        /** \brief display plugin copyright help */
+        void displayHelpPluginCopyright();
+        /** \brief display tutorials */
+        void displayHelpTutorials();
+        /** \brief display tutorials */
+        void displayPluginHelp();
 
         /** \brief whenever a new project is created this is called every 500ms, until the project has been save at least once. This function asks the suer to save the project when he adds the first items */
         void saveProjectFirstTime();
@@ -207,6 +221,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         //void updateRecentFileActions();
         QString createPluginDoc(bool docLinks=false);
         QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
+        QString createPluginDocSettings(QString mainitem_before=QObject::tr("<h2>%1 Settings:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocCopyrights(QString mainitem_before=QObject::tr("<h2>%1 Copyrights:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocHelp(QString mainitem_before=QObject::tr("<h2>%1 Help:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         /** \brief create one item in the plugin listing, created in createPluginDoc(). Provide all the basic data. If you want additional row, supply them in additional where line i contains the i-th addition name and line i+1 contains the i-th addition value */
@@ -222,9 +237,13 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QList<QPair<QString, QString> > htmlReplaceList;
         QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
 
+        QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
+
         QTimer newProjectTimer;
 
         QMenu *toolsMenu;
+        QMenu *projectToolsMenu;
+        QMenu *debugToolsMenu;
         QMenu *fileMenu;
         QMenu *dataMenu;
         QMenu *evaluationMenu;
@@ -243,6 +262,14 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QAction *aboutQtAct;
         QAction *aboutPluginsAct;
         QAction* helpAct;
+        QList<QAction*> helpActList;
+
+        QAction* helpCopyrightAct;
+        QAction* helpPluginCopyrightAct;
+        QAction* helpTutorialsAct;
+        QAction* helpPluginAct;
+
+
         QAction* optionsAct;
         QAction* actRDRReplace;
         QAction* actRDRUndoReplace;

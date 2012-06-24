@@ -30,6 +30,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         /** \brief return a list of all implemented IDs */
         QStringList getIDList(int i) const ;
 
+        bool contains(const QString& ID);
+
         /** \brief return number of available plugins */
         int pluginCount() { return fitPlugins.size(); }
 
@@ -61,6 +63,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
         QString getPluginTutorial(int ID);
+        /** \brief returns the plugins settings file (html) for a specified  ID. */
+        QString getPluginSettings(int ID);
         /** \brief returns the plugins copyright file (html) for a specified  ID. */
         QString getPluginCopyrightFile(int ID);
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */

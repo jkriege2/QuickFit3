@@ -250,7 +250,6 @@ void QFEvaluationItem::setDescription(const QString& d) {
 void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName) {
     if (doEmitResultsChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits resultsChanged()";
-        emit resultsChanged();
         emit resultsChanged(record, evaluationName, resultName);
     }
 }

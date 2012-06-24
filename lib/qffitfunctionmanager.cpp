@@ -27,7 +27,12 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
             if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFPluginFitFunction* iRecord = qobject_cast<QFPluginFitFunction*>(plugin);
             if (iRecord) {
-                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginFitFunction OK\n");
+                int pmajor, pminor;
+                iRecord->getQFLibVersion(pmajor, pminor);
+                if (QApplication::arguments().contains("--verboseplugin")) {
+                    QFPluginLogTools::log_global_text("    QFPluginFitFunction OK\n");
+                    QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
+                }
                 fitPlugins.append(iRecord);
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
@@ -39,8 +44,10 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
                     info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
                     info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                     info.tutorial=info.directory+QString("tutorial.html");
+                    info.settings=info.directory+QString("settings.html");
                     if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
+                    if (!QFile::exists(info.settings)) info.settings="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
                     info.plugintypename=tr("Fit Function Plugins");
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
@@ -108,6 +115,13 @@ QStringList QFFitFunctionManager::getIDList(int i) const {
     return fitPlugins[i]->getIDs();
 }
 
+bool QFFitFunctionManager::contains(const QString &ID)
+{
+    for (int i=0; i<fitPlugins.size(); i++)
+        if (fitPlugins[i]->getID()==ID) return true;
+    return false;
+}
+
 int QFFitFunctionManager::getPluginForID(QString id) const {
     for (int i=0; i<fitPlugins.size(); i++) {
          QStringList ids=fitPlugins[i]->getIDs();
@@ -166,6 +180,16 @@ QString QFFitFunctionManager::getPluginTutorial(int ID) {
     return "";
 }
 
+QString QFFitFunctionManager::getPluginSettings(int ID) {
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/settings.html").arg(basename);
+    }
+    return "";
+}
 QString QFFitFunctionManager::getPluginCopyrightFile(int ID) {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();

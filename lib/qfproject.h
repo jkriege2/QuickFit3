@@ -310,8 +310,6 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message);
 
-    protected slots:
-        void projectChanged();
 
 };
 

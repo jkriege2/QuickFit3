@@ -38,7 +38,10 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
             ValueRole=Qt::UserRole,
             NameRole=Qt::UserRole+1,
             AvgRole=Qt::UserRole+2,
-            SDRole=Qt::UserRole+3
+            SDRole=Qt::UserRole+3,
+            SumRole=Qt::UserRole+4,
+            Sum2Role=Qt::UserRole+5,
+            CountRole=Qt::UserRole+6
         };
 
 

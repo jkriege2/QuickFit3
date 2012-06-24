@@ -252,8 +252,6 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          *  \note \a property may be empty, signalling that no special properties, but possible multiple have changed
          */
         void propertiesChanged(const QString& property, bool visible);
-        /** \brief emitted whenever the evaluation results change */
-        void resultsChanged();
         /** \brief emitted whenever the evaluation results change, if both arguments are empty, the changes are larger than just the given result */
         void resultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName);
         /** \brief signal emitted when the highlighted record changed */

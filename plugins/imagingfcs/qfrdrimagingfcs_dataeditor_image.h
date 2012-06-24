@@ -188,7 +188,7 @@ protected:
 
             This function updates the contents of the image setting comboboxes, but tries to preserve the current selection!
          */
-        void resultsChanged();
+        void resultsChanged(const QString &evalName=QString(""), const QString &resultName=QString(""), bool deleted=false);
 
         void debugInfo();
 

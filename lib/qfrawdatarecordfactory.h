@@ -83,6 +83,8 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFRawDataRecord ID. */
         QString getPluginTutorial(QString ID);
+        /** \brief returns the plugins settings file (html) for a specified QFRawDataRecord ID. */
+        QString getPluginSettings(QString ID);
         /** \brief returns the plugins copyright file (html) for a specified QFRawDataRecord ID. */
         QString getPluginCopyrightFile(QString ID);
 

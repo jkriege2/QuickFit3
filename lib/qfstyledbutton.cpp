@@ -63,7 +63,7 @@ void QFStyledButton::openBuddyContents() {
     emit clicked(prop);
     if (m_action) m_action->trigger();
 
-    if (m_actionmode==OpenURL) {
+    if (m_actionmode==OpenURL || m_actionmode==OpenFile) {
         if (!prop.isEmpty()) QDesktopServices::openUrl(QUrl(prop, QUrl::TolerantMode));
     } else if (m_actionmode==OpenPrependedURL) {
         if (!prop.isEmpty()) QDesktopServices::openUrl(QUrl(m_prependURL+prop, QUrl::TolerantMode));
@@ -121,6 +121,11 @@ void QFStyledButton::setBuddyWithDefaultIcon(QWidget* b, ActionMode mode) {
         i.addFile(":/lib/qfstyledbutton/execute_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/execute_pressed.png", QSize(), QIcon::Active);
     } else if (mode==SelectFile) {
+        i=QIcon(":/lib/qfstyledbutton/selectfile.png");
+        i.addFile(":/lib/qfstyledbutton/selectfile_disabled.png", QSize(), QIcon::Disabled);
+        i.addFile(":/lib/qfstyledbutton/selectfile_hover.png", QSize(), QIcon::Selected);
+        i.addFile(":/lib/qfstyledbutton/selectfile_pressed.png", QSize(), QIcon::Active);
+    } else if (mode==OpenFile) {
         i=QIcon(":/lib/qfstyledbutton/openfile.png");
         i.addFile(":/lib/qfstyledbutton/openfile_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/openfile_hover.png", QSize(), QIcon::Selected);

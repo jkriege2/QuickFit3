@@ -115,8 +115,18 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void propertiesChanged(QString property, bool visible);
         /** \brief basic properties changed (i.e. name, description and folder) */
         void basicPropertiesChanged();
-        /** \brief emitted whenever at least one of the results changes */
-        void resultsChanged();
+        /*! \brief emitted whenever at least one of the results changes
+
+            The function arguments specify what changed:
+            <table>
+              <tr><th>\a evalName</th><th>\a resultName</th><th>meaning</th></tr>
+              <tr><th>set</th><th>set</th><td>the property resultName in the evaluation evalName changed</td></tr>
+              <tr><th>set</th><th>unset</th><td>something changed in the evaluation evalName</td></tr>
+              <tr><th>unset</th><th>unset</th><td>any result changed</td></tr>
+            </table>
+
+         */
+        void resultsChanged(const QString& evalName, const QString& resultName, bool removed);
         /** \brief emitted whenever the data in this object changes */
         void rawDataChanged();
         /** \brief emitted whenever the folder changes */
@@ -125,7 +135,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged(const QString& property=QString(""), bool visible=true);
         /** \brief this function emits a resultsChanged() signal. */
-        virtual void emitResultsChanged();
+        virtual void emitResultsChanged(const QString& evalName=QString(""), const QString& resultName=QString(""), bool removed=false);
         /** \brief this function emits a rawDataChanged() signal. */
         virtual void emitRawDataChanged();
         /** \brief disable emitting of rawDataChanged() signal*/

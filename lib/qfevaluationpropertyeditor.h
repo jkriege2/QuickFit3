@@ -122,7 +122,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
-        void resultsChanged();
+        void resultsChanged(QFRawDataRecord *record=NULL, const QString &evalName=QString(""), const QString &resultName=QString(""));
 
         void refreshResults();
 

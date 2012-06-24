@@ -32,7 +32,12 @@ void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices
             if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFExtension* iRecord = qobject_cast<QFExtension*>(plugin);
             if (iRecord) {
-                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFExtension OK\n");
+                int pmajor, pminor;
+                iRecord->getQFLibVersion(pmajor, pminor);
+                if (QApplication::arguments().contains("--verboseplugin")) {
+                    QFPluginLogTools::log_global_text("    QFExtension OK\n");
+                    QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
+                }
                 items[iRecord->getID()]=iRecord;
                 itemobjects[iRecord->getID()]=plugin;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
@@ -45,8 +50,10 @@ void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices
                     info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
                     info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                     info.tutorial=info.directory+QString("tutorial.html");
+                    info.settings=info.directory+QString("settings.html");
                     if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
+                    if (!QFile::exists(info.settings)) info.settings="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_extension.html");
                     info.plugintypename=tr("Extension Plugins");
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
@@ -186,6 +193,17 @@ QString QFExtensionManager::getPluginTutorial(QString ID) {
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+    }
+    return "";
+}
+
+QString QFExtensionManager::getPluginSettings(QString ID) {
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/settings.html").arg(basename);
     }
     return "";
 }

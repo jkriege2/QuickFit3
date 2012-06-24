@@ -931,7 +931,27 @@ void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& se
     for (int i=0; i<sel.size(); i++) {
         int r=sel[i].row();
         //int c=sel[i].column();
-        QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
+        QVariant dataS=sel[i].data(QFRDRResultsModel::SumRole);
+        QVariant dataS2=sel[i].data(QFRDRResultsModel::Sum2Role);
+        QVariant dataC=sel[i].data(QFRDRResultsModel::CountRole);
+        QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
+        double d=0;
+        bool ok=false;
+        if (dataS.canConvert(QVariant::Double) && dataS2.canConvert(QVariant::Double) && dataC.canConvert(QVariant::LongLong)) {
+            if (names.contains(r)) {
+                sum[r] = sum[r]+dataS.toDouble();
+                sum2[r] = sum2[r]+dataS2.toDouble();
+                count[r] = count[r]+dataC.toLongLong();
+            } else {
+                sum[r] = dataS.toDouble();
+                sum2[r] = dataS2.toDouble();
+                count[r] = dataC.toLongLong();
+                names[r] = name;
+            }
+
+        }
+
+        /*QVariant data=sel[i].data(QFRDRResultsModel::ValueRole);
         QString name=sel[i].data(QFRDRResultsModel::NameRole).toString();
         double d=0;
         bool ok=false;
@@ -955,7 +975,7 @@ void QFRawDataPropertyEditor::tvResultsSelectionChanged(const QItemSelection& se
                 count[r] = 1;
                 names[r] = name;
             }
-        }
+        }*/
     }
 
     int lineHeight=labAveragedresults->fontMetrics().lineSpacing();

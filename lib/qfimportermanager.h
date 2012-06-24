@@ -57,6 +57,8 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
         QString getPluginTutorial(int ID);
+        /** \brief returns the plugins tutorial file (html) for a specified  ID. */
+        QString getPluginSettings(int ID);
         /** \brief returns the plugins copyright file (html) for a specified  ID. */
         QString getPluginCopyrightFile(int ID);
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
@@ -109,6 +111,7 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         int getMajorVersion(int i);
         /** \brief get plugins minor version number */
         int getMinorVersion(int i);
+        bool contains(const QString &ID);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

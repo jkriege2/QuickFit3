@@ -3,6 +3,8 @@
 
 #include "lib_imexport.h"
 #include "qflib_version.h"
+#include <QIcon>
+#include <QString>
 
 /** \brief virtual interface class for all QuickFit 3 plugins
     \ingroup qf3plugins
@@ -53,5 +55,6 @@ class QFPlugin {
 
 Q_DECLARE_INTERFACE(QFPlugin,
                      "www.dkfz.de.b040.quickfit3.QFPlugin/1.0")
+
 
 #endif // QFPLUGIN_H

@@ -14,6 +14,11 @@
 #include <QUrl>
 #include "qfplugin.h"
 #include "qfpluginservices.h"
+#include "qfenhancedlineedit.h"
+#include "qfstyledbutton.h"
+#include <QCheckBox>
+#include <QToolButton>
+#include <QMenuBar>
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
@@ -65,6 +70,8 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
         void addInternalReplace(QString key, QString replaceBy) {
             internal_replaces.append(qMakePair(key, replaceBy));
         }
+
+        void setContentsMenuActions(const QList<QAction*>& items);
     public slots:
         /** \brief updates the information in the window */
         void updateHelp(QString title, QString filename);
@@ -88,10 +95,26 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
 
         QFPluginServices* m_pluginServices;
 
-        QPushButton* btnPrevious;
-        QPushButton* btnNext;
-        QPushButton* btnHome;
-        QPushButton* btnPrint;
+        QToolButton* btnPrevious;
+        QToolButton* btnNext;
+        QToolButton* btnHome;
+        QToolButton* btnPrint;
+        QToolButton* btnFind;
+        QWidget* widFind;
+        QFEnhancedLineEdit* edtFind;
+        QToolButton* btnFindNext;
+        QToolButton* btnFindPrev;
+        QCheckBox* chkCaseSensitive;
+        QCheckBox* chkFindWholeWord;
+        QMenuBar* menuBar;
+        QMenu* menuPage;
+        QMenu* menuContents;
+        QAction* actFind;
+        QAction* actHome;
+        QAction* actNext;
+        QAction* actPrevious;
+        QAction* actPrint;
+        QAction* actClose;
 
 
         /** \brief a text edit for the model information/description */
@@ -135,6 +158,9 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
         void showFile(QString filename);
         void print();
         void updateButtons();
+        void find(bool checked=true);
+        void findNext();
+        void findPrev();
 };
 
 #endif // QFHTMLHelpWindow_H

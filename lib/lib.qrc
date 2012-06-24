@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="lib/help_next.png">../images/16x16/help_next.png</file>
-        <file alias="lib/help_previous.png">../images/16x16/help_previous.png</file>
-        <file alias="lib/help_home.png">../images/16x16/help_home.png</file>
         <file alias="lib/print.png">../images/16x16/document_print.png</file>
         <file alias="lib/save16.png">../images/16x16/filesave.png</file>
         <file alias="lib/delete16.png">../images/16x16/deletetable.png</file>
@@ -26,6 +23,11 @@
         <file alias="help_contents.png">icons/help_contents.png</file>
         <file alias="help_tutorial.png">icons/help_tutorial.png</file>
         <file alias="help_copyright.png">icons/help_copyright.png</file>
+        <file alias="help.png">icons/help.png</file>
+        <file alias="help_rdr.png">icons/help_rdr.png</file>
+        <file alias="help_eval.png">icons/help_eval.png</file>
+        <file alias="exit.png">icons/exit.png</file>
+        <file alias="print.png">../images/16x16/document_print.png</file>
     </qresource>
     <qresource prefix="/lib">
         <file alias="fitalg_icon.png">icons/fitalg_icon.png</file>
@@ -42,6 +44,15 @@
         <file alias="help.png">icons/help.png</file>
         <file alias="help_rdr.png">icons/help_rdr.png</file>
         <file alias="help_eval.png">icons/help_eval.png</file>
+
+
+        <file alias="help_print.png">icons/help_print.png</file>
+        <file alias="help_next.png">icons/help_btn_next.png</file>
+        <file alias="help_previous.png">icons/help_btn_previous.png</file>
+        <file alias="help_home.png">icons/help_home.png</file>
+        <file alias="help_find.png">icons/help_find.png</file>
+        <file alias="help_findnext.png">icons/help_findnext.png</file>
+        <file alias="help_findprev.png">icons/help_findprev.png</file>
     </qresource>
 
 
@@ -60,6 +71,11 @@
         <file alias="openfile_disabled.png">icons/fileopen_disabled.png</file>
         <file alias="openfile_hover.png">icons/fileopen_hover.png</file>
         <file alias="openfile_pressed.png">icons/fileopen_active.png</file>
+
+        <file alias="selectfile.png">icons/fileselect.png</file>
+        <file alias="selectfile_disabled.png">icons/fileselect_disabled.png</file>
+        <file alias="selectfile_hover.png">icons/fileselect_hover.png</file>
+        <file alias="selectfile_pressed.png">icons/fileselect_active.png</file>
 
         <file alias="clear_edt.png">icons/clear_edt.png</file>
         <file alias="clear_edt_disabled.png">icons/clear_edt_disabled.png</file>

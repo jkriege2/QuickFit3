@@ -4,6 +4,7 @@
         <file alias="icon.png">../images/icon_32.png</file>
         <file alias="icon_large.png">../images/icon_256.png</file>
         <file alias="help.png">../images/16x16/help.png</file>
+        <file alias="help_copyright.png">../images/16x16/help_copyright.png</file>
         <file alias="help_next.png">../images/16x16/help_next.png</file>
         <file alias="help_previous.png">../images/16x16/help_previous.png</file>
         <file alias="help_home.png">../images/16x16/help_home.png</file>

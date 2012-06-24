@@ -41,7 +41,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         inline QSettings* getQSettings() { return settings; }
 
         /** \brief return the maximum number of threds */
-        int getMaxThreads() { return maxThreads; };
+        int getMaxThreads() { return maxThreads; }
 
         inline QString getCurrentRawDataDir() { return currentRawDataDir; }
         inline void setCurrentRawDataDir(QString d) { currentRawDataDir=d; }
@@ -57,7 +57,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         void setStyle(QString st);
 
         /** \brief set the maximum number of threds */
-        void setMaxThreads(int threads) { maxThreads=threads; };
+        void setMaxThreads(int threads) { maxThreads=threads; }
 
         /** \brief autosave project every X minutes */
         int getAutosave() { return autosave; }
@@ -75,6 +75,15 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString getAssetsDirectory() const;
         /** \brief returns the directory of the QuickFit main application */
         QString getApplicationDirectory() const;
+
+        bool getUserSaveAfterFirstEdit() const;
+        void setUserSaveAfterFirstEdit(bool set);
+        bool getChildWindowsStayOnTop() const;
+        void setChildWindowsStayOnTop(bool set);
+        bool getHelpWindowsStayOnTop() const;
+        void setHelpWindowsStayOnTop(bool set);
+        bool getProjectWindowsStayOnTop() const;
+        void setProjectWindowsStayOnTop(bool set);
     public slots:
 
 
@@ -118,6 +127,14 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString currentRawDataDir;
         /** \brief directory of the QuickFit executable (as this circumvents problems with MacOS bundles ... use this instead of QApplication::applicationDirPath() )*/
         QString appDir;
+        /** \brief indicates whether to ask the user to save the project after the first edit operation */
+        bool userSaveAfterFirstEdit;
+        /** \brief indicates whether child windows (RDR, Eval) are set to stay on top */
+        bool childWindowsStayOnTop;
+        /** \brief indicates whether help windows are set to stay on top */
+        bool helpWindowsStayOnTop;
+        /** \brief indicates whether project window is set to stay on top */
+        bool projectWindowStayOnTop;
 
         /** \brief maximum number of threads */
         int maxThreads;
@@ -133,10 +150,10 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString pluginsDir;
 
-       private:
+    private:
         static  ProgramOptions* inst;
 
-       public:
+   public:
         /** \brief returns an sinatnce to the main object of this type in the current QuickFit 3  instance */
         static ProgramOptions* getInstance() {
             return inst;

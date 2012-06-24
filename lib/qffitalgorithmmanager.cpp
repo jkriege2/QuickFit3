@@ -17,6 +17,13 @@ QFFitAlgorithmManager::~QFFitAlgorithmManager()
     //dtor
 }
 
+bool QFFitAlgorithmManager::contains(const QString &ID)
+{
+    for (int i=0; i<fitPlugins.size(); i++)
+        if (fitPlugins[i]->getID()==ID) return true;
+    return false;
+}
+
 void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
@@ -30,7 +37,12 @@ void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServi
             if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFPluginFitAlgorithm* iRecord = qobject_cast<QFPluginFitAlgorithm*>(plugin);
             if (iRecord) {
-                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginFitAlgorithm OK\n");
+                int pmajor, pminor;
+                iRecord->getQFLibVersion(pmajor, pminor);
+                if (QApplication::arguments().contains("--verboseplugin")) {
+                    QFPluginLogTools::log_global_text("    QFPluginFitAlgorithm OK\n");
+                    QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
+                }
                 fitPlugins.append(iRecord);
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded fit algorithm plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
@@ -42,8 +54,10 @@ void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServi
                     info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
                     info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                     info.tutorial=info.directory+QString("tutorial.html");
+                    info.settings=info.directory+QString("settings.html");
                     if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
+                    if (!QFile::exists(info.settings)) info.settings="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitalg.html");
                     info.plugintypename=tr("Fit Algorithm Plugins");
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
@@ -169,6 +183,17 @@ QString QFFitAlgorithmManager::getPluginTutorial(int ID) {
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+    }
+    return "";
+}
+
+QString QFFitAlgorithmManager::getPluginSettings(int ID) {
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/settings.html").arg(basename);
     }
     return "";
 }

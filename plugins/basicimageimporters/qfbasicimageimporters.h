@@ -1,8 +1,9 @@
 #ifndef QFBASICIMAGEIMPORTERS_H
 #define QFBASICIMAGEIMPORTERS_H
-
+#include "qfpluginservices.h"
 #include "qfpluginimporters.h"
 #include "qfimagereaderlibtiff.h"
+#include "qfpluginoptionsdialog.h"
 
 /*!
     \defgroup qf3importerplugins_importers_basicimages Importer Plugin
@@ -14,14 +15,14 @@
 /*! \brief plugin class for Importers
     \ingroup qf3importerplugins_importers_basicimages
 */
-class QFBasicImageImporters : public QObject, public QFPluginImporters {
+class QFBasicImageImporters : public QObject, public QFPluginImporters, public QFPluginOptionsDialogInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginImporters)
+        Q_INTERFACES(QFPluginImporters QFPluginOptionsDialogInterface)
         Q_INTERFACES(QFPlugin)
     public:
 
         /** Default constructor */
-        QFBasicImageImporters(QObject* parent=NULL) {}
+        QFBasicImageImporters(QObject* parent=NULL);
         /** Default destructor */
         virtual ~QFBasicImageImporters() {}
 
@@ -71,6 +72,13 @@ class QFBasicImageImporters : public QObject, public QFPluginImporters {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFImporter* createImporter(QString id) const ;
+
+        /** \brief return the display name for the options pane */
+        QString pluginOptionsName() const;
+        /** \brief return the display icon for the options pane */
+        QIcon pluginOptionsIcon() const;
+        /** \brief create a widget to display in the options dialog */
+        QFPluginOptionsWidget* createOptionsWidget(QWidget* parent) ;
 
         QF_PLUGIN
     private:

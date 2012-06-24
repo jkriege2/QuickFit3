@@ -6,10 +6,13 @@
 #include "qfrdrreplacedialog.h"
 #include "statistics_tools.h"
 
-MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
+MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
+    QMainWindow(NULL)
+{
     settings=s;
     splashPix=splash->pixmap();
-		project=NULL;
+    project=NULL;
+    helpWindow=NULL;
 
     newProjectTimer.setInterval(2500);
     newProjectTimer.stop();
@@ -76,10 +79,12 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash) {
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
+    htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getAssetsDirectory()+QString("/help/")));
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
+    htmlReplaceList.append(qMakePair(QString("settings_contents"), QString("<ul>")+createPluginDocSettings("<li>%1 settings:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a></div>")));
 
@@ -317,7 +322,7 @@ void MainWindow::about() {
     QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
     widget->exec();
     delete widget;
 }
@@ -514,6 +519,63 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     return text;
 }
 
+QString MainWindow::createPluginDocSettings(QString mainitem_before, QString mainitem_after) {
+    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+    QString text=mainitem_before.arg(tr("Raw Data Record"));
+    // gather information about plugins
+    for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
+        QString id=getRawDataRecordFactory()->getIDList().at(i);
+        QString dir=getRawDataRecordFactory()->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("Data Evaluation"));
+    // gather information about plugins
+    for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
+        QString id=getEvaluationItemFactory()->getIDList().at(i);
+        QString dir=getEvaluationItemFactory()->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">Fit Algorithm</a>"));
+    // gather information about plugins
+    for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=fitAlgorithmManager->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function</a>"));
+    // gather information about plugins
+    for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=fitFunctionManager->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("Importers"));
+    // gather information about plugins
+    for (int i=0; i<importerManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=importerManager->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
+    // gather information about plugins
+    for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
+        QString id=getExtensionManager()->getIDList().at(i);
+        QString dir=getExtensionManager()->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+    return text;
+}
 
 QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainitem_after) {
     QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
@@ -649,6 +711,9 @@ void MainWindow::createWidgets() {
     helpWindow->initFromPluginServices(this);
     helpWindow->close();
     helpWindow->setParent(NULL, Qt::Tool);
+    if (settings->getHelpWindowsStayOnTop()) helpWindow->setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
+    else helpWindow->setWindowFlags(Qt::Tool);
+
 
 }
 
@@ -696,6 +761,22 @@ void MainWindow::createActions() {
 
     helpAct=new QAction(QIcon(":/help.png"), tr("&Help"), this);
     connect(helpAct, SIGNAL(triggered()), this, SLOT(displayHelp()));
+
+    helpCopyrightAct=new QAction(QIcon(":/help_copyright.png"), tr("QuickFit &Copyright"), this);
+    connect(helpCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpCopyright()));
+    helpPluginCopyrightAct=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("Plugin C&opyright"), this);
+    connect(helpPluginCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
+    helpTutorialsAct=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("Plugin &Tutorials"), this);
+    connect(helpTutorialsAct, SIGNAL(triggered()), this, SLOT(displayHelpTutorials()));
+    helpPluginAct=new QAction(QIcon(":/lib/help/help_contents.png"), tr("&Plugin Help"), this);
+    connect(helpPluginAct, SIGNAL(triggered()), this, SLOT(displayPluginHelp()));
+
+    helpActList.append(helpAct);
+    helpActList.append(helpCopyrightAct);
+    helpActList.append(helpPluginAct);
+    helpActList.append(helpTutorialsAct);
+    helpActList.append(helpPluginCopyrightAct);
+
 
 
     aboutAct = new QAction(QIcon(":/about.png"), tr("&About"), this);
@@ -774,16 +855,23 @@ void MainWindow::createMenus() {
 
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
-    toolsMenu->addAction(actRDRReplace);
-    toolsMenu->addAction(actRDRUndoReplace);
-    toolsMenu->addSeparator();
-    toolsMenu->addAction(actPerformanceTest);
+    projectToolsMenu=toolsMenu->addMenu(tr("project tools"));
+    projectToolsMenu->addAction(actRDRReplace);
+    projectToolsMenu->addAction(actRDRUndoReplace);
+    debugToolsMenu=toolsMenu->addMenu(tr("debug tools"));
+    debugToolsMenu->addAction(actPerformanceTest);
     toolsMenu->addSeparator();
 
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(helpAct);
+    helpMenu->addAction(helpCopyrightAct);
+    helpMenu->addSeparator();
+    helpMenu->addAction(helpPluginAct);
+    helpMenu->addAction(helpTutorialsAct);
+    helpMenu->addAction(helpPluginCopyrightAct);
+
     helpMenu->addSeparator();
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutPluginsAct);
@@ -796,6 +884,8 @@ void MainWindow::createMenus() {
     menus["extensions"]=extensionMenu;
     menus["help"]=helpMenu;
     menus["tools"]=toolsMenu;
+    menus["tools/project"]=projectToolsMenu;
+    menus["tools/debug"]=debugToolsMenu;
 
     tvMain->addAction(insertItemMenu->menuAction());
     tvMain->addAction(evaluationMenu->menuAction());
@@ -904,6 +994,15 @@ void MainWindow::readSettings() {
     } else {
         timerAutosave->setInterval(settings->getAutosave()*60000);
         timerAutosave->start();
+    }
+
+    if (settings->getProjectWindowsStayOnTop()) setWindowFlags(Qt::Window/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint */);
+    else setWindowFlags(Qt::Window);
+    show();
+
+    if (helpWindow) {
+        if (settings->getHelpWindowsStayOnTop()) helpWindow->setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
+        else helpWindow->setWindowFlags(Qt::Tool);
     }
 
 }
@@ -1122,10 +1221,12 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
     if (project) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QFProjectTreeModelNode::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
+        Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+        //if (settings->getChildWindowsStayOnTop()) f=f|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint;
         if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
             QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(index);
             if (rec) {
-                QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
+                QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), NULL, f);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 rawDataPropEditors.append(edt);
                 edt->show();
@@ -1133,7 +1234,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
         } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
             if (rec) {
-                QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), this, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint);
+                QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), NULL, f);
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 evaluationPropEditors.append(edt);
                 edt->show();
@@ -1284,9 +1385,11 @@ void MainWindow::incProgress() {
 
 void MainWindow::openSettingsDialog() {
     OptionsDialog* opt=new OptionsDialog(this);
+    opt->setPlugins(pluginOptionDialogs);
     //std::cout<<"opening settings\n";
     opt->open(settings);
     //std::cout<<"autosave="<<settings->getAutosave()<<"\n";
+    readSettings();
     if (settings->getAutosave()<=0) {
         timerAutosave->stop();
     } else {
@@ -1337,6 +1440,11 @@ QString MainWindow::getPluginHelpDirectory(const QString& pluginID) {
     else return QFileInfo(hlp).absolutePath()+"/";
 }
 
+void MainWindow::registerSettingsPane(QFPluginOptionsDialogInterface *plugin)
+{
+    pluginOptionDialogs.append(plugin);
+}
+
 QString MainWindow::getPluginHelp(const QString& pluginID) {
     if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginHelp(pluginID);
     if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginHelp(pluginID);
@@ -1348,11 +1456,25 @@ QString MainWindow::getPluginTutorial(const QString& pluginID) {
     if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginTutorial(pluginID);
     if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginTutorial(pluginID);
     if (extensionManager->contains(pluginID)) return extensionManager->getPluginTutorial(pluginID);
+    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginTutorial( fitFunctionManager->getPluginForID(pluginID));
+    if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginTutorial(fitAlgorithmManager->getPluginForID(pluginID));
+    if (importerManager->contains(pluginID)) return importerManager->getPluginTutorial(importerManager->getPluginForID(pluginID));
+    return "";
+}
+
+QString MainWindow::getPluginSettings(const QString& pluginID) {
+    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginSettings(pluginID);
+    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginSettings(pluginID);
+    if (extensionManager->contains(pluginID)) return extensionManager->getPluginSettings(pluginID);
+    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginSettings(fitFunctionManager->getPluginForID(pluginID));
+    if (fitAlgorithmManager->contains(pluginID)) return fitFunctionManager->getPluginSettings(fitFunctionManager->getPluginForID(pluginID));
+    if (importerManager->contains(pluginID)) return importerManager->getPluginSettings(importerManager->getPluginForID(pluginID));
     return "";
 }
 
 void MainWindow::displayHelpWindow(const QString& helpfile) {
     helpWindow->clear();
+    helpWindow->setContentsMenuActions(helpActList);
     if (helpfile.isEmpty()) helpWindow->updateHelp(settings->getAssetsDirectory()+QString("/help/quickfit.html"));
     else helpWindow->updateHelp(helpfile);
     helpWindow->show();
@@ -1361,6 +1483,26 @@ void MainWindow::displayHelpWindow(const QString& helpfile) {
 
 void MainWindow::displayHelp() {
     displayHelpWindow("");
+}
+
+void MainWindow::displayHelpCopyright()
+{
+     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/copyright.html"));
+}
+
+void MainWindow::displayHelpPluginCopyright()
+{
+    displayHelpWindow(settings->getAssetsDirectory()+QString("/help/plugin_copyrights.html"));
+}
+
+void MainWindow::displayHelpTutorials()
+{
+    displayHelpWindow(settings->getAssetsDirectory()+QString("/help/plugin_tutorials.html"));
+}
+
+void MainWindow::displayPluginHelp()
+{
+    displayHelpWindow(settings->getAssetsDirectory()+QString("/help/plugin_help.html"));
 }
 
 QMenu* MainWindow::getMenu(QString menu) {
@@ -1411,7 +1553,8 @@ QString MainWindow::getPluginsDirectory() {
 }
 
 void MainWindow::saveProjectFirstTime() {
-	  if (!project) return;
+    if (!settings->getUserSaveAfterFirstEdit()) return;
+    if (!project) return;
     if (project->getRawDataCount()+project->getEvaluationCount()>0) {
         newProjectTimer.stop();
         int ret = QMessageBox::question(this, tr("QuickFit %1").arg(VERSION_FULL),
@@ -1547,7 +1690,7 @@ void MainWindow::projectPerformanceTest() {
                 QApplication::processEvents();
 
 
-                if (s==0) {
+                //if (s==0) {
                     log_text(tr("  * writing/reading simple results (operations=%1  repeats=%2): ").arg(propCnt).arg(repeats));
                     record->disableEmitPropertiesChanged();
                     for (int r=0; r<repeats; r++) {
@@ -1587,8 +1730,8 @@ void MainWindow::projectPerformanceTest() {
                         //log_text(tr("    * writing %1 results ... ").arg(propCnt));
                         record->resultsClearAll();
                         timer.start();
-                        QVector<double> v(100, M_PI);
-                        QVector<double> e(100, M_PI/2.0);
+                        QVector<double> v(propCnt, M_PI);
+                        QVector<double> e(propCnt, M_PI/2.0);
                         for (int i=0; i<propCnt; i++) {
                             record->resultsSetNumberErrorList("testeval", QString("testprop%1").arg(i), v, e, "unit");
                         }
@@ -1613,7 +1756,38 @@ void MainWindow::projectPerformanceTest() {
                     log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
                     log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
                     QApplication::processEvents();
-                }
+
+
+                    log_text(tr("  * writing/reading in array results (operations=%1  repeats=%2): ").arg(propCnt).arg(repeats));
+                    record->disableEmitPropertiesChanged();
+                    for (int r=0; r<repeats; r++) {
+                        //log_text(tr("    * writing %1 results ... ").arg(propCnt));
+                        timer.start();
+                        for (int i=0; i<propCnt; i++) {
+                            record->resultsSetInNumberErrorList("testeval", QString("testprop%1").arg(i), i, double(i), double(i)/10.0, "unit");
+                        }
+                        double duration=double(timer.nsecsElapsed())/1.0e6;
+                        durW[r]=duration;
+                        //log_text(tr("OK [%1 ms]\n").arg(duration));
+
+                        //log_text(tr("    * reading %1 results ... ").arg(propCnt));
+                        timer.start();
+                        for (int i=0; i<propCnt; i++) {
+                            double vv=record->resultsGetAsDouble("testeval", QString("testprop%1").arg(i), i);
+                            vv=vv+i;
+                        }
+                        duration=double(timer.nsecsElapsed())/1.0e6;
+                        durR[r]=duration;
+                        //log_text(tr("OK [%1 ms]\n").arg(duration));
+                        log_text(".");
+                        QApplication::processEvents();
+                    }
+                    log_text("\n");
+                    record->enableEmitPropertiesChanged();
+                    log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                    QApplication::processEvents();
+                //}
 
                 if (edt) {
                     edt->close();

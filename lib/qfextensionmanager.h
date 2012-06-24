@@ -80,6 +80,8 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFExtension ID. */
         QString getPluginTutorial(QString ID);
+        /** \brief returns the plugins settings file (html) for a specified QFExtension ID. */
+        QString getPluginSettings(QString ID);
         /** \brief returns the plugins copyright file (html) for a specified QFExtension ID. */
         QString getPluginCopyrightFile(QString ID);
 

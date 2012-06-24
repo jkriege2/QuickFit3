@@ -75,6 +75,8 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
         QString getPluginTutorial(int ID);
+        /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
+        QString getPluginSettings(int ID);
         /** \brief returns the plugins copyright file (html) for a specified plugin \a ID. */
         QString getPluginCopyrightFile(int ID);
 
@@ -94,6 +96,7 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
             return NULL;
         }
 
+        bool contains(const QString &ID);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

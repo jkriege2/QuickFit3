@@ -25,7 +25,12 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QList<QFPluginServ
             if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
             QFPluginRawDataRecord* iRecord = qobject_cast<QFPluginRawDataRecord*>(plugin);
             if (iRecord) {
-                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginRawDataRecord OK\n");
+                int pmajor, pminor;
+                iRecord->getQFLibVersion(pmajor, pminor);
+                if (QApplication::arguments().contains("--verboseplugin")) {
+                    QFPluginLogTools::log_global_text("    QFPluginRawDataRecord OK\n");
+                    QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
+                }
                 items[iRecord->getID()]=iRecord;
                 filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
                 emit showMessage(tr("loaded raw data plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
@@ -37,8 +42,10 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QList<QFPluginServ
                     info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
                     info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                     info.tutorial=info.directory+QString("tutorial.html");
+                    info.settings=info.directory+QString("settings.html");
                     if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
+                    if (!QFile::exists(info.settings)) info.settings="";
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_rdrscreen.html");
                     info.plugintypename=tr("Raw Data Plugins");
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
@@ -158,6 +165,18 @@ QString QFRawDataRecordFactory::getPluginTutorial(QString ID) {
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
+    }
+    return "";
+}
+
+QString QFRawDataRecordFactory::getPluginSettings(QString ID)
+{
+    if (items.contains(ID)) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/settings.html").arg(basename);
     }
     return "";
 }
