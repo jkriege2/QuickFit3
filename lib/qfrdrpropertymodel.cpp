@@ -16,10 +16,10 @@ QFRDRPropertyModel::~QFRDRPropertyModel()
 
 
 void QFRDRPropertyModel::propertiesChanged(const QString &property, bool visible) {
-    qDebug()<<"QFRDRPropertyModel::propertiesChanged()   porperty="<<property<<"   visible="<<visible;
+    //qDebug()<<"QFRDRPropertyModel::propertiesChanged()   porperty="<<property<<"   visible="<<visible;
     if (visible) {
         if (property.isEmpty()){
-            qDebug()<<"QFRDRPropertyModel::propertiesChanged: updateModel()";
+            //qDebug()<<"QFRDRPropertyModel::propertiesChanged: updateModel()";
             updateModel();
         } else {
             int row=props.indexOf(property);
@@ -29,13 +29,13 @@ void QFRDRPropertyModel::propertiesChanged(const QString &property, bool visible
                 while (i<props.size() && property>props[i]) {
                     i++;
                 }
-                qDebug()<<"QFRDRPropertyModel::propertiesChanged: insert i="<<i<<"   props.size()="<<props.size();
+                //qDebug()<<"QFRDRPropertyModel::propertiesChanged: insert i="<<i<<"   props.size()="<<props.size();
                 beginInsertRows(QModelIndex(), i, i);
                 props.insert(i, property);
                 endInsertRows();
                 //emit dataChanged(index(i, 0), index(i, columnCount()-1));
             } else {
-                qDebug()<<"QFRDRPropertyModel::propertiesChanged: data changed row="<<row;
+                //qDebug()<<"QFRDRPropertyModel::propertiesChanged: data changed row="<<row;
                 emit dataChanged(index(row, 0), index(row, columnCount()-1));
             }
         }
@@ -56,7 +56,7 @@ void QFRDRPropertyModel::updateModel(bool doReset)
 }
 
 void QFRDRPropertyModel::init(QFRawDataRecord* record) {
-    if (record) qDebug()<<"QFRDRPropertyModel::init("<<record->getName()<<")";
+    //if (record) qDebug()<<"QFRDRPropertyModel::init("<<record->getName()<<")";
     setParent(record);
     this->record=record;
     disconnect();

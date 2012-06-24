@@ -848,7 +848,7 @@ void QFRawDataPropertyEditor::newPropClicked() {
             if (current->propertyExists(d->propertyName())) {
                 ok=current->isPropertyUserEditable(d->propertyName());
             }
-            qDebug()<<"QFRawDataPropertyEditor::newPropClicked()  pn="<<d->propertyName()<<"   val="<<v<<"   ok="<<ok;
+            //qDebug()<<"QFRawDataPropertyEditor::newPropClicked()  pn="<<d->propertyName()<<"   val="<<v<<"   ok="<<ok;
             if (ok) current->setQFProperty(d->propertyName(), v, true, true);
         }
 
@@ -872,7 +872,7 @@ void QFRawDataPropertyEditor::deletePropClicked() {
         if (props.size()>0) {
             for (int i=0; i<props.size(); i++) {
                 //std::cout<<"deleting "<<props[i].toStdString()<<std::endl;
-                qDebug()<<"QFRawDataPropertyEditor::deletePropClicked '"<<props[i]<<"'";
+                //qDebug()<<"QFRawDataPropertyEditor::deletePropClicked '"<<props[i]<<"'";
                 if (!props[i].isEmpty() && current->isPropertyUserEditable(props[i])) current->deleteProperty(props[i]);
             }
         }

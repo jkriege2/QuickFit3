@@ -2255,11 +2255,11 @@ QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup)
 
 
 void QFRawDataRecord::emitPropertiesChanged(const QString &property, bool visible) {
-    qDebug()<<"emitPropertiesChanged( prop="<<property<<"   vis="<<visible<<")";
+    //qDebug()<<"emitPropertiesChanged( prop="<<property<<"   vis="<<visible<<")";
     if (doEmitPropertiesChanged) {
         //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
         emit propertiesChanged(property, visible);
-        qDebug()<<"   ... emitted";
+        //qDebug()<<"   ... emitted";
 
     }
 }
