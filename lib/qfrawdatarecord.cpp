@@ -66,6 +66,7 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     resultsmodel=NULL;
     propModel=NULL;
     doEmitResultsChanged=true;
+    doEmitPropertiesChanged=true;
     evaluationIDMetadataInitSize=100;
     dstore=new QFRawDataRecordPrivate();
     setResultsInitSize(100);
@@ -2254,9 +2255,11 @@ QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup)
 
 
 void QFRawDataRecord::emitPropertiesChanged(const QString &property, bool visible) {
+    qDebug()<<"emitPropertiesChanged( prop="<<property<<"   vis="<<visible<<")";
     if (doEmitPropertiesChanged) {
         //qDebug()<<"QFRawDataRecord ("<<name<<") emits propertiesChanged()";
         emit propertiesChanged(property, visible);
+        qDebug()<<"   ... emitted";
 
     }
 }

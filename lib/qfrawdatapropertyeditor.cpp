@@ -848,7 +848,8 @@ void QFRawDataPropertyEditor::newPropClicked() {
             if (current->propertyExists(d->propertyName())) {
                 ok=current->isPropertyUserEditable(d->propertyName());
             }
-            if (ok) current->setQFProperty(d->propertyName(), v);
+            qDebug()<<"QFRawDataPropertyEditor::newPropClicked()  pn="<<d->propertyName()<<"   val="<<v<<"   ok="<<ok;
+            if (ok) current->setQFProperty(d->propertyName(), v, true, true);
         }
 
         delete d;
@@ -861,16 +862,18 @@ void QFRawDataPropertyEditor::deletePropClicked() {
         QModelIndexList l=tvProperties->selectionModel()->selectedIndexes();
         QStringList props;
         for (int i=0; i<l.size(); i++) {
-            int row=l[i].row();
+            /*int row=l[i].row();
             QString prop=current->getVisibleProperty(row);
             if ((!prop.isEmpty()) && current->propertyExists(prop) && current->isPropertyUserEditable(prop)) {
                 props.append(prop);
-            }
+            }*/
+            props.append(current->getPropertyModel()->getPropertyForRow(l[i].row()));
         }
         if (props.size()>0) {
             for (int i=0; i<props.size(); i++) {
                 //std::cout<<"deleting "<<props[i].toStdString()<<std::endl;
-                current->deleteProperty(props[i]);
+                qDebug()<<"QFRawDataPropertyEditor::deletePropClicked '"<<props[i]<<"'";
+                if (!props[i].isEmpty() && current->isPropertyUserEditable(props[i])) current->deleteProperty(props[i]);
             }
         }
 

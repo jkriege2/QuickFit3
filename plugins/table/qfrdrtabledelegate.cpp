@@ -22,7 +22,7 @@ QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionVie
      }
      if ( index.data().type() == QVariant::Int || index.data().type() == QVariant::LongLong ) {
          QSpinBox* editor=new QSpinBox(parent);
-         editor->setRange(-INT_MIN, INT_MAX);
+         editor->setRange(INT_MIN, INT_MAX);
          return editor;
      }
      if ( index.data().type() == QVariant::UInt || index.data().type() == QVariant::ULongLong ) {

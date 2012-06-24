@@ -33,7 +33,9 @@ class QFLIB_EXPORT QFRDRPropertyModel : public QAbstractTableModel {
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-    private slots:
+        QString getPropertyForRow(int row) const;
+
+    protected slots:
         void propertiesChanged(const QString& property, bool visible);
     protected:
         QFRawDataRecord* record;

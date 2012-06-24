@@ -79,7 +79,7 @@ void QFLightSourceConfigWidgetThread::nextInstruction() {
         QStringList powerUnits;
         QStringList lineNames;
         if (LightSource) {
-            for (int i=0; i<LightSource->getLightSourceLineCount(LightSourceID); i++) {
+            for (unsigned int i=0; i<LightSource->getLightSourceLineCount(LightSourceID); i++) {
                 //checkInstructions();
                 enabled.append(LightSource->getLightSourceLineEnabled(LightSourceID, i));
                 widgetsEnabled.append(LightSource->isLastLightSourceActionFinished(LightSourceID));

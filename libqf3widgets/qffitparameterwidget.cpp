@@ -19,7 +19,7 @@
 #define STRETCH_MAX 1
 
 
-double roundError(double error, int addSignifcant) {
+double QFFitParameterWidgetWrapper_roundError(double error, int addSignifcant) {
     if (fabs(error)<DBL_MIN*10.0) return error;
     int sbits_error=ceil(log(fabs(error))/log(10.0));
     double f=pow(10.0, sbits_error-1-addSignifcant);
@@ -385,7 +385,7 @@ void QFFitParameterWidgetWrapper::reloadValues() {
     if (m_widgetType!=Header) {
         if (labError) {
             labError->setTextFormat(Qt::RichText);
-            labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
+            labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(QFFitParameterWidgetWrapper_roundError(error,2), 5, true).c_str()));
         } else if (neditError) {
             neditError->setValue(error);
         }
@@ -419,7 +419,7 @@ void QFFitParameterWidgetWrapper::setValue(double value, double error, bool writ
     if (m_displayError  && (m_widgetType!=Header)) {
         if (labError) {
             labError->setTextFormat(Qt::RichText);
-            labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(roundError(error,2), 5, true).c_str()));
+            labError->setText(tr("&plusmn; %1").arg(floattohtmlstr(QFFitParameterWidgetWrapper_roundError(error,2), 5, true).c_str()));
         } else if (neditError) {
             neditError->setValue(error);
         }

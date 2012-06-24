@@ -26,7 +26,7 @@ void QFRDRPropertyModel::propertiesChanged(const QString &property, bool visible
             if (row<0) {
                 //updateModel();
                 int i=0;
-                while (i<props.size() && property<=props[i]) {
+                while (i<props.size() && property>props[i]) {
                     i++;
                 }
                 qDebug()<<"QFRDRPropertyModel::propertiesChanged: insert i="<<i<<"   props.size()="<<props.size();
@@ -43,18 +43,20 @@ void QFRDRPropertyModel::propertiesChanged(const QString &property, bool visible
     //qDebug()<<"QFRDRPropertyModel::propertiesChanged() ... done";
 }
 
+bool QFRDRPropertyModel_caseInsensitiveLessThan(const QString &s1, const QString &s2)
+{
+ return s1.toLower() < s2.toLower();
+}
+
 void QFRDRPropertyModel::updateModel(bool doReset)
 {
-    int count=record->getVisiblePropertyCount();
-    props.clear();
-    for (int i=0; i<count; i++) {
-        props.append(record->getVisibleProperty(i));
-    }
-    props.sort();
+    props=record->getVisibleProperties();
+    qSort(props.begin(), props.end(), QFRDRPropertyModel_caseInsensitiveLessThan);
     if (doReset) reset();
 }
 
 void QFRDRPropertyModel::init(QFRawDataRecord* record) {
+    if (record) qDebug()<<"QFRDRPropertyModel::init("<<record->getName()<<")";
     setParent(record);
     this->record=record;
     disconnect();
@@ -76,8 +78,8 @@ int QFRDRPropertyModel::columnCount(const QModelIndex &parent) const {
 
 Qt::ItemFlags QFRDRPropertyModel::flags(const QModelIndex &index) const {
     if (!record || !index.isValid()) return 0;
-    QString p=record->getVisibleProperty(index.row());
-    if (record->isPropertyUserEditable(p) && index.column()==2) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    QString p=props.value(index.row(), "");
+    if (!p.isEmpty() && record->isPropertyUserEditable(p) && index.column()==2) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
@@ -88,10 +90,16 @@ bool QFRDRPropertyModel::setData(const QModelIndex &index, const QVariant &value
         if (!p.isEmpty()) {
             if (!record->isPropertyUserEditable(p)) return false;
             record->setQFProperty(p, value);
+            emit dataChanged(index, index);
             return true;
         }
     }
     return false;
+}
+
+QString QFRDRPropertyModel::getPropertyForRow(int row) const
+{
+    return props.value(row, "");
 }
 
 
@@ -104,14 +112,16 @@ QVariant QFRDRPropertyModel::data(const QModelIndex &index, int role) const {
             //if (index.row()%2) return pal.color(QPalette::Window).darker(130);
             return pal.color(QPalette::Window);
         } else {
-            QString p=record->getVisibleProperty(index.row());
-            if (record->isPropertyUserEditable(p)) {
-                //if (index.row()%2) return pal.color(QPalette::AlternateBase);
-                return pal.color(QPalette::Base);
-            } else {
-                //if (index.row()%2) return pal.color(QPalette::Window).darker(130);
-                //return pal.color(QPalette::Window);
-                return pal.color(QPalette::Window).darker(130);
+            QString p=props.value(index.row(), "");
+            if (!p.isEmpty()) {
+                if (record->isPropertyUserEditable(p)) {
+                    //if (index.row()%2) return pal.color(QPalette::AlternateBase);
+                    return pal.color(QPalette::Base);
+                } else {
+                    //if (index.row()%2) return pal.color(QPalette::Window).darker(130);
+                    //return pal.color(QPalette::Window);
+                    return pal.color(QPalette::Window).darker(130);
+                }
             }
         }
     } else if (role==Qt::DisplayRole || role==Qt::EditRole) {

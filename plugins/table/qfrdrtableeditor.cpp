@@ -459,6 +459,7 @@ void QFRDRTableEditor::slSetDatatype() {
                                 t=3; break;
                             case QVariant::Bool:
                                 t=4; break;
+                            default: break;
                         }
 
                         if (first) {

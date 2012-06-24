@@ -59,6 +59,20 @@ unsigned int QFProperties::getVisiblePropertyCount() const {
     return c;
 }
 
+QStringList QFProperties::getVisibleProperties() const
+{
+    QReadLocker lock(propertyLocker);
+    QStringList c;
+    //for (int i=0; i<props.keys().size(); i++) {
+        //QString p=props.keys().at(i);
+    QHashIterator<QString, propertyItem> i(props);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value().visible) c.append(i.key());
+    }
+    return c;
+}
+
 QString QFProperties::getVisibleProperty(unsigned int j) const {
     QReadLocker lock(propertyLocker);
     unsigned int c=0;

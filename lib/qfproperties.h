@@ -35,6 +35,8 @@ class QFLIB_EXPORT QFProperties {
         unsigned int getPropertyCount() const;
         /** \brief return the number of visible properties in the object */
         unsigned int getVisiblePropertyCount() const;
+        /** \brief returna list of all visible properties */
+        QStringList getVisibleProperties() const;
         /** \brief get the name of the i-th visible property */
         QString getVisibleProperty(unsigned int i) const;
         /** \brief returns a QStringList which contains the names of all properties */

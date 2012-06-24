@@ -227,14 +227,14 @@ double binfileReadDouble(QFile& file) {
 }
 
 void binfileWriteDoubleArray(QFile& file, const double* data, uint32_t dataN) {
-    for (int i=0; i<dataN; i++)  {
+    for (uint32_t i=0; i<dataN; i++)  {
         const double w=qToLittleEndian(data[i]);
         file.write((char*)(&w), sizeof(w));
     }
 }
 
 void binfileWriteDoubleArrayMinus1(QFile& file, const double* data, uint32_t dataN) {
-    for (int i=0; i<dataN; i++)  {
+    for (uint32_t i=0; i<dataN; i++)  {
         const double w=qToLittleEndian(data[i]-1.0);
         file.write((char*)(&w), sizeof(w));
     }
@@ -242,7 +242,7 @@ void binfileWriteDoubleArrayMinus1(QFile& file, const double* data, uint32_t dat
 
 void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN) {
     file.read((char*)data, dataN*sizeof(double));
-    for (int i=0; i<dataN; i++)  {
+    for (uint32_t i=0; i<dataN; i++)  {
         double d=data[i];
         data[i]=qFromLittleEndian(d);
     }
@@ -251,7 +251,7 @@ void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN) {
 
 void binfileReadUInt16Array(QFile& file, uint16_t* data, uint32_t dataN) {
     file.read((char*)data, dataN*sizeof(uint16_t));
-    for (int i=0; i<dataN; i++)  {
+    for (uint32_t i=0; i<dataN; i++)  {
         uint16_t d=data[i];
         data[i]=qFromLittleEndian(d);
     }

@@ -198,7 +198,7 @@ void QFFilterChangerConfigWidget::updateFilters() {
         if (FilterChanger->isFilterChangerConnected(FilterChangerID)) {
             for (unsigned int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
                 QString f="---";
-                if (i<filters.size()) {
+                if (i<uint64_t(filters.size())) {
                     if (!filters[i].isEmpty()) {
                         f=filters[i];
                     }
@@ -229,12 +229,12 @@ void QFFilterChangerConfigWidget::selectFilters() {
     QFormLayout* formlayout=new QFormLayout(dlg);
 
     QList<QF3FilterCombobox*> combos;
-    for (int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
+    for (unsigned int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
         QF3FilterCombobox* cmb=new QF3FilterCombobox(this);
         combos.append(cmb);
         cmb->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig);
         formlayout->addRow(tr("filter #%1:").arg(i+1), cmb);
-        if (i<filters.size()) cmb->setCurrentFilter(filters[i]);
+        if (int64_t(i)<filters.size()) cmb->setCurrentFilter(filters[i]);
     }
 
     lay->addLayout(formlayout);
