@@ -33,13 +33,15 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
         enum {
-            ValueRole=Qt::UserRole,
-            NameRole=Qt::UserRole+1,
-            AvgRole=Qt::UserRole+2,
-            SDRole=Qt::UserRole+3,
-            SumRole=Qt::UserRole+4,
-            Sum2Role=Qt::UserRole+5,
-            CountRole=Qt::UserRole+6
+            ValueRole=Qt::UserRole,        /**< returns the value as a string, the way it should be displayed in the table (i.e. with shortened lists/matrices ...) */
+            NameRole=Qt::UserRole+1,       /**< same as ResultNameRole, i.e. returns the resultName of the result displayed in the cell */
+            AvgRole=Qt::UserRole+2,        /**< returns the average of all numeric values (for lists and matrices) in this cell */
+            SDRole=Qt::UserRole+3,         /**< same as AvgRole, but retruns the standard deviation */
+            SumRole=Qt::UserRole+4,        /**< same as AvgRole, but returns the sum (usefull when calculating avergae/SD over several cells) */
+            Sum2Role=Qt::UserRole+5,       /**< same as AvgRole, but returns the sum of squares (usefull when calculating avergae/SD over several cells) */
+            CountRole=Qt::UserRole+6,      /**< returns the number of values represented by the cell (i.e. items in list/matrix, or 1) */
+            EvalNameRole=Qt::UserRole+7,   /**< returns the evaluation name of the result in the cell */
+            ResultNameRole=Qt::UserRole+8  /**< returns the resultname of the result in the cell */
         };
     public slots:
         void setResultFilter(QString filter);

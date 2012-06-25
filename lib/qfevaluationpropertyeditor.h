@@ -16,6 +16,7 @@
 #include "qfenhancedlineedit.h"
 #include "qfstyledbutton.h"
 #include "qfcompleterfromfile.h"
+#include "qfproject.h"
 
 class QFEvaluationPropertyEditor; // forward
 
@@ -155,6 +156,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void filterResultsTextChanged(const QString &text);
         void currentTabChanged(int tab);
         void checkHelpAvailable();
+
+        void deleteSelectedRecords();
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;
@@ -212,6 +215,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
         QAction* actRefreshResults;
+        QAction* actDeleteResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
 

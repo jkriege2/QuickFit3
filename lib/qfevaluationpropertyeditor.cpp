@@ -346,6 +346,38 @@ void QFEvaluationPropertyEditor::checkHelpAvailable()
 
 }
 
+void QFEvaluationPropertyEditor::deleteSelectedRecords() {
+    if (!current) return;
+    QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
+    if (sel.size()>0) {
+        QMessageBox::StandardButton ret;
+        ret = QMessageBox::question(this, tr("QuickFit %1").arg(QF_VERSION),
+                     tr("Do you really want to delete the selected results?"),
+                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        if (ret == QMessageBox::Yes) {
+
+            QSet<QFRawDataRecord*> recs;
+            for (int i=0; i<sel.size(); i++) {
+                QString en=sel[i].data(QFEvaluationResultsModel::EvalNameRole).toString();
+                QString rn=sel[i].data(QFEvaluationResultsModel::ResultNameRole).toString();
+                int rid=sel[i].data(QFEvaluationResultsModel::ResultIDRole).toInt();
+                if (rid>=0) {
+                    QFRawDataRecord* r=current->getProject()->getRawDataByID(rid);
+                    if (r) {
+                        recs.insert(r);
+                        r->disableEmitResultsChanged();
+                        r->resultsRemove(en, rn, false);
+                    }
+                }
+            }
+            QSetIterator<QFRawDataRecord *> i(recs);
+            while (i.hasNext()) {
+                i.next()->enableEmitResultsChanged(true);
+            }
+        }
+    }
+}
+
 void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
     if (current) {
         current->setName(text);
@@ -464,7 +496,12 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tbResults=new QToolBar("toolbar_eval_results", this);
     rwvlayout->addWidget(tbResults);
     actRefreshResults=new QAction(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), this);
+    actRefreshResults->setShortcut(tr("F5"));
     tbResults->addAction(actRefreshResults);
+    tbResults->addSeparator();
+    actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected results"), this);
+    actDeleteResults->setShortcut(QKeySequence::Delete);
+    tbResults->addAction(actDeleteResults);
     tbResults->addSeparator();
 
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
@@ -567,6 +604,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tvResults->addAction(actCopyValErrResultsNoHead);
     tvResults->addAction(actSaveResults);
     tvResults->addAction(actRefreshResults);
+    tvResults->addAction(actDeleteResults);
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -582,6 +620,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
+    connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedRecords()));
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
@@ -620,6 +659,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     menuResults->addAction(actRefreshResults);
+    menuResults->addSeparator();
+    menuResults->addAction(actDeleteResults);
     menuResults->addSeparator();
     menuResults->addAction(actSaveResults);
     menuResults->addSeparator();

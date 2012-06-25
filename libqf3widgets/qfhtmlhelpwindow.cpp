@@ -698,7 +698,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
             pos = 0;
             while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
-                QString latex=rxLaTeX.cap(2).trimmed();
+                QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
 
                 if (command=="math" || command=="bmath") {
                     QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
@@ -711,9 +711,9 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     QString ht=mathParser.toHtml(&ok);
                     if (ok) {
                         if (command=="bmath") {
-                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\">%1</font></blockquote>").arg(ht));
+                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
                         } else {
-                            result=result.replace(rxLaTeX.cap(0), ht);
+                            result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
                         }
                     } else {
                         QSizeF size=mathParser.getSize(p);

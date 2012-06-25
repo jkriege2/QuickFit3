@@ -7,6 +7,82 @@
 #include <QLocale>
 #include <QDebug>
 
+QAction* getSeparatorAction(QObject* parent) {
+    QAction* a=new QAction(parent);
+    a->setSeparator(true);
+    return a;
+}
+
+
+
+
+QAction* createActionAndButton(QToolButton*& button, QWidget* parent) {
+    return createActionAndButton(button, QIcon(), QString(), parent);
+}
+
+
+QAction* createActionAndButton(QToolButton*& button, const QString& text, QWidget* parent) {
+    return createActionAndButton(button, QIcon(), text, parent);
+}
+
+QAction* createActionAndButton(QToolButton*& button, const QIcon& icon, const QString& text, QWidget* parent) {
+    QAction* act=new QAction(icon, text, parent);
+    button=new QToolButton(parent);
+    button->setDefaultAction(act);
+    return act;
+}
+
+
+
+
+QToolButton* createButtonAndAction(QAction*& action, QWidget* parent) {
+    return createButtonAndAction(action, QIcon(), QString(), parent);
+}
+
+
+QToolButton* createButtonAndAction(QAction*& action, const QString& text, QWidget* parent) {
+    return createButtonAndAction(action, QIcon(), text, parent);
+}
+
+QToolButton* createButtonAndAction(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent) {
+    action=new QAction(icon, text, parent);
+    QToolButton* button=new QToolButton(parent);
+    button->setDefaultAction(action);
+    return button;
+}
+
+QToolButton* createButtonAndActionShowText(QAction*& action, QWidget* parent) {
+    QToolButton* button= createButtonAndAction(action, QIcon(), QString(), parent);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    QSizePolicy p=button->sizePolicy();
+    p.setControlType(QSizePolicy::PushButton);
+    p.setHorizontalPolicy(QSizePolicy::Minimum);
+    button->setSizePolicy(p);
+    return button;
+}
+
+
+QToolButton* createButtonAndActionShowText(QAction*& action, const QString& text, QWidget* parent) {
+    QToolButton* button= createButtonAndAction(action, QIcon(), text, parent);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    QSizePolicy p=button->sizePolicy();
+    p.setControlType(QSizePolicy::PushButton);
+    p.setHorizontalPolicy(QSizePolicy::Minimum);
+    button->setSizePolicy(p);
+    return button;
+}
+
+QToolButton* createButtonAndActionShowText(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent) {
+    QToolButton* button= createButtonAndAction(action, icon, text, parent);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    QSizePolicy p=button->sizePolicy();
+    p.setControlType(QSizePolicy::PushButton);
+    p.setHorizontalPolicy(QSizePolicy::Minimum);
+    button->setSizePolicy(p);
+    return button;
+}
+
+
 void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
     settings.setValue(prefix+"pos", widget->pos());
     settings.setValue(prefix+"size", widget->size());
@@ -48,7 +124,7 @@ void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
     for (int i=0; i<s1.count(); i++) {
         if (i<sizes.size()) s1[i]=sizes[i];
     }*/
-    splitter->restoreState(settings.value(prefix+"splitter_sizes").toByteArray());
+    splitter->restoreState(settings.value(prefix+"splitter_sizes", splitter->saveState()).toByteArray());
 }
 
 

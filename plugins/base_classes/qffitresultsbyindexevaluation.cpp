@@ -188,17 +188,17 @@ void QFFitResultsByIndexEvaluation::setCurrentIndex(int index) {
     }
 }
 
-int QFFitResultsByIndexEvaluation::getCurrentIndex() {
+int QFFitResultsByIndexEvaluation::getCurrentIndex() const {
     QFRawDataRecord* r=getHighlightedRecord();
     int index=m_currentIndex;
     if (r!=NULL) {
-        m_currentIndex=index=r->getProperty(QString(getType()+QString::number(getID())+"_last_index"), index).toInt();
+        /*m_currentIndex=*/index=r->getProperty(QString(getType()+QString::number(getID())+"_last_index"), index).toInt();
     }
     if (index<getIndexMin(r)) {
-        m_currentIndex=index=getIndexMin(r);
+        /*m_currentIndex=*/index=getIndexMin(r);
     }
     if (index>getIndexMax(r)) {
-        m_currentIndex=getIndexMax(r);
+        /*m_currentIndex=*/index=getIndexMax(r);
     }
     return index;
 }

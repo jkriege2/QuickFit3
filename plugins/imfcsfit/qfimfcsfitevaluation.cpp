@@ -91,11 +91,11 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
     return false;
 }
 
-int QFImFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) {
+int QFImFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) const {
     return -1;
 }
 
-int QFImFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) {
+int QFImFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) const {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (fcs->getCorrelationRuns()<=0) return -1;
@@ -123,7 +123,7 @@ int QFImFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) {
 // FITTING AND READING DATA FOR FIT, FIT STATISTICS
 /////////////////////////////////////////////////////////////////////
 
-double* QFImFCSFitEvaluation::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) {
+double* QFImFCSFitEvaluation::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) const {
     if (weightsOKK) *weightsOKK=false;
     QFRawDataRecord* record=record_in;
     if (!record_in) record=getHighlightedRecord();
@@ -268,6 +268,9 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
         try {
+            bool epc=get_doEmitPropertiesChanged();
+            bool erc=get_doEmitResultsChanged();
+            bool rerc=record->isEmitResultsChangedEnabled();
             set_doEmitPropertiesChanged(false);
             set_doEmitResultsChanged(false);
             record->disableEmitResultsChanged();
@@ -334,7 +337,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
                 if (OK) {
-                    record->disableEmitResultsChanged();
+                    //record->disableEmitResultsChanged();
 
                     QFFitAlgorithm::FitResult result=doFitThread->getResult();
                     ffunc->calcParameter(params, errors);
@@ -481,11 +484,11 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
                     {
-                        QFFitStatistics fit_stat=calcFitStatistics(ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run);
+                        QFFitStatistics fit_stat=calcFitStatistics(true, ffunc, N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25, record, run);
                         fit_stat.free();
                     }
 
-                    record->enableEmitResultsChanged(false);
+                    //record->enableEmitResultsChanged(false);
                     //emit resultsChanged();
                 } else {
                     getProject()->getServices()->log_warning(tr("   - fit canceled by user!!!\n"));
@@ -493,9 +496,10 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
             } else {
                 getProject()->getServices()->log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
             }
-            set_doEmitPropertiesChanged(true);
-            set_doEmitResultsChanged(true);
-            record->enableEmitResultsChanged(false);
+
+            if (epc) set_doEmitPropertiesChanged(true);
+            if (erc) set_doEmitResultsChanged(true);
+            if (rerc) record->enableEmitResultsChanged(true);
             //emitPropertiesChanged();
             //emitResultsChanged();
         } catch(std::exception& E) {
@@ -521,11 +525,11 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 }
 
 
-QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
+QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
     QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
 
     if (record) {
-        if (hasFit(record, run)) {
+        if (storeAsResults) {
             QString param="";
             QString eid= getEvaluationResultID(run);
             setFitResultValue(record, run, param="fitstat_chisquared", result.residSqrSum);

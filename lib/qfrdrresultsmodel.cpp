@@ -495,6 +495,24 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                 }
             }
         }
+
+    } else if (role==EvalNameRole) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) {
+                QString en=lastResultSets[resI].first;
+                return en;
+                if (record->resultsExists(en, lastResultNames[resNameI])) {
+                    return record->resultsGetAsQVariant(en, lastResultNames[resNameI]);
+                }
+            }
+        }
+    } else if (role==ResultNameRole) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) {
+                QString en=lastResultSets[resI].first;
+                return lastResultNames[resNameI];
+            }
+        }
     } else if (role==NameRole) {
         if (resNameI<lastResultNames.size()) {
             return QVariant(lastResultNames[resNameI]);

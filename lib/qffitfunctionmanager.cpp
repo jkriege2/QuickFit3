@@ -75,6 +75,16 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
     return res;
 }
 
+QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent) {
+    for (int i=0; i<fitPlugins.size(); i++) {
+        QStringList ids=fitPlugins[i]->getIDs();
+        if (ids.contains(ID)) {
+            return fitPlugins[i]->get(ID, parent);
+        }
+    }
+    return NULL;
+}
+
 QString QFFitFunctionManager::getName(int i) const {
     if ((i<0) || (i>=fitPlugins.size())) return "";
     return fitPlugins[i]->getName();

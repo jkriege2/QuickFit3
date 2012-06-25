@@ -135,13 +135,24 @@ void QFRDRTableEditor::createWidgets() {
     tbMain->addAction(actSetColumnTitle);
 
     tvMain->addAction(actCopy);
-    tvMain->addAction(actCut);
-    tvMain->addAction(actPaste);
-    QAction* actSep=new QAction(this);
-    actSep->setSeparator(true);
-    tvMain->addAction(actSep);
     tvMain->addAction(actCopyResults);
     tvMain->addAction(actCopyResultsNoHead);
+    tvMain->addAction(actCut);
+    tvMain->addAction(actPaste);
+    tvMain->addAction(getSeparatorAction(this));
+    tvMain->addAction(actDelete);
+    tvMain->addAction(actDeleteRow);
+    tvMain->addAction(actDeleteColumn);
+    tvMain->addAction(getSeparatorAction(this));
+    tvMain->addAction(actInsertRow);
+    tvMain->addAction(actAppendRow);
+    tvMain->addAction(actInsertColumn);
+    tvMain->addAction(actAppendColumn);
+    tvMain->addAction(actDeleteColumn);
+    tvMain->addAction(getSeparatorAction(this));
+    tvMain->addAction(actSetColumnTitle);
+    tvMain->addAction(actSetDatatype);
+    tvMain->addAction(getSeparatorAction(this));
 
     l->addWidget(tvMain);
 

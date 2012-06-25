@@ -5,6 +5,7 @@
 #include "svnversion.h"
 
 #define VERSION_FULL "3.0"
+#define QF_VERSION VERSION_FULL
 
 #define VERSION_STATUS "beta"
 

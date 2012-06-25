@@ -42,12 +42,12 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual int getIndexFromEvaluationResultID(const QString& resultID);
 
         /** \brief return the smallest available index */
-        virtual int getIndexMin(QFRawDataRecord* r)=0;
+        virtual int getIndexMin(QFRawDataRecord* r) const=0 ;
         /** \brief return the largest available index */
-        virtual int getIndexMax(QFRawDataRecord* r)=0;
+        virtual int getIndexMax(QFRawDataRecord* r) const=0;
 
         /** \brief set the current index to use */
-        int getCurrentIndex();
+        int getCurrentIndex() const;
 
         /** \brief return a name for the given index */
         virtual QString getIndexName(QFRawDataRecord *rec, int index);

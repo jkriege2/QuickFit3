@@ -79,6 +79,7 @@ public:
     /** \brief get the current fitting algorithm */
     virtual QFFitAlgorithm* getFitAlgorithm() const;
 
+
     /** \brief returns a list of all available fit algorithms */
     virtual QStringList getAvailableFitAlgorithms() const;
 
@@ -96,6 +97,13 @@ public:
     /** \brief get the current fitting algorithm */
     virtual QFFitFunction* getFitFunction();
 
+
+
+    /** \brief create a new instance of the current fit algorithm ... the user has to destroy the instance */
+    virtual QFFitAlgorithm* createFitAlgorithm(QObject *parent=NULL) const;
+
+    /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
+    virtual QFFitFunction* createFitFunction(QObject *parent=NULL) const;
 
 
 
@@ -684,7 +692,7 @@ public:
     virtual void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
     /*! \brief load all parameters of a given QFFitAlgorithm from the internal fit algorithm parameter store algorithm_parameterstore
     */
-    virtual void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
+    virtual void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) const;
 
 
 

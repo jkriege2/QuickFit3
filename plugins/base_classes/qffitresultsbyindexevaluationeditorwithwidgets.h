@@ -6,7 +6,7 @@
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>
-#include <QPushButton>
+#include <QToolButton>
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QToolBar>
@@ -39,6 +39,8 @@
 #include "qffitresultsbyindexevaluation.h"
 #include "qffitresultsevaluation.h"
 #include "qffitresultsbyindexevaluationeditorbase.h"
+#include "qftools.h"
+#include "qfevaluationpropertyeditor.h"
 
 /*! \brief evaluation item editor base class for data fits using QFFitAlgorithm and QFFitFunction where the
            QFRawDataRecord is a dataset with different runs (we can fit to each run). The QFEvaluationItem for
@@ -90,12 +92,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QVisibleHandleSplitter* splitPlot;
         /** \brief Splitter between Plots and Model */
         QVisibleHandleSplitter* splitModel;
-        /** \brief pushbutton to configure Fitting Algorithm */
-        QPushButton* btnConfigAlgorithm;
-        /** \brief pushbutton to show help on Fitting Algorithm */
-        QPushButton* btnAlgorithmHelp;
-        /** \brief pushbutton to show help on Fitting Algorithm */
-        QPushButton* btnModelHelp;
+
         /** \brief QSpinBox that allows to select a special run */
         QSpinBox* spinRun;
         /** \brief label for the run name */
@@ -124,7 +121,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QLabel* labFitParameters;
         /** \brief widget to switch between editing fit parameter values and ranges  */
         QTabBar* tbEditRanges;
-        //QPushButton* btnEditRanges;
+        //QToolButton* btnEditRanges;
         /** \brief plotter for residual distribution histogram */
         JKQtPlotter* pltResidualHistogram;
         /** \brief plotter for residual autocorrelation */
@@ -142,34 +139,46 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief toolbox to switch between residual histogram and parameters */
         QTabWidget* tabResidulas;
         /** \brief to fit current file */
-        QPushButton* btnFitCurrent;
+        QAction* actFitCurrent;
         /** \brief to fit all runs in current file */
-        QPushButton* btnFitRunsCurrent;
+        QAction* actFitRunsCurrent;
         /** \brief to fit current run in all file */
-        QPushButton* btnFitAll;
+        QAction* actFitAll;
         /** \brief to fit all runs in all file */
-        QPushButton* btnFitRunsAll;
+        QAction* actFitRunsAll;
         /** \brief reset current parameter set to default */
-        QPushButton* btnResetCurrent;
+        QAction* actResetCurrent;
         /** \brief reset all parameter sets to default */
-        QPushButton* btnResetAll;
+        QAction* actResetAll;
         /** \brief reset all runs in the current file to default */
-        QPushButton* btnResetAllRuns;
+        QAction* actResetAllRuns;
         /** \brief copy current parameter set to default parameters */
-        QPushButton* btnCopyToInitial;
+        QAction* actCopyToInitial;
         /** \brief copy current parameter set to all files & initial parameters */
-        QPushButton* btnCopyToAll;
+        QAction* actCopyToAll;
         /** \brief copy current parameter set to all runs in the current file & initial parameters */
-        QPushButton* btnCopyToAllRuns;
+        QAction* actCopyToAllRuns;
         /** \brief copy current parameter set to all files (but therein just the current run & initial parameters */
-        QPushButton* btnCopyToAllCurrentRun;
-
-        QGridLayout* layButtons;
+        QAction* actCopyToAllCurrentRun;
 
         /** \brief button to save current parameter set */
-        QPushButton* btnSaveParameters;
+        QAction* actSaveParameters;
         /** \brief button to load current parameter set */
-        QPushButton* btnLoadParameters;
+        QAction* actLoadParameters;
+        /** \brief pushbutton to configure Fitting Algorithm */
+        QAction* actConfigAlgorithm;
+        /** \brief pushbutton to show help on Fitting Algorithm */
+        QAction* actAlgorithmHelp;
+        /** \brief pushbutton to show help on Fitting Algorithm */
+        QAction* actModelHelp;
+
+        QMenu* menuFit;
+        QMenu* menuParameters;
+        QMenu* menuResults;
+
+
+
+        QGridLayout* layButtons;
 
         /** \brief scroll area for the fit parameters */
         JKVerticalScrollArea* scrollParameters;
@@ -195,6 +204,40 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief stores the last fit statistics report, created in updateFitFunction() */
         QString fitStatisticsReport;
 
+
+    private:
+        /** \brief to fit current file */
+        QToolButton* btnFitCurrent;
+        /** \brief to fit all runs in current file */
+        QToolButton* btnFitRunsCurrent;
+        /** \brief to fit current run in all file */
+        QToolButton* btnFitAll;
+        /** \brief to fit all runs in all file */
+        QToolButton* btnFitRunsAll;
+        /** \brief reset current parameter set to default */
+        QToolButton* btnResetCurrent;
+        /** \brief reset all parameter sets to default */
+        QToolButton* btnResetAll;
+        /** \brief reset all runs in the current file to default */
+        QToolButton* btnResetAllRuns;
+        /** \brief copy current parameter set to default parameters */
+        QToolButton* btnCopyToInitial;
+        /** \brief copy current parameter set to all files & initial parameters */
+        QToolButton* btnCopyToAll;
+        /** \brief copy current parameter set to all runs in the current file & initial parameters */
+        QToolButton* btnCopyToAllRuns;
+        /** \brief copy current parameter set to all files (but therein just the current run & initial parameters */
+        QToolButton* btnCopyToAllCurrentRun;
+        /** \brief pushbutton to configure Fitting Algorithm */
+        QToolButton* btnConfigAlgorithm;
+        /** \brief pushbutton to show help on Fitting Algorithm */
+        QToolButton* btnAlgorithmHelp;
+        /** \brief pushbutton to show help on Fitting Algorithm */
+        QToolButton* btnModelHelp;
+        /** \brief button to save current parameter set */
+        QToolButton* btnSaveParameters;
+        /** \brief button to load current parameter set */
+        QToolButton* btnLoadParameters;
 
     protected slots:
         /** \brief executed when the mouse position over the plot changes */

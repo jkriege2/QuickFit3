@@ -109,7 +109,9 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
         /** \brief button used to calculate the focal volume */
-        QPushButton* btnCalibrateFocalVolume;
+        QAction* actCalibrateFocalVolume;
+        /** \brief button used to calculate the focal volume */
+        QToolButton* btnCalibrateFocalVolume;
 
 
         /** \brief create a report in a given QTextDocument object

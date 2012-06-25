@@ -101,6 +101,16 @@ QFFitFunction* QFFitResultsEvaluation::getFitFunction() {
     return getFitFunction(m_fitFunction);
 }
 
+QFFitAlgorithm *QFFitResultsEvaluation::createFitAlgorithm(QObject* parent) const
+{
+    return QFFitAlgorithmManager::getInstance()->createAlgorithm(m_fitAlgorithm, parent);
+}
+
+QFFitFunction *QFFitResultsEvaluation::createFitFunction(QObject *parent) const
+{
+    return QFFitFunctionManager::getInstance()->createFunction(m_fitFunction, parent);
+}
+
 QString QFFitResultsEvaluation::transformResultID(const QString &resultID) const {
     return resultID;
 }
@@ -148,7 +158,7 @@ void QFFitResultsEvaluation::storeQFFitAlgorithmParameters(QFFitAlgorithm* algor
     project->setDataChanged();
 }
 
-void QFFitResultsEvaluation::restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) {
+void QFFitResultsEvaluation::restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) const {
     QString aid=algorithm->id();
     QStringList params=algorithm->getParameterIDs();
     for (int i=0; i<params.size(); i++) {

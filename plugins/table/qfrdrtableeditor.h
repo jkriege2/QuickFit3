@@ -16,6 +16,7 @@
 #include "qfrawdatapropertyeditor.h"
 #include "tableresizedialog.h"
 #include "qfrdrtabledelegate.h"
+#include "qftools.h"
 
 
 /*! \brief editor class for tables

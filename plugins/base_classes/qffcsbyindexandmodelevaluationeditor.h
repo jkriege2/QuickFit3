@@ -12,7 +12,7 @@
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>
-#include <QPushButton>
+#include <QToolButton>
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QToolBar>
@@ -40,6 +40,7 @@
 #include "qfsimplefitparameterswidget.h"
 #include "qfusesresultsbyindexevaluationeditor.h"
 #include "qfrdrfcsdatainterface.h"
+#include "qfevaluationpropertyeditor.h"
 
 class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluationEditor {
         Q_OBJECT
@@ -181,27 +182,27 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         /** \brief toolbox to switch between residual histogram and parameters */
         QTabWidget* tabResidulas;
         /** \brief to fit current file */
-        QPushButton* btnFitCurrent;
+        QAction* actFitCurrent;
         /** \brief to fit all runs in current file */
-        QPushButton* btnFitRunsCurrent;
+        QAction* actFitRunsCurrent;
         /** \brief to fit current run in all file */
-        QPushButton* btnFitAll;
+        QAction* actFitAll;
         /** \brief to fit all runs in all file */
-        QPushButton* btnFitRunsAll;
+        QAction* actFitRunsAll;
         /** \brief reset current parameter set to default */
-        QPushButton* btnResetCurrent;
+        QAction* actResetCurrent;
         /** \brief reset all parameter sets to default */
-        QPushButton* btnResetAll;
+        QAction* actResetAll;
         /** \brief reset all runs in the current file to default */
-        QPushButton* btnResetAllRuns;
+        QAction* actResetAllRuns;
         /** \brief copy current parameter set to default parameters */
-        QPushButton* btnCopyToInitial;
+        QAction* actCopyToInitial;
         /** \brief copy current parameter set to all files & initial parameters */
-        QPushButton* btnCopyToAll;
+        QAction* actCopyToAll;
         /** \brief copy current parameter set to all runs in the current file & initial parameters */
-        QPushButton* btnCopyToAllRuns;
+        QAction* actCopyToAllRuns;
         /** \brief copy current parameter set to all files (but therein just the current run & initial parameters */
-        QPushButton* btnCopyToAllCurrentRun;
+        QAction* actCopyToAllCurrentRun;
         /** \brief widget for fit parameters  */
         QFSimpleFitParametersWidget* widFitParams;
         /** \brief scroll area for widFitParams */
@@ -209,6 +210,10 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
 
         QFormLayout* flAlgorithmParams;
         QHBoxLayout* hblModel;
+
+        QMenu* menuParameters;
+        QMenu* menuFit;
+        QMenu* menuResults;
 
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */
@@ -227,6 +232,29 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         
+    private:
+        /** \brief to fit current file */
+        QToolButton* btnFitCurrent;
+        /** \brief to fit all runs in current file */
+        QToolButton* btnFitRunsCurrent;
+        /** \brief to fit current run in all file */
+        QToolButton* btnFitAll;
+        /** \brief to fit all runs in all file */
+        QToolButton* btnFitRunsAll;
+        /** \brief reset current parameter set to default */
+        QToolButton* btnResetCurrent;
+        /** \brief reset all parameter sets to default */
+        QToolButton* btnResetAll;
+        /** \brief reset all runs in the current file to default */
+        QToolButton* btnResetAllRuns;
+        /** \brief copy current parameter set to default parameters */
+        QToolButton* btnCopyToInitial;
+        /** \brief copy current parameter set to all files & initial parameters */
+        QToolButton* btnCopyToAll;
+        /** \brief copy current parameter set to all runs in the current file & initial parameters */
+        QToolButton* btnCopyToAllRuns;
+        /** \brief copy current parameter set to all files (but therein just the current run & initial parameters */
+        QToolButton* btnCopyToAllCurrentRun;
 };
 
 #endif // QFFCSBYINDEXANDMODELEVALUATIONEDITOR_H

@@ -4,6 +4,8 @@
 #include "../version.h"
 #include "qfhtmldelegate.h"
 #include "qfstyleditemdelegate.h"
+#include <QModelIndex>
+#include <QModelIndexList>
 
 
 // TODO: add some more options to the fit results display: store column under different name
@@ -274,7 +276,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     tbResults->addAction(actSaveResults);
 
     tbResults->addSeparator();
-    actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete Selection"), this);
+    actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), this);
+    actDeleteResults->setShortcut(QKeySequence::Delete);
     tbResults->addAction(actDeleteResults);
 
     tbResults->addSeparator();
@@ -1019,14 +1022,14 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
     if (sel.size()>0) {
         QMessageBox::StandardButton ret;
-        ret = QMessageBox::question(this, tr("QuickFit 3.0"),
+        ret = QMessageBox::question(this, tr("QuickFit %1").arg(QF_VERSION),
                      tr("Do you really want to delete the selected results?"),
                      QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
         if (ret == QMessageBox::Yes) {
             // first we store a list of all items to be deleted (one list for the evaluation name (col)
             // and one list for the result name (row).
             //std::cout<<"\n\n-- deleteing "<<sel.size()<<" items:\n";
-            QStringList row, col;
+            /*QStringList row, col;
             for (int i=0; i<sel.size(); i++) {
                 QString hh=tvResults->model()->headerData(sel[i].column(), Qt::Horizontal).toString();
                 QString vh=tvResults->model()->headerData(sel[i].row(), Qt::Vertical).toString();
@@ -1044,7 +1047,16 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
             }
             current->enableEmitResultsChanged();
             current->emitResultsChanged();
-            //tvResults->setModel(m);
+            //tvResults->setModel(m);*/
+
+            current->disableEmitResultsChanged();
+            for (int i=0; i<sel.size(); i++) {
+                QString en=sel[i].data(QFRDRResultsModel::EvalNameRole).toString();
+                QString rn=sel[i].data(QFRDRResultsModel::ResultNameRole).toString();
+                current->resultsRemove(en, rn, false);
+            }
+            current->enableEmitResultsChanged(true);
+
         }
     }
 }

@@ -63,9 +63,9 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
 
 
         /** \brief return the smallest available index */
-        virtual int getIndexMin(QFRawDataRecord* r);
+        virtual int getIndexMin(QFRawDataRecord* r) const;
         /** \brief return the largest available index */
-        virtual int getIndexMax(QFRawDataRecord* r);
+        virtual int getIndexMax(QFRawDataRecord* r) const;
 
         /*! \brief perform a fit for the given \a record and \a run
 
@@ -77,11 +77,11 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL);
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        QFFitStatistics calcFitStatistics(QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
+        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1);
+        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1) const;
 
     protected:
         /*! \copydoc QFFitResultsEvaluation::intWriteDataAlgorithm()      */

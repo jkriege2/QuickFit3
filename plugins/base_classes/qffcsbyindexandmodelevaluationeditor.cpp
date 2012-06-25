@@ -19,8 +19,8 @@ QFFCSByIndexAndModelEvaluationEditor::QFFCSByIndexAndModelEvaluationEditor(QFPlu
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
 
     // connect widgets
-    //connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
-    //connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
+    //connect(ui->actEvaluateAll, SIGNAL(triggered()), this, SLOT(evaluateAll()));
+    //connect(ui->actnEvaluateCurrent, SIGNAL(triggered()), this, SLOT(evaluateCurrent()));
 
     dataEventsEnabled=true;
 }
@@ -327,40 +327,40 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
     QGridLayout* layBtn=new QGridLayout(this);
     layBtn->setContentsMargins(0,0,0,0);
-    btnFitCurrent=new QPushButton(QIcon(":/fcs_maxent/fit_fitcurrent.png"), tr("&Fit Current"), this);
-    btnFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));
+    btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/fcs_maxent/fit_fitcurrent.png"), tr("&Fit Current"), this);
+    actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));
     layBtn->addWidget(btnFitCurrent, 0, 0);
-    btnFitRunsCurrent=new QPushButton(QIcon(":/fcs_maxent/fit_fitallruns.png"), tr("Fit All &Runs"), this);
-    btnFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently selected file "));
+    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/fcs_maxent/fit_fitallruns.png"), tr("Fit All &Runs"), this);
+    actFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently selected file "));
     layBtn->addWidget(btnFitRunsCurrent, 0, 1);
-    btnFitAll=new QPushButton(QIcon(":/fcs_maxent/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current Run)"), this);
-    btnFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
+    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/fcs_maxent/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current Run)"), this);
+    actFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
     layBtn->addWidget(btnFitAll, 1, 0);
-    btnFitRunsAll=new QPushButton(QIcon(":/fcs_maxent/fit_fitall.png"), tr("Fit &Everything"), this);
-    btnFitRunsAll->setToolTip(tr("perform a fit for all runs in all files"));
+    btnFitRunsAll=createButtonAndActionShowText(actFitRunsAll, QIcon(":/fcs_maxent/fit_fitall.png"), tr("Fit &Everything"), this);
+    actFitRunsAll->setToolTip(tr("perform a fit for all runs in all files"));
     layBtn->addWidget(btnFitRunsAll, 1, 1);
-    btnResetCurrent=new QPushButton(tr("&Reset Current"), this);
-    btnResetCurrent->setToolTip(tr("reset the currently displayed file (and run) to the initial parameters\nThis deletes all fit results stored for the current file."));
+    btnResetCurrent=createButtonAndActionShowText(actResetCurrent, tr("&Reset Current"), this);
+    actResetCurrent->setToolTip(tr("reset the currently displayed file (and run) to the initial parameters\nThis deletes all fit results stored for the current file."));
     layBtn->addWidget(btnResetCurrent, 2, 0);
-    btnResetAll=new QPushButton(tr("&Reset All"), this);
-    btnResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files (and all runs therein)."));
+    btnResetAll=createButtonAndActionShowText(actResetAll, tr("&Reset All"), this);
+    actResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files (and all runs therein)."));
     layBtn->addWidget(btnResetAll, 3, 1);
 
-    btnResetAllRuns=new QPushButton(tr("&Reset All Runs"), this);
-    btnResetAllRuns->setToolTip(tr("reset all runs to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
+    btnResetAllRuns=createButtonAndActionShowText(actResetAllRuns, tr("&Reset All Runs"), this);
+    actResetAllRuns->setToolTip(tr("reset all runs to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
     layBtn->addWidget(btnResetAllRuns, 2, 1);
 
-    btnCopyToInitial=new QPushButton(tr("Copy to &Initial"), this);
-    btnCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\nso they are used by files/runs that were not fit yet."));
+    btnCopyToInitial=createButtonAndActionShowText(actCopyToInitial, tr("Copy to &Initial"), this);
+    actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\nso they are used by files/runs that were not fit yet."));
     layBtn->addWidget(btnCopyToInitial, 4, 0);
-    btnCopyToAllRuns=new QPushButton(tr("&Copy to All Runs"), this);
-    btnCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all runs in the current file."));
+    btnCopyToAllRuns=createButtonAndActionShowText(actCopyToAllRuns, tr("&Copy to All Runs"), this);
+    actCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all runs in the current file."));
     layBtn->addWidget(btnCopyToAllRuns, 4, 1);
-    btnCopyToAll=new QPushButton(tr("&Copy to All"), this);
-    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set\n of initial parameters and also to all files."));
+    btnCopyToAll=createButtonAndActionShowText(actCopyToAll, tr("&Copy to All"), this);
+    actCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set\n of initial parameters and also to all files."));
     layBtn->addWidget(btnCopyToAll, 5, 1);
-    btnCopyToAllCurrentRun=new QPushButton(tr("&Copy to All (Current Run)"), this);
-    btnCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current run therein."));
+    btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("&Copy to All (Current Run)"), this);
+    actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current run therein."));
     layBtn->addWidget(btnCopyToAllCurrentRun, 5, 0);
 
     layModel->addLayout(layBtn);
@@ -421,17 +421,17 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     connect(pltResidualHistogram, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResidualCorrelation, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
 
-    connect(btnFitCurrent, SIGNAL(clicked()), this, SLOT(fitCurrent()));
-    connect(btnFitAll, SIGNAL(clicked()), this, SLOT(fitRunsAll()));
-    connect(btnFitRunsAll, SIGNAL(clicked()), this, SLOT(fitAll()));
-    connect(btnFitRunsCurrent, SIGNAL(clicked()), this, SLOT(fitRunsCurrent()));
-    connect(btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
-    connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetAll()));
-    connect(btnCopyToAll, SIGNAL(clicked()), this, SLOT(copyToAll()));
-    connect(btnResetAllRuns, SIGNAL(clicked()), this, SLOT(resetAllRuns()));
-    connect(btnCopyToAllRuns, SIGNAL(clicked()), this, SLOT(copyToAllRuns()));
-    connect(btnCopyToInitial, SIGNAL(clicked()), this, SLOT(copyToInitial()));
-    connect(btnCopyToAllCurrentRun, SIGNAL(clicked()), this, SLOT(copyToAllCurrentRun()));
+    connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrent()));
+    connect(actFitAll, SIGNAL(triggered()), this, SLOT(fitRunsAll()));
+    connect(actFitRunsAll, SIGNAL(triggered()), this, SLOT(fitAll()));
+    connect(actFitRunsCurrent, SIGNAL(triggered()), this, SLOT(fitRunsCurrent()));
+    connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
+    connect(actResetAll, SIGNAL(triggered()), this, SLOT(resetAll()));
+    connect(actCopyToAll, SIGNAL(triggered()), this, SLOT(copyToAll()));
+    connect(actResetAllRuns, SIGNAL(triggered()), this, SLOT(resetAllRuns()));
+    connect(actCopyToAllRuns, SIGNAL(triggered()), this, SLOT(copyToAllRuns()));
+    connect(actCopyToInitial, SIGNAL(triggered()), this, SLOT(copyToInitial()));
+    connect(actCopyToAllCurrentRun, SIGNAL(triggered()), this, SLOT(copyToAllCurrentRun()));
 
     connect(datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
     connect(datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
@@ -439,6 +439,43 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     connect(datacut, SIGNAL(copyUserMinToAllRuns(int)), this, SLOT(copyUserMinToAllRuns(int)));
     connect(datacut, SIGNAL(copyUserMaxToAllRuns(int)), this, SLOT(copyUserMaxToAllRuns(int)));
     connect(datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));
+
+
+
+    menuParameters=propertyEditor->addMenu("&Parameters", 0);
+    menuParameters->addAction(actResetCurrent);
+    menuParameters->addAction(actResetAll);
+    menuParameters->addAction(actResetAllRuns);
+    menuParameters->addSeparator();
+    menuParameters->addAction(actCopyToAll);
+    menuParameters->addAction(actCopyToAllRuns);
+    menuParameters->addAction(actCopyToInitial);
+    menuParameters->addAction(actCopyToAllCurrentRun);
+
+    //menuParameters->addAction();
+
+
+    menuFit=propertyEditor->addMenu("&Fit", 0);
+    menuFit->addAction(actFitCurrent);
+    menuFit->addAction(actFitRunsCurrent);
+    menuFit->addAction(actFitRunsAll);
+    menuFit->addAction(actFitAll);
+
+
+    menuResults=propertyEditor->addMenu("&Results", 0);
+    menuResults->addAction(pltData->get_plotter()->get_actSaveData());
+    menuResults->addAction(pltData->get_plotter()->get_actSavePlot());
+    menuResults->addAction(pltData->get_plotter()->get_actPrint());
+    menuResults->addSeparator();
+    menuResults->addAction(pltData->get_plotter()->get_actCopyData());
+    menuResults->addAction(pltData->get_plotter()->get_actCopyMatlab());
+    menuResults->addAction(pltData->get_plotter()->get_actCopyPixelImage());
+    pltData->get_plotter()->get_actCopyPixelImage()->setText("copy correlation plot");
+    pltData->get_plotter()->get_actPrint()->setText("print correlation plot");
+    pltData->get_plotter()->get_actSavePlot()->setText("save correlation plot");
+    menuResults->addSeparator();
+    menuResults->addAction(actSaveReport);
+    menuResults->addAction(actPrintReport);
 }
 
 int QFFCSByIndexAndModelEvaluationEditor::getUserMinAbsMax(QFRawDataRecord *rec, int index) {

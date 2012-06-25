@@ -27,7 +27,7 @@ The first tab <b>Properties</b> (see image above) may be used to enter a name fo
 <a name="#evalresults"><h2>Evaluation Results</h2>
 <p> The second last tab <b>Evaluation Results</b> may be used to view the results of the evaluation object. These results (but only for one raw data record) are also visible on the <a href="qf3_rdrscreen.html">raw data record screen</a>.
       <center><img src="./pic/qf3_eval_results.png"></center>
-This tab has some features:
+This tab has these features:
 <ul>
 <li>The results are shown as a table, where every row represents the set of results for ONE raw data record. Every row is designated by the evaluation result id, which consists of the raw data record name (e.g. <tt>20nM_488_Day2_04s.asc - CH0</tt>), the evaluation type name together with the internal ID of the evaluation object (e.g. <tt>fcs_fit_1</tt> where <tt>1</tt> is the ID) and an evaluation-dependend suffix (e.g. <tt>fcd_diff1_run0</tt>) . Every column shows the single results (if they are numbers or strings).</li>
 <li>average and standard deviation over the currently selected cells will be sidplayed as a second table below the results table.</li>
@@ -36,8 +36,10 @@ This tab has some features:
 <li>You may select multiple cells in the results table and then <b>copy them to the system clipboard</b>, using the <img src=":/lib/copy16.png"> button. The clipboard contents may be directly pasted into a text editor or a spreadsheet program (e.g. OpenOffice Calc, or Microsoft Excel). The button <img src=":/lib/copy16_nohead.png"> will copy the data only (no header rows/columns). Using the button <img src=":/lib/copy16valerr.png"> instead will also copy the selection, but values and errors are separated into two subsequent columns. This option also copies average and standard deviation of a number list/matrix as value/error.</li>
 <li>You may also <b>save the complete table</b>> of results to a data file which is readable by most spreadsheet programs, using the <img src=":/lib/save16.png"> button. </li>
 <li>A click on <img src=":/lib/refresh16.png"> will reload the results.</li>
+<li>A click on <img src=":/lib/delete16.png"> will delete the selected results.</li>
 <li>The <b>filename filer</b> allows to interactively filter the results table: If this is non-empty, only rows that match (match means "contains", wildcards * for many characters and ? for a single character are possible) the filter string are displayed. If "RegExp" is activated you may use full <a href="qf3_qtregexp.html">regular expressions</a> instead of the simple wildcards.</li>
 <li>The <b>results filer</b> allows to filter the columns, the same way as the filename filter filters the rows. If "RegExp" is activated you may use full <a href="qf3_qtregexp.html">regular expressions</a> instead of the simple wildcards.</li>
+<li>All functions are also accessible over the windows main menu and the tables context menu.</li>
 </ul>
 </p>
 

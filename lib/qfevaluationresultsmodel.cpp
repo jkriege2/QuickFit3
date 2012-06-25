@@ -378,6 +378,35 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         }
+
+    } else if (role==EvalNameRole) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QString en=lastResults[resI].second;
+                //QString rname=lastResultNames[resNameI];
+                return en;
+            }
+        }
+    } else if (role==ResultNameRole) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                //QString en=lastResults[resI].second;
+                QString rname=lastResultNames[resNameI];
+                return rname;
+            }
+        }
+
+    } else if (role==ResultIDRole) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                if (record) {
+                    return record->getID();
+                }
+            }
+        }
+        return -1;
+
     } else if (role==NameRole) {
         if (resNameI<lastResultNames.size()) {
             return QVariant(lastResultNames[resNameI]);

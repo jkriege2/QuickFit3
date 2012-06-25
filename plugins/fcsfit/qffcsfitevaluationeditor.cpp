@@ -50,11 +50,13 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     layAlgorithm->addWidget(cmbWeights);
     layAlgorithm->addStretch();
 
-    btnCalibrateFocalVolume=new QPushButton(QIcon(":/fcsfit/focalvolume.png"), tr("Focal &Volume"), this);
-    btnCalibrateFocalVolume->setToolTip(tr("estimate the focal volume from a given concentration or diffusion coefficient"));
+    btnCalibrateFocalVolume=createButtonAndActionShowText(actCalibrateFocalVolume, QIcon(":/fcsfit/focalvolume.png"), tr("Focal &Volume"), this);
+    actCalibrateFocalVolume->setToolTip(tr("estimate the focal volume from a given concentration or diffusion coefficient"));
     layButtons->addWidget(btnCalibrateFocalVolume, 8, 0);
-    connect(btnCalibrateFocalVolume, SIGNAL(clicked()), this, SLOT(calibrateFocalVolume()));
+    connect(actCalibrateFocalVolume, SIGNAL(triggered()), this, SLOT(calibrateFocalVolume()));
 
+    menuFit->addSeparator();
+    menuFit->addAction(actCalibrateFocalVolume);
 }
 
 
@@ -115,7 +117,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
             /////////////////////////////////////////////////////////////////////////////////////////////
             // create new parameter widgets
             /////////////////////////////////////////////////////////////////////////////////////////////
-            btnCalibrateFocalVolume->setEnabled(false);
+            actCalibrateFocalVolume->setEnabled(false);
             bool has_particles=false;
             bool has_wxy=false;
             bool has_tauD=false;
@@ -128,7 +130,7 @@ void QFFCSFitEvaluationEditor::displayModel(bool newWidget) {
                 if ((id.toLower()=="focus_struct_fac")) has_gamma=true;
 
             }
-            btnCalibrateFocalVolume->setEnabled((has_tauD||(has_particles&&has_gamma))&&has_wxy);
+            actCalibrateFocalVolume->setEnabled((has_tauD||(has_particles&&has_gamma))&&has_wxy);
         }
     }
 }
@@ -215,7 +217,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                QFFitStatistics fitResults=eval->calcFitStatistics(ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
+                QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
                 record->enableEmitResultsChanged();
 
 

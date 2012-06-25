@@ -12,6 +12,75 @@
 #include "lib_imexport.h"
 #include <QFileDialog>
 #include <QRegExp>
+#include <QAction>
+#include <QToolButton>
+#include <QString>
+#include <QIcon>
+
+/*! \brief returns a new separator action
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QAction* getSeparatorAction(QObject* parent=NULL);
+
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QAction* createActionAndButton(QToolButton*& button, QWidget* parent);
+
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QAction* createActionAndButton(QToolButton*& button, const QString& text, QWidget* parent);
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QAction* createActionAndButton(QToolButton*& button, const QIcon& icon, const QString& text, QWidget* parent=NULL);
+
+
+
+
+
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonAndAction(QAction*& action, QWidget* parent);
+
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonAndAction(QAction*& action, const QString& text, QWidget* parent);
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonAndAction(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent=NULL);
+
+
+
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonAndActionShowText(QAction*& action, QWidget* parent);
+
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonAndActionShowText(QAction*& action, const QString& text, QWidget* parent);
+
+/*! \brief creates an action and a toolbutton which uses it (in \a button)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonAndActionShowText(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent=NULL);
+
+
+
 
 /*! \brief store the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
