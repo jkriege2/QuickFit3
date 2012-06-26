@@ -1153,8 +1153,8 @@ bool MainWindow::saveProject(const QString &fileName) {
     QApplication::restoreOverrideCursor();
 
     setCurrentProject(fileName);
-    statusBar()->showMessage(tr("Project file '%1' saved!").arg(fileName), 2000);
-    logFileProjectWidget->log_text(tr("Project file '%1' saved!\n").arg(fileName));
+    statusBar()->showMessage(tr("%2: Project file '%1' saved!").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")), 2000);
+    logFileProjectWidget->log_text(tr("%2: Project file '%1' saved!\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")));
     return true;
 }
 
@@ -1427,8 +1427,8 @@ void MainWindow::autosaveProject() {
     if (autosaveFilename.isEmpty()) autosaveFilename="untitled.qfp";
     autosaveFilename=autosaveFilename+".autosave";
 
-    statusBar()->showMessage(tr("autosaving project file '%1' ...").arg(autosaveFilename), 500);
-    logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename));
+    statusBar()->showMessage(tr("%2: autosaving project file '%1' ...").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")), 500);
+    logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")));
     project->writeXML(autosaveFilename, false);
     QApplication::restoreOverrideCursor();
 

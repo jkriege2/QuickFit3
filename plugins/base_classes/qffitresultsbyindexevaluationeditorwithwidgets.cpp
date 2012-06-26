@@ -1202,11 +1202,17 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsCurrent() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     dlgFitProgress->setAllowCancel(true);
     dlgFitProgress->display();
+    QTime time;
+    time.start();
     for (int run=runmin; run<=runmax; run++) {
         falg->setReporter(dlgFitProgressReporter);
         QString runname=tr("average");
         if (run>=0) runname=QString::number(run);
-        dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+        double runtime=double(time.elapsed())/1.0e3;
+        double timeperfit=runtime/double(run-runmin);
+        double estimatedRuntime=double(runmax-runmin)*timeperfit;
+        double remaining=estimatedRuntime-runtime;
+        dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(double(runmax-runmin)/runtime));
 
         //doFit(record, run);
         eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
@@ -1262,6 +1268,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
     dlgFitProgress->setSuperProgressMax(items);
 
     // iterate through all records and all runs therein and do the fits
+    int jobsDone=0;
+    QTime time;
+    time.start();
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
         //std::cout<<"i="<<i<<"   run="<<run<<"   record="<<record<<"   data="<<data<<"\n";
@@ -1272,13 +1281,18 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
             //std::cout<<"   corrN="<<data->getCorrelationN()<<"   corrRuns="<<data->getCorrelationRuns()<<"\n";
             if (run<=runmax) {
                 falg->setReporter(dlgFitProgressReporter);
-                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+                double runtime=double(time.elapsed())/1.0e3;
+                double timeperfit=runtime/double(jobsDone);
+                double estimatedRuntime=double(items)*timeperfit;
+                double remaining=estimatedRuntime-runtime;
+                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(uint(int(runtime)%60)),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(double(jobsDone)/runtime));
 
                 //doFit(record, run);
                 eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
 
                 falg->setReporter(NULL);
                 if (dlgFitProgress->isCanceled()) break;
+                jobsDone++;
             }
             dlgFitProgress->incSuperProgress();
             record->enableEmitResultsChanged(true);
@@ -1335,6 +1349,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
     dlgFitProgress->setSuperProgressMax(items);
 
     // iterate through all records and all runs therein and do the fits
+    QTime time;
+    time.start();
+    int jobsDone=0;
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
 
@@ -1347,7 +1364,11 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
                 falg->setReporter(dlgFitProgressReporter);
                 QString runname=tr("average");
                 if (run>=0) runname=QString::number(run);
-                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \n").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()));
+                double runtime=double(time.elapsed())/1.0e3;
+                double timeperfit=runtime/double(jobsDone);
+                double estimatedRuntime=double(items)*timeperfit;
+                double remaining=estimatedRuntime-runtime;
+                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(double(jobsDone)/runtime));
 
                 //doFit(record, run);
                 eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
@@ -1355,6 +1376,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
                 dlgFitProgress->incSuperProgress();
                 falg->setReporter(NULL);
                 if (dlgFitProgress->isCanceled()) break;
+                jobsDone++;
             }
             record->enableEmitResultsChanged(true);
         }
@@ -1446,6 +1468,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     }
     bool finished=false;
     bool canceled=false;
+    QTime time;
+    time.start();
     while (!finished) {
 
 
@@ -1457,7 +1481,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
             jobsDone=jobsDone+threads[i]->getJobsDone();
         }
         dlgTFitProgress->setProgress(jobsDone);
-        if (!canceled) dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done").arg(jobsDone).arg(items).arg(threadcount));
+        if (!canceled) {
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(jobsDone);
+            double estimatedRuntime=double(items)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(jobsDone).arg(items).arg(threadcount).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(double(jobsDone)/runtime));
+        }
         QApplication::processEvents();
 
         // check for user canceled
@@ -1560,6 +1590,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
     }
     bool finished=false;
     bool canceled=false;
+    QTime time;
+    time.start();
     while (!finished) {
 
 
@@ -1571,7 +1603,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
             jobsDone=jobsDone+threads[i]->getJobsDone();
         }
         dlgTFitProgress->setProgress(jobsDone);
-        if (!canceled) dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done").arg(jobsDone).arg(items).arg(threadcount));
+        if (!canceled) {
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(jobsDone);
+            double estimatedRuntime=double(items)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(jobsDone).arg(items).arg(threadcount).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(double(jobsDone)/runtime));
+        }
         QApplication::processEvents();
 
         // check for user canceled
@@ -1671,6 +1709,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     }
     bool finished=false;
     bool canceled=false;
+    QTime time;
+    time.start();
     while (!finished) {
 
 
@@ -1682,7 +1722,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
             jobsDone=jobsDone+threads[i]->getJobsDone();
         }
         dlgTFitProgress->setProgress(jobsDone);
-        if (!canceled) dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done").arg(jobsDone).arg(items).arg(threadcount));
+        if (!canceled) {
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(jobsDone);
+            double estimatedRuntime=double(items)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(jobsDone).arg(items).arg(threadcount).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(double(jobsDone)/runtime));
+        }
         QApplication::processEvents();
 
         // check for user canceled
