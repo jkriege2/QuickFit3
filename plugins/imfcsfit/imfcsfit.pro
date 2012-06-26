@@ -25,7 +25,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../interfaces/qfrdrimagetoruninterface.h \
     ../base_classes/qffitresultsbyindexasvectorevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
-    imfcscalibrationdialog.h
+    imfcscalibrationdialog.h \
+    qfimfcsfitthread.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -38,7 +39,8 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffitresultsevaluation.cpp \
     ../base_classes/qffitresultsbyindexasvectorevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp \
-    imfcscalibrationdialog.cpp
+    imfcscalibrationdialog.cpp \
+    qfimfcsfitthread.cpp
 
 
 FORMS = \    

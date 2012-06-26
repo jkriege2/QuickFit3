@@ -95,7 +95,7 @@ void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value)
     params[id].valueset=true;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id)
+double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id) const
 {
     QFFitFunction* ffunc=getFitFunction();
 
@@ -116,7 +116,7 @@ double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id)
     return 0;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id)
+double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id) const
 {
     QFFitFunction* ffunc=getFitFunction();
 
@@ -138,7 +138,7 @@ void QFRDRFCSFitFunctionSimulator::setFitError(const QString &id, double error)
     params[id].error=error;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id)
+bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id) const
 {
     return false;
 }
@@ -159,7 +159,7 @@ void QFRDRFCSFitFunctionSimulator::resetDefaultFitFix(const QString &id)
 {
 }
 
-double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id) {
+double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id) const {
     QFFitFunction* ffunc=getFitFunction();
 
     if (ffunc) {
@@ -177,7 +177,7 @@ double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id) {
     return 0;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id) {
+bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id) const {
     return false;
 }
 
@@ -379,7 +379,7 @@ void QFRDRFCSFitFunctionSimulator::modelChanged(int index) {
     QApplication::restoreOverrideCursor();
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id)
+double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id) const
 {
     QFFitFunction* ffunc=getFitFunction();
 
@@ -397,7 +397,7 @@ double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id)
     return 0;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id)
+double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id) const
 {
     QFFitFunction* ffunc=getFitFunction();
 

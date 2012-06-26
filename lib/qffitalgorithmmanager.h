@@ -85,7 +85,10 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
 
 
 
-        /** \brief create a new fit algorithm object instance */
+        /** \brief create a new fit algorithm object instance
+         *
+         *  \note This function is thread-safe
+         */
         QFFitAlgorithm* createAlgorithm(QString id, QObject* parent=NULL) const;
 
         /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
@@ -107,6 +110,7 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         QList<QFPluginFitAlgorithm*> fitPlugins;
         QStringList filenames;
         ProgramOptions* m_options;
+        QMutex* mutex;
     private:
 };
 

@@ -73,11 +73,17 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList);
 
         /** \brief return a list of the models which start with the specified string
-         *         all instance are newly created with the given parent in every call! */
+         *         all instance are newly created with the given parent in every call!
+         *
+         *  \note This function is thread-safe
+         */
         QMap<QString, QFFitFunction*> getModels(QString id_start=QString(""), QObject* parent=NULL);
         /** \brief returns a new instance of the model which is specified by ID
          *
-         *         the instance are newly created with the given parent in every call! */
+         *         the instance are newly created with the given parent in every call!
+         *
+         *  \note This function is thread-safe
+*/
         QFFitFunction* createFunction(QString ID, QObject* parent=NULL);
 
         /** \brief return the plugin index for a given fit function id */
@@ -105,6 +111,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QList<QFPluginFitFunction*> fitPlugins;
         QStringList filenames;
         ProgramOptions* m_options;
+
+        QMutex* mutex;
 };
 
 #endif // QFFITFUNCTIONMANAGER_H

@@ -67,27 +67,27 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRuns() */
-        virtual int getCorrelationRuns();
+        virtual int getCorrelationRuns() const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationN() */
-        virtual long long getCorrelationN();
+        virtual long long getCorrelationN() const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationT() */
-        virtual double* getCorrelationT();
+        virtual double* getCorrelationT() const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelation() */
-        virtual double* getCorrelation();
+        virtual double* getCorrelation() const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRun() */
-        virtual double* getCorrelationRun(int run);
+        virtual double* getCorrelationRun(int run) const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunError() */
-        virtual double* getCorrelationRunError(int run);
+        virtual double* getCorrelationRunError(int run) const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
-        virtual QString getCorrelationRunName(int run);
+        virtual QString getCorrelationRunName(int run) const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationMean() */
-        virtual double* getCorrelationMean();
+        virtual double* getCorrelationMean() const;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationStdDev() */
-        virtual double* getCorrelationStdDev();
+        virtual double* getCorrelationStdDev() const;
         /** \copydoc QFRDRFCSDataInterface::isCorrelationRunVisible() */
-        virtual bool isCorrelationRunVisible(int run);
+        virtual bool isCorrelationRunVisible(int run) const ;
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunErrors() */
-        virtual double* getCorrelationRunErrors();
+        virtual double* getCorrelationRunErrors() const ;
 
 
 
@@ -95,7 +95,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \brief returns whether to leave out a run */
-        virtual bool leaveoutRun(int run);
+        virtual bool leaveoutRun(int run) const ;
         /** \brief add a run to the leaveouts */
         virtual void leaveoutAddRun(int run);
         /** \brief remove a run from the leaveouts */
@@ -104,15 +104,15 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void leaveoutClear();
 
         void maskLoad(const QString& filename);
-        void maskSave(const QString& filename);
+        void maskSave(const QString& filename) const ;
         void maskClear();
         void maskSetAll();
         void maskSet(uint16_t x, uint16_t y);
         void maskUnset(uint16_t x, uint16_t y, bool value=true);
         void maskToggle(uint16_t x, uint16_t y);
         void maskInvert();
-        bool maskGet(uint16_t x, uint16_t y);
-        bool* maskGet();
+        bool maskGet(uint16_t x, uint16_t y) const ;
+        bool* maskGet() const;
 
         /** \brief recalculate the averages/std. deviations */
         void recalcCorrelations();
@@ -310,9 +310,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual QString getImageStackTimepointName(int stack, int t) const;
 
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateAverage() */
-        virtual double getSimpleCountrateAverage(int run=-1);
+        virtual double getSimpleCountrateAverage(int run=-1) const ;
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateVariance() */
-        virtual double getSimpleCountrateVariance(int run=-1);
+        virtual double getSimpleCountrateVariance(int run=-1) const ;
 
 };
 

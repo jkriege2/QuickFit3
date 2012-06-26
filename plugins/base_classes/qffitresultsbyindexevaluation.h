@@ -36,10 +36,10 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
     public:
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(QString fitFunction, int currentIndex);
+        virtual QString getEvaluationResultID(QString fitFunction, int currentIndex) const;
 
         /** \brief extract the index number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
-        virtual int getIndexFromEvaluationResultID(const QString& resultID);
+        virtual int getIndexFromEvaluationResultID(const QString& resultID) const;
 
         /** \brief return the smallest available index */
         virtual int getIndexMin(QFRawDataRecord* r) const=0 ;
@@ -50,7 +50,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         int getCurrentIndex() const;
 
         /** \brief return a name for the given index */
-        virtual QString getIndexName(QFRawDataRecord *rec, int index);
+        virtual QString getIndexName(QFRawDataRecord *rec, int index) const;
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
 
@@ -77,7 +77,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param value value to be stored
          */
-        virtual void setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value);
+        virtual void setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value) ;
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -86,7 +86,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param value value to be stored
          *  \param unit unit associated with \a value
          */
-        virtual void setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, QString unit);
+        virtual void setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, QString unit) ;
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -94,7 +94,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param value value to be stored
          */
-        virtual void setFitResultValueString(QFRawDataRecord* r, int index, const QString& id, QString value);
+        virtual void setFitResultValueString(QFRawDataRecord* r, int index, const QString& id, QString value) ;
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -102,7 +102,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param value value to be stored
          */
-        virtual void setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value);
+        virtual void setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value) ;
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -111,7 +111,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param value value to be stored
          *  \param unit unit associated with \a value
          */
-        virtual void setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value, QString unit);
+        virtual void setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value, QString unit) ;
 
         /** \brief stores the given value as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -119,7 +119,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param value value to be stored
          */
-        virtual void setFitResultValueBool(QFRawDataRecord* r, int index, const QString& id, bool value);
+        virtual void setFitResultValueBool(QFRawDataRecord* r, int index, const QString& id, bool value) ;
 
         /** \brief stores the given value and error as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -128,7 +128,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param value value to be stored
          *  \param error error associated with \a value
          */
-        virtual void setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, double error);
+        virtual void setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, double error) ;
 
         /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -136,7 +136,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param error error to be stored
          */
-        virtual void setFitResultError(QFRawDataRecord* r, int index, const QString& id, double error);
+        virtual void setFitResultError(QFRawDataRecord* r, int index, const QString& id, double error) ;
 
         /** \brief stores the given values and errors as a fit result, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -144,7 +144,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        virtual void setFitResultValues(QFRawDataRecord* r, int index, double* values, double* errors);
+        virtual void setFitResultValues(QFRawDataRecord* r, int index, double* values, double* errors) ;
 
         /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord
          *  \param r the record to adress
@@ -152,7 +152,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        virtual void setFitResultValuesVisible(QFRawDataRecord* r, int index, double* values, double* errors);
+        virtual void setFitResultValuesVisible(QFRawDataRecord* r, int index, double* values, double* errors)  ;
 
         /** \brief stores the given values and errors as a fit result if they are visible, i.e. into the currently highlighted QFRawDataRecord.
          *          Also imports the fit parameter description from the QFFitFunction and sets the parameter group to the given value
@@ -161,7 +161,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param values values to be stored
          *  \param errors errors to be stored
          */
-        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""), bool sortPriority=true);
+        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""), bool sortPriority=true) ;
 
         /*! \brief return the value of a given parameter
             \param r the record to adress
@@ -176,7 +176,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual double getFitValue(QFRawDataRecord* r, int index, const QString& id);
+        virtual double getFitValue(QFRawDataRecord* r, int index, const QString& id) const;
 
         /*! \brief return the fit error of a given parameter
             \param r the record to adress
@@ -184,7 +184,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \param id the parameter id
             \return the error associated with the given parameter.
         */
-        virtual double getFitError(QFRawDataRecord* r, int index, const QString& id);
+        virtual double getFitError(QFRawDataRecord* r, int index, const QString& id) const ;
 
         /*! \brief set the error of a given parameter
 
@@ -213,7 +213,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param id set the value of the parameter with this id (see QFFitFunction)
          *  \param fix fix to be stored
          */
-        virtual void setFitResultFix(QFRawDataRecord* r, int index, const QString& id, bool fix);
+        virtual void setFitResultFix(QFRawDataRecord* r, int index, const QString& id, bool fix) ;
 
         /*! \brief return the fix property of a given parameter
 
@@ -222,7 +222,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \param id the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        virtual bool getFitFix(QFRawDataRecord* r, int index, const QString& id);
+        virtual bool getFitFix(QFRawDataRecord* r, int index, const QString& id) const ;
 
         /** \brief sets the group of the given fit result
          *  \param r the record to adress
@@ -230,7 +230,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param parameterID set the value of the parameter with this id (see QFFitFunction)
          *  \param group group to be stored
          */
-        virtual void setFitResultGroup(QFRawDataRecord* r, int index, const QString& parameterID, const QString& group);
+        virtual void setFitResultGroup(QFRawDataRecord* r, int index, const QString& parameterID, const QString& group) ;
 
         /** \brief sets the label of the given fit result
          *  \param r the record to adress
@@ -239,40 +239,40 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param label label to be stored
          *  \param label_richtext richtext-ed label to be stored
          */
-        virtual void setFitResultLabel(QFRawDataRecord* r, int index, const QString& parameterID, const QString& label, const QString& label_richtext=QString(""));
+        virtual void setFitResultLabel(QFRawDataRecord* r, int index, const QString& parameterID, const QString& label, const QString& label_richtext=QString("")) ;
 
         /** \brief sets the group of the given evaluation result ID \a resultID
          *  \param r the record to adress
             \param index the index in which to adress
          *  \param group group to be stored
          */
-        virtual void setFitResultEvaluationGroup(QFRawDataRecord* r, int index, const QString& group);
+        virtual void setFitResultEvaluationGroup(QFRawDataRecord* r, int index, const QString& group) ;
 
         /** \brief sets the description of the given evaluation result ID \a resultID
          *  \param r the record to adress
             \param index the index in which to adress
          *  \param description description to be stored
          */
-        virtual void setFitResultEvaluationDescription(QFRawDataRecord* r, int index, const QString& description);
+        virtual void setFitResultEvaluationDescription(QFRawDataRecord* r, int index, const QString& description) ;
 
         /** \brief fill the given array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter vector to fill
          */
-        virtual void fillParameters(QFRawDataRecord* r, int index, double* param);
+        virtual void fillParameters(QFRawDataRecord* r, int index, double* param) const;
         /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter error vector to fill
         */
-        virtual void fillParameterErrors(QFRawDataRecord* r, int index, double* param);
+        virtual void fillParameterErrors(QFRawDataRecord* r, int index, double* param) const;
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter fix vector to fill
         */
-        virtual void fillFix(QFRawDataRecord* r, int index, bool* param);
+        virtual void fillFix(QFRawDataRecord* r, int index, bool* param) const ;
 
         /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
@@ -280,21 +280,21 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \return parameter vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual double* allocFillParameters(QFRawDataRecord* r, int index);
+        virtual double* allocFillParameters(QFRawDataRecord* r, int index) const ;
         /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter error vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual double* allocFillParameterErrors(QFRawDataRecord* r, int index);
+        virtual double* allocFillParameterErrors(QFRawDataRecord* r, int index) const;
         /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter fix vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual bool* allocFillFix(QFRawDataRecord* r, int index);
+        virtual bool* allocFillFix(QFRawDataRecord* r, int index) const ;
 
         /** \brief determine whether a fit has been carried out for the given record and index
          *
@@ -303,7 +303,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
          *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
          */
-        virtual bool hasFit(QFRawDataRecord* r, int index);
+        virtual bool hasFit(QFRawDataRecord* r, int index) const;
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files and all indexes */
         virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false);
@@ -322,18 +322,18 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function */
-        virtual QString getEvaluationResultID();
+        virtual QString getEvaluationResultID() const ;
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(QString fitFunction);
+        virtual QString getEvaluationResultID(QString fitFunction) const;
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(int currentIndex);
+        virtual QString getEvaluationResultID(int currentIndex) const;
 
 
-        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error);
+        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
         /*! \brief perform a fit for the given \a record and \a run

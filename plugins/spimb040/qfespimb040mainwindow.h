@@ -49,6 +49,7 @@
     It also implements QFPluginLogService and may thus be used for logging.
  */
 class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
+        Q_INTERFACES(QFPluginLogService)
         Q_OBJECT
     public:
         QFESPIMB040MainWindow(QFPluginServices* pluginServices, QWidget* parent=NULL);

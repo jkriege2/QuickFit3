@@ -10,11 +10,12 @@ QFFitAlgorithmManager::QFFitAlgorithmManager(ProgramOptions* options, QObject* p
     QObject(parent)
 {
     m_options=options;
+    mutex=new QMutex();
 }
 
 QFFitAlgorithmManager::~QFFitAlgorithmManager()
 {
-    //dtor
+    delete mutex;
 }
 
 bool QFFitAlgorithmManager::contains(const QString &ID)
@@ -123,6 +124,7 @@ int QFFitAlgorithmManager::getPluginForID(QString id) const {
 }
 
 QFFitAlgorithm* QFFitAlgorithmManager::createAlgorithm(QString id, QObject* parent) const {
+    QMutexLocker  locker(mutex);
     for (int i=0; i<fitPlugins.size(); i++) {
         QStringList ids=fitPlugins[i]->getIDs();
         if (ids.contains(id)) {

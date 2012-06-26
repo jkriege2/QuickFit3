@@ -15,6 +15,10 @@
 #include "../base_classes/qffitresultsevaluation.h"
 #include "../base_classes/qffitresultsbyindexasvectorevaluation.h"
 #include "qffitalgorithm.h"
+#include "qfimfcsfitthread.h"
+#include "qfpluginservices.h"
+
+
 
 /*! \brief evaluation item class for imaging FCS least square fits
     \ingroup qf3evalp_imfcsfit
@@ -22,6 +26,9 @@
 */
 class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         Q_OBJECT
+
+    friend class QFImFCSFitThread;
+
     public:
         /** \brief which data weighting should be applied */
         enum DataWeight {
@@ -73,8 +80,20 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
             If both are -1, the full range is used
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+
+            \note this method is intended to perform the fits one after the other or single fits. It will internally starts the fit algorithm
+                  in its own thread. If you want to control the multithreading by yourself, use doFitForMultithread() instead !!!
           */
         virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL);
+
+        /*! \brief perform a fit for the given \a record and \a run
+
+            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
+            If both are -1, the full range is used
+
+            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+          */
+        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
         QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
@@ -90,14 +109,16 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         /*! \copydoc QFFitResultsEvaluation::intReadDataAlgorithm()      */
         virtual void intReadDataAlgorithm(QDomElement& e);
 
-        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error);
-        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error);
+        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
+        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
         /** \brief type of data weighting */
         DataWeight m_weighting;
 
-        virtual bool overrideFitFunctionPreset(QString paramName, double &value);
+        QMutex* mutexThreadedFit;
+
+        virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
 
     public:
 

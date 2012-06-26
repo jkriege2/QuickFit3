@@ -463,7 +463,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                 if (t<nextcrInterval) {
                     countrate[c]++;
                 } else if (crCounter<countrate_items) {
-                    int64_t emptyrecords=(int64_t)floor((t-nextcrInterval)/job.countrate_binning)+1;
+                    uint64_t emptyrecords=uint64_t(qMax(int64_t(0),(int64_t)floor((t-nextcrInterval)/job.countrate_binning)+1));
                     //qDebug()<<emptyrecords;
                     for (register uint64_t i=0; i<channels*emptyrecords; i++) {
                         int c=i%channels;

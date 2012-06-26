@@ -53,6 +53,7 @@
  */
 class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         Q_OBJECT
+        Q_INTERFACES(QFPluginLogService)
     public:
         QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL);
         virtual ~QFESPIMB040MainWindow2();

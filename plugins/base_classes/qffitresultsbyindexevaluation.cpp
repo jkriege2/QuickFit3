@@ -11,12 +11,12 @@ QFFitResultsByIndexEvaluation::~QFFitResultsByIndexEvaluation() {
 
 }
 
-QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction, int currentIndex) {
+QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction, int currentIndex) const {
     if (currentIndex<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
     return QString("%1_%2_%3_run%4").arg(getType()).arg(getID()).arg(fitFunction).arg(currentIndex);
 }
 
-int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString &resultID) {
+int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString &resultID) const {
     if (resultID.size()<=0) return -1;
     if (resultID.endsWith("runavg")) return -1;
     int l=0;
@@ -31,19 +31,19 @@ int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString 
 
 
 
-QString QFFitResultsByIndexEvaluation::getEvaluationResultID() {
+QString QFFitResultsByIndexEvaluation::getEvaluationResultID() const {
     return getEvaluationResultID(m_fitFunction, m_currentIndex);
 }
 
-QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction) {
+QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction) const {
     return getEvaluationResultID(fitFunction, m_currentIndex);
 }
 
-QString QFFitResultsByIndexEvaluation::getEvaluationResultID(int currentIndex) {
+QString QFFitResultsByIndexEvaluation::getEvaluationResultID(int currentIndex) const {
     return getEvaluationResultID(m_fitFunction, currentIndex);
 }
 
-bool QFFitResultsByIndexEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) {
+bool QFFitResultsByIndexEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) const {
     return false;
 }
 
@@ -55,7 +55,7 @@ bool QFFitResultsByIndexEvaluation::hasSpecial(QFRawDataRecord *r, int index, co
 
 
 
-bool QFFitResultsByIndexEvaluation::hasFit(QFRawDataRecord* r1, int index) {
+bool QFFitResultsByIndexEvaluation::hasFit(QFRawDataRecord* r1, int index) const {
     QFRawDataRecord* r=r1;
     if (getFitFunction()==NULL) return false;
     if (r==NULL) r=getHighlightedRecord();
@@ -67,26 +67,26 @@ bool QFFitResultsByIndexEvaluation::hasFit(QFRawDataRecord* r1, int index) {
 
 
 
-void QFFitResultsByIndexEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value) {
+void QFFitResultsByIndexEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value)  {
     setFitResultValue(r, getEvaluationResultID(index), id, value);
 }
-void QFFitResultsByIndexEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, QString unit) {
+void QFFitResultsByIndexEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, QString unit)  {
     setFitResultValue(r, getEvaluationResultID(index), id, value, unit);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValueString(QFRawDataRecord* r, int index, const QString& id, QString value) {
+void QFFitResultsByIndexEvaluation::setFitResultValueString(QFRawDataRecord* r, int index, const QString& id, QString value)  {
     setFitResultValueString(r, getEvaluationResultID(index), id, value);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValueBool(QFRawDataRecord* r, int index, const QString& id, bool value) {
+void QFFitResultsByIndexEvaluation::setFitResultValueBool(QFRawDataRecord* r, int index, const QString& id, bool value)  {
     setFitResultValueBool(r, getEvaluationResultID(index), id, value);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value) {
+void QFFitResultsByIndexEvaluation::setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value)  {
     setFitResultValueInt(r, getEvaluationResultID(index), id, value);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value, QString unit) {
+void QFFitResultsByIndexEvaluation::setFitResultValueInt(QFRawDataRecord* r, int index, const QString& id, int64_t value, QString unit)  {
     setFitResultValueInt(r, getEvaluationResultID(index), id, value, unit);
 }
 
@@ -98,47 +98,47 @@ void QFFitResultsByIndexEvaluation::setFitError(QFRawDataRecord* r, int index, c
     setFitError(r, getEvaluationResultID(index), id, error);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, double error) {
+void QFFitResultsByIndexEvaluation::setFitResultValue(QFRawDataRecord* r, int index, const QString& id, double value, double error)  {
     setFitResultValue(r, getEvaluationResultID(index), id, value, error);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultError(QFRawDataRecord* r, int index, const QString& id, double error) {
+void QFFitResultsByIndexEvaluation::setFitResultError(QFRawDataRecord* r, int index, const QString& id, double error)  {
     setFitResultError(r, getEvaluationResultID(index), id, error);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValues(QFRawDataRecord* r, int index, double* values, double* errors) {
+void QFFitResultsByIndexEvaluation::setFitResultValues(QFRawDataRecord* r, int index, double* values, double* errors)  {
     setFitResultValues(r, getEvaluationResultID(index), values, errors);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int index, double* values, double* errors) {
+void QFFitResultsByIndexEvaluation::setFitResultValuesVisible(QFRawDataRecord* r, int index, double* values, double* errors)  {
     setFitResultValuesVisible(r, getEvaluationResultID(index),  values, errors);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority) {
+void QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority)  {
     setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(index),  values, errors, group, fix, fixGroup, sortPriority);
 }
 
-double QFFitResultsByIndexEvaluation::getFitValue(QFRawDataRecord* r, int index, const QString& id) {
+double QFFitResultsByIndexEvaluation::getFitValue(QFRawDataRecord* r, int index, const QString& id) const {
     return getFitValue(r, getEvaluationResultID(index), id);
 }
 
-double QFFitResultsByIndexEvaluation::getFitError(QFRawDataRecord* r, int index, const QString& id)  {
+double QFFitResultsByIndexEvaluation::getFitError(QFRawDataRecord* r, int index, const QString& id) const  {
     return getFitError(r, getEvaluationResultID(index), id);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultGroup(QFRawDataRecord* r, int index, const QString& parameterID, const QString& group) {
+void QFFitResultsByIndexEvaluation::setFitResultGroup(QFRawDataRecord* r, int index, const QString& parameterID, const QString& group)  {
     setFitResultGroup(r, getEvaluationResultID(index), parameterID, group);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultLabel(QFRawDataRecord* r, int index, const QString& parameterID, const QString& label, const QString& label_richtext) {
+void QFFitResultsByIndexEvaluation::setFitResultLabel(QFRawDataRecord* r, int index, const QString& parameterID, const QString& label, const QString& label_richtext)  {
     setFitResultLabel(r, getEvaluationResultID(index), parameterID, label, label_richtext);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, int index, const QString& group) {
+void QFFitResultsByIndexEvaluation::setFitResultEvaluationGroup(QFRawDataRecord* r, int index, const QString& group)  {
     setFitResultEvaluationGroup(r, getEvaluationResultID(index), group);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultEvaluationDescription(QFRawDataRecord* r, int index, const QString& description) {
+void QFFitResultsByIndexEvaluation::setFitResultEvaluationDescription(QFRawDataRecord* r, int index, const QString& description)  {
     setFitResultEvaluationDescription(r, getEvaluationResultID(index), description);
 }
 
@@ -146,35 +146,35 @@ void QFFitResultsByIndexEvaluation::setFitFix(QFRawDataRecord* r, int index, con
     setFitFix(r, getEvaluationResultID(index), id, fix);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultFix(QFRawDataRecord* r, int index, const QString& id, bool fix) {
+void QFFitResultsByIndexEvaluation::setFitResultFix(QFRawDataRecord* r, int index, const QString& id, bool fix)  {
     setFitResultFix(r, getEvaluationResultID(index), id, fix);
 }
 
-bool QFFitResultsByIndexEvaluation::getFitFix(QFRawDataRecord* r, int index, const QString& id) {
+bool QFFitResultsByIndexEvaluation::getFitFix(QFRawDataRecord* r, int index, const QString& id) const {
     return getFitFix(r, getEvaluationResultID(index), id);
 }
 
-void QFFitResultsByIndexEvaluation::fillParameters(QFRawDataRecord* r, int index, double* param) {
+void QFFitResultsByIndexEvaluation::fillParameters(QFRawDataRecord* r, int index, double* param) const {
     fillParameters(r, getEvaluationResultID(index), param);
 }
 
-void QFFitResultsByIndexEvaluation::fillParameterErrors(QFRawDataRecord* r, int index, double* param) {
+void QFFitResultsByIndexEvaluation::fillParameterErrors(QFRawDataRecord* r, int index, double* param) const {
     fillParameterErrors(r, getEvaluationResultID(index), param);
 }
 
-void QFFitResultsByIndexEvaluation::fillFix(QFRawDataRecord* r, int index, bool* param) {
+void QFFitResultsByIndexEvaluation::fillFix(QFRawDataRecord* r, int index, bool* param) const {
     fillFix(r, getEvaluationResultID(index), param);
 }
 
-double* QFFitResultsByIndexEvaluation::allocFillParameters(QFRawDataRecord* r, int index) {
+double* QFFitResultsByIndexEvaluation::allocFillParameters(QFRawDataRecord* r, int index) const {
     return allocFillParameters(r, getEvaluationResultID(index));
 }
 
-double* QFFitResultsByIndexEvaluation::allocFillParameterErrors(QFRawDataRecord* r, int index) {
+double* QFFitResultsByIndexEvaluation::allocFillParameterErrors(QFRawDataRecord* r, int index) const {
     return allocFillParameterErrors(r, getEvaluationResultID(index));
 }
 
-bool* QFFitResultsByIndexEvaluation::allocFillFix(QFRawDataRecord* r, int index) {
+bool* QFFitResultsByIndexEvaluation::allocFillFix(QFRawDataRecord* r, int index) const {
     return allocFillFix(r, getEvaluationResultID(index));
 }
 
@@ -203,7 +203,7 @@ int QFFitResultsByIndexEvaluation::getCurrentIndex() const {
     return index;
 }
 
-QString QFFitResultsByIndexEvaluation::getIndexName(QFRawDataRecord *rec, int index) {
+QString QFFitResultsByIndexEvaluation::getIndexName(QFRawDataRecord *rec, int index) const {
     return QString::number(index);
 }
 

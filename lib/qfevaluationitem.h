@@ -219,7 +219,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         virtual QString getResultsDisplayFilter() const;
 
         /** \brief return whether resultsChanged() signals are enabled */
-        inline bool get_doEmitResultsChanged() {
+        inline bool get_doEmitResultsChanged() const {
             return doEmitResultsChanged;
         }
         /** \brief set whether resultsChanged() signals are enabled */
@@ -228,7 +228,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         }
 
         /** \brief return whether propertiesChanged() signals are enabled */
-        inline bool get_doEmitPropertiesChanged() {
+        inline bool get_doEmitPropertiesChanged() const {
             return doEmitPropertiesChanged;
         }
         /** \brief set whether propertiesChanged() signals are enabled */

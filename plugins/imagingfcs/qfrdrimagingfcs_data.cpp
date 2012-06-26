@@ -643,53 +643,53 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     return true;
 }
 
-int QFRDRImagingFCSData::getCorrelationRuns() {
+int QFRDRImagingFCSData::getCorrelationRuns() const {
     return width*height;
 }
 
-long long QFRDRImagingFCSData::getCorrelationN() {
+long long QFRDRImagingFCSData::getCorrelationN() const {
     return N;
 }
 
-double* QFRDRImagingFCSData::getCorrelationT() {
+double* QFRDRImagingFCSData::getCorrelationT() const {
     return tau;
 }
 
-double* QFRDRImagingFCSData::getCorrelation() {
+double* QFRDRImagingFCSData::getCorrelation() const {
     return correlations;
 }
 
-double* QFRDRImagingFCSData::getCorrelationRunErrors() {
+double* QFRDRImagingFCSData::getCorrelationRunErrors() const {
     return sigmas;
 }
 
-bool QFRDRImagingFCSData::leaveoutRun(int run) {
+bool QFRDRImagingFCSData::leaveoutRun(int run) const {
     return maskGet(runToX(run), runToY(run));
 }
 
-double* QFRDRImagingFCSData::getCorrelationRun(int run) {
+double* QFRDRImagingFCSData::getCorrelationRun(int run) const {
     return &(correlations[run*N]);
 }
 
-double* QFRDRImagingFCSData::getCorrelationRunError(int run) {
+double* QFRDRImagingFCSData::getCorrelationRunError(int run) const {
     return &(sigmas[run*N]);
 }
 
-QString QFRDRImagingFCSData::getCorrelationRunName(int run) {
+QString QFRDRImagingFCSData::getCorrelationRunName(int run) const {
     int x=runToX(run);
     int y=runToY(run);
     return QString("[%1, %2]").arg(x).arg(y);
 }
 
-double* QFRDRImagingFCSData::getCorrelationMean() {
+double* QFRDRImagingFCSData::getCorrelationMean() const {
     return correlationMean;
 }
 
-double* QFRDRImagingFCSData::getCorrelationStdDev() {
+double* QFRDRImagingFCSData::getCorrelationStdDev() const {
     return correlationStdDev;
 }
 
-bool QFRDRImagingFCSData::isCorrelationRunVisible(int run) {
+bool QFRDRImagingFCSData::isCorrelationRunVisible(int run) const {
     return !leaveoutRun(run);
 }
 
@@ -958,7 +958,7 @@ void QFRDRImagingFCSData::maskLoad(const QString &filename) {
     }
 }
 
-void QFRDRImagingFCSData::maskSave(const QString &filename) {
+void QFRDRImagingFCSData::maskSave(const QString &filename) const {
     QFile f(filename);
     if (f.open(QIODevice::WriteOnly)) {
         QTextStream str(&f);
@@ -996,11 +996,11 @@ void QFRDRImagingFCSData::leaveoutAddRun(int run) {
     if (run>=0 && run<width*height) leaveout[run]=true;
 }
 
-bool *QFRDRImagingFCSData::maskGet() {
+bool *QFRDRImagingFCSData::maskGet() const {
     return leaveout;
 }
 
-bool QFRDRImagingFCSData::maskGet(uint16_t x, uint16_t y) {
+bool QFRDRImagingFCSData::maskGet(uint16_t x, uint16_t y) const {
     return leaveout[y*width+x];
 }
 
@@ -1165,12 +1165,12 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
     return QString("%1%2").arg(getImageStackTUnitFactor(stack)*t).arg(getImageStackTUnitName(stack));
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateAverage(int /*run*/) {
+double QFRDRImagingFCSData::getSimpleCountrateAverage(int /*run*/) const {
     if (hasStatistics) return statAvgCnt/getTauMin()/1000.0;
     return 0;
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateVariance(int /*run*/) {
+double QFRDRImagingFCSData::getSimpleCountrateVariance(int /*run*/) const {
     if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
     return 0;
 }

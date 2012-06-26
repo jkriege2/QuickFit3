@@ -176,7 +176,7 @@ void QFRDRFCSData::recalculateCorrelations() {
     emitRawDataChanged();
 }
 
-double QFRDRFCSData::calcRateMean(int run, int channel) {
+double QFRDRFCSData::calcRateMean(int run, int channel) const {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
@@ -194,7 +194,7 @@ double QFRDRFCSData::calcRateMean(int run, int channel) {
 
 
 
-double QFRDRFCSData::getRateMean(int run, int channel) {
+double QFRDRFCSData::getRateMean(int run, int channel) const {
     if (rateN<=0 || !rate) {
         return 0.0;
     }
@@ -216,7 +216,7 @@ double QFRDRFCSData::getRateMean(int run, int channel) {
     return rateMean[channel*rateRuns+run];
 }
 
-double QFRDRFCSData::getRateStdDev(int run, int channel) {
+double QFRDRFCSData::getRateStdDev(int run, int channel) const {
    if (rateN<0 || !rate) {
         return 0.0;
     }
@@ -238,7 +238,7 @@ double QFRDRFCSData::getRateStdDev(int run, int channel) {
     return rateStdDev[channel*rateRuns+run];
 }
 
-double QFRDRFCSData::calcRateStdDev(int run, int channel) {
+double QFRDRFCSData::calcRateStdDev(int run, int channel) const {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return 0.0;
@@ -257,7 +257,7 @@ double QFRDRFCSData::calcRateStdDev(int run, int channel) {
     return sd;
 }
 
-void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max, int channel) {
+void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max, int channel) const {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
         return;
@@ -276,7 +276,7 @@ void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max, int channel
     rateMax[channel*rateRuns+run]=max;
 }
 
-void QFRDRFCSData::getRateMinMax(int run, double &min, double &max, int channel) {
+void QFRDRFCSData::getRateMinMax(int run, double &min, double &max, int channel) const {
     min=0;
     max=0;
     if (!(rateMin.contains(channel*rateRuns+run) && rateMax.contains(channel*rateRuns+run))) {
@@ -725,7 +725,7 @@ bool QFRDRFCSData::loadFromALV5000(QString filename) {
 }
 
 
-QString QFRDRFCSData::getCorrelationRunName(int run) {
+QString QFRDRFCSData::getCorrelationRunName(int run) const {
     //if (run<0) return tr("average");
     if (run<correlationRuns) return tr("run %1").arg(run);
     return QString("");

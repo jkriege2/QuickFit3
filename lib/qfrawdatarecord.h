@@ -360,25 +360,25 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
 
         /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
-        double resultsGetInNumberList(const QString& evaluationName, const QString& resultName, int position, double defaultValue=0);
+        double resultsGetInNumberList(const QString& evaluationName, const QString& resultName, int position, double defaultValue=0) const ;
         /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
-        double resultsGetInNumberMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double defaultValue=0);
+        double resultsGetInNumberMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double defaultValue=0) const;
         /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
-        double resultsGetErrorInNumberErrorList(const QString& evaluationName, const QString& resultName, int position, double defaultValue=0);
+        double resultsGetErrorInNumberErrorList(const QString& evaluationName, const QString& resultName, int position, double defaultValue=0) const;
         /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
-        double resultsGetErrorInNumberErrorMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double defaultValue=0);
+        double resultsGetErrorInNumberErrorMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, double defaultValue=0) const;
         /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
-        qlonglong resultsGetInIntegerList(const QString& evaluationName, const QString& resultName, int position, qlonglong defaultValue=0);
+        qlonglong resultsGetInIntegerList(const QString& evaluationName, const QString& resultName, int position, qlonglong defaultValue=0) const;
         /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
-        qlonglong resultsGetInIntegerMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, qlonglong defaultValue=0);
+        qlonglong resultsGetInIntegerMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, qlonglong defaultValue=0) const;
         /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
-        bool resultsGetInBooleanList(const QString& evaluationName, const QString& resultName, int position, bool defaultValue=false);
+        bool resultsGetInBooleanList(const QString& evaluationName, const QString& resultName, int position, bool defaultValue=false) const;
         /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
-        bool resultsGetInBooleanMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, bool defaultValue=false);
+        bool resultsGetInBooleanMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, bool defaultValue=false) const;
         /** \brief returns an element from the given list, or a defaultValue, if the element does not exist */
-        QString resultsGetInStringList(const QString& evaluationName, const QString& resultName, int position, const QString& defaultValue=QString(""));
+        QString resultsGetInStringList(const QString& evaluationName, const QString& resultName, int position, const QString& defaultValue=QString("")) const;
         /** \brief returns an element from the given matrix, or a defaultValue, if the element does not exist */
-        QString resultsGetInStringMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, const QString& defaultValue=QString(""));
+        QString resultsGetInStringMatrix(const QString& evaluationName, const QString& resultName,  int row, int column, const QString& defaultValue=QString("")) const;
 
 
 
@@ -574,7 +574,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             \param newEvalName name of the target evaluation results section
             \note if \a newEvalName already exists, the additional results will be added to \a newEvalName
          */
-        void resultsCopy(const QString& oldEvalName, const QString& newEvalName);
+        void resultsCopy(const QString& oldEvalName, const QString& newEvalName) ;
 
         /*! \brief save the results to a CSV file
 
@@ -589,7 +589,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             \param stringDelimiter strings are surrounded by this character (one in front,one behind)
             \return \c true on success
         */
-        bool resultsSaveToCSV(const QString& filename, const QString& separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"');
+        bool resultsSaveToCSV(const QString& filename, const QString& separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"') const;
 
         /*! \brief save the results to a SYLK file
 
@@ -601,10 +601,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             \param filename the file to create
             \return \c true on success
         */
-        bool resultsSaveToSYLK(const QString& filename);
+        bool resultsSaveToSYLK(const QString& filename) const;
 
         /** \brief return a table model which may be used to display the results */
-        QFRDRResultsModel* resultsGetModel();
+        QFRDRResultsModel* resultsGetModel() const;
 
         /*! \brief return a list of all result names for this raw data record
 

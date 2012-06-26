@@ -24,48 +24,48 @@ class QFRDRFCSDataInterface {
         virtual ~QFRDRFCSDataInterface() {}
 
         /** \brief number of correlation runs in this object */
-        virtual int getCorrelationRuns()=0;
+        virtual int getCorrelationRuns() const=0;
         /** \brief number of datapoints in every correlation curve */
-        virtual long long getCorrelationN()=0;
+        virtual long long getCorrelationN() const=0;
         /** \brief sample points (times \f$ \tau \f$ ) of the correlation function.
          *         This is a 1D array of size correlationN */
-        virtual double* getCorrelationT()=0;
+        virtual double* getCorrelationT() const=0;
         /** \brief values of the correlation function.
          *         This is a 2D array of size runs * correlationN
          *
          * access this as \code correlation[run*correlationN + n] \endcode
          */
-        virtual double* getCorrelation()=0;
+        virtual double* getCorrelation() const=0;
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        virtual double* getCorrelationRun(int run)=0;
+        virtual double* getCorrelationRun(int run) const=0;
         /** \brief errors, associated with the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        virtual double* getCorrelationRunError(int run)=0;
+        virtual double* getCorrelationRunError(int run) const=0;
         /** \brief values of the correlation function errors.
          *         This is a 2D array of size runs * correlationN
          *
          * access this as \code correlationRunErros[run*correlationN + n] \endcode
          */
-        virtual double* getCorrelationRunErrors()=0;
+        virtual double* getCorrelationRunErrors() const=0;
         /** \brief return a string naming/describing a run (should be short) */
-        virtual QString getCorrelationRunName(int run)=0;
+        virtual QString getCorrelationRunName(int run) const=0;
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        virtual double* getCorrelationMean()=0;
+        virtual double* getCorrelationMean() const=0;
         /** \brief values of the standard deviation of the correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        virtual double* getCorrelationStdDev()=0;
+        virtual double* getCorrelationStdDev() const=0;
 
         /** \brief returns true when a given run is visible. the average run is indicated by -1 */
-        virtual bool isCorrelationRunVisible(int run)=0;
+        virtual bool isCorrelationRunVisible(int run) const=0;
 
 };
 
 Q_DECLARE_INTERFACE( QFRDRFCSDataInterface,
-                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRFCSDataInterface/1.0")
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRFCSDataInterface/1.1")
 
 
 

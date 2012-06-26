@@ -247,6 +247,8 @@ class QFLIB_EXPORT QFPluginProgressTools {
 
 /*! \brief this class provides static methods that allow to do logging output to the applications logging pane
     \ingroup qf3plugintools
+
+    \note These functions are guarateed to be thread safe!!!
 */
 class QFLIB_EXPORT QFPluginLogTools {
     public:

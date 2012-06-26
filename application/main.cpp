@@ -61,6 +61,7 @@ int main(int argc, char * argv[])
 
     ProgramOptions* settings=new ProgramOptions("", &app, &app);
 
+    qRegisterMetaType<QTextCursor>("QTextCursor");
     MainWindow win(settings, &splash);
     win.show();
     QTimer::singleShot(2500, &splash, SLOT(close()));

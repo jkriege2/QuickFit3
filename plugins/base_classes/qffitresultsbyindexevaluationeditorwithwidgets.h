@@ -144,6 +144,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QAction* actFitRunsCurrent;
         /** \brief to fit current run in all file */
         QAction* actFitAll;
+        /** \brief the separator that follows the fits in menuFit */
+        QAction* actFitSeparator;
         /** \brief to fit all runs in all file */
         QAction* actFitRunsAll;
         /** \brief reset current parameter set to default */

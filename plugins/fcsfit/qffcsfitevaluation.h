@@ -96,7 +96,7 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         /*! \copydoc QFFitResultsEvaluation::intReadDataAlgorithm()      */
         virtual void intReadDataAlgorithm(QDomElement& e);
 
-        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error);
+        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
 
 
         /** \brief type of data weighting */
@@ -114,7 +114,7 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         using QFFitResultsByIndexEvaluation::getEvaluationResultID;
 
 
-        virtual QString getIndexName(QFRawDataRecord *rec, int index);
+        virtual QString getIndexName(QFRawDataRecord *rec, int index) const ;
 };
 
 #endif // QFFCSFITEVALUATION_H

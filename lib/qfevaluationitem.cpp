@@ -247,14 +247,14 @@ void QFEvaluationItem::setDescription(const QString& d) {
     }
 };
 
-void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName) {
+void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName)  {
     if (doEmitResultsChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits resultsChanged()";
         emit resultsChanged(record, evaluationName, resultName);
     }
 }
 
-void QFEvaluationItem::emitPropertiesChanged(const QString& property, bool visible) {
+void QFEvaluationItem::emitPropertiesChanged(const QString& property, bool visible)  {
     if (doEmitPropertiesChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits propertiesChanged()";
         emit propertiesChanged(property, visible);

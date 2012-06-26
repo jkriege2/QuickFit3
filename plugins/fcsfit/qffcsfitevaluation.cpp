@@ -29,7 +29,7 @@ QFFCSFitEvaluation::~QFFCSFitEvaluation() {
 }
 
 
-QString QFFCSFitEvaluation::getIndexName(QFRawDataRecord *rec, int index) {
+QString QFFCSFitEvaluation::getIndexName(QFRawDataRecord *rec, int index) const {
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (fcs) {
         return fcs->getCorrelationRunName(index);
@@ -60,7 +60,7 @@ bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
-bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) {
+bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
     int run=getIndexFromEvaluationResultID(id);
     if (paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);

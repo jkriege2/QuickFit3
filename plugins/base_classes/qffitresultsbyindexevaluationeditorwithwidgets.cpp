@@ -500,7 +500,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets() {
     menuFit->addAction(actFitRunsCurrent);
     menuFit->addAction(actFitRunsAll);
     menuFit->addAction(actFitAll);
-    menuFit->addSeparator();
+    actFitSeparator=menuFit->addSeparator();
     menuFit->addAction(actConfigAlgorithm);
     menuFit->addAction(actAlgorithmHelp);
     menuFit->addAction(actModelHelp);

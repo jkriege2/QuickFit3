@@ -61,6 +61,24 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     layAlgorithm->addWidget(cmbWeights);
     layAlgorithm->addStretch();
 
+    actFitAllFilesThreaded=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current Run, multi-threaded)"), this);
+    actFitAllFilesThreaded->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
+    connect (actFitAllFilesThreaded, SIGNAL(triggered()), this, SLOT(fitAllFilesThreaded()));
+
+
+    actFitAllThreaded=new QAction(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit Everything (multi-threaded)"), this);
+    actFitAllThreaded->setToolTip(tr("perform a fit for all files, and all runs therein (everything)"));
+    connect (actFitAllThreaded, SIGNAL(triggered()), this, SLOT(fitEverythingThreaded()));
+
+    actFitAllRunsThreaded=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All Runs (multi-threaded)"), this);
+    actFitAllRunsThreaded->setToolTip(tr("perform a fit for all runs, in the current file"));
+    connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
+
+    menuFit->insertSeparator(actFitSeparator);
+    menuFit->insertAction(actFitSeparator, actFitAllRunsThreaded);
+    menuFit->insertAction(actFitSeparator, actFitAllFilesThreaded);
+    menuFit->insertAction(actFitSeparator, actFitAllThreaded);
+
 }
 
 
@@ -667,6 +685,7 @@ void QFImFCSFitEvaluationEditor::weightsChanged(int model) {
 
 
 
+
 int QFImFCSFitEvaluationEditor::getUserMin(QFRawDataRecord* rec, int index) {
     return getUserMin(rec, index, datacut->get_userMin());
 }
@@ -955,4 +974,359 @@ void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     htmlBot.replace("width=\"95%\"", "");
     cursor.insertFragment(QTextDocumentFragment::fromHtml(htmlBot));
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void QFImFCSFitEvaluationEditor::fitEverythingThreaded() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
+    dlgTFitProgress->reportTask(tr("fit all files and all runs therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgTFitProgress->setProgressMax(100);
+    dlgTFitProgress->setProgress(0);
+    dlgTFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgTFitProgress->display();
+
+
+    dlgTFitProgress->reportStatus("creating thread objects ...");
+    QApplication::processEvents();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    QList<QFImFCSFitThread*> threads;
+    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    for (int i=0; i<threadcount; i++) {
+        threads.append(new QFImFCSFitThread(true, this));
+    }
+
+
+    // enqueue the jobs in the several threads and finally make sure they know when to stop
+    dlgTFitProgress->reportStatus("distributing jobs ...");
+    QApplication::processEvents();
+    int items=0;
+    int thread=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+
+        if (record ) {
+            record->disableEmitResultsChanged();
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            items=items+runmax-runmin+1;
+            for (int run=runmin; run<=runmax; run++) {
+                threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                thread++;
+                if (thread>=threadcount) thread=0;
+            }
+        }
+    }
+    dlgTFitProgress->setProgressMax(items+5);
+
+
+    // start all threads and wait for them to finish
+    for (int i=0; i<threadcount; i++) {
+        threads[i]->start();
+    }
+    bool finished=false;
+    bool canceled=false;
+    while (!finished) {
+
+
+        // check whether all threads have finished and collect progress info
+        finished=true;
+        int jobsDone=0;
+        for (int i=0; i<threadcount; i++) {
+            finished=finished&&threads[i]->isFinished();
+            jobsDone=jobsDone+threads[i]->getJobsDone();
+        }
+        dlgTFitProgress->setProgress(jobsDone);
+        if (!canceled) dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done").arg(jobsDone).arg(items).arg(threadcount));
+        QApplication::processEvents();
+
+        // check for user canceled
+        if (!canceled && dlgTFitProgress->isCanceled()) {
+            dlgTFitProgress->reportStatus("sending all threads the CANCEL signal");
+            for (int i=0; i<threadcount; i++) {
+                threads[i]->cancel(false);
+            }
+            canceled=true;
+        }
+    }
+
+
+    // free memory
+    for (int i=0; i<threadcount; i++) {
+        delete threads[i];
+    }
+
+    dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
+    dlgTFitProgress->setProgress(items+2);
+    QApplication::processEvents();
+
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        if (record ) {
+            record->enableEmitResultsChanged(true);
+        }
+    }
+    current->emitResultsChanged();
+
+    dlgTFitProgress->setProgress(items+3);
+    QApplication::processEvents();
+    displayModel(false);
+    replotData();
+    dlgTFitProgress->setProgress(items+5);
+    QApplication::processEvents();
+    QApplication::restoreOverrideCursor();
+    dlgTFitProgress->done();
+    delete dlgTFitProgress;
+}
+
+
+void QFImFCSFitEvaluationEditor::fitAllRunsThreaded() {
+    if (!current) return;
+    if (!cmbModel) return;
+    QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
+    dlgTFitProgress->reportTask(tr("fit all runs in the current file<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgTFitProgress->setProgressMax(100);
+    dlgTFitProgress->setProgress(0);
+    dlgTFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgTFitProgress->display();
+
+
+    dlgTFitProgress->reportStatus("creating thread objects ...");
+    QApplication::processEvents();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    QList<QFImFCSFitThread*> threads;
+    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    for (int i=0; i<threadcount; i++) {
+        threads.append(new QFImFCSFitThread(true, this));
+    }
+
+
+    // enqueue the jobs in the several threads and finally make sure they know when to stop
+    dlgTFitProgress->reportStatus("distributing jobs ...");
+    QApplication::processEvents();
+    int items=0;
+    int thread=0;
+    //for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=eval->getHighlightedRecord();
+
+        if (record ) {
+            record->disableEmitResultsChanged();
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            items=items+runmax-runmin+1;
+            for (int run=runmin; run<=runmax; run++) {
+                threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                thread++;
+                if (thread>=threadcount) thread=0;
+            }
+        }
+    //}
+    dlgTFitProgress->setProgressMax(items+5);
+
+
+    // start all threads and wait for them to finish
+    for (int i=0; i<threadcount; i++) {
+        threads[i]->start();
+    }
+    bool finished=false;
+    bool canceled=false;
+    while (!finished) {
+
+
+        // check whether all threads have finished and collect progress info
+        finished=true;
+        int jobsDone=0;
+        for (int i=0; i<threadcount; i++) {
+            finished=finished&&threads[i]->isFinished();
+            jobsDone=jobsDone+threads[i]->getJobsDone();
+        }
+        dlgTFitProgress->setProgress(jobsDone);
+        if (!canceled) dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done").arg(jobsDone).arg(items).arg(threadcount));
+        QApplication::processEvents();
+
+        // check for user canceled
+        if (!canceled && dlgTFitProgress->isCanceled()) {
+            dlgTFitProgress->reportStatus("sending all threads the CANCEL signal");
+            for (int i=0; i<threadcount; i++) {
+                threads[i]->cancel(false);
+            }
+            canceled=true;
+        }
+    }
+
+
+    // free memory
+    for (int i=0; i<threadcount; i++) {
+        delete threads[i];
+    }
+
+    dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
+    dlgTFitProgress->setProgress(items+2);
+    QApplication::processEvents();
+
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        if (record ) {
+            record->enableEmitResultsChanged(true);
+        }
+    }
+    current->emitResultsChanged();
+
+    dlgTFitProgress->setProgress(items+3);
+    QApplication::processEvents();
+    displayModel(false);
+    replotData();
+    dlgTFitProgress->setProgress(items+5);
+    QApplication::processEvents();
+    QApplication::restoreOverrideCursor();
+    dlgTFitProgress->done();
+    delete dlgTFitProgress;
+}
+
+void QFImFCSFitEvaluationEditor::fitAllFilesThreaded()
+{
+    if (!current) return;
+    if (!cmbModel) return;
+    QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
+    if (!eval) return;
+    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if ((!ffunc)||(!falg)) return;
+
+    dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
+    dlgTFitProgress->reportTask(tr("fit the current run in all files<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgTFitProgress->setProgressMax(100);
+    dlgTFitProgress->setProgress(0);
+    dlgTFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgTFitProgress->display();
+
+
+    dlgTFitProgress->reportStatus("creating thread objects ...");
+    QApplication::processEvents();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    QList<QFImFCSFitThread*> threads;
+    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    for (int i=0; i<threadcount; i++) {
+        threads.append(new QFImFCSFitThread(true, this));
+    }
+
+
+    // enqueue the jobs in the several threads and finally make sure they know when to stop
+    dlgTFitProgress->reportStatus("distributing jobs ...");
+    QApplication::processEvents();
+    int items=0;
+    int thread=0;
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+
+        if (record ) {
+            record->disableEmitResultsChanged();
+            items=items+1;
+            int run=eval->getCurrentIndex();
+            threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+            thread++;
+            if (thread>=threadcount) thread=0;
+        }
+    }
+    dlgTFitProgress->setProgressMax(items+5);
+
+
+    // start all threads and wait for them to finish
+    for (int i=0; i<threadcount; i++) {
+        threads[i]->start();
+    }
+    bool finished=false;
+    bool canceled=false;
+    while (!finished) {
+
+
+        // check whether all threads have finished and collect progress info
+        finished=true;
+        int jobsDone=0;
+        for (int i=0; i<threadcount; i++) {
+            finished=finished&&threads[i]->isFinished();
+            jobsDone=jobsDone+threads[i]->getJobsDone();
+        }
+        dlgTFitProgress->setProgress(jobsDone);
+        if (!canceled) dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done").arg(jobsDone).arg(items).arg(threadcount));
+        QApplication::processEvents();
+
+        // check for user canceled
+        if (!canceled && dlgTFitProgress->isCanceled()) {
+            dlgTFitProgress->reportStatus("sending all threads the CANCEL signal");
+            for (int i=0; i<threadcount; i++) {
+                threads[i]->cancel(false);
+            }
+            canceled=true;
+        }
+    }
+
+
+    // free memory
+    for (int i=0; i<threadcount; i++) {
+        delete threads[i];
+    }
+
+    dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
+    dlgTFitProgress->setProgress(items+2);
+    QApplication::processEvents();
+
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        if (record ) {
+            record->enableEmitResultsChanged(true);
+        }
+    }
+    current->emitResultsChanged();
+
+    dlgTFitProgress->setProgress(items+3);
+    QApplication::processEvents();
+    displayModel(false);
+    replotData();
+    dlgTFitProgress->setProgress(items+5);
+    QApplication::processEvents();
+    QApplication::restoreOverrideCursor();
+    dlgTFitProgress->done();
+    delete dlgTFitProgress;
 }

@@ -72,6 +72,9 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     evaluationIDMetadataInitSize=100;
     dstore=new QFRawDataRecordPrivate();
     setResultsInitSize(100);
+    resultsmodel=new QFRDRResultsModel();
+    resultsmodel->init(this);
+
 }
 
 
@@ -99,11 +102,7 @@ QFRDRPropertyModel* QFRawDataRecord::getPropertyModel() {
     return propModel;
 }
 
-QFRDRResultsModel* QFRawDataRecord::resultsGetModel() {
-    if (resultsmodel==NULL) {
-        resultsmodel=new QFRDRResultsModel();
-        resultsmodel->init(this);
-    }
+QFRDRResultsModel* QFRawDataRecord::resultsGetModel() const {
     return resultsmodel;
 };
 
@@ -1419,7 +1418,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     emitResultsChanged(evaluationName, resultName, false);
 }
 
-double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) {
+double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -1900,9 +1899,6 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const
 {
-    evaluationResult r;
-    if (resultsExists(evalName, resultName)) {
-        
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 #endif
@@ -1910,6 +1906,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
+
+ evaluationResult r;
+    if (resultsExists(evalName, resultName)) {
         return dstore->results[evalName]->results.value(resultName);
     }
     return r;
@@ -2494,7 +2493,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     return QString("");
 }
 
-void QFRawDataRecord::resultsCopy(const QString& oldEvalName, const QString& newEvalName) {
+void QFRawDataRecord::resultsCopy(const QString& oldEvalName, const QString& newEvalName)  {
     if (resultsExistsFromEvaluation(oldEvalName)) {
         {     
 #ifdef DEBUG_THREAN
@@ -2516,7 +2515,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     }
 }
 
-bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, const QString& separator, QChar decimalPoint, QChar stringDelimiter) {
+bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, const QString& separator, QChar decimalPoint, QChar stringDelimiter) const {
     QString sdel=stringDelimiter;
     QString dp=decimalPoint;
     QList<QPair<QString,QString> > rownames=resultsCalcNamesAndLabels();
@@ -2584,7 +2583,7 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, const QString& s
 }
 
 
-bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename) {
+bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename) const {
     // try output SYLK file
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
@@ -2967,7 +2966,7 @@ bool QFRawDataRecord::isEmitPropertiesChangedEnabled() const {
     return doEmitPropertiesChanged;
 }
 
-QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) {
+QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -2990,7 +2989,7 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
     return resultsGetInStringList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
-bool QFRawDataRecord::resultsGetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool defaultValue) {
+bool QFRawDataRecord::resultsGetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3013,7 +3012,7 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
     return resultsGetInBooleanList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
-QString QFRawDataRecord::resultsGetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &defaultValue) {
+QString QFRawDataRecord::resultsGetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3031,7 +3030,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     return defaultValue;
 }
 
-qlonglong QFRawDataRecord::resultsGetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong defaultValue) {
+qlonglong QFRawDataRecord::resultsGetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3054,7 +3053,7 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
     return resultsGetInIntegerList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
-bool QFRawDataRecord::resultsGetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool defaultValue) {
+bool QFRawDataRecord::resultsGetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3064,15 +3063,16 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
-    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
+    QFRawDataRecordPrivate::evaluationIDMetadata* ev=dstore->results[evaluationName];
+    if (!ev->results.contains(resultName)) return defaultValue;
 
-    evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+    evaluationResult& r=ev->results[resultName];
     if (position<r.bvec.size()) return r.bvec[position];
 
     return defaultValue;
 }
 
-double QFRawDataRecord::resultsGetErrorInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) {
+double QFRawDataRecord::resultsGetErrorInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3095,7 +3095,7 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
     return resultsGetErrorInNumberErrorList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
-qlonglong QFRawDataRecord::resultsGetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong defaultValue) {
+qlonglong QFRawDataRecord::resultsGetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3113,7 +3113,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     return defaultValue;
 }
 
-double QFRawDataRecord::resultsGetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) {
+double QFRawDataRecord::resultsGetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -3136,7 +3136,7 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
     return resultsGetInNumberList(evaluationName, resultName, r.columns*row+column, defaultValue);
 }
 
-double QFRawDataRecord::resultsGetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) {
+double QFRawDataRecord::resultsGetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";

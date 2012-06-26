@@ -21,7 +21,7 @@
  */
 class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, public QFExtensionShutter, public QFPluginLogService {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionShutter )
+        Q_INTERFACES(QFExtension QFExtensionShutter QFPluginLogService)
     public:
         /** Default constructor */
         QFExtensionShutterServoArduino(QObject* parent=NULL);

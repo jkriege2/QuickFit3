@@ -56,7 +56,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         }
 
     protected slots:

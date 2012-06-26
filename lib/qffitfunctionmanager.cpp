@@ -7,11 +7,12 @@ QFFitFunctionManager::QFFitFunctionManager(ProgramOptions* options, QObject* par
     QObject(parent)
 {
     m_options=options;
+    mutex=new QMutex();
 }
 
 QFFitFunctionManager::~QFFitFunctionManager()
 {
-    //dtor
+    delete mutex;
 }
 
 void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList) {
@@ -61,6 +62,7 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
 
 
 QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, QObject* parent) {
+    QMutexLocker locker(mutex);
     QMap<QString, QFFitFunction*> res;
 
     for (int i=0; i<fitPlugins.size(); i++) {
@@ -76,6 +78,7 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
 }
 
 QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent) {
+    QMutexLocker locker(mutex);
     for (int i=0; i<fitPlugins.size(); i++) {
         QStringList ids=fitPlugins[i]->getIDs();
         if (ids.contains(ID)) {

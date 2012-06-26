@@ -93,103 +93,103 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,
          *         but only one channel is represented by one object. This is saved in the property
          *         CHANNEL. */
-        inline virtual int getChannel() { return getProperty("CHANNEL", QVariant((int)0)).toUInt(); }
+        inline virtual int getChannel() const { return getProperty("CHANNEL", QVariant((int)0)).toUInt(); }
         /** \brief number of correlation runs in this object */
-        inline virtual int getCorrelationRuns() { return correlationRuns; };
+        inline virtual int getCorrelationRuns() const { return correlationRuns; };
         /** \brief number of datapoints in every correlation curve */
-        inline virtual long long getCorrelationN() { return correlationN; }
+        inline virtual long long getCorrelationN() const { return correlationN; }
         /** \brief sample points (times \f$ \tau \f$ ) of the correlation function.
          *         This is a 1D array of size correlationN */
-        inline virtual double* getCorrelationT() { return correlationT; };
+        inline virtual double* getCorrelationT() const { return correlationT; };
         /** \brief values of the correlation function.
          *         This is a 2D array of size runs * correlationN
          *
          * access this as \code correlation[run*correlationN + n] \endcode
          */
-        inline virtual double* getCorrelation() { return correlation; };
+        inline virtual double* getCorrelation() const { return correlation; };
         /** \brief values of the correlation function.
          *         This is a 2D array of size runs * correlationN
          *
          * access this as \code correlation[run*correlationN + n] \endcode
          */
-        inline virtual double* getCorrelationRunErrors() { return correlationErrors; };
+        inline virtual double* getCorrelationRunErrors() const { return correlationErrors; };
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        inline virtual double* getCorrelationRun(int run) { return &(correlation[run*correlationN]); };
+        inline virtual double* getCorrelationRun(int run) const { return &(correlation[run*correlationN]); };
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        inline virtual double* getCorrelationMean() { return correlationMean; };
+        inline virtual double* getCorrelationMean() const { return correlationMean; };
         /** \brief values of the standard deviation of the correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
-        inline virtual double* getCorrelationStdDev() { return correlationStdDev; };
+        inline virtual double* getCorrelationStdDev() const { return correlationStdDev; };
         /** \brief errors, associated with the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        virtual double* getCorrelationRunError(int run) { return &(correlationErrors[run*correlationN]); };
+        virtual double* getCorrelationRunError(int run) const { return &(correlationErrors[run*correlationN]); };
 
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
-        virtual QString getCorrelationRunName(int run);
+        virtual QString getCorrelationRunName(int run) const;
 
 
         /** \brief returns the number of channels with count rates */
-        virtual int getRateChannels()  { return rateChannels; }
+        virtual int getRateChannels() const  { return rateChannels; }
 
         /** \brief number of countrate runs in this object */
-        inline virtual int getRateRuns() { return rateRuns; };
+        inline virtual int getRateRuns() const { return rateRuns; };
         /** \brief number of datapoints in every count rate curve */
-        inline virtual long long getRateN() { return rateN; };
+        inline virtual long long getRateN() const { return rateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the count rate
          *         This is a 1D array of size rateN */
-        inline virtual double* getRateT() { return rateT; };
+        inline virtual double* getRateT() const { return rateT; };
         /** \brief values of the count rate.
          *         This is a 2D array of size runs * rateN
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRate(int channel=0) { return &(rate[channel*rateN*rateRuns]); };
+        inline virtual double* getRate(int channel=0) const { return &(rate[channel*rateN*rateRuns]); };
         /** \brief values of the count rate nfor a given run.
          *         This is a 1D array of length  rateN
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRateRun (int run, int channel=0) { return &(rate[channel*rateN*rateRuns+run*rateN]); };
+        inline virtual double* getRateRun(int run, int channel=0) const  { return &(rate[channel*rateN*rateRuns+run*rateN]); };
 
 
         /** \brief number of binned count rate runs in this object */
-        inline virtual int getBinnedRateRuns(int channel=0) { return rateRuns; };
+        inline virtual int getBinnedRateRuns(int channel=0) const { return rateRuns; };
         /** \brief number of datapoints in every binned count rate */
-        inline virtual long long getBinnedRateN() { return binnedRateN; };
+        inline virtual long long getBinnedRateN() const { return binnedRateN; };
         /** \brief sample points (times \f$ \tau \f$ ) of the binned count rate
          *         This is a 1D array of size binnedRateN */
-        inline virtual double* getBinnedRateT() { return binnedRateT; };
+        inline virtual double* getBinnedRateT() const { return binnedRateT; };
         /** \brief values of the binned count rate.
          *         This is a 2D array of size runs * binnedRateN
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline virtual double* getBinnedRate(int channel=0) { return &binnedRate[channel*binnedRateN*rateRuns]; };
+        inline virtual double* getBinnedRate(int channel=0) const { return &binnedRate[channel*binnedRateN*rateRuns]; };
         /** \brief values of the binned count rate for a given run.
          *         This is a 1D array of length  binnedRateN
          *
          * access this as \code rate[run*binnedRateN + n] \endcode
          */
-        inline virtual double* getBinnedRateRun (int run, int channel=0) { return &(binnedRate[channel*binnedRateN*rateRuns + run*binnedRateN]); };
+        inline virtual double* getBinnedRateRun (int run, int channel=0) const { return &(binnedRate[channel*binnedRateN*rateRuns + run*binnedRateN]); };
 
 
         /** \brief calculate the mean value of the count rate */
-        virtual double calcRateMean(int run=0, int channel=0);
+        virtual double calcRateMean(int run=0, int channel=0) const;
         /** \brief calculate the standard deviation of the count rate */
-        virtual double calcRateStdDev(int run=0, int channel=0);
+        virtual double calcRateStdDev(int run=0, int channel=0) const;
         /** \brief return the mean value of the count rate, as last calculated by a call to calcRateMean() */
-        virtual double getRateMean(int run=0, int channel=0);
+        virtual double getRateMean(int run=0, int channel=0) const ;
         /** \brief return the standard deviation of the count rate, as last calculated by a call to calcRateStdDev()  */
-        virtual double getRateStdDev(int run=0, int channel=0);
+        virtual double getRateStdDev(int run=0, int channel=0) const ;
 
         /** \brief calculate minimum and maximum count rates */
-        virtual void calcRateMinMax(int run, double& min, double& max, int channel=0);
+        virtual void calcRateMinMax(int run, double& min, double& max, int channel=0) const;
         /** \brief calculate minimum and maximum count rates */
-        virtual void getRateMinMax(int run, double& min, double& max, int channel=0);
+        virtual void getRateMinMax(int run, double& min, double& max, int channel=0) const ;
         /** \brief recalculate correlation curve mean and standard deviation */
         virtual void recalculateCorrelations();
 
@@ -205,7 +205,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual void calcBinnedRate();
 
         /** \brief returns whether to leave out a run */
-        inline virtual bool leaveoutRun(int run) { return leaveout.contains(run); };
+        inline virtual bool leaveoutRun(int run) const { return leaveout.contains(run); };
         /** \brief add a run to the leaveouts */
         inline virtual void leaveoutAddRun(int run) { leaveout.append(run); }
         /** \brief remove a run from the leaveouts */
@@ -214,7 +214,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         inline virtual void leaveoutClear() { leaveout.clear(); }
 
         /** \brief returns true when a given run is visible. the average run is indicated by -1 */
-        inline virtual bool isCorrelationRunVisible(int run) {
+        inline virtual bool isCorrelationRunVisible(int run) const {
             if (run+1<runsVisibleList.size() && run>=-1)
                 return runsVisibleList[run+1];
             else return true;
@@ -302,10 +302,10 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          */
         double* rate;
 
-        QMap<int, double> rateMean;
-        QMap<int, double> rateStdDev;
-        QMap<int, double> rateMin;
-        QMap<int, double> rateMax;
+        mutable QMap<int, double> rateMean;
+        mutable QMap<int, double> rateStdDev;
+        mutable QMap<int, double> rateMin;
+        mutable QMap<int, double> rateMax;
 
         /** \brief if positive this is the number of datapoints to which the countrate
          *         shall be binned in the binnedRate field. */

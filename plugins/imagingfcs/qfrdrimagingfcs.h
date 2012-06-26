@@ -56,7 +56,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
         /** \brief icon for the plugin */

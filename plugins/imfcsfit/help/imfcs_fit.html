@@ -7,7 +7,8 @@
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
 	 <p>
-	 This plugin allows to perform fits for imaging FCS data. It shares most functionality with the <a href="$$plugin_info:help:fcs_fit$$">FCS Curve Fitting Plugin</a>. There is only one major difference between these two plugins: The FCS fit plugin stores the fit results for each run in a separate column/row/set of fit results, whereas this plugin creates one set for the average run and one set for all other runs. The fit results are then stored as vectors/matrices inside this set. This saves a considerable amount of memory in the project file and while QuickFit is running. Also it improves the speed of execution of the <a href="$$plugin_info:help:imaging_fcs$$">imFCS raw data record Plugin</a>.
+	 This plugin allows to perform fits for imaging FCS data. It shares most functionality with the <a href="$$plugin_info:help:fcs_fit$$">FCS Curve Fitting Plugin</a>. There is only one major difference between these two plugins: The FCS fit plugin stores the fit results for each run in a separate column/row/set of fit results, whereas this plugin creates one set for the average run and one set for all other runs. The fit results are then stored as vectors/matrices inside this set. This saves a considerable amount of memory in the project file and while QuickFit is running. Also it improves the speed of execution of the <a href="$$plugin_info:help:imaging_fcs$$">imFCS raw data record Plugin</a>. <br>
+	 This plugin allows to perform fits on several processor cores in parallel (multi-threaded). Set the maximum number of processors to use in the <a href="$$mainhelpdir$$qf3_settings.html">general settings dialog</a>.
 	 <ol>
 	   <li><a href="./ui.html">imFCS Curve Fit User Interface</a></li>
 	   <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
