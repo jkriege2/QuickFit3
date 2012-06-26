@@ -47,6 +47,7 @@ void OptionsDialog::on_btnHelp_clicked()
 
 
 void OptionsDialog::open(ProgramOptions* options) {
+    spnMaxThreads->setRange(1,100);
     spnMaxThreads->setValue(options->getMaxThreads());
     m_options=options;
 
