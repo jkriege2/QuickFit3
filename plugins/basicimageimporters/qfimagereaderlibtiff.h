@@ -54,10 +54,36 @@ class QFImageReaderLIBTIFF: public QFImporterImageSeries {
         TIFF* tif;
         QString filename;
 
+        static void logTIFFMessage(const char* module, const char* fmt, ...)  {
+            va_list vl;
+            va_start(vl,fmt);
+            libTIFFMessageHandler(module, fmt, vl);
+            va_end(vl);
+
+        }
+
+        static void logTIFFError(const char* module, const char* fmt, ...)  {
+            va_list vl;
+            va_start(vl,fmt);
+            libTIFFErrorHandler(module, fmt, vl);
+            va_end(vl);
+
+        }
+
+        static void logTIFFWarning(const char* module, const char* fmt, ...)  {
+            va_list vl;
+            va_start(vl,fmt);
+            libTIFFWarningHandler(module, fmt, vl);
+            va_end(vl);
+
+        }
+
     public:
         static FILE* fLibTIFFLog;
         static QString fLibTIFFLogFilename;
         static QMutex* mutex;
+
+
 
         static void libTIFFErrorHandler(const char* module, const char* fmt, va_list ap) {
             QMutexLocker lock(mutex);

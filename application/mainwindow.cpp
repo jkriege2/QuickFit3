@@ -1634,7 +1634,11 @@ void MainWindow::projectPerformanceTest() {
                     for (int i=0; i<propCnt; i++) {
                         record->setQFProperty(QString("testprop%1").arg(i), i);
                     }
-                    double duration=double(timer.nsecsElapsed())/1.0e6;
+                    #if QT_VERSION >= 0x040800
+                        double duration=double(timer.nsecsElapsed())*1.0e6;
+                    #else
+                        double duration=double(timer.elapsed());
+                    #endif
                     durW[r]=duration;
                     //log_text(tr("OK [%1 ms]\n").arg(duration));
 
@@ -1644,15 +1648,19 @@ void MainWindow::projectPerformanceTest() {
                         int ii=record->getProperty(QString("testprop%1").arg(i), i).toInt();
                         ii=i+1;
                     }
-                    duration=double(timer.nsecsElapsed())/1.0e6;
+                    #if QT_VERSION >= 0x040800
+                        duration=double(timer.nsecsElapsed())*1.0e6;
+                    #else
+                        duration=double(timer.elapsed());
+                    #endif
                     durR[r]=duration;
                     //log_text(tr("OK [%1 ms]\n").arg(duration));
                     log_text(".");
                     QApplication::processEvents();
                 }
                 log_text("\n");
-                log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
-                log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                log_text(tr("    => per write operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                log_text(tr("    => per read operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
 
 
                 propCnt=200;
@@ -1667,7 +1675,12 @@ void MainWindow::projectPerformanceTest() {
                     for (int i=0; i<propCnt; i++) {
                         record->setQFProperty(QString("testprop%1").arg(i), i);
                     }
-                    double duration=double(timer.nsecsElapsed())/1.0e6;
+                    #if QT_VERSION >= 0x040800
+                        double duration=double(timer.nsecsElapsed())*1.0e6;
+                    #else
+                        double duration=double(timer.elapsed());
+                    #endif
+                    durR[r]=duration;
                     durW[r]=duration;
                     //log_text(tr("OK [%1 ms]\n").arg(duration));
 
@@ -1677,7 +1690,12 @@ void MainWindow::projectPerformanceTest() {
                         int ii=record->getProperty(QString("testprop%1").arg(i), i).toInt();
                         ii=ii+i;
                     }
-                    duration=double(timer.nsecsElapsed())/1.0e6;
+                    #if QT_VERSION >= 0x040800
+                        duration=double(timer.nsecsElapsed())*1.0e6;
+                    #else
+                        duration=double(timer.elapsed());
+                    #endif
+                    durR[r]=duration;
                     durR[r]=duration;
                     //log_text(tr("OK [%1 ms]\n").arg(duration));
                     log_text(".");
@@ -1685,8 +1703,8 @@ void MainWindow::projectPerformanceTest() {
                 }
                 log_text("\n");
                 record->enableEmitPropertiesChanged();
-                log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
-                log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                log_text(tr("    => per write operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                log_text(tr("    => per read operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
                 QApplication::processEvents();
 
 
@@ -1700,7 +1718,12 @@ void MainWindow::projectPerformanceTest() {
                         for (int i=0; i<propCnt; i++) {
                             record->resultsSetNumberError("testeval", QString("testprop%1").arg(i), i, double(i)/10.0, "unit");
                         }
-                        double duration=double(timer.nsecsElapsed())/1.0e6;
+                        #if QT_VERSION >= 0x040800
+                            double duration=double(timer.nsecsElapsed())*1.0e6;
+                        #else
+                            double duration=double(timer.elapsed());
+                        #endif
+                        durR[r]=duration;
                         durW[r]=duration;
                         //log_text(tr("OK [%1 ms]\n").arg(duration));
 
@@ -1710,7 +1733,13 @@ void MainWindow::projectPerformanceTest() {
                             double ii=record->resultsGetAsDouble("testeval", QString("testprop%1").arg(i));
                             ii=ii+i;
                         }
-                        duration=double(timer.nsecsElapsed())/1.0e6;
+                        #if QT_VERSION >= 0x040800
+                            duration=double(timer.nsecsElapsed())*1.0e6;
+                        #else
+                            duration=double(timer.elapsed());
+                        #endif
+                        durR[r]=duration;
+
                         durR[r]=duration;
                         //log_text(tr("OK [%1 ms]\n").arg(duration));
                         log_text(".");
@@ -1718,8 +1747,8 @@ void MainWindow::projectPerformanceTest() {
                     }
                     log_text("\n");
                     record->enableEmitPropertiesChanged();
-                    log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
-                    log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per write operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per read operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
                     QApplication::processEvents();
 
 
@@ -1735,7 +1764,11 @@ void MainWindow::projectPerformanceTest() {
                         for (int i=0; i<propCnt; i++) {
                             record->resultsSetNumberErrorList("testeval", QString("testprop%1").arg(i), v, e, "unit");
                         }
-                        double duration=double(timer.nsecsElapsed())/1.0e6;
+                        #if QT_VERSION >= 0x040800
+                            double duration=double(timer.nsecsElapsed())*1.0e6;
+                        #else
+                            double duration=double(timer.elapsed());
+                        #endif
                         durW[r]=duration;
                         //log_text(tr("OK [%1 ms]\n").arg(duration));
 
@@ -1745,7 +1778,11 @@ void MainWindow::projectPerformanceTest() {
                             QVector<double> vv=record->resultsGetAsDoubleList("testeval", QString("testprop%1").arg(i));
                             vv.append(1);
                         }
-                        duration=double(timer.nsecsElapsed())/1.0e6;
+                        #if QT_VERSION >= 0x040800
+                            duration=double(timer.nsecsElapsed())*1.0e6;
+                        #else
+                            duration=double(timer.elapsed());
+                        #endif
                         durR[r]=duration;
                         //log_text(tr("OK [%1 ms]\n").arg(duration));
                         log_text(".");
@@ -1753,8 +1790,8 @@ void MainWindow::projectPerformanceTest() {
                     }
                     log_text("\n");
                     record->enableEmitPropertiesChanged();
-                    log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
-                    log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per write operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per read operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
                     QApplication::processEvents();
 
 
@@ -1766,7 +1803,12 @@ void MainWindow::projectPerformanceTest() {
                         for (int i=0; i<propCnt; i++) {
                             record->resultsSetInNumberErrorList("testeval", QString("testprop%1").arg(i), i, double(i), double(i)/10.0, "unit");
                         }
-                        double duration=double(timer.nsecsElapsed())/1.0e6;
+                        double duration=0;
+                        #if QT_VERSION >= 0x040800
+                            duration=double(timer.nsecsElapsed())*1.0e6;
+                        #else
+                            duration=double(timer.elapsed());
+                        #endif
                         durW[r]=duration;
                         //log_text(tr("OK [%1 ms]\n").arg(duration));
 
@@ -1776,7 +1818,11 @@ void MainWindow::projectPerformanceTest() {
                             double vv=record->resultsGetAsDouble("testeval", QString("testprop%1").arg(i), i);
                             vv=vv+i;
                         }
-                        duration=double(timer.nsecsElapsed())/1.0e6;
+                        #if QT_VERSION >= 0x040800
+                            duration=double(timer.nsecsElapsed())*1.0e6;
+                        #else
+                            duration=double(timer.elapsed());
+                        #endif
                         durR[r]=duration;
                         //log_text(tr("OK [%1 ms]\n").arg(duration));
                         log_text(".");
@@ -1784,8 +1830,8 @@ void MainWindow::projectPerformanceTest() {
                     }
                     log_text("\n");
                     record->enableEmitPropertiesChanged();
-                    log_text(tr("    => per write operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
-                    log_text(tr("    => per read operation ( %1 +/- %2 ) 탎\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per write operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durW, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durW, repeats)/double(propCnt)*1000.0));
+                    log_text(tr("    => per read operation ( %1 +/- %2 ) s\n").arg(statisticsAverage(durR, repeats)/double(propCnt)*1000.0).arg(statisticsStdDev(durR, repeats)/double(propCnt)*1000.0));
                     QApplication::processEvents();
                 //}
 

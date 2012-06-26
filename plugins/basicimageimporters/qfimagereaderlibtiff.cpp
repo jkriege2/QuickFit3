@@ -76,7 +76,7 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         this->filename=filename;
         //TIFFSetWarningHandler(NULL);
         //qDebug()<<"  QFImageReaderLIBTIFF::open("<<filename<<")   tif="<<tif<<"  result=false";
-        libTIFFMessageHandler("QFImageReaderLIBTIFF", "opened file %s\n", filename.toLocal8Bit().data());
+        logTIFFMessage("QFImageReaderLIBTIFF", "opened file %s\n", filename.toLocal8Bit().data());
         return true;
     } else {
         width=0;
@@ -95,7 +95,7 @@ void QFImageReaderLIBTIFF::close() {
     QString fn=filename;
     filename="";
     tif=NULL;
-    libTIFFMessageHandler("QFImageReaderLIBTIFF", "closed file %s\n", fn.toLocal8Bit().data());
+    logTIFFMessage("QFImageReaderLIBTIFF", "closed file %s\n", fn.toLocal8Bit().data());
     //qDebug()<<"  QFImageReaderLIBTIFF::close()   tif="<<tif;
 }
 
