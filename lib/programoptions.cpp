@@ -76,7 +76,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     style= QApplication::style()->metaObject()->className();
     stylesheet="default";
     languageID="en";
-    maxThreads=1;
+    maxThreads=2;
     autosave=5;
 
     readSettings();
