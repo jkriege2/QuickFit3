@@ -1,7 +1,7 @@
-#include "qfimfcsfitthread.h"
-#include "qfimfcsfitevaluation.h"
+#include "qffitresultsbyindexevaluationfitthread.h"
+#include "qffitresultsbyindexevaluation.h"
 
-QFImFCSFitThread::QFImFCSFitThread(bool stopWhenEmpty, QObject *parent) :
+QFFitResultsByIndexEvaluationFitThread::QFFitResultsByIndexEvaluationFitThread(bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
 {
     lock=new QReadWriteLock();
@@ -12,18 +12,18 @@ QFImFCSFitThread::QFImFCSFitThread(bool stopWhenEmpty, QObject *parent) :
 
 }
 
-QFImFCSFitThread::~QFImFCSFitThread()
+QFFitResultsByIndexEvaluationFitThread::~QFFitResultsByIndexEvaluationFitThread()
 {
     delete lock;
 }
 
-void QFImFCSFitThread::run() {
+void QFFitResultsByIndexEvaluationFitThread::run() {
     bool jempty=false;
     { QReadLocker locker(lock);
         jempty=jobs.isEmpty();
     }
     while(!stopped  && (!(stopWhenEmpty&&jempty))) {
-        QFImFCSFitThread::Job job;
+        QFFitResultsByIndexEvaluationFitThread::Job job;
         bool jobIsValid=false;
         // look into input queue, whether there are still tasks to perform
         {   QReadLocker locker(lock);
@@ -46,8 +46,8 @@ void QFImFCSFitThread::run() {
     }
 }
 
-void QFImFCSFitThread::addJob(QFImFCSFitEvaluation *evaluation, QFRawDataRecord *record, int run, int userMin, int userMax) {
-    QFImFCSFitThread::Job j;
+void QFFitResultsByIndexEvaluationFitThread::addJob(QFFitResultsByIndexEvaluation *evaluation, QFRawDataRecord *record, int run, int userMin, int userMax) {
+    QFFitResultsByIndexEvaluationFitThread::Job j;
     j.evaluation=evaluation;
     j.record=record;
     j.run=run;
@@ -58,21 +58,21 @@ void QFImFCSFitThread::addJob(QFImFCSFitEvaluation *evaluation, QFRawDataRecord 
     jobCount++;
 }
 
-void QFImFCSFitThread::cancel(bool waitForFinished) {
+void QFFitResultsByIndexEvaluationFitThread::cancel(bool waitForFinished) {
     stopped=true;
     while (waitForFinished && isRunning()) {
         QApplication::processEvents();
     }
 }
 
-int QFImFCSFitThread::getJobsDone()
+int QFFitResultsByIndexEvaluationFitThread::getJobsDone()
 {
     QReadLocker locker(lock);
     return jobsDone;
 }
 
 
-QFImFCSFitThread::Job::Job() {
+QFFitResultsByIndexEvaluationFitThread::Job::Job() {
     evaluation=NULL;
     record=NULL;
     run=-1;
@@ -80,22 +80,22 @@ QFImFCSFitThread::Job::Job() {
     userMax=0;
 }
 
-int QFImFCSFitThread::getJobCount()
+int QFFitResultsByIndexEvaluationFitThread::getJobCount()
 {
     return jobCount;
 }
 
-void QFImFCSFitThread::log_text(QString message)
+void QFFitResultsByIndexEvaluationFitThread::log_text(QString message)
 {
     emit sigLogText(message);
 }
 
-void QFImFCSFitThread::log_error(QString message)
+void QFFitResultsByIndexEvaluationFitThread::log_error(QString message)
 {
     emit sigLogError(message);
 }
 
-void QFImFCSFitThread::log_warning(QString message)
+void QFFitResultsByIndexEvaluationFitThread::log_warning(QString message)
 {
     emit sigLogWarning(message);
 }

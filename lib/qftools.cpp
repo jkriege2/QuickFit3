@@ -58,6 +58,7 @@ QToolButton* createButtonAndActionShowText(QAction*& action, QWidget* parent) {
     p.setControlType(QSizePolicy::PushButton);
     p.setHorizontalPolicy(QSizePolicy::Minimum);
     button->setSizePolicy(p);
+    button->setFocusPolicy(Qt::StrongFocus);
     return button;
 }
 
@@ -69,6 +70,7 @@ QToolButton* createButtonAndActionShowText(QAction*& action, const QString& text
     p.setControlType(QSizePolicy::PushButton);
     p.setHorizontalPolicy(QSizePolicy::Minimum);
     button->setSizePolicy(p);
+    button->setFocusPolicy(Qt::StrongFocus);
     return button;
 }
 
@@ -79,6 +81,7 @@ QToolButton* createButtonAndActionShowText(QAction*& action, const QIcon& icon, 
     p.setControlType(QSizePolicy::PushButton);
     p.setHorizontalPolicy(QSizePolicy::Minimum);
     button->setSizePolicy(p);
+    button->setFocusPolicy(Qt::StrongFocus);
     return button;
 }
 

@@ -71,6 +71,9 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
         virtual void copyToAllCurrentRun();
 
 
+        void log_text(QString message);
+        void log_warning(QString message);
+        void log_error(QString message);
 
     public:
 

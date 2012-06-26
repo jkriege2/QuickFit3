@@ -41,6 +41,8 @@
 #include "qffitresultsbyindexevaluationeditorbase.h"
 #include "qftools.h"
 #include "qfevaluationpropertyeditor.h"
+#include "qffitresultsbyindexevaluationfitthread.h"
+
 
 /*! \brief evaluation item editor base class for data fits using QFFitAlgorithm and QFFitFunction where the
            QFRawDataRecord is a dataset with different runs (we can fit to each run). The QFEvaluationItem for
@@ -53,7 +55,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0);
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false);
         
     protected slots:
         /** \brief connect widgets to current data record */
@@ -173,6 +175,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QAction* actAlgorithmHelp;
         /** \brief pushbutton to show help on Fitting Algorithm */
         QAction* actModelHelp;
+        QAction* actFitAllFilesThreaded;
+        QAction* actFitAllThreaded;
+        QAction* actFitAllRunsThreaded;
 
         QMenu* menuFit;
         QMenu* menuParameters;
@@ -207,7 +212,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QString fitStatisticsReport;
 
 
-    private:
+    protected:
         /** \brief to fit current file */
         QToolButton* btnFitCurrent;
         /** \brief to fit all runs in current file */
@@ -312,10 +317,13 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief fit all runs in current file */
         void fitRunsCurrent();
 
+        void fitEverythingThreaded();
+        void fitAllRunsThreaded();
+        void fitAllFilesThreaded();
 
     private:
         /** \brief create all widgets on the form */
-        void createWidgets();
+        void createWidgets(bool hasMultiThreaded);
 };
 
 #endif // QFFITRESULTSBYINDEXEVALUATIONEDITORWITHWIDGETS_H

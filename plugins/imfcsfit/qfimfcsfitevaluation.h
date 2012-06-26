@@ -15,7 +15,6 @@
 #include "../base_classes/qffitresultsevaluation.h"
 #include "../base_classes/qffitresultsbyindexasvectorevaluation.h"
 #include "qffitalgorithm.h"
-#include "qfimfcsfitthread.h"
 #include "qfpluginservices.h"
 
 
@@ -84,7 +83,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
             \note this method is intended to perform the fits one after the other or single fits. It will internally starts the fit algorithm
                   in its own thread. If you want to control the multithreading by yourself, use doFitForMultithread() instead !!!
           */
-        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL);
+        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false);
 
         /*! \brief perform a fit for the given \a record and \a run
 
@@ -115,8 +114,6 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
 
         /** \brief type of data weighting */
         DataWeight m_weighting;
-
-        QMutex* mutexThreadedFit;
 
         virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
 

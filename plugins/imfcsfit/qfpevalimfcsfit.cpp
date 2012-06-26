@@ -2,11 +2,13 @@
 #include <QtGui>
 #include "qfimfcsfitevaluation.h"
 #include "imfcscalibrationdialog.h"
+#include "optionswidget.h"
 
 QFPEvalIMFCSFit::QFPEvalIMFCSFit(QObject* parent):
     QObject(parent)
 {
     //ctor
+    QFPluginServices::getInstance()->registerSettingsPane(this);
 }
 
 QFPEvalIMFCSFit::~QFPEvalIMFCSFit()
@@ -33,6 +35,20 @@ void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
 
 }
 
+QString QFPEvalIMFCSFit::pluginOptionsName() const
+{
+    return getName();
+}
+
+QIcon QFPEvalIMFCSFit::pluginOptionsIcon() const
+{
+    return QIcon(getIconFilename());
+}
+
+QFPluginOptionsWidget *QFPEvalIMFCSFit::createOptionsWidget(QWidget *parent)
+{
+    return new OptionsWidget(this, parent);
+}
 
 
 

@@ -2,6 +2,10 @@
 #define QFPEVALIMFCSFIT_H
 
 #include "qfpluginevaluation.h"
+#include "qfpluginoptionsdialog.h"
+#include "qfpluginservices.h"
+
+
 /*!
     \defgroup qf3evalp_imfcsfit FCS Least Squares Curve Fitting Plugin for imaging FCS
     \ingroup qf3evaluationplugins
@@ -14,9 +18,9 @@
 /*! \brief plugin class for imaging FCS least-square fits
     \ingroup qf3evalp_imfcsfit
 */
-class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase {
+class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, public QFPluginOptionsDialogInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginEvaluationItem)
+        Q_INTERFACES(QFPluginEvaluationItem QFPluginOptionsDialogInterface)
     public:
         /** Default constructor */
         QFPEvalIMFCSFit(QObject* parent=NULL);
@@ -59,6 +63,9 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase {
             minor=1;
         }
 
+        QString pluginOptionsName() const;
+        QIcon pluginOptionsIcon() const;
+        QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
     protected slots:
         /** \brief insert FCS data from file*/
         void insertFCSFit();

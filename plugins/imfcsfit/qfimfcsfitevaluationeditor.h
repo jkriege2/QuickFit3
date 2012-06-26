@@ -38,7 +38,7 @@
 #include "../base_classes/qffitresultsbyindexevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h"
 #include "../interfaces/qfrdrimagetoruninterface.h"
-#include "qfimfcsfitthread.h"
+#include "qffitresultsbyindexevaluationfitthread.h"
 #include "dlgqfprogressdialog.h"
 
 
@@ -81,9 +81,6 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
 
-        QAction* actFitAllFilesThreaded;
-        QAction* actFitAllThreaded;
-        QAction* actFitAllRunsThreaded;
 
 
 
@@ -112,9 +109,6 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** \brief called when the weights changes */
         void weightsChanged(int weight);
 
-        void fitEverythingThreaded();
-        void fitAllRunsThreaded();
-        void fitAllFilesThreaded();
 
 
     private:

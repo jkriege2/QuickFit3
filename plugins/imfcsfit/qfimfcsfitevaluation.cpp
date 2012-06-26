@@ -193,7 +193,7 @@ double* QFImFCSFitEvaluation::allocWeights(bool* weightsOKK, QFRawDataRecord* re
 
 
 
-void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress) {
+void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress, bool doLog) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFitFunction* ffunc=getFitFunction();
     QFFitAlgorithm* falg=getFitAlgorithm();
@@ -216,7 +216,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
         dlgFitProgress->setProgressMax(100);
         dlgFitProgress->setProgress(0);
 
-        QFPluginLogTools::log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', run %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
+        if (doLog) QFPluginLogTools::log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', run %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
 
         long N=data->getCorrelationN();
         double* weights=NULL;
@@ -249,14 +249,14 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
             dt+=QString(", %1").arg(taudata[i]);
             dc+=QString(", %1").arg(corrdata[i]);
         }
-        QFPluginLogTools::log_text(tr("   - tau:  (%1)\n").arg(dt));
-        QFPluginLogTools::log_text(tr("   - corr: (%1)\n").arg(dc));*/
+        if (doLog) QFPluginLogTools::log_text(tr("   - tau:  (%1)\n").arg(dt));
+        if (doLog) QFPluginLogTools::log_text(tr("   - corr: (%1)\n").arg(dc));*/
 
 
-        QFPluginLogTools::log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
+        if (doLog) QFPluginLogTools::log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
         weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
-        if (!weightsOK) QFPluginLogTools::log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
+        if (!weightsOK && doLog) QFPluginLogTools::log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters
@@ -370,11 +370,11 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                         //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                     }
 
-                    QFPluginLogTools::log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
-                    QFPluginLogTools::log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
-                    QFPluginLogTools::log_text(tr("   - initial params         (%1)\n").arg(iparams));
-                    QFPluginLogTools::log_text(tr("   - output params          (%1)\n").arg(oparams));
-                    QFPluginLogTools::log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
+                    if (doLog) QFPluginLogTools::log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
+                    if (doLog) QFPluginLogTools::log_text(tr("   - result-message: %1\n").arg(result.messageSimple));
+                    if (doLog) QFPluginLogTools::log_text(tr("   - initial params         (%1)\n").arg(iparams));
+                    if (doLog) QFPluginLogTools::log_text(tr("   - output params          (%1)\n").arg(oparams));
+                    if (doLog) QFPluginLogTools::log_text(tr("   - output params, rounded (%1)\n").arg(orparams));
 
 
                     QString evalID=transformResultID(getEvaluationResultID(ffunc->id(), run));
@@ -493,10 +493,10 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     //record->enableEmitResultsChanged(false);
                     //emit resultsChanged();
                 } else {
-                    QFPluginLogTools::log_warning(tr("   - fit canceled by user!!!\n"));
+                    if (doLog) QFPluginLogTools::log_warning(tr("   - fit canceled by user!!!\n"));
                 }
             } else {
-                QFPluginLogTools::log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
+                if (doLog) QFPluginLogTools::log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
             }
 
             if (epc) set_doEmitPropertiesChanged(true);
@@ -505,7 +505,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
             //emitPropertiesChanged();
             //emitResultsChanged();
         } catch(std::exception& E) {
-            QFPluginLogTools::log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
+            if (doLog) QFPluginLogTools::log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
         }
 
         // clean temporary parameters
@@ -609,8 +609,7 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &va
 
 
 
-void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
-{
+void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFitFunction* ffunc=createFitFunction(NULL);
     QFFitAlgorithm* falg=createFitAlgorithm(NULL);
@@ -672,7 +671,9 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
         //if (logservice) logservice->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
         weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
-        if (!weightsOK) QFPluginLogTools::log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
+        if (!weightsOK && logservice) {
+            logservice->log_warning(tr("fitting file '%1', run %2:\n   weights have invalid values => setting all weights to 1\n").arg(record->getName()).arg(run));
+        }
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters
@@ -946,14 +947,14 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                 }
 
             } else {
-                QFPluginLogTools::log_error(tr("   - there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount));
+                if (logservice) logservice->log_error(tr("fitting file '%3', run %4:\n   there are not enough datapoints for the fit (%1 datapoints, but %2 fit parameters!)\n").arg(cut_N).arg(fitparamcount).arg(record->getName()).arg(run));
             }
 
             /*if (epc) set_doEmitPropertiesChanged(true);
             if (erc) set_doEmitResultsChanged(true);
             if (rerc) record->enableEmitResultsChanged(true);*/
         } catch(std::exception& E) {
-            QFPluginLogTools::log_error(tr("error during fitting, error message: %1\n").arg(E.what()));
+            if (logservice) logservice->log_error(tr("fitting file '%2', run %3:\n   error during fitting, error message: %1\n").arg(E.what()).arg(record->getName()).arg(run));
         }
 
         // clean temporary parameters

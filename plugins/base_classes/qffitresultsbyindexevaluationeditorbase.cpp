@@ -390,6 +390,21 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllCurrentRun() {
     QApplication::restoreOverrideCursor();
 }
 
+void QFFitResultsByIndexEvaluationEditorBase::log_text(QString message)
+{
+    QFPluginLogTools::log_text(message);
+}
+
+void QFFitResultsByIndexEvaluationEditorBase::log_warning(QString message)
+{
+    QFPluginLogTools::log_warning(message);
+}
+
+void QFFitResultsByIndexEvaluationEditorBase::log_error(QString message)
+{
+    QFPluginLogTools::log_error(message);
+}
+
 
 
 

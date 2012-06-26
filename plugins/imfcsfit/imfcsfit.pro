@@ -26,7 +26,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qffitresultsbyindexasvectorevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
     imfcscalibrationdialog.h \
-    qfimfcsfitthread.h
+    ../base_classes/qffitresultsbyindexevaluationfitthread.h \
+    optionswidget.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -40,11 +41,13 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffitresultsbyindexasvectorevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp \
     imfcscalibrationdialog.cpp \
-    qfimfcsfitthread.cpp
+    ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
+    optionswidget.cpp
 
 
 FORMS = \    
-    imfcscalibrationdialog.ui
+    imfcscalibrationdialog.ui \
+    optionswidget.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

@@ -1,4 +1,5 @@
 #include "qfpevalfcsfit.h"
+#include "optionswidget.h"
 #include <QtGui>
 #include "qffcsfitevaluation.h"
 
@@ -6,6 +7,7 @@ QFPEvalFCSFit::QFPEvalFCSFit(QObject* parent):
     QObject(parent)
 {
     //ctor
+    QFPluginServices::getInstance()->registerSettingsPane(this);
 }
 
 QFPEvalFCSFit::~QFPEvalFCSFit()
@@ -27,6 +29,20 @@ void QFPEvalFCSFit::registerToMenu(QMenu* menu) {
 
 
 
+QString QFPEvalFCSFit::pluginOptionsName() const
+{
+    return getName();
+}
+
+QIcon QFPEvalFCSFit::pluginOptionsIcon() const
+{
+    return QIcon(getIconFilename());
+}
+
+QFPluginOptionsWidget *QFPEvalFCSFit::createOptionsWidget(QWidget *parent)
+{
+    return new OptionsWidget(this, parent);
+}
 
 void QFPEvalFCSFit::insertFCSFit() {
     if (project) {

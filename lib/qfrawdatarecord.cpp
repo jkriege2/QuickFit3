@@ -1666,28 +1666,33 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 
 void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QString& resultName, const QString& label, const QString& label_rich) {
     {
-        if (!resultsExists(evaluationName, resultName)) return;
-        evaluationResult r=resultsGet(evaluationName, resultName);
+/*        if (!resultsExists(evaluationName, resultName)) return;
+        evaluationResult r=resultsGet(evaluationName, resultName);*/
         
-#ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
-#endif
- QWriteLocker locker(lock);
-#ifdef DEBUG_THREAN
- qDebug()<<Q_FUNC_INFO<<"  locked";
-#endif
-        r.label=label;
-        r.label_rich=label_rich;
-        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
-        dstore->results[evaluationName]->results[resultName]=r;
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+         evaluationResult r;
+         if (dstore->results.contains(evaluationName)) {
+             if (dstore->results[evaluationName]->results.contains(resultName)) {
+                 r=dstore->results[evaluationName]->results[resultName];
+             }
+         }
+         r.label=label;
+         r.label_rich=label_rich;
+         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+         dstore->results[evaluationName]->results[resultName]=r;
     }
     emitResultsChanged(evaluationName, resultName, false);
 }
 
 void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QString& resultName, const QString& group) {
-        if (!resultsExists(evaluationName, resultName)) return;
-        evaluationResult r=resultsGet(evaluationName, resultName);
-        r.group=group;
+/*        if (!resultsExists(evaluationName, resultName)) return;
+        evaluationResult r=resultsGet(evaluationName, resultName);*/
     {
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
@@ -1696,6 +1701,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
+         evaluationResult r;
+         if (dstore->results.contains(evaluationName)) {
+             if (dstore->results[evaluationName]->results.contains(resultName)) {
+                 r=dstore->results[evaluationName]->results[resultName];
+             }
+         }
+         r.group=group;
         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
         dstore->results[evaluationName]->results[resultName]=r;
     }
@@ -1704,8 +1716,8 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 
 void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr) {
     {
-        if (!resultsExists(evaluationName, resultName)) return;
-        evaluationResult r=resultsGet(evaluationName, resultName);
+        /*if (!resultsExists(evaluationName, resultName)) return;
+        evaluationResult r=resultsGet(evaluationName, resultName);*/
 
         
 #ifdef DEBUG_THREAN
@@ -1715,6 +1727,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
+        evaluationResult r;
+        if (dstore->results.contains(evaluationName)) {
+            if (dstore->results[evaluationName]->results.contains(resultName)) {
+                r=dstore->results[evaluationName]->results[resultName];
+            }
+        }
+
         r.sortPriority=pr;
         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
         dstore->results[evaluationName]->results[resultName]=r;
@@ -1899,18 +1918,31 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const
 {
-#ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
-#endif
- QReadLocker locker(lock);
-#ifdef DEBUG_THREAN
- qDebug()<<Q_FUNC_INFO<<"  locked";
-#endif
-
- evaluationResult r;
-    if (resultsExists(evalName, resultName)) {
-        return dstore->results[evalName]->results.value(resultName);
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    #endif
+     QReadLocker locker(lock);
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+    evaluationResult r;
+    if (dstore->results.contains(evalName)) {
+        if (dstore->results[evalName]->results.contains(resultName)) {
+            r=dstore->results[evalName]->results[resultName];
+        }
     }
+    //return false;
+
+/*    if (resultsExists(evalName, resultName)) {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+        #endif
+         QReadLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+        return dstore->results[evalName]->results.value(resultName);
+    }*/
     return r;
 }
 
@@ -1931,7 +1963,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 
 QVariant QFRawDataRecord::resultsGetAsQVariant(const QString& evalName, const QString& resultName) const {
     QVariant result;
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreBoolean: result=r.bvalue; break;
         case qfrdreInteger: result=(qlonglong)r.ivalue; break;
@@ -2101,7 +2133,7 @@ QVariant QFRawDataRecord::resultsGetAsStringVariant(const QString& evalName, con
 }
 
 double QFRawDataRecord::resultsGetAsDouble(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreBoolean: if (r.bvalue) return 1; else return 0;
@@ -2117,7 +2149,7 @@ double QFRawDataRecord::resultsGetAsDouble(const QString& evalName, const QStrin
 }
 
 int64_t QFRawDataRecord::resultsGetAsInteger(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
      switch(r.type) {
         case qfrdreBoolean: if (r.bvalue) return 1; else return 0;
@@ -2132,7 +2164,7 @@ int64_t QFRawDataRecord::resultsGetAsInteger(const QString& evalName, const QStr
 }
 
 bool QFRawDataRecord::resultsGetAsBoolean(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
      switch(r.type) {
         case qfrdreBoolean: return r.bvalue;
@@ -2147,7 +2179,7 @@ bool QFRawDataRecord::resultsGetAsBoolean(const QString& evalName, const QString
 }
 
 QVector<double> QFRawDataRecord::resultsGetAsDoubleList(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreNumberVector:
@@ -2182,7 +2214,7 @@ QVector<double> QFRawDataRecord::resultsGetAsDoubleList(const QString& evalName,
 }
 
 QVector<qlonglong> QFRawDataRecord::resultsGetAsIntegerList(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreIntegerVector:
@@ -2205,7 +2237,7 @@ QVector<qlonglong> QFRawDataRecord::resultsGetAsIntegerList(const QString& evalN
 }
 
 QVector<bool> QFRawDataRecord::resultsGetAsBooleanList(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreBooleanVector:
@@ -2218,7 +2250,7 @@ QVector<bool> QFRawDataRecord::resultsGetAsBooleanList(const QString& evalName, 
 }
 
 QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreNumberMatrix:
         case qfrdreNumberVector: {
@@ -2283,7 +2315,7 @@ QVariant QFRawDataRecord::resultsGetAsStringVariant(const QString &evalName, con
 }
 
 QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreInteger:
             if (alsoGetNonVec) return QVariant(r.ivalue);
@@ -2333,7 +2365,7 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString &evalName, const QS
 }
 
 double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreInteger:
             if (alsoGetNonVec) return r.ivalue;
@@ -2369,7 +2401,7 @@ double QFRawDataRecord::resultsGetAsDouble(const QString &evalName, const QStrin
 }
 
 double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreNumberErrorMatrix:
         case qfrdreNumberErrorVector: {
@@ -2386,7 +2418,7 @@ double QFRawDataRecord::resultsGetErrorAsDouble(const QString &evalName, const Q
 }
 
 bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreBooleanVector:
         case qfrdreBooleanMatrix: {
@@ -2402,7 +2434,7 @@ bool QFRawDataRecord::resultsGetAsBoolean(const QString &evalName, const QString
 }
 
 int64_t QFRawDataRecord::resultsGetAsInteger(const QString &evalName, const QString &resultName, int position, bool *ok, bool alsoGetNonVec) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {
         case qfrdreInteger:
             if (alsoGetNonVec) return r.ivalue;
@@ -2426,7 +2458,7 @@ int64_t QFRawDataRecord::resultsGetAsInteger(const QString &evalName, const QStr
 }
 
 double QFRawDataRecord::resultsGetErrorAsDouble(const QString& evalName, const QString& resultName, bool* ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreNumber: case qfrdreNumberError: return r.derror;
@@ -2438,7 +2470,7 @@ double QFRawDataRecord::resultsGetErrorAsDouble(const QString& evalName, const Q
 }
 
 QVector<double> QFRawDataRecord::resultsGetErrorAsDoubleList(const QString &evalName, const QString &resultName, bool *ok) const {
-    const evaluationResult& r=resultsGet(evalName, resultName);
+    const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
         case qfrdreNumberErrorVector:
@@ -2456,19 +2488,19 @@ QVector<double> QFRawDataRecord::resultsGetErrorAsDoubleList(const QString &eval
 
 
 QString QFRawDataRecord::resultsGetLabel(const QString& evaluationName, const QString& resultName) const {
-    const evaluationResult& r=resultsGet(evaluationName, resultName);
+    const evaluationResult r=resultsGet(evaluationName, resultName);
     if (r.label.isEmpty()) return resultName;
     else return r.label;
 }
 
 
 QString QFRawDataRecord::resultsGetGroup(const QString& evaluationName, const QString& resultName) const {
-    const evaluationResult& r=resultsGet(evaluationName, resultName);
+    const evaluationResult r=resultsGet(evaluationName, resultName);
     return r.group;
 }
 
 QString QFRawDataRecord::resultsGetLabelRichtext(const QString& evaluationName, const QString& resultName) const {
-    const evaluationResult& r=resultsGet(evaluationName, resultName);
+    const evaluationResult r=resultsGet(evaluationName, resultName);
     if (r.label_rich.isEmpty()) return r.label;
     else if (r.label_rich.isEmpty()) return resultName;
     else return r.label_rich;

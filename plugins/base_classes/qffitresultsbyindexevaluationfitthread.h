@@ -1,5 +1,5 @@
-#ifndef QFImFCSFitThread_H
-#define QFImFCSFitThread_H
+#ifndef QFFitResultsByIndexEvaluationFitThread_H
+#define QFFitResultsByIndexEvaluationFitThread_H
 
 #include <QThread>
 #include "qfrawdatarecord.h"
@@ -10,10 +10,10 @@
 #include <QQueue>
 #include "qfpluginservices.h"
 
-class QFImFCSFitEvaluation; // forward
+class QFFitResultsByIndexEvaluation; // forward
 
 
-/*! \brief QThread used to perform imFCS fits in several parallel threads
+/*! \brief QThread used to performFCS fits in several parallel threads
     \ingroup qf3evalp_imfcsfit
 
     Use this class by starting a thread and adding jobs with addJob(). The thread will terminate
@@ -21,17 +21,17 @@ class QFImFCSFitEvaluation; // forward
     or, when all jobs are done and stopWhenEmpty is \c true. If it is \c false, the thread will
     wait for new jobs.
 */
-class QFImFCSFitThread : public QThread, public QFPluginLogService {
+class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLogService {
         Q_OBJECT
         Q_INTERFACES(QFPluginLogService)
     public:
 
-        explicit QFImFCSFitThread(bool stopWhenEmpty, QObject* parent=NULL);
-        virtual ~QFImFCSFitThread();
+        explicit QFFitResultsByIndexEvaluationFitThread(bool stopWhenEmpty, QObject* parent=NULL);
+        virtual ~QFFitResultsByIndexEvaluationFitThread();
         
         virtual void run();
 
-        void addJob(QFImFCSFitEvaluation* evaluation, QFRawDataRecord* record, int run, int userMin, int userMax);
+        void addJob(QFFitResultsByIndexEvaluation* evaluation, QFRawDataRecord* record, int run, int userMin, int userMax);
 
         void cancel(bool waitForFinished=true);
 
@@ -56,7 +56,7 @@ class QFImFCSFitThread : public QThread, public QFPluginLogService {
     protected:
         struct Job {
             Job();
-            QFImFCSFitEvaluation* evaluation;
+            QFFitResultsByIndexEvaluation* evaluation;
             QFRawDataRecord* record;
             int run;
             int userMin;
@@ -75,4 +75,4 @@ class QFImFCSFitThread : public QThread, public QFPluginLogService {
         
 };
 
-#endif // QFImFCSFitThread_H
+#endif // QFFitResultsByIndexEvaluationFitThread_H

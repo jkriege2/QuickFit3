@@ -24,7 +24,9 @@ HEADERS +=  qfpevalfcsfit.h \
             ../base_classes/qffitresultsbyindexevaluationeditorbase.h \
             ../interfaces/qfrdrsimplecountrateinterface.h \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
-    ../interfaces/qfextensiontool.h
+    ../interfaces/qfextensiontool.h \
+    ../base_classes/qffitresultsbyindexevaluationfitthread.h \
+    optionswidget.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \
@@ -36,10 +38,13 @@ SOURCES +=  qfpevalfcsfit.cpp \
             ../base_classes/qffitresultsbyindexevaluation.cpp \
             ../base_classes/qffitresultsevaluationeditorbase.cpp\
             ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp \
-    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp
+    ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp \
+    ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
+    optionswidget.cpp
 
 
-FORMS =    estimatefocalvolumedlg.ui
+FORMS =    estimatefocalvolumedlg.ui \
+    optionswidget.ui
 
 RESOURCES += qfevalfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc
