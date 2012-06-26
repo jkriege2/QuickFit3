@@ -221,52 +221,57 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
         return;
     }*/
-    QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
-    f.open();
-    QXmlStreamWriter w(&f);
-    w.setAutoFormatting(false);
-    w.writeStartDocument();
-    w.writeStartElement("quickfitproject");
-    w.writeAttribute("quickfit_version", VERSION_FULL);
-    w.writeAttribute("quickfit_svn", SVNVERSION);
-    w.writeAttribute("quickfit_compiledate", COMPILEDATE);
-    w.writeAttribute("name", name);
-    w.writeAttribute("creator", creator);
-    w.writeStartElement("description");
-    w.writeCDATA(description);
-    w.writeEndElement();
-    w.writeStartElement("properties");
-    storeProperties(w);
-    w.writeEndElement();
-    w.writeStartElement("rawdata");
-    QMapIterator<int, QFRawDataRecord*> ir(rawData);
-    //for (int i=0; i<rawData.keys().size(); i++) {
-    while (ir.hasNext()) {
-        ir.next();
-        //std::cout<<"writing rdr "<<ir.key()<<std::endl;
-        //int k=rawData.keys().at(i);
-        ir.value()->writeXML(w);
-        //std::cout<<"   DONE!"<<std::endl;
-    }
-    w.writeEndElement();
-    w.writeStartElement("evaluations");
-    QMapIterator<int, QFEvaluationItem*> i(evaluations);
-    //for (int i=0; i<evaluations.keys().size(); i++) {
-    while (i.hasNext()) {
-        i.next();
-        //std::cout<<"writing eval "<<i.key()<<std::endl;
-        //int k=evaluations.keys().at(i);
-        i.value()->writeXML(w);
-        //std::cout<<"   DONE!"<<std::endl;
-    }
-    w.writeEndElement();
+    //QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
+    //f.open();
+    //QXmlStreamWriter w(&f);
+    QByteArray bytemp;
+    {
+        QBuffer buf(&bytemp);
+        QXmlStreamWriter w(&buf);
+        w.setAutoFormatting(false);
+        w.writeStartDocument();
+        w.writeStartElement("quickfitproject");
+        w.writeAttribute("quickfit_version", VERSION_FULL);
+        w.writeAttribute("quickfit_svn", SVNVERSION);
+        w.writeAttribute("quickfit_compiledate", COMPILEDATE);
+        w.writeAttribute("name", name);
+        w.writeAttribute("creator", creator);
+        w.writeStartElement("description");
+        w.writeCDATA(description);
+        w.writeEndElement();
+        w.writeStartElement("properties");
+        storeProperties(w);
+        w.writeEndElement();
+        w.writeStartElement("rawdata");
+        QMapIterator<int, QFRawDataRecord*> ir(rawData);
+        //for (int i=0; i<rawData.keys().size(); i++) {
+        while (ir.hasNext()) {
+            ir.next();
+            //std::cout<<"writing rdr "<<ir.key()<<std::endl;
+            //int k=rawData.keys().at(i);
+            ir.value()->writeXML(w);
+            //std::cout<<"   DONE!"<<std::endl;
+        }
+        w.writeEndElement();
+        w.writeStartElement("evaluations");
+        QMapIterator<int, QFEvaluationItem*> i(evaluations);
+        //for (int i=0; i<evaluations.keys().size(); i++) {
+        while (i.hasNext()) {
+            i.next();
+            //std::cout<<"writing eval "<<i.key()<<std::endl;
+            //int k=evaluations.keys().at(i);
+            i.value()->writeXML(w);
+            //std::cout<<"   DONE!"<<std::endl;
+        }
+        w.writeEndElement();
 
-    w.writeEndElement();
-    w.writeEndDocument();
-    if (resetDataChanged) {
-        if (!errorOcc) {
-            emitStructureChanged();
-            if (namechanged) emitPropertiesChanged();
+        w.writeEndElement();
+        w.writeEndDocument();
+        if (resetDataChanged) {
+            if (!errorOcc) {
+                emitStructureChanged();
+                if (namechanged) emitPropertiesChanged();
+            }
         }
     }
 
@@ -275,10 +280,17 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 
     QFile f1(file);
     f1.rename(file+".backup");
-    f.setAutoRemove(false);
-    if (!f.rename(file)) {
+
+    QFile f(file);
+    if (f.open(QIODevice::WriteOnly)) {
+        f.write(bytemp);
+    } else {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
     }
+    //f.setAutoRemove(false);
+    //if (!f.rename(file)) {
+    //    setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+    //}
     /*if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
         return;

@@ -835,8 +835,10 @@ void QFRawDataPropertyEditor::newPropClicked() {
             }
         }*/
         dlgNewProperty* d=new dlgNewProperty(this);
-        d->setPropertyName(tr("new_property"));
         d->addPropertyNames(current->getProject()->getAllPropertyNames());
+        d->setPropertyName(ProgramOptions::getConfigValue(QString("rawdatapropeditor%1/newprop/name").arg(id), tr("new_property")).toString());
+        d->setPropertyType(ProgramOptions::getConfigValue(QString("rawdatapropeditor%1/newprop/type").arg(id), 1).toInt());
+        d->setPropertyValue(ProgramOptions::getConfigValue(QString("rawdatapropeditor%1/newprop/value").arg(id), "").toString());
 
         if (d->exec()==QDialog::Accepted) {
             QVariant v=d->propertyValue();
@@ -848,11 +850,17 @@ void QFRawDataPropertyEditor::newPropClicked() {
                 default: break;
             }
             bool ok=true;
+
+            ProgramOptions::setConfigValue(QString("rawdatapropeditor%1/newprop/name").arg(id), d->propertyName());
+            ProgramOptions::setConfigValue(QString("rawdatapropeditor%1/newprop/type").arg(id), d->propertyType());
+            ProgramOptions::setConfigValue(QString("rawdatapropeditor%1/newprop/value").arg(id), d->propertyValue());
+
             if (current->propertyExists(d->propertyName())) {
                 ok=current->isPropertyUserEditable(d->propertyName());
             }
             //qDebug()<<"QFRawDataPropertyEditor::newPropClicked()  pn="<<d->propertyName()<<"   val="<<v<<"   ok="<<ok;
             if (ok) current->setQFProperty(d->propertyName(), v, true, true);
+            else QMessageBox::critical(this, tr("QuickFit"), tr("The property '%1' may not bge changed or created, as it is marked readonly!"));
         }
 
         delete d;

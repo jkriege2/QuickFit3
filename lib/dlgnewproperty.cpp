@@ -5,6 +5,10 @@ dlgNewProperty::dlgNewProperty(QWidget* parent):
     QDialog(parent), ui(new Ui::dlgNewProperty)
 {
     ui->setupUi(this);
+
+
+    ui->cmbName->setFocus(Qt::MouseFocusReason);
+    ui->cmbName->lineEdit()->selectAll();
 }
 
 dlgNewProperty::~dlgNewProperty()
