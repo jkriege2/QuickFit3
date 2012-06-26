@@ -55,7 +55,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false);
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false);
         
     protected slots:
         /** \brief connect widgets to current data record */
@@ -323,7 +323,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
     private:
         /** \brief create all widgets on the form */
-        void createWidgets(bool hasMultiThreaded);
+        void createWidgets(bool hasMultiThreaded, bool multiThreadPriority);
 };
 
 #endif // QFFITRESULTSBYINDEXEVALUATIONEDITORWITHWIDGETS_H

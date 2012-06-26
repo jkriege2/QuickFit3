@@ -16,7 +16,7 @@
 #include "qffitalgorithmmanager.h"
 #include "dlgqfprogressdialog.h"
 
-QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded) :
+QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority) :
     QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
 {
     cmbModel=NULL;
@@ -26,11 +26,11 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
     fitStatisticsReport="";
 
 
-    createWidgets(hasMultiThreaded);
+    createWidgets(hasMultiThreaded, multiThreadPriority);
 
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded) {
+void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool multiThreadPriority) {
 
 
 
@@ -543,9 +543,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 
     if (hasMultiThreaded) {
-        btnFitAll->setDefaultAction(actFitAllFilesThreaded);
-        btnFitRunsAll->setDefaultAction(actFitAllThreaded);
-        btnFitRunsCurrent->setDefaultAction(actFitAllRunsThreaded);
+        if (multiThreadPriority) {
+            btnFitAll->setDefaultAction(actFitAllFilesThreaded);
+            btnFitRunsAll->setDefaultAction(actFitAllThreaded);
+            btnFitRunsCurrent->setDefaultAction(actFitAllRunsThreaded);
+        } else {
+            btnFitAll->addAction(actFitAllFilesThreaded);
+            btnFitRunsAll->addAction(actFitAllThreaded);
+            btnFitRunsCurrent->addAction(actFitAllRunsThreaded);
+        }
 
         menuFit->insertSeparator(actFitRunsCurrent);
         menuFit->insertAction(actFitRunsCurrent, actFitAllRunsThreaded);
