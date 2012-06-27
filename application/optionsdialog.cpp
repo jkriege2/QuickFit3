@@ -104,6 +104,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);
         }
+        options->writeSettings();
     }
 }
 

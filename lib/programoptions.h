@@ -85,7 +85,10 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         bool getProjectWindowsStayOnTop() const;
         void setProjectWindowsStayOnTop(bool set);
     public slots:
-
+        /** \brief this function reads the current settings from the internal QSettings object settings */
+        void readSettings();
+        /** \brief this function writes the current settings to the internal QSettings object settings */
+        void writeSettings();
 
 
     signals:
@@ -102,10 +105,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         void styleChanged(QString style);
 
     protected:
-        /** \brief this function reads the current settings from the internal QSettings object settings */
-        void readSettings();
-        /** \brief this function writes the current settings to the internal QSettings object settings */
-        void writeSettings();
+
 
 
         /** \brief QSettings object used for config options I/O */

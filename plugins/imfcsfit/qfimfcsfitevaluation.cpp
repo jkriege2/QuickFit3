@@ -397,7 +397,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     record->resultsSetLabel(evalID, param, tr("fit: model"));
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_name", falg->id());
-                    else record->resultsSetInStringList(evalID, "fitalg_name", run, falg->id());
+                    else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_name", run, falg->id());
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
 
@@ -412,12 +412,12 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     record->resultsSetLabel(evalID, param, tr("fit: success"));
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
-                    else record->resultsSetInStringList(evalID, "fitalg_message", run, result.messageSimple);
+                    else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_message", run, result.messageSimple);
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: message"));
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
-                    else record->resultsSetInStringList(evalID, "fitalg_messageHTML", run, result.message);
+                    else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_messageHTML", run, result.message);
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
 
@@ -461,7 +461,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                                 break;
                             case QFRawDataRecord::qfrdreString:
                                 if (run<0) record->resultsSetString(evalID, param=("fitalg_"+it.key()), it.value().svalue);
-                                else record->resultsSetInStringList(evalID, param=("fitalg_"+it.key()), run, it.value().svalue, it.value().unit);
+                                else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, param=("fitalg_"+it.key()), run, it.value().svalue, it.value().unit);
                                 break;
 
                             case QFRawDataRecord::qfrdreBooleanVector:

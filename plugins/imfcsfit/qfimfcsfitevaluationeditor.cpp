@@ -61,7 +61,13 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     layAlgorithm->addWidget(cmbWeights);
     layAlgorithm->addStretch();
 
+    chkDontSaveFitResultMessage=new QCheckBox(tr("don't save fit messages"), this);
+    chkDontSaveFitResultMessage->setToolTip(tr("this improves the speed of saving the project significantly!"));
+    chkDontSaveFitResultMessage->setChecked(false);
+    connect(chkDontSaveFitResultMessage, SIGNAL(toggled(bool)), this, SLOT(dontSaveFitResultMessageChanged(bool)));
 
+
+    layButtons->addWidget(chkDontSaveFitResultMessage, layButtons->rowCount(),0,1,2);
 }
 
 
@@ -106,6 +112,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
     if (eval) {
         dataEventsEnabled=false;
         cmbWeights->setCurrentIndex(eval->getFitDataWeighting());
+        chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", false).toBool());
         dataEventsEnabled=true;
     }
 }
@@ -663,6 +670,12 @@ void QFImFCSFitEvaluationEditor::weightsChanged(int model) {
     displayModel(true);
     replotData();
     QApplication::restoreOverrideCursor();
+}
+
+void QFImFCSFitEvaluationEditor::dontSaveFitResultMessageChanged(bool checked)
+{
+    if (!current) return;
+    current->setQFProperty("dontSaveFitResultMessage", checked, false, false);
 }
 
 

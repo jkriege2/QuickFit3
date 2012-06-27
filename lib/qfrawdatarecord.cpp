@@ -369,8 +369,8 @@ qDebug()<<Q_FUNC_INFO<<"relock";
                                 double d=loc.toDouble(s[i], &ok);
                                 if (ok) { r.dvec.append(d); }
                                 else { r.dvec.append(0); }
-                                double e;
-                                if (i<s1.size()) e=loc.toDouble(s1[i], &ok);
+                                //double e;
+                                //if (i<s1.size()) e=loc.toDouble(s1[i], &ok);
                                 if (ok) { r.evec.append(d); }
                                 else { r.evec.append(0); }
                             }

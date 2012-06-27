@@ -81,6 +81,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
 
+        QCheckBox* chkDontSaveFitResultMessage;
 
 
 
@@ -110,6 +111,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         void weightsChanged(int weight);
 
 
+        void dontSaveFitResultMessageChanged(bool checked);
 
     private:
         /** \brief create all widgets on the form */
