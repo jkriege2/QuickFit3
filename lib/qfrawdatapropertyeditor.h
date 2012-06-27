@@ -80,6 +80,10 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void newPropClicked();
         /** \brief delete a property */
         void deletePropClicked();
+        void makePropEditable();
+        void copyProperties();
+        void cutProperties();
+        void pasteProperties();
         /** \brief resize the cells in the properties table */
         void resizePropertiesTable();
         /** \brief remove the current record */
@@ -144,9 +148,11 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         /** \brief button to switch to next record */
         QToolButton* btnNext;
         /** \brief button to insert a new property */
-        QPushButton* btnNewProperty;
+        QToolButton* btnNewProperty;
+        QAction* actNewProperty;
         /** \brief button to delete a property */
-        QPushButton* btnDeleteProperty;
+        QToolButton* btnDeleteProperty;
+        QAction* actDeleteProperty;
         /** \brief button to switch to previous record */
         QToolButton* btnPrevious;
         /** \brief button to delete the current record */
@@ -159,6 +165,14 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QLabel* labAveragedresults;
         /** \brief toolbar to access functions of tvResults */
         QToolBar* tbResults;
+
+
+        QToolButton* btnCopyProperty;
+        QAction* actCopyProperty;
+        QToolButton* btnCutProperty;
+        QAction* actCutProperty;
+        QToolButton* btnPasteProperty;
+        QAction* actPasteProperty;
 
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
@@ -173,6 +187,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actNext;
         QAction* actDelete;
         QAction* actClose;
+
+        QAction* actMakePropertyEditable;
 
 
         QMenuBar* menuBar;

@@ -1,7 +1,9 @@
 #include "binarydatatools.h"
+#include <QElapsedTimer>
 #include <QByteArray>
 #include <QtEndian>
 #include <QtGlobal>
+#include <QDebug>
 
 QVector<double> stringToDoubleArray_base64(const QString& data) {
     QVector<double> result;
@@ -38,6 +40,8 @@ QVector<double> stringToDoubleArray_hex(const QString& data) {
 }
 
 QByteArray doubleArrayToString_base64(const QVector<double>& data) {
+    //QElapsedTimer t;
+    //t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<double> datai=data;
     for (int i=0; i<datai.size(); i++) {
@@ -49,9 +53,14 @@ QByteArray doubleArrayToString_base64(const QVector<double>& data) {
     QByteArray result=QByteArray::fromRawData((char*)data.constData(), data.size()*sizeof(double));
     return result.toBase64();
 #endif
+    //qDebug()<<"doubleArrayToString_base64(N="<<data.size()<<"):   "<<double(t.nsecsElapsed())/1.0e6<<" ms";
+    //return s;
 }
 
 QByteArray doubleArrayToString_hex(const QVector<double>& data) {
+    //QElapsedTimer t;
+    //t.start();
+
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<double> datai=data;
     for (int i=0; i<datai.size(); i++) {
@@ -63,6 +72,8 @@ QByteArray doubleArrayToString_hex(const QVector<double>& data) {
     QByteArray result=QByteArray::fromRawData((char*)data.constData(), data.size()*sizeof(double));
     return result.toHex();
 #endif
+    //qDebug()<<"doubleArrayToString_hex(N="<<data.size()<<"):   "<<double(t.nsecsElapsed())/1.0e6<<" ms";
+    //return s;
 }
 
 

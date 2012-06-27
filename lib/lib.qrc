@@ -45,6 +45,9 @@
         <file alias="help_rdr.png">icons/help_rdr.png</file>
         <file alias="help_eval.png">icons/help_eval.png</file>
 
+        <file alias="edit_copy.png">icons/edit_copy.png</file>
+        <file alias="edit_cut.png">icons/edit_cut.png</file>
+        <file alias="edit_paste.png">icons/edit_paste.png</file>
 
         <file alias="help_print.png">icons/help_print.png</file>
         <file alias="help_next.png">icons/help_btn_next.png</file>

@@ -221,13 +221,13 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
         return;
     }*/
-    //QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
-    //f.open();
-    //QXmlStreamWriter w(&f);
-    QByteArray bytemp;
-    {
-        QBuffer buf(&bytemp);
-        QXmlStreamWriter w(&buf);
+    QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
+    f.open();
+    QXmlStreamWriter w(&f);
+    //QByteArray bytemp;
+    //{
+//        QBuffer buf(&bytemp);
+  //      QXmlStreamWriter w(&buf);
         w.setAutoFormatting(false);
         w.writeStartDocument();
         w.writeStartElement("quickfitproject");
@@ -273,7 +273,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
                 if (namechanged) emitPropertiesChanged();
             }
         }
-    }
+  //  }
 
     QFile f2(file+".backup");
     if (f2.exists()) f2.remove();
@@ -281,16 +281,16 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     QFile f1(file);
     f1.rename(file+".backup");
 
-    QFile f(file);
-    if (f.open(QIODevice::WriteOnly)) {
-        f.write(bytemp);
-    } else {
+    //QFile f(file);
+    //if (f.open(QIODevice::WriteOnly)) {
+//        f.write(bytemp);
+//    } else {
+//        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+//    }
+    f.setAutoRemove(false);
+    if (!f.rename(file)) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
     }
-    //f.setAutoRemove(false);
-    //if (!f.rename(file)) {
-    //    setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
-    //}
     /*if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
         return;

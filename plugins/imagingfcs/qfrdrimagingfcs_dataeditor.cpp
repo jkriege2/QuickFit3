@@ -586,10 +586,12 @@ void QFRDRImagingFCSDataEditor::readSettings() {
     if (!settings) return;
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsdataeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/log_tau_axis"), true).toBool());
-    chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/display_avg"), true).toBool());
+    //chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/display_avg"), true).toBool());
+    chkDisplayAverage->setChecked(true);
     cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_style"), 0).toInt());
     cmbAverageErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_error_style"), 2).toInt());
-    cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_display"), 3).toInt());
+    //cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_display"), 3).toInt());
+    cmbRunDisplay->setCurrentIndex(3);
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_style"), 0).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_error_style"), 0).toInt());
     loadSplitter(*(settings->getQSettings()), splitter, "imfcsdataeditor/corrsplitterSizes");

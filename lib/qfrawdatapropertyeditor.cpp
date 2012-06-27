@@ -244,12 +244,25 @@ void QFRawDataPropertyEditor::createWidgets() {
     pl1->addWidget(tvProperties);
     QVBoxLayout* pl2=new QVBoxLayout(this);
     pl1->addLayout(pl2);
-    btnNewProperty=new QPushButton(QIcon(":/lib/prop_add.png"), tr("In&sert Property"), this);
-    connect(btnNewProperty, SIGNAL(clicked()), this, SLOT(newPropClicked()));
+    btnNewProperty=createButtonAndActionShowText(actNewProperty, QIcon(":/lib/prop_add.png"), tr("In&sert Property"), this);
+    connect(actNewProperty, SIGNAL(triggered()), this, SLOT(newPropClicked()));
     pl2->addWidget(btnNewProperty);
-    btnDeleteProperty=new QPushButton(QIcon(":/lib/prop_delete.png"), tr("&Delete Property"), this);
-    connect(btnDeleteProperty, SIGNAL(clicked()), this, SLOT(deletePropClicked()));
+    btnDeleteProperty=createButtonAndActionShowText(actDeleteProperty, QIcon(":/lib/prop_delete.png"), tr("&Delete Property"), this);
+    connect(actDeleteProperty, SIGNAL(triggered()), this, SLOT(deletePropClicked()));
     pl2->addWidget(btnDeleteProperty);
+
+    btnCopyProperty=createButtonAndActionShowText(actCopyProperty, QIcon(":/lib/edit_copy.png"), tr("&Copy Property"), this);
+    connect(actCopyProperty, SIGNAL(triggered()), this, SLOT(copyProperties()));
+    pl2->addWidget(btnCopyProperty);
+
+    btnCutProperty=createButtonAndActionShowText(actCutProperty, QIcon(":/lib/edit_cut.png"), tr("C&ut Property"), this);
+    connect(actCutProperty, SIGNAL(triggered()), this, SLOT(cutProperties()));
+    pl2->addWidget(btnCutProperty);
+
+    btnPasteProperty=createButtonAndActionShowText(actPasteProperty, QIcon(":/lib/edit_paste.png"), tr("&Paste Property"), this);
+    connect(actPasteProperty, SIGNAL(triggered()), this, SLOT(pasteProperties()));
+    pl2->addWidget(btnPasteProperty);
+
     pl2->addStretch();
     //fl->addRow(tr("Properties:"), widProperties);
     fl->addWidget((l=new QLabel(tr("Properties:"), w)), 6, 0);
@@ -257,6 +270,20 @@ void QFRawDataPropertyEditor::createWidgets() {
     fl->addWidget(widProperties, 6, 1);
     fl->setRowStretch(6,3);
     //fl->setRowStretch(flcounter-1, 5);
+
+    actMakePropertyEditable=new QAction(tr("Make property editable"), this);
+    connect(actMakePropertyEditable, SIGNAL(triggered()), this, SLOT(makePropEditable()));
+
+    tvProperties->addAction(actNewProperty);
+    tvProperties->addAction(actDeleteProperty);
+    tvProperties->addAction(getSeparatorAction(this));
+    tvProperties->addAction(actCopyProperty);
+    tvProperties->addAction(actCutProperty);
+    tvProperties->addAction(actPasteProperty);
+    tvProperties->addAction(getSeparatorAction(this));
+    tvProperties->addAction(actMakePropertyEditable);
+    tvProperties->setContextMenuPolicy(Qt::ActionsContextMenu);
+
 
     widResults=new QWidget(this);
     QVBoxLayout* rwvlayout=new QVBoxLayout(this);
@@ -867,6 +894,99 @@ void QFRawDataPropertyEditor::newPropClicked() {
     }
 }
 
+void QFRawDataPropertyEditor::makePropEditable() {
+    if (current) {
+        QModelIndexList l=tvProperties->selectionModel()->selectedIndexes();
+        QStringList props;
+        for (int i=0; i<l.size(); i++) {
+            /*int row=l[i].row();
+            QString prop=current->getVisibleProperty(row);
+            if ((!prop.isEmpty()) && current->propertyExists(prop) && current->isPropertyUserEditable(prop)) {
+                props.append(prop);
+            }*/
+            props.append(current->getPropertyModel()->getPropertyForRow(l[i].row()));
+        }
+        if (props.size()>0) {
+            if (QMessageBox::warning(this, tr("QuickFit"), tr("You are about to change the editablility of a property!\n"
+                                                              "Possibly it was non-editable on purpose, so changing this\n"
+                                                              "is at your own risk and may in some cases be overridden \n"
+                                                              "when the project is loaded the next time!\n\n"
+                                                              "Are you sure you want to make this property user-editable?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+
+                for (int i=0; i<props.size(); i++) {
+                    //std::cout<<"deleting "<<props[i].toStdString()<<std::endl;
+                    //qDebug()<<"QFRawDataPropertyEditor::deletePropClicked '"<<props[i]<<"'";
+                    //if (!props[i].isEmpty() && current->isPropertyUserEditable(props[i])) current->deleteProperty(props[i]);
+                    current->setQFProperty(props[i], current->getProperty(props[i]), true, true);
+                }
+            }
+        }
+
+    }
+}
+
+void QFRawDataPropertyEditor::copyProperties() {
+    if (current) {
+        QModelIndexList l=tvProperties->selectionModel()->selectedIndexes();
+        QStringList props;
+        for (int i=0; i<l.size(); i++) {
+            /*int row=l[i].row();
+            QString prop=current->getVisibleProperty(row);
+            if ((!prop.isEmpty()) && current->propertyExists(prop) && current->isPropertyUserEditable(prop)) {
+                props.append(prop);
+            }*/
+            props.append(current->getPropertyModel()->getPropertyForRow(l[i].row()));
+        }
+        if (props.size()>0) {
+            QMimeData* mime=new QMimeData();
+            QString data;
+            for (int i=0; i<props.size(); i++) {
+                data.append(escapify(props[i])+"\n");
+                QVariant v=current->getProperty(props[i]);
+                data.append(getQVariantType(v)+"\n");
+                data.append(escapify(getQVariantData(v))+"\n");
+                data.append(boolToQString(current->isPropertyUserEditable(props[i])+"\n"));
+            }
+            mime->setData("quickfit3/properties", data.toUtf8());
+            QApplication::clipboard()->setMimeData(mime);
+        }
+
+    }
+}
+
+void QFRawDataPropertyEditor::cutProperties()
+{
+    copyProperties();
+    deletePropClicked();
+}
+
+void QFRawDataPropertyEditor::pasteProperties()
+{
+    const QMimeData* mime=QApplication::clipboard()->mimeData();
+    if (mime) {
+        if (mime->hasFormat("quickfit3/properties")) {
+            QString data=QString::fromUtf8(mime->data("quickfit3/properties"));
+            QStringList sl=data.split("\n");
+            for (int i=0; i<sl.size(); i+=4) {
+                if (i+3<sl.size()) {
+                    QString name=deescapify(sl[i]);
+                    QString type=sl[i+1];
+                    QVariant v=getQVariantFromString(type, sl[i+2]);
+                    bool editable=QStringToBool(sl[i+3]);
+                    bool ok=true;
+                    if (current->propertyExists(name)) {
+                        QString otherData=current->getProperty(name).toString();
+                        ok= QMessageBox::question(this, tr("QuickFit"), tr("The property '%1' already exists.\n"
+                                                                           "   old data: %2\n"
+                                                                           "   new data: %3\n\n"
+                                                                           "Overwrite?").arg(name).arg(otherData).arg(v.toString()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+                    }
+                    if (ok) current->setQFProperty(name, v, editable, true);
+                }
+            }
+        }
+    }
+}
 
 void QFRawDataPropertyEditor::deletePropClicked() {
     if (current) {

@@ -1122,11 +1122,13 @@ void MainWindow::loadProject(const QString &fileName) {
 
 bool MainWindow::saveProject(const QString &fileName) {
     newProjectTimer.stop();
-    logFileMainWidget->log_text(tr("saving project to file '%1' ...\n").arg(fileName));
+    logFileMainWidget->log_text(tr("%2: saving project to file '%1' ...\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")));
     tabLogs->setCurrentWidget(logFileProjectWidget);
     statusBar()->showMessage(tr("saving project file '%1' ...").arg(fileName), 2000);
-    logFileProjectWidget->log_text(tr("saving project file '%1' ...\n").arg(fileName));
+    logFileProjectWidget->log_text(tr("%2: saving project file '%1' ...\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")));
     QApplication::setOverrideCursor(Qt::WaitCursor);
+    QElapsedTimer time;
+    double elapsed=-1;
     if (project) {
 
         writeSettings();
@@ -1140,7 +1142,14 @@ bool MainWindow::saveProject(const QString &fileName) {
         }
         logFileProjectWidget->open_logfile(tr("%1.log").arg(fileName), true);
         logFileProjectWidget->clearLogStore();
+        time.start();
         project->writeXML(fileName);
+#if QT_VERSION >= 0x040800
+   elapsed=double(time.nsecsElapsed())/1.0e9;
+#else
+    elapsed=double(time.elapsed())/1000.0;
+#endif
+        elapsed=double(time.elapsed())/1000.0;
         readProjectProperties();
         if (project->error()) {
             QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL), project->errorDescription());
@@ -1154,7 +1163,7 @@ bool MainWindow::saveProject(const QString &fileName) {
 
     setCurrentProject(fileName);
     statusBar()->showMessage(tr("%2: Project file '%1' saved!").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")), 2000);
-    logFileProjectWidget->log_text(tr("%2: Project file '%1' saved!\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")));
+    logFileProjectWidget->log_text(tr("%2: Project file '%1' saved after %3 secs!\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")).arg(elapsed));
     return true;
 }
 
@@ -1428,8 +1437,11 @@ void MainWindow::autosaveProject() {
     autosaveFilename=autosaveFilename+".autosave";
 
     statusBar()->showMessage(tr("%2: autosaving project file '%1' ...").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")), 500);
-    logFileProjectWidget->log_text(tr("autosaving project file '%1' ...\n").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")));
+    logFileProjectWidget->log_text(tr("%2: autosaving project file '%1' ...\n").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")));
+    QTime time;
+    time.start();
     project->writeXML(autosaveFilename, false);
+    logFileProjectWidget->log_text(tr("%2: autosaving project file '%1' ... done after %3 sec\n").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")).arg(double(time.elapsed())/1000.0));
     QApplication::restoreOverrideCursor();
 
 }
@@ -1635,7 +1647,7 @@ void MainWindow::projectPerformanceTest() {
                         record->setQFProperty(QString("testprop%1").arg(i), i);
                     }
                     #if QT_VERSION >= 0x040800
-                        double duration=double(timer.nsecsElapsed())*1.0e6;
+                        double duration=double(timer.nsecsElapsed())/1.0e6;
                     #else
                         double duration=double(timer.elapsed());
                     #endif
@@ -1649,7 +1661,7 @@ void MainWindow::projectPerformanceTest() {
                         ii=i+1;
                     }
                     #if QT_VERSION >= 0x040800
-                        duration=double(timer.nsecsElapsed())*1.0e6;
+                        duration=double(timer.nsecsElapsed())/1.0e6;
                     #else
                         duration=double(timer.elapsed());
                     #endif
@@ -1676,7 +1688,7 @@ void MainWindow::projectPerformanceTest() {
                         record->setQFProperty(QString("testprop%1").arg(i), i);
                     }
                     #if QT_VERSION >= 0x040800
-                        double duration=double(timer.nsecsElapsed())*1.0e6;
+                        double duration=double(timer.nsecsElapsed())/1.0e6;
                     #else
                         double duration=double(timer.elapsed());
                     #endif
@@ -1691,7 +1703,7 @@ void MainWindow::projectPerformanceTest() {
                         ii=ii+i;
                     }
                     #if QT_VERSION >= 0x040800
-                        duration=double(timer.nsecsElapsed())*1.0e6;
+                        duration=double(timer.nsecsElapsed())/1.0e6;
                     #else
                         duration=double(timer.elapsed());
                     #endif
@@ -1719,7 +1731,7 @@ void MainWindow::projectPerformanceTest() {
                             record->resultsSetNumberError("testeval", QString("testprop%1").arg(i), i, double(i)/10.0, "unit");
                         }
                         #if QT_VERSION >= 0x040800
-                            double duration=double(timer.nsecsElapsed())*1.0e6;
+                            double duration=double(timer.nsecsElapsed())/1.0e6;
                         #else
                             double duration=double(timer.elapsed());
                         #endif
@@ -1734,7 +1746,7 @@ void MainWindow::projectPerformanceTest() {
                             ii=ii+i;
                         }
                         #if QT_VERSION >= 0x040800
-                            duration=double(timer.nsecsElapsed())*1.0e6;
+                            duration=double(timer.nsecsElapsed())/1.0e6;
                         #else
                             duration=double(timer.elapsed());
                         #endif
@@ -1765,7 +1777,7 @@ void MainWindow::projectPerformanceTest() {
                             record->resultsSetNumberErrorList("testeval", QString("testprop%1").arg(i), v, e, "unit");
                         }
                         #if QT_VERSION >= 0x040800
-                            double duration=double(timer.nsecsElapsed())*1.0e6;
+                            double duration=double(timer.nsecsElapsed())/1.0e6;
                         #else
                             double duration=double(timer.elapsed());
                         #endif
@@ -1779,7 +1791,7 @@ void MainWindow::projectPerformanceTest() {
                             vv.append(1);
                         }
                         #if QT_VERSION >= 0x040800
-                            duration=double(timer.nsecsElapsed())*1.0e6;
+                            duration=double(timer.nsecsElapsed())/1.0e6;
                         #else
                             duration=double(timer.elapsed());
                         #endif
@@ -1805,7 +1817,7 @@ void MainWindow::projectPerformanceTest() {
                         }
                         double duration=0;
                         #if QT_VERSION >= 0x040800
-                            duration=double(timer.nsecsElapsed())*1.0e6;
+                            duration=double(timer.nsecsElapsed())/1.0e6;
                         #else
                             duration=double(timer.elapsed());
                         #endif
@@ -1819,7 +1831,7 @@ void MainWindow::projectPerformanceTest() {
                             vv=vv+i;
                         }
                         #if QT_VERSION >= 0x040800
-                            duration=double(timer.nsecsElapsed())*1.0e6;
+                            duration=double(timer.nsecsElapsed())/1.0e6;
                         #else
                             duration=double(timer.elapsed());
                         #endif
