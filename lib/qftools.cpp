@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QLocale>
 #include <QDebug>
+#include <QElapsedTimer>
 
 QAction* getSeparatorAction(QObject* parent) {
     QAction* a=new QAction(parent);
@@ -276,43 +277,45 @@ bool touchFile(const QString& filename) {
 
 
 QString escapify(const QString& text){
+  //QElapsedTimer time;
+  //time.start();
   QString res="";
-  if (text.size()>0) {
-    for (int i=0; i<text.size(); i++)
-      switch((char)text[i].toLatin1()) {
-        case '\0': res+="\\0"; break;
-        case '\n': res+="\\n"; break;
-        case '\r': res+="\\r"; break;
-        case '\t': res+="\\t"; break;
-        case '\\': res+="\\\\"; break;
-        case '"': res+="\\\""; break;
-        case '\'': res+="\\'"; break;
-        case '\a': res+="\\a"; break;
-        case '\b': res+="\\b"; break;
-        case '\v': res+="\\v"; break;
-        case '\f': res+="\\f"; break;
-        case '\e': res+="\\e"; break;
-        case '\?': res+="\\?"; break;
-        default:
-          if ((unsigned char)text[i].toLatin1()<32) {
-              QString n=QString::number((unsigned char)text[i].toLatin1(), 16);
-              if (n.size()<3) n.prepend(QString(3-n.size(), QChar('0')));
-              res+="\\x"+n;
-          } else res+=text[i];
-          break;
-      };
+  res.reserve(text.size());
+  for (int i=0; i<text.size(); i++) {
+      QChar c=text.at(i);
+      if (c.unicode()=='\0') res.append(QLatin1String("\\0"));
+      else if (c.unicode()=='\n') res.append(QLatin1String("\\n"));
+      else if (c.unicode()=='\r') res.append(QLatin1String("\\r"));
+      else if (c.unicode()=='\t') res.append(QLatin1String("\\t"));
+      else if (c.unicode()=='\\') res.append(QLatin1String("\\\\"));
+      else if (c.unicode()=='"') res.append(QLatin1String("\\\""));
+      else if (c.unicode()=='\'') res.append(QLatin1String("\\'"));
+      else if (c.unicode()=='\a') res.append(QLatin1String("\\a"));
+      else if (c.unicode()=='\b') res.append(QLatin1String("\\b"));
+      else if (c.unicode()=='\v') res.append(QLatin1String("\\v"));
+      else if (c.unicode()=='\f') res.append(QLatin1String("\\f"));
+      else if (c.unicode()=='\e') res.append(QLatin1String("\\e"));
+      else if (c.unicode()=='\?') res.append(QLatin1String("\\?"));
+      else if (c.unicode()<32) {
+          QString n=QString::number((unsigned char)c.unicode(), 16);
+          if (n.size()<3) n.prepend(QString(3-n.size(), QChar('0')));
+          res.append(QLatin1String("\\x"))+n;
+      } else res+=c;
   }
+  //qDebug()<<"escapify()    "<<time.elapsed()<<" ms";
   return res;
 }
 
 
 QString deescapify(const QString& text){
   QString res="";
+  res.reserve(text.size());
   if (text.size()>0) {
     int i=0;
     while (i<text.size()) {
-      if (text[i]!='\\') {
-        res+=text[i];
+      QChar c=text.at(i);
+      if (c!='\\') {
+        res+=c;
       } else {
         if (i+1<text.size()) {
           char next=text[i+1].toLatin1();
@@ -349,10 +352,14 @@ QString deescapify(const QString& text){
 
 QString escapify(const QStringList& text) {
     QString s;
+    QElapsedTimer time;
+    time.start();
+    s.reserve(text.size()*100);
     for (int si=0; si<text.size(); si++) {
-        if (si>0) s=s+";";
-        s=s+QString("\'%1\'").arg(escapify(text[si]));
+        if (si>0) s+=";";
+        s+=QLatin1String("\'")+escapify(text[si])+QLatin1String("\'");
     }
+    //qDebug()<<"escapify(QStringList, N="<<text.size()<<" )    "<<time.elapsed()<<" ms";
     return s;
 }
 
@@ -361,44 +368,45 @@ QStringList deescapifyList(const QString& text, char stringDelim, char separator
     QString res="";
     bool inString=false;
     if (text.size()>0) {
-      int i=0;
-      while (i<text.size()) {
-        if (text[i]==stringDelim) {
-            inString=!inString;
-        } else if ((!inString) && (text[i]==separator)) {
-            if (!res.isEmpty()) {
-                result.append(res);
-                res="";
-            }
-        } else if (text[i]!='\\') {
-            res+=text[i];
-        } else if (inString) {
-          if (i+1<text.size()) {
-            char next=text[i+1].toLatin1();
-            switch(next) {
-              case '0': res+='\0'; i++; break;
-              case 'n': res+='\n'; i++; break;
-              case 'r': res+='\r'; i++; break;
-              case 't': res+='\t'; i++; break;
-              case 'a': res+='\a'; i++; break;
-              case 'b': res+='\b'; i++; break;
-              case 'v': res+='\v'; i++; break;
-              case 'f': res+='\f'; i++; break;
-              case 'e': res+='\e'; i++; break;
-              case '\\': res+='\\'; i++; break;
-              case '"': res+='\"'; i++; break;
-              case '?': res+='\?'; i++; break;
-              case '\'': res+='\''; i++; break;
-              case 'x':
-              case 'X':
-                if (i+3<text.size()) {
-                  QString num=text.mid(i+2,2);
-                  i+=3;
-                  res+=QChar(num.toUInt(0, 16));
-                } else i++;
-                break;
-            }
-          }
+        int i=0;
+        while (i<text.size()) {
+            QChar c=text.at(i);
+            if (c==stringDelim) {
+                inString=!inString;
+            } else if ((!inString) && (c==separator)) {
+                if (!res.isEmpty()) {
+                    result.append(res);
+                    res="";
+                }
+            } else if (c!='\\') {
+                res+=c;
+            } else if (inString) {
+              if (i+1<text.size()) {
+                char next=text[i+1].toLatin1();
+                switch(next) {
+                  case '0': res+='\0'; i++; break;
+                  case 'n': res+='\n'; i++; break;
+                  case 'r': res+='\r'; i++; break;
+                  case 't': res+='\t'; i++; break;
+                  case 'a': res+='\a'; i++; break;
+                  case 'b': res+='\b'; i++; break;
+                  case 'v': res+='\v'; i++; break;
+                  case 'f': res+='\f'; i++; break;
+                  case 'e': res+='\e'; i++; break;
+                  case '\\': res+='\\'; i++; break;
+                  case '"': res+='\"'; i++; break;
+                  case '?': res+='\?'; i++; break;
+                  case '\'': res+='\''; i++; break;
+                  case 'x':
+                  case 'X':
+                    if (i+3<text.size()) {
+                      QString num=text.mid(i+2,2);
+                      i+=3;
+                      res+=QChar(num.toUInt(0, 16));
+                    } else i++;
+                    break;
+                }
+              }
         }
         i++;
       }

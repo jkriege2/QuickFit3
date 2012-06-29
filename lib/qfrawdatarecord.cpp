@@ -603,7 +603,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
             j.next();
             w.writeStartElement("result");
             QString rn=j.key();
-            qDebug()<<"   writing result "<<rn;
+
+            QElapsedTimer saveTimer;
+            saveTimer.start();
             w.writeAttribute("name", rn);
             const evaluationResult& r=j.value();
             if (!r.label.isEmpty()) w.writeAttribute("label", r.label);
@@ -711,6 +713,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
                     } break;
 
             }
+            //qDebug()<<"   writing property "<<rn<<"   in "<<saveTimer.elapsed()<<" ms";
             w.writeEndElement();
         }
         w.writeEndElement();

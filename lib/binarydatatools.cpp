@@ -40,15 +40,15 @@ QVector<double> stringToDoubleArray_hex(const QString& data) {
 }
 
 QByteArray doubleArrayToString_base64(const QVector<double>& data) {
-    //QElapsedTimer t;
-    //t.start();
+    QElapsedTimer t;
+    t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<double> datai=data;
     for (int i=0; i<datai.size(); i++) {
         datai[i]=qToLittleEndian(data[i]);
     }
     QByteArray result=QByteArray::fromRawData((char*)datai.constData(), datai.size()*sizeof(double));
-    return result.toBase64();
+    return  result.toBase64();
 #else
     QByteArray result=QByteArray::fromRawData((char*)data.constData(), data.size()*sizeof(double));
     return result.toBase64();
@@ -58,8 +58,8 @@ QByteArray doubleArrayToString_base64(const QVector<double>& data) {
 }
 
 QByteArray doubleArrayToString_hex(const QVector<double>& data) {
-    //QElapsedTimer t;
-    //t.start();
+    QElapsedTimer t;
+    t.start();
 
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<double> datai=data;
@@ -67,10 +67,10 @@ QByteArray doubleArrayToString_hex(const QVector<double>& data) {
         datai[i]=qToLittleEndian(data[i]);
     }
     QByteArray result=QByteArray::fromRawData((char*)datai.constData(), datai.size()*sizeof(double));
-    return result.toHex();
+    return  result.toHex();
 #else
     QByteArray result=QByteArray::fromRawData((char*)data.constData(), data.size()*sizeof(double));
-    return result.toHex();
+    return  result.toHex();
 #endif
     //qDebug()<<"doubleArrayToString_hex(N="<<data.size()<<"):   "<<double(t.nsecsElapsed())/1.0e6<<" ms";
     //return s;
@@ -120,31 +120,40 @@ QVector<qlonglong> stringToQlonglongArray_hex(const QString& data) {
 }
 
 QByteArray qlonglongArrayToString_base64(const QVector<qlonglong>& data) {
+    QElapsedTimer t;
+    t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<qlonglong> datai=data;
     for (int i=0; i<datai.size(); i++) {
         datai[i]=qToLittleEndian(data[i]);
     }
     QByteArray result=QByteArray::fromRawData((char*)datai.constData(), datai.size()*sizeof(qlonglong));
-    return result.toBase64();
+    return  result.toBase64();
 #else
     QByteArray result=QByteArray::fromRawData((char*)data.constData(), data.size()*sizeof(qlonglong));
-    return result.toBase64();
+    return  result.toBase64();
 #endif
+    //qDebug()<<"qlonglongArrayToString_base64(N="<<data.size()<<"):   "<<double(t.nsecsElapsed())/1.0e6<<" ms";
+    //return s;
+
 }
 
 QByteArray qlonglongArrayToString_hex(const QVector<qlonglong>& data) {
+    QElapsedTimer t;
+    t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<qlonglong> datai=data;
     for (int i=0; i<datai.size(); i++) {
         datai[i]=qToLittleEndian(data[i]);
     }
     QByteArray result=QByteArray::fromRawData((char*)datai.constData(), datai.size()*sizeof(qlonglong));
-    return result.toHex();
+    QString s= result.toHex();
 #else
     QByteArray result=QByteArray::fromRawData((char*)data.constData(), data.size()*sizeof(qlonglong));
-    return result.toHex();
+    return  result.toHex();
 #endif
+    //qDebug()<<"qlonglongArrayToString_hex(N="<<data.size()<<"):   "<<double(t.nsecsElapsed())/1.0e6<<" ms";
+    //return s;
 }
 
 
