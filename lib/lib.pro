@@ -73,7 +73,8 @@ HEADERS += dlgnewproperty.h \
     qfstyledbutton.h \
     qfcompleterfromfile.h \
     qfpluginoptionsdialog.h \
-    dlgqfprogressdialog.h
+    dlgqfprogressdialog.h \
+    qfxmlstreamwriter.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -117,7 +118,8 @@ SOURCES += dlgnewproperty.cpp \
     qfstyledbutton.cpp \
     qfcompleterfromfile.cpp \
     qfpluginoptionsdialog.cpp \
-    dlgqfprogressdialog.cpp
+    dlgqfprogressdialog.cpp \
+    qfxmlstreamwriter.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

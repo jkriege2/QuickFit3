@@ -1464,6 +1464,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
                 if (thread>=threadcount) thread=0;
             }
         }
+        QApplication::processEvents();
     }
     dlgTFitProgress->setProgressMax(items+5);
 
