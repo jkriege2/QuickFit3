@@ -51,6 +51,10 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     menuPage=menuBar->addMenu(tr("&Page"));
     menuContents=menuBar->addMenu(tr("&Help Contents"));
 
+    actHelpHelp=menuContents->addAction(QIcon(":/lib/help_help.png"), tr("Help for &Online-Help Browser"));
+    connect(actHelpHelp, SIGNAL(triggered()), this, SLOT(helpOnHelp()));
+    actHelpHelp->setParent(this);
+
 
     QHBoxLayout* layButtons=new QHBoxLayout;//(this);
 
@@ -65,10 +69,6 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
 
     btnHome=new QToolButton(this);
     layButtons->addWidget(btnHome);
-
-    actHelpHelp=menuContents->addAction(QIcon(":/lib/help_help.png"), tr("Help for &Online-Help Browser"));
-    connect(actHelpHelp, SIGNAL(triggered()), this, SLOT(helpOnHelp()));
-    actHelpHelp->setParent(this);
 
     actNext=menuPage->addAction(tr("&Next"), this, SLOT(next()));
     actNext->setIcon(QIcon(":/lib/help_next.png"));
