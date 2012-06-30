@@ -88,7 +88,7 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="JKDoubleEdit" name="edtGivenD"/>
+          <widget class="QFDoubleEdit" name="edtGivenD"/>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_8">
@@ -98,7 +98,7 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="JKDoubleEdit" name="edtGivenDVisc"/>
+          <widget class="QFDoubleEdit" name="edtGivenDVisc"/>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_9">
@@ -375,9 +375,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>JKDoubleEdit</class>
+   <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
-   <header>jkdoubleedit.h</header>
+   <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
    </slots>

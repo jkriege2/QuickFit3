@@ -20,6 +20,7 @@
 #include "qfenhancedlineedit.h"
 #include "qfstyledbutton.h"
 #include "qfcompleterfromfile.h"
+#include "qfpropertyitemdelegate.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -228,6 +229,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QFPluginServices* services;
 
         QString currentSaveDir;
+
+        QFPropertyItemDelegate* propDelegate;
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_H

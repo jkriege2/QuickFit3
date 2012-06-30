@@ -6,7 +6,7 @@
 #include <QGridLayout>
 #include <QList>
 #include <QPointer>
-#include "numberedit.h"
+#include "qfdoubleedit.h"
 #include "libwid_imexport.h"
 #include "qfsimplefitparameterinterface.h"
 #include <QStringList>
@@ -36,7 +36,7 @@ class QFWIDLIB_EXPORT QFSimpleFitParametersWidget : public QWidget {
         struct subWidget {
             QString id;
             QPointer<QLabel> label;
-            QPointer<NumberEdit> edit;
+            QPointer<QFDoubleEdit> edit;
         };
         QList<subWidget> widgets;
 

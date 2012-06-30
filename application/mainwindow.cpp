@@ -76,6 +76,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
     htmlReplaceList.append(qMakePair(QString("author"), QString(QF_AUTHOR)));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(QF_WEBLINK)));
+    htmlReplaceList.append(qMakePair(QString("license"), tr(QF_LICENSE)));
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
@@ -321,8 +322,10 @@ void MainWindow::about() {
     ui.setupUi(widget);
     QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
+    QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
     ui_label->setPixmap(splashPix);
     ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
+    ui_labelLic->setText(tr(QF_LICENSE));
     widget->exec();
     delete widget;
 }
@@ -687,8 +690,10 @@ void MainWindow::createWidgets() {
 
     tabLogs=new QTabWidget(this);
     logFileProjectWidget=new QtLogFile(tabLogs);
+    logFileProjectWidget->set_log_date_time(true);
     logFileMainWidget=new QtLogFile(tabLogs);
     logFileMainWidget->set_log_file_append(true);
+    logFileMainWidget->set_log_date_time(true);
     logFileProjectWidget->set_log_file_append(true);
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
     QFileInfo fi(QApplication::applicationFilePath());
@@ -706,13 +711,13 @@ void MainWindow::createWidgets() {
     prgMainProgress=new QProgressBar(this);
     statusBar()->addPermanentWidget(prgMainProgress);
 
-    helpWindow=new QFHTMLHelpWindow(0, Qt::Tool/* | Qt::WindowStaysOnTopHint*/);
+    helpWindow=new QFHTMLHelpWindow(0);
     //helpWindow->setHtmlReplacementList(&htmlReplaceList);
     helpWindow->initFromPluginServices(this);
     helpWindow->close();
-    helpWindow->setParent(NULL, Qt::Tool);
-    if (settings->getHelpWindowsStayOnTop()) helpWindow->setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
-    else helpWindow->setWindowFlags(Qt::Tool);
+    //helpWindow->setParent(NULL, Qt::Tool);
+    //if (settings->getHelpWindowsStayOnTop()) helpWindow->setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
+    //else helpWindow->setWindowFlags(Qt::Tool);
 
 
 }
@@ -1122,10 +1127,10 @@ void MainWindow::loadProject(const QString &fileName) {
 
 bool MainWindow::saveProject(const QString &fileName) {
     newProjectTimer.stop();
-    logFileMainWidget->log_text(tr("%2: saving project to file '%1' ...\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")));
+    logFileMainWidget->log_text(tr("saving project to file '%1' ...\n").arg(fileName));
     tabLogs->setCurrentWidget(logFileProjectWidget);
     statusBar()->showMessage(tr("saving project file '%1' ...").arg(fileName), 2000);
-    logFileProjectWidget->log_text(tr("%2: saving project file '%1' ...\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")));
+    logFileProjectWidget->log_text(tr("saving project file '%1' ...\n").arg(fileName));
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QElapsedTimer time;
     double elapsed=-1;
@@ -1162,8 +1167,8 @@ bool MainWindow::saveProject(const QString &fileName) {
     QApplication::restoreOverrideCursor();
 
     setCurrentProject(fileName);
-    statusBar()->showMessage(tr("%2: Project file '%1' saved!").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")), 2000);
-    logFileProjectWidget->log_text(tr("%2: Project file '%1' saved after %3 secs!\n").arg(fileName).arg(QTime::currentTime().toString("hh:mm:ss")).arg(elapsed));
+    statusBar()->showMessage(tr("Project file '%1' saved!").arg(fileName), 2000);
+    logFileProjectWidget->log_text(tr("Project file '%1' saved after %2 secs!\n").arg(fileName).arg(elapsed));
     return true;
 }
 

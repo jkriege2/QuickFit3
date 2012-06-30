@@ -69,7 +69,7 @@ void QFSimpleFitParametersWidget::addParameter(const QString &id, const QString 
     w.id=id;
     w.label=new QLabel(label, this);
     w.label->setTextFormat(Qt::RichText);
-    w.edit=new NumberEdit(this);
+    w.edit=new QFDoubleEdit(this);
     w.edit->setCheckBounds(false, false);
     w.edit->setDecimals(6);
     connect(w.edit, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));

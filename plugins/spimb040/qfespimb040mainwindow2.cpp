@@ -91,6 +91,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     splitter->addWidget(w);
     loglayout->setContentsMargins(0,0,0,0);
     logMain=new QtLogFile(this);
+    logMain->set_log_date_time(true);
     loglayout->addWidget(new QLabel(tr("<b>Log Messages:</b>")));
     loglayout->addWidget(logMain);
 

@@ -28,7 +28,6 @@
 #include <cstdio>
 #include <QTextDocument>
 #include "datacutslider.h"
-#include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
 #include "jkverticalscrollarea.h"
 #include "dlgqffitalgorithmprogressdialog.h"

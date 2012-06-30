@@ -114,7 +114,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         virtual void copyMoreDataToInitial();
 
         /** \brief number edit to change alpha */
-        NumberEdit* edtAlpha;
+        QFDoubleEdit* edtAlpha;
         /** \brief number edit to change Ndist */
         QSpinBox* edtNdist;
         /** \brief number edit to change NumIter */

@@ -35,7 +35,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="JKDoubleEdit" name="edtLevel"/>
+        <widget class="QFDoubleEdit" name="edtLevel"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_2">
@@ -155,9 +155,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>JKDoubleEdit</class>
+   <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
-   <header>jkdoubleedit.h</header>
+   <header>qfdoubleedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

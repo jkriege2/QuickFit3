@@ -1,6 +1,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+#include <QtGlobal>
 #include "compiledate.h"
 #include "svnversion.h"
 
@@ -16,5 +17,7 @@
 #define QF_AUTHOR "Jan Krieger"
 
 #define QF_WEBLINK "http://www.dkfz.de/Macromol/quickfit/"
+
+#define QF_LICENSE QT_TR_NOOP("<b>This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:</b><br>DKFZ<br>z.H. Jan Krieger<br>Im Neuenheimer Feld 580<br>D-69120 Heidelberg<br>GERMANY")
 
 #endif //VERSION_H

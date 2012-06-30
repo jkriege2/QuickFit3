@@ -226,7 +226,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvProperties->horizontalHeader()->setStretchLastSection(true);
     //tvProperties->setSizePolicy(tvProperties->sizePolicy().horizontalPolicy(), QSizePolicy::Expanding);
     tvProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    tvProperties->setItemDelegate(new QFItemDelegate(tvProperties));
+    tvProperties->setItemDelegate(propDelegate=new QFPropertyItemDelegate(tvProperties));
     /*paramFilterProxy=new QSortFilterProxyModel(this);
     paramFilterProxy->setDynamicSortFilter(false);
     paramFilterProxy->setFilterKeyColumn(0);
@@ -509,6 +509,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         edtName->setEnabled(true);
         edtFolder->setText(current->getFolder());
         edtFolder->setEnabled(true);
+        propDelegate->setProject(current->getProject());
 
         pteDescription->setPlainText(current->getDescription());
         pteDescription->setEnabled(true);
@@ -570,6 +571,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         helpWidget->updateHelp(dll);*/
 
     } else {
+        propDelegate->setProject(NULL);
         edtName->setText("");
         edtName->setEnabled(false);
         edtFolder->setText("");
@@ -589,7 +591,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         compFilterEvaluation->setFilename("");
         compFilterEvaluationNot->setFilename("");
         compFilterResults->setFilename("");
-        compFilterResultsNot->setFilename("");    }
+        compFilterResultsNot->setFilename("");
+    }
     checkHelpAvailable();
     //std::cout<<"creating new editors ... DONE!\n";
 }

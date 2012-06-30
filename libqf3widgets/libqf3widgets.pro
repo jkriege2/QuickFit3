@@ -38,11 +38,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/flowlayout.h \
            ../../../../LIB/trunk/qt/jkqtfastplotter.h \
            ../../../../LIB/trunk/qt/qtlogfile.h \
-           ../../../../LIB/trunk/qt/qtshortcutwidgets.h \
            ../../../../LIB/trunk/tools.h \
            ../../../../LIB/trunk/datatable2.h \
-           ../../../../LIB/trunk/qt/numberedit.h \
-           ../../../../LIB/trunk/qt/jkdoubleedit.h \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.h \
            ../../../../LIB/trunk/qt/colorcombobox.h \
            ../../../../LIB/trunk/qt/jkstyledbutton.h \
@@ -73,7 +70,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfshuttercombobox.h \
     ../../../../LIB/trunk/qt/qrecentfilesmenu.h \
     qfplayercontrols.h \
-    qfhtmlhelpwindow.h \
     ../../../../LIB/trunk/qt/jkqtpoverlayelements.h \
     qfsimplefitparameterinterface.h \
     qfsimplefitparameterswidget.h \
@@ -103,11 +99,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
             ../../../../LIB/trunk/qt/flowlayout.cpp \
            ../../../../LIB/trunk/qt/qtlogfile.cpp \
            ../../../../LIB/trunk/qt/jkqtfastplotter.cpp \
-           ../../../../LIB/trunk/qt/qtshortcutwidgets.cpp \
            ../../../../LIB/trunk/tools.cpp \
            ../../../../LIB/trunk/datatable2.cpp \
-           ../../../../LIB/trunk/qt/numberedit.cpp \
-           ../../../../LIB/trunk/qt/jkdoubleedit.cpp \
            ../../../../LIB/trunk/qt/jkverticalscrollarea.cpp \
            ../../../../LIB/trunk/qt/colorcombobox.cpp \
            ../../../../LIB/trunk/qt/jkstyledbutton.cpp \
@@ -129,7 +122,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfshuttercombobox.cpp \
     ../../../../LIB/trunk/qt/qrecentfilesmenu.cpp \
     qfplayercontrols.cpp \
-    qfhtmlhelpwindow.cpp \
     ../../../../LIB/trunk/qt/jkqtpoverlayelements.cpp \
     qfsimplefitparameterswidget.cpp \
     ../../../../LIB/trunk/image_tools.cpp \
@@ -154,7 +146,8 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qkeysequenceedit.qrc \
              ../../../../LIB/trunk/qt/numberedit.qrc \
              libqf3widgets.qrc \
-    ../../../../LIB/trunk/qt/qprogresslistwidget.qrc
+    ../../../../LIB/trunk/qt/qprogresslistwidget.qrc \
+    ../../../../LIB/trunk/qt/qtlogfile.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 

@@ -18,7 +18,7 @@
 #include "datacutslider.h"
 #include "qfrdrimagingfcsrunsmodel.h"
 #include <QSet>
-#include "jkdoubleedit.h"
+#include "qfdoubleedit.h"
 #include "qtriple.h"
 #include "qfhtmldelegate.h"
 #include <QTableView>
@@ -344,8 +344,8 @@ protected:
         /** \brief checkbox to en-/disable automatic color bar scaling */
         QCheckBox* chkImageAutoScale;
 
-        JKDoubleEdit* edtColMin;
-        JKDoubleEdit* edtColMax;
+        QFDoubleEdit* edtColMin;
+        QFDoubleEdit* edtColMax;
 
         /** \brief toolbar to work with parameter images */
         QToolBar* tbParameterImage;

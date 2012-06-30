@@ -17,7 +17,7 @@
 #include <QAbstractTableModel>
 #include <QTabWidget>
 #include <QSet>
-#include "jkdoubleedit.h"
+#include "qfdoubleedit.h"
 #include "qtriple.h"
 #include "qfhtmldelegate.h"
 #include <QTableView>
@@ -114,8 +114,8 @@ class QFHistogramView : public QWidget {
         QCheckBox* chkNormalizedHistograms;
         double mainHistogramMax;
         QCheckBox* chkHistogramRangeAuto;
-        JKDoubleEdit* edtHistogramMin;
-        JKDoubleEdit* edtHistogramMax;
+        QFDoubleEdit* edtHistogramMin;
+        QFDoubleEdit* edtHistogramMax;
         QFormLayout* flHistSet;
 
 

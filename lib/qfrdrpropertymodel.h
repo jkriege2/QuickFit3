@@ -13,6 +13,10 @@ class QFRawDataRecord;
 /*! \brief this class serves as a QAbstractTableModel for the properties associated with a
            QFRawDataRecord.
     \ingroup qf3lib_project
+
+    \note SetData() may be called for the second column with an integer (0: string, 1: number, 2: integer, 3: boolean, 4: date/time) to change the property type.
+          This will cause the actual data to be cast to the new datatype. Data may be lost, if the types are not compatible!!!). If it is called with a string describing
+          the type, this class tries to read the new type from the string.
 */
 class QFLIB_EXPORT QFRDRPropertyModel : public QAbstractTableModel {
         Q_OBJECT
@@ -31,7 +35,7 @@ class QFLIB_EXPORT QFRDRPropertyModel : public QAbstractTableModel {
 
         virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-        virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+        virtual bool setData(const QModelIndex &idx, const QVariant &value, int role = Qt::EditRole);
 
         QString getPropertyForRow(int row) const;
 

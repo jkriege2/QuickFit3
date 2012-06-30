@@ -276,9 +276,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkImageAutoScale=new QCheckBox("auto", wimg);
     gli->addRow(tr("color &range:"), chkImageAutoScale);
 
-    edtColMin=new JKDoubleEdit(wimg);
+    edtColMin=new QFDoubleEdit(wimg);
     edtColMin->setCheckBounds(false, false);
-    edtColMax=new JKDoubleEdit(wimg);
+    edtColMax=new QFDoubleEdit(wimg);
     edtColMax->setCheckBounds(false, false);
     QHBoxLayout* coll=new QHBoxLayout();
     coll->addWidget(edtColMin,1);

@@ -40,7 +40,7 @@ QFFCSMaxEntEvaluationEditor::~QFFCSMaxEntEvaluationEditor()
 
 
 void QFFCSMaxEntEvaluationEditor::createWidgets() {
-    edtAlpha=new NumberEdit(this);
+    edtAlpha=new QFDoubleEdit(this);
     edtAlpha->setRange(0, DBL_MAX);
     edtAlpha->setCheckBounds(true, false);
     edtAlpha->setDecimals(10);

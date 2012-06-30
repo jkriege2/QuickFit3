@@ -25,7 +25,7 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("Damping Parameter <i>&mu;</i>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditMu=new JKDoubleEdit(this);
+    neditMu=new QFDoubleEdit(this);
     neditMu->setRange(0, 1e6);
     neditMu->setSingleStep(0.001);
     neditMu->setDecimals(12);
@@ -36,7 +36,7 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("Gradient threshold &epsilon;<sub>1</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditEpsilon1=new JKDoubleEdit(this);
+    neditEpsilon1=new QFDoubleEdit(this);
     neditEpsilon1->setRange(0, 1e6);
     neditEpsilon1->setSingleStep(0.001);
     neditEpsilon1->setDecimals(12);
@@ -47,7 +47,7 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("Parameter Change threshold &epsilon;<sub>2</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditEpsilon2=new JKDoubleEdit(this);
+    neditEpsilon2=new QFDoubleEdit(this);
     neditEpsilon2->setRange(0, 1e6);
     neditEpsilon2->setSingleStep(0.001);
     neditEpsilon2->setDecimals(12);
@@ -58,7 +58,7 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("SES change threshold &epsilon;<sub>2</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditEpsilon3=new JKDoubleEdit(this);
+    neditEpsilon3=new QFDoubleEdit(this);
     neditEpsilon3->setRange(0, 1e6);
     neditEpsilon3->setSingleStep(0.001);
     neditEpsilon3->setDecimals(12);
@@ -69,7 +69,7 @@ LevmarConfigDialog::LevmarConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("Gradient Delta ||<b>&delta;p</b>||<sub>2</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditGradDelta=new JKDoubleEdit(this);
+    neditGradDelta=new QFDoubleEdit(this);
     neditGradDelta->setRange(0, 1e6);
     neditGradDelta->setSingleStep(0.001);
     neditGradDelta->setDecimals(12);

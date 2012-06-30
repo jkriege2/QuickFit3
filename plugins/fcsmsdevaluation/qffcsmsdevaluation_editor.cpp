@@ -51,21 +51,21 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     QHBoxLayout* lay=new QHBoxLayout(w);
     lay->setContentsMargins(0,0,0,0);
     w->setLayout(lay);
-    numPre[i]=new NumberEdit(this);
+    numPre[i]=new QFDoubleEdit(this);
     numPre[i]->setRange(0, DBL_MAX);
     numPre[i]->setCheckBounds(true, false);
     numPre[i]->setDecimals(1);
     numPre[i]->setValue(6);
     connect(numPre[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
 
-    numD[i]=new NumberEdit(this);
+    numD[i]=new QFDoubleEdit(this);
     numD[i]->setRange(0, DBL_MAX);
     numD[i]->setCheckBounds(true, false);
     numD[i]->setDecimals(2);
     numD[i]->setValue(10);
     connect(numD[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
 
-    numAlpha[i]=new NumberEdit(this);
+    numAlpha[i]=new QFDoubleEdit(this);
     numAlpha[i]->setRange(0, DBL_MAX);
     numAlpha[i]->setCheckBounds(true, false);
     numAlpha[i]->setDecimals(2);
@@ -104,7 +104,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("fit width:"), spinFitWidth);
 
 
-  /*  edtAlpha=new NumberEdit(this);
+  /*  edtAlpha=new QFDoubleEdit(this);
     edtAlpha->setRange(0, DBL_MAX);
     edtAlpha->setCheckBounds(true, false);
     edtAlpha->setDecimals(10);

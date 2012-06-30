@@ -417,12 +417,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     splitModel->setStretchFactor(0,4);
     splitModel->setStretchFactor(1,1);
 
-    hlpAlgorithm=new QFHTMLHelpWindow(0);
-    hlpAlgorithm->initFromPluginServices(services);
-    hlpAlgorithm->close();
-    hlpFunction=new QFHTMLHelpWindow(0);
-    hlpFunction->initFromPluginServices(services);
-    hlpFunction->close();
+    //hlpAlgorithm=new QFHTMLHelpWindow(0);
+    //hlpAlgorithm->initFromPluginServices(services);
+    //hlpAlgorithm->close();
+    //hlpFunction=new QFHTMLHelpWindow(0);
+    //hlpFunction->initFromPluginServices(services);
+    //hlpFunction->close();
 
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
@@ -644,8 +644,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::writeSettings() {
     if (cmbModel && current) {
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/algorithm").arg(current->getType()).arg(current->getID()), cmbAlgorithm->currentIndex());
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/model").arg(current->getType()).arg(current->getID()), cmbModel->currentIndex());
-        hlpAlgorithm->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/algorithm_").arg(current->getType()).arg(current->getID()));
-        hlpFunction->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
+        //hlpAlgorithm->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/algorithm_").arg(current->getType()).arg(current->getID()));
+        //hlpFunction->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), splitPlot, QString("fitevaleditor_%1%2/splitter_plot").arg(current->getType()).arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), splitModel, QString("fitevaleditor_%1%2/splitter_model").arg(current->getType()).arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), splitFitStatistics, QString("fitevaleditor_%1%2/splitter_fitstatistics").arg(current->getType()).arg(current->getID()));
@@ -664,8 +664,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::readSettings() {
         pltResiduals->loadSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/pltresiduals/").arg(current->getType()).arg(current->getID()));
         pltResidualHistogram->loadSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/pltresidualhistogram/").arg(current->getType()).arg(current->getID()));
         pltResidualCorrelation->loadSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/pltresidualcorrelation/").arg(current->getType()).arg(current->getID()));
-        hlpAlgorithm->readSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/algorithm_").arg(current->getType()).arg(current->getID()));
-        hlpFunction->readSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
+        //hlpAlgorithm->readSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/algorithm_").arg(current->getType()).arg(current->getID()));
+        //hlpFunction->readSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
         loadSplitter(*(settings->getQSettings()), splitPlot, QString("fitevaleditor_%1%2/splitter_plot").arg(current->getType()).arg(current->getID()));
         loadSplitter(*(settings->getQSettings()), splitModel, QString("fitevaleditor_%1%2/splitter_model").arg(current->getType()).arg(current->getID()));
         loadSplitter(*(settings->getQSettings()), splitFitStatistics, QString("fitevaleditor_%1%2/splitter_fitstatistics").arg(current->getType()).arg(current->getID()));
@@ -911,7 +911,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::zoomChangedLocally(double n
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitFunctionHelp()
 {
-    hlpFunction->clear();
+    //hlpFunction->clear();
     if (!current) return;
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     //QStringList sl;
@@ -925,8 +925,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitFunctionHelp()
     QFFitFunction* function=data->getFitFunction(pid);
     QString help=services->getFitFunctionManager()->getPluginHelp(ppid, pid);
     if (QFile::exists(help) && function) {
-        hlpFunction->updateHelp(help);
-        hlpFunction->show();
+        QFPluginServices::getInstance()->displayHelpWindow(help);
+        //hlpFunction->updateHelp(help);
+        //hlpFunction->show();
     } else {
         QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit function available."));
     }
@@ -934,7 +935,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitFunctionHelp()
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitAlgorithmHelp()
 {
-    hlpAlgorithm->clear();
+    //hlpAlgorithm->clear();
     if (!current) return;
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     //QStringList sl;
@@ -952,8 +953,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitAlgorithmHelp()
     QFFitAlgorithm* algorithm=data->getFitAlgorithm(pid);
     QString help=services->getFitAlgorithmManager()->getPluginHelp(ppid, pid);
     if (QFile::exists(help) && algorithm) {
-        hlpAlgorithm->updateHelp(help);
-        hlpAlgorithm->show();
+        QFPluginServices::getInstance()->displayHelpWindow(help);
+        //hlpAlgorithm->updateHelp(help);
+        //hlpAlgorithm->show();
     } else {
         QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit algorithm available."));
     }

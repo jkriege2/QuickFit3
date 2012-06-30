@@ -27,7 +27,7 @@
 #include <cstdio>
 #include <QTextDocument>
 #include "datacutslider.h"
-#include "qfhtmlhelpwindow.h"
+//#include "qfhtmlhelpwindow.h"
 #include "qffitparameterwidget.h"
 #include "jkverticalscrollarea.h"
 #include "dlgqffitalgorithmprogressdialog.h"
@@ -100,9 +100,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief label for the run name */
         QLabel* labRun;
         /** \brief help window for help on the current fit algorithm */
-        QFHTMLHelpWindow* hlpAlgorithm;
+        //QFHTMLHelpWindow* hlpAlgorithm;
         /** \brief help window for help on the current fit model function */
-        QFHTMLHelpWindow* hlpFunction;
+        //QFHTMLHelpWindow* hlpFunction;
         /** \brief combobox to select a plotting style */
         QComboBox* cmbPlotStyle;
         /** \brief combobox to select a plotting style for the data errors */

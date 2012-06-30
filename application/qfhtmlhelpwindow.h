@@ -1,8 +1,10 @@
 #ifndef QFHTMLHelpWindow_H
 #define QFHTMLHelpWindow_H
 
+#include <QDir>
+#include <QShortcut>
+#include <QListWidget>
 #include <QTextBrowser>
-#include "libwid_imexport.h"
 #include <QLabel>
 #include <QFont>
 #include <QString>
@@ -19,6 +21,7 @@
 #include <QCheckBox>
 #include <QToolButton>
 #include <QMenuBar>
+#include "qvisiblehandlesplitter.h"
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
@@ -31,7 +34,7 @@
     The mechanism replace every occurence of \c $$key by the according \c replaceBy string.
  */
 
-class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
+class QFHTMLHelpWindow : public QWidget {
         Q_OBJECT
 
     public:
@@ -39,7 +42,7 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
 
 
         /** \brief class constructor */
-        QFHTMLHelpWindow(QWidget* parent=0, Qt::WindowFlags flags= 0);
+        QFHTMLHelpWindow(QWidget* parent=0, Qt::WindowFlags flags= Qt::Window|Qt::WindowTitleHint|Qt::WindowMinMaxButtonsHint|Qt::WindowCloseButtonHint);
 
         /** \brief read widget size and position from a QSettings object where prefix is prepended to all keys */
         void readSettings(QSettings& settings, QString prefix=QString(""));
@@ -74,11 +77,14 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
         void setContentsMenuActions(const QList<QAction*>& items);
     public slots:
         /** \brief updates the information in the window */
-        void updateHelp(QString title, QString filename);
+        //void updateHelp(QString title, QString filename);
         /** \brief updates the information in the window. The title is taken from the HTML page */
         void updateHelp(QString filename);
         /** \brief clear contents of window */
         void clear();
+        void showAndSearchInAll();
+
+        void helpOnHelp();
     private:
         QList<QPair<QString, QString> >* replaces;
 
@@ -100,21 +106,34 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
         QToolButton* btnHome;
         QToolButton* btnPrint;
         QToolButton* btnFind;
+        QToolButton* btnFindInAll;
+        QToolButton* btnFindInAllFind;
         QWidget* widFind;
+        QWidget* widFindInAll;
         QFEnhancedLineEdit* edtFind;
+        QFEnhancedLineEdit* edtFindInAll;
         QToolButton* btnFindNext;
         QToolButton* btnFindPrev;
         QCheckBox* chkCaseSensitive;
         QCheckBox* chkFindWholeWord;
+        QCheckBox* chkCaseSensitiveInAll;
+        QCheckBox* chkFindWholeWordInAll;
         QMenuBar* menuBar;
         QMenu* menuPage;
         QMenu* menuContents;
         QAction* actFind;
+        QAction* actFindNext;
+        QAction* actFindPrev;
         QAction* actHome;
         QAction* actNext;
         QAction* actPrevious;
         QAction* actPrint;
         QAction* actClose;
+        QAction* actFindInAll;
+        QAction* actHelpHelp;
+        QVisibleHandleSplitter* splitterSearch;
+        QListWidget* listFindInAll;
+        QShortcut* scFindInAllFind;
 
 
         /** \brief a text edit for the model information/description */
@@ -149,6 +168,8 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
 
         int history_idx;
 
+        void searchHelpDir(const QDir& dir, QStringList& files);
+
     private slots:
         void displayTitle();
         void anchorClicked(const QUrl& link);
@@ -159,8 +180,11 @@ class QFWIDLIB_EXPORT QFHTMLHelpWindow : public QWidget {
         void print();
         void updateButtons();
         void find(bool checked=true);
+        void findInAll(bool checked=true);
+        void searchInAll();
         void findNext();
         void findPrev();
+        void searchAllItemDoubleClicked(QListWidgetItem* item);
 };
 
 #endif // QFHTMLHelpWindow_H

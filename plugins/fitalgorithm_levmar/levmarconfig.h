@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 #include <QSpinBox>
 #include <QCheckBox>
-#include "jkdoubleedit.h"
+#include "qfdoubleedit.h"
 
 /*! \brief This class represents a configuration dialog for the Levmar Levenberg-Marquardt Library
     \ingroup qf3fitalgp_levmar
@@ -57,11 +57,11 @@ class LevmarConfigDialog : public QDialog {
 
     protected:
         QSpinBox* spinMaxIterations;
-        JKDoubleEdit* neditGradDelta;
-        JKDoubleEdit* neditMu;
-        JKDoubleEdit* neditEpsilon1;
-        JKDoubleEdit* neditEpsilon2;
-        JKDoubleEdit* neditEpsilon3;
+        QFDoubleEdit* neditGradDelta;
+        QFDoubleEdit* neditMu;
+        QFDoubleEdit* neditEpsilon1;
+        QFDoubleEdit* neditEpsilon2;
+        QFDoubleEdit* neditEpsilon3;
         QCheckBox* chkNumGrad;
         QDialogButtonBox* buttons;
 };

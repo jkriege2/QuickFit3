@@ -148,7 +148,7 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     }
 
     if (widget==FloatEdit) {
-        neditValue=new JKDoubleEdit(parent);
+        neditValue=new QFDoubleEdit(parent);
         neditValue->setRange(datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
         layout->addWidget(neditValue, row, COL_VALUE);
         neditValue->setSingleStep(m_increment);
@@ -239,7 +239,7 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
             layout->addWidget(labError, row, COL_ERROR);
             height=qMax(height, labError->minimumSizeHint().height());
         } else if (displayError==QFFitFunction::EditError) {
-            neditError=new JKDoubleEdit(parent);
+            neditError=new QFDoubleEdit(parent);
             neditError->setCheckBounds(false, false);
             neditError->setShowUpDown(false);
             layout->addWidget(neditError, row, COL_ERROR);
@@ -254,13 +254,13 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
 
     if (editable) {
         if (widget==FloatEdit) {
-            neditMin=new JKDoubleEdit(parent);
+            neditMin=new QFDoubleEdit(parent);
             neditMin->setCheckBounds(false, false);
             neditMin->setSingleStep(m_increment);
             neditMin->setShowUpDown(false);
             connect(neditMin, SIGNAL(valueChanged(double)), this, SLOT(doubleMinChanged(double)));
 
-            neditMax=new JKDoubleEdit(parent);
+            neditMax=new QFDoubleEdit(parent);
             neditMax->setCheckBounds(false, false);
             neditMax->setSingleStep(m_increment);
             neditMax->setShowUpDown(false);

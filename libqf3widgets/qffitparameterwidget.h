@@ -15,7 +15,7 @@
 #include <limits.h>
 #include <QMessageBox>
 #include "qffitparameterbasicinterface.h"
-#include "jkdoubleedit.h"
+#include "qfdoubleedit.h"
 #include "qffitfunction.h"
 #include "tools.h"
 
@@ -29,7 +29,7 @@
     from the layout.
 
     This widget will display a widget that is used to set the parameter. These widgets are possible:
-      - a JKDoubleEdit
+      - a QFDoubleEdit
       - a QSpinBox
       - a QComboBox
       - a header for the parameters
@@ -180,13 +180,13 @@ class QFWIDLIB_EXPORT QFFitParameterWidgetWrapper : public QObject {
 
         QStringList m_comboValues;
 
-        QPointer<JKDoubleEdit> neditValue;
-        QPointer<JKDoubleEdit> neditError;
+        QPointer<QFDoubleEdit> neditValue;
+        QPointer<QFDoubleEdit> neditError;
         QPointer<QSpinBox> spinIntValue;
         QPointer<QComboBox> cmbIntValue;
-        QPointer<JKDoubleEdit> neditMin;
+        QPointer<QFDoubleEdit> neditMin;
         QPointer<QSpinBox> spinIntMin;
-        QPointer<JKDoubleEdit> neditMax;
+        QPointer<QFDoubleEdit> neditMax;
         QPointer<QSpinBox> spinIntMax;
         QPointer<QCheckBox> chkFix;
         QPointer<QLabel> labError;

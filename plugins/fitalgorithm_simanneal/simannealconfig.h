@@ -7,7 +7,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QSpinBox>
-#include "jkdoubleedit.h"
+#include "qfdoubleedit.h"
 
 /*! \brief This class represents a configuration dialog for the Levmar Levenberg-Marquardt Library
     \ingroup qf3fitalgp_sa
@@ -62,10 +62,10 @@ class SimannealConfigDialog : public QDialog {
 
     protected:
         QSpinBox* spinMaxIterations;
-        JKDoubleEdit* neditFMax;
-        JKDoubleEdit* neditT0;
-        JKDoubleEdit* neditRT;
-        JKDoubleEdit* neditC;
+        QFDoubleEdit* neditFMax;
+        QFDoubleEdit* neditT0;
+        QFDoubleEdit* neditRT;
+        QFDoubleEdit* neditC;
         QSpinBox*  spinNS;
         QSpinBox*  spinNT;
         QSpinBox*  spinNEpsilon;

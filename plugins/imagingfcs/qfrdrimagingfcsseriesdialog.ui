@@ -58,7 +58,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="JKDoubleEdit" name="edtStart">
+        <widget class="QFDoubleEdit" name="edtStart">
          <property name="text">
           <string>1</string>
          </property>
@@ -75,14 +75,14 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="JKDoubleEdit" name="edtStop">
+        <widget class="QFDoubleEdit" name="edtStop">
          <property name="text">
           <string>10</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="JKDoubleEdit" name="edtDelta">
+        <widget class="QFDoubleEdit" name="edtDelta">
          <property name="text">
           <string>1</string>
          </property>
@@ -116,9 +116,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>JKDoubleEdit</class>
+   <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
-   <header>jkdoubleedit.h</header>
+   <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
    </slots>

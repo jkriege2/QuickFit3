@@ -27,6 +27,7 @@
         <file alias="help_eval.png">icons/help_eval.png</file>
         <file alias="exit.png">icons/exit.png</file>
         <file alias="print.png">../images/16x16/document_print.png</file>
+        <file alias="help_help.png">icons/help_help.png</file>
     </qresource>
     <qresource prefix="/lib">
         <file alias="delete16.png">icons/delete16.png</file>
@@ -44,11 +45,9 @@
         <file alias="help.png">icons/help.png</file>
         <file alias="help_rdr.png">icons/help_rdr.png</file>
         <file alias="help_eval.png">icons/help_eval.png</file>
-
         <file alias="edit_copy.png">icons/edit_copy.png</file>
         <file alias="edit_cut.png">icons/edit_cut.png</file>
         <file alias="edit_paste.png">icons/edit_paste.png</file>
-
         <file alias="help_print.png">icons/help_print.png</file>
         <file alias="help_next.png">icons/help_btn_next.png</file>
         <file alias="help_previous.png">icons/help_btn_previous.png</file>
@@ -56,30 +55,28 @@
         <file alias="help_find.png">icons/help_find.png</file>
         <file alias="help_findnext.png">icons/help_findnext.png</file>
         <file alias="help_findprev.png">icons/help_findprev.png</file>
+        <file alias="btn_down.png">icons/btn_down.png</file>
+        <file alias="btn_up.png">icons/btn_up.png</file>
+        <file alias="help_findinall.png">icons/help_findinall.png</file>
+        <file alias="help_help.png">icons/help_help.png</file>
     </qresource>
-
-
     <qresource prefix="/lib/qfstyledbutton">
         <file alias="network.png">icons/network.png</file>
         <file alias="network_disabled.png">icons/network_disabled.png</file>
         <file alias="network_hover.png">icons/network_hover.png</file>
         <file alias="network_pressed.png">icons/network_active.png</file>
-
         <file alias="execute.png">icons/execute.png</file>
         <file alias="execute_disabled.png">icons/execute_disabled.png</file>
         <file alias="execute_hover.png">icons/execute_hover.png</file>
         <file alias="execute_pressed.png">icons/execute_active.png</file>
-
         <file alias="openfile.png">icons/fileopen.png</file>
         <file alias="openfile_disabled.png">icons/fileopen_disabled.png</file>
         <file alias="openfile_hover.png">icons/fileopen_hover.png</file>
         <file alias="openfile_pressed.png">icons/fileopen_active.png</file>
-
         <file alias="selectfile.png">icons/fileselect.png</file>
         <file alias="selectfile_disabled.png">icons/fileselect_disabled.png</file>
         <file alias="selectfile_hover.png">icons/fileselect_hover.png</file>
         <file alias="selectfile_pressed.png">icons/fileselect_active.png</file>
-
         <file alias="clear_edt.png">icons/clear_edt.png</file>
         <file alias="clear_edt_disabled.png">icons/clear_edt_disabled.png</file>
         <file alias="clear_edt_hover.png">icons/clear_edt_hover.png</file>

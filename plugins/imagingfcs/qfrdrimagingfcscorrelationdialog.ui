@@ -449,7 +449,7 @@
             </widget>
            </item>
            <item>
-            <widget class="JKDoubleEdit" name="edtFrameTime">
+            <widget class="QFDoubleEdit" name="edtFrameTime">
              <property name="maximumSize">
               <size>
                <width>150</width>
@@ -492,7 +492,7 @@
             </widget>
            </item>
            <item>
-            <widget class="JKDoubleEdit" name="edtFrameRate">
+            <widget class="QFDoubleEdit" name="edtFrameRate">
              <property name="maximumSize">
               <size>
                <width>150</width>
@@ -782,7 +782,7 @@
             </widget>
            </item>
            <item>
-            <widget class="JKDoubleEdit" name="edtOffset">
+            <widget class="QFDoubleEdit" name="edtOffset">
              <property name="maximumSize">
               <size>
                <width>150</width>
@@ -1801,9 +1801,9 @@ p, li { white-space: pre-wrap; }
    <header>qenhancedlineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>JKDoubleEdit</class>
+   <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
-   <header>jkdoubleedit.h</header>
+   <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
    </slots>

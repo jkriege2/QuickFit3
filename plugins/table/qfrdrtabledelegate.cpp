@@ -1,7 +1,6 @@
 #include "qfrdrtabledelegate.h"
 #include <QtGui>
-#include "numberedit.h"
-#include "jkdoubleedit.h"
+#include "qfdoubleedit.h"
 
 QFRDRTableDelegate::QFRDRTableDelegate(QObject *parent) :
     QItemDelegate(parent)
@@ -16,7 +15,7 @@ QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionVie
          return editor;
      }
      if ( !index.isValid() || index.data().type() == QVariant::Double ) {
-         JKDoubleEdit* editor=new JKDoubleEdit(parent);
+         QFDoubleEdit* editor=new QFDoubleEdit(parent);
          editor->setCheckBounds(false, false);
          return editor;
      }
@@ -61,7 +60,7 @@ void QFRDRTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index
          if (dateEditor) {
              dateEditor->setDateTime(index.model()->data(index, Qt::EditRole).toDateTime());
          } else {
-             JKDoubleEdit *dEditor = qobject_cast<JKDoubleEdit *>(editor);
+             QFDoubleEdit *dEditor = qobject_cast<QFDoubleEdit *>(editor);
              if (dEditor) {
                  dEditor->setValue(index.model()->data(index, Qt::EditRole).toDouble());
              } else {
@@ -83,7 +82,7 @@ void QFRDRTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 
 void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    JKDoubleEdit *dEditor = qobject_cast<JKDoubleEdit *>(editor);
+    QFDoubleEdit *dEditor = qobject_cast<QFDoubleEdit *>(editor);
     if (dEditor) {
         QVariant v( dEditor->value());
         v.convert(QVariant::Double);

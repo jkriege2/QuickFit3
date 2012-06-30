@@ -1,5 +1,8 @@
 #include "qfhtmlhelpwindow.h"
-
+#include <QHBoxLayout>
+#include <QTextDocument>
+#include <QFile>
+#include <QDir>
 #include <QtGui>
 #include <iostream>
 #include <QDir>
@@ -12,6 +15,7 @@
 #include "qffitfunction.h"
 #include "jkqtmathtext.h"
 #include "programoptions.h"
+#include "qmodernprogresswidget.h"
 
 QString removeHTMLComments(const QString& data) {
      QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
@@ -31,7 +35,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     m_titleFont=font();
     m_titleFont.setPointSizeF(m_titleFont.pointSizeF()*2);
     m_titleFont.setBold(true);
-    m_home="";
+    m_home=ProgramOptions::getInstance()->getAssetsDirectory()+"/help/quickfit.html";
     history_idx=-1;
 
     labelTitle=new QLabel(this);
@@ -42,13 +46,11 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     descriptionBrowser->setPalette(p);
     connect(descriptionBrowser, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
 
-    QVBoxLayout* layout=new QVBoxLayout;//(this);
-    layout->setContentsMargins(0,0,0,0);
 
     menuBar=new QMenuBar(this);
     menuPage=menuBar->addMenu(tr("&Page"));
     menuContents=menuBar->addMenu(tr("&Help Contents"));
-    layout->addWidget(menuBar);
+
 
     QHBoxLayout* layButtons=new QHBoxLayout;//(this);
 
@@ -64,6 +66,9 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     btnHome=new QToolButton(this);
     layButtons->addWidget(btnHome);
 
+    actHelpHelp=menuContents->addAction(QIcon(":/lib/help_help.png"), tr("Help for &Online-Help Browser"));
+    connect(actHelpHelp, SIGNAL(triggered()), this, SLOT(helpOnHelp()));
+    actHelpHelp->setParent(this);
 
     actNext=menuPage->addAction(tr("&Next"), this, SLOT(next()));
     actNext->setIcon(QIcon(":/lib/help_next.png"));
@@ -96,6 +101,16 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     btnFind->setDefaultAction(actFind);
     layButtons->addWidget(btnFind);
 
+    actFindInAll=menuPage->addAction(tr("&Find in all help pages"));
+    actFindInAll->setCheckable(true);
+    actFindInAll->setShortcut(QKeySequence("Ctrl+Shift+F"));
+    actFindInAll->setChecked(false);
+    connect(actFindInAll, SIGNAL(triggered(bool)), this, SLOT(findInAll(bool)));
+    actFindInAll->setIcon(QIcon(":/lib/help_findinall.png"));
+    btnFindInAll=new QToolButton(this);
+    btnFindInAll->setDefaultAction(actFindInAll);
+    layButtons->addWidget(btnFindInAll);
+
     menuPage->addSeparator();
     actClose=menuPage->addAction(tr("&Close"));
     actClose->setShortcut(QKeySequence::Close);
@@ -114,16 +129,23 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     edtFind->setToolTip(tr("simply enter a search phrase\n\nthe search in the currently displayed help page begins immediately after typing the first letter. If no match was found, the field will change its background color to a light red."));
     layFind->addWidget(edtFind);
     connect(edtFind, SIGNAL(textEdited(QString)), this, SLOT(findNext()));
+
+    actFindNext=new QAction(QIcon(":/lib/help_findnext.png"), tr("&find next"), this);
+    actFindNext->setShortcut(QKeySequence::FindNext);
+    connect(actFindNext, SIGNAL(triggered()), this, SLOT(findNext()));
+
     btnFindNext=new  QToolButton(this);
-    btnFindNext->setIcon(QIcon(":/lib/help_findnext.png"));
-    btnFindNext->setText(tr("&find next"));
-    connect(btnFindNext, SIGNAL(clicked()), this, SLOT(findNext()));
+    btnFindNext->setDefaultAction(actFindNext);
     layFind->addWidget(btnFindNext);
+
+    actFindPrev=new QAction(QIcon(":/lib/help_findprev.png"), tr("find &previous"), this);
+    actFindPrev->setShortcut(QKeySequence::FindPrevious);
+    connect(actFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()));
+
     btnFindPrev=new  QToolButton(this);
-    btnFindPrev->setIcon(QIcon(":/lib/help_findprev.png"));
-    btnFindPrev->setText(tr("&find previous"));
-    connect(btnFindPrev, SIGNAL(clicked()), this, SLOT(findPrev()));
+    btnFindPrev->setDefaultAction(actFindPrev);
     layFind->addWidget(btnFindPrev);
+
     chkCaseSensitive=new QCheckBox(tr("case-sensitive"), this);
     chkCaseSensitive->setChecked(false);
     connect(chkCaseSensitive, SIGNAL(toggled(bool)), this, SLOT(findNext()));
@@ -139,32 +161,110 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
 
     layButtons->addStretch();
 
+
+
+    widFindInAll=new QWidget(this);
+    QGridLayout* layFindAll=new QGridLayout(widFindInAll);
+    layFindAll->setContentsMargins(0,0,0,0);
+    widFindInAll->setLayout(layFindAll);
+    layFindAll->addWidget(new QLabel(tr("phrase: ")),0,0);
+    edtFindInAll=new QFEnhancedLineEdit(widFindInAll);
+    edtFindInAll->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFindInAll, edtFindInAll));
+    edtFindInAll->setMinimumWidth(150);
+    edtFindInAll->setToolTip(tr("<b>find text in all help files:</b><br><br>enter a search phrase and click on <b><img src=\":/lib/help_findinall.png\"> Search ...</b> afterwards to start the search. the results will be displayed in the list below"));
+    scFindInAllFind=new QShortcut(QKeySequence("ENTER"), edtFindInAll);
+    connect(scFindInAllFind, SIGNAL(activated()), this, SLOT(searchInAll()));
+    layFindAll->addWidget(edtFindInAll,0,1);
+
+    QHBoxLayout* layTemp=new QHBoxLayout(widFindInAll);
+    layFindAll->addLayout(layTemp,1,1,1,2);
+    chkCaseSensitiveInAll=new QCheckBox(tr("case-sensitive"), widFindInAll);
+    chkCaseSensitiveInAll->setChecked(false);
+    layTemp->addWidget(chkCaseSensitiveInAll);
+    chkFindWholeWordInAll=new QCheckBox(tr("whole word"), widFindInAll);
+    chkFindWholeWordInAll->setChecked(false);
+    layTemp->addWidget(chkFindWholeWordInAll,1);
+
+    btnFindInAllFind=new QToolButton(widFindInAll);
+    btnFindInAllFind->setText("&Search ...");
+    btnFindInAllFind->setIcon(QIcon(":/lib/help_findinall.png"));
+    btnFindInAllFind->setToolTip(tr("search all help files available"));
+    btnFindInAllFind->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(btnFindInAllFind, SIGNAL(clicked()), this, SLOT(searchInAll()));
+    QSizePolicy sp=btnFindInAllFind->sizePolicy();
+    sp.setControlType(QSizePolicy::PushButton);
+    sp.setHorizontalPolicy(QSizePolicy::Minimum);
+    btnFindInAllFind->setSizePolicy(sp);
+    btnFindInAllFind->setFocusPolicy(Qt::StrongFocus);
+    layFindAll->addWidget(btnFindInAllFind,0,2);
+
+    listFindInAll=new QListWidget(widFindInAll);
+    listFindInAll->setToolTip(tr("<b>Reult of the last global help search.</b><br>double-click an entry to display the according help page"));
+    connect(listFindInAll, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(searchAllItemDoubleClicked(QListWidgetItem*)));
+    layFindAll->addWidget(listFindInAll, 2,0,1,3);
+
+    layFindAll->setColumnStretch(1,1);
+    layFindAll->setRowStretch(2,1);
+    widFindInAll->setVisible(false);
+    widFindInAll->setMinimumWidth(100);
+
+
+    QVBoxLayout* layout=new QVBoxLayout;//(this);
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(menuBar);
     layout->addLayout(layButtons);
-    layout->addWidget(labelTitle);
-    layout->setStretchFactor(labelTitle, 0);
-    layout->addWidget(descriptionBrowser);
-    layout->setStretchFactor(descriptionBrowser, 6);
     setLayout(layout);
 
-    setWindowFlags(flags);
+
+    QVBoxLayout* layoutContents=new QVBoxLayout;//(this);
+    layoutContents->addWidget(labelTitle);
+    layoutContents->setStretchFactor(labelTitle, 0);
+    layoutContents->addWidget(descriptionBrowser);
+    layoutContents->setStretchFactor(descriptionBrowser, 6);
+
+    splitterSearch=new QVisibleHandleSplitter(Qt::Horizontal, this);
+
+    QWidget* w=new QWidget(this);
+    w->setLayout(layoutContents);
+    splitterSearch->addWidget(widFindInAll);
+    splitterSearch->addWidget(w);
+
+    layout->addWidget(splitterSearch,1);
+    splitterSearch->setCollapsible(0,false);
+    splitterSearch->setCollapsible(1,false);
+    QList<int> sizes;
+    sizes<<200<<400;
+    splitterSearch->setSizes(sizes);
+
+    //setWindowFlags(flags);
     setWindowTitle(tr("QuickFit Online-Help"));
     setWindowIcon(QIcon(":/lib/help.png"));
 
-    if (ProgramOptions::getInstance()->getHelpWindowsStayOnTop()) setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
-    else setWindowFlags(Qt::Tool);
+    //if (ProgramOptions::getInstance()->getHelpWindowsStayOnTop()) setWindowFlags(Qt::Tool/*|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint*/ );
+    //else setWindowFlags(Qt::Tool);
+    setParent(NULL);
+    addAction(actFindNext);
+    addAction(actFindPrev);
+    descriptionBrowser->addAction(actFindNext);
+    descriptionBrowser->addAction(actFindPrev);
+    actFindNext->setEnabled(false);
+    actFindPrev->setEnabled(false);
+
 }
 
 void QFHTMLHelpWindow::readSettings(QSettings& settings, QString prefix) {
      resize(settings.value(prefix+"htmlhelpwin.size", QSize(400, 400)).toSize());
      move(settings.value(prefix+"htmlhelpwin.pos", QPoint(200, 200)).toPoint());
+     loadSplitter(settings, splitterSearch, prefix);
 }
 
 void QFHTMLHelpWindow::writeSettings(QSettings& settings, QString prefix) {
      settings.setValue(prefix+"htmlhelpwin.size", size());
      settings.setValue(prefix+"htmlhelpwin.pos", pos());
+     saveSplitter(settings, splitterSearch, prefix);
 }
 
-void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
+/*void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
     QString filename=filename1;
     QString fragment="";
     int hashpos=filename1.indexOf("#");
@@ -202,11 +302,13 @@ void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
     //descriptionBrowser->setSource(QFileInfo(filename).fileName());
     //descriptionBrowser->reload();
     connect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
-}
+}*/
 
 
 void QFHTMLHelpWindow::updateHelp(QString filename1) {
-    QString filename=filename1;
+    anchorClicked(filename1);
+
+    /*QString filename=filename1;
     QString fragment="";
     int hashpos=filename1.indexOf("#");
     if (hashpos>=0) {
@@ -244,7 +346,7 @@ void QFHTMLHelpWindow::updateHelp(QString filename1) {
         descriptionBrowser->scrollToAnchor(QString("#")+fragment);
     }
 
-    connect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
+    connect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));*/
 }
 
 void QFHTMLHelpWindow::clear() {
@@ -254,11 +356,23 @@ void QFHTMLHelpWindow::clear() {
     updateButtons();
 }
 
+void QFHTMLHelpWindow::showAndSearchInAll() {
+    clear();
+    show();
+    actFindInAll->setChecked(false);
+    actFindInAll->setChecked(true);
+}
+
+void QFHTMLHelpWindow::helpOnHelp()
+{
+    updateHelp(ProgramOptions::getInstance()->getAssetsDirectory()+"/help/qf3_help.html");
+}
+
 void QFHTMLHelpWindow::displayTitle() {
     QString title=descriptionBrowser->documentTitle();
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
-    actHome->setText(tr("&Home: '%1'").arg(title));
+    //actHome->setText(tr("&Home: '%1'").arg(title));
     labelTitle->setVisible(!title.isEmpty());
     updateButtons();
     //QStringList sp;
@@ -792,6 +906,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     return result;
 }
 
+
 void QFHTMLHelpWindow::setHtmlReplacementList(QList<QPair<QString, QString> >* list) {
     replaces=list;
 }
@@ -812,6 +927,8 @@ void QFHTMLHelpWindow::setContentsMenuActions(const QList<QAction *> &items)
     menuContents->addAction(actHome);
     menuContents->addSeparator();
     menuContents->addActions(items);
+    menuContents->addSeparator();
+    menuContents->addAction(actHelpHelp);
 }
 
 void QFHTMLHelpWindow::updateButtons() {
@@ -851,6 +968,93 @@ void QFHTMLHelpWindow::find(bool checked) {
         edtFind->setFocus();
         edtFind->selectAll();
     }
+    actFindNext->setEnabled(checked);
+    actFindPrev->setEnabled(checked);
+}
+
+void QFHTMLHelpWindow::findInAll(bool checked) {
+    widFindInAll->setVisible(checked);
+    btnFindInAllFind->setEnabled(checked);
+    scFindInAllFind->setEnabled(checked);
+    if (checked) {
+        edtFindInAll->setFocus(Qt::TabFocusReason);
+        edtFindInAll->selectAll();
+    }
+}
+
+void QFHTMLHelpWindow::searchInAll() {
+
+    QModernProgressDialog progress(this);
+    progress.setHasCancel(true);
+    progress.setLabelText(tr("building list of help files ..."));
+    progress.setMode(true, false);
+    progress.show();
+    QApplication::processEvents();
+    QApplication::processEvents();
+
+    QString phrase=edtFindInAll->text();
+    int flags=0;
+    if (chkCaseSensitiveInAll->isChecked()) flags|=QTextDocument::FindCaseSensitively;
+    if (chkFindWholeWordInAll->isChecked()) flags|=QTextDocument::FindWholeWords;
+
+    QDir dir(ProgramOptions::getInstance()->getAssetsDirectory());
+    dir.cd("help");
+    QStringList files;
+    searchHelpDir(dir, files);
+    dir.cdUp();
+
+    dir.cd("plugins");
+    dir.cd("help");
+    searchHelpDir(dir, files);
+    dir.cdUp();
+    dir.cdUp();
+
+    if (!progress.wasCanceled()) {
+        listFindInAll->clear();
+        progress.setLabelText(tr("searching in help files ...\n"));
+        progress.setRange(0, files.size());
+        progress.setMode(true, true);
+        progress.setValue(0);
+        QApplication::processEvents();
+        QApplication::processEvents();
+        for (int i=0; i<files.size(); i++) {
+            progress.setLabelText(tr("searching in help files ...\n   current: %1").arg(dir.relativeFilePath(files[i])));
+            progress.setValue(i);
+            QApplication::processEvents();
+            if (progress.wasCanceled()) break;
+            if (QFile::exists(files[i])) {
+                QTextDocument doc;
+                doc.setHtml(loadHTML(files[i]));
+                QTextCursor pos=doc.find(phrase, 0, QTextDocument::FindFlags(flags));
+                if (!pos.isNull()) {
+                    QListWidgetItem* it=new QListWidgetItem(listFindInAll);
+                    it->setText(doc.metaInformation(QTextDocument::DocumentTitle));
+                    it->setData(Qt::UserRole, files[i]);
+                    it->setData(Qt::UserRole+1, pos.selectionStart());
+                    it->setData(Qt::UserRole+2, pos.selectionEnd());
+                    listFindInAll->addItem(it);
+                }
+            }
+
+        }
+    }
+}
+
+void QFHTMLHelpWindow::searchHelpDir(const QDir &dir, QStringList &files) {
+    //qDebug()<<"searchHelpDir("<<dir<<")";
+    QStringList f=dir.entryList(QStringList("*.html"), QDir::Files|QDir::Readable|QDir::NoDotAndDotDot);
+    for (int i=0; i<f.size(); i++) {
+        files.append(dir.absoluteFilePath(f[i]));
+    }
+    QStringList dirs=dir.entryList(QStringList("*"), QDir::AllDirs|QDir::NoDotAndDotDot);
+    for (int i=0; i<dirs.size(); i++) {
+        //qDebug()<<"   -> "<<dirs[i];
+        QDir d=dir;
+        d.cd(dirs[i]);
+        if (d!=dir) searchHelpDir(d, files);
+        d.cdUp();
+    }
+
 }
 
 void QFHTMLHelpWindow::findNext()
@@ -893,4 +1097,15 @@ void QFHTMLHelpWindow::findPrev()
         else p.setColor(QPalette::Base, palette().color(QPalette::Base));
         edtFind->setPalette(p);
     }
+}
+
+void QFHTMLHelpWindow::searchAllItemDoubleClicked(QListWidgetItem *item) {
+    QString file=item->data(Qt::UserRole).toString();
+    int selStart=item->data(Qt::UserRole+1).toInt();
+    int selEnd=item->data(Qt::UserRole+2).toInt();
+    anchorClicked(QUrl(file));
+    QTextCursor cur=QTextCursor(descriptionBrowser->document());
+    cur.setPosition(selStart);
+    cur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, selEnd-selStart);
+    descriptionBrowser->setTextCursor(cur);
 }

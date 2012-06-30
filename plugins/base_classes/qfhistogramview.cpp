@@ -50,10 +50,10 @@ void QFHistogramView::createWidgets() {
     flHistSet->addRow(tr("normalized:"), chkNormalizedHistograms);
     chkHistogramRangeAuto=new QCheckBox("auto", grpHistogramSettings);
     flHistSet->addRow(tr("range:"), chkHistogramRangeAuto);
-    edtHistogramMin=new JKDoubleEdit(this);
+    edtHistogramMin=new QFDoubleEdit(this);
     edtHistogramMin->setCheckBounds(false, false);
     edtHistogramMin->setValue(0);
-    edtHistogramMax=new JKDoubleEdit(this);
+    edtHistogramMax=new QFDoubleEdit(this);
     edtHistogramMax->setCheckBounds(false, false);
     edtHistogramMax->setValue(10);
     QHBoxLayout* coll=new QHBoxLayout();

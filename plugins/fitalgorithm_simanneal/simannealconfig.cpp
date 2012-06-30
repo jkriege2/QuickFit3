@@ -25,7 +25,7 @@ SimannealConfigDialog::SimannealConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("Initial Temperature T<sub>0</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditT0=new JKDoubleEdit(this);
+    neditT0=new QFDoubleEdit(this);
     neditT0->setRange(0, 1e6);
     neditT0->setSingleStep(0.001);
     neditT0->setDecimals(12);
@@ -36,7 +36,7 @@ SimannealConfigDialog::SimannealConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("Temperature Decrease Rate r<sub>T</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditRT=new JKDoubleEdit(this);
+    neditRT=new QFDoubleEdit(this);
     neditRT->setRange(0, 1e6);
     neditRT->setSingleStep(0.001);
     neditRT->setDecimals(12);
@@ -47,7 +47,7 @@ SimannealConfigDialog::SimannealConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("convergence parameter f<sub>max</sub>:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditFMax=new JKDoubleEdit(this);
+    neditFMax=new QFDoubleEdit(this);
     neditFMax->setRange(0, 1e6);
     neditFMax->setSingleStep(0.001);
     neditFMax->setDecimals(12);
@@ -58,7 +58,7 @@ SimannealConfigDialog::SimannealConfigDialog(QWidget *parent):
 
     l=new QLabel(tr("step update constant c:"), this);
     l->setAlignment(Qt::AlignRight);
-    neditC=new JKDoubleEdit(this);
+    neditC=new QFDoubleEdit(this);
     neditC->setRange(0, 1e6);
     neditC->setSingleStep(0.001);
     neditC->setDecimals(12);

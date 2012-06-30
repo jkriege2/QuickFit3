@@ -35,12 +35,14 @@ QMAKE_RPATHDIR += $$DESTDIR
 HEADERS += mainwindow.h \
            optionsdialog.h \
     ../version.h \
-    qfrdrreplacedialog.h
+    qfrdrreplacedialog.h \
+    qfhtmlhelpwindow.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
            optionsdialog.cpp \
-    qfrdrreplacedialog.cpp
+    qfrdrreplacedialog.cpp \
+    qfhtmlhelpwindow.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
