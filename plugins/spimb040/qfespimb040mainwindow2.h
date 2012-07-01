@@ -38,7 +38,6 @@
 #include "qfespimb040imagestackconfigwidget2.h"
 #include "qfespimb040acquisitionconfigwidget2.h"
 #include "qfespimb040camparamstackconfigwidget2.h"
-#include "qfhtmlhelpwindow.h"
 #include "qfespimb040opticssetup.h"
 #include "qtriple.h"
 #include "qftools.h"

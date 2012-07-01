@@ -1,7 +1,7 @@
 #ifndef QFRDRTABLE_H
 #define QFRDRTABLE_H
 
-#include "../base_classes/qftablemodel.h"
+#include "qftablepluginmodel.h"
 
 #include "qfrawdatarecord.h"
 #include "qfrawdatarecordfactory.h"
@@ -13,7 +13,7 @@
 /*! \brief this class is used to manage a table of values (strings/numbers)
     \ingroup qf3rdrdp_table
 
-    The data is stored in a QFTableModel object which is also externally accessible for data access.
+    The data is stored in a QFTablePluginModel object which is also externally accessible for data access.
  */
 
 class QFRDRTable : public QFRawDataRecord {
@@ -94,7 +94,7 @@ class QFRDRTable : public QFRawDataRecord {
         virtual ~QFRDRTable();
 
         /** \brief returns the used datamodel */
-        QFTableModel* model() ;
+        QFTablePluginModel* model() ;
         /** \brief returns the table contents at the given position */
         QVariant getModelData(quint16 row, quint16 column);
 
@@ -151,7 +151,7 @@ class QFRDRTable : public QFRawDataRecord {
         virtual void intReadData(QDomElement* e=NULL);
 
         /** \brief stores a table of QVariants */
-        QFTableModel* datamodel;
+        QFTablePluginModel* datamodel;
         QList<PlotInfo> plots;
     private:
 };

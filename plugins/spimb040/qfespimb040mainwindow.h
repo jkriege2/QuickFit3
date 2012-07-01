@@ -36,7 +36,7 @@
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget.h"
 #include "qfespimb040acquisitionconfigwidget.h"
-#include "qfhtmlhelpwindow.h"
+//#include "qfhtmlhelpwindow.h"
 #include "qfespimb040opticssetup.h"
 #include "qtriple.h"
 #include "qftools.h"
@@ -78,7 +78,7 @@ class QFESPIMB040MainWindow : public QWidget, public QFPluginLogService {
         QFESPIMB040ImageStackConfigWidget* widImageStack;
 
         QTabWidget* tabMain;
-        QFHTMLHelpWindow* help;
+        //QFHTMLHelpWindow* help;
         QPushButton* btnHelp;
 
 

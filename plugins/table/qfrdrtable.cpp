@@ -50,9 +50,9 @@ QFRDRTable::~QFRDRTable()
     //dtor
 }
 
-QFTableModel* QFRDRTable::model() {
+QFTablePluginModel* QFRDRTable::model() {
     if (!datamodel) {
-        datamodel=new QFTableModel(this);
+        datamodel=new QFTablePluginModel(this);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -61,7 +61,7 @@ QFTableModel* QFRDRTable::model() {
 
 QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
     if (!datamodel) {
-        datamodel=new QFTableModel(this);
+        datamodel=new QFTablePluginModel(this);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -146,7 +146,7 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
 
 void QFRDRTable::intReadData(QDomElement* e) {
     if (!datamodel) {
-        datamodel=new QFTableModel(this);
+        datamodel=new QFTablePluginModel(this);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -263,7 +263,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
 
 void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     if (!datamodel) {
-        datamodel=new QFTableModel(this);
+        datamodel=new QFTablePluginModel(this);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }

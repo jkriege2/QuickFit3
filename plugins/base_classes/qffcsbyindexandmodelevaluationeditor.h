@@ -33,7 +33,6 @@
 #include <cstdio>
 #include <QTextDocument>
 #include "datacutslider.h"
-#include "qfhtmlhelpwindow.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"

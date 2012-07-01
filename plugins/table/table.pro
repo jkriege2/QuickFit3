@@ -19,7 +19,8 @@ HEADERS += dlgcsvparameters.h \
     tableresizedialog.h \
     qfrdrtabledelegate.h \
     qfrdrploteditor.h \
-    qfrdrtableplotwidget.h
+    qfrdrtableplotwidget.h \
+    qftablepluginmodel.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -29,7 +30,8 @@ SOURCES += dlgcsvparameters.cpp \
     tableresizedialog.cpp \
     qfrdrtabledelegate.cpp \
     qfrdrploteditor.cpp \
-    qfrdrtableplotwidget.cpp
+    qfrdrtableplotwidget.cpp \
+    qftablepluginmodel.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \
