@@ -257,6 +257,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     bleachOffset=(float*)calloc(frame_width*frame_height, sizeof(float));
                     bleachAmplitude=(float*)calloc(frame_width*frame_height, sizeof(float));
                     bleachTime=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    bleachFitOK=(uint8_t*)calloc(frame_width*frame_height, sizeof(uint8_t));
                     firstFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
                     lastFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
 
@@ -286,6 +287,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString bleachOffsetFilename="";
                     QString bleachAmplitudeFilename="";
                     QString bleachTimeFilename="";
+                    QString bleachFitSuccessFilename="";
                     QString firstFramesFilename="";
                     QString lastFramesFilename="";
                     QString bleachtimesFilename="";
@@ -398,6 +400,13 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 tif = TIFFOpen(localFilename.toAscii().data(),"w");
                                 if (tif) {
                                     TIFFTWriteFloat(tif, bleachTime, frame_width, frame_height);
+                                    TIFFClose(tif);
+                                } else error=true;
+
+                                localFilename=bleachFitSuccessFilename=outputFilenameBase+".bleachfitok.tif";
+                                tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                if (tif) {
+                                    TIFFTWriteUint8(tif, bleachFitOK, frame_width, frame_height);
                                     TIFFClose(tif);
                                 } else error=true;
 
@@ -663,6 +672,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (!dccfFilenameBin.isEmpty())         text<<"bin. distance ccf file      : " << d.relativeFilePath(dccfFilenameBin) << "\n";
                                 text<<"width                       : "<<outLocale.toString(frame_width) << "\n";
                                 text<<"height                      : "<<outLocale.toString(frame_height) << "\n";
+                                if (job.cameraSettingsGiven) {
+                                    text<<"pixel width                 : "<<outLocale.toString(job.cameraPixelWidth) << "\n";
+                                    text<<"pixel height                : "<<outLocale.toString(job.cameraPixelHeight) << "\n";
+                                }
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
                                 text<<"interleaved binning         : "<< QString((reader->getInterleavedBinning())?"true":"false") << "\n";
                                 text<<"averaging binning           : "<< QString((reader->getAverageBinning())?"true":"false") << "\n";
@@ -717,6 +730,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     //text<<"bleach amplitude A          : "<<outLocale.toString((double)job.bleachA) << "\n";
                                     text<<"bleach amplitude file       : "<<d.relativeFilePath(bleachAmplitudeFilename) << "\n";
                                     text<<"bleach time file            : "<<d.relativeFilePath(bleachTimeFilename) << "\n";
+                                    text<<"bleach fit success          : "<<d.relativeFilePath(bleachFitSuccessFilename) << "\n";
                                     text<<"bleach timeseries t file    : "<<d.relativeFilePath(bleachtimesFilename) << "\n";
                                     text<<"bleach timeseries I file    : "<<d.relativeFilePath(bleachframesFilename) << "\n";
                                 }  else if (job.bleach==BLEACH_NONE) {
@@ -748,6 +762,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     if (bleachOffset) free(bleachOffset);
                     if (bleachAmplitude) free(bleachAmplitude);
                     if (bleachTime) free(bleachTime);
+                    if (bleachFitOK) free(bleachFitOK);
                     if (average_frame) free(average_frame);
                     if (acf_tau) free(acf_tau);
                     if (acf) free(acf);
@@ -1156,10 +1171,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     for (register uint64_t i=0; i<frame_width*frame_height; i++) {
                         uint64_t idx=t*frame_width*frame_height+i;
                         //image_series[idx]=image_series[idx]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
-                        double expT=bleachAmplitude[i]*exp(-(double)t/bleachTime[i]);
-                        double exp0=bleachAmplitude[i];
-                        image_series[idx]=image_series[idx]/sqrt(expT/exp0)+exp0*(1.0-sqrt(expT/exp0));
-                                          //*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
+                        if (bleachFitOK[i]!=0) {
+                            double expT=bleachAmplitude[i]*exp(-(double)t/bleachTime[i]);
+                            double exp0=bleachAmplitude[i];
+                            image_series[idx]=image_series[idx]/sqrt(expT/exp0)+exp0*(1.0-sqrt(expT/exp0));
+                                              //*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
+                        }
                     }
                 }
             } else if (job.bleach==BLEACH_REMOVEAVG) {
@@ -1708,7 +1725,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
                 if (job.bleach==BLEACH_EXP) {
                     for (register uint16 i=0; i<frame_width*frame_height; i++) {
-                        frame_data[i]=frame_data[i]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)frame/bleachTime[i]));
+                        if (bleachFitOK[i]!=0) {
+                            frame_data[i]=frame_data[i]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)frame/bleachTime[i]));
+                        }
                     }
                 } else if (job.bleach==BLEACH_REMOVEAVG) {
                     for (register uint16 i=0; i<frame_width*frame_height; i++) {
@@ -1800,7 +1819,7 @@ static double QFRDRImagingFCSCorrelationJobThread_fExpLin( double t, const doubl
 
 void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames, double* fit_t, int NFitFrames) {
     if (job.bleach==BLEACH_EXP) {
-        if (fit_frames && fit_t && NFitFrames) {
+        if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
                 control.maxcall=500;
@@ -1818,6 +1837,20 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 bleachAmplitude[i]=exp(par[0]);
                 bleachTime[i]=par[1];
                 bleachOffset[i]=0;
+                bleachFitOK[i]=1;
+                double t1=fit_t[NFitFrames/2];
+                double t2=fit_t[2*NFitFrames/3];
+                if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                     || (!QFFloatIsOK(bleachOffset[i]))
+                     || (!QFFloatIsOK(bleachTime[i]))
+                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                     || (bleachTime[i]==0)
+                     || (std::isinf(bleachTime[i]))
+                     || (std::isinf(bleachAmplitude[i]))
+                     || (bleachAmplitude[i]==0) ) {
+                    bleachFitOK[i]=0;
+                }
                 free(fit_I);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
@@ -1828,6 +1861,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 bleachAmplitude[i]=0;
                 bleachOffset[i]=0;
                 bleachTime[i]=1;
+                bleachFitOK[i]=0;
             }
         }
     } else {
@@ -1835,6 +1869,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
             bleachAmplitude[i]=0;
             bleachOffset[i]=0;
             bleachTime[i]=1;
+            bleachFitOK[i]=1;
         }
     }
 }

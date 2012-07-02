@@ -486,8 +486,9 @@ void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
             ui->pltFunction->addGraph(g_fit);
         }
 
-        ui->pltFunction->set_doDrawing(true);
         ui->pltFunction->zoomToFit();
+        ui->pltFunction->set_doDrawing(true);
+        ui->pltFunction->update_plot();
     } catch(std::exception& E) {
         services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
     }

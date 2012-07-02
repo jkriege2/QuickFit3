@@ -170,8 +170,9 @@ void DlgCalcDiffCoeff::updatePlot()
         ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr("solution viscosity [mPa{\\cdot}s]"));
     }
 
-    ui->plotter->set_doDrawing(true);
     ui->plotter->zoomToFit();
+    ui->plotter->set_doDrawing(true);
+    ui->plotter->update_plot();
 }
 
 void DlgCalcDiffCoeff::readSettings() {

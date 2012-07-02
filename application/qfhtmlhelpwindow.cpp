@@ -174,6 +174,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     edtFindInAll->setToolTip(tr("<b>find text in all help files:</b><br><br>enter a search phrase and click on <b><img src=\":/lib/help_findinall.png\"> Search ...</b> afterwards to start the search. the results will be displayed in the list below"));
     scFindInAllFind=new QShortcut(QKeySequence("ENTER"), edtFindInAll);
     connect(scFindInAllFind, SIGNAL(activated()), this, SLOT(searchInAll()));
+    connect(edtFindInAll, SIGNAL(returnPressed()), this, SLOT(searchInAll()));
     layFindAll->addWidget(edtFindInAll,0,1);
 
     QHBoxLayout* layTemp=new QHBoxLayout(widFindInAll);

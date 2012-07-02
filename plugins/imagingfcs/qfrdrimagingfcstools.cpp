@@ -6,9 +6,11 @@
 #include <QtEndian>
 
 
-void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height) {
+void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height ) {
     if (set.contains("acquisition/image_width")) image_width=set.value("acquisition/image_width", image_width).toInt();
     if (set.contains("acquisition/image_height")) image_height=set.value("acquisition/image_height", image_height).toInt();
+    if (set.contains("acquisition/pixel_width")) { hasPixel=true; pixel_width=set.value("acquisition/pixel_width", pixel_width).toDouble()*1000.0;}
+    if (set.contains("acquisition/pixel_height")) { hasPixel=true; pixel_height=set.value("acquisition/pixel_height", pixel_height).toDouble()*1000.0;}
     if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
     else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
     baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
@@ -70,6 +72,12 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
                 files_types<<"zstack";
                 files_descriptions<<inifiledescriptions[i];
             }
+        } else if (inifiletypes[i].toLower().contains("csv")) {
+            if (inifiledescriptions[i].toLower().contains("measureable") && inifiledescriptions[i].toLower().contains("properties") && inifiletypes[i].toLower()=="csv") {
+                files<<inifiles[i];
+                files_types<<"setup_properties";
+                files_descriptions<<inifiledescriptions[i];
+            }
         }
     }
 
@@ -79,3 +87,72 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
 
 
 
+
+QString findB040ExperimentDescriptionForData(const QString& filename) {
+    QString filenameDisplayed=QFileInfo(filename).absoluteFilePath();
+
+    //////////////////////////////////////////////////////////////////////////////////
+    // now we search for a .configuration.ini file describing the selected file
+    //////////////////////////////////////////////////////////////////////////////////
+    QDir d=QFileInfo(filenameDisplayed).absoluteDir();
+    QStringList nameFilters;
+    nameFilters<<"*.ini";
+    nameFilters<<"*.cfg";
+    nameFilters<<"*.txt";
+    QString inputconfigfile="";
+    d.setNameFilters(nameFilters);
+    // could be that the absolute pathes are wrong. In this case we try to get a second guess by finding a file which
+    // equals in the name, but not the directory ... the user can correct the data anyways. This second guess is stored
+    // in these variables:
+    bool hasFirst=false;
+    foreach (QString iniFile, d.entryList(QDir::Files)) {
+        //QApplication::processEvents();
+
+        QSettings set(d.absoluteFilePath(iniFile), QSettings::IniFormat);
+        int fcnt=set.value("files/count", 0).toInt();
+        if (fcnt>0) {
+            for (int f=0; f<fcnt; f++) {
+                QString fn=set.value("files/name"+QString::number(f), "").toString();
+                QString ft=set.value("files/type"+QString::number(f), "").toString();
+                if (!fn.isEmpty()) {
+                    QString fnAbs=d.absoluteFilePath(fn);
+                    //qDebug()<<"fn="<<fn<<"  fnAbs="<<fnAbs<<"  fn(filename)="<<QFileInfo(filename).fileName()<<"  fn(fnAbs)="<<QFileInfo(fnAbs).fileName();
+                    if (fnAbs==filenameDisplayed) {
+                        hasFirst=true;
+                        inputconfigfile=d.absoluteFilePath(iniFile);
+                    } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filenameDisplayed).fileName()) {
+                        hasFirst=true;
+                        inputconfigfile=d.absoluteFilePath(iniFile);
+                    }
+                }
+            }
+
+        }
+        if (hasFirst) break;
+    }
+
+    // if we didn't find a second guess, we try to find a config file with the same
+    // basename + one of a set of extensions (newsuffix list) and try to read info from
+    // that.
+    if (!hasFirst) {
+        QString suffix=QFileInfo(filenameDisplayed).suffix();
+        QString cfgname;
+
+        QStringList newsuffix;
+        newsuffix<<"ini"
+                 <<"configuration.ini"
+                 <<"settings.ini"
+                 <<"settings.txt"
+                 <<"cfg";
+        for (int i=0; i<newsuffix.size(); i++) {
+            cfgname=filenameDisplayed.left(filenameDisplayed.size()-suffix.size())+newsuffix[i];
+            if (QFile::exists(cfgname)) {
+                hasFirst=true;
+                inputconfigfile=cfgname;
+            }
+        }
+    }
+
+
+    return inputconfigfile;
+}

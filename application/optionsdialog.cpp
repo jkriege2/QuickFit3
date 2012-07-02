@@ -45,6 +45,11 @@ void OptionsDialog::on_btnHelp_clicked()
     QFPluginServices::getInstance()->displayHelpWindow(ProgramOptions::getInstance()->getAssetsDirectory()+QString("/help/qf3_settings.html"));
 }
 
+void OptionsDialog::on_listWidget_currentRowChanged(int currentRow)
+{
+    stackedWidget->setCurrentIndex(currentRow);
+}
+
 
 void OptionsDialog::open(ProgramOptions* options) {
     spnMaxThreads->setRange(1,100);
@@ -113,7 +118,10 @@ void OptionsDialog::setPlugins(const QList<QFPluginOptionsDialogInterface *> &pl
     m_plugins.clear();
     for (int i=0; i<plugins.size(); i++) {
         QFPluginOptionsWidget* w=plugins[i]->createOptionsWidget(this);
-        tabWidget->addTab(w, QIcon(plugins[i]->pluginOptionsIcon()), plugins[i]->pluginOptionsName());
+        //tabWidget->addTab(w, QIcon(plugins[i]->pluginOptionsIcon()), plugins[i]->pluginOptionsName());
+        stackedWidget->addWidget(w);
+        QListWidgetItem* lw=new QListWidgetItem(QIcon(plugins[i]->pluginOptionsIcon()), plugins[i]->pluginOptionsName(), listWidget);
+        listWidget->addItem(lw);
         m_plugins.append(w);
     }
 }

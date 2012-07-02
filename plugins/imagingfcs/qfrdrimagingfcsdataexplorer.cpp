@@ -255,10 +255,13 @@ bool QFRDRImagingFCSDataExplorer::init(QFImporterImageSeries* reader, QFImporter
     ui->labInfo->setText(tr("filename: '%1'").arg(filename));
     QApplication::processEvents();
     ui->pltImage->zoomToFit();
+    ui->pltImage->update_plot();
     QApplication::processEvents();
     ui->pltImageRaw->zoomToFit();
+    ui->pltImageRaw->update_plot();
     QApplication::processEvents();
     ui->pltIntensity->zoomToFit();
+    ui->pltIntensity->update_plot();
     QApplication::processEvents();
     initing=false;
     prg->close();
@@ -437,6 +440,7 @@ bool QFRDRImagingFCSDataExplorer::readStatistics(QModernProgressDialog *prg) {
     readFrames(false);
     calcFit();
     ui->pltIntensity->zoomToFit();
+    ui->pltIntensity->update_plot();
 
     ui->labIntensityInfo->setText(tr(""));
 
@@ -468,6 +472,7 @@ void QFRDRImagingFCSDataExplorer::on_chkDisplaySD_toggled(bool checked) {
         avgGraph->set_yErrorStyle(JKQTPnoError);
     }
     ui->pltIntensity->zoomToFit();
+    ui->pltIntensity->update_plot();
 }
 
 void QFRDRImagingFCSDataExplorer::nextPlayFrame() {
@@ -489,6 +494,8 @@ void QFRDRImagingFCSDataExplorer::rereadFrame() {
     readFrames(false);
     ui->pltImage->zoomToFit();
     ui->pltImageRaw->zoomToFit();
+    ui->pltImage->update_plot();
+    ui->pltImageRaw->update_plot();
 
 }
 

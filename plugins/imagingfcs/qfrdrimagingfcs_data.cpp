@@ -185,6 +185,11 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("background frame");
                     ovrImages.append(img);
+                } else if (ft=="display_image") {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=files_desciptions.value(i, tr("image #%1").arg(i+1));
+                    ovrImages.append(img);
                 } else if (ft=="overview_before") {
                     QFRDRImagingFCSData::ovrImageData img;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
@@ -245,6 +250,12 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         img.geoElements.append(rect);;
                     }
                     ovrImages.append(img);
+                } else if (ft.startsWith("overview_")) {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=files_desciptions.value(i, ft);
+                    ovrImages.append(img);
+
                 } else if (ft=="acf" || ft=="ccf" || ft=="dccf") {
                     if (!dataLoaded) {
                         if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {

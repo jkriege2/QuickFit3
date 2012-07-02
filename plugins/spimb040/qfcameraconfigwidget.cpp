@@ -453,8 +453,10 @@ bool QFCameraConfigWidget::acquireSingle() {
             double exposure=viewData.camera->getExposureTime(usedcam);
             viewData.timestamp=timestamp;
             viewData.exposureTime=exposure;
-            viewData.acqFrames++;
-            viewData.acqFramesQR++;
+            if (ok) {
+                viewData.acqFrames++;
+                viewData.acqFramesQR++;
+            }
             return ok;
         }
     }

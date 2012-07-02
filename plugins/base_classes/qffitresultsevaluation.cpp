@@ -565,6 +565,7 @@ double QFFitResultsEvaluation::getFitValue(QFRawDataRecord* r, const QString& re
 
     res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
+
     QString psID=getParameterStoreID(parameterID);
     if (parameterStore.contains(psID)) {
         if (parameterStore[psID].valueSet) {
@@ -602,6 +603,7 @@ double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& re
             return parameterStore[psID].error;
         }
     }
+
     return 0.0;
 }
 

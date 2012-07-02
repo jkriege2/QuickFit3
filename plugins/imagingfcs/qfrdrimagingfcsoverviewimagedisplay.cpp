@@ -136,6 +136,7 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
     }
     pltImage->set_doDrawing(true);
     pltImage->zoomToFit();
+    pltImage->update_plot();
 }
 
 

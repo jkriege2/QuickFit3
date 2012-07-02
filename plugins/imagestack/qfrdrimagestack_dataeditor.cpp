@@ -295,14 +295,16 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
     }
 
 
-    pltImage->set_doDrawing(dd);
     if (dd) {
+        pltImage->update_plot();
+        pltImage->set_doDrawing(dd);
         pltImage->update_plot();
         if (startPlayer) player->singleShotTimerStart();
     }
-    pltData->set_doDrawing(ddd);
     if (ddd) {
         pltData->zoomToFit();
+        pltData->set_doDrawing(ddd);
+        pltData->update_plot();
     }
 }
 

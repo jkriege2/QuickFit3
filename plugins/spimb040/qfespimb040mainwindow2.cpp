@@ -2342,7 +2342,7 @@ QString QFESPIMB040MainWindow2::saveMeasuredData(const QString& filenamePrefix, 
             }
         }
 
-        out<<"# ";
+        out<<"#! ";
         for (int c=0; c<columns.size(); c++) {
             if (c>0) out<<",\t";
             out<<columns[c];

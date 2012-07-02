@@ -150,8 +150,10 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         avgGraph->set_xErrorColumn(-1);
         avgGraph->set_yErrorColumn(-1);
 
-        ui->pltIntensity->set_doDrawing(true);
+
         ui->pltIntensity->zoomToFit();
+        ui->pltIntensity->set_doDrawing(true);
+        ui->pltIntensity->update_plot();
         ui->edtData->clear();
         ui->labInfo->clear();
     } else {
@@ -263,8 +265,9 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         rangeGraph->set_rangeCenter(dispMean);
         rangeGraph->set_rangeMin(dispMean-dispStddev);
         rangeGraph->set_rangeMax(dispMean+dispStddev);
-        ui->pltIntensity->set_doDrawing(true);
         ui->pltIntensity->zoomToFit();
+        ui->pltIntensity->set_doDrawing(true);
+        ui->pltIntensity->update_plot();
 
         ui->edtData->setText(current->getProperty("imfcs_crddisplay_fitresults", QString("")).toString());
         ui->labInfo->setText(tr("<table width=\"95%\"><tr><td>average of graph: %2</td><td>data points: %1</td></tr>"

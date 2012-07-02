@@ -29,6 +29,7 @@ void dlgQFFitAlgorithmProgressDialog::done() {
 
 void dlgQFFitAlgorithmProgressDialog::doDisplay() {
     if (m_display) open();
+    QApplication::processEvents();
 }
 
 void dlgQFFitAlgorithmProgressDialog::display() {
@@ -37,6 +38,8 @@ void dlgQFFitAlgorithmProgressDialog::display() {
     ui->labCancel->setText("");
     if (m_displayDelay>0) QTimer::singleShot(m_displayDelay, this, SLOT(doDisplay()));
     else doDisplay();
+    QApplication::processEvents();
+    QApplication::processEvents();
 }
 
 void dlgQFFitAlgorithmProgressDialog::on_btnCancel_clicked() {

@@ -11,6 +11,7 @@
 #include "../base_classes/qfusesresultsbyindexevaluation.h"
 #include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
 
+#define MSDTHEORYCOUNT 4
 
 
 /*! \brief evaluation item class 

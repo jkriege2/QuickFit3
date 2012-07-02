@@ -86,6 +86,11 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         QFRDRImagingFCSCorrelationDialog* dlgCorrelate;
 
+        /** \brief insert record, if it is not yet contained in the project! */
+        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QMap<QString,QVariant>(), const QStringList& init_params_readonly=QStringList());
+
+        bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
+
 };
 
 #endif // QFRDRIMAGINGFCS_H

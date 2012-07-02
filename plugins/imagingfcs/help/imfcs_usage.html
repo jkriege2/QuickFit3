@@ -55,6 +55,9 @@
 			<blockquote><tt>[path_to]/results/[inputfilename]<b>1</b>.autocorrelation.dat<br>[path_to]/results/[inputfilename]<b>1</b>.crosscorrelation.dat<br>...
 			</tt></blockquote>
 		</li>
+	    <li>If your microscope does not save metadata (e.g. pixel sizes) together with the raw data or they are not readable by QuickFit, then you can supply some of these data next to the checkbox "camera description", if it is activated. This can also be used to overwrite values possibly set in the experiment description. The setable values are:<ol>
+		  <li>pixel width/height in nanometers: These are the width/height of the pixels in the image plane, i.e. taking into account the magnification.</li>
+		</ol></li>
 	    <li>Sometimes one wants to exclude certain parts of the image series. This is possible by setting the <b>first</b> and <b>last frame</b>.</li>
 		<li>Sometimes model fitting is more reliable, if an estimate of the statistic error <i>&Delta;g(&tau;)</i> introduced when estimating the ACF/CCF is known. So this module allows to <b>cut the input image series into several segments</b> (taking into account the iven first and last frame) and to correlate each segment separately. Then the ACF/CCF may be calculated as the average and the error as the standard deviation over the ACF/CCF for the single segments.</li>
 		<li>It is especially important to set the correct <b>framerate</b> (in images/second) or <b>frame time</b> (=1/framerate in microseconds), as this is crucial for the correctlag time axis.</li> 

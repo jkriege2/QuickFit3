@@ -139,10 +139,10 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         JKQtPlotter* pltDistResults;
         QComboBox* cmbDistResultsMode;
 
-        QFDoubleEdit* numPre[3];
-        QFDoubleEdit* numD[3];
-        QFDoubleEdit* numAlpha[3];
-        QCheckBox* chkSlope[3];
+        QFDoubleEdit* numPre[4];
+        QFDoubleEdit* numD[4];
+        QFDoubleEdit* numAlpha[4];
+        QCheckBox* chkSlope[4];
         QSpinBox* spinFitWidth;
         QCheckBox* chkShowKeyDist;
         QCheckBox* chkShowKeyDistResults;

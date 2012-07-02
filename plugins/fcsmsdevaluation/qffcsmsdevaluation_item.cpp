@@ -11,7 +11,7 @@ QFFCSMSDEvaluationItem::QFFCSMSDEvaluationItem(QFProject* parent):
     QFUsesResultsByIndexAndModelEvaluation(parent, true, false)
 {
     currentIndex=-1;
-    currentModel=0;
+    currentModel=1;
     currentWeights=0;
 }
 
@@ -418,7 +418,7 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
 
 bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
 
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<MSDTHEORYCOUNT; i++) {
         if (parameterID==QString("msd_theory%1_en").arg(i)) {
             defaultValue.value=0;
             return true;
@@ -435,6 +435,7 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
             defaultValue.value=1;
             if (i==1) defaultValue.value=0.75;
             if (i==2) defaultValue.value=0.5;
+            if (i==3) defaultValue.value=0.66;
             return true;
         }
     }
@@ -811,5 +812,5 @@ QString QFFCSMSDEvaluationItem::getParameterID(int model, int id) const {
 }
 
 int QFFCSMSDEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 3;
+    return 2;
 }

@@ -192,7 +192,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          * \param inputFilesTypes types of the files listed in \a inputFiles
          * \return a pointer to the newly created record
          */
-        QFRawDataRecord* addRawData(QString type, QString name=QString(""), QStringList inputFiles=QStringList(), qfp_param_type initParams=qfp_param_type(), QStringList initParamsReadonly=QStringList(), QStringList inputFilesTypes=QStringList());
+        QFRawDataRecord* addRawData(QString type, QString name=QString(""), QStringList inputFiles=QStringList(), qfp_param_type initParams=qfp_param_type(), QStringList initParamsReadonly=QStringList(), QStringList inputFilesTypes=QStringList(), QStringList inputFilesDescriptions=QStringList());
 
         /** \brief add new evaluation record
          *

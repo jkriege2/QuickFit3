@@ -63,7 +63,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual ~QFRawDataRecord();
 
         /** \brief initialize the object with the given data */
-        void init(const QString& name=QString(""), QStringList inputFiles=QStringList(), QStringList inputFilesTypes=QStringList());
+        void init(const QString& name=QString(""), QStringList inputFiles=QStringList(), QStringList inputFilesTypes=QStringList(), QStringList inputFileDescriptions=QStringList());
         /** \brief initialize from QDomElement */
         void init(QDomElement& e);
 
@@ -87,6 +87,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline QStringList getFiles() const { return files; }
         /** \brief return the list of linked files */
         inline QStringList getFilesTypes() const { return files_types; }
+        /** \brief return the list of linked files */
+        inline QStringList getFilesDescriptions() const { return files_desciptions; }
         /** \brief return the filename associated with a given type, returns an empty string if no file was found */
         QString getFileForType(const QString& type);
         /** \brief return a list of filenames associated with a given type, returns an empty list if no files were found */
@@ -173,6 +175,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QStringList files;
         /** \brief list of the types of the files connected with this record (see files) */
         QStringList files_types;
+        /** \brief list of the descriptions for the files connected with this record (see files) */
+        QStringList files_desciptions;
         /** \brief indicates whether an error has occured */
         bool errorOcc;
         /** \brief contains the description of the last error */

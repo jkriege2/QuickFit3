@@ -26,7 +26,6 @@
 
 
 
-
 #include <QtGui>
 #include <QtCore>
 
@@ -72,11 +71,10 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     numAlpha[i]->setValue(1);
     connect(numAlpha[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
 
-    lay1->addWidget(new QLabel(tr("<r²> = ")));
     lay1->addWidget(numPre[i]);
     lay1->addWidget(new QLabel("*"));
     lay1->addWidget(numD[i]);
-    lay1->addWidget(new QLabel(tr("µm²/s t ^")));
+    lay1->addWidget(new QLabel(tr("*t^")));
     lay1->addWidget(numAlpha[i]);
     chkSlope[i]=new QCheckBox(this);
     chkSlope[i]->setChecked(false);
@@ -84,7 +82,9 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     connect(chkSlope[i], SIGNAL(toggled(bool)), w1, SLOT(setEnabled(bool)));
     connect(chkSlope[i], SIGNAL(toggled(bool)), this, SLOT(theoryChanged()));
 
-    lay->addWidget(chkSlope[i]);
+    chkSlope[i]->setText(tr("MSD %1:").arg(i+1));
+
+    //lay->addWidget(chkSlope[i]);
     lay->addWidget(w1);
 
     return w;
@@ -93,10 +93,14 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
 
 void QFFCSMSDEvaluationEditor::createWidgets() {
 
+    flAlgorithmParams->addRow(tr("Theory:"), new QLabel(tr("<font size=\"+1\"><i>&lang;r<sup>2</sup>&rang; = f&middot;D&middot;t<sup>&alpha;<&sup></i> [&mu;m<sup>2</sup>]</size>")));
 
-    flAlgorithmParams->addRow(tr("Theory 1:"), createSlopeWidgets(0));
-    flAlgorithmParams->addRow(tr("Theory 2:"), createSlopeWidgets(1));
-    flAlgorithmParams->addRow(tr("Theory 3:"), createSlopeWidgets(2));
+    for (int i=0; i<MSDTHEORYCOUNT; i++) {
+        flAlgorithmParams->addRow(chkSlope[i], createSlopeWidgets(i));
+    }
+    //flAlgorithmParams->addRow(tr("MSD 2:"), createSlopeWidgets(1));
+    //flAlgorithmParams->addRow(tr("MSD 3:"), createSlopeWidgets(2));
+    //flAlgorithmParams->addRow(tr("MSD 4:"), createSlopeWidgets(3));
 
     spinFitWidth=new QSpinBox(this);
     spinFitWidth->setRange(5, INT_MAX);
@@ -409,7 +413,7 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
     if (item) {
         dataEventsEnabled=false;
 
-        for (int i=0; i<3; i++)     {
+        for (int i=0; i<MSDTHEORYCOUNT; i++)     {
             chkSlope[i]->setChecked(item->getTheoryEnabled(i));
             numPre[i]->setValue(item->getTheoryPre(i));
             numD[i]->setValue(item->getTheoryD(i));
@@ -477,7 +481,7 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         spinFitWidth->setValue(eval->getFitWidth());
         //edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         //edtNumIter->setValue(eval->getNumIter());
-        for (int i=0; i<3; i++)     {
+        for (int i=0; i<4; i++)     {
             chkSlope[i]->setChecked(eval->getTheoryEnabled(i));
             numPre[i]->setValue(eval->getTheoryPre(i));
             numD[i]->setValue(eval->getTheoryD(i));
@@ -1433,7 +1437,7 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
     /////////////////////////////////////////////////////////////////////////////////
     // plot theory curves
     /////////////////////////////////////////////////////////////////////////////////
-    for (int i=0; i<3; i++)     {
+    for (int i=0; i<MSDTHEORYCOUNT; i++)     {
         QVector<double> theo;
         if (chkSlope[i]->isChecked()) {
             const double D=numPre[i]->value()*numD[i]->value();
@@ -1445,7 +1449,7 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
             int c_theo=dsdist->addCopiedColumn(theo.data(), theo.size(), QString("theory%1").arg(i+1));
             JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
             g_dist->set_drawLine(true);
-            g_dist->set_title(tr("theory %1, D=%2µm²/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
+            g_dist->set_title(tr("MSD %1, D=%2µm²/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
             g_dist->set_xColumn(c_disttau);
             g_dist->set_yColumn(c_theo);
             g_dist->set_datarange_start(sliderDist->get_userMin());
@@ -1507,7 +1511,7 @@ void QFFCSMSDEvaluationEditor::theoryChanged() {
     bool pc=data->get_doEmitPropertiesChanged();
     data->set_doEmitResultsChanged(false);
     data->set_doEmitPropertiesChanged(false);
-    for (int i=0; i<3; i++)     {
+    for (int i=0; i<MSDTHEORYCOUNT; i++)     {
         data->setTheory(i, chkSlope[i]->isChecked(), numPre[i]->value(), numD[i]->value(), numAlpha[i]->value());
     }
     data->set_doEmitResultsChanged(rc);

@@ -205,6 +205,79 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     return result;
 }
 
+void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+    bool found=false;
+    for (int i=0; i<project->getRawDataCount(); i++) {
+        QFRawDataRecord*  r=project->getRawDataByNum(i);
+        if (r->getType()==type && r->getName()==name && r->getFolder()==directory) {
+            found=true;
+            break;
+        }
+    }
+    if (!found && project->getRawDataRecordFactory()->contains(type)) {
+        QStringList files, files_types;
+        files<<filename;
+
+        // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
+        QFRawDataRecord* e=project->addRawData(type, name, files,  init_params, init_params_readonly, QStringList(), QStringList());
+        e->setFolder(directory);
+        e->setDescription(description);
+        if (e->error()) { // when an error occured: remove record and output an error message
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+            services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
+        }
+    }
+}
+
+bool QFRDRImagingFCSPlugin::parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions)
+{
+    if (QFile::exists(filename_settings)) {
+        QSettings settings(filename_settings, QSettings::IniFormat);
+        appendCategorizedFilesFromB040SPIMConfig(settings, files, files_types, files_descriptions);
+
+        if (settings.contains("acquisition/exposure_time")) {
+            initParams["EXPOSURE_TIME"]=settings.value("acquisition/exposure_time").toDouble();
+            paramsReadonly<<"EXPOSURE_TIME";
+        }
+        if (settings.contains("acquisition/frame_time")) {
+            initParams["FRAME_TIME"]=settings.value("acquisition/frame_time").toDouble();
+            paramsReadonly<<"FRAME_TIME";
+        }
+        if (settings.contains("acquisition/pixel_height") && !initParams.contains("PIXEL_HEIGHT")) {
+            initParams["PIXEL_HEIGHT"]=settings.value("acquisition/pixel_height").toDouble()*1000.0;
+            paramsReadonly<<"PIXEL_HEIGHT";
+        }
+        if (settings.contains("acquisition/pixel_width") && !initParams.contains("PIXEL_WIDTH")) {
+            initParams["PIXEL_WIDTH"]=settings.value("acquisition/pixel_width").toDouble()*1000.0;
+            paramsReadonly<<"PIXEL_WIDTH";
+        }
+        if (settings.contains("experiment/title")) {
+            description=description+tr("%1:\n\n").arg(settings.value("experiment/title").toString());
+        }
+        if (settings.contains("experiment/experimenter")) {
+            description=description+tr("- experimenter: %1\n").arg(settings.value("experiment/experimenter").toString());
+        }
+        if (settings.contains("experiment/labbook")) {
+            description=description+tr("- labbook page: %1\n").arg(settings.value("experiment/labbook").toString());
+        }
+        if (settings.contains("experiment/id")) {
+            description=description+tr("- ID: %1\n").arg(settings.value("experiment/id").toString());
+        }
+        if (settings.contains("experiment/start_time")) {
+            description=description+tr("- date/time: %1\n").arg(settings.value("experiment/start_time").toString());
+        }
+        if (settings.contains("experiment/description")) {
+            description=description+tr("- description: %1\n").arg(settings.value("experiment/description").toString());
+        }
+        if (settings.contains("experiment/sample")) {
+            description=description+tr("- sample: %1\n").arg(settings.value("experiment/sample").toString());
+        }
+        return true;
+    }
+    return false;
+}
+
 void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, bool binary) {
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
@@ -223,6 +296,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     bool ok=true;
     bool isJanBFile=false;
 
+    QStringList more_files, more_files_types, more_files_descriptions;
 
 
     // set whatever you want (FILETYPE is just an example)!
@@ -304,7 +378,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                                 height=value.toInt();
                                 paramsReadonly<<"HEIGHT";
                             }
-                         } else if (name=="dccf frame width") {
+                        } else if (name=="dccf frame width") {
                             if (isDCCF) {
                                 initParams["WIDTH"]=value.toInt();
                                 width=value.toInt();
@@ -316,6 +390,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                                 height=value.toInt();
                                 paramsReadonly<<"HEIGHT";
                             }
+                        } else if (name=="pixel width") {
+                            initParams["PIXEL_WIDTH"]=value.toDouble();
+                            paramsReadonly<<"PIXEL_WIDTH";
+                        } else if (name=="pixel height") {
+                            initParams["PIXEL_HEIGHT"]=value.toDouble();
+                            paramsReadonly<<"PIXEL_HEIGHT";
                         } else if (name=="reading frame count") {
                             initParams["FRAME_COUNT"]=value.toInt();
                             paramsReadonly<<"FRAME_COUNT";
@@ -415,6 +495,13 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="date/time") {
                             initParams["CORRELATION_DATE"]=value;
                             paramsReadonly<<"CORRELATION_DATE";
+                        } else {
+                            QString fn=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                            if (QFile::exists(fn) && ((QFileInfo(fn).suffix().toLower()=="tif")||(QFileInfo(fn).suffix().toLower()=="tiff"))) {
+                                more_files<<fn;
+                                more_files_types<<"display_image";
+                                more_files_descriptions<<name;
+                            }
                         }
                     }
                 } while (!line.isNull());
@@ -436,34 +523,46 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             if (QFile::exists(filename_overview)) {
                 files<<filename_overview;
                 files_types<<"overview";
+                files_descriptions<<tr("average image");
             }
             if (QFile::exists(filename_video)) {
                 files<<filename_video;
                 files_types<<"video";
+                files_descriptions<<tr("averaged video");
             }
             if (QFile::exists(filename_statistics)) {
                 files<<filename_statistics;
                 files_types<<"statistics";
+                files_descriptions<<tr("statistics data");
             }
             if (QFile::exists(filename_mask)) {
                 files<<filename_mask;
                 files_types<<"mask";
+                files_descriptions<<tr("mask");
             }
             if (QFile::exists(filename_settings)) {
                 files<<filename_settings;
                 files_types<<"acquisition_settings";
+                files_descriptions<<tr("acquisition settings");
             }
             if (QFile::exists(filename_acquisition)) {
                 files<<filename_acquisition;
                 files_types<<"input";
+                files_descriptions<<tr("input dataset");
             }
             if (QFile::exists(filename_background)) {
                 files<<filename_background;
                 files_types<<"background";
+                files_descriptions<<tr("background frame");
             }
 
+            files<<more_files;
+            files_types<<more_files_types;
+            files_descriptions<<more_files_descriptions;
+
             QString description;
-            if (QFile::exists(filename_settings)) {
+            parseSPIMSettings(filename_settings,  description,  initParams,  paramsReadonly,  files,  files_types,  files_descriptions);
+            /*if (QFile::exists(filename_settings)) {
                 QSettings settings(filename_settings, QSettings::IniFormat);
                 appendCategorizedFilesFromB040SPIMConfig(settings, files, files_types, files_descriptions);
 
@@ -475,11 +574,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     initParams["FRAME_TIME"]=settings.value("acquisition/frame_time").toDouble();
                     paramsReadonly<<"FRAME_TIME";
                 }
-                if (settings.contains("acquisition/pixel_height")) {
+                if (settings.contains("acquisition/pixel_height") && !initParams.contains("PIXEL_HEIGHT")) {
                     initParams["PIXEL_HEIGHT"]=settings.value("acquisition/pixel_height").toDouble()*1000.0;
                     paramsReadonly<<"PIXEL_HEIGHT";
                 }
-                if (settings.contains("acquisition/pixel_width")) {
+                if (settings.contains("acquisition/pixel_width") && !initParams.contains("PIXEL_WIDTH")) {
                     initParams["PIXEL_WIDTH"]=settings.value("acquisition/pixel_width").toDouble()*1000.0;
                     paramsReadonly<<"PIXEL_WIDTH";
                 }
@@ -505,7 +604,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     description=description+tr("- sample: %1\n").arg(settings.value("experiment/sample").toString());
                 }
 
-            }
+            }*/
 
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;
@@ -527,7 +626,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     initParams["CORRELATION_ERROR_COLUMN"]=2;
                 }
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files, initParams, paramsReadonly, files_types);
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files, initParams, paramsReadonly, files_types, files_descriptions);
                 if (!filename_acquisition.isEmpty()) {
                     e->setFolder(QFileInfo(filename_acquisition).baseName());
                 }
@@ -546,11 +645,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                     if (columns>4) initParams["CORRELATION_ERROR_COLUMN"]=c+4;
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types);
+                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types, files_descriptions);
                     if (!filename_acquisition.isEmpty()) {
                         e->setFolder(QFileInfo(filename_acquisition).baseName());
                     }
                     if (!description.isEmpty()) e->setDescription(description);
+
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -565,7 +665,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     initParams["CORRELATION_SET"]=c-1;
 
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types);
+                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types, files_descriptions);
                     if (!filename_acquisition.isEmpty()) {
                         e->setFolder(QFileInfo(filename_acquisition).baseName());
                     }
@@ -584,7 +684,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                 if (columns>2 && !binary) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - DCCF"), files, initParams, paramsReadonly, files_types);
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - DCCF"), files, initParams, paramsReadonly, files_types, files_descriptions);
                 if (!filename_acquisition.isEmpty()) {
                     e->setFolder(QFileInfo(filename_acquisition).baseName());
                 }
@@ -595,6 +695,27 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     project->deleteRawData(e->getID());
                 }
             }
+
+            if (QFile::exists(filename_settings)) {
+                QFileInfo fi(filename_settings);
+                insertProjectRecord("rdr_settings", fi.fileName()+tr(" - acquisition settings"), filename_settings, description, QFileInfo(filename_settings).baseName());
+            }
+
+            for (int i=0; i<files_types.size(); i++) {
+                if (QFile::exists(files[i]) && files_types[i].toLower().trimmed()=="setup_properties") {
+                    QFileInfo fi(files[i]);
+                    QMap<QString, QVariant> p;
+                    p["column_separator"]=",";
+                    p["decimal_separator"]=".";
+                    p["comment_start"]="#";
+                    p["header_start"]="#!";
+
+                    QStringList roParams;
+                    roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
+                    insertProjectRecord("table", fi.fileName(), files[i], description, QFileInfo(files[i]).baseName(), p, roParams);
+                }
+            }
+
 
 
         } else {
@@ -650,9 +771,15 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
     }
 
     if (ok && QFile::exists(filename)) {
-        QStringList files, files_types;
+        QStringList files, files_types,files_descriptions;
         files<<filename+".valid";
         files_types<<"acf";
+        files_descriptions<<tr("correlation data from SPAD array");
+        QString description="";
+        QString filename_settings=findB040ExperimentDescriptionForData(filename);
+        if (QFile::exists(filename_settings)) parseSPIMSettings(filename_settings,  description,  initParams,  paramsReadonly,  files,  files_types,  files_descriptions);
+
+
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
         QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files,            initParams,         paramsReadonly, files_types);
         if (e->error()) { // when an error occured: remove record and output an error message

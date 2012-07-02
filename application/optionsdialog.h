@@ -26,6 +26,8 @@ class OptionsDialog : public QDialog, public Ui::OptionsDlg {
         void on_cmbStyle_currentIndexChanged( const QString & text );
         void on_cmbStyle_highlighted( const QString & text );
         void on_btnHelp_clicked();
+        void on_listWidget_currentRowChanged(int currentRow );
+
     private:
         ProgramOptions* m_options;
         QList<QFPluginOptionsWidget*> m_plugins;

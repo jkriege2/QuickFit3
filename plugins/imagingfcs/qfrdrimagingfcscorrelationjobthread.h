@@ -1,6 +1,6 @@
 #ifndef QFRDRIMAGINGFCSCORRELATIONJOBTHREAD_H
 #define QFRDRIMAGINGFCSCORRELATIONJOBTHREAD_H
-
+#include <stdint.h>
 #include <QThread>
 #include <QPointer>
 #include "qfimporterimageseries.h"
@@ -116,20 +116,18 @@ struct IMFCSJob {
     int DCCFDeltaY;
     /** \brief bleach correction, 0: none, 1: remove frame average, 2: remove mono-exponential */
     int bleach;
-    /** \brief bleach correction decay constant */
-    //double bleachDecay;
-    /** \brief bleach correction amplitude  */
-    //double bleachA;
-    /** \brief bleach correction decay constant 2 */
-    //double bleachDecay2;
-    /** \brief bleach correction amplitude 2 */
-    //double bleachA2;
-    /** \brief bleach correction offset */
-    //double bleachB;
+
     /** \brief number of frames to average over when determining the bleach correction parameters */
     uint32_t bleachAvgFrames;
-    /** ßbrief use interleaved binning */
+    /** \brief use interleaved binning */
     bool interleaved_binning;
+
+    /** \brief indicates whether to use the following camera settings */
+    bool cameraSettingsGiven;
+    /** \brief width of camera+microscope pixels (in image plane) in nm */
+    double cameraPixelWidth;
+    /** \brief height of camera+microscope pixels (in image plane) in nm */
+    double cameraPixelHeight;
 
 };
 
@@ -449,6 +447,7 @@ data                                                   size [bytes]             
     float* bleachOffset;
     float* bleachAmplitude;
     float* bleachTime;
+    uint8_t* bleachFitOK;
     float* firstFrames;
     float* lastFrames;
 

@@ -610,6 +610,8 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, co
 
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
+
+
         QString psID=getParameterStoreID(parameterID);
         if (parameterStore.contains(psID)) {
             if (parameterStore[psID].valueSet) {
@@ -658,17 +660,18 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, co
 
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
+
         QString psID=getParameterStoreID(parameterID);
         if (parameterStore.contains(psID)) {
             if (parameterStore[psID].errorSet) {
                 res=parameterStore[psID].error;
             }
         }
-
         double sval=0, serr=res;
         if (hasSpecial(r, resultID, parameterID, sval, serr)) {
             res=serr;
         }
+
         if (hasFit(r, resultID)) {
             if (r->resultsExists(tresultID, fpid)) {
                 if (r->resultsExists(tresultID, getParamNameLocalStore(fpid))) {

@@ -106,12 +106,13 @@ QFRDRResultsModel* QFRawDataRecord::resultsGetModel() const {
     return resultsmodel;
 };
 
-void QFRawDataRecord::init(const QString& name, QStringList inputFiles, QStringList inputFilesTypes) {
+void QFRawDataRecord::init(const QString& name, QStringList inputFiles, QStringList inputFilesTypes, QStringList inputFileDescriptions) {
     this->ID=project->getNewID();
     this->name=name;
     description="";
     files=inputFiles;
     files_types=inputFilesTypes;
+    files_desciptions=inputFileDescriptions;
     intReadData();
     //std::cout<<"after intReadData() in init ...\n";
     project->registerRawDataRecord(this);
@@ -518,6 +519,7 @@ qDebug()<<Q_FUNC_INFO<<"relock";
             while (!fe.isNull()) {
                 QString filexml=fe.text();
                 QString typexml=fe.attribute("type", "");
+                QString descxml=fe.attribute("description", "");
                 QFileInfo fi(project->getFile());
                 //std::cout<<"file = "<<filexml.toStdString()<<"\n";
                 //std::cout<<"  project-absolute path = "<<fi.absoluteDir().absolutePath().toStdString()<<"\n";
@@ -525,6 +527,7 @@ qDebug()<<Q_FUNC_INFO<<"relock";
 
                 files.push_back(fi.absoluteDir().absoluteFilePath(filexml));
                 files_types.append(typexml);
+                files_desciptions.append(descxml);
                 fe=fe.nextSiblingElement("file");
             }
         }
@@ -742,6 +745,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
             if (i<files_types.size()) {
                 if (!files_types[i].isEmpty()) {
                     w.writeAttribute("type", files_types[i]);
+                    w.writeAttribute("description", files_desciptions[i]);
                 }
             }
             w.writeCharacters(file);

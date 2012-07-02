@@ -349,6 +349,9 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst2", ui->spinDecay2->value());
     //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachA2", ui->edtDecayA2->value());
     //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/pixel_width", ui->spinPixelWidth->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -389,6 +392,9 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     //ui->spinDecay2->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst2", ui->spinDecay2->value()).toDouble());
     //ui->edtDecayA2->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachA2", ui->edtDecayA2->value()).toDouble());
     //ui->edtDecayB->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachB", ui->edtDecayB->value()).toDouble());
+    ui->spinPixelWidth->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/pixel_width", ui->spinPixelWidth->value()).toDouble());
+    ui->spinPixelHeight->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value()).toDouble());
+    ui->chkCamera->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked()).toBool());
 
 }
 
@@ -488,6 +494,9 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.DCCFDeltaY=ui->spinDistanceCCFDeltaY->value();
     job.bleach=ui->cmbBleachType->currentIndex();
     job.bleachAvgFrames=ui->spinBleachAvgFrames->value();
+    job.cameraSettingsGiven=ui->chkCamera->isChecked();
+    job.cameraPixelWidth=ui->spinPixelWidth->value();
+    job.cameraPixelHeight=ui->spinPixelHeight->value();
     //job.bleachDecay=ui->spinDecay->value();
     //job.bleachA=ui->edtDecayA->value();
     //job.bleachDecay2=ui->spinDecay2->value();
@@ -687,6 +696,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     double baseline_offset=ui->edtOffset->value();
     QString backgroundF=ui->edtBackgroundFile->text();
 
+    double pixel_width=ui->spinPixelWidth->value();
+    double pixel_height=ui->spinPixelHeight->value();
+    bool hasPixel=ui->chkCamera->isChecked();
+
     //////////////////////////////////////////////////////////////////////////////////
     // now we search for a .configuration.ini file describing the selected file
     //////////////////////////////////////////////////////////////////////////////////
@@ -731,10 +744,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             }
 
             if (hasFirst) {
-                readB040SPIMExperimentConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height);
+                readB040SPIMExperimentConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height);
                 //qDebug()<<"read first  "<<frametime<<baseline_offset<<backgroundF<<image_width<<image_height;
             } else if (foundSecond) {
-                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height);
                 //qDebug()<<"read second  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 hasSecond=true;
             }
@@ -759,7 +772,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
             cfgname=filenameDisplayed.left(filenameDisplayed.size()-suffix.size())+newsuffix[i];
             if (QFile::exists(cfgname)) {
                 QSettings set(cfgname, QSettings::IniFormat);
-                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height);
                 //qDebug()<<"read third  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 break;
             }
@@ -782,6 +795,9 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     frameTimeChanged(frametime);
     ui->edtOffset->setValue(baseline_offset);
     ui->edtBackgroundFile->setText(backgroundF);
+    ui->spinPixelWidth->setValue(pixel_width);
+    ui->spinPixelHeight->setValue(pixel_height);
+    ui->chkCamera->setChecked(hasPixel);
 
 
 
