@@ -495,6 +495,9 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     quint16 row=0, rows=0, column=0, columns=0;
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    bool hasTitle=false;
+    bool hasData=false;
+    QMap<int,QString> specialHeader;
     while (!line.isNull()) {
         bool dataread=false;
         line=line;
@@ -523,6 +526,30 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                     //if (c<columnNames.size()) columnNames[c]=n;
                     setColumnTitleCreate(c, n);
                 }
+                hasTitle=true;
+            } else if (line.startsWith(comment_start) && &hasTitle && !hasData) {
+                header_read=true;
+                line=line.right(line.size()-1);
+                QStringList sl=line.split(QString(column_separator));
+                columns=(columns>sl.size())?columns:sl.size();
+                /*if (clearTable) {
+                    resize(rows+start_row, columns+start_col);
+                    //columnNames.clear();
+                } else {
+                    resize(qMax(rowCount(), rows+start_row), qMax(columnCount(), columns+start_col));
+                }*/
+                //while (columnNames.size()<sl.size()+start_col) {
+                //    columnNames.append("");
+                //}
+                for (int i=0; i<sl.size(); i++) {
+                    int c=start_col+i;
+                    QString n=sl[i].trimmed();
+                    if (n[0]=='\"' || n[0]=='\'') {
+                        n=n.mid(1, n.size()-2);
+                    }
+                    //if (c<columnNames.size()) columnNames[c]=n;
+                    specialHeader[c]=n;
+                }
             } else if (!line.startsWith(comment_start)) {
                 int i=0;
                 while (i<line.size()) {
@@ -536,6 +563,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                         }
                         //resize(rows, columns);
                         setCellCreate(row+start_row, column+start_col, s);
+                        hasData=true;
                         //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<s<<"\n";
                         dataread=true;
                     } else if (c=='\"') {
@@ -546,7 +574,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                             i++;
                         }
                         //resize(rows, columns);
-                        setCellCreate(row+start_row, column+start_col, s);
+                        hasData=true; setCellCreate(row+start_row, column+start_col, s);
                         //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<s<<"\n";
                         dataread=true;
                     } else if (c==comment_start) {
@@ -569,12 +597,12 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                         if (ok) {
                             //resize(rows, columns);
                             if (d==round(d)) {
-                                setCellCreate(row+start_row, column+start_col, ((qlonglong)d));
+                                hasData=true; setCellCreate(row+start_row, column+start_col, ((qlonglong)d));
                                 //std::cout<<"  <"<<row<<"/"<<rows<<", "<<column<<"/"<<columns<<">="<<(qlonglong)d<<"\n";
                                 //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<(qlonglong)d<<"\n";
                                 dataread=true;
                             } else {
-                                setCellCreate(row+start_row, column+start_col, d);
+                                hasData=true; setCellCreate(row+start_row, column+start_col, d);
                                 //std::cout<<"  <"<<row<<"/"<<rows<<", "<<column<<"/"<<columns<<">="<<d<<"\n";
                                 //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<d<<"\n";
                                 dataread=true;
@@ -583,11 +611,11 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                             QDateTime dt=loc.toDateTime(s);
                             //resize(rows, columns);
                             if (dt.isValid()) {
-                                setCellCreate(row+start_row, column+start_col, dt);
+                                hasData=true; setCellCreate(row+start_row, column+start_col, dt);
                                 //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<dt<<"\n";
                                 dataread=true;
                             } else {
-                                setCellCreate(row+start_row, column+start_col, s);
+                                hasData=true; setCellCreate(row+start_row, column+start_col, s);
                                 //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<s<<"\n";
                                 dataread=true;
                             }
@@ -600,10 +628,22 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                             i++;
                         }
                         if (i<line.size()) i--;
+                        s=s.trimmed();
                         //resize(rows, columns);
+                        hasData=true;
                         if (s.toLower()=="true" || s.toLower()=="yes" || s.toLower()=="ja") setCellCreate(row+start_row, column+start_col, true);
                         else if (s.toLower()=="false" || s.toLower()=="no" || s.toLower()=="nein") setCellCreate(row+start_row, column+start_col, false);
-                        else setCellCreate(row+start_row, column+start_col, s);
+                        else {
+                            bool okd=false;
+                            double cd=s.toDouble(&okd);
+                            bool okl=false;
+                            qlonglong cl=s.toLongLong(&okl);
+                            if (!okd && !okl) {
+                                setCellCreate(row+start_row, column+start_col, s);
+                            } else {
+                                setCellCreate(row+start_row, column+start_col, cd);
+                            }
+                        }
                         //qDebug()<<"  <"<<row+start_row<<", "<<column+start_col<<">="<<s<<"\n";
                         //std::cout<<"  <"<<row<<", "<<column<<">="<<s.toStdString()<<"\n";
                         dataread=true;
@@ -617,7 +657,15 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
         if (row+1>rows) rows=row+1;
         if (column+1>columns) columns=column+1;
         column=0;
-    } ;
+    }
+
+    if (!hasTitle && specialHeader.size()>0 && abs(specialHeader.size()-columns)<columns/10) {
+        QMapIterator<int,QString> it(specialHeader);
+        while (it.hasNext()) {
+            it.next();
+            setColumnTitleCreate(it.key(), it.value());
+        }
+    }
 
     //std::cout<<"rows="<<rows<<"   columns="<<columns<<std::endl;
     //this->rows=rows;

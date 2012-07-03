@@ -744,8 +744,8 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
             w.writeStartElement("file");
             if (i<files_types.size()) {
                 if (!files_types[i].isEmpty()) {
-                    w.writeAttribute("type", files_types[i]);
-                    w.writeAttribute("description", files_desciptions[i]);
+                    if (i<files_types.size()) w.writeAttribute("type", files_types[i]);
+                    if (i<files_desciptions.size()) w.writeAttribute("description", files_desciptions[i]);
                 }
             }
             w.writeCharacters(file);

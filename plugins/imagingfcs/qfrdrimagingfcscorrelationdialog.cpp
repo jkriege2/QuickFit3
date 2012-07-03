@@ -797,7 +797,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
     ui->edtBackgroundFile->setText(backgroundF);
     ui->spinPixelWidth->setValue(pixel_width);
     ui->spinPixelHeight->setValue(pixel_height);
-    ui->chkCamera->setChecked(hasPixel);
+    ui->chkCamera->setChecked(!hasPixel);
 
 
 
