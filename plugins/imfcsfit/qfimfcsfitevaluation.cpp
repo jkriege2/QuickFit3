@@ -10,7 +10,7 @@ QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
 
     m_weighting=EqualWeighting;
     m_currentIndex=-1;
-    mutexThreadedFit=new QMutex(QMutex::Recursive);
+    //mutexThreadedFit=new QMutex(QMutex::Recursive);
 
     if (m_fitFunctions.contains("fcs_spim_diff")) {
         m_fitFunction="fcs_spim_diff";
@@ -25,7 +25,7 @@ QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
 }
 
 QFImFCSFitEvaluation::~QFImFCSFitEvaluation() {
-    delete mutexThreadedFit;
+    //delete mutexThreadedFit;
 }
 
 

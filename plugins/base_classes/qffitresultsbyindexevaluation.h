@@ -363,7 +363,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         /** \brief current index to use */
         int m_currentIndex;
 
-        QMutex* mutexThreadedFit;
+        mutable QMutex* mutexThreadedFit;
 
 
 
