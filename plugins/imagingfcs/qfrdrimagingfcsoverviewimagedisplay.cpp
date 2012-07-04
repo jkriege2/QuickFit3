@@ -169,13 +169,17 @@ void QFRDRImagingFCSOverviewImageDisplay::showHistograms(double *data, int size)
     if (!histogram) return;
     if (!data && size<=0) {
         histogram->clear();
-    } else if (histogram->histogramCount()<2) {
+    } else if (histogram->histogramCount()<1) {
         histogram->clear();
-        histogram->addHistogram( tr("full"), data, size);
-        histogram->addHistogram( tr("selection"), NULL, 0);//m->getPreviewImage(cmbImage->currentIndex()), width*height);
+        double* d=(double*)calloc(size,sizeof(double));
+        memcpy(d, data, sizeof(double)*size);
+        histogram->addHistogram( tr("full"), d, size);
+        //histogram->addHistogram( tr("selection"), NULL, 0);//m->getPreviewImage(cmbImage->currentIndex()), width*height);
     } else {
-        histogram->setHistogram(0, tr("full"), data, size);
-        histogram->setHistogram(1, tr("selection"), NULL, 0);//m->getPreviewImage(cmbImage->currentIndex()), width*height);
+        double* d=(double*)calloc(size,sizeof(double));
+        memcpy(d, data, sizeof(double)*size);
+        histogram->setHistogram(0, tr("full"), d, size);
+        //histogram->setHistogram(1, tr("selection"), NULL, 0);//m->getPreviewImage(cmbImage->currentIndex()), width*height);
     }
     histogram->updateHistogram(true);
 }

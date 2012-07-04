@@ -110,6 +110,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         virtual void displayParameters();
         void distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
 
+        void averageFirstFewFrames();
+
     protected:       
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
@@ -147,6 +149,9 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QCheckBox* chkShowKeyDist;
         QCheckBox* chkShowKeyDistResults;
         QCheckBox* chkShowKey;
+
+        QAction* actAverageFirstFrames;
+
 
     private:
         void createWidgets();

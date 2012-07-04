@@ -82,6 +82,7 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     connect(chkSlope[i], SIGNAL(toggled(bool)), w1, SLOT(setEnabled(bool)));
     connect(chkSlope[i], SIGNAL(toggled(bool)), this, SLOT(theoryChanged()));
 
+
     chkSlope[i]->setText(tr("MSD %1:").arg(i+1));
 
     //lay->addWidget(chkSlope[i]);
@@ -285,6 +286,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     splitterDist->setCollapsible(splitterDist->indexOf(pltDistribution), false);
     splitterDist->setCollapsible(splitterDist->indexOf(pltDistResults), false);
 
+    QAction* actFirst=menuParameters->actions().value(0, NULL);
+    actAverageFirstFrames=new QAction(tr("&average first few frames for N"), this);
+    connect(actAverageFirstFrames, SIGNAL(triggered()), this, SLOT(averageFirstFewFrames()));
+    menuParameters->insertAction(actFirst, actAverageFirstFrames);
+    menuParameters->insertSeparator(actFirst);
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
@@ -1050,6 +1056,54 @@ void QFFCSMSDEvaluationEditor::distzoomChangedLocally(double newxmin, double new
         pltDistribution->zoomToFit(false, true);
         connect(pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     }
+}
+
+void QFFCSMSDEvaluationEditor::averageFirstFewFrames() {
+    /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    if ((!eval)||(!record)||(!data)) return;
+
+    int data_start=datacut->get_userMin();
+    int data_end=datacut->get_userMax();
+
+    bool ok=false;
+    int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), 5, 1, data_end-data_start, 1, &ok);
+    if (ok) {
+        double *d=NULL;
+        if (eval->getCurrentIndex()<0) {
+            d=data->getCorrelationMean();
+        } else {
+            if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
+                d=data->getCorrelationRun(eval->getCurrentIndex());
+            } else {
+                d=data->getCorrelationMean();
+            }
+        }
+        if (d) {
+            double avg=0;
+            double cnt=0;
+            for (int i=data_start; i<data_start+points; i++) {
+                avg=avg+d[i];
+                cnt++;
+            }
+            avg=avg/cnt;
+            for (int i=0; i<eval->getParameterCount(eval->getCurrentModel()); i++) {
+                QString pid=eval->getParameterID(eval->getCurrentModel(), i);
+                //qDebug()<<pid<<1.0/avg;
+                if (pid=="n_particle") {
+                    eval->setFitValue(record, eval->getCurrentIndex(), eval->getCurrentModel(), pid, 1.0/avg);
+                }
+            }
+        }
+
+    }
+    widFitParams->updateWidgetValues();
+    fitParamChanged();
+
 }
 
 
