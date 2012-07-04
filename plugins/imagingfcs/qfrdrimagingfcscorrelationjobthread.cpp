@@ -1359,7 +1359,7 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<Multi
                             ccf_std[i*ccf_N+tt]=ccf_std[i*ccf_N+tt]+v*v;
                         }
                         delete ccfjb[i];
-                        ccfjb[i]=new correlatorjb<double, double>(job.S, job.P);
+                        ccfjb[i]=new correlatorjb<double, double>(job.S, job.P, 0.0);
                         free(corr1[0]);
                         free(corr1[1]);
                     }
@@ -1397,7 +1397,7 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
         acf_N=acfjk[0]->getSlots();
     } else {
         for (register uint32_t i=0; i<frame_width*frame_height; i++) {
-            acfjb.append(new correlatorjb<double, double>(job.S, job.P));
+            acfjb.append(new correlatorjb<double, double>(job.S, job.P, 0.0));
         }
         acf_N=job.S*job.P;
     }

@@ -614,7 +614,7 @@ void QFETCSPCImporterJobThread::createCorrelators() {
              }
 
          } else if (job.fcs_correlator==CORRELATOR_MTAUONEMON) {
-             corrjb[id]=new corrjb_type(job.fcs_S, job.fcs_P);
+             corrjb[id]=new corrjb_type(job.fcs_S, job.fcs_P, 0.0);
              if (fcs_tau.isEmpty()) {
                  fcs_tau.clear();
                  double** corr1=corrjb[id]->get_array_G();
