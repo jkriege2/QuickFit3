@@ -133,7 +133,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
   int                i, j;
   char               byte, inv_byte;
 
-  if ((fpga=='m')||(fpga='M')) {
+  if ((fpga=='m')||(fpga=='M')) {
      id_product = ID_PRODUCT_MASTER;
      sprintf(message, "programming master FPGA");
   } else {
