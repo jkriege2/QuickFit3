@@ -32,9 +32,14 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** Default destructor */
         virtual ~QFExtensionCameraRh2v2();
 
+        struct processingChainSettings{
+            QSettings *settings;
+            processing_chain *pc;
+            bool enabled;
+        };
+
         struct cameraSettings{
-          QSettings *settings_pc;
-          processing_chain *pc;
+          struct processingChainSettings raw,cor;
           QString *prefix;
           unsigned int xRes,yRes;
           float pixelWidth,pixelHeight;
@@ -79,6 +84,8 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
 
         /** \brief QAction used to program the FPGA */
         QAction* actProgramFPGA;
+
+        bool setConfiguration(unsigned int camera, const QSettings &settings, const QString &setName);
 
     /////////////////////////////////////////////////////////////////////////////
     // QFExtensionCamera routines
@@ -167,7 +174,8 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
 
 	protected:
         QFPluginLogService* logService;
-        QString& findGroupByType(const QString &t, const unsigned int camera);
+        bool findGroupByType(const QString &t, const unsigned int camera, QString &group);
+        bool findGroupByType(const QString &t, QSettings &settings, QString &group);
         struct cameraSettings* cameraSetting;
         QString bitfileMaster;
         QString bitfileSlave;
@@ -178,15 +186,16 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         int retryDelay;
 				
 	public:
-        bool reconfigure(unsigned int camera, const QSettings& settings, unsigned int set);
-        bool reconfigure(unsigned int camera, const QSettings& settings, const QString& setName);
-        void reconfigure2(unsigned int camera, const QSettings& settings, const QString& postfix);
+        bool reconfigure(unsigned int camera, const QSettings &settings, const QString& setName);
+        void reconfigure2(unsigned int camera, const QSettings &settings, const QString& postfix);
+        bool flashFPGA(unsigned int camera);
 
-	protected slots:
+protected slots:
 		void logger_txt(QString message){log_text(LOG_PREFIX+message);}
 		void logger_wrn(QString message){log_warning(LOG_PREFIX+message);}
 		void logger_err(QString message){log_error(LOG_PREFIX+message);}
         void programFPGA();
+        void acquisitionFinished(int camera);
 
 };
 

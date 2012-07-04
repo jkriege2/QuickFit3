@@ -11,6 +11,7 @@ DEPENDPATH += ./
 
 include(../plugins.pri)
 include(../../extlibs/usb.pri)
+LIBS += -lusb-1.0 -lusb
 
 DESTDIR = $$QFOUTPUT/plugins
 
@@ -24,15 +25,18 @@ HEADERS += cam_rh2v2.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/highrestimer.h \
     qfradhard2flashtool.h \
-    ../base_classes/radhard2flash.h
+    ../base_classes/radhard2flash.h \
+    cam_rh2v2_cfgdlg.h
 
 SOURCES += cam_rh2v2.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
     qfradhard2flashtool.cpp \
-    ../base_classes/radhard2flash.cpp
+    ../base_classes/radhard2flash.cpp \
+    cam_rh2v2_cfgdlg.cpp
 
 FORMS = \
-    qfradhard2flashtool.ui
+    qfradhard2flashtool.ui \
+    cam_rh2v2_cfgdlg.ui
 
 RESOURCES += cam_rh2v2.qrc
 
@@ -47,4 +51,5 @@ QT += gui xml svg
 CONFIG += exceptions rtti stl
 
 OTHER_FILES += \
-    cam_rh2v2.pc.ini
+    cam_rh2v2.cor.ini \
+    cam_rh2v2.raw.ini

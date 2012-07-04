@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file alias="cam_rh2v2.logo.png">cam_rh2v2.logo.png</file>
-        <file alias="cam_rh2v2.pc.ini">cam_rh2v2.pc.ini</file>
+        <file>cam_rh2v2.cor.ini</file>
+        <file>cam_rh2v2.raw.ini</file>
     </qresource>
     <qresource prefix="/camrh2v2">
         <file alias="dialog_close.png">images/dialog_close.png</file>
