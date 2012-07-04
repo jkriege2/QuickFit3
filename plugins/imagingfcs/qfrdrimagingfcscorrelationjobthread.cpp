@@ -177,7 +177,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
     } else {
         m_status=1;
         emit statusChanged(m_status);
-        emit rangeChanged(0,4280);
+        emit rangeChanged(0,4780);
 
 
         reader=NULL;
@@ -213,6 +213,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     frame_width=reader->frameWidth();
                     frame_height=reader->frameHeight();
                     average_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    sqrsum_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
 
                     baseline=job.backgroundOffset;
 
@@ -275,6 +276,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     //qDebug()<<outputFilenameBase;
                     QString configFilename=outputFilenameBase+".evalsettings.txt";
                     QString averageFilename="";
+                    QString stdFilename="";
+                    QString averageFilenameF="";
                     QString backgroundFilename="";
                     QString videoFilename="";
                     QString statisticsFilename="";
@@ -346,6 +349,48 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 averageFilename="";
                                 emit messageChanged(tr("could not create overview image '%1'!").arg(localFilename));
+                            }
+                            localFilename=averageFilenameF=outputFilenameBase+".overview_float.tif";
+                            tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            if (tif) {
+
+                                TIFFTWriteFloat(tif, average_frame, frame_width, frame_height);
+                                TIFFClose(tif);
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                averageFilenameF="";
+                                emit messageChanged(tr("could not create float overview image '%1'!").arg(localFilename));
+                            }
+
+                        }
+                        emit progressIncrement(10);
+
+                        //************** SAVE OVERVIEWSTD  IMAGE
+                        if ((m_status==1) && !was_canceled && sqrsum_frame) {
+                            emit messageChanged(tr("saving overview stddev image ..."));
+                            QString localFilename=stdFilename=outputFilenameBase+".overviewstd.tif";
+                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            if (tif) {
+                                float* sd=(float*)calloc(frame_width*frame_height, sizeof(float));
+
+                                if (frames>1) {
+                                    for (int i=0; i<frame_width*frame_height; i++) {
+                                        sd[i]=sqrt(double(frames)/double(frames-1)*(sqrsum_frame[i]-average_frame[i]*average_frame[i]));
+                                    }
+                                } else {
+                                    for (int i=0; i<frame_width*frame_height; i++) {
+                                        sd[i]=0;
+                                    }
+
+                                }
+
+                                TIFFTWriteFloat(tif, sd, frame_width, frame_height);
+                                TIFFClose(tif);
+                                free(sd);
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                averageFilenameF="";
+                                emit messageChanged(tr("could not create stddev overview image '%1'!").arg(localFilename));
                             }
 
                         }
@@ -582,11 +627,11 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             double* ccfsegments[1]={acf_segments};
                             QString error;
                             //qDebug()<<"acf = "<<acf<<"  acf_std = "<<acf_std;
-                            if (!saveCorrelationCSV(localFilename, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, input_length, error)) {
+                            if (!saveCorrelationCSV(localFilename, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, input_length, error,125)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create autocorrelation file '%1': %2!").arg(localFilename).arg(error));
                             }
-                            if (!saveCorrelationBIN(localFilename1, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, ccfsegments, error)) {
+                            if (!saveCorrelationBIN(localFilename1, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, ccfsegments, error,125)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
@@ -594,7 +639,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             else addFiles.append(localFilename);
 
                         }
-                        emit progressIncrement(10);
+                        emit progressIncrement(250);
 
 
                         //************** SAVE DCCF
@@ -607,11 +652,11 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             double* ccferr[1]={dccf_std};
                             double* ccfsegments[1]={dccf_segments};
                             QString error;
-                            if (!saveCorrelationCSV(localFilename, dccf_tau, ccf, ccferr, 1, dccf_N, frame_width, frame_height, input_length, error)) {
+                            if (!saveCorrelationCSV(localFilename, dccf_tau, ccf, ccferr, 1, dccf_N, frame_width, frame_height, input_length, error,125)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create distance crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
                             }
-                            if (!saveCorrelationBIN(localFilename1, dccf_tau, ccf, ccferr, 1, dccf_N, frame_width, frame_height, ccfsegments, error)) {
+                            if (!saveCorrelationBIN(localFilename1, dccf_tau, ccf, ccferr, 1, dccf_N, frame_width, frame_height, ccfsegments, error,125)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary distance crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
@@ -620,7 +665,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
 
                         }
-                        emit progressIncrement(10);
+                        emit progressIncrement(250);
 
 
                         //************** SAVE CCF
@@ -661,6 +706,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"input file                  : "<<d.relativeFilePath(job.filename) << "\n";
                                 if (!job.descriptionFilename.isEmpty()) text<<"input description file      : " << d.relativeFilePath(job.descriptionFilename) << "\n";
                                 if (!averageFilename.isEmpty())         text<<"overview image file         : " << d.relativeFilePath(averageFilename) << "\n";
+                                if (!averageFilenameF.isEmpty())        text<<"overview image file real    : " << d.relativeFilePath(averageFilenameF) << "\n";
+                                if (!stdFilename.isEmpty())             text<<"overview std image          : " << d.relativeFilePath(stdFilename) << "\n";
                                 if (!backgroundFilename.isEmpty())      text<<"background image file       : " << d.relativeFilePath(backgroundFilename) << "\n";
                                 if (!videoFilename.isEmpty())           text<<"video file                  : " << d.relativeFilePath(videoFilename) << "\n";
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << d.relativeFilePath(statisticsFilename) << "\n";
@@ -764,6 +811,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     if (bleachTime) free(bleachTime);
                     if (bleachFitOK) free(bleachFitOK);
                     if (average_frame) free(average_frame);
+                    if (sqrsum_frame) free(sqrsum_frame);
                     if (acf_tau) free(acf_tau);
                     if (acf) free(acf);
                     if (acf_segments) free(acf_segments);
@@ -818,13 +866,19 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 }
 
 
-bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error) const {
+bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps) {
    /* qDebug()<<corrTau<<corrs<<correrrs<<corrN<<N<<width<<height<<input_length;
     for (uint32_t j=0; j<corrN; j++) {
         qDebug()<<"corrs["<<j<<"] = "<<corrs[j];
     }*/
     QFile f(filename);
     error="";
+    int dataToWrite=width*height;
+    int progressEvery=0;
+    if (progress_steps>0) progressEvery=dataToWrite/progress_steps;
+    int progress=0;
+    int progem=0;
+    bool ok=true;
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
         QTextStream text(&f);
         text.setLocale(outLocale);
@@ -845,17 +899,28 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &file
                 } else break;
             }
             text<<"\n\n";
+            progress++;
+            if (progressEvery>0 && progress%progressEvery==0) { progem++; emit progressIncrement(1);}
         }
         f.close();
     } else {
         error=f.errorString();
-        return false;
+        ok= false;
     }
-    return true;
+    if (progressEvery>0 && progem<progress_steps)  { emit progressIncrement(progress_steps-progem); }
+
+    return ok;
 }
 
-bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error) const {
+bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps) {
     QFile f(filename);
+
+    int dataToWrite=width*height*(job.segments+1);
+    int progressEvery=0;
+    if (progress_steps>0) progressEvery=dataToWrite/progress_steps;
+    int progress=0;
+    int progem=0;
+    bool ok=true;
     if (f.open(QIODevice::WriteOnly)) {
         f.write("QF3.0imFCS"); // write header
         binfileWriteUint32(f, width);
@@ -882,6 +947,9 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
                     }*/
                 }
             }
+
+            progress++;
+            if (progressEvery>0 && progress%progressEvery==0) {progem++; emit progressIncrement(1); }
         }
 
         if (job.segments>1 && corrSegments[0]) {
@@ -894,6 +962,8 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
                             const double d=qToLittleEndian((corrSegments[j])[seg*corrN*N+p*N+i]-1.0);  f.write((char*)(&d), sizeof(d));
                         }*/
                     }
+                    progress++;
+                    if (progressEvery>0 && progress%progressEvery==0) {progem++; emit progressIncrement(1); }
                 }
             }
         }
@@ -901,9 +971,10 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
 
         f.close();
     } else {
-        return false;
+        ok= false;
     }
-    return true;
+    if (progressEvery>0 && progem<progress_steps)  { emit progressIncrement(progress_steps-progem); }
+    return ok;
 }
 
 
@@ -1224,7 +1295,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         //bool statFirst=true;
         for(register uint32_t frame=0; frame<frames; frame++) {
             float* frame_data=&(image_series[frame*frame_width*frame_height]);
-            contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
+            contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &sqrsum_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
 
             if (frames<500) {
                 emit messageChanged(tr("calculating statistics/video (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
@@ -1429,7 +1500,7 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
 }
 
 
-void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max) {
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max) {
 
     float frame_min=frame_data[0];
     float frame_max=frame_data[0];
@@ -1439,6 +1510,7 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
             frame_min=(v<frame_min)?v:frame_min;
             frame_max=(v>frame_max)?v:frame_max;
             (*average_frame)[i]=(*average_frame)[i]+(float)v/(float)frames;
+            (*sqrsum_frame)[i]=(*sqrsum_frame)[i]+(float)v*(float)v/(float)frames;
             state.sum+=v;
             state.sum2+=(v*v);
             state.video_frame[i]=state.video_frame[i]+(float)v/(float)job.video_frames;
@@ -1736,7 +1808,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 }
 
                 // CALCULATE STATISTICS AND VIDEO
-                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
+                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &sqrsum_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
 
 
 

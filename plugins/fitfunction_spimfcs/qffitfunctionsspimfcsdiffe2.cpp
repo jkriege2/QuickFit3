@@ -41,6 +41,12 @@ QFFitFunctionsSPIMFCSDiffE2::QFFitFunctionsSPIMFCSDiffE2() {
     #define FCSSDiff_focus_volume 13
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSSDiff_concentration 14
+    addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
+    #define FCSSDiff_count_rate 15
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
+    #define FCSSDiff_background 16
+    addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
+    #define FCSSDiff_cpm 17
 }
 
 double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const {
@@ -55,6 +61,10 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
     const double wxy=data[FCSSDiff_focus_width]/1.0e3;
     const double a=data[FCSSDiff_pixel_width]/1.0e3;
     const double offset=data[FCSSDiff_offset];
+    const double background=data[FCSSDiff_background];
+    const double cr=data[FCSSDiff_count_rate];
+    double backfactor=1.0/sqr(1.0+background/cr);
+    if (fabs(cr)<1e-15 || fabs(background)<1e-10) backfactor=1;
 
     double rho1=1;
     if (comp==2) {
@@ -92,7 +102,7 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
     }
 
     const double pre=1.0/sqr(a);
-    return offset+pre/N*cfac;
+    return offset+pre/N*cfac*backfactor;
 }
 
 void QFFitFunctionsSPIMFCSDiffE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
@@ -253,6 +263,11 @@ void QFFitFunctionsSPIMFCSDiffE2::calcParameter(double* data, double* error) con
     double erho2=0;
     double rho3=data[FCSSDiff_diff_rho3];
     double erho3=0;
+    double cps=data[FCSSDiff_count_rate];
+    double ecps=0;
+    double ecpm=0;
+    double background=data[FCSSDiff_background];
+    double ebackground=0;
 
     if (error) {
         eN=error[FCSSDiff_n_particle];
@@ -263,6 +278,9 @@ void QFFitFunctionsSPIMFCSDiffE2::calcParameter(double* data, double* error) con
         eoffset=error[FCSSDiff_offset];
         erho2=error[FCSSDiff_diff_rho2];
         erho3=error[FCSSDiff_diff_rho3];
+        ecps=error[FCSSDiff_count_rate];
+        ecpm=error[FCSSDiff_cpm];
+        ebackground=error[FCSSDiff_background];
     }
 
 
@@ -317,6 +335,12 @@ void QFFitFunctionsSPIMFCSDiffE2::calcParameter(double* data, double* error) con
         if ((sigmaz!=0)&&(a!=0)) error[FCSSDiff_concentration]=sqrt( sqr(eN/sqr(a)/pi32/sigmaz) + sqr(esigmaz*N/pi32/sqr(a)/sqr(sigmaz)) + sqr(ea*2.0*N/cube(a)/sigmaz/pi32) )/(NAVOGADRO * 1.0e-24);
         else error[FCSSDiff_concentration]=0;
     }
+
+
+    // calculate CPM = (CPS-background)/N
+    data[FCSSDiff_cpm]=(cps-background)/N;
+    error[FCSSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
+
 }
 
 bool QFFitFunctionsSPIMFCSDiffE2::isParameterVisible(int parameter, const double* data) const {

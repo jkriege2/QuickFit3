@@ -71,7 +71,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
             value=scrintf->getSimpleCountrateAverage(index);
             error=scrintf->getSimpleCountrateVariance(index);
         }
-        return true;
+        if (crintf||scrintf) return true;
 
     } else if (paramid=="pixel_width") {
         if (!r) return false;

@@ -13,6 +13,8 @@
 #include "jkqttools.h"
 #include "jkqtpgeoelements.h"
 #include "qfplayercontrols.h"
+#include <QTabWidget>
+#include "qfhistogramview.h"
 
 class QFRDRImagingFCSOverviewImageDisplay : public QWidget
 {
@@ -33,6 +35,8 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
 
         void displayImage();
 
+        void showHistograms(double* data, int size);
+
         void calcExpFit();
     public slots:
         /** \brief read the settings */
@@ -40,11 +44,19 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
         /** \brief write the settings */
         virtual void writeSettings(QSettings &settings, const QString &prefix=QString("")) ;
 
+    protected slots:
+        void mouseMoved(double x, double y);
+
     protected:
         QLabel* labDescription;
+        QLabel* labValue;
         QComboBox* cmbImage;
         JKQtPlotter* pltImage;
         QToolBar* toolbar;
+        QFHistogramView* histogram;
+        QCheckBox* chkHistVideo;
+
+        QTabWidget* tabMain;
 
         QFPLayerControls* player;
 

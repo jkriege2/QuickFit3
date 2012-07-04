@@ -29,6 +29,7 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     width=0;
     height=0;
     overviewF=NULL;
+    overviewFSTD=NULL;
     leaveout=NULL;
     statAvg=NULL;
     statStdDev=NULL;
@@ -174,6 +175,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 QString ft=files_types[i].toLower().trimmed();
                 if (ft=="overview") {
                     loadOverview(files[i]);
+                } else if (ft=="overview_std") {
+                    loadOverviewSTD(files[i]);
                 } else if (ft=="statistics") {
                     loadStatistics(files[i]);
                     hasStatistics=true;
@@ -188,7 +191,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 } else if (ft=="display_image") {
                     QFRDRImagingFCSData::ovrImageData img;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
-                    img.name=files_desciptions.value(i, tr("image #%1").arg(i+1));
+                    img.name=files_desciptions.value(i, tr("image #%1: %2").arg(i+1).arg(QFileInfo(files[i]).fileName()));
+                    if (img.name.isEmpty()) img.name=tr("image #%1: %2").arg(i+1).arg(QFileInfo(files[i]).fileName());
                     ovrImages.append(img);
                 } else if (ft=="overview_before") {
                     QFRDRImagingFCSData::ovrImageData img;
@@ -318,23 +322,11 @@ bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            uint16_t* ovw=(uint16_t*)malloc(nx*ny*sizeof(uint16_t));
-            ok=TIFFReadFrame<uint16_t>(tif, ovw);
-
-            //qDebug()<<"TIFF: "<<nx<<"x"<<ny<<"    data: "<<width<<"x"<<height;
-
-            if (width*height<=(int64_t)nx*(int64_t)ny) {
-                for (int32_t y=0; y<height; y++) {
-                    for (int32_t x=0; x<width; x++) {
-                        overviewF[y*width+x]=ovw[y*nx+x];
-                    }
-
-                }
-            } else {
+            if (nx!=width || ny!=height) {
                 ok=false;
+            } else {
+                ok=TIFFReadFrame<double>(tif, overviewF);
             }
-
-            free(ovw);
             TIFFClose(tif);
         }
     }
@@ -347,6 +339,34 @@ bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
     return ok;
 }
 
+bool QFRDRImagingFCSData::loadOverviewSTD(const QString& filename) {
+    bool ok=false;
+    //qDebug()<<"load: overviewFSTD="<<overviewFSTD<<filename;
+
+    if (!overviewFSTD) return false;
+
+    if (QFile::exists(filename)) {
+        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        if (tif) {
+            uint32 nx,ny;
+            TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
+            TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+            if (nx!=width || ny!=height) {
+                ok=false;
+            } else {
+                ok=TIFFReadFrame<double>(tif, overviewFSTD);
+            }
+            TIFFClose(tif);
+        }
+    }
+
+    if (!ok && overviewFSTD) {
+        for (int i=0; i<width*height; i++) {
+            overviewFSTD[i]=0;
+        }
+    }
+    return ok;
+}
 
 bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int* width, int* height) {
     bool ok=false;
@@ -430,12 +450,12 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
         QByteArray dataFromFile=file.readAll();
         file.close();
 #ifdef DEBUG_TIMING
-        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
 #endif
         //QTextStream stream(&file);
         QTextStream stream(&dataFromFile);
 #ifdef DEBUG_TIMING
-        qDebug()<<"read file contents into memory buffer     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<"read file contents into memory buffer     "<<time.elapsed()<<"ms"; time.start();
 #endif
         bool last_empty, empty=true;
         QList<QList<QTriple<double, double, double> > > data_matrix;
@@ -481,7 +501,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 
         }
 #ifdef DEBUG_TIMING
-        qDebug()<<"parsed CSV     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<"parsed CSV     "<<time.elapsed()<<"ms"; time.start();
 #endif
         dataFromFile.clear();
         width=getProperty("WIDTH").toInt();
@@ -523,7 +543,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
         }
 	}
 #ifdef DEBUG_TIMING
-        qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
 #endif
 
 	if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
@@ -560,7 +580,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
         double taufactor=getProperty("TAU_FACTOR", 1).toDouble();
         double corroffset=getProperty("CORR_OFFSET", 0).toDouble();
 #ifdef DEBUG_TIMING
-        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
 #endif
         QByteArray file_id=file.read(10);
         if (file_id=="QF3.0imFCS") {
@@ -613,7 +633,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
     }
 #ifdef DEBUG_TIMING
-    qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
+    //qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
 #endif
 
     if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
@@ -642,6 +662,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     }
     for(int i=0; i<width*height; i++) {
         overviewF[i]=cfr->getRaw(i,0);
+        overviewFSTD[i]=0;
     }
     delete cfr;
 
@@ -711,6 +732,7 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (sigmas) free(sigmas);
     if (tau) free(tau);
     if (overviewF) free(overviewF);
+    if (overviewFSTD) free(overviewFSTD);
     if (leaveout) free(leaveout);
     correlations=NULL;
     correlationMean=NULL;
@@ -719,12 +741,16 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     tau=NULL;
     overviewF=NULL;
     leaveout=NULL;
+    overviewFSTD=NULL;
+    //qDebug()<<"freed overviewFSTD="<<overviewFSTD;
     if ((x>0) && (y>0) && (N>0)) {
         correlations=(double*)calloc(x*y*N,sizeof(double));
         sigmas=(double*)calloc(x*y*N,sizeof(double));
         correlationMean=(double*)calloc(N,sizeof(double));
         correlationStdDev=(double*)calloc(N,sizeof(double));
         overviewF=(double*)calloc(x*y,sizeof(double));
+        overviewFSTD=(double*)calloc(x*y,sizeof(double));
+        //qDebug()<<"alloced: overviewFSTD="<<overviewFSTD;
         leaveout=(bool*)calloc(x*y,sizeof(bool));
         tau=(double*)calloc(N,sizeof(double));
         width=x;
@@ -734,7 +760,7 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
         setQFProperty("HEIGHT", y, false, true);
     }
 #ifdef DEBUG_SIZES
-    qDebug()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(double)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
+    //qDebug()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(double)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
 #endif
 }
 
@@ -758,7 +784,7 @@ void QFRDRImagingFCSData::allocateStatistics(uint32_t N) {
         statT=(double*)calloc(statN, sizeof(double));
     }
 #ifdef DEBUG_SIZES
-    qDebug()<<"allocateStatistics( N="<<N<<"):  "<<bytestostr(statN*5*sizeof(double)).c_str();
+    //qDebug()<<"allocateStatistics( N="<<N<<"):  "<<bytestostr(statN*5*sizeof(double)).c_str();
 #endif
 
 }
@@ -1045,36 +1071,41 @@ double *QFRDRImagingFCSData::getStatisticsMax() const {
 
 
 int QFRDRImagingFCSData::getPreviewImageCount() const {
-    return 1+ovrImages.size();
+    return 2+ovrImages.size();
 }
 
 int QFRDRImagingFCSData::getPreviewImageWidth(int image) const {
     if (image==0) return getImageFromRunsWidth();
-    if (image<=ovrImages.size()) return ovrImages[image-1].width;
+    if (image==1) return getImageFromRunsWidth();
+    if (image-1<=ovrImages.size()) return ovrImages[image-2].width;
     return 0;
 }
 
 int QFRDRImagingFCSData::getPreviewImageHeight(int image) const {
     if (image==0) return getImageFromRunsHeight();
-    if (image<=ovrImages.size()) return ovrImages[image-1].height;
+    if (image==1) return getImageFromRunsHeight();
+    if (image-1<=ovrImages.size()) return ovrImages[image-2].height;
     return 0;
 }
 
 QString QFRDRImagingFCSData::getPreviewImageName(int image) const {
     if (image==0) return tr("overview image (time average)");
-    if (image<=ovrImages.size()) return ovrImages[image-1].name;
+    if (image==1) return tr("standard deviation overview image (time average)");
+    if (image-1<=ovrImages.size()) return ovrImages[image-2].name;
     return QString("");
 }
 
 double *QFRDRImagingFCSData::getPreviewImage(int image) const {
     if (image==0) return overviewF;
-    if (image<=ovrImages.size()) return ovrImages[image-1].image;
+    //qDebug()<<"overviewFSTD="<<overviewFSTD;
+    if (image==1) return overviewFSTD;
+    if (image-1<=ovrImages.size()) return ovrImages[image-2].image;
     return NULL;
 }
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getPreviewImageGeoElements(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (image>0 && image<=ovrImages.size()) return ovrImages[image-1].geoElements;
+    if (image>1 && image<=ovrImages.size()) return ovrImages[image-2].geoElements;
     return result;
 }
 
@@ -1176,12 +1207,18 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
     return QString("%1%2").arg(getImageStackTUnitFactor(stack)*t).arg(getImageStackTUnitName(stack));
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateAverage(int /*run*/) const {
+double QFRDRImagingFCSData::getSimpleCountrateAverage(int run) const {
+    if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
+        if (run>=0) return overviewF[run];
+    }
     if (hasStatistics) return statAvgCnt/getTauMin()/1000.0;
     return 0;
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateVariance(int /*run*/) const {
+double QFRDRImagingFCSData::getSimpleCountrateVariance(int run) const {
+    if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
+        if (run>=0 && run<width*height) return overviewFSTD[run];
+    }
     if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
     return 0;
 }

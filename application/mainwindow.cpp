@@ -1244,6 +1244,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 rawDataPropEditors.append(edt);
                 edt->show();
+                edt->activateWindow();
             }
         } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
             QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
@@ -1252,6 +1253,7 @@ void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
                 edt->setAttribute(Qt::WA_DeleteOnClose);
                 evaluationPropEditors.append(edt);
                 edt->show();
+                edt->activateWindow();
             }
         }
         QApplication::restoreOverrideCursor();
@@ -1496,6 +1498,8 @@ void MainWindow::displayHelpWindow(const QString& helpfile) {
     else helpWindow->updateHelp(helpfile);
     helpWindow->show();
     helpWindow->raise();
+    helpWindow->activateWindow();
+
 }
 
 void MainWindow::displayHelp() {

@@ -258,7 +258,7 @@ protected:
     void prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double** acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
 
     /*! \brief store a set of correlation functions as a CSV file */
-    bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error) const;
+    bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps=0) ;
     /*! \brief store a set of correlation functions as a binary file
 
         The binary file has this data layout:
@@ -367,7 +367,7 @@ data                                                   size [bytes]             
 \endverbatim
         \note All numbers are stored in little-endian form!!! and the pixel order is always row major!
     */
-    bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error) const;
+    bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0) ;
 
     struct contribute_to_statistics_state {
         float sum;
@@ -379,7 +379,7 @@ data                                                   size [bytes]             
         uint64_t cnt;
     };
 
-    void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max);
+    void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max);
 
 
     int m_status;
@@ -396,6 +396,7 @@ data                                                   size [bytes]             
     uint32_t frame_width;
     uint32_t frame_height;
     float* average_frame;
+    float* sqrsum_frame;
     float* video;
     uint32_t video_count;
     uint32_t real_video_count;

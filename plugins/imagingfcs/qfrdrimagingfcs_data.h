@@ -150,6 +150,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief load overview image file */
         bool loadOverview(const QString& filename);
 
+        /** \brief load standard deviation overview image file */
+        bool loadOverviewSTD(const QString& filename);
+
         /** \brief load an image file into the given arrays */
         bool loadImage(const QString &filename, double **data, int *width, int *height);
 
@@ -199,6 +202,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         /** \brief overview image */
         double* overviewF;
+        double* overviewFSTD;
 
         struct ovrImageData {
             double* image;

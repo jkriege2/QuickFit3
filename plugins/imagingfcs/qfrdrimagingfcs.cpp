@@ -282,6 +282,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
     QString filename_overview=filename_overvieww;
+    QString filename_overviewstd="";
     QString filename_background="";
     QString filename_statistics="";
     QString filename_settings="";
@@ -351,6 +352,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     if (QFile::exists(filename)) {
         int width=0;
         int height=0;
+        bool overviewReal=false;
         if (QFile::exists(evalFilename)) {
             QFile file(evalFilename);
             QDir d=QFileInfo(evalFilename).absoluteDir();
@@ -435,6 +437,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="video sum up") {
                             initParams["VIDEO_AVGFRAMES"]=value.toInt();
                             paramsReadonly<<"VIDEO_AVGFRAMES";
+                        } else if (name=="video avgmin") {
+                            initParams["VIDEO_AVGMIN"]=value.toDouble();
+                            paramsReadonly<<"VIDEO_AVGMIN";
+                        } else if (name=="video avgmax") {
+                            initParams["VIDEO_AVGMAX"]=value.toDouble();
+                            paramsReadonly<<"VIDEO_AVGMAX";
                         } else if (name=="duration [s]") {
                             initParams["EVALUATION_DURATION"]=value.toInt();
                             paramsReadonly<<"EVALUATION_DURATION";
@@ -479,7 +487,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         QString value=line.mid(colon_idx+1).trimmed();
                         //qDebug()<<name<<value;
                         if (name=="overview image file") {
+                            if (!overviewReal) filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        } else if (name=="overview image file real") {
                             filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                            overviewReal=true;
+                        } else if (name=="overview std image") {
+                            filename_overviewstd=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="background image file") {
                             filename_background=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="video file") {
@@ -524,6 +537,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 files<<filename_overview;
                 files_types<<"overview";
                 files_descriptions<<tr("average image");
+            }
+            if (QFile::exists(filename_overviewstd)) {
+                files<<filename_overviewstd;
+                files_types<<"overview_std";
+                files_descriptions<<tr("standard deviation for overview image");
             }
             if (QFile::exists(filename_video)) {
                 files<<filename_video;
@@ -608,6 +626,9 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
             initParams["WIDTH"]=width;
             initParams["HEIGHT"]=height;
+
+            initParams["IS_OVERVIEW_SCALED"]=!overviewReal;
+            paramsReadonly<<"IS_OVERVIEW_SCALED";
 
 
             int columns=1;
