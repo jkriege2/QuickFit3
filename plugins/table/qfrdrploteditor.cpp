@@ -31,7 +31,9 @@ void QFRDRPlotEditor::createWidgets() {
     l->addWidget(tabPlots);
 
     actAddPlot=new QAction(QIcon(":/table/plot_add.png"), tr("add plot"), this);
+    connect(actAddPlot, SIGNAL(triggered()), this, SLOT(addPlot()));
     actDeletePlot=new QAction(QIcon(":/table/plot_delete.png"), tr("delete current plot"), this);
+    connect(actDeletePlot, SIGNAL(triggered()), this, SLOT(deleteCurrentPlot()));
 
     tbMain->addAction(actAddPlot);
     tbMain->addAction(actDeletePlot);
@@ -67,18 +69,33 @@ void QFRDRPlotEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* 
 }
 
 void QFRDRPlotEditor::rawDataChanged() {
+    for (int i=0; i<plotWidgets.size(); i++)         {
+        if (plotWidgets[i]) {
+            plotWidgets[i]->rawDataChanged();
+        }
+    }
 }
 
 void QFRDRPlotEditor::readSettings() {
     if (settings) {
         //std::cout<<"QFRDRPlotEditor::readSettings()\n";
         currentPlotDir=settings->getQSettings()->value("rawtableeditor/currentPlotDir", currentPlotDir).toString();
+        for (int i=0; i<plotWidgets.size(); i++)         {
+            if (plotWidgets[i]) {
+                plotWidgets[i]->readSettings(*(settings->getQSettings()), QString("rawtableeditor/plotwidget%1/").arg(i));
+            }
+        }
     }
 }
 
 void QFRDRPlotEditor::writeSettings() {
     if (settings) {
         settings->getQSettings()->setValue("rawtableeditor/currentPlotDir", currentPlotDir);
+        for (int i=0; i<plotWidgets.size(); i++)         {
+            if (plotWidgets[i]) {
+                plotWidgets[i]->writeSettings(*(settings->getQSettings()), QString("rawtableeditor/plotwidget%1/").arg(i));
+            }
+        }
         settings->getQSettings()->sync();
     }
 }
@@ -86,16 +103,17 @@ void QFRDRPlotEditor::writeSettings() {
 void QFRDRPlotEditor::addPlot() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
-        if (m->model()) {
-        }
+        updating=true;
+        qDebug()<<"adding plot";
+        m->addPlot();
+        rebuildPlotWidgets();
+        updating=false;
     }
 
 }
 
 void QFRDRPlotEditor::deleteCurrentPlot() {
-    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
-    if (m) {
-    }
+    deletePlot(tabPlots->currentIndex());
 
 }
 
@@ -110,16 +128,18 @@ void QFRDRPlotEditor::deletePlot(int i) {
 }
 
 void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
-
+    qDebug()<<"rebuilding plot widgets";
     bool updt=updating;
     updating=true;
     int pos=tabPlots->currentIndex();
 
     if (!current) {
+        qDebug()<<"   clearPlotWIdgets";
         clearPlotWidgets();
     } else {
         while (plotWidgets.size()<current->getPlotCount()) {
             plotWidgets.append(new QFRDRTablePlotWidget(current, plotWidgets.size(), tabPlots));
+            tabPlots->addTab(plotWidgets[plotWidgets.size()-1], "plot");
         }
         while (plotWidgets.size()>current->getPlotCount()) {
             int idx=tabPlots->indexOf(plotWidgets.last());
@@ -129,6 +149,8 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
             if (plotWidgets.last()) delete plotWidgets.last();
         }
         for (int i=0; i<current->getPlotCount(); i++) {
+            //qDebug()<<"   setRecord "<<i;
+            tabPlots->setTabText(i, tr("plot %1").arg(i+1));
             plotWidgets[i]->setRecord(current, i);
         }
     }

@@ -3,16 +3,18 @@
 #include <QtXml>
 #include "qfrdrtableeditor.h"
 #include "qfrdrploteditor.h"
+#include "qftools.h"
 
 QFRDRTable::GraphInfo::GraphInfo() {
     title="";
+    type=QFRDRTable::gtLines;
     xcolumn=-1;
     ycolumn=-1;
     xerrorcolumn=-1;
     yerrorcolumn=-1;
     style=Qt::SolidLine;
     color=QColor("red");
-    errorcolor=color.darker();
+    errorColor=color.darker();
     linewidth=1;
     symbol=JKQTPnoSymbol;
     symbolSize=5;
@@ -78,8 +80,7 @@ QFRDRTable::PlotInfo QFRDRTable::getPlot(int i) const
     return plots[i];
 }
 
-void QFRDRTable::addPlot()
-{
+void QFRDRTable::addPlot() {
     PlotInfo info;
     info.title="new graph";
     plots.append(info);
@@ -238,7 +239,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 QDomElement ge=te.firstChildElement("graph");
                 while (!ge.isNull()) {
                     GraphInfo graph;
+                    graph.type=String2GraphType(ge.attribute("type"));
                     graph.title=ge.attribute("title");
+                    graph.drawLine= QStringToBool(ge.attribute("drawline", "true"));
                     graph.xcolumn=ge.attribute("xcolumn", "-1").toInt();
                     graph.ycolumn=ge.attribute("ycolumn", "-1").toInt();
                     graph.xerrorcolumn=ge.attribute("xerrorcolumn", "-1").toInt();
@@ -246,7 +249,8 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.linewidth=ge.attribute("linewidth", "1").toDouble();
                     graph.symbolSize=ge.attribute("symbolSize", "1").toDouble();
                     graph.color=QColor(ge.attribute("color", "blue"));
-                    graph.errorcolor=QColor(ge.attribute("errorcolor", "darkblue"));
+                    graph.errorColor=QColor(ge.attribute("errorcolor", "darkblue"));
+                    graph.fillColor=QColor(ge.attribute("fillcolor", "blue"));
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));
@@ -298,7 +302,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
 
         for (int g=0; g<plots[i].graphs.size(); g++) {
             w.writeStartElement("graph");
+            w.writeAttribute("type", GraphType2String(plots[i].graphs[g].type));
             w.writeAttribute("title", plots[i].graphs[g].title);
+            w.writeAttribute("drawline", boolToQString( plots[i].graphs[g].drawLine));
             w.writeAttribute("xcolumn", QString::number(plots[i].graphs[g].xcolumn));
             w.writeAttribute("ycolumn", QString::number(plots[i].graphs[g].ycolumn));
             w.writeAttribute("xerrorcolumn", QString::number(plots[i].graphs[g].xerrorcolumn));
@@ -307,7 +313,8 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("symbolSize", QString::number(plots[i].graphs[g].symbolSize));
             w.writeAttribute("style", QPenStyle2String(plots[i].graphs[g].style));
             w.writeAttribute("color", QColor2String(plots[i].graphs[g].color));
-            w.writeAttribute("errorcolor", QColor2String(plots[i].graphs[g].errorcolor));
+            w.writeAttribute("errorcolor", QColor2String(plots[i].graphs[g].errorColor));
+            w.writeAttribute("fillcolor", QColor2String(plots[i].graphs[g].fillColor));
             w.writeAttribute("symbol", JKQTPgraphSymbols2String(plots[i].graphs[g].symbol));
             w.writeAttribute("errorStyle", JKQTPerrorPlotstyle2String(plots[i].graphs[g].errorStyle));
             w.writeEndElement();

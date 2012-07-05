@@ -62,6 +62,7 @@ class QFRDRTable : public QFRawDataRecord {
 
         struct GraphInfo {
             GraphInfo();
+            GraphType type;
             QString title;
             int xcolumn;
             int ycolumn;
@@ -69,11 +70,13 @@ class QFRDRTable : public QFRawDataRecord {
             int yerrorcolumn;
             Qt::PenStyle style;
             QColor color;
-            QColor errorcolor;
+            QColor errorColor;
+            QColor fillColor;
             double linewidth;
             JKQTPgraphSymbols symbol;
             double symbolSize;
             JKQTPerrorPlotstyle errorStyle;
+            bool drawLine;
         };
 
         struct PlotInfo {
