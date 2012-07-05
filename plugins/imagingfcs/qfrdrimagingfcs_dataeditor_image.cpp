@@ -11,6 +11,8 @@
 #include "statistics_tools.h"
 #include "jkqtpelements.h"
 #include "qfrdrimagingfcsmaskbyintensity.h"
+#include "qftools.h"
+#include "qfrawdatapropertyeditor.h"
 
 #define sqr(x) ((x)*(x))
 
@@ -179,42 +181,42 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wmask->setLayout(glmask);
 
     int mskgrpRow=0;
-    btnDontUse=new QPushButton(QIcon(":/imaging_fcs/mask.png"), tr("&mask selected"), w);
-    btnDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
-    connect(btnDontUse, SIGNAL(clicked()), this, SLOT(excludeRuns()));
+    btnDontUse=createButtonAndActionShowText(actDontUse, QIcon(":/imaging_fcs/mask.png"), tr("&mask selected"), w);
+    actDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
+    connect(actDontUse, SIGNAL(triggered()), this, SLOT(excludeRuns()));
     glmask->addWidget(btnDontUse, mskgrpRow, 0);
-    btnUse=new QPushButton(QIcon(":/imaging_fcs/unmask.png"), tr("&unmask selected"), w);
-    btnUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
-    connect(btnUse, SIGNAL(clicked()), this, SLOT(includeRuns()));
+    btnUse=createButtonAndActionShowText(actUse, QIcon(":/imaging_fcs/unmask.png"), tr("&unmask selected"), w);
+    actUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
+    connect(actUse, SIGNAL(triggered()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, mskgrpRow, 1);
 
-    btnUseAll=new QPushButton(QIcon(":/imaging_fcs/clearmask.png"), tr("&clear mask"), w);
-    btnUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
+    btnUseAll=createButtonAndActionShowText(actUseAll, QIcon(":/imaging_fcs/clearmask.png"), tr("&clear mask"), w);
+    actUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnUseAll, mskgrpRow, 2);
-    connect(btnUseAll, SIGNAL(clicked()), this, SLOT(includeAll()));
+    connect(actUseAll, SIGNAL(triggered()), this, SLOT(includeAll()));
     mskgrpRow++;
-    btnInvertMask=new QPushButton(QIcon(":/imaging_fcs/invertmask.png"), tr("&invert mask"), w);
-    btnInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
+    btnInvertMask=createButtonAndActionShowText(actInvertMask, QIcon(":/imaging_fcs/invertmask.png"), tr("&invert mask"), w);
+    actInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnInvertMask, mskgrpRow, 0);
-    connect(btnInvertMask, SIGNAL(clicked()), this, SLOT(invertMask()));
+    connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
 
-    btnSaveMask=new QPushButton(QIcon(":/imaging_fcs/savemask.png"), tr("&save mask"), w);
-    btnSaveMask->setToolTip(tr("save the mask to harddisk"));
+    btnSaveMask=createButtonAndActionShowText(actSaveMask, QIcon(":/imaging_fcs/savemask.png"), tr("&save mask"), w);
+    actSaveMask->setToolTip(tr("save the mask to harddisk"));
     glmask->addWidget(btnSaveMask, mskgrpRow, 1);
-    connect(btnSaveMask, SIGNAL(clicked()), this, SLOT(saveMask()));
-    btnLoadMask=new QPushButton(QIcon(":/imaging_fcs/loadmask.png"), tr("&load mask"), w);
-    btnLoadMask->setToolTip(tr("load a mask from harddisk"));
+    connect(actSaveMask, SIGNAL(triggered()), this, SLOT(saveMask()));
+    btnLoadMask=createButtonAndActionShowText(actLoadMask, QIcon(":/imaging_fcs/loadmask.png"), tr("&load mask"), w);
+    actLoadMask->setToolTip(tr("load a mask from harddisk"));
     glmask->addWidget(btnLoadMask, mskgrpRow, 2);
-    connect(btnLoadMask, SIGNAL(clicked()), this, SLOT(loadMask()));
+    connect(actLoadMask, SIGNAL(triggered()), this, SLOT(loadMask()));
     mskgrpRow++;
-    btnSaveSelection=new QPushButton(QIcon(":/imaging_fcs/saveselection.png"), tr("&save selection"), w);
-    btnSaveSelection->setToolTip(tr("save the selection to harddisk"));
+    btnSaveSelection=createButtonAndActionShowText(actSaveSelection, QIcon(":/imaging_fcs/saveselection.png"), tr("&save selection"), w);
+    actSaveSelection->setToolTip(tr("save the selection to harddisk"));
     glmask->addWidget(btnSaveSelection, mskgrpRow, 0);
-    connect(btnSaveSelection, SIGNAL(clicked()), this, SLOT(saveSelection()));
-    btnLoadSelection=new QPushButton(QIcon(":/imaging_fcs/loadselection.png"), tr("&load selection"), w);
-    btnLoadSelection->setToolTip(tr("load a selection from harddisk"));
+    connect(actSaveSelection, SIGNAL(triggered()), this, SLOT(saveSelection()));
+    btnLoadSelection=createButtonAndActionShowText(actLoadSelection, QIcon(":/imaging_fcs/loadselection.png"), tr("&load selection"), w);
+    actLoadSelection->setToolTip(tr("load a selection from harddisk"));
     glmask->addWidget(btnLoadSelection, mskgrpRow, 1);
-    connect(btnLoadSelection, SIGNAL(clicked()), this, SLOT(loadSelection()));
+    connect(actLoadSelection, SIGNAL(triggered()), this, SLOT(loadSelection()));
 
 
     mskgrpRow++;
@@ -223,27 +225,27 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     glmask->addWidget(frame, mskgrpRow, 0, 1, 3);
 
     mskgrpRow++;
-    btnMaskByIntensity=new QPushButton(tr("mask by &overview"), w);
-    btnMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
+    btnMaskByIntensity=createButtonAndActionShowText(actMaskByIntensity, tr("mask by &overview"), w);
+    actMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
-    connect(btnMaskByIntensity, SIGNAL(clicked()), this, SLOT(excludeByIntensity()));
-    btnMaskByGofIntensity=new QPushButton(tr("mask by &GOF"), w);
-    btnMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
+    connect(actMaskByIntensity, SIGNAL(triggered()), this, SLOT(excludeByIntensity()));
+    btnMaskByGofIntensity=createButtonAndActionShowText(actMaskByGofIntensity, tr("mask by &GOF"), w);
+    actMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByGofIntensity, mskgrpRow, 1);
-    connect(btnMaskByGofIntensity, SIGNAL(clicked()), this, SLOT(excludeByGOFIntensity()));
-    btnMaskByParamIntensity=new QPushButton(tr("mask by &param img"), w);
-    btnMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
+    connect(actMaskByGofIntensity, SIGNAL(triggered()), this, SLOT(excludeByGOFIntensity()));
+    btnMaskByParamIntensity=createButtonAndActionShowText(actMaskByParamIntensity, tr("mask by &param img"), w);
+    actMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 2);
-    connect(btnMaskByParamIntensity, SIGNAL(clicked()), this, SLOT(excludeByParamIntensity()));
+    connect(actMaskByParamIntensity, SIGNAL(triggered()), this, SLOT(excludeByParamIntensity()));
 
 
 
@@ -764,29 +766,29 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
 
     QGridLayout* grdTop=new QGridLayout(this);
-    btnPrintReport = new QPushButton(QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
-    btnPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
+    btnPrintReport = createButtonAndActionShowText(actPrintReport, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
+    actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
                                   "<li>all images (parameter, mask, goodnes-of-fit, overview</li>"
                                   "<li>correlation curves and fit parameters</li>"
                                   "<li>histpgram and statistics</li>"
                                   "<li>additional data (files, description configuration ...)</li>"
                                   "</ul>"));
 
-    connect(btnPrintReport, SIGNAL(clicked()), this, SLOT(printReport()));
-    btnSaveReport = new QPushButton(QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
-    btnSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
+    btnSaveReport = createButtonAndActionShowText(actSaveReport, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
+    actSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
                                   "<li>all images (parameter, mask, goodnes-of-fit, overview)</li>"
                                   "<li>correlation curves and fit parameters</li>"
                                   "<li>histpgram and statistics</li>"
                                   "<li>additional data (files, description configuration ...)</li>"
                                   "</ul>"));
-    connect(btnSaveReport, SIGNAL(clicked()), this, SLOT(saveReport()));
-    btnSaveData = new QPushButton(QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
-    btnSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, goodnes-of-fit, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
-    connect(btnSaveData, SIGNAL(clicked()), this, SLOT(saveData()));
-    btnCopyDataToMatlab = new QPushButton(QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy to &Matlab"), this);
-    btnCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as a Matlab script."));
-    connect(btnCopyDataToMatlab, SIGNAL(clicked()), this, SLOT(copyToMatlab()));
+    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+    btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
+    actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, goodnes-of-fit, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
+    connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
+    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy to &Matlab"), this);
+    actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as a Matlab script."));
+    connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
     grdTop->addWidget(grpTop, 0, 2, 3, 1);
     grdTop->addWidget(btnSaveData, 0, 0);
     grdTop->addWidget(btnCopyDataToMatlab, 1, 0);
@@ -967,7 +969,36 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     connectParameterWidgets();
-};
+
+
+
+
+
+    menuData=propertyEditor->addMenu("&Data", 0);
+    menuData->addAction(actSaveData);
+    menuData->addAction(actCopyDataToMatlab);
+    menuData->addSeparator();
+    menuData->addAction(actSaveReport);
+    menuData->addAction(actPrintReport);
+
+    menuMask=propertyEditor->addMenu("&Mask", 0);
+    menuMask->addAction(actUse);
+    menuMask->addAction(actDontUse);
+    menuMask->addAction(actUseAll);
+    menuMask->addAction(actInvertMask);
+    menuMask->addAction(actMaskByIntensity);
+    menuMask->addAction(actMaskByGofIntensity);
+    menuMask->addAction(actMaskByParamIntensity);
+    menuMask->addSeparator();
+    menuMask->addAction(actSaveMask);
+    menuMask->addAction(actLoadMask);
+
+    menuSelection=propertyEditor->addMenu("&Selection", 0);
+    menuSelection->addAction(actSaveSelection);
+    menuSelection->addAction(actLoadSelection);
+
+
+}
 
 void QFRDRImagingFCSImageEditor::saveImageSettings() {
     if (current){

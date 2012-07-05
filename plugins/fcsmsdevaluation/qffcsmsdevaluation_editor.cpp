@@ -1071,8 +1071,9 @@ void QFFCSMSDEvaluationEditor::averageFirstFewFrames() {
     int data_end=datacut->get_userMax();
 
     bool ok=false;
-    int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), 5, 1, data_end-data_start, 1, &ok);
+    int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), ProgramOptions::getConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", 5).toInt(), 1, data_end-data_start, 1, &ok);
     if (ok) {
+        ProgramOptions::setConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", points);
         double *d=NULL;
         if (eval->getCurrentIndex()<0) {
             d=data->getCorrelationMean();

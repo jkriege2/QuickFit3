@@ -36,8 +36,11 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
         void displayImage();
 
         void showHistograms(double* data, int size);
+        /** \brief replot the selection displays only */
+        void replotSelection(bool replot=true);
 
-        void calcExpFit();
+        void setImageEditMode();
+        void updateSelectionArrays();
     public slots:
         /** \brief read the settings */
         virtual void readSettings(QSettings &settings, const QString &prefix=QString("")) ;
@@ -46,10 +49,16 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
 
     protected slots:
         void mouseMoved(double x, double y);
-
+        void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
+        void imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool last);
+        void imageRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers);
+        void imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers);
+        void imageCircleFinished(double x, double y, double radius, Qt::KeyboardModifiers modifiers);
+        void imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers);
     protected:
         QLabel* labDescription;
         QLabel* labValue;
+        QLabel* labImageAvg;
         QComboBox* cmbImage;
         JKQtPlotter* pltImage;
         QToolBar* toolbar;
@@ -62,8 +71,29 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
 
         JKQTPMathImage* image;
         QList<JKQTPgraph*> overlayGraphs;
+        /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
+        JKQTPOverlayImageEnhanced* plteSelected;
 
         QFRawDataRecord* current;
+        /** \brief set which contains all currently selected runs */
+        QSet<int32_t> selected;
+        int selected_width;
+        int selected_height;
+        /** \brief data in plteOverviewSelected */
+        bool* plteOverviewSelectedData;
+        /** \brief size of plteOverviewSelectedData */
+        int plteOverviewSize;
+
+
+        QAction* actImagesZoom;
+        QAction* actImagesDrawPoints;
+        QAction* actImagesDrawRectangle;
+        QAction* actImagesDrawCircle;
+        QAction* actImagesDrawEllipse;
+        QAction* actImagesDrawLine;
+        QAction* actImagesScribble;
+        QActionGroup* agImageSelectionActions;
+
 
         void createWidgets();
 

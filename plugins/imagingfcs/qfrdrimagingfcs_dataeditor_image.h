@@ -155,6 +155,7 @@ protected:
         void imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers);
         void setImageEditMode();
 
+
         /** \brief activated when the user selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
         void parameterSetChanged();
         /** \brief activated when the user selects a new parameter*/
@@ -247,30 +248,15 @@ protected:
         QComboBox* cmbRunStyle;
         /** \brief a combobox to select how the error of the runs are displayed */
         QComboBox* cmbRunErrorStyle;
-        /** \brief a button which excludes the selected runs from the evaluation */
-        QPushButton* btnDontUse;
-        /** \brief a button which includes the selected runs to the evaluation */
-        QPushButton* btnUse;
-        /** \brief a button which includes all runs to the evaluation */
-        QPushButton* btnUseAll;
-        /** \brief a button which inverts the mask */
-        QPushButton* btnInvertMask;
-        /** \brief button to mask pixels by intensity */
-        QPushButton* btnMaskByIntensity;
-        /** \brief button to mask pixels by gof image */
-        QPushButton* btnMaskByGofIntensity;
-        /** \brief button to mask pixels by parameter image */
-        QPushButton* btnMaskByParamIntensity;
         /** \brief checkbox to select log tau-axis */
         QCheckBox* chkLogTauAxis;
         /** \brief label for the run options */
         QLabel* labRunOptions;
         /** \brief checkbox to select whether to display key in the graphs */
         QCheckBox* chkKeys;
-        QPushButton* btnLoadSelection;
-        QPushButton* btnLoadMask;
-        QPushButton* btnSaveSelection;
-        QPushButton* btnSaveMask;
+
+
+
 
         /** \brief label over the parameter image plot */
         QLabel* labParamImage;
@@ -382,15 +368,9 @@ protected:
 
         QFTableModel* tabFitvals;
 
-        /** \brief action to print a report */
-        QPushButton* btnPrintReport;
 
-        /** \brief action to save a report */
-        QPushButton* btnSaveReport;
-        /** \brief action to save image data */
-        QPushButton* btnSaveData;
-        /** \brief action to copy image data to Matlab */
-        QPushButton* btnCopyDataToMatlab;
+
+
 
 
         /** \brief plotter widget for the parameter histogram */
@@ -455,6 +435,81 @@ protected:
         bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index);
 
         void createReportDoc(QTextDocument* document);
+
+
+
+
+
+
+
+
+
+
+        /** \brief a button which excludes the selected runs from the evaluation */
+        QToolButton* btnDontUse;
+        /** \brief a button which includes the selected runs to the evaluation */
+        QToolButton* btnUse;
+        /** \brief a button which includes all runs to the evaluation */
+        QToolButton* btnUseAll;
+        /** \brief a button which inverts the mask */
+        QToolButton* btnInvertMask;
+        /** \brief button to mask pixels by intensity */
+        QToolButton* btnMaskByIntensity;
+        /** \brief button to mask pixels by gof image */
+        QToolButton* btnMaskByGofIntensity;
+        /** \brief button to mask pixels by parameter image */
+        QToolButton* btnMaskByParamIntensity;
+
+        QToolButton* btnLoadSelection;
+        QToolButton* btnLoadMask;
+        QToolButton* btnSaveSelection;
+        QToolButton* btnSaveMask;
+        /** \brief action to print a report */
+        QToolButton* btnPrintReport;
+
+        /** \brief action to save a report */
+        QToolButton* btnSaveReport;
+        /** \brief action to save image data */
+        QToolButton* btnSaveData;
+        /** \brief action to copy image data to Matlab */
+        QToolButton* btnCopyDataToMatlab;
+
+
+
+
+
+        /** \brief a button which excludes the selected runs from the evaluation */
+        QAction* actDontUse;
+        /** \brief a button which includes the selected runs to the evaluation */
+        QAction* actUse;
+        /** \brief a button which includes all runs to the evaluation */
+        QAction* actUseAll;
+        /** \brief a button which inverts the mask */
+        QAction* actInvertMask;
+        /** \brief button to mask pixels by intensity */
+        QAction* actMaskByIntensity;
+        /** \brief button to mask pixels by gof image */
+        QAction* actMaskByGofIntensity;
+        /** \brief button to mask pixels by parameter image */
+        QAction* actMaskByParamIntensity;
+
+        QAction* actLoadSelection;
+        QAction* actLoadMask;
+        QAction* actSaveSelection;
+        QAction* actSaveMask;
+        /** \brief action to print a report */
+        QAction* actPrintReport;
+
+        /** \brief action to save a report */
+        QAction* actSaveReport;
+        /** \brief action to save image data */
+        QAction* actSaveData;
+        /** \brief action to copy image data to Matlab */
+        QAction* actCopyDataToMatlab;
+
+        QMenu* menuData;
+        QMenu* menuMask;
+        QMenu* menuSelection;
 };
 
 #endif // QFRDRIMAGINGFCSEDITORIMAGE_H

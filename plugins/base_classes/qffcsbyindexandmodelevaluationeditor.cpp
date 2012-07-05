@@ -441,6 +441,20 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     connect(datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));
 
 
+    menuResults=propertyEditor->addMenu("&Results", 0);
+    menuResults->addAction(pltData->get_plotter()->get_actSaveData());
+    menuResults->addAction(pltData->get_plotter()->get_actSavePlot());
+    menuResults->addAction(pltData->get_plotter()->get_actPrint());
+    menuResults->addSeparator();
+    menuResults->addAction(pltData->get_plotter()->get_actCopyData());
+    menuResults->addAction(pltData->get_plotter()->get_actCopyMatlab());
+    menuResults->addAction(pltData->get_plotter()->get_actCopyPixelImage());
+    pltData->get_plotter()->get_actCopyPixelImage()->setText("copy correlation plot");
+    pltData->get_plotter()->get_actPrint()->setText("print correlation plot");
+    pltData->get_plotter()->get_actSavePlot()->setText("save correlation plot");
+    menuResults->addSeparator();
+    menuResults->addAction(actSaveReport);
+    menuResults->addAction(actPrintReport);
 
     menuParameters=propertyEditor->addMenu("&Parameters", 0);
     menuParameters->addAction(actResetCurrent);
@@ -462,20 +476,6 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     menuFit->addAction(actFitAll);
 
 
-    menuResults=propertyEditor->addMenu("&Results", 0);
-    menuResults->addAction(pltData->get_plotter()->get_actSaveData());
-    menuResults->addAction(pltData->get_plotter()->get_actSavePlot());
-    menuResults->addAction(pltData->get_plotter()->get_actPrint());
-    menuResults->addSeparator();
-    menuResults->addAction(pltData->get_plotter()->get_actCopyData());
-    menuResults->addAction(pltData->get_plotter()->get_actCopyMatlab());
-    menuResults->addAction(pltData->get_plotter()->get_actCopyPixelImage());
-    pltData->get_plotter()->get_actCopyPixelImage()->setText("copy correlation plot");
-    pltData->get_plotter()->get_actPrint()->setText("print correlation plot");
-    pltData->get_plotter()->get_actSavePlot()->setText("save correlation plot");
-    menuResults->addSeparator();
-    menuResults->addAction(actSaveReport);
-    menuResults->addAction(actPrintReport);
 }
 
 int QFFCSByIndexAndModelEvaluationEditor::getUserMinAbsMax(QFRawDataRecord *rec, int index) {
