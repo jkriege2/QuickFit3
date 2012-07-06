@@ -365,13 +365,13 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->getXAxis()->set_labelFont(p.fontName);
         ui->plotter->getXAxis()->set_labelFontSize(p.axisLabelFontSize);
         ui->plotter->getXAxis()->set_tickLabelFont(p.fontName);
-        ui->plotter->getXAxis()->set_tickLabelFontSize(p.axisLabelFontSize);
+        ui->plotter->getXAxis()->set_tickLabelFontSize(p.axisFontSize);
         ui->plotter->getYAxis()->set_axisLabel(p.ylabel);
         ui->plotter->getYAxis()->set_logAxis(p.ylog);
         ui->plotter->getYAxis()->set_labelFont(p.fontName);
         ui->plotter->getYAxis()->set_labelFontSize(p.axisLabelFontSize);
         ui->plotter->getYAxis()->set_tickLabelFont(p.fontName);
-        ui->plotter->getYAxis()->set_tickLabelFontSize(p.axisLabelFontSize);
+        ui->plotter->getYAxis()->set_tickLabelFontSize(p.axisFontSize);
         ui->plotter->get_plotter()->set_keyFont(p.fontName);
         ui->plotter->get_plotter()->set_keyFontSize(p.keyFontSize);
         ui->plotter->setGrid(p.grid);
