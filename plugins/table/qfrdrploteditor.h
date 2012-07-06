@@ -47,6 +47,7 @@ class QFRDRPlotEditor : public QFRawDataEditor {
         void deletePlot(int i);
         void rebuildPlotWidgets(bool keepPosition=false);
         void clearPlotWidgets();
+        void updatePlotName(int plot, QString title);
     protected:
 
         QPointer<QFRDRTable> current;

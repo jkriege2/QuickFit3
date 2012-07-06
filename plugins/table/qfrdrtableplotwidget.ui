@@ -14,20 +14,36 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="margin">
-    <number>5</number>
-   </property>
    <item>
     <widget class="QVisibleHandleSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="JKQtPlotter" name="plotter" native="true"/>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <layout class="QVBoxLayout" name="layPlot">
+       <item>
+        <widget class="JKQtPlotter" name="plotter" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>200</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>1</number>
       </property>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tabPlots">
        <attribute name="title">
         <string>&amp;Plots</string>
        </attribute>
@@ -203,7 +219,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tabSystem">
        <attribute name="title">
         <string>&amp;System</string>
        </attribute>
@@ -247,6 +263,208 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>x axis range:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>y axis range:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>axis scaling:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QCheckBox" name="chkLogX">
+            <property name="text">
+             <string>x: log-scale</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="chkLogY">
+            <property name="text">
+             <string>y: log-scale</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item row="4" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QFDoubleEdit" name="edtXMin"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFDoubleEdit" name="edtXMax"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAutoscaleX">
+            <property name="text">
+             <string>autoscale</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QFDoubleEdit" name="edtYMin"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFDoubleEdit" name="edtYMax"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAutoscaleY">
+            <property name="text">
+             <string>autoscale</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>key:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QCheckBox" name="chkShowKey">
+            <property name="text">
+             <string>show key</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>grid:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QCheckBox" name="chkGrid">
+          <property name="text">
+           <string>show grid</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>font name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QFontComboBox" name="cmbFontname"/>
+        </item>
+        <item row="10" column="0">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string>key font size:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QDoubleSpinBox" name="spinKeyFontSize">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>axis tick font size:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxisFontSize">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>axis label font size:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -284,6 +502,11 @@
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

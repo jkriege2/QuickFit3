@@ -2,17 +2,65 @@
 #include "ui_qfrdrtableplotwidget.h"
 #include "qfrdrtable.h"
 #include "qftools.h"
+#include "qfdoubleedit.h"
 
-QFRDRTablePlotWidget::QFRDRTablePlotWidget(QFRDRTable *record, int plot, QWidget *parent) :
+
+
+QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFRDRTablePlotWidget)
 {
+    autocolors.append(QColor("red"));
+    autocolors.append(QColor("green"));
+    autocolors.append(QColor("fuchsia"));
+    autocolors.append(QColor("darkorange"));
+    autocolors.append(QColor("navy"));
+    autocolors.append(QColor("firebrick"));
+    autocolors.append(QColor("darkgreen"));
+    autocolors.append(QColor("darkmagenta"));
+    autocolors.append(QColor("darkgreen"));
+    autocolors.append(QColor("darkslateblue"));
+    autocolors.append(QColor("maroon"));
+    autocolors.append(QColor("indianred"));
+    autocolors.append(QColor("darkolivegreen"));
+    autocolors.append(QColor("mediumpurple"));
+    autocolors.append(QColor("darkcyan"));
+
     updating=true;
     ui->setupUi(this);
-    current=record;
-    this->plot=plot;
+    ui->edtXMin->setCheckBounds(false, true);
+    ui->edtXMax->setCheckBounds(true, false);
+    ui->edtYMin->setCheckBounds(false, true);
+    ui->edtYMax->setCheckBounds(true, false);
+    connect(ui->edtXMin, SIGNAL(valueChanged(double)), ui->edtXMax, SLOT(setMinimum(double)));
+    connect(ui->edtXMax, SIGNAL(valueChanged(double)), ui->edtXMin, SLOT(setMaximum(double)));
+    connect(ui->edtYMin, SIGNAL(valueChanged(double)), ui->edtYMax, SLOT(setMinimum(double)));
+    connect(ui->edtYMax, SIGNAL(valueChanged(double)), ui->edtYMin, SLOT(setMaximum(double)));
+    ui->plotter->set_displayToolbar(false);
+    ui->plotter->set_displayMousePosition(false);
+    ui->plotter->set_mouseActionMode(JKQtPlotter::NoMouseAction);
+    ui->plotter->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->plotter->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
+    ui->plotter->get_plotter()->set_userSettigsPrefix("rdr_table/QFRDRTablePlotWidget/");
+
+    toolbarPlot=new QToolBar("tb_plot", this);
+    ui->layPlot->insertWidget(0, toolbarPlot);
+    toolbarPlot->addAction(ui->plotter->get_plotter()->get_actPrint());
+    toolbarPlot->addAction(ui->plotter->get_plotter()->get_actSavePlot());
+    toolbarPlot->addAction(ui->plotter->get_plotter()->get_actSaveData());
+    toolbarPlot->addSeparator();
+    toolbarPlot->addAction(ui->plotter->get_plotter()->get_actCopyPixelImage());
+    toolbarPlot->addAction(ui->plotter->get_plotter()->get_actCopyData());
+    toolbarPlot->addAction(ui->plotter->get_plotter()->get_actCopyMatlab());
+    toolbarPlot->addSeparator();
+    labPlotPosition=new QLabel("", this);
+    toolbarPlot->addWidget(labPlotPosition);
+    current=NULL;
+    this->plot=-1;
     updating=false;
-    connectWidgets();
+
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 QFRDRTablePlotWidget::~QFRDRTablePlotWidget()
@@ -28,20 +76,30 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     disconnectWidgets();
     if (record) {
         if (graph>=0 && graph<record->getPlotCount()) {
+            ui->tabSystem->setVisible(true);
             QFRDRTable::PlotInfo g=record->getPlot(plot);
             ui->edtTitle->setText(g.title);
             ui->edtXLabel->setText(g.xlabel);
             ui->edtYLabel->setText(g.ylabel);
+            ui->chkLogX->setChecked(g.xlog);
+            ui->chkLogY->setChecked(g.ylog);
+            ui->chkGrid->setChecked(g.grid);
+            ui->chkShowKey->setChecked(g.showKey);
+            ui->edtXMin->setValue(g.xmin);
+            ui->edtXMax->setValue(g.xmax);
+            ui->edtYMin->setValue(g.ymin);
+            ui->edtYMax->setValue(g.ymax);
+            ui->cmbFontname->setCurrentFont(QFont(g.fontName));
+            ui->spinAxisFontSize->setValue(g.axisFontSize);
+            ui->spinAxisLabelFontSize->setValue(g.axisLabelFontSize);
+            ui->spinKeyFontSize->setValue(g.keyFontSize);
             ui->listGraphs->clear();
             QList<QFRDRTable::GraphInfo> graphs=g.graphs;
             for (int i=0; i<g.graphs.size(); i++) {
                 ui->listGraphs->addItem(graphs.at(i).title);
             }
         } else {
-            ui->edtTitle->setText("");
-            ui->edtXLabel->setText("");
-            ui->edtYLabel->setText("");
-            ui->listGraphs->clear();
+            ui->tabSystem->setVisible(false);
         }
     }
     ui->listGraphs->setCurrentRow(0);
@@ -83,12 +141,6 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
 
     if (!current || this->plot<0 || this->plot>=current->getPlotCount() || currentRow<0 || currentRow>=current->getPlot(this->plot).graphs.size()) {
         ui->widGraphSettings->setEnabled(false);
-        ui->edtGraphTitle->setText("");
-        ui->cmbLinesXData->setCurrentIndex(0);
-        ui->cmbLinesXError->setCurrentIndex(0);
-        ui->cmbLinesYData->setCurrentIndex(0);
-        ui->cmbLinesYError->setCurrentIndex(0);
-        ui->cmbGraphType->setCurrentIndex(0);
     } else {
         ui->widGraphSettings->setEnabled(true);
         QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.at(currentRow);
@@ -165,6 +217,12 @@ void QFRDRTablePlotWidget::on_btnAddGraph_clicked() {
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
         QFRDRTable::GraphInfo g;
         g.title=tr("graph %1").arg(p.graphs.size()+1);
+        g.color=autocolors.value(p.graphs.size()+1, QColor("red"));
+        g.linewidth=2;
+        QColor c=g.color;
+        c.setAlphaF(0.5);
+        g.fillColor=c;
+        g.errorColor=g.color.darker();
         p.graphs.append(g);
         updating=true;
         ui->listGraphs->addItem(g.title);
@@ -174,6 +232,34 @@ void QFRDRTablePlotWidget::on_btnAddGraph_clicked() {
         ui->listGraphs->setCurrentRow(p.graphs.size()-1);
         ui->edtGraphTitle->setFocus();
     }
+}
+
+void QFRDRTablePlotWidget::on_btnAutoscaleX_clicked()
+{
+    ui->plotter->zoomToFit(true, false);
+    updating=true;
+    disconnectWidgets();
+    ui->edtXMin->setValue(ui->plotter->getXMin());
+    ui->edtXMax->setValue(ui->plotter->getXMax());
+    updating=false;
+    connectWidgets();
+    plotDataChanged();
+}
+
+void QFRDRTablePlotWidget::on_btnAutoscaleY_clicked() {
+    ui->plotter->zoomToFit(false, true);
+    updating=true;
+    disconnectWidgets();
+    ui->edtYMin->setValue(ui->plotter->getYMin());
+    ui->edtYMax->setValue(ui->plotter->getYMax());
+    updating=false;
+    connectWidgets();
+    plotDataChanged();
+}
+
+void QFRDRTablePlotWidget::on_plotter_plotMouseMove(double x, double y)
+{
+    labPlotPosition->setText(tr("position: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
 }
 
 void QFRDRTablePlotWidget::reloadColumns(QComboBox *combo) {
@@ -195,6 +281,7 @@ void QFRDRTablePlotWidget::reloadColumns(QComboBox *combo) {
 }
 
 void QFRDRTablePlotWidget::graphDataChanged() {
+    qDebug()<<"graphDataChanged    updating="<<updating;
     if (updating) return;
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -203,6 +290,8 @@ void QFRDRTablePlotWidget::graphDataChanged() {
         if (r>=0 && r<p.graphs.size()) {
             QFRDRTable::GraphInfo graph=p.graphs.at(r);
             graph.title=ui->edtGraphTitle->text();
+            ui->listGraphs->item(r)->setText(graph.title);
+            ui->listGraphs->item(r)->setIcon(ui->cmbGraphType->itemIcon(ui->cmbGraphType->currentIndex()));
 
             switch(ui->cmbGraphType->currentIndex()) {
                 case 1: graph.type=QFRDRTable::gtImpulsesVertical; break;
@@ -232,13 +321,29 @@ void QFRDRTablePlotWidget::graphDataChanged() {
 }
 
 void QFRDRTablePlotWidget::plotDataChanged() {
+    qDebug()<<"plotDataChanged   updating="<<updating;
     if (updating) return;
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
+
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
         p.title=ui->edtTitle->text();
         p.xlabel=ui->edtXLabel->text();
-        p.ylabel=ui->edtXLabel->text();
+        p.ylabel=ui->edtYLabel->text();
+        emit plotTitleChanged(this->plot, p.title);
+        p.xlog=ui->chkLogX->isChecked();
+        p.ylog=ui->chkLogY->isChecked();
+        p.grid=ui->chkGrid->isChecked();
+        p.showKey=ui->chkShowKey->isChecked();
+        p.xmin=ui->edtXMin->value();
+        p.xmax=ui->edtXMax->value();
+        p.ymin=ui->edtYMin->value();
+        p.ymax=ui->edtYMax->value();
+        p.fontName=ui->cmbFontname->currentFont().family();
+        p.axisFontSize=ui->spinAxisFontSize->value();
+        p.axisLabelFontSize=ui->spinAxisLabelFontSize->value();
+        p.keyFontSize=ui->spinKeyFontSize->value();
+
         current->setPlot(this->plot, p);
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
     }
@@ -247,8 +352,9 @@ void QFRDRTablePlotWidget::plotDataChanged() {
 
 void QFRDRTablePlotWidget::updateGraph() {
     if (current) {
+        qDebug()<<"updateGraph  plot="<<this->plot+1<<"/"<<current->getPlotCount();
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
-        int r=ui->listGraphs->currentRow();
+        qDebug()<<"updateGraph";
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
 
         ui->plotter->set_doDrawing(false);
@@ -256,8 +362,20 @@ void QFRDRTablePlotWidget::updateGraph() {
 
         ui->plotter->getXAxis()->set_axisLabel(p.xlabel);
         ui->plotter->getXAxis()->set_logAxis(p.xlog);
+        ui->plotter->getXAxis()->set_labelFont(p.fontName);
+        ui->plotter->getXAxis()->set_labelFontSize(p.axisLabelFontSize);
+        ui->plotter->getXAxis()->set_tickLabelFont(p.fontName);
+        ui->plotter->getXAxis()->set_tickLabelFontSize(p.axisLabelFontSize);
         ui->plotter->getYAxis()->set_axisLabel(p.ylabel);
         ui->plotter->getYAxis()->set_logAxis(p.ylog);
+        ui->plotter->getYAxis()->set_labelFont(p.fontName);
+        ui->plotter->getYAxis()->set_labelFontSize(p.axisLabelFontSize);
+        ui->plotter->getYAxis()->set_tickLabelFont(p.fontName);
+        ui->plotter->getYAxis()->set_tickLabelFontSize(p.axisLabelFontSize);
+        ui->plotter->get_plotter()->set_keyFont(p.fontName);
+        ui->plotter->get_plotter()->set_keyFontSize(p.keyFontSize);
+        ui->plotter->setGrid(p.grid);
+        ui->plotter->get_plotter()->set_showKey(p.showKey);
         ui->plotter->setXY(p.xmin, p.xmax, p.ymin, p.ymax);
         ui->plotter->clearGraphs(true);
         updateData();
@@ -336,12 +454,24 @@ void QFRDRTablePlotWidget::updateData() {
 
 void QFRDRTablePlotWidget::connectWidgets()
 {
-    //qDebug()<<"connectWidgets";
+    qDebug()<<"connectWidgets";
     connect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
 
     connect(ui->edtTitle, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
     connect(ui->edtXLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
     connect(ui->edtYLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
+    connect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->edtXMin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->edtXMax, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->edtYMin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->edtYMax, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbFontname, SIGNAL(currentIndexChanged(QString)), this, SLOT(plotDataChanged()));
+    connect(ui->spinAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
     connect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
     connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
@@ -353,12 +483,25 @@ void QFRDRTablePlotWidget::connectWidgets()
 
 void QFRDRTablePlotWidget::disconnectWidgets()
 {
-    //qDebug()<<"disconnectWidgets";
+    qDebug()<<"disconnectWidgets";
     disconnect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
 
     disconnect(ui->edtTitle, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
     disconnect(ui->edtXLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
     disconnect(ui->edtYLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtXMin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtXMax, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtYMin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtYMax, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbFontname, SIGNAL(currentIndexChanged(QString)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+
 
     disconnect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
     disconnect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));

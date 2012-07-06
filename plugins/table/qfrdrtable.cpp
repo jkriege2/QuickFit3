@@ -32,6 +32,12 @@ QFRDRTable::PlotInfo::PlotInfo()
     xmax=10;
     ymin=0;
     ymax=10;
+    showKey=true;
+    grid=true;
+    fontName=QApplication::font().family();
+    keyFontSize=10;
+    axisFontSize=10;
+    axisLabelFontSize=12;
 }
 
 
@@ -226,15 +232,21 @@ void QFRDRTable::intReadData(QDomElement* e) {
             te=te.firstChildElement("plot");
             while (!te.isNull()) {
                 PlotInfo plot;
-                plot.title=te.attribute("title");
-                plot.xlabel=te.attribute("xlabel");
-                plot.ylabel=te.attribute("ylabel");
-                plot.xlog=QStringToBool( te.attribute("xlog"));
-                plot.ylog=QStringToBool( te.attribute("ylog"));
-                plot.xmin=CQStringToDouble(te.attribute("xmin"));
-                plot.xmax=CQStringToDouble(te.attribute("xmax"));
-                plot.ymin=CQStringToDouble(te.attribute("ymin"));
-                plot.ymax=CQStringToDouble(te.attribute("ymax"));
+                plot.title=te.attribute("title", tr("graph title"));
+                plot.xlabel=te.attribute("xlabel", "x");
+                plot.ylabel=te.attribute("ylabel", "y");
+                plot.xlog=QStringToBool( te.attribute("xlog", "false"));
+                plot.ylog=QStringToBool( te.attribute("ylog", "false"));
+                plot.grid=QStringToBool( te.attribute("grid", "true"));
+                plot.showKey=QStringToBool( te.attribute("showkey"));
+                plot.xmin=CQStringToDouble(te.attribute("xmin", "0"));
+                plot.xmax=CQStringToDouble(te.attribute("xmax", "10"));
+                plot.ymin=CQStringToDouble(te.attribute("ymin", "0"));
+                plot.ymax=CQStringToDouble(te.attribute("ymax", "10"));
+                plot.fontName=te.attribute("fontname", "Arial");
+                plot.keyFontSize=te.attribute("keyfontsize", "12").toDouble();
+                plot.axisFontSize=te.attribute("axisfontsize", "10").toDouble();
+                plot.axisLabelFontSize=te.attribute("axislabelfontsize", "12").toDouble();
 
                 QDomElement ge=te.firstChildElement("graph");
                 while (!ge.isNull()) {
@@ -293,12 +305,18 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("title", plots[i].title);
         w.writeAttribute("xlabel", plots[i].xlabel);
         w.writeAttribute("ylabel", plots[i].ylabel);
+        w.writeAttribute("showkey", boolToQString(plots[i].showKey));
+        w.writeAttribute("grid", boolToQString(plots[i].grid));
         w.writeAttribute("xlog", boolToQString(plots[i].xlog));
         w.writeAttribute("ylog", boolToQString(plots[i].ylog));
         w.writeAttribute("xmin", CDoubleToQString(plots[i].xmin));
         w.writeAttribute("xmax", CDoubleToQString(plots[i].xmax));
         w.writeAttribute("ymin", CDoubleToQString(plots[i].ymin));
         w.writeAttribute("ymax", CDoubleToQString(plots[i].ymax));
+        w.writeAttribute("keyfontsize", CDoubleToQString(plots[i].keyFontSize));
+        w.writeAttribute("axisfontsize", CDoubleToQString(plots[i].axisFontSize));
+        w.writeAttribute("axislabelfontsize", CDoubleToQString(plots[i].axisLabelFontSize));
+        w.writeAttribute("fontname", plots[i].fontName);
 
         for (int g=0; g<plots[i].graphs.size(); g++) {
             w.writeStartElement("graph");

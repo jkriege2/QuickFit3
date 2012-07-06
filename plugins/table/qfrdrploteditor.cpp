@@ -138,7 +138,9 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
         clearPlotWidgets();
     } else {
         while (plotWidgets.size()<current->getPlotCount()) {
-            plotWidgets.append(new QFRDRTablePlotWidget(current, plotWidgets.size(), tabPlots));
+            QFRDRTablePlotWidget* w=new QFRDRTablePlotWidget(tabPlots);
+            connect(w, SIGNAL(plotTitleChanged(int,QString)), this, SLOT(updatePlotName(int,QString)));
+            plotWidgets.append(w);
             tabPlots->addTab(plotWidgets[plotWidgets.size()-1], "plot");
         }
         while (plotWidgets.size()>current->getPlotCount()) {
@@ -150,7 +152,9 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
         }
         for (int i=0; i<current->getPlotCount(); i++) {
             //qDebug()<<"   setRecord "<<i;
-            tabPlots->setTabText(i, tr("plot %1").arg(i+1));
+            QString pn=current->getPlot(i).title;
+            if (pn.isEmpty()) pn=tr("plot %1").arg(i+1);
+            tabPlots->setTabText(i, pn);
             plotWidgets[i]->setRecord(current, i);
         }
     }
@@ -171,6 +175,10 @@ void QFRDRPlotEditor::clearPlotWidgets()
         if (plotWidgets[i]) delete plotWidgets[i];
     }
     plotWidgets.clear();
+}
+
+void QFRDRPlotEditor::updatePlotName(int plot, QString title) {
+    if (plot>=0 && plot<tabPlots->count()) tabPlots->setTabText(plot, title);
 }
 
 

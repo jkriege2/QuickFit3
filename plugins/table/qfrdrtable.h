@@ -86,6 +86,12 @@ class QFRDRTable : public QFRawDataRecord {
             QString ylabel;
             double xmin, xmax, ymin, ymax;
             bool xlog, ylog;
+            bool grid;
+            bool showKey;
+            QString fontName;
+            double keyFontSize;
+            double axisFontSize;
+            double axisLabelFontSize;
             QList<GraphInfo> graphs;
         };
 
