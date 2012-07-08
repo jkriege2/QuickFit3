@@ -80,6 +80,7 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
 
 
     histogram=new QFHistogramView(tabMain);
+    histogram->setHistogramXLabel(tr("intensity [A.U.]"));
     histogram->setBins(50);
     histogram->setAutorange(true);
 
@@ -596,6 +597,7 @@ void QFRDRImagingFCSOverviewImageDisplay::showFrame(int frame) {
 
         if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, frame), width*height);
         histogram->setEnabled(chkHistVideo->isChecked());
+        histogram->setHistogramXLabel(tr("intensity [A.U. or kHz]"));
     }
 
 

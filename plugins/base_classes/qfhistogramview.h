@@ -88,6 +88,8 @@ class QFHistogramView : public QWidget {
         void removeHistogram(int i);
         int histogramCount() const;
 
+        void setHistogramXLabel(const QString label, bool update=false);
+
         void writeReport(QTextCursor& cursor, QTextDocument* document);
     signals:
         void settingsChanged();
@@ -117,6 +119,7 @@ class QFHistogramView : public QWidget {
         QFDoubleEdit* edtHistogramMin;
         QFDoubleEdit* edtHistogramMax;
         QFormLayout* flHistSet;
+        QString histLabel;
 
 
 

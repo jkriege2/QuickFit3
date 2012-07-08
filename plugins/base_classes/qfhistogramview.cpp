@@ -20,6 +20,7 @@ QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
 {
     connectParameterWidgetsCounter=0;
+    histLabel="";
     createWidgets();
 }
 
@@ -235,10 +236,19 @@ int QFHistogramView::histogramCount() const {
     return histograms.size();
 }
 
+void QFHistogramView::setHistogramXLabel(const QString label, bool update)
+{
+    histLabel=label;
+    if (update) replotHistogram();
+}
+
 /** \brief replot histogram */
 void QFHistogramView::replotHistogram() {
     pltParamHistogram->set_doDrawing(false);
     pltParamHistogram->getYAxis()->set_logAxis(chkLogHistogram->isChecked());
+    pltParamHistogram->getXAxis()->set_axisLabel(histLabel);
+    if (chkNormalizedHistograms->isChecked()) pltParamHistogram->getYAxis()->set_axisLabel(tr("normalized frequency"));
+    else pltParamHistogram->getYAxis()->set_axisLabel(tr("frequency"));
     pltParamHistogram->zoomToFit(true, true, false, !chkLogHistogram->isChecked());
     pltParamHistogram->set_doDrawing(true);
     pltParamHistogram->update_plot();

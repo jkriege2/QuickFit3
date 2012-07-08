@@ -3612,6 +3612,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
             }
         }
         histogram->addHistogram(tr("complete"), datahist, datasize);
+        histogram->setHistogramXLabel(cmbParameter->currentText());
     }
 
     updateSelectionHistogram(false);
@@ -3651,8 +3652,10 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
         if (datasizesel>2) {
             if (histogram->histogramCount()>1) {
                 histogram->setHistogram(1, tr("selection"), datahistsel, datasizesel);
+                histogram->setHistogramXLabel(cmbParameter->currentText());
             } else {
                 histogram->addHistogram(tr("selection"), datahistsel, datasizesel);
+                histogram->setHistogramXLabel(cmbParameter->currentText());
             }
         }
     }
