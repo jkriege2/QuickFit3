@@ -416,8 +416,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltOverview=new JKQtPlotter(wpltOverview);
     pltOverview->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltOverview->setObjectName("pltOverview");
-    lpltOverview->addWidget(new QLabel(tr("Overview:")));
+    //lpltOverview->addWidget(new QLabel(tr("Overview:")));
     lpltOverview->addWidget(pltOverview, 1);
+    pltOverview->get_plotter()->set_plotLabel(tr("\\textbf{Overview}"));
+    pltOverview->get_plotter()->set_plotLabelFontSize(10);
     pltOverview->set_zoomByDoubleAndRightMouseClick(false);
     pltOverview->set_displayMousePosition(false);
     pltOverview->set_displayToolbar(true);
@@ -476,8 +478,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltMask=new JKQtPlotter(wpltMask);
     pltMask->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltMask->setObjectName("pltMask");
+    pltMask->get_plotter()->set_plotLabel(tr("\\textbf{Mask/Selected}"));
+    pltMask->get_plotter()->set_plotLabelFontSize(10);
 
-    lpltMask->addWidget(new QLabel(tr("Mask/Selected:")));
+    //lpltMask->addWidget(new QLabel(tr("Mask/Selected:")));
     lpltMask->addWidget(pltMask, 1);
     pltMask->set_zoomByDoubleAndRightMouseClick(false);
     pltMask->set_displayMousePosition(false);
@@ -536,8 +540,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltImage=new JKQtPlotter(wpltImage);
     pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltImage->setObjectName("pltImage");
+    pltImage->get_plotter()->set_plotLabel(tr("\\textbf{Parameter Image}"));
+    pltImage->get_plotter()->set_plotLabelFontSize(10);
 
-    lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
+    //lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
     lpltImage->addWidget(pltImage, 1);
 
     pltImage->set_zoomByDoubleAndRightMouseClick(false);
@@ -601,8 +607,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage=new JKQtPlotter(wpltGofImage);
     pltGofImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltGofImage->setObjectName("pltGofImage");
+    pltGofImage->get_plotter()->set_plotLabel(tr("\\textbf{\"Goodnes of Fit\" Image}"));
+    pltGofImage->get_plotter()->set_plotLabelFontSize(10);
 
-    lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
+    //lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
     lpltGofImage->addWidget(pltGofImage, 1);
 
     pltGofImage->set_zoomByDoubleAndRightMouseClick(false);
@@ -1933,7 +1941,15 @@ void QFRDRImagingFCSImageEditor::replotImage() {
 
     if (!m) {
         plteImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
+        plteImage->get_colorBarRightAxis()->set_labelFontSize(8);
+        plteImage->get_colorBarRightAxis()->set_axisLabel("");
+        plteImage->get_colorBarTopAxis()->set_labelFontSize(8);
+        plteImage->get_colorBarTopAxis()->set_axisLabel("");
         plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
+        plteGofImage->get_colorBarRightAxis()->set_labelFontSize(8);
+        plteGofImage->get_colorBarRightAxis()->set_axisLabel("");
+        plteGofImage->get_colorBarTopAxis()->set_labelFontSize(8);
+        plteGofImage->get_colorBarTopAxis()->set_axisLabel("");
         //qDebug()<<"replotImage !m";
     } else {
         double w=m->getImageFromRunsWidth();
@@ -1957,6 +1973,16 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         pltGofImage->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
         pltGofImage->get_plotter()->set_maintainAxisAspectRatio(true);
         pltGofImage->get_plotter()->set_axisAspectRatio(1.0*w/h);
+
+        plteImage->get_colorBarRightAxis()->set_labelFontSize(8);
+        plteImage->get_colorBarRightAxis()->set_axisLabel(formatTransformAndParameter(cmbParameter, cmbParameterTransform));
+        plteImage->get_colorBarTopAxis()->set_labelFontSize(8);
+        plteImage->get_colorBarTopAxis()->set_axisLabel(formatTransformAndParameter(cmbParameter, cmbParameterTransform));
+        plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
+        plteGofImage->get_colorBarRightAxis()->set_labelFontSize(8);
+        plteGofImage->get_colorBarRightAxis()->set_axisLabel(formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
+        plteGofImage->get_colorBarTopAxis()->set_labelFontSize(8);
+        plteGofImage->get_colorBarTopAxis()->set_axisLabel(formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
 
         if (w>3*h) {
             pltImage->get_plotter()->getXAxis()->set_minTicks(3);
@@ -2561,6 +2587,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
     //QTime t;
     //t.start();
     plotter->update_plot();
+    plotterResid->update_plot();
 #ifdef DEBUG_TIMIMNG
     //qDebug()<<"replotData   update plots: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
@@ -2928,6 +2955,15 @@ QFRDRImagingFCSImageEditor::ImageTransforms QFRDRImagingFCSImageEditor::currentG
     //return QFRDRImagingFCSImageEditor::itSqrt;
     if (cmbGofParameterTransform->currentIndex()<0) return QFRDRImagingFCSImageEditor::itNone;
     return (QFRDRImagingFCSImageEditor::ImageTransforms)cmbGofParameterTransform->currentIndex();
+}
+
+QString QFRDRImagingFCSImageEditor::formatTransformAndParameter(QComboBox *cmbParameter, QComboBox *cmbTransform)
+{
+    if (cmbTransform->currentIndex()==1) return tr("abs(%1)").arg(cmbParameter->currentText().replace('_', "{\\_}"));
+    else if (cmbTransform->currentIndex()==2) return tr("log_{10}\\left({%1}\\right)").arg(cmbParameter->currentText().replace('_', "{\\_}"));
+    else if (cmbTransform->currentIndex()==3) return tr("1/\\left({%1}\\right)").arg(cmbParameter->currentText().replace('_', "{\\_}"));
+    else if (cmbTransform->currentIndex()==4) return tr("\\sqrt{%1}").arg(cmbParameter->currentText().replace('_', "{\\_}"));
+    else return cmbParameter->currentText().replace('_', "{\\_}");
 }
 
 

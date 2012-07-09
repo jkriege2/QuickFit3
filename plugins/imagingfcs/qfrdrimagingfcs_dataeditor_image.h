@@ -76,6 +76,8 @@ protected:
         /** \brief return the currently selected goodnes of fit parameter transformation */
         ImageTransforms currentGofParameterTransfrom() const;
 
+        QString formatTransformAndParameter(QComboBox* cmbParameter, QComboBox* cmbTransform);
+
     protected slots:
 
         /** \brief switch plots on and off according to selected visible plots */

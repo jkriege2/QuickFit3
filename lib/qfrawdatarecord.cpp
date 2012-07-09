@@ -2257,6 +2257,19 @@ QVector<bool> QFRawDataRecord::resultsGetAsBooleanList(const QString& evalName, 
     return QVector<bool>();
 }
 
+QStringList QFRawDataRecord::resultsGetAsStringList(const QString &evalName, const QString &resultName, bool* ok) const {
+    const evaluationResult r=resultsGet(evalName, resultName);
+    if (ok) *ok=true;
+    switch(r.type) {
+        case qfrdreStringVector:
+        case qfrdreStringMatrix: return r.svec;
+        default: if (ok) *ok=false;
+                 return QStringList();
+    }
+    if (ok) *ok=false;
+    return QStringList();
+}
+
 QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QString &resultName, int position, bool alsoGetNonVec) const {
     const evaluationResult r=resultsGet(evalName, resultName);
     switch(r.type) {

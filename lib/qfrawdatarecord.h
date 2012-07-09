@@ -465,6 +465,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QVector<qlonglong> resultsGetAsIntegerList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result as bool vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         QVector<bool> resultsGetAsBooleanList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
+        /** \brief return a specified result as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
+        QStringList resultsGetAsStringList(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
 
 
 

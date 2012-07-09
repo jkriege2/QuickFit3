@@ -568,9 +568,10 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     for (int i=0; i<records.size(); i++) data.append(sdel+records[i].first->getName()+": "+records[i].second+sdel);
 
+
+    QMap<int, int> subcolumns;
     for (int c=0; c<colnames.size(); c++) {
-        header[0] += separator+sdel+colnames[c].first+sdel;
-        header[1] += separator+sdel+tr("value")+sdel;
+        subcolumns[c]=1;
         bool hasError=false;
         for (int r=0; r<records.size(); r++) {
             QFRawDataRecord* record=records[r].first;
@@ -579,17 +580,104 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
             if (record) {
                 if (record->resultsExists(evalname, colnames[c].second)) {
                     switch(record->resultsGet(evalname, colnames[c].second).type) {
+                        case QFRawDataRecord::qfrdreNumberError:
+                        case QFRawDataRecord::qfrdreNumber:
+                        case QFRawDataRecord::qfrdreInteger:
+                        case QFRawDataRecord::qfrdreBoolean:
+                        case QFRawDataRecord::qfrdreString: subcolumns[c]=qMax(subcolumns[c], 1); break;
+                        case QFRawDataRecord::qfrdreNumberErrorVector:
+                        case QFRawDataRecord::qfrdreNumberErrorMatrix:
+                        case QFRawDataRecord::qfrdreNumberVector:
+                        case QFRawDataRecord::qfrdreNumberMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).dvec.size()); break;
+                        case QFRawDataRecord::qfrdreIntegerVector:
+                        case QFRawDataRecord::qfrdreIntegerMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).ivec.size()); break;
+                        case QFRawDataRecord::qfrdreBooleanVector:
+                        case QFRawDataRecord::qfrdreBooleanMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).bvec.size()); break;
+                        case QFRawDataRecord::qfrdreStringVector:
+                        case QFRawDataRecord::qfrdreStringMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).svec.size()); break;
+                        default: subcolumns[c]=qMax(subcolumns[c], 1); break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    for (int c=0; c<colnames.size(); c++) {
+        header[0] += separator+sdel+colnames[c].first+sdel;
+        header[1] += separator+sdel+tr("value")+sdel;
+        bool hasError=false;
+        int hcols;
+        for (int r=0; r<records.size(); r++) {
+            QFRawDataRecord* record=records[r].first;
+            QString evalname=records[r].second;
+            QString dat="";
+            int colcnt=0;
+            if (record) {
+                if (record->resultsExists(evalname, colnames[c].second)) {
+                    switch(record->resultsGet(evalname, colnames[c].second).type) {
                         case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
+                        case QFRawDataRecord::qfrdreNumberVector:
+                        case QFRawDataRecord::qfrdreNumberMatrix: {
+                            QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
+                            for (int it=0; it<d.size(); it++) {
+                                if (it>0) dat+=separator;
+                                dat+=doubleToQString(d[it], 15, 'g', decimalPoint);
+                            }
+                            colcnt=d.size();
+                        } break;
+                        case QFRawDataRecord::qfrdreNumberErrorVector:
+                        case QFRawDataRecord::qfrdreNumberErrorMatrix: {
+                            QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
+                            for (int it=0; it<d.size(); it++) {
+                                if (it>0) dat+=separator;
+                                dat+=doubleToQString(d[it], 15, 'g', decimalPoint);
+                            }
+                            hasError=true;
+                            colcnt=d.size();
+                        } break;
                         case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
                         case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
+                        case QFRawDataRecord::qfrdreIntegerVector:
+                        case QFRawDataRecord::qfrdreIntegerMatrix:
+                        case QFRawDataRecord::qfrdreBooleanVector:
+                        case QFRawDataRecord::qfrdreBooleanMatrix: {
+                            QVector<qlonglong> d=record->resultsGetAsIntegerList(evalname, colnames[c].second);
+                            for (int it=0; it<d.size(); it++) {
+                                if (it>0) dat+=separator;
+                                dat+=loc.toString(d[it]);
+                            }
+                            colcnt=d.size();
+                        } break;
                         case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c].second))?QString("1"):QString("0"); break;
                         case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace(separator, "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter; break;
+                        case QFRawDataRecord::qfrdreStringVector:
+                        case QFRawDataRecord::qfrdreStringMatrix: {
+                            QStringList d=record->resultsGetAsStringList(evalname, colnames[c].second);
+                            for (int it=0; it<d.size(); it++) {
+                                if (it>0) dat+=separator;
+                                dat+=stringDelimiter+d[it].replace(separator, "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter;
+                            }
+                            colcnt=d.size();
+                        } break;
                         default: dat=""; break;
                     }
                 }
             }
             data[r]+=separator+dat;
+            colcnt=qMax(1,colcnt);
+            int addcols=subcolumns[c]-colcnt;
+            for (int ac=0; ac<addcols; ac++) {
+                data[r]+=separator;
+            }
+            hcols+=addcols;
         }
+        for (int ac=0; ac<subcolumns[c]-1; ac++) {
+            header[0]+=separator;
+            header[1]+=separator;
+        }
+
+        hcols=0;
         if (hasError) {
             header[0] += separator;
             header[1] += separator+sdel+tr("error")+sdel;
@@ -597,16 +685,41 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
                 QFRawDataRecord* record=records[r].first;
                 QString evalname=records[r].second;
                 QString dat="";
+                int colcnt=1;
                 if (record) {
                     if (record->resultsExists(evalname, colnames[c].second)) {
-                        if (record->resultsGet(evalname, colnames[c].second).type==QFRawDataRecord::qfrdreNumberError) {
-                            dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
+                        switch (record->resultsGet(evalname, colnames[c].second).type) {
+                            case QFRawDataRecord::qfrdreNumberError:
+                                dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
+                                break;
+                            case QFRawDataRecord::qfrdreNumberErrorVector:
+                            case QFRawDataRecord::qfrdreNumberErrorMatrix: {
+                                QVector<double> d=record->resultsGetErrorAsDoubleList(evalname, colnames[c].second);
+                                for (int it=0; it<d.size(); it++) {
+                                    if (it>0) dat+=separator;
+                                    dat+=doubleToQString(d[it], 15, 'g', decimalPoint);
+                                }
+                                hasError=true;
+                                colcnt=d.size();
+                            } break;
                         }
                     }
                 }
                 data[r]+=separator+dat;
+                colcnt=qMax(1,colcnt);
+                int addcols=subcolumns[c]-colcnt;
+                for (int ac=0; ac<addcols; ac++) {
+                    data[r]+=separator;
+                }
+                //hcols+=addcols;
+            }
+
+            for (int ac=0; ac<subcolumns[c]-1; ac++) {
+                header[0]+=separator;
+                header[1]+=separator;
             }
         }
+
     }
 
     QFile of(filename);
@@ -632,11 +745,47 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
         out.setCodec(c);
         out<<"ID;P\n";
 
+
+
         QChar stringDelimiter='"';
         QChar decimalPoint='.';
         QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
         QLocale loc=QLocale::c();
+
+
+        QMap<int, int> subcolumns;
+        for (int c=0; c<colnames.size(); c++) {
+            subcolumns[c]=1;
+            for (int r=0; r<records.size(); r++) {
+                QFRawDataRecord* record=records[r].first;
+                QString evalname=records[r].second;
+                QString dat="";
+                if (record) {
+                    if (record->resultsExists(evalname, colnames[c].second)) {
+                        switch(record->resultsGet(evalname, colnames[c].second).type) {
+                            case QFRawDataRecord::qfrdreNumberError:
+                            case QFRawDataRecord::qfrdreNumber:
+                            case QFRawDataRecord::qfrdreInteger:
+                            case QFRawDataRecord::qfrdreBoolean:
+                            case QFRawDataRecord::qfrdreString: subcolumns[c]=qMax(subcolumns[c], 1); break;
+                            case QFRawDataRecord::qfrdreNumberErrorVector:
+                            case QFRawDataRecord::qfrdreNumberErrorMatrix:
+                            case QFRawDataRecord::qfrdreNumberVector:
+                            case QFRawDataRecord::qfrdreNumberMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).dvec.size()); break;
+                            case QFRawDataRecord::qfrdreIntegerVector:
+                            case QFRawDataRecord::qfrdreIntegerMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).ivec.size()); break;
+                            case QFRawDataRecord::qfrdreBooleanVector:
+                            case QFRawDataRecord::qfrdreBooleanMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).bvec.size()); break;
+                            case QFRawDataRecord::qfrdreStringVector:
+                            case QFRawDataRecord::qfrdreStringMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).svec.size()); break;
+                            default: subcolumns[c]=qMax(subcolumns[c], 1); break;
+                        }
+                    }
+                }
+            }
+        }
+
         loc.setNumberOptions(QLocale::OmitGroupSeparator);
         for (int i=0; i<records.size(); i++) {
             out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(i+3).arg(1).arg(records[i].first->getName()+": "+records[i].second);
@@ -649,39 +798,104 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
             for (int r=0; r<records.size(); r++) {
                 QFRawDataRecord* record=records[r].first;
                 QString evalname=records[r].second;
-                QString dat="";
+                QStringList dat;
+                int colcnt=1;
                 if (record) {
                     if (record->resultsExists(evalname, colnames[c].second)) {
                         switch(record->resultsGet(evalname, colnames[c].second).type) {
-                            case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
+                            /*case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
                             case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
                             case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
                             case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c].second))?QString("1"):QString("0"); break;
                             case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter; break;
-                            default: dat=""; break;
+                            default: dat=""; break;*/
+                            case QFRawDataRecord::qfrdreNumber: dat<<doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
+                            case QFRawDataRecord::qfrdreNumberVector:
+                            case QFRawDataRecord::qfrdreNumberMatrix: {
+                                QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
+                                for (int it=0; it<d.size(); it++) {
+                                    dat<<doubleToQString(d[it], 15, 'g', decimalPoint);
+                                }
+                                colcnt=d.size();
+                            } break;
+                            case QFRawDataRecord::qfrdreNumberErrorVector:
+                            case QFRawDataRecord::qfrdreNumberErrorMatrix: {
+                                QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
+                                for (int it=0; it<d.size(); it++) {
+                                    dat<<doubleToQString(d[it], 15, 'g', decimalPoint);
+                                }
+                                hasError=true;
+                                colcnt=d.size();
+                            } break;
+                            case QFRawDataRecord::qfrdreNumberError: dat<<doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
+                            case QFRawDataRecord::qfrdreInteger: dat<<loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
+                            case QFRawDataRecord::qfrdreIntegerVector:
+                            case QFRawDataRecord::qfrdreIntegerMatrix:
+                            case QFRawDataRecord::qfrdreBooleanVector:
+                            case QFRawDataRecord::qfrdreBooleanMatrix: {
+                                QVector<qlonglong> d=record->resultsGetAsIntegerList(evalname, colnames[c].second);
+                                for (int it=0; it<d.size(); it++) {
+                                    dat<<loc.toString(d[it]);
+                                }
+                                colcnt=d.size();
+                            } break;
+                            case QFRawDataRecord::qfrdreBoolean: if (record->resultsGetAsBoolean(evalname, colnames[c].second)) dat<<QString("1"); else dat<<QString("0"); break;
+                            case QFRawDataRecord::qfrdreString: dat<<(stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter); break;
+                            case QFRawDataRecord::qfrdreStringVector:
+                            case QFRawDataRecord::qfrdreStringMatrix: {
+                                QStringList d=record->resultsGetAsStringList(evalname, colnames[c].second);
+                                for (int it=0; it<d.size(); it++) {
+                                    dat<<(stringDelimiter+d[it].replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter);
+                                }
+                                colcnt=d.size();
+                            } break;
+                            default: break;
                         }
                     }
                 }
-                if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+                for (int i=0; i<dat.size(); i++) {
+                    out<<QString("C;X%1;Y%2;N;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    //col++;
+                }
+                //if ((subcolumns[c]-colcnt)>0) col+=(subcolumns[c]-colcnt);
             }
+            col+=subcolumns[c];
             if (hasError) {
-                col++;
                 out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
                 for (int r=0; r<records.size(); r++) {
                     QFRawDataRecord* record=records[r].first;
                     QString evalname=records[r].second;
-                    QString dat="";
+                    QStringList dat;
+                    int colcnt=1;
                     if (record) {
                         if (record->resultsExists(evalname, colnames[c].second)) {
-                            if (record->resultsGet(evalname, colnames[c].second).type==QFRawDataRecord::qfrdreNumberError) {
+                            /*if (record->resultsGet(evalname, colnames[c].second).type==QFRawDataRecord::qfrdreNumberError) {
                                 dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
+                            }*/
+                            switch (record->resultsGet(evalname, colnames[c].second).type) {
+                                case QFRawDataRecord::qfrdreNumberError:
+                                    dat<<doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
+                                    break;
+                                case QFRawDataRecord::qfrdreNumberErrorVector:
+                                case QFRawDataRecord::qfrdreNumberErrorMatrix: {
+                                    QVector<double> d=record->resultsGetErrorAsDoubleList(evalname, colnames[c].second);
+                                    for (int it=0; it<d.size(); it++) {
+                                        dat<<doubleToQString(d[it], 15, 'g', decimalPoint);
+                                    }
+                                    hasError=true;
+                                    colcnt=d.size();
+                                } break;
                             }
                         }
                     }
-                    if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+                    //if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+                    for (int i=0; i<dat.size(); i++) {
+                        out<<QString("C;X%1;Y%2;N;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                        //col++;
+                    }
+                    //if ((subcolumns[c]-colcnt)>0) col+=(subcolumns[c]-colcnt);
                 }
             }
-            col++;
         }
 
     } else { return false; }
