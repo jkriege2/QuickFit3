@@ -95,6 +95,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
 
         /** \brief save results to a file */
         void saveResults();
+        void saveResultsAveraged();
 
         /** \brief display help dialog */
         void displayHelp();
@@ -207,6 +208,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actCopyResultsNoHead;
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
+        QAction* actSaveResultsAveraged;
         /** \brief action used to delete selection in tvResults */
         QAction* actDeleteResults;
 

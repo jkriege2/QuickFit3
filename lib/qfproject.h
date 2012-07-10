@@ -255,12 +255,13 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
 
             \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
             \param filename the file to create
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
             \param separator column separator in the file
             \param decinmalPoint which character to sue as decimal point
             \param stringDelimiter strings are surrounded by this character (one in front,one behind)
             \return \c true on success
         */
-        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"');
+        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg=false, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"');
 
         /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
 
@@ -271,9 +272,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
 
             \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
             \param filename the file to create
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
             \return \c true on success
         */
-        bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename);
+        bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg=false);
 
 
         QFRawDataRecordFactory* getRawDataRecordFactory() { return rdrFactory; };

@@ -300,6 +300,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs, but without a header (so data only)"), this);
     tbResults->addAction(actCopyValErrResultsNoHead);
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
+    actSaveResultsAveraged=new QAction(tr("Save all results to file with averaged vector/matrix results"), this);
     tbResults->addAction(actSaveResults);
 
     tbResults->addSeparator();
@@ -384,6 +385,7 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvResults->addAction(actCopyValErrResults);
     tvResults->addAction(actCopyValErrResultsNoHead);
     tvResults->addAction(actSaveResults);
+    tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actDeleteResults);
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
@@ -399,9 +401,12 @@ void QFRawDataPropertyEditor::createWidgets() {
     connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
     connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
+    connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
 
     menuResults->addAction(actSaveResults);
+    menuResults->addAction(actSaveResultsAveraged);
+    menuResults->addSeparator();
     menuResults->addAction(actDeleteResults);
     menuResults->addSeparator();
     menuResults->addAction(actCopyResults);
@@ -1195,18 +1200,46 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
 void QFRawDataPropertyEditor::saveResults() {
     if (current) {
         QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk)");
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
+            bool ok=false;
             if (f==1) {
-                current->resultsSaveToCSV(fileName, ";", ',', '"');
+                ok=current->resultsSaveToCSV(fileName, false, ";", ',', '"');
             } else if (f==2) {
-                current->resultsSaveToSYLK(fileName);
+                ok=current->resultsSaveToSYLK(fileName, false);
+            } else if (f==3) {
+                ok=current->resultsSaveToCSV(fileName, false, "\t", '.', '"');
             } else {
-                current->resultsSaveToCSV(fileName, ", ", '.', '"');
+                ok=current->resultsSaveToCSV(fileName, false, ", ", '.', '"');
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
+            if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
+        }
+    }
+}
+
+void QFRawDataPropertyEditor::saveResultsAveraged()
+{
+    if (current) {
+        QString selectedFilter="";
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
+        QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
+        if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+            int f=filter.split(";;").indexOf(selectedFilter);
+            bool ok=false;
+            if (f==1) {
+                ok=current->resultsSaveToCSV(fileName, true, ";", ',', '"');
+            } else if (f==2) {
+                ok=current->resultsSaveToSYLK(fileName, true);
+            } else if (f==3) {
+                ok=current->resultsSaveToCSV(fileName, true, "\t", '.', '"');
+            } else {
+                ok=current->resultsSaveToCSV(fileName, true, ", ", '.', '"');
+            }
+            currentSaveDir=QFileInfo(fileName).absolutePath();
+            if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
         }
     }
 }

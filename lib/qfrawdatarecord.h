@@ -590,12 +590,13 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             If numbers in a column have errors then a second column is added for the errors.
 
             \param filename the file to create
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
             \param separator column separator in the file
             \param decinmalPoint which character to sue as decimal point
             \param stringDelimiter strings are surrounded by this character (one in front,one behind)
             \return \c true on success
         */
-        bool resultsSaveToCSV(const QString& filename, const QString& separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"') const;
+        bool resultsSaveToCSV(const QString& filename, bool vectorsToAvg=false, const QString& separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"') const;
 
         /*! \brief save the results to a SYLK file
 
@@ -605,9 +606,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             If numbers in a column have errors then a second column is added for the errors.
 
             \param filename the file to create
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
             \return \c true on success
         */
-        bool resultsSaveToSYLK(const QString& filename) const;
+        bool resultsSaveToSYLK(const QString& filename, bool vectorsToAvg=false) const;
 
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel() const;

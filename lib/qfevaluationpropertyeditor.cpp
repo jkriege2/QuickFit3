@@ -514,6 +514,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tbResults->addAction(actCopyValErrResultsNoHead);
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
+    actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
 
     tbResults->addSeparator();
     tbResults->addWidget(new QLabel(" filter: file contains "));
@@ -603,6 +604,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tvResults->addAction(actCopyValErrResults);
     tvResults->addAction(actCopyValErrResultsNoHead);
     tvResults->addAction(actSaveResults);
+    tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actRefreshResults);
     tvResults->addAction(actDeleteResults);
     rwvlayout->addWidget(tvResults);
@@ -619,6 +621,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
     connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
+    connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedRecords()));
 
@@ -663,6 +666,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     menuResults->addAction(actDeleteResults);
     menuResults->addSeparator();
     menuResults->addAction(actSaveResults);
+    menuResults->addAction(actSaveResultsAveraged);
     menuResults->addSeparator();
     menuResults->addAction(actCopyResults);
     menuResults->addAction(actCopyResultsNoHead);
@@ -881,18 +885,47 @@ void QFEvaluationPropertyEditor::saveResults() {
     if (current) {
         QString evalfilter=current->getResultsDisplayFilter();
         QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk)");
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
+            bool ok=false;
             if (f==1) {
-                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ';', ',', '"');
+                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, ';', ',', '"');
             } else if (f==2) {
-                current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName);
+                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, false);
+            } else if (f==3) {
+                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, '\t', '.', '"');
             } else {
-                current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, ',', '.', '"');
+                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, ',', '.', '"');
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
+            if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
+        }
+    }
+}
+
+void QFEvaluationPropertyEditor::saveResultsAveraged()
+{
+    if (current) {
+        QString evalfilter=current->getResultsDisplayFilter();
+        QString selectedFilter="";
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
+        QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
+        if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+            int f=filter.split(";;").indexOf(selectedFilter);
+            bool ok=false;
+            if (f==1) {
+                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, ';', ',', '"');
+            } else if (f==2) {
+                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, true);
+            } else if (f==3) {
+                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, '\t', '.', '"');
+            } else {
+                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, ',', '.', '"');
+            }
+            currentSaveDir=QFileInfo(fileName).absolutePath();
+            if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
         }
     }
 }

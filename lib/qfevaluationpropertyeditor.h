@@ -129,6 +129,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         /** \brief save results to a file */
         void saveResults();
+        /** \brief save results to a file with averaged vector/matrix items */
+        void saveResultsAveraged();
 
         /** \brief remove the currently selected QFRawDataRecord */
         void removeRawData();
@@ -214,6 +216,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QAction* actCopyValErrResultsNoHead;
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
+        QAction* actSaveResultsAveraged;
         QAction* actRefreshResults;
         QAction* actDeleteResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
