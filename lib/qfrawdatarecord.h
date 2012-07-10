@@ -607,9 +607,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
             \param filename the file to create
             \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
+            \param flipTable if set \c true, the output will exchange X and Y coordinates of the cells, effectively flipping the result table
             \return \c true on success
         */
-        bool resultsSaveToSYLK(const QString& filename, bool vectorsToAvg=false) const;
+        bool resultsSaveToSYLK(const QString& filename, bool vectorsToAvg=false, bool flipTable=false) const;
 
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel() const;

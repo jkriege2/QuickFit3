@@ -169,7 +169,7 @@ QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& 
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator=',' );
+QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator='.' );
 
 /*! \brief convert a number to a QString with the c-locale (and without group separator)
     \ingroup qf3lib_tools

@@ -885,7 +885,7 @@ void QFEvaluationPropertyEditor::saveResults() {
     if (current) {
         QString evalfilter=current->getResultsDisplayFilter();
         QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
@@ -895,6 +895,8 @@ void QFEvaluationPropertyEditor::saveResults() {
             } else if (f==2) {
                 ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, false);
             } else if (f==3) {
+                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, false, true);
+            } else if (f==4) {
                 ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, '\t', '.', '"');
             } else {
                 ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, ',', '.', '"');
@@ -910,7 +912,7 @@ void QFEvaluationPropertyEditor::saveResultsAveraged()
     if (current) {
         QString evalfilter=current->getResultsDisplayFilter();
         QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
@@ -920,6 +922,8 @@ void QFEvaluationPropertyEditor::saveResultsAveraged()
             } else if (f==2) {
                 ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, true);
             } else if (f==3) {
+                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, true, true);
+            } else if (f==4) {
                 ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, '\t', '.', '"');
             } else {
                 ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, ',', '.', '"');

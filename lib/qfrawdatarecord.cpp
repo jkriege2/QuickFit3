@@ -2736,7 +2736,7 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, bool vectorsToAv
 }
 
 
-bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToAvg) const {
+bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToAvg, bool flipTable) const {
     // try output SYLK file
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
@@ -2787,16 +2787,26 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
 
 
     // write column headers
-    out<<QString("C;Y1;X1;K\"%1\"\n").arg(tr("datafield"));
+    out<<QString("F;Y1;X1;SDS\nF;Y2;X1;SDS\nC;Y1;X1;K\"%1\"\n").arg(tr("datafield"));
+
     for (int r=0; r<rownames.size(); r++) {
-        out<<QString("C;Y%2;X1;K\"%1\"\n").arg(rownames[r].first).arg(r+3);
+        if (flipTable) {
+            out<<QString("F;X%2;Y1;SDS\nC;X%2;Y1;K\"%1\"\n").arg(rownames[r].first).arg(r+3);
+        } else {
+            out<<QString("F;Y%2;X1;SDS\nC;Y%2;X1;K\"%1\"\n").arg(rownames[r].first).arg(r+3);
+        }
     }
 
     int col=2;
     for (int c=0; c<resultsGetEvaluationCount(); c++) {
         QString evalname=resultsGetEvaluationName(c);
-        out<<QString("C;Y1;X%2;K\"%1\"\n").arg(evalname).arg(col);
-        out<<QString("C;Y2;X%2;K\"%1\"\n").arg(tr("value")).arg(col);
+        if (flipTable) {
+            out<<QString("F;SDS;X1;Y%2\nC;X1;Y%2;K\"%1\"\n").arg(evalname.replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")).arg(col);
+            out<<QString("F;SDIS;X2;Y%2\nC;X2;Y%2;K\"%1\"\n").arg(tr("value")).arg(col);
+        } else {
+            out<<QString("F;SDS;Y1;X%2\nC;Y1;X%2;K\"%1\"\n").arg(evalname.replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")).arg(col);
+            out<<QString("F;SDIS;Y2;X%2\nC;Y2;X%2;K\"%1\"\n").arg(tr("value")).arg(col);
+        }
         bool hasError=false;
         int addCol=1;
         for (int r=0; r<rownames.size(); r++) {
@@ -2805,8 +2815,8 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
             QStringList dat;
             if (resultsExists(evalname, rownames[r].second)) {
                 switch(resultsGet(evalname, rownames[r].second).type) {
-                    case qfrdreNumber: dat<<doubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); break;
-                    case qfrdreNumberError: dat<<doubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); hasError=true; break;
+                    case qfrdreNumber: dat<<CDoubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); break;
+                    case qfrdreNumberError: dat<<CDoubleToQString(resultsGetAsDouble(evalname, rownames[r].second)); hasError=true; break;
                     case qfrdreInteger: dat<<loc.toString((qlonglong)resultsGetAsInteger(evalname, rownames[r].second)); break;
                     case qfrdreBoolean: if (resultsGetAsBoolean(evalname, rownames[r].second)) dat<<QString("1"); else dat<<QString("0"); break;
                     case qfrdreString: dat<<(stringDelimiter+resultsGetAsString(evalname, rownames[r].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter); break;
@@ -2824,9 +2834,9 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
                             QVector<double> sl=resultsGetAsDoubleList(evalname, rownames[r].second);
                             if (!vectorsToAvg) {
                                 for (int i=0; i<sl.size(); i++) {
-                                    dat<<doubleToQString(sl[i]);
+                                    dat<<CDoubleToQString(sl[i]);
                                 }
-                            } else dat<<doubleToQString(qfstatisticsAverage(sl));
+                            } else dat<<CDoubleToQString(qfstatisticsAverage(sl));
                         } break;
                     case qfrdreIntegerVector:
                     case qfrdreIntegerMatrix:
@@ -2837,45 +2847,66 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
                                 for (int i=0; i<sl.size(); i++) {
                                     dat<<loc.toString(sl[i]);
                                 }
-                            } else dat<<doubleToQString(qfstatisticsAverage(sl));
+                            } else dat<<CDoubleToQString(qfstatisticsAverage(sl));
                         } break;
                     default: break;
                 }
             }
             for (int i=0; i<dat.size(); i++) {
-                out<<QString("C;X%1;Y%2;N;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                if (flipTable) {
+                    out<<QString("C;X%2;Y%1;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                } else {
+                    out<<QString("C;X%1;Y%2;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                }
             }
             addCol=qMax(addCol, dat.size());
         }
         col+=addCol;
         if (hasError) {
-            out<<QString("C;Y2;X%2;K\"%1\"\n").arg(tr("error")).arg(col);
-            //out<<QString("F;Y2;X%2;SDB\n").arg(col);
+            if (flipTable) {
+                out<<QString("F;SDIS;Y%2;X2\nC;Y%2;X2;K\"%1\"\n").arg(tr("error")).arg(col);
+            } else {
+                out<<QString("F;SDIS;Y2;X%2\nC;Y2;X%2;K\"%1\"\n").arg(tr("error")).arg(col);
+            }
             for (int r=0; r<rownames.size(); r++) {
                 QStringList dat;
                 if (resultsExists(evalname, rownames[r].second)) {
                     switch(resultsGet(evalname, rownames[r].second).type) {
-                        case qfrdreNumberError: dat<<doubleToQString(resultsGetErrorAsDouble(evalname, rownames[r].second)); hasError=true; break;
+                        case qfrdreNumberError: dat<<CDoubleToQString(resultsGetErrorAsDouble(evalname, rownames[r].second)); hasError=true; break;
                         case qfrdreNumberErrorVector:
                         case qfrdreNumberErrorMatrix: {
                                 QVector<double> sl=resultsGetErrorAsDoubleList(evalname, rownames[r].second);
                                 if (!vectorsToAvg) {
                                     for (int i=0; i<sl.size(); i++) {
-                                        dat<<doubleToQString(sl[i]);
+                                        dat<<CDoubleToQString(sl[i]);
                                     }
-                                } else dat<<doubleToQString(qfstatisticsAverage(sl));
+                                } else dat<<CDoubleToQString(qfstatisticsAverage(sl));
                             } break;
                         default: break;
                     }
                 }
                 for (int i=0; i<dat.size(); i++) {
-                    out<<QString("C;X%1;Y%2;N;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    if (flipTable) {
+                        out<<QString("C;X%2;Y%1;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    } else {
+                        out<<QString("C;X%1;Y%2;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    }
                 }
                 addCol=qMax(addCol, dat.size());
             }
             col+=addCol;
         }
     }
+    if (flipTable) {
+        out<<"F;R1;SDSB\n";
+        out<<"F;C1;SDS\n";
+        out<<"F;C2;SDSR\n";
+    } else {
+        out<<"F;C1;SDSR\n";
+        out<<"F;R1;SDS\n";
+        out<<"F;R2;SDSB\n";
+    }
+    out<<"E\n";
     return true;
 }
 

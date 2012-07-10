@@ -1200,7 +1200,7 @@ void QFRawDataPropertyEditor::deleteSelectedResults() {
 void QFRawDataPropertyEditor::saveResults() {
     if (current) {
         QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
@@ -1210,6 +1210,8 @@ void QFRawDataPropertyEditor::saveResults() {
             } else if (f==2) {
                 ok=current->resultsSaveToSYLK(fileName, false);
             } else if (f==3) {
+                ok=current->resultsSaveToSYLK(fileName, false, true);
+            } else if (f==4) {
                 ok=current->resultsSaveToCSV(fileName, false, "\t", '.', '"');
             } else {
                 ok=current->resultsSaveToCSV(fileName, false, ", ", '.', '"');
@@ -1224,7 +1226,7 @@ void QFRawDataPropertyEditor::saveResultsAveraged()
 {
     if (current) {
         QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
+        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
             int f=filter.split(";;").indexOf(selectedFilter);
@@ -1234,6 +1236,8 @@ void QFRawDataPropertyEditor::saveResultsAveraged()
             } else if (f==2) {
                 ok=current->resultsSaveToSYLK(fileName, true);
             } else if (f==3) {
+                ok=current->resultsSaveToSYLK(fileName, true);
+            } else if (f==4) {
                 ok=current->resultsSaveToCSV(fileName, true, "\t", '.', '"');
             } else {
                 ok=current->resultsSaveToCSV(fileName, true, ", ", '.', '"');

@@ -720,6 +720,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
                                     dat+=doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
                                 }
                             } break;
+                            default: break;
                         }
                     }
                 }
@@ -753,7 +754,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
     return true;
 }
 
-bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg) {
+bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg, bool flipTable) {
     QFile of(filename);
     if (of.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&of);
@@ -766,7 +767,6 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
 
 
         QChar stringDelimiter='"';
-        QChar decimalPoint='.';
         QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
         QLocale loc=QLocale::c();
@@ -806,14 +806,23 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
             }
         }
 
+
         loc.setNumberOptions(QLocale::OmitGroupSeparator);
         for (int i=0; i<records.size(); i++) {
-            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(i+3).arg(1).arg(records[i].first->getName()+": "+records[i].second);
+            if (flipTable)
+                out<<QString("F;SDS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(i+3).arg(1).arg(QString(records[i].first->getName()+": "+records[i].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_"));
+            else
+                out<<QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(i+3).arg(1).arg(QString(records[i].first->getName()+": "+records[i].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_"));
         }
         int col=2;
         for (int c=0; c<colnames.size(); c++) {
-            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(1).arg(col).arg(colnames[c].first);
-            out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
+            if (flipTable) {
+                out<<QString("F;SDS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(1).arg(col).arg(colnames[c].first);
+                out<<QString("F;SDIS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
+            } else {
+                out<<QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(1).arg(col).arg(colnames[c].first);
+                out<<QString("F;SDIS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
+            }
             bool hasError=false;
             for (int r=0; r<records.size(); r++) {
                 QFRawDataRecord* record=records[r].first;
@@ -823,23 +832,17 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                 if (record) {
                     if (record->resultsExists(evalname, colnames[c].second)) {
                         switch(record->resultsGet(evalname, colnames[c].second).type) {
-                            /*case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
-                            case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
-                            case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
-                            case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c].second))?QString("1"):QString("0"); break;
-                            case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter; break;
-                            default: dat=""; break;*/
-                            case QFRawDataRecord::qfrdreNumber: dat<<doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
+                            case QFRawDataRecord::qfrdreNumber: dat<<CDoubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second)); break;
                             case QFRawDataRecord::qfrdreNumberVector:
                             case QFRawDataRecord::qfrdreNumberMatrix: {
                                 QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
                                 if (!vectorsToAvg) {
                                     for (int it=0; it<d.size(); it++) {
-                                        dat<<doubleToQString(d[it], 15, 'g', decimalPoint);
+                                        dat<<CDoubleToQString(d[it]);
                                     }
                                     colcnt=d.size();
                                 } else {
-                                    dat<<doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
+                                    dat<<CDoubleToQString(qfstatisticsAverage(d));
                                 }
                             } break;
                             case QFRawDataRecord::qfrdreNumberErrorVector:
@@ -847,15 +850,15 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                                 QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
                                 if (!vectorsToAvg) {
                                     for (int it=0; it<d.size(); it++) {
-                                        dat<<doubleToQString(d[it], 15, 'g', decimalPoint);
+                                        dat<<CDoubleToQString(d[it]);
                                     }
                                     colcnt=d.size();
                                 } else {
-                                    dat<<doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
+                                    dat<<CDoubleToQString(qfstatisticsAverage(d));
                                 }
                                 hasError=true;
                             } break;
-                            case QFRawDataRecord::qfrdreNumberError: dat<<doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
+                            case QFRawDataRecord::qfrdreNumberError: dat<<CDoubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second)); hasError=true; break;
                             case QFRawDataRecord::qfrdreInteger: dat<<loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
                             case QFRawDataRecord::qfrdreIntegerVector:
                             case QFRawDataRecord::qfrdreIntegerMatrix:
@@ -868,7 +871,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                                     }
                                     colcnt=d.size();
                                 } else {
-                                    dat<<doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
+                                    dat<<CDoubleToQString(qfstatisticsAverage(d));
                                 }
                             } break;
                             case QFRawDataRecord::qfrdreBoolean: if (record->resultsGetAsBoolean(evalname, colnames[c].second)) dat<<QString("1"); else dat<<QString("0"); break;
@@ -888,14 +891,22 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                     }
                 }
                 for (int i=0; i<dat.size(); i++) {
-                    out<<QString("C;X%1;Y%2;N;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    if (flipTable) {
+                        out<<QString("C;X%2;Y%1;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    } else {
+                        out<<QString("C;X%1;Y%2;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                    }
                     //col++;
                 }
                 //if ((subcolumns[c]-colcnt)>0) col+=(subcolumns[c]-colcnt);
             }
             col+=subcolumns[c];
             if (hasError) {
-                out<<QString("C;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
+                if (flipTable) {
+                    out<<QString("F;SDIS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
+                } else {
+                    out<<QString("F;SDIS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
+                }
                 for (int r=0; r<records.size(); r++) {
                     QFRawDataRecord* record=records[r].first;
                     QString evalname=records[r].second;
@@ -903,37 +914,50 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
                     int colcnt=1;
                     if (record) {
                         if (record->resultsExists(evalname, colnames[c].second)) {
-                            /*if (record->resultsGet(evalname, colnames[c].second).type==QFRawDataRecord::qfrdreNumberError) {
-                                dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
-                            }*/
                             switch (record->resultsGet(evalname, colnames[c].second).type) {
                                 case QFRawDataRecord::qfrdreNumberError:
-                                    dat<<doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
+                                    dat<<CDoubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second));
                                     break;
                                 case QFRawDataRecord::qfrdreNumberErrorVector:
                                 case QFRawDataRecord::qfrdreNumberErrorMatrix: {
                                     QVector<double> d=record->resultsGetErrorAsDoubleList(evalname, colnames[c].second);
                                     if (!vectorsToAvg) {
                                         for (int it=0; it<d.size(); it++) {
-                                            dat<<doubleToQString(d[it], 15, 'g', decimalPoint);
+                                            dat<<CDoubleToQString(d[it]);
                                         }
                                         colcnt=d.size();
                                     } else {
-                                        dat<<doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
+                                        dat<<CDoubleToQString(qfstatisticsAverage(d));
                                     }
                                 } break;
+                                    default: break;
                             }
                         }
                     }
-                    //if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;N;K%3\n").arg(col).arg(r+3).arg(dat);
+                    //if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;K%3\n").arg(col).arg(r+3).arg(dat);
                     for (int i=0; i<dat.size(); i++) {
-                        out<<QString("C;X%1;Y%2;N;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                        if (flipTable) {
+                            out<<QString("C;X%2;Y%1;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                        } else {
+                            out<<QString("C;X%1;Y%2;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
+                        }
                         //col++;
                     }
                     //if ((subcolumns[c]-colcnt)>0) col+=(subcolumns[c]-colcnt);
                 }
             }
         }
+
+        if (flipTable) {
+            out<<"F;R1;SDSB\n";
+            out<<"F;C1;SDS\n";
+            out<<"F;C2;SDSR\n";
+        } else {
+            out<<"F;C1;SDSR\n";
+            out<<"F;R1;SDS\n";
+            out<<"F;R2;SDSB\n";
+        }
+        out<<"E\n";
 
     } else { return false; }
     return true;
