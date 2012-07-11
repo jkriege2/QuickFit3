@@ -38,6 +38,7 @@ QFRDRTable::PlotInfo::PlotInfo()
     keyFontSize=10;
     axisFontSize=10;
     axisLabelFontSize=12;
+    labelFontSize=16;
 }
 
 
@@ -247,6 +248,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.keyFontSize=te.attribute("keyfontsize", "12").toDouble();
                 plot.axisFontSize=te.attribute("axisfontsize", "10").toDouble();
                 plot.axisLabelFontSize=te.attribute("axislabelfontsize", "12").toDouble();
+                plot.labelFontSize=te.attribute("labelFontSize", "16").toDouble();
 
                 QDomElement ge=te.firstChildElement("graph");
                 while (!ge.isNull()) {
@@ -266,6 +268,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));
+                    graph.colorTransparent=ge.attribute("color_trans", "1").toDouble();
+                    graph.errorColorTransparent=ge.attribute("errorcolor_trans", "1").toDouble();
+                    graph.fillColorTransparent=ge.attribute("fillcolor_trans", "0.3").toDouble();
                     plot.graphs.append(graph);
                     ge = ge.nextSiblingElement("graph");
                 }
@@ -316,6 +321,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("keyfontsize", CDoubleToQString(plots[i].keyFontSize));
         w.writeAttribute("axisfontsize", CDoubleToQString(plots[i].axisFontSize));
         w.writeAttribute("axislabelfontsize", CDoubleToQString(plots[i].axisLabelFontSize));
+        w.writeAttribute("labelfontsize", CDoubleToQString(plots[i].labelFontSize));
         w.writeAttribute("fontname", plots[i].fontName);
 
         for (int g=0; g<plots[i].graphs.size(); g++) {
@@ -335,6 +341,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("fillcolor", QColor2String(plots[i].graphs[g].fillColor));
             w.writeAttribute("symbol", JKQTPgraphSymbols2String(plots[i].graphs[g].symbol));
             w.writeAttribute("errorStyle", JKQTPerrorPlotstyle2String(plots[i].graphs[g].errorStyle));
+            w.writeAttribute("color_trans", QString::number(plots[i].graphs[g].colorTransparent));
+            w.writeAttribute("errorcolor_trans", QString::number(plots[i].graphs[g].errorColorTransparent));
+            w.writeAttribute("fillcolor_trans", QString::number(plots[i].graphs[g].fillColorTransparent));
             w.writeEndElement();
         }
         w.writeEndElement();

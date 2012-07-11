@@ -46,6 +46,21 @@ class QFRDRTable : public QFRawDataRecord {
             return QString("");
         }
 
+        static QIcon GraphType2Icon(GraphType type) {
+            switch(type) {
+                case gtLines: return QIcon(":/table/icons/plot_pointslines.png");
+                case gtImpulsesVertical: return QIcon(":/table/icons/plot_vimpulses.png");
+                case gtImpulsesHorizontal: return QIcon(":/table/icons/plot_himpulses.png");
+                case gtFilledCurveX: return QIcon(":/table/icons/plot_xfilledcurve.png");
+                case gtFilledCurveY: return QIcon(":/table/icons/plot_yfilledcurve.png");
+                case gtStepsHorizontal: return QIcon(":/table/icons/plot_hsteps.png");
+                case gtStepsVertical: return QIcon(":/table/icons/plot_vsteps.png");
+                case gtbarsHorizontal: return QIcon(":/table/icons/plot_hbars.png");
+                case gtbarsVertical: return QIcon(":/table/icons/plot_vbars.png");
+            }
+            return QIcon();
+        }
+
         static GraphType String2GraphType(QString type) {
             QString s=type.trimmed().toLower();
             if (s=="lines") return gtLines;
@@ -70,8 +85,11 @@ class QFRDRTable : public QFRawDataRecord {
             int yerrorcolumn;
             Qt::PenStyle style;
             QColor color;
+            double colorTransparent;
             QColor errorColor;
             QColor fillColor;
+            double errorColorTransparent;
+            double fillColorTransparent;
             double linewidth;
             JKQTPgraphSymbols symbol;
             double symbolSize;
@@ -90,6 +108,7 @@ class QFRDRTable : public QFRawDataRecord {
             bool showKey;
             QString fontName;
             double keyFontSize;
+            double labelFontSize;
             double axisFontSize;
             double axisLabelFontSize;
             QList<GraphInfo> graphs;

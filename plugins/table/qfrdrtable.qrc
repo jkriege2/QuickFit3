@@ -21,5 +21,18 @@
         <file alias="table_resize.png">icons/table_resize.png</file>
         <file alias="plot_add.png">icons/plot_add.png</file>
         <file alias="plot_delete.png">icons/plot_delete.png</file>
+        <file>icons/plot_ebars.png</file>
+        <file>icons/plot_elines.png</file>
+        <file>icons/plot_elinesbars.png</file>
+        <file>icons/plot_epolygons.png</file>
+        <file>icons/plot_himpulses.png</file>
+        <file>icons/plot_pointslines.png</file>
+        <file>icons/plot_vimpulses.png</file>
+        <file>icons/plot_vsteps.png</file>
+        <file>icons/plot_hbars.png</file>
+        <file>icons/plot_hsteps.png</file>
+        <file>icons/plot_vbars.png</file>
+        <file>icons/plot_xfilledcurve.png</file>
+        <file>icons/plot_yfilledcurve.png</file>
     </qresource>
 </RCC>
