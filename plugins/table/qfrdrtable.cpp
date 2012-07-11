@@ -16,9 +16,15 @@ QFRDRTable::GraphInfo::GraphInfo() {
     color=QColor("red");
     errorColor=color.darker();
     linewidth=1;
-    symbol=JKQTPnoSymbol;
-    symbolSize=5;
+    symbol=JKQTPplus;
+    symbolSize=10;
     errorStyle=JKQTPnoError;
+    drawLine=true;
+    errorStyle=JKQTPerrorBars;
+    colorTransparent=1;
+    errorColorTransparent=1;
+    fillColorTransparent=0.3;
+
 }
 
 QFRDRTable::PlotInfo::PlotInfo()

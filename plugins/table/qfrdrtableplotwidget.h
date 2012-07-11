@@ -32,6 +32,7 @@ class QFRDRTablePlotWidget : public QWidget
     protected slots:
         void listGraphs_currentRowChanged(int currentRow);
         void on_btnDeleteGraph_clicked();
+        void on_btnCloneGraph_clicked();
         void on_btnAddGraph_clicked();
         void on_btnAutoscaleX_clicked();
         void on_btnAutoscaleY_clicked();
