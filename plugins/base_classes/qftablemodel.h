@@ -64,6 +64,8 @@ class QFTableModel : public QAbstractTableModel {
             return a & 0xFFFF;
         }
 
+        bool doEmitSignals;
+
         /** \brief the number of rows */
         quint16 rows;
         /** \brief the number of columns */
@@ -204,6 +206,10 @@ class QFTableModel : public QAbstractTableModel {
         void copy(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false);
         /*! \brief pastes data from the cklipboard into the table, starting from the given position ... the table is resized if needed */
         void paste(int row_start=0, int column_start=0);
+
+        bool getDoEmitSignals() const;
+        void enableSignals(bool emitReset=true);
+        void disableSignals();
     public slots:
         /** \brief append a new row */
         inline void appendRow() { resize(rows+1, columns); }

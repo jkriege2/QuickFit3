@@ -6,6 +6,7 @@ QFTableModel::QFTableModel(QObject * parent):
 {
     readonly=true;
     readonlyButStillCheckable=false;
+    doEmitSignals=true;
     //quint32 a=xyAdressToUInt32(5, 5);
     //std::cout<<"adress test: "<<a<<" => row="<<UInt32ToRow(a)<<", column="<<UInt32ToColumn(a)<<"\n";
 }
@@ -61,6 +62,9 @@ QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int 
 }
 
 bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+
     //qDebug()<<index<<"("<<role<<" chk="<<Qt::CheckStateRole<<")"<<value;
     if (index.isValid() && role == Qt::EditRole && (!readonly || readonlyButStillCheckable)) {
         quint32 a=xyAdressToUInt32(index.row(), index.column());
@@ -68,7 +72,8 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
         if (dataMap.contains(a)) old=dataMap[a];
         dataMap[a]=value;
         hasDataChanged=hasDataChanged | (old!=value);
-        emit dataChanged(index, index);
+        doEmitSignals=oldEmit;
+        if (doEmitSignals) emit dataChanged(index, index);
         return true;
     } else if (index.isValid() && role == Qt::CheckStateRole && (!readonly || readonlyButStillCheckable)) {
         quint32 a=xyAdressToUInt32(index.row(), index.column());
@@ -76,9 +81,11 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
         if (dataCheckedMap.contains(a)) old=dataCheckedMap[a];
         dataCheckedMap[a]=value;
         hasDataChanged=hasDataChanged | (old!=value);
-        emit dataChanged(index, index);
+        doEmitSignals=oldEmit;
+        if (doEmitSignals) emit dataChanged(index, index);
         return true;
     }
+    doEmitSignals=oldEmit;
     return false;
 }
 
@@ -119,11 +126,13 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
         if (dataEditMap.contains(didx[i])) dataEditMap.remove(didx[i]);
     }
     //std::cout<<"  resize("<<rows<<", "<<columns<<"): 5\n";
-    reset();
+    if (doEmitSignals)reset();
     //std::cout<<"  resize("<<rows<<", "<<columns<<"): 6\n";
 }
 
 void QFTableModel::insertRow(quint16 r) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     appendRow();
     if (r<rows-1) for (int i=rows-2; i>=r; i--) {
         for (int c=0; c<columns; c++) {
@@ -133,11 +142,14 @@ void QFTableModel::insertRow(quint16 r) {
     for (int c=0; c<columns; c++) {
         setCell(r, c, QVariant());
     }
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals)reset();
 }
 
 void QFTableModel::insertColumn(quint16 c) {
     //std::cout<<"  insertColumn("<<c<<")\n";
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     appendColumn();
     while (columnNames.size()<columns) columnNames.append("");
     if (c<columns-1) for (int i=columns-2; i>=c; i--) {
@@ -149,11 +161,14 @@ void QFTableModel::insertColumn(quint16 c) {
     for (int r=0; r<rows; r++) {
         setCell(r, c, QVariant());
     }
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals)reset();
     //std::cout<<"  insertColumn("<<c<<") ... DONE\n";
 }
 
 void QFTableModel::deleteRow(quint16 r) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     if (r>=rows ) return;
     for (int i=r; i<rows-1; i++) {
         for (int c=0; c<columns; c++) {
@@ -161,10 +176,13 @@ void QFTableModel::deleteRow(quint16 r) {
         }
     }
     resize(rows-1, columns);
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals)reset();
 }
 
 void QFTableModel::deleteColumn(quint16 c) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     if (c>=columns) return;
     for (int i=c; i<columns-1; i++) {
         for (int r=0; r<rows; r++) {
@@ -173,7 +191,8 @@ void QFTableModel::deleteColumn(quint16 c) {
         if (i+1<columnNames.size()) columnNames[i]=columnNames[i+1];
     }
     resize(rows, columns-1);
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals)reset();
 }
 
 void QFTableModel::deleteCell(quint16 row, quint16 column) {
@@ -183,13 +202,17 @@ void QFTableModel::deleteCell(quint16 row, quint16 column) {
     dataEditMap.remove(a);
     dataBackgroundMap.remove(a);
     dataCheckedMap.remove(a);
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::deleteCells(QModelIndexList selection) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     for (int i=0; i<selection.size(); i++) {
         deleteCell(selection[i].row(), selection[i].column());
     }
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) reset();
 }
 
 void QFTableModel::clear() {
@@ -201,7 +224,7 @@ void QFTableModel::clear() {
     dataBackgroundMap.clear();
     dataCheckedMap.clear();
     columnNames.clear();
-    reset();
+    if (doEmitSignals) reset();
 }
 
 bool QFTableModel::changeDatatype(quint16 row, quint16 column, QVariant::Type newType) {
@@ -220,7 +243,7 @@ bool QFTableModel::changeDatatype(quint16 row, quint16 column, QVariant::Type ne
         dataMap[a]=QVariant(newType);
         return true;
     }
-    reset();
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCell(quint16 row, quint16 column, QVariant value) {
@@ -228,7 +251,7 @@ void QFTableModel::setCell(quint16 row, quint16 column, QVariant value) {
     if (readonly || (row>=rows) || (column>=columns)) return;
     quint32 a=xyAdressToUInt32(row, column);
     dataMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellCreate(quint16 row, quint16 column, QVariant value) {
@@ -238,7 +261,7 @@ void QFTableModel::setCellCreate(quint16 row, quint16 column, QVariant value) {
     }
     quint32 a=xyAdressToUInt32(row, column);
     dataMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellEditRole(quint16 row, quint16 column, QVariant value) {
@@ -246,7 +269,7 @@ void QFTableModel::setCellEditRole(quint16 row, quint16 column, QVariant value) 
     if (readonly || (row>=rows) || (column>=columns)) return;
     quint32 a=xyAdressToUInt32(row, column);
     dataEditMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellEditRoleCreate(quint16 row, quint16 column, QVariant value) {
@@ -256,14 +279,14 @@ void QFTableModel::setCellEditRoleCreate(quint16 row, quint16 column, QVariant v
     }
     quint32 a=xyAdressToUInt32(row, column);
     dataEditMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellBackgroundRole(quint16 row, quint16 column, QVariant value) {
     if (readonly || (row>=rows) || (column>=columns)) return;
     quint32 a=xyAdressToUInt32(row, column);
     dataBackgroundMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellBackgroundRoleCreate(quint16 row, quint16 column, QVariant value) {
@@ -273,14 +296,14 @@ void QFTableModel::setCellBackgroundRoleCreate(quint16 row, quint16 column, QVar
     }
     quint32 a=xyAdressToUInt32(row, column);
     dataBackgroundMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellCheckedRole(quint16 row, quint16 column, QVariant value) {
     if (readonly || (row>=rows) || (column>=columns)) return;
     quint32 a=xyAdressToUInt32(row, column);
     dataCheckedMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 void QFTableModel::setCellCheckedRoleCreate(quint16 row, quint16 column, QVariant value) {
@@ -290,7 +313,7 @@ void QFTableModel::setCellCheckedRoleCreate(quint16 row, quint16 column, QVarian
     }
     quint32 a=xyAdressToUInt32(row, column);
     dataCheckedMap[a]=value;
-    emit dataChanged(index(row, column), index(row, column));
+    if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
 
@@ -327,7 +350,7 @@ void QFTableModel::setColumnTitle(quint16 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly || (column>=columns)) return;
     if (column<columnNames.size()) columnNames[column]=name;
-    reset();
+    if (doEmitSignals) reset();
 }
 
 void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
@@ -335,7 +358,7 @@ void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
     if (readonly) return;
     resize(rows, qMax(columns, quint16(column+1)));
     if (column<columnNames.size()) columnNames[column]=name;
-    reset();
+    if (doEmitSignals) reset();
 }
 
 QString QFTableModel::columnTitle(quint16 column) const {
@@ -486,6 +509,8 @@ bool QFTableModel::readCSV(const QString& filename, char column_separator, char 
 }
 
 bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_separator, QString header_start, char comment_start, int start_row, int start_col, bool clearTable) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     bool ro=readonly;
     readonly=false;
     if (clearTable) clear();
@@ -671,7 +696,8 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     //this->rows=rows;
     //this->columns=columns;
     readonly=ro;
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) reset();
     return true;
 }
 
@@ -747,6 +773,10 @@ void QFTableModel::paste(int row_start, int column_start) {
     if (row_start<0) row=0;
     if (column_start<0) column=0;
 
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+
+
     /*for (int i=0; i<mime->formats().size(); i++) {
         //qDebug()<<mime->formats().at(i)<<":";
         //qDebug()<<mime->data(mime->formats().at(i));
@@ -774,10 +804,29 @@ void QFTableModel::paste(int row_start, int column_start) {
         //qDebug()<<"sep='"<<sep<<"'    dec='"<<dec<<"'";
         readCSV(in, sep, dec, "#!", '#', row, column, false);
     }
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) reset();
+}
+
+bool QFTableModel::getDoEmitSignals() const
+{
+    return doEmitSignals;
+}
+
+void QFTableModel::enableSignals(bool emitReset)
+{
+    doEmitSignals=true;
+    if (emitReset) reset();
+}
+
+void QFTableModel::disableSignals()
+{
+    doEmitSignals=false;
 }
 
 bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable) {
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
     int srow=start_row;
     int scol=start_col;
     if (srow<0) srow=0;
@@ -819,10 +868,13 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                     e=e.nextSiblingElement("cell");
                 }
             }
+            doEmitSignals=oldEmit;
+            if (doEmitSignals) reset();
             return true;
         }
     }
-    reset();
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) reset();
     return false;
 }
 

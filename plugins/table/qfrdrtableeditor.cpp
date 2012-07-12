@@ -404,10 +404,12 @@ void QFRDRTableEditor::slDeleteRow() {
                         if (!rl.contains(l[i].row())) rl.append(l[i].row());
                     }
                     qSort(rl);
+                    m->model()->disableSignals();
                     for (int i=rl.size()-1; i>=0; i--) {
                         //std::cout<<"deleting row "<<rl[i]<<std::endl;
                         m->model()->deleteRow(rl[i]);
                     }
+                    m->model()->enableSignals(true);
                 }
             }
         }
@@ -431,10 +433,12 @@ void QFRDRTableEditor::slDeleteColumn() {
                         if (!rl.contains(l[i].column())) rl.append(l[i].column());
                     }
                     qSort(rl);
+                    m->model()->disableSignals();
                     for (int i=rl.size()-1; i>=0; i--) {
                         //std::cout<<"deleting column "<<rl[i]<<std::endl;
                         m->model()->deleteColumn(rl[i]);
                     }
+                    m->model()->enableSignals(true);
                 }
             }
         }
@@ -496,9 +500,11 @@ void QFRDRTableEditor::slSetDatatype() {
                         case 4: t=QVariant::Bool; break;
                     }
 
+                    m->model()->disableSignals();
                     for (int i=0; i<l.size(); i++) {
                         m->model()->changeDatatype(l[i].row(), l[i].column(), t);
                     }
+                    m->model()->enableSignals(true);
                 }
             }
         }
