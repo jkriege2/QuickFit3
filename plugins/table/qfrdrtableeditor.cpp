@@ -1,4 +1,6 @@
 #include "qfrdrtableeditor.h"
+#include "qfrdrtableformuladialog.h"
+#include "qfrdrtablecolumnvaluesdialog.h"
 #include "qfrdrtable.h"
 #include "dlgcsvparameters.h"
 
@@ -134,6 +136,17 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSetColumnTitle, SIGNAL(triggered()), this, SLOT(slSetColumnTitle()));
     tbMain->addAction(actSetColumnTitle);
 
+
+    actSetColumnValues=new QAction("set column values (linear, ...)", this);
+    actSetColumnValues->setToolTip(tr("init the current column with e.g. linearly increasing numbers ..."));
+    connect(actSetColumnValues, SIGNAL(triggered()), this, SLOT(slSetColumnValues()));
+
+    actCalculateColumn=new QAction("evaluate formula", this);
+    actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable formula"));
+    connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
+
+
+
     tvMain->addAction(actCopy);
     tvMain->addAction(actCopyResults);
     tvMain->addAction(actCopyResultsNoHead);
@@ -153,6 +166,8 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actSetColumnTitle);
     tvMain->addAction(actSetDatatype);
     tvMain->addAction(getSeparatorAction(this));
+    tvMain->addAction(actSetColumnValues);
+    tvMain->addAction(actCalculateColumn);
 
     l->addWidget(tvMain);
 
@@ -160,6 +175,7 @@ void QFRDRTableEditor::createWidgets() {
     QMenu* menuFile=propertyEditor->addMenu("&File", 0);
     menuFile->addAction(actLoadTable);
     menuFile->addAction(actSaveTable);
+
     QMenu* menuEdit=propertyEditor->addMenu("&Edit", 0);
     menuEdit->addAction(actCopy);
     menuEdit->addAction(actCut);
@@ -182,9 +198,13 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addSeparator();
     menuTab->addAction(actSetDatatype);
     menuTab->addAction(actSetColumnTitle);
+    menuTab->addAction(actSetColumnValues);
+    menuTab->addAction(actCalculateColumn);
     menuTab->addSeparator();
     menuTab->addAction(actClear);
     menuTab->addAction(actResize);
+
+
 }
 
 void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -604,6 +624,243 @@ void QFRDRTableEditor::slDelete() {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             m->model()->deleteCells(tvMain->selectionModel()->selectedIndexes());
             QApplication::restoreOverrideCursor();
+        }
+    }
+}
+
+void QFRDRTableEditor::slSetColumnValues() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QModelIndex ci=tvMain->currentIndex();
+            if (ci.isValid()) {
+                QFRDRTableColumnValuesDialog* dlg=new QFRDRTableColumnValuesDialog(this);
+                QItemSelectionModel* smod=tvMain->selectionModel();
+                if (smod->hasSelection()) {
+                    smod->selectedColumns();
+                    bool set=false;
+                    for (int c=0; c<m->model()->columnCount(); c++) {
+                        if (smod->isColumnSelected(c, QModelIndex())) {
+                            dlg->setColumn(true);
+                            dlg->setCount(m->model()->rowCount());
+                            set=true;
+                            break;
+                        }
+                    }
+                    if (!set) {
+                        for (int c=0; c<m->model()->rowCount(); c++) {
+                            if (smod->isRowSelected(c, QModelIndex())) {
+                                dlg->setColumn(false);
+                                dlg->setCount(m->model()->columnCount());
+                                set=true;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+
+                if (dlg->exec()) {
+                    QList<double> val=dlg->getValues();
+                    if (val.size()>0) {
+                        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                        m->model()->disableSignals();
+                        if (dlg->addAsColumn()) {
+                            for (int i=0; i<val.size(); i++) {
+                                m->model()->setCellCreate(ci.row()+i, ci.column(), val[i]);
+                            }
+                        } else {
+                            for (int i=0; i<val.size(); i++) {
+                                m->model()->setCellCreate(ci.row(), ci.column()+i, val[i]);
+                            }
+                        }
+                        m->model()->enableSignals(true);
+                        QApplication::restoreOverrideCursor();
+                    }
+                }
+                delete dlg;
+            }
+        }
+    }
+}
+
+struct jkMathParserData {
+    QFTablePluginModel* model;
+    int row;
+    int column;
+};
+
+jkMathParser::jkmpResult fQFRDRTableEditor_data(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
+    jkMathParser::jkmpResult res;
+    res.num=NAN;
+    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            res.type=jkMathParser::jkmpDouble;
+            if (n!=2) p->jkmpError("data(row, column) needs 2 argument");
+            if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)) p->jkmpError("data(row, column) needs two integer arguments");
+            int r=floor(params[0].num);
+            int c=floor(params[1].num);
+            if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
+                QVariant da= d->model->cell(r,c);
+                switch(da.type()) {
+                    case QVariant::LongLong :
+                    case QVariant::ULongLong :
+                    case QVariant::Int :
+                    case QVariant::UInt :
+                    case QVariant::Double: res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                    case QVariant::Date:
+                    case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
+                    case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
+                    case QVariant::Bool: res.boolean=da.toBool(); res.type=jkMathParser::jkmpBool; break;
+                    case QVariant::String:
+                        res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                    default:
+                        if (da.canConvert(QVariant::Double)) {
+                            res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                        } else {
+                            res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+    return res;
+}
+
+jkMathParser::jkmpResult fQFRDRTableEditor_dataleft(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
+    jkMathParser::jkmpResult res;
+    res.num=NAN;
+    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            res.type=jkMathParser::jkmpDouble;
+            if (n!=1) p->jkmpError("dataleft(delta_column) needs 1 argument");
+            if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("dataleft(delta_column) needs one integer arguments");
+            int delta=floor(params[0].num);
+            QVariant da= d->model->cell(d->row,d->column-delta);
+            switch(da.type()) {
+                case QVariant::LongLong :
+                case QVariant::ULongLong :
+                case QVariant::Int :
+                case QVariant::UInt :
+                case QVariant::Double: res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                case QVariant::Date:
+                case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
+                case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
+                case QVariant::Bool: res.boolean=da.toBool(); res.type=jkMathParser::jkmpBool; break;
+                case QVariant::String:
+                    res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                default:
+                    if (da.canConvert(QVariant::Double)) {
+                        res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                    } else {
+                        res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                    }
+                    break;
+            }
+        }
+    }
+    return res;
+}
+
+void QFRDRTableEditor::slCalcColumn() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QModelIndex ci=tvMain->currentIndex();
+            if (ci.isValid()) {
+                QFRDRTableFormulaDialog* dlg=new QFRDRTableFormulaDialog(this);
+                QItemSelectionModel* smod=tvMain->selectionModel();
+                if (smod->hasSelection()) {
+                    if (dlg->exec()) {
+                        QModelIndexList idxs=smod->selectedIndexes();
+                        if (idxs.size()>0) {
+                            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                            m->model()->disableSignals();
+                            bool ok=true;
+                            jkMathParser mp; // instanciate
+                            mp.addFunction("data", fQFRDRTableEditor_data);
+                            mp.addFunction("dataleft", fQFRDRTableEditor_dataleft);
+                            mp.addVariableDouble("row", 0.0);
+                            mp.addVariableDouble("col", 0.0);
+                            mp.addVariableDouble("column", 0.0);
+                            mp.addVariableDouble("columns", 1.0);
+                            mp.addVariableDouble("rows", 1.0);
+
+                            jkMathParser::jkmpNode* n=NULL;
+
+
+                            try {
+                                n=mp.parse(dlg->getExpression().toStdString());
+                            } catch(std::exception& E) {
+                                QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the expression '%1':\n%2").arg(dlg->getExpression()).arg(E.what()));
+                                ok=false;
+                            }
+
+                            if (ok && n) {
+                                int row=-1;
+                                int column=-1;
+                                for (int i=0; i<idxs.size(); i++) {
+                                    ok=true;
+                                    try {
+                                        row = idxs[i].row();
+                                        column = idxs[i].column();
+                                        mp.addVariableDouble("row", idxs[i].row());
+                                        mp.addVariableDouble("col", idxs[i].column());
+                                        mp.addVariableDouble("column", idxs[i].column());
+                                        mp.addVariableDouble("rows", m->model()->rowCount());
+                                        mp.addVariableDouble("columns", m->model()->columnCount());
+
+                                        jkMathParserData d;
+                                        d.column=column;
+                                        d.row=row;
+                                        d.model=m->model();
+                                        mp.set_data(&d);
+
+                                        jkMathParser::jkmpResult r;
+                                        r=n->evaluate();
+
+
+                                        if (r.isValid) {
+                                            if (r.type==jkMathParser::jkmpBool) {
+                                                m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), r.boolean);
+                                            } else if (r.type==jkMathParser::jkmpDouble) {
+                                                if (QFFloatIsOK(r.num))
+                                                    m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), r.num);
+                                                else
+                                                    m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
+                                            } else if (r.type==jkMathParser::jkmpString) {
+                                                m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QString(r.str.c_str()));
+                                            } else {
+                                                m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
+                                            }
+                                        } else {
+                                            m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
+                                        }
+
+                                        mp.set_data(NULL);
+                                    } catch(std::exception& E) {
+                                       ok= QMessageBox::critical(this, tr("QuickFit-table"),
+                                                                 tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(dlg->getExpression()).arg(E.what()).arg(row).arg(column),
+                                                                    QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok;
+                                    }
+                                    if (!ok) break;
+
+                                }
+                            }
+
+                            if (n) delete n;
+
+                            m->model()->enableSignals(true);
+                            QApplication::restoreOverrideCursor();
+                        }
+                    }
+                    delete dlg;
+                }
+
+            }
         }
     }
 }

@@ -68,10 +68,10 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         void setValue(double value);
         void setMaximum(double value) { setCheckMaximum(true); m_maximum=value; setValue(this->value()); }
         void setMinimum(double value) { setCheckMinimum(true); m_minimum=value; setValue(this->value()); }
-        void setRange(double min, double max) { setCheckMaximum(true); setCheckMinimum(true); m_minimum=min; m_maximum=max; setValue(value()); }
+        void setRange(double min, double max);
         void setDecimals(int decimals) { m_decimals=decimals; setValue(value()); }
-        void stepUp() { double i=m_increment;  if (m_Integer) i=round(m_increment); setValue(value()+i); };
-        void stepDown() { double i=m_increment;  if (m_Integer) i=round(m_increment); setValue(value()-i); };
+        void stepUp();
+        void stepDown();
         void setIncrement(double inc) { m_increment=inc; };
         void setSingleStep(double inc) { setIncrement(inc); };
         void setShowUpDown(bool showUpDown);

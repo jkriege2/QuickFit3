@@ -1,4 +1,5 @@
 #include "qfrdrtableplotwidget.h"
+#include "programoptions.h"
 #include "ui_qfrdrtableplotwidget.h"
 #include "qfrdrtable.h"
 #include "qftools.h"
@@ -61,10 +62,13 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     updating=false;
 
     ui->tabWidget->setCurrentIndex(0);
+
+    if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) readSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
 }
 
 QFRDRTablePlotWidget::~QFRDRTablePlotWidget()
 {
+    if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
     delete ui;
 }
 

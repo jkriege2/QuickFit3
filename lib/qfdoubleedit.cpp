@@ -99,6 +99,31 @@ void QFDoubleEdit::setValue(double valueIn) {
     }
 }
 
+void QFDoubleEdit::setRange(double min, double max)
+{
+    setCheckMaximum(true);
+    setCheckMinimum(true);
+    m_minimum=min;
+    m_maximum=max;
+    setValue(value());
+}
+
+void QFDoubleEdit::stepUp()
+{
+    double i=m_increment;
+    if (m_Integer) i=round(m_increment);
+    setValue(value()+i);
+    emit valueChanged(value());
+}
+
+void QFDoubleEdit::stepDown()
+{
+    double i=m_increment;
+    if (m_Integer) i=round(m_increment);
+    setValue(value()-i);
+    emit valueChanged(value());
+}
+
 void QFDoubleEdit::updateWidget(const QString & text) {
     double oldvalue=value();
     /* if we have "1,", "1e", "1e-", "-" and are still typing, do not create a signal

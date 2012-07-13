@@ -17,7 +17,7 @@
 #include "tableresizedialog.h"
 #include "qfrdrtabledelegate.h"
 #include "qftools.h"
-
+#include "jkmathparser.h"
 
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
@@ -58,6 +58,9 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slCut();
         void slDelete();
 
+        void slSetColumnValues();
+        void slCalcColumn();
+
     protected:
         /** \brief table view for the contents */
         QEnhancedTableView* tvMain;
@@ -80,6 +83,9 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCopyResultsNoHead;
         QAction* actResize;
         QAction* actDelete;
+
+        QAction* actSetColumnValues;
+        QAction* actCalculateColumn;
 
         QAction* actCopy;
         QAction* actCut;

@@ -20,7 +20,10 @@ HEADERS += dlgcsvparameters.h \
     qfrdrtabledelegate.h \
     qfrdrploteditor.h \
     qfrdrtableplotwidget.h \
-    qftablepluginmodel.h
+    qftablepluginmodel.h \
+    qfrdrtablecolumnvaluesdialog.h \
+    ../../../../../LIB/trunk/jkmathparser.h \
+    qfrdrtableformuladialog.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -31,11 +34,16 @@ SOURCES += dlgcsvparameters.cpp \
     qfrdrtabledelegate.cpp \
     qfrdrploteditor.cpp \
     qfrdrtableplotwidget.cpp \
-    qftablepluginmodel.cpp
+    qftablepluginmodel.cpp \
+    qfrdrtablecolumnvaluesdialog.cpp \
+    ../../../../../LIB/trunk/jkmathparser.cpp \
+    qfrdrtableformuladialog.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \
-    qfrdrtableplotwidget.ui
+    qfrdrtableplotwidget.ui \
+    qfrdrtablecolumnvaluesdialog.ui \
+    qfrdrtableformuladialog.ui
 
 RESOURCES += qfrdrtable.qrc
 
