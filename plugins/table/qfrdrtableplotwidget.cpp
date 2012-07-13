@@ -517,6 +517,7 @@ void QFRDRTablePlotWidget::plotDataChanged() {
 }
 
 void QFRDRTablePlotWidget::updateGraph() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     if (current) {
         qDebug()<<"updateGraph  plot="<<this->plot+1<<"/"<<current->getPlotCount();
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -879,6 +880,7 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->set_doDrawing(true);
         ui->plotter->update_plot();
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRTablePlotWidget::updateData() {

@@ -94,6 +94,8 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     logMain->set_log_date_time(true);
     loglayout->addWidget(new QLabel(tr("<b>Log Messages:</b>")));
     loglayout->addWidget(logMain);
+    logMain->set_log_file_append(true);
+    logMain->open_logfile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/b040spim_main.log", false);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

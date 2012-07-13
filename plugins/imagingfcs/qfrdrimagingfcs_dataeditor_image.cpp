@@ -1,4 +1,5 @@
 #include "qfrdrimagingfcs_dataeditor_image.h"
+#include "qfrdrimagingfcscopydataselectdialog.h"
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
 #include <math.h>
@@ -797,12 +798,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy to &Matlab"), this);
     actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as a Matlab script."));
     connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
+    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy as &Columns"), this);
+    actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
+    connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
     grdTop->addWidget(grpTop, 0, 2, 3, 1);
     grdTop->addWidget(btnSaveData, 0, 0);
     grdTop->addWidget(btnCopyDataToMatlab, 1, 0);
+    grdTop->addWidget(btnCopyDataAsColumns, 2, 0);
     grdTop->addWidget(btnSaveReport, 0, 1);
     grdTop->addWidget(btnPrintReport, 1, 1);
     grdTop->setColumnStretch(1,0);
+    grdTop->setColumnStretch(0,0);
 
 
 
@@ -985,6 +991,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuData=propertyEditor->addMenu("&Data", 0);
     menuData->addAction(actSaveData);
     menuData->addAction(actCopyDataToMatlab);
+    menuData->addAction(actCopyDataAsColumns);
     menuData->addSeparator();
     menuData->addAction(actSaveReport);
     menuData->addAction(actPrintReport);
@@ -3294,6 +3301,87 @@ void QFRDRImagingFCSImageEditor::copyToMatlab() {
         clipboard->setText(data);
     }
 }
+
+
+void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        QFRDRImagingFCSCopyDataSelectDialog* dlg=new QFRDRImagingFCSCopyDataSelectDialog(this);
+        if (dlg->exec()) {
+            JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+            overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
+            for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                mask_image(i)=(plteOverviewExcludedData[i])?1:0;
+            }
+
+            QLocale loc=QLocale::system();
+
+            QStringList pim= QString(image.to_csv_column("\n", '.').c_str()).split('\n');
+            QStringList gim= QString(gof_image.to_csv_column("\n", '.').c_str()).split('\n');
+            QStringList oim= QString(overview_image.to_csv_column("\n", '.').c_str()).split('\n');
+            QStringList mim= QString(mask_image.to_csv_column("\n", '.').c_str()).split('\n');
+
+            QString data="";
+            QString qfdata="";
+            int cnt=pim.size();
+            if (gim.size()>cnt) cnt=gim.size();
+            if (oim.size()>cnt) cnt=oim.size();
+            if (mim.size()>cnt) cnt=mim.size();
+
+            if (dlg->copyID()) data+="\"pixel number\"";
+            if (dlg->copyCoordinates()) { if (!data.isEmpty()) data.append("; "); data+="\"x\"; \"y\""; }
+            if (dlg->copyParam()) { if (!data.isEmpty()) data.append("; ");  data+="\""+formatTransformAndParameter(cmbParameter, cmbParameterTransform).replace('\"', '_')+"\""; }
+            if (dlg->copyGOF()) { if (!data.isEmpty()) data.append("; ");  data+="\""+formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform).replace('\"', '_')+"\""; }
+            if (dlg->copyOvf()) { if (!data.isEmpty()) data.append("; ");  data+="\"overview\""; }
+            if (dlg->copyMask()) { if (!data.isEmpty()) data.append("; ");  data+="\"mask\""; }
+            data+="\n";
+            qfdata="";
+            if (dlg->copyID()) qfdata+="\"pixel number\"";
+            if (dlg->copyCoordinates()) { if (!qfdata.isEmpty()) qfdata.append(", "); qfdata+="\"x\", \"y\""; }
+            if (dlg->copyParam()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\""+formatTransformAndParameter(cmbParameter, cmbParameterTransform).replace('\"', '_')+"\""; }
+            if (dlg->copyGOF()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\""+formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform).replace('\"', '_')+"\""; }
+            if (dlg->copyOvf()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\"overview\""; }
+            if (dlg->copyMask()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\"mask\""; }
+            qfdata="#! "+qfdata+"\n";
+            for (int i=0; i<cnt; i++) {
+                QString line="";
+                if (dlg->copyID()) { if (!line.isEmpty()) line.append("; "); line+=QString::number(i); }
+                if (dlg->copyCoordinates()) { if (!line.isEmpty()) line.append("; "); line+=QString::number(i%image.width())+"; "+QString::number(i/image.width()); }
+                if (dlg->copyParam()) { if (!line.isEmpty()) line.append("; "); line+=pim.value(i, "").replace('.', loc.decimalPoint()); }
+                if (dlg->copyGOF()) { if (!line.isEmpty()) line.append("; ");  line+=gim.value(i, "").replace('.', loc.decimalPoint()); }
+                if (dlg->copyOvf())  { if (!line.isEmpty()) line.append("; "); line+=oim.value(i, "").replace('.', loc.decimalPoint()); }
+                if (dlg->copyMask())  { if (!line.isEmpty()) line.append("; ");  line+=mim.value(i, "").replace('.', loc.decimalPoint()); }
+                data+=line+"\n";
+
+                line="";
+                if (dlg->copyID()) { if (!line.isEmpty()) line.append(", "); line+=QString::number(i); }
+                if (dlg->copyCoordinates()) { if (!line.isEmpty()) line.append(", "); line+=QString::number(i%image.width())+", "+QString::number(i/image.width()); }
+                if (dlg->copyParam()) { if (!line.isEmpty()) line.append(", "); line+=pim.value(i, ""); }
+                if (dlg->copyGOF()) { if (!line.isEmpty()) line.append(", ");  line+=gim.value(i, ""); }
+                if (dlg->copyOvf())  { if (!line.isEmpty()) line.append(", "); line+=oim.value(i, ""); }
+                if (dlg->copyMask())  { if (!line.isEmpty()) line.append(", ");  line+=mim.value(i, ""); }
+                qfdata+=(line+"\n");
+
+
+            }
+
+            QClipboard *clipboard = QApplication::clipboard();
+            QMimeData* mime=new QMimeData();
+            mime->setText(data);
+            mime->setData("quickfit/csv", qfdata.toUtf8());
+            clipboard->setMimeData(mime);
+        }
+        delete dlg;
+    }
+
+}
+
 
 void QFRDRImagingFCSImageEditor::saveData() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);

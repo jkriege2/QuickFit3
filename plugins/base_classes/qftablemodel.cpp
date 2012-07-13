@@ -784,9 +784,23 @@ void QFTableModel::paste(int row_start, int column_start) {
     }*/
     if (mime && mime->hasFormat("quickfit3/qfrdrtable")) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
+        qDebug()<<"pasting quickfit3/qfrdrtable";
         readXML(data, row, column, false);
+    } else if (mime && mime->hasFormat("jkqtplotter/csv")) {
+        QString data=QString::fromUtf8(mime->data("jkqtplotter/csv").data());
+        qDebug()<<"pasting jkqtplotter/csv: \n"<<data;
+        readXML(data, row, column, false);
+        QTextStream in(&data);
+        readCSV(in, ',', '.', "#!", '#', row, column, false);
+    } else if (mime && mime->hasFormat("quickfit/csv")) {
+        QString data=QString::fromUtf8(mime->data("quickfit/csv").data());
+        qDebug()<<"pasting quickfit/csv: \n"<<data;
+        readXML(data, row, column, false);
+        QTextStream in(&data);
+        readCSV(in, ',', '.', "#!", '#', row, column, false);
     } else if (mime && mime->hasText()) {
         QString data=mime->text();
+        qDebug()<<"pasting text: \n"<<data;
         QLocale loc;
         QTextStream in(&data);
         QStringList sl=data.split("\n");

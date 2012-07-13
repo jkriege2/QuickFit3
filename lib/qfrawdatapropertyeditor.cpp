@@ -489,7 +489,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
     current=c;
     //std::cout<<"creating new editors ... \n";
     if (current) {
-        setWindowTitle(tr("Raw Data Editor/Viewer (%1)").arg(current->getTypeDescription()));
+        setWindowTitle(tr("Raw Data (%1): %2").arg(current->getTypeDescription()).arg(current->getName()));
+        setWindowIcon(current->getLargeIcon());
         if (current->getType()!=oldType) {
             editorList.clear();
             for (int i=0; i<current->getEditorCount(); i++) {
@@ -558,6 +559,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         compFilterEvaluationNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterevalsnot.txt");
         compFilterResults->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterresults.txt");
         compFilterResultsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterresults_not.txt");
+
 
         /*QPoint pos;
         pos.setX(current->getProject()->getProperty(QString("rawdatapropeditor%1/posx").arg(id), 20).toInt());

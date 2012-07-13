@@ -42,7 +42,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
     ../../../../../LIB/trunk/yaid_rh.h \
-    qfrdrimagingfcsseriesdialog.h
+    qfrdrimagingfcsseriesdialog.h \
+    qfrdrimagingfcscopydataselectdialog.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -64,7 +65,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsoverviewimagedisplay.cpp \
     qfrdrimagingfcsoverviewrateeditor.cpp \
     qfrdrimagingfcstools.cpp \
-    qfrdrimagingfcsseriesdialog.cpp
+    qfrdrimagingfcsseriesdialog.cpp \
+    qfrdrimagingfcscopydataselectdialog.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -72,7 +74,8 @@ FORMS = \
     qfrdrimagingfcsdataexplorer.ui \
     qfrdrimagingfcsmaskbyintensity.ui \
     qfrdrimagingfcscountratedisplay.ui \
-    qfrdrimagingfcsseriesdialog.ui
+    qfrdrimagingfcsseriesdialog.ui \
+    qfrdrimagingfcscopydataselectdialog.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 
@@ -91,8 +94,3 @@ ASSETS_TESTDATA.files = ./assets/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/imfcs_testdata/
 
 INSTALLS += ASSETS_TESTDATA
-
-
-
-
-

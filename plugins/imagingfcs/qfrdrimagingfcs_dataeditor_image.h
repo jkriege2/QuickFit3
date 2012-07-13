@@ -201,6 +201,8 @@ protected:
         void saveData();
         /** \brief copy displayed images to Matlab */
         void copyToMatlab();
+        /** \brief copy the shown images as columns of values */
+        void copyDataAsColumns();
         /** \brief print a report of the evaluation results */
         void printReport();
     protected:
@@ -475,6 +477,8 @@ protected:
         QToolButton* btnSaveData;
         /** \brief action to copy image data to Matlab */
         QToolButton* btnCopyDataToMatlab;
+        /** \brief action to copy image data as column table (CSV) */
+        QToolButton* btnCopyDataAsColumns;
 
 
 
@@ -508,6 +512,8 @@ protected:
         QAction* actSaveData;
         /** \brief action to copy image data to Matlab */
         QAction* actCopyDataToMatlab;
+        /** \brief action to copy image data to Matlab */
+        QAction* actCopyDataAsColumns;
 
         QMenu* menuData;
         QMenu* menuMask;

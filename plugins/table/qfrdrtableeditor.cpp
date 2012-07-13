@@ -257,10 +257,12 @@ void QFRDRTableEditor::slSaveTable() {
             QString filter= m->getExportDialogFiletypes();
             QString fileName = qfGetSaveFileName(this, m->getExportDialogTitle(), currentTableDir, filter, &selectedFilter);
             if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 int f=filter.split(";;").indexOf(selectedFilter);
                 //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<"   "<<m->getExportFiletypes().at(f).toStdString()<<std::endl;
                 m->exportData(m->getExportFiletypes().at(f), fileName);
             }
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -277,6 +279,7 @@ void QFRDRTableEditor::slLoadTable() {
             QString fileName = qfGetOpenFileName(this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
             //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
             if (!fileName.isNull()) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 int f=filter.indexOf(selectedFilter);
 
                 dlgCSVParameters* csvDlg=new dlgCSVParameters(this, settings->getQSettings()->value("table/column_separator_save", ",").toString(),
@@ -308,6 +311,7 @@ void QFRDRTableEditor::slLoadTable() {
                     settings->getQSettings()->setValue("table/header_start_save", QString(csvDlg->header_start));
                     m->model()->readCSV(fileName, csvDlg->column_separator, csvDlg->decimal_separator, csvDlg->header_start, csvDlg->comment_start);
                 }
+                QApplication::restoreOverrideCursor();
             }
         }
     }
@@ -321,7 +325,9 @@ void QFRDRTableEditor::slClear() {
              QMessageBox::StandardButton answer;
              answer = QMessageBox::question(this, tr("Clear Table"), tr("Clearing the table will delete all its contents. Are you sure that you want to clear the table?"), QMessageBox::Yes | QMessageBox::No);
              if (answer == QMessageBox::Yes) {
-                m->model()->clear();
+                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                 m->model()->clear();
+                 QApplication::restoreOverrideCursor();
              }
         }
     }
@@ -332,7 +338,9 @@ void QFRDRTableEditor::slAppendRow() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             m->model()->appendRow();
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -341,7 +349,9 @@ void QFRDRTableEditor::slAppendColumn() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             m->model()->appendColumn();
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -352,6 +362,7 @@ void QFRDRTableEditor::slInsertRow() {
     if (m) {
         if (m->model()) {
             QItemSelectionModel* sm=tvMain->selectionModel();
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             if (!sm->hasSelection()) {
                 m->model()->insertRow(0);
             } else {
@@ -363,6 +374,7 @@ void QFRDRTableEditor::slInsertRow() {
                 //std::cout<<"insertRow("<<i0<<")\n";
                 m->model()->insertRow(i0);
             }
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -372,6 +384,7 @@ void QFRDRTableEditor::slInsertColumn() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QItemSelectionModel* sm=tvMain->selectionModel();
             if (!sm->hasSelection()) {
                 m->model()->insertColumn(0);
@@ -384,6 +397,7 @@ void QFRDRTableEditor::slInsertColumn() {
                 //std::cout<<"insertColumn("<<i0<<")\n";
                 m->model()->insertColumn(i0);
             }
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -392,6 +406,7 @@ void QFRDRTableEditor::slDeleteRow() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QItemSelectionModel* sm=tvMain->selectionModel();
             if (!sm->hasSelection()) {
             } else {
@@ -412,6 +427,7 @@ void QFRDRTableEditor::slDeleteRow() {
                     m->model()->enableSignals(true);
                 }
             }
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -421,6 +437,7 @@ void QFRDRTableEditor::slDeleteColumn() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QItemSelectionModel* sm=tvMain->selectionModel();
             if (!sm->hasSelection()) {
             } else {
@@ -441,6 +458,7 @@ void QFRDRTableEditor::slDeleteColumn() {
                     m->model()->enableSignals(true);
                 }
             }
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -491,6 +509,7 @@ void QFRDRTableEditor::slSetDatatype() {
                 bool ok;
                 QString item = QInputDialog::getItem(this, tr("Change cell types ..."), tr("Select a new datatype:"), items, type, false, &ok);
                 if (ok && items.indexOf(item)>=0) {
+                    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                     QVariant::Type t=QVariant::String;
                     switch (items.indexOf(item)) {
                         case 0: t=QVariant::String; break;
@@ -505,6 +524,7 @@ void QFRDRTableEditor::slSetDatatype() {
                         m->model()->changeDatatype(l[i].row(), l[i].column(), t);
                     }
                     m->model()->enableSignals(true);
+                    QApplication::restoreOverrideCursor();
                 }
             }
         }
@@ -522,7 +542,9 @@ void QFRDRTableEditor::slSetColumnTitle() {
                 bool ok;
                 QString text = QInputDialog::getText(this, tr("Change Column Title ..."), tr("New column title:"), QLineEdit::Normal, t, &ok);
                  if (ok) {
+                     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                      m->model()->setColumnTitle(c, text);
+                     QApplication::restoreOverrideCursor();
                  }
             }
         }
@@ -536,7 +558,9 @@ void QFRDRTableEditor::slResize() {
             TableResizeDialog* dlg=new TableResizeDialog(this);
             dlg->init(m->model()->columnCount(), m->model()->rowCount());
             if (dlg->exec()==QDialog::Accepted) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 m->model()->resize(dlg->newHeight(), dlg->newWidth());
+                QApplication::restoreOverrideCursor();
             }
             delete dlg;
         }
@@ -547,7 +571,9 @@ void QFRDRTableEditor::slCopy() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             m->model()->copy(tvMain->selectionModel()->selectedIndexes());
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -556,22 +582,28 @@ void QFRDRTableEditor::slPaste() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QModelIndex c=tvMain->selectionModel()->currentIndex();
             m->model()->paste(c.row(), c.column());
+            QApplication::restoreOverrideCursor();
         }
     }
 }
 
 void QFRDRTableEditor::slCut() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     slCopy();
     slDelete();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRTableEditor::slDelete() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             m->model()->deleteCells(tvMain->selectionModel()->selectedIndexes());
+            QApplication::restoreOverrideCursor();
         }
     }
 }

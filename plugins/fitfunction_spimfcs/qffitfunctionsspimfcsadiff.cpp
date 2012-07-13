@@ -1,4 +1,4 @@
-#include "QFFitFunctionsSPIMFCSADiff.h"
+#include "qffitfunctionsspimfcsadiff.h"
 
 #include <cmath>
 #define sqr(x) ((x)*(x))
