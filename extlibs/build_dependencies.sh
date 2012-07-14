@@ -464,6 +464,37 @@ fi
 
 
 
+
+
+libnidaqmxOK=-5
+ISMSYS=`uname -o`
+echo $ISMSYS
+if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+	libusbOK=-1
+	read -p "Do you want to build 'libNIDAQmx' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- BUILDING: libnidaqmxOK                                             --\n"\
+		"------------------------------------------------------------------------\n\n"\
+
+		cd nidaqmx
+		./makenidaqmx.sh
+		libOK=$?
+		cd ${CURRENTDIR}
+		
+		if [ $libOK -eq 0 ] ; then		
+			libnidaqmxOK=0
+		else
+			libnidaqmxOK=-3
+		fi
+	fi
+fi
+
+
+
+
 eigenOK=-1
 read -p "Do you want to build 'eigen' (y/n)? " -n 1 INSTALL_ANSWER
 echo -e  "\n"
@@ -508,4 +539,5 @@ print_result "libpng" $libpngOK
 print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK
+print_result "libNIDAQmx $libnidaqmxOK
 print_result "eigen" $eigenOK
