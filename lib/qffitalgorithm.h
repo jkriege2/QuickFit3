@@ -212,6 +212,71 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
 
 
+        /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
+
+            The Functor declares a nD function \f$ \vec{f}(\vec{p}), \vec{p}\in\mathbb{R}^N \f$ .
+
+            As Functor may contain parameters \f$ p_n, n=1..N \f$ that are no fitting parameters (e.g. because they are fixed) we have to do parameter reordering.
+            So the fitting algorithm is presented with a modified parameter vector \f$ \vec{q}\in\mathbb{R}^Q \f$ with \f$ Q<N \f$ . The mapping is done using a
+             function \f$ m(\cdot) \f$ with \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ and
+            \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
+                \f[ g_m(\vec{q})=\frac{y_m-f(x_m; m(\vec{q}))}{\sigma_m} \f]
+            Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
+        */
+        class QFLIB_EXPORT FitQFOptimizeFunctionFunctor: public Functor {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param model Functor object used to evaluate \f$ f(x; \vec{p}) \f$
+                    \param params parameter count for model
+                    \param currentParams the initial parameters. You will have to give the values of ALL non-fit parameters in this vector!
+                    \param fixParams \c true if a parameter is fixed by the user
+                */
+                FitQFOptimizeFunctionFunctor(Functor* model, const double* currentParams, const bool* fixParams) ;
+
+                ~FitQFOptimizeFunctionFunctor();
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           The result is a NEW array created by calling \c calloc()
+                */
+                double* createMappedArrayForFunctor(const double* modelData);
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           This function only copies those entries that are present in \a functorData.
+                */
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
+                           and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
+                */
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+
+                /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
+                virtual void evaluate(double* evalout, const double* params);
+
+                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
+                virtual void evaluateJacobian(double* evalout, const double* params);
+
+                /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
+                virtual bool get_implementsJacobian() const { return m_model->get_implementsJacobian(); }
+
+                /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
+                virtual int get_paramcount() const { return m_paramCount; }
+            protected:
+
+
+                /** \brief  QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$ */
+                Functor* m_model;
+                /** \brief number of parameters in m_model */
+                int m_N;
+                /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
+                int m_paramCount;
+                /** \brief maps from function parameter index to model parameter index (size m_N) */
+                int* functorFromModel;
+                /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
+                int* modelFromFunctor;
+                /** \brief copy of the current model parameter vector (size m_N) */
+                double* m_modelParams;
+        };
 
 
         /** \brief this struct is used to return the fit result */
@@ -291,6 +356,22 @@ class QFLIB_EXPORT QFFitAlgorithm {
         FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
 
 
+        /*! \brief this wrapper routine allows to use the fitting algorithm for a general optimization problem with a given model function \f$ f(\vec{p}) \f$ encoded in \a model.
+                   This routine solves the problem:
+                   \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\| \f$
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param[out] paramErrorsOut The optimal parameter error vector is written into this array
+            \param N number of datapoints (i.e. size of the arrays dataX, dataY and dataWeights
+            \param model the model function to use
+            \param initialParams initial values for the parameters
+            \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \return a FitResult object describing the fit result
+        */
+        FitResult optimize(double* paramsOut, double* paramErrorsOut, Functor* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
+
 
         /*! \brief display a modal configuration dialog for you fit algorithm
             \return \c true if the user clicked "OK"
@@ -342,7 +423,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
             This method uses the nested Functor class to solve a problem of the form
                 \f[ \vec{p}^\ast=\min\limits_{\vec{p}}\|\vec{f}(\vec{p})\| \f]
             The norm \f$ \|\cdot\| \f$ is usually the \f$ L^2 \f$ norm, but may be any other norm defined
-            by the fitting algorithm. Note that this function is called for data fitting problems with an internal
+            by the fitting algorithm. Note that this function is called for data fitting problems  (fit() method) with an internal
             implementation of Functor which evaluates to \f$ f_m=\frac{y_m-f_m(x_m, \vec{p})}{\sigma_m} \f$ where
             \f$ (x_m, y_m, \sigma_m) \f$ is a measurement vector with weights \f$ \sigma_m \f$ .
         */
@@ -357,6 +438,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
         /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
         virtual bool get_supportsBoxConstraints() const =0;
+
+
 };
 
 #endif // QFFITALGORITHM_H

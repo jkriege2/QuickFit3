@@ -85,7 +85,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qflightsourceconfigwidgetthread.h \
     ../../../../LIB/trunk/qt/qprogresslistwidget.h \
     ../../../../LIB/trunk/qt/qsettingsmodel.h \
-    ../../../../LIB/trunk/qt/linestylecombobox.h
+    ../../../../LIB/trunk/qt/linestylecombobox.h \
+    qfacquisitionconfigcombobox.h \
+    qfacquisitioncombobox.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -135,7 +137,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qflightsourceconfigwidgetthread.cpp \
     ../../../../LIB/trunk/qt/qprogresslistwidget.cpp \
     ../../../../LIB/trunk/qt/qsettingsmodel.cpp \
-    ../../../../LIB/trunk/qt/linestylecombobox.cpp
+    ../../../../LIB/trunk/qt/linestylecombobox.cpp \
+    qfacquisitionconfigcombobox.cpp \
+    qfacquisitioncombobox.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

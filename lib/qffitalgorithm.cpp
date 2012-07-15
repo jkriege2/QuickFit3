@@ -334,32 +334,158 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     return result;
 }
 
-/*QFFitAlgorithm::FitResult QFFitAlgorithm::optimize(double* paramsOut, double* paramErrorsOut, Functor* model, double* initialParams, double* paramsMin, double* paramsMax) {
+
+QFFitAlgorithm::FitResult QFFitAlgorithm::optimize(double* paramsOut, double* paramErrorsOut, Functor* model, const double* initialParams, const bool* fixParams,  const double* paramsMin,  const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
-    double* pparamsMin=paramsMin;
-    double* pparamsMax=paramsMax;
+    const double* pparamsMin=paramsMin;
+    double* ppparamsMin=NULL;
+    const double* pparamsMax=paramsMax;
+    double* ppparamsMax=NULL;
+    const bool* pparamsFix=fixParams;
+    bool* ppparamsFix=NULL;
     if (paramsMin==NULL) {
-        pparamsMin=(double*)calloc(model->get_paramcount(), sizeof(double));
+        ppparamsMin=(double*)calloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
-            pparamsMin[i]=-DBL_MAX;
+            ppparamsMin[i]=-DBL_MAX;
         }
+        pparamsMin=ppparamsMin;
     }
     if (paramsMax==NULL) {
-        pparamsMax=(double*)calloc(model->get_paramcount(), sizeof(double));
+        ppparamsMax=(double*)calloc(model->get_paramcount(), sizeof(double));
         for (int i=0; i<model->get_paramcount(); i++) {
-            pparamsMax[i]=DBL_MAX;
+            ppparamsMax[i]=DBL_MAX;
         }
+        pparamsMax=ppparamsMax;
     }
 
-    result=intMinimize(paramsOut, paramErrorsOut, initialParams, model, pparamsMin, pparamsMax);
+    if (fixParams==NULL) {
+        ppparamsFix=(bool*)calloc(model->get_paramcount(), sizeof(bool));
+        for (int i=0; i<model->get_paramcount(); i++) {
+            ppparamsFix[i]=false;
+        }
+        pparamsFix=ppparamsFix;
+    }
 
-    if (paramsMin==NULL) free(pparamsMin);
-    if (paramsMax==NULL) free(pparamsMax);
+
+
+    QFFitAlgorithm::FitQFOptimizeFunctionFunctor fm(model, initialParams, pparamsFix);
+    double* tparamsMin=fm.createMappedArrayForFunctor(pparamsMin);
+    double* tparamsMax=fm.createMappedArrayForFunctor(pparamsMax);
+    double* tparamsOut=(double*)calloc(fm.get_paramcount(), sizeof(double));
+    double* tparamErrorsOut=(double*)calloc(fm.get_paramcount(), sizeof(double));
+    double* tinitialParams=fm.createMappedArrayForFunctor(initialParams);
+
+    result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, &fm, tparamsMin, tparamsMax);
+
+    for (int i=0; i<model->get_paramcount(); i++) {
+        paramsOut[i]=initialParams[i];
+        paramErrorsOut[i]=0;
+    }
+    fm.mapArrayFromFunctorToModel(paramsOut, tparamsOut);
+    fm.mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);
+
+    free(tparamsMax);
+    free(tparamsMin);
+    free(tparamErrorsOut);
+    free(tparamsOut);
+    free(tinitialParams);
+
+    if (ppparamsMin==NULL) free(ppparamsMin);
+    if (ppparamsMax==NULL) free(ppparamsMax);
+    if (ppparamsFix==NULL) free(ppparamsFix);
     return result;
-}*/
+}
 
 bool QFFitAlgorithm::displayConfig() {
     QMessageBox::information(NULL, name(), QObject::tr("No configuration dialog is supplied for this optimization algorithm!"));
     return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+QFFitAlgorithm::FitQFOptimizeFunctionFunctor::FitQFOptimizeFunctionFunctor(Functor* model, const double *currentParams, const bool *fixParams):
+    QFFitAlgorithm::Functor(model->get_evalout())
+{
+    m_model=model;
+    m_N=model->get_paramcount();
+    functorFromModel=NULL;
+    modelFromFunctor=NULL;
+
+    // now we calculate the mapping of the data
+    m_paramCount=0;
+    for (int i=0; i<m_N; i++) {
+        if (!fixParams[i]) {
+            m_paramCount++;
+        }
+    }
+    functorFromModel=(int*)calloc(m_N, sizeof(int));
+    modelFromFunctor=(int*)calloc(m_paramCount, sizeof(int));
+    int pid=0;
+    for (int i=0; i<m_N; i++) {
+        functorFromModel[i]=-1;
+        if (!fixParams[i]) {
+            functorFromModel[i]=pid;
+            modelFromFunctor[pid]=i;
+            //printf("   mapping m=%2d -> f=%2d [%s]\n", i, pid, d.id.toStdString().c_str());
+            pid++;
+        }
+    }
+    m_modelParams=(double*)calloc(m_N, sizeof(double));
+    for (int i=0; i<m_N; i++) {
+        m_modelParams[i]=currentParams[i];
+    }
+};
+
+QFFitAlgorithm::FitQFOptimizeFunctionFunctor::~FitQFOptimizeFunctionFunctor() {
+    free(functorFromModel);
+    free(modelFromFunctor);
+    free(m_modelParams);
+}
+
+double* QFFitAlgorithm::FitQFOptimizeFunctionFunctor::createMappedArrayForFunctor(const double* modelData) {
+    double* result=(double*)calloc(m_paramCount, sizeof(double));
+
+    for (register int i=0; i<m_paramCount; i++) {
+        result[i]=modelData[modelFromFunctor[i]];
+    }
+
+    return result;
+}
+
+void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::mapArrayFromModelToFunctor(double* functorData, const double* modelData) {
+    for (register int i=0; i<m_paramCount; i++) {
+        functorData[i]=modelData[modelFromFunctor[i]];
+    }
+}
+
+void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, const double* functorData) {
+    for (register int i=0; i<m_paramCount; i++) {
+        modelData[modelFromFunctor[i]]=functorData[i];
+    }
+}
+
+
+void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluate(double* evalout, const double* params) {
+    mapArrayFromFunctorToModel(m_modelParams, params);
+    m_model->evaluate(evalout, m_modelParams);
+}
+
+void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluateJacobian(double* evalout, const double* params) {
+    mapArrayFromFunctorToModel(m_modelParams, params);
+    m_model->evaluateJacobian(evalout, m_modelParams);
 }
