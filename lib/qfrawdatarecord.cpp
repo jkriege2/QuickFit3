@@ -1724,7 +1724,9 @@ void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QStri
         #ifdef DEBUG_THREAN
         qDebug()<<Q_FUNC_INFO<<"QReadLocker";
         #endif
-         QReadLocker locker(lock);
+         //QReadLocker locker(lock);
+        lock->lockForRead();
+        qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -1732,16 +1734,21 @@ void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QStri
          if (dstore->results.contains(evaluationName)) {
              if (dstore->results[evaluationName]->results.contains(resultName)) {
                  r=dstore->results[evaluationName]->results[resultName];
+                 ok=(r.group!=group);
              }
          }
-         ok=(r.group!=group);
+         qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
+         lock->unlock();
+
     }
 
-    if (ok) */{
+    if (ok)*/ {
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ //QWriteLocker locker(lock);
+ lock->lockForWrite();
+ qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock write";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1754,8 +1761,11 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
          r.group=group;
         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
         dstore->results[evaluationName]->results[resultName]=r;
+        qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): unlock write";
+        lock->unlock();
+        emitResultsChanged(evaluationName, resultName, false);
     }
-    emitResultsChanged(evaluationName, resultName, false);
+
 }
 
 void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr) {
@@ -1772,9 +1782,11 @@ void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, cons
          if (dstore->results.contains(evaluationName)) {
              if (dstore->results[evaluationName]->results.contains(resultName)) {
                  r=dstore->results[evaluationName]->results[resultName];
+                 ok=(r.sortPriority!=pr);
              }
          }
-         ok=(r.sortPriority!=pr);
+         locker.unlock();
+
     }
 
     if (ok)*/ {
