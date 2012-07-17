@@ -359,6 +359,18 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsResetInList(const QString& evaluationName, const QString& resultName,  int position);
 
 
+        /** \brief set a result element of type number vector. If more elements are needed in the vector, as available, these are initialized with 0. This function also sets an entry in an additional boolean list at the same position. */
+        void resultsSetInNumberErrorListAndBool(const QString& evaluationName, const QString& resultName, int position, double value, double error, const QString& unit, const QString& resultBoolName, bool boolValue=true);
+        /** \brief set a result element of type number vector. If more elements are needed in the vector, as available, these are initialized with 0. This function also sets an entry in an additional boolean list at the same position. */
+        void resultsSetInNumberListAndBool(const QString& evaluationName, const QString& resultName, int position, double value, const QString& unit, const QString& resultBoolName, bool boolValue=true);
+        /** \brief set a result element of type integer vector. If more elements are needed in the vector, as available, these are initialized with 0. This function also sets an entry in an additional boolean list at the same position. */
+        void resultsSetInIntegerListAndBool(const QString& evaluationName, const QString& resultName, int position, qlonglong value, const QString& unit, const QString& resultBoolName, bool boolValue=true);
+        /** \brief set a result element of type string vector. If more elements are needed in the vector, as available, these are initialized with 0. This function also sets an entry in an additional boolean list at the same position. */
+        void resultsSetInStringListAndBool(const QString& evaluationName, const QString& resultName, int position, const QString& value, const QString& unit, const QString& resultBoolName, bool boolValue=true);
+        /** \brief set a result element of type boolean vector. If more elements are needed in the vector, as available, these are initialized with 0. This function also sets an entry in an additional boolean list at the same position. */
+        void resultsSetInBooleanListAndBool(const QString& evaluationName, const QString& resultName, int position, bool value, const QString& unit, const QString& resultBoolName, bool boolValue=true);
+
+
 
 
 

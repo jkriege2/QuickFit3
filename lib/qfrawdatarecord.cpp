@@ -1143,6 +1143,194 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     emitResultsChanged(evaluationName, resultName, false);
 }
 
+void QFRawDataRecord::resultsSetInNumberErrorListAndBool(const QString &evaluationName, const QString &resultName, int position, double value, double error, const QString &unit, const QString &resultBoolName, bool boolValue)
+{
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+        if (!dstore->results[evaluationName]->results.contains(resultBoolName))  dstore->results[evaluationName]->results.insert(resultBoolName, evaluationResult());
+
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberErrorVector;
+        r.unit=unit;
+
+        if (position>=r.dvec.size()) {
+            for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        }
+        if (position>=r.evec.size()) {
+            for (int i=r.evec.size(); i<=position; i++) r.evec.append(0.0);
+        }
+        r.dvec[position]=value;
+        r.evec[position]=error;
+
+        r=dstore->results[evaluationName]->results[resultBoolName];
+        r.type=qfrdreBooleanVector;
+
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        }
+        r.bvec[position]=boolValue;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+    emitResultsChanged(evaluationName, resultBoolName, false);
+}
+
+void QFRawDataRecord::resultsSetInNumberListAndBool(const QString &evaluationName, const QString &resultName, int position, double value, const QString &unit, const QString &resultBoolName, bool boolValue)
+{
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+        if (!dstore->results[evaluationName]->results.contains(resultBoolName))  dstore->results[evaluationName]->results.insert(resultBoolName, evaluationResult());
+
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreNumberVector;
+        r.unit=unit;
+
+        if (position>=r.dvec.size()) {
+            for (int i=r.dvec.size(); i<=position; i++) r.dvec.append(0.0);
+        }
+        r.dvec[position]=value;
+
+        r=dstore->results[evaluationName]->results[resultBoolName];
+        r.type=qfrdreBooleanVector;
+
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        }
+        r.bvec[position]=boolValue;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+    emitResultsChanged(evaluationName, resultBoolName, false);
+}
+
+void QFRawDataRecord::resultsSetInIntegerListAndBool(const QString &evaluationName, const QString &resultName, int position, qlonglong value, const QString &unit, const QString &resultBoolName, bool boolValue)
+{
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+        if (!dstore->results[evaluationName]->results.contains(resultBoolName))  dstore->results[evaluationName]->results.insert(resultBoolName, evaluationResult());
+
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreIntegerVector;
+        r.unit=unit;
+
+        if (position>=r.ivec.size()) {
+            for (int i=r.ivec.size(); i<=position; i++) r.ivec.append(0.0);
+        }
+        r.ivec[position]=value;
+
+        r=dstore->results[evaluationName]->results[resultBoolName];
+        r.type=qfrdreBooleanVector;
+
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        }
+        r.bvec[position]=boolValue;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+    emitResultsChanged(evaluationName, resultBoolName, false);
+
+}
+
+void QFRawDataRecord::resultsSetInStringListAndBool(const QString &evaluationName, const QString &resultName, int position, const QString &value, const QString &unit, const QString &resultBoolName, bool boolValue)
+{
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+        if (!dstore->results[evaluationName]->results.contains(resultBoolName))  dstore->results[evaluationName]->results.insert(resultBoolName, evaluationResult());
+
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreStringVector;
+        r.unit=unit;
+
+        if (position>=r.svec.size()) {
+            for (int i=r.svec.size(); i<=position; i++) r.svec.append("");
+        }
+        r.svec[position]=value;
+
+        r=dstore->results[evaluationName]->results[resultBoolName];
+        r.type=qfrdreBooleanVector;
+
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        }
+        r.bvec[position]=boolValue;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+    emitResultsChanged(evaluationName, resultBoolName, false);
+
+}
+
+void QFRawDataRecord::resultsSetInBooleanListAndBool(const QString &evaluationName, const QString &resultName, int position, bool value, const QString &unit, const QString &resultBoolName, bool boolValue)
+{
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        if (!dstore->results[evaluationName]->results.contains(resultName))  dstore->results[evaluationName]->results.insert(resultName, evaluationResult());
+        if (!dstore->results[evaluationName]->results.contains(resultBoolName))  dstore->results[evaluationName]->results.insert(resultBoolName, evaluationResult());
+
+        evaluationResult& r=dstore->results[evaluationName]->results[resultName];
+        r.type=qfrdreBooleanVector;
+        r.unit=unit;
+
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        }
+        r.bvec[position]=value;
+
+        r=dstore->results[evaluationName]->results[resultBoolName];
+        r.type=qfrdreBooleanVector;
+
+        if (position>=r.bvec.size()) {
+            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        }
+        r.bvec[position]=boolValue;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+    emitResultsChanged(evaluationName, resultBoolName, false);
+
+}
+
+
 void QFRawDataRecord::resultsSetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double error) {
      {    
 #ifdef DEBUG_THREAN
@@ -1426,6 +1614,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     emitResultsChanged(evaluationName, resultName, false);
 }
 
+
 double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
@@ -1673,27 +1862,28 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 }
 
 void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QString& resultName, const QString& label, const QString& label_rich) {
-    /*bool ok=true;
-    {
-        #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QReadLocker";
-        #endif
-         QReadLocker locker(lock);
-        #ifdef DEBUG_THREAN
-         qDebug()<<Q_FUNC_INFO<<"  locked";
-        #endif
-         evaluationResult r;
-         if (dstore->results.contains(evaluationName)) {
-             if (dstore->results[evaluationName]->results.contains(resultName)) {
-                 r=dstore->results[evaluationName]->results[resultName];
-             }
+    bool ok=true;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    #endif
+     //QReadLocker locker(lock);
+    lock->lockForRead();
+    //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     evaluationResult r;
+     if (dstore->results.contains(evaluationName)) {
+         if (dstore->results.value(evaluationName)->results.contains(resultName)) {
+             r=dstore->results.value(evaluationName)->results.value(resultName);
+             ok=((r.label!=label) || (r.label_rich!=label_rich));
          }
-         ok=((r.label!=label)||(r.label_rich!=label_rich));
-    }
+     }
+     //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
+     lock->unlock();
 
-    if (ok)*/ {
-/*        if (!resultsExists(evaluationName, resultName)) return;
-        evaluationResult r=resultsGet(evaluationName, resultName);*/
+
+    if (ok) {
         
         #ifdef DEBUG_THREAN
         qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
@@ -1702,7 +1892,7 @@ void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QStri
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
-         evaluationResult r;
+
          if (dstore->results.contains(evaluationName)) {
              if (dstore->results[evaluationName]->results.contains(resultName)) {
                  r=dstore->results[evaluationName]->results[resultName];
@@ -1719,49 +1909,45 @@ void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QStri
 void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QString& resultName, const QString& group) {
 /*        if (!resultsExists(evaluationName, resultName)) return;
         evaluationResult r=resultsGet(evaluationName, resultName);*/
-    /*bool ok=true;
-    {
-        #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QReadLocker";
-        #endif
-         //QReadLocker locker(lock);
-        lock->lockForRead();
-        qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
-        #ifdef DEBUG_THREAN
-         qDebug()<<Q_FUNC_INFO<<"  locked";
-        #endif
-         evaluationResult r;
-         if (dstore->results.contains(evaluationName)) {
-             if (dstore->results[evaluationName]->results.contains(resultName)) {
-                 r=dstore->results[evaluationName]->results[resultName];
-                 ok=(r.group!=group);
-             }
+    bool ok=true;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    #endif
+     //QReadLocker locker(lock);
+    lock->lockForRead();
+    //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         if (dstore->results.value(evaluationName)->results.contains(resultName)) {
+             ok=(dstore->results.value(evaluationName)->results.value(resultName).group!=group);
          }
-         qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
-         lock->unlock();
+     }
+     //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
+     lock->unlock();
 
-    }
 
-    if (ok)*/ {
+    if (ok) {
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 #endif
  //QWriteLocker locker(lock);
  lock->lockForWrite();
- qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock write";
+ //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock write";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
          evaluationResult r;
          if (dstore->results.contains(evaluationName)) {
-             if (dstore->results[evaluationName]->results.contains(resultName)) {
-                 r=dstore->results[evaluationName]->results[resultName];
+             if (dstore->results.value(evaluationName)->results.contains(resultName)) {
+                 r=dstore->results.value(evaluationName)->results.value(resultName);
              }
          }
          r.group=group;
         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
         dstore->results[evaluationName]->results[resultName]=r;
-        qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): unlock write";
+        //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): unlock write";
         lock->unlock();
         emitResultsChanged(evaluationName, resultName, false);
     }
@@ -1769,29 +1955,26 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 }
 
 void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr) {
-    /*bool ok=true;
-    {
-        #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QReadLocker";
-        #endif
-         QReadLocker locker(lock);
-        #ifdef DEBUG_THREAN
-         qDebug()<<Q_FUNC_INFO<<"  locked";
-        #endif
-         evaluationResult r;
-         if (dstore->results.contains(evaluationName)) {
-             if (dstore->results[evaluationName]->results.contains(resultName)) {
-                 r=dstore->results[evaluationName]->results[resultName];
-                 ok=(r.sortPriority!=pr);
-             }
+    bool ok=true;
+    #ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    #endif
+     //QReadLocker locker(lock);
+    lock->lockForRead();
+    //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
+    #ifdef DEBUG_THREAN
+     qDebug()<<Q_FUNC_INFO<<"  locked";
+    #endif
+     if (dstore->results.contains(evaluationName)) {
+         if (dstore->results.value(evaluationName)->results.contains(resultName)) {
+             ok=(dstore->results.value(evaluationName)->results.value(resultName).sortPriority!=pr);
          }
-         locker.unlock();
+     }
+     //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
+     lock->unlock();
 
-    }
 
-    if (ok)*/ {
-        /*if (!resultsExists(evaluationName, resultName)) return;
-        evaluationResult r=resultsGet(evaluationName, resultName);*/
+    if (ok)  {
 
         
 #ifdef DEBUG_THREAN
@@ -3382,10 +3565,10 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
     if (!dstore->results.contains(evaluationName)) return defaultValue;
-    QFRawDataRecordPrivate::evaluationIDMetadata* ev=dstore->results[evaluationName];
-    if (!ev->results.contains(resultName)) return defaultValue;
+    //const QFRawDataRecordPrivate::evaluationIDMetadata* ev=dstore->results[evaluationName];
+    if (!dstore->results[evaluationName]->results.contains(resultName)) return defaultValue;
 
-    evaluationResult& r=ev->results[resultName];
+    evaluationResult r=dstore->results[evaluationName]->results[resultName];
     if (position<r.bvec.size()) return r.bvec[position];
 
     return defaultValue;

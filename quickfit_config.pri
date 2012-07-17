@@ -20,7 +20,7 @@ BLAS_INCLUDE =
 
 OUTPUTDIR_NAME = output
 
-QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type
+QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type -m128bit-long-double -mtune=generic -msse -mfpmath=sse
 exists(quickfit.inc):include(quickfit.inc)
 
 !win32 {

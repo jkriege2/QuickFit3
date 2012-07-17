@@ -102,17 +102,11 @@
      <property name="spacing">
       <number>2</number>
      </property>
-     <property name="gridSize">
-      <size>
-       <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
      <property name="uniformItemSizes">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="selectionRectVisible">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="currentRow">
       <number>0</number>
