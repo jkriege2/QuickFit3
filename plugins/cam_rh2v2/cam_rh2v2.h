@@ -10,6 +10,7 @@
 #include "jkstyledbutton.h"
 #include "../base_classes/radhard2flash.h"
 #include "qfradhard2flashtool.h"
+#include "cam_rh2v2_cordlg.h"
 
 
 #define LOG_PREFIX "[RH2v2]: "
@@ -44,6 +45,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
           unsigned int xRes,yRes;
           float pixelWidth,pixelHeight;
           float exposureTime;
+          cam_rh2v2_cordlg *cordlg;
         };
 
 
@@ -189,9 +191,9 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         bool reconfigure(unsigned int camera, const QSettings &settings, const QString& setName);
         void reconfigure2(unsigned int camera, const QSettings &settings, const QString& postfix);
         bool flashFPGA(unsigned int camera);
-
 protected slots:
-		void logger_txt(QString message){log_text(LOG_PREFIX+message);}
+        void reconfigureDialog(int camera);
+        void logger_txt(QString message){log_text(LOG_PREFIX+message);}
 		void logger_wrn(QString message){log_warning(LOG_PREFIX+message);}
 		void logger_err(QString message){log_error(LOG_PREFIX+message);}
         void programFPGA();

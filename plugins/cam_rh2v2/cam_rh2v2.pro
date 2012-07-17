@@ -25,17 +25,20 @@ HEADERS += cam_rh2v2.h \
            ../../../../../LIB/trunk/highrestimer.h \
     qfradhard2flashtool.h \
     ../base_classes/radhard2flash.h \
-    cam_rh2v2_cfgdlg.h
+    cam_rh2v2_cfgdlg.h \
+    cam_rh2v2_cordlg.h
 
 SOURCES += cam_rh2v2.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
     qfradhard2flashtool.cpp \
     ../base_classes/radhard2flash.cpp \
-    cam_rh2v2_cfgdlg.cpp
+    cam_rh2v2_cfgdlg.cpp \
+    cam_rh2v2_cordlg.cpp
 
 FORMS = \
     qfradhard2flashtool.ui \
-    cam_rh2v2_cfgdlg.ui
+    cam_rh2v2_cfgdlg.ui \
+    cam_rh2v2_cordlg.ui
 
 RESOURCES += cam_rh2v2.qrc
 

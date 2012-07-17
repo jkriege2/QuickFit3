@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "cam_rh2v2.h"
 #include "cam_rh2v2_cfgdlg.h"
+#include "jkqtfastplotter.h"
 
 #ifdef DEBUG
 #define QDEBUG(s) qDebug()<<"><"<<__FUNCTION__<<"@"<<__LINE__<<s;
@@ -39,6 +40,8 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
   cameraSetting[0].pixelWidth=30;
   cameraSetting[0].pixelHeight=30;
   cameraSetting[0].exposureTime=0.000010;
+  cameraSetting[0].cordlg=new cam_rh2v2_cordlg(NULL);
+  cameraSetting[0].cordlg->setCamera(0);
 
   QObject::connect(cameraSetting[0].raw.pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
   QObject::connect(cameraSetting[0].raw.pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
@@ -48,6 +51,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
   QObject::connect(cameraSetting[0].cor.pc, SIGNAL(log_err(QString)), this, SLOT(logger_err(QString)));
   QObject::connect(cameraSetting[0].raw.pc, SIGNAL(finishedAll(int)), this, SLOT(acquisitionFinished(int)));
   QObject::connect(cameraSetting[0].cor.pc, SIGNAL(finishedAll(int)), this, SLOT(acquisitionFinished(int)));
+  QObject::connect(cameraSetting[0].cordlg,SIGNAL(reconfigure(int)), this, SLOT(reconfigureDialog(int)));
 
 
   cameraSetting[1].prefix=new QString("Multisensor");
@@ -63,11 +67,15 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
   cameraSetting[1].pixelWidth=30;
   cameraSetting[1].pixelHeight=30;
   cameraSetting[1].exposureTime=0.0001;
-	
+  cameraSetting[1].cordlg=new cam_rh2v2_cordlg(NULL);
+  cameraSetting[1].cordlg->setCamera(1);
+
   QObject::connect(cameraSetting[1].raw.pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
   QObject::connect(cameraSetting[1].raw.pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
   QObject::connect(cameraSetting[1].raw.pc, SIGNAL(log_err(QString)), this, SLOT(logger_err(QString)));
-  QObject::connect(cameraSetting[0].raw.pc, SIGNAL(finishedAll(int)), this, SLOT(acquisitionFinished(int)));
+  QObject::connect(cameraSetting[1].raw.pc, SIGNAL(finishedAll(int)), this, SLOT(acquisitionFinished(int)));
+  QObject::connect(cameraSetting[1].cordlg,SIGNAL(reconfigure(int)), this, SLOT(reconfigureDialog(int)));
+
 }
 
 QFExtensionCameraRh2v2::~QFExtensionCameraRh2v2() {
@@ -350,6 +358,35 @@ void QFExtensionCameraRh2v2::reconfigure2(unsigned int camera, const QSettings& 
     QStringList init=cameraSetting[camera].raw.settings->allKeys();
 }
 
+
+void QFExtensionCameraRh2v2::reconfigureDialog(int camera){
+    if(cameraSetting[camera].cor.pc!=NULL){
+        if(cameraSetting[camera].cor.pc->isRunning()){
+            we_correlator_hw *we_chw = cameraSetting[camera].cor.pc->find_first<we_correlator_hw>();
+            if(we_chw!=NULL){
+                double **results = cameraSetting[camera].cordlg->getData();
+                double *taus = cameraSetting[camera].cordlg->getTaus();
+                we_chw->setData(results);
+                we_chw->setTaus(taus);
+                JKQTFPLinePlot **plots=cameraSetting[camera].cordlg->getPlots();
+                for(int i=0;i<1024;i++){
+                    plots[i]->set_data(&(taus[1]),&(results[i][1]),14*8-1);
+                }
+                for(int i=0;i<cameraSetting[camera].cordlg->getPlotterCount();i++){
+                    JKQTFastPlotter *plotter = cameraSetting[camera].cordlg->getPlotter(i);
+                    plotter->set_doDrawing(false);
+                    plotter->setXRange(taus[1],taus[14*8-1],true);
+                    plotter->set_doDrawing(true);
+                    QObject::connect(we_chw, SIGNAL(newData()), plotter, SLOT(update_data()));
+                }
+            }else{
+                qDebug()<<"WARNING: 'we_correlator_hw' not found!";
+            }
+        }
+    }
+}
+
+
 void QFExtensionCameraRh2v2::useCameraSettings(unsigned int camera, const QSettings& settings) {
     QDEBUG("")
     cameraSetting[camera].raw.pc->stop(QString("UI"));
@@ -361,9 +398,18 @@ void QFExtensionCameraRh2v2::useCameraSettings(unsigned int camera, const QSetti
 
     reconfigure2(camera,settings,"preview");
     cameraSetting[camera].raw.pc->run();
-//    if(cameraSetting[camera].cor.pc!=NULL){
-//        cameraSetting[camera].cor.pc->run();
-//    }
+    if(cameraSetting[camera].cor.pc!=NULL){
+        cameraSetting[camera].cordlg->show();
+        cameraSetting[camera].cor.pc->run();
+        if(cameraSetting[camera].cor.pc->isRunning()){
+            reconfigureDialog(camera);
+            we_reader_usb_rh2 *we_ru = cameraSetting[camera].cor.pc->find_first<we_reader_usb_rh2>();
+            if(we_ru!=NULL){
+                QObject::connect(cameraSetting[camera].cordlg, SIGNAL(btnReset()), we_ru, SLOT(resetCor()));
+                QObject::connect(cameraSetting[camera].cordlg, SIGNAL(sndCmd(uint16_t)), we_ru, SLOT(sndCmd(uint16_t)));
+            }
+        }
+    }
 }
 
 void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {

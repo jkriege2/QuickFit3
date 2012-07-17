@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>RADHARD2 and MULTISENSOR camera interface</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	<p>This plugin controls all cameras with HW-YAID based output streams. Currently <i>RADHARD2</i> with custom firmware and correlation output and <i>MULTISENSOR</i> are supported.</p>
+	<p>Internally it uses a so called <i>processing_chain</i>: every single task is performed by a thread (USB data acquisition, frame analysis, preview, etc.), connected by FIFOs.</p>
+	<p><i>processing_chain</i> depends on <i>libusb-1.0</i></p>
+
+	<h2>Configuration Options (<i>RADHARD2</i>)</h2>
+	<center>
+		  <img src="./pic/cfg_dlg.png"><br>
+		  Configuration dialog.
+	</center>
+	<table border="1">
+		<tr>
+			<th>configuration option</th>
+			<th>meaning</th>
+		</tr>
+		<tr>
+			<td>Frame accumulation count</td>
+			<td>The number of frames that are accumulated before being displayed (applies for preview only).</td>
+		</tr>
+		<tr>
+			<td>Number of Frames to be read out</td>
+			<td>Acquisition stops when this number of frames is reached. When temporal binning is enabled, the actual number of frames has to be multiplied by the binning value.</td>
+		</tr>
+		<tr>
+			<td>First line of ROI</td>
+			<td>It is possible to define a region of interest. This number represents the first line of it. A ROI must contain at least two lines.</td>
+		</tr>
+		<tr>
+			<td>Last line of ROI</td>
+			<td>see above.</td>
+		</tr>
+		<tr>
+			<td>Frame integration time</td>
+			<td>This specifies the time between two subsequent frames.</td>
+		</tr>
+		<tr>
+			<td>Temporal binning</td>
+			<td>The <i>RADHARD2</i> firmware allows the accumulation of up to 3 subsequent frames before the data is sent to the correlator. 
+          As the sensors are limited to detect single photons only, this can improve the detection of multi-photon events.</td>
+		</tr>
+		<tr>
+			<td>Acquire HW-correlator data</td>
+			<td>Wheather the hardware correlator is used in parallel. If not, the frame integration time can be choosen more freely.</td>
+		</tr>
+	</table>
+
+	<h2>USB Speed Considerations</h2>
+	<p>In principal USB 2.0 speed is a crucial point in the whole setup. 
+     If frames are not transmitted completely, the correlation might become unreliable. 
+     For a single second measurement, a frame integration time of 5.7µs for full frames should be possible.</p>
+  </body>
+</html>
