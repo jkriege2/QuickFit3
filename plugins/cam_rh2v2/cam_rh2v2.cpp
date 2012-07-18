@@ -485,14 +485,14 @@ bool QFExtensionCameraRh2v2::flashFPGA(unsigned int camera){
     //quick'n'dirty
     QString flashResult;
     bool ret;
-    ret=flashFPGA(QString("/home/jan/dkfz/repository/B040/SPIM/trunk/hardware/projects/ise/radhard2_fpga1/fpga1_top.bit"),'M',flashResult,1);
+    ret=flashFPGA(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/"+getID()+QString("/fpga1_top.bit"),'M',flashResult,1);
     if(ret==false){
         log_error(flashResult);
     }else{
         log_text(flashResult);
     }
     sleep(1);
-    ret=flashFPGA(QString("/home/jan/dkfz/repository/B040/SPIM/trunk/hardware/projects/ise/radhard2_fpga2/fpga2_top.bit"),'S',flashResult,1);
+    ret=flashFPGA(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/"+getID()+QString("/fpga2_top.bit"),'S',flashResult,1);
     if(ret==false){
         log_error(flashResult);
     }else{

@@ -24,6 +24,7 @@ QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type -m128bit-long-double 
 exists(quickfit.inc):include(quickfit.inc)
 
 !win32 {
+    QMAKE_CXXFLAGS += -march=native
     DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
 }
 

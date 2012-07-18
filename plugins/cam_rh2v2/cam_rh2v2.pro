@@ -8,6 +8,7 @@ CONFIG += plugin
 TARGET = cam_rh2v2
 DEPENDPATH += ./
 
+LIBS += -lusb
 
 include(../plugins.pri)
 include(../../extlibs/usb1.0.pri)

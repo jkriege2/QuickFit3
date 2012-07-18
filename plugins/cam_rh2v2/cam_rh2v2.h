@@ -11,7 +11,8 @@
 #include "../base_classes/radhard2flash.h"
 #include "qfradhard2flashtool.h"
 #include "cam_rh2v2_cordlg.h"
-
+#include "programoptions.h"
+#include "qfpluginservices.h"
 
 #define LOG_PREFIX "[RH2v2]: "
 
