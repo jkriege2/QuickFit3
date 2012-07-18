@@ -1171,13 +1171,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         r.dvec[position]=value;
         r.evec[position]=error;
 
-        r=dstore->results[evaluationName]->results[resultBoolName];
-        r.type=qfrdreBooleanVector;
+        evaluationResult& r1=dstore->results[evaluationName]->results[resultBoolName];
+        r1.type=qfrdreBooleanVector;
 
-        if (position>=r.bvec.size()) {
-            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        if (position>=r1.bvec.size()) {
+            for (int i=r1.bvec.size(); i<=position; i++) r1.bvec.append(false);
         }
-        r.bvec[position]=boolValue;
+        r1.bvec[position]=boolValue;
     }
     emitResultsChanged(evaluationName, resultName, false);
     emitResultsChanged(evaluationName, resultBoolName, false);
@@ -1207,13 +1207,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         }
         r.dvec[position]=value;
 
-        r=dstore->results[evaluationName]->results[resultBoolName];
-        r.type=qfrdreBooleanVector;
+        evaluationResult& r1=dstore->results[evaluationName]->results[resultBoolName];
+        r1.type=qfrdreBooleanVector;
 
-        if (position>=r.bvec.size()) {
-            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        if (position>=r1.bvec.size()) {
+            for (int i=r1.bvec.size(); i<=position; i++) r1.bvec.append(false);
         }
-        r.bvec[position]=boolValue;
+        r1.bvec[position]=boolValue;
     }
     emitResultsChanged(evaluationName, resultName, false);
     emitResultsChanged(evaluationName, resultBoolName, false);
@@ -1243,13 +1243,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         }
         r.ivec[position]=value;
 
-        r=dstore->results[evaluationName]->results[resultBoolName];
-        r.type=qfrdreBooleanVector;
+        evaluationResult& r1=dstore->results[evaluationName]->results[resultBoolName];
+        r1.type=qfrdreBooleanVector;
 
-        if (position>=r.bvec.size()) {
-            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        if (position>=r1.bvec.size()) {
+            for (int i=r1.bvec.size(); i<=position; i++) r1.bvec.append(false);
         }
-        r.bvec[position]=boolValue;
+        r1.bvec[position]=boolValue;
     }
     emitResultsChanged(evaluationName, resultName, false);
     emitResultsChanged(evaluationName, resultBoolName, false);
@@ -1280,13 +1280,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         }
         r.svec[position]=value;
 
-        r=dstore->results[evaluationName]->results[resultBoolName];
-        r.type=qfrdreBooleanVector;
+        evaluationResult& r1=dstore->results[evaluationName]->results[resultBoolName];
+        r1.type=qfrdreBooleanVector;
 
-        if (position>=r.bvec.size()) {
-            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        if (position>=r1.bvec.size()) {
+            for (int i=r1.bvec.size(); i<=position; i++) r1.bvec.append(false);
         }
-        r.bvec[position]=boolValue;
+        r1.bvec[position]=boolValue;
     }
     emitResultsChanged(evaluationName, resultName, false);
     emitResultsChanged(evaluationName, resultBoolName, false);
@@ -1317,13 +1317,13 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         }
         r.bvec[position]=value;
 
-        r=dstore->results[evaluationName]->results[resultBoolName];
-        r.type=qfrdreBooleanVector;
+        evaluationResult& r1=dstore->results[evaluationName]->results[resultBoolName];
+        r1.type=qfrdreBooleanVector;
 
-        if (position>=r.bvec.size()) {
-            for (int i=r.bvec.size(); i<=position; i++) r.bvec.append(false);
+        if (position>=r1.bvec.size()) {
+            for (int i=r1.bvec.size(); i<=position; i++) r1.bvec.append(false);
         }
-        r.bvec[position]=boolValue;
+        r1.bvec[position]=boolValue;
     }
     emitResultsChanged(evaluationName, resultName, false);
     emitResultsChanged(evaluationName, resultBoolName, false);
