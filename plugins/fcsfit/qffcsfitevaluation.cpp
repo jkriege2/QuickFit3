@@ -687,7 +687,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
                 tstart.start();
                 QFFitAlgorithm::FitResult result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
                 #if QT_VERSION >= 0x040800
-                    double deltaTime=double(tstart.nsecsElapsed())*1.0e6;
+                    double deltaTime=double(tstart.nsecsElapsed())/1.0e6;
                 #else
                     double deltaTime=double(tstart.elapsed());
                 #endif
