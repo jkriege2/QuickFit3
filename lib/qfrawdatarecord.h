@@ -547,6 +547,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief return the group of a result  */
         QString resultsGetGroup(const QString& evaluationName, const QString& resultName) const;
 
+        /** \brief set the group and labels of a result (the result already has to exist!) */
+        void resultsSetGroupAndLabels(const QString& evaluationName, const QString& resultName, const QString& group, const QString& label, const QString& label_rich=QString(""));
+
+        /** \brief set the group and labels of a result (the result already has to exist!) */
+        void resultsSetGroupLabelsAndSortPriority(const QString& evaluationName, const QString& resultName, const QString& group, const QString& label, const QString& label_rich, bool pr);
+
         /** \brief set the sort priority of a result (the result already has to exist!) */
         void resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr);
         /** \brief return the sort priority of a result  */

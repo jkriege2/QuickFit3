@@ -2786,6 +2786,59 @@ QString QFRawDataRecord::resultsGetGroup(const QString& evaluationName, const QS
     return r.group;
 }
 
+void QFRawDataRecord::resultsSetGroupAndLabels(const QString &evaluationName, const QString &resultName, const QString &group, const QString &label, const QString &label_rich)
+{
+    {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+         evaluationResult r;
+         if (dstore->results.contains(evaluationName)) {
+             QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+             if (evr->results.contains(resultName)) {
+                 r=evr->results[resultName];
+             }
+         }
+         r.label=label;
+         r.label_rich=label_rich;
+         r.group=group;
+         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+         dstore->results[evaluationName]->results[resultName]=r;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+}
+
+void QFRawDataRecord::resultsSetGroupLabelsAndSortPriority(const QString &evaluationName, const QString &resultName, const QString &group, const QString &label, const QString &label_rich, bool pr)
+{
+    {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+         evaluationResult r;
+         if (dstore->results.contains(evaluationName)) {
+             QFRawDataRecordPrivate::evaluationIDMetadata* evr=dstore->results[evaluationName];
+             if (evr->results.contains(resultName)) {
+                 r=evr->results[resultName];
+             }
+         }
+         r.label=label;
+         r.label_rich=label_rich;
+         r.group=group;
+         r.sortPriority=pr;
+         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+         dstore->results[evaluationName]->results[resultName]=r;
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+}
+
 QString QFRawDataRecord::resultsGetLabelRichtext(const QString& evaluationName, const QString& resultName) const {
     const evaluationResult r=resultsGet(evaluationName, resultName);
     if (r.label_rich.isEmpty()) return r.label;

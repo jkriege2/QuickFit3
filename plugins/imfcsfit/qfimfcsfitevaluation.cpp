@@ -779,17 +779,13 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                         else {
                             record->resultsSetInNumberErrorListAndBool(evalID, fpid, run, params[i], errors[i], unit, getParamNameLocalStore(fpid), true);
                         }
-                        record->resultsSetGroup(evalID, fpid, tr("fit results"));
-                        record->resultsSetLabel(evalID, fpid, ffunc->getDescription(pid).name, ffunc->getDescription(pid).label);
-                        record->resultsSetSortPriority(evalID, fpid, true);
+                        record->resultsSetGroupLabelsAndSortPriority(evalID, fpid, tr("fit results"), ffunc->getDescription(pid).name, ffunc->getDescription(pid).label, true);
 
                         if (run<0) record->resultsSetBoolean(evalID, ffid, paramsFix[i]);
                         else {
                             record->resultsSetInBooleanListAndBool(evalID, ffid, run, paramsFix[i], QString(""), getParamNameLocalStore(ffid), true);
                         }
-                        record->resultsSetGroup(evalID,ffid, tr("fit results"));
-                        record->resultsSetLabel(evalID, ffid, ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"));
-                        record->resultsSetSortPriority(evalID,  ffid, true);
+                        record->resultsSetGroupLabelsAndSortPriority(evalID,ffid, tr("fit results"), ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"), true);
                     }
                 }
 
@@ -803,64 +799,55 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                 else {
                     record->resultsSetInStringListAndBool(evalID, "fit_model_name", run, ffunc->id(), QString(""), getParamNameLocalStore("fit_model_name"), true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: model"));
+                record->resultsSetGroupAndLabels(evalID, param, group, tr("fit: model"));
 
                 if (run<0) record->resultsSetString(evalID, "fitalg_name", falg->id());
                 else {
                     record->resultsSetInStringListAndBool(evalID, "fitalg_name", run, falg->id(), QString(""), getParamNameLocalStore("fitalg_name"), true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
+                record->resultsSetGroupAndLabels(evalID, param, group,  tr("fit: algorithm"));
 
                 if (run<0) record->resultsSetNumber(evalID, "fitalg_runtime", deltaTime, "msecs");
                 else {
                     record->resultsSetInNumberListAndBool(evalID, "fitalg_runtime", run, deltaTime, "msecs", getParamNameLocalStore("fitalg_runtime"), true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: runtime"));
+                record->resultsSetGroupAndLabels(evalID, param, group,  tr("fit: runtime"));
 
                 if (run<0) record->resultsSetBoolean(evalID, "fitalg_success", result.fitOK);
                 else {
                     record->resultsSetInBooleanListAndBool(evalID, "fitalg_success", run, result.fitOK, QString(""), getParamNameLocalStore("fitalg_success"), true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: success"));
+                record->resultsSetGroupAndLabels(evalID, param, group,  tr("fit: success"));
 
                 if (run<0) record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
                 else {
                     record->resultsSetInStringListAndBool(evalID, "fitalg_message", run, result.messageSimple, QString(""), getParamNameLocalStore("fitalg_message"), true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: message"));
+                record->resultsSetGroupAndLabels(evalID, param, group,  tr("fit: message"));
 
                 if (run<0) record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
                 else {
                     record->resultsSetInStringListAndBool(evalID, "fitalg_messageHTML", run, result.message, QString(""), getParamNameLocalStore("fitalg_messageHTML"), true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
+                record->resultsSetGroupAndLabels(evalID, param, group,  tr("fit: message (markup)"));
 
                 if (run<0) record->resultsSetInteger(evalID, "fit_datapoints", cut_N);
                 else {
                     record->resultsSetInIntegerListAndBool(evalID, "fit_datapoints", run, cut_N, QString(""), getParamNameLocalStore("fit_datapoints"),  true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: datapoints"));
+                record->resultsSetGroupAndLabels(evalID, param, group, tr("fit: datapoints"));
 
                 if (run<0) record->resultsSetInteger(evalID, "fit_cut_low", cut_low);
                 else {
                     record->resultsSetInIntegerListAndBool(evalID, "fit_cut_low", run, cut_low, QString(""), getParamNameLocalStore("fit_cut_low"),  true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: first point"));
+                record->resultsSetGroupAndLabels(evalID, param, group, tr("fit: first point"));
 
                 if (run<0) record->resultsSetInteger(evalID, "fit_cut_up", cut_up);
                 else {
                     record->resultsSetInIntegerListAndBool(evalID, "fit_cut_up", run, cut_up, QString(""), getParamNameLocalStore("fit_cut_up"),  true);
                 }
-                record->resultsSetGroup(evalID, param, group);
-                record->resultsSetLabel(evalID, param, tr("fit: last point"));
+                record->resultsSetGroupAndLabels(evalID, param, group, tr("fit: last point"));
 
 
                 QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
@@ -915,8 +902,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                     }
 
                     if (!param.isEmpty()) {
-                        record->resultsSetGroup(evalID, param, group);
-                        record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
+                        record->resultsSetGroupAndLabels(evalID, param, group, it.value().label, it.value().label_rich);
                     }
                 }
 
@@ -929,78 +915,67 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_chisquared", run, result.residSqrSum, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_chisquared_weighted", result.residWeightSqrSum);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_chisquared_weighted", run, result.residWeightSqrSum, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_residavg", result.residAverage);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_residavg", run, result.residAverage, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("residual average"), QString("&lang;E&rang;"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("residual average"), QString("&lang;E&rang;"));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_residavg_weighted", result.residWeightAverage);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_residavg_weighted", run, result.residWeightAverage, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_residstddev", result.residStdDev);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_residstddev", run, result.residStdDev, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_residstddev_weighted", result.residWeightStdDev);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_residstddev_weighted", run, result.residWeightStdDev, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"));
 
                     if (run<0) record->resultsSetInteger(evalID, param="fitstat_fitparams", result.fitparamN);
                     else {
                         record->resultsSetInIntegerListAndBool(evalID, param="fitstat_fitparams", run, result.fitparamN, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("fit params"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("fit params"));
 
                     if (run<0) record->resultsSetInteger(evalID, param="fitstat_datapoints", result.dataSize);
                     else {
                         record->resultsSetInIntegerListAndBool(evalID, param="fitstat_datapoints", run, result.dataSize, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("datapoints"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("datapoints"));
 
                     if (run<0) record->resultsSetInteger(evalID, param="fitstat_dof", result.degFreedom);
                     else {
                         record->resultsSetInIntegerListAndBool(evalID, param="fitstat_dof", run, result.degFreedom, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("degrees of freedom"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("degrees of freedom"));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_r2", result.Rsquared);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_r2", run, result.Rsquared, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("R squared"), tr("R<sup>2</sup>"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("R squared"), tr("R<sup>2</sup>"));
 
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_tss", result.TSS);
                     else {
                         record->resultsSetInNumberListAndBool(evalID, param="fitstat_tss", run, result.TSS, QString(""), getParamNameLocalStore(param),  true);
                     }
-                    record->resultsSetGroup(evalID, param, group);
-                    record->resultsSetLabel(evalID, param, tr("total sum of squares"));
+                    record->resultsSetGroupAndLabels(evalID, param, group, tr("total sum of squares"));
 
                     result.free();
                 }
