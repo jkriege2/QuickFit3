@@ -79,6 +79,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     chkUserSaveAfterFirstEdit->setChecked(options->getUserSaveAfterFirstEdit());
     chkProjectWindowsStayOnTop->setChecked(options->getProjectWindowsStayOnTop());
     chkHelpWindowsStayOnTop->setChecked(options->getHelpWindowsStayOnTop());
+    chkDebugMessages->setChecked(options->debugLogVisible());
 
 
     // find all available stylesheets
@@ -106,6 +107,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setUserSaveAfterFirstEdit(chkUserSaveAfterFirstEdit->isChecked());
         options->setHelpWindowsStayOnTop(chkHelpWindowsStayOnTop->isChecked());
         options->setProjectWindowsStayOnTop(chkProjectWindowsStayOnTop->isChecked());
+        options->setDebugLogVisible(chkDebugMessages->isChecked());
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);
         }

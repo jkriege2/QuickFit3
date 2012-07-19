@@ -31,6 +31,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     childWindowsStayOnTop=true;
     helpWindowsStayOnTop=true;
     projectWindowStayOnTop=false;
+    m_debugLogVisible=false;
 
     QFileInfo fi(QApplication::applicationFilePath());
     appDir=QApplication::applicationDirPath();
@@ -100,6 +101,7 @@ void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/childWindowsStayOnTop", childWindowsStayOnTop);
     settings->setValue("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop);
     settings->setValue("quickfit/projectWindowStayOnTop", projectWindowStayOnTop);
+    settings->setValue("quickfit/debugLogVisible", m_debugLogVisible);
 }
 
 
@@ -121,6 +123,7 @@ void ProgramOptions::readSettings() {
     childWindowsStayOnTop=settings->value("quickfit/childWindowsStayOnTop", childWindowsStayOnTop).toBool();
     helpWindowsStayOnTop=settings->value("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop).toBool();
     projectWindowStayOnTop=settings->value("quickfit/projectWindowStayOnTop", projectWindowStayOnTop).toBool();
+    m_debugLogVisible=settings->value("quickfit/debugLogVisible", m_debugLogVisible).toBool();
 
     languageID=settings->value("quickfit/language", languageID).toString();
     if (languageID != "en") { // english is default
@@ -224,6 +227,16 @@ bool ProgramOptions::getProjectWindowsStayOnTop() const
 void ProgramOptions::setProjectWindowsStayOnTop(bool set)
 {
     projectWindowStayOnTop=set;
+}
+
+bool ProgramOptions::debugLogVisible() const
+{
+    return m_debugLogVisible;
+}
+
+void ProgramOptions::setDebugLogVisible(bool visible)
+{
+    m_debugLogVisible=visible;
 }
 
 void ProgramOptions::setLanguageID(QString id) {

@@ -9,6 +9,7 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 Several debugging tools are implemented in QuickFit:
 <ul>
   <li>Man plugins and also QuickFit itself output a lot of information into the log files which are visible in the main window and are stored as <tt>quickfit3.log</tt> for the global log in the QuickFit user settings directory and in project-specific log fiels saved together with the project file (file extension <tt>.log</tt>).</li>
+  <li>Additional debug output (usually sent to the console) is also redirected to <tt>quickfit3_qdebug.log</tt> in the QuickFit user settings directory and can also be shown in an additional "Debug Log" tab on the main screen. To activate this tab, use the "Debugging" section of the <a href="qf3_settings.html">options dialog</a>.</li>
   <li>You may run QuickFit with the command line option <tt>--verboseplugin</tt>. This will output additional information when the plugins are loaded. This often helps to fid out why a plugin was not loaded. Note that each file in the plugins directory is checked by each of the different plugin managers once, so each plugin appears several times although it is loaded successfully only once, if there was no error!</li>
 </ul>
 

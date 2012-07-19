@@ -33,5 +33,6 @@
         <file>optionsdlg_icons/opt_view_lang.png</file>
         <file>optionsdlg_icons/opt_autosave.png</file>
         <file>optionsdlg_icons/opt_parallel.png</file>
+        <file>optionsdlg_icons/debugging.png</file>
     </qresource>
 </RCC>

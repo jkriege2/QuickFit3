@@ -84,6 +84,9 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         void setHelpWindowsStayOnTop(bool set);
         bool getProjectWindowsStayOnTop() const;
         void setProjectWindowsStayOnTop(bool set);
+
+        bool debugLogVisible() const;
+        void setDebugLogVisible(bool visible);
     public slots:
         /** \brief this function reads the current settings from the internal QSettings object settings */
         void readSettings();
@@ -149,6 +152,8 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString assetsDir;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString pluginsDir;
+
+        bool m_debugLogVisible;
 
     private:
         static  ProgramOptions* inst;

@@ -6,6 +6,42 @@
 #include "qfrdrreplacedialog.h"
 #include "statistics_tools.h"
 
+static QtLogFile* appLogFileQDebugWidget=NULL;
+
+
+#if defined(Q_OS_WIN)
+extern Q_CORE_EXPORT void qWinMsgHandler(QtMsgType t, const char* str);
+#endif
+
+
+void myMessageOutput(QtMsgType type, const char *msg)
+ {
+    if (appLogFileQDebugWidget) {
+         switch (type) {
+         case QtDebugMsg:
+             appLogFileQDebugWidget->log_text_linebreak(msg);
+             break;
+         case QtWarningMsg:
+             appLogFileQDebugWidget->log_warning_linebreak(msg);
+             break;
+         case QtCriticalMsg:
+             appLogFileQDebugWidget->log_error_linebreak(msg);
+             break;
+         case QtFatalMsg:
+             appLogFileQDebugWidget->log_error_linebreak(QObject::tr("FATAL ERROR: %1\n   APPLICATION WILL BE CLOSED/ABORTED!").arg(msg));
+             //abort();
+             break;
+         }
+    }
+
+    #if defined(Q_OS_WIN)
+     qWinMsgHandler(type, msg);
+    #else
+     qt_message_output(type, msg);
+    #endif
+    if (type==QtFatalMsg) abort();
+ }
+
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMainWindow(NULL)
 {
@@ -688,15 +724,22 @@ void MainWindow::createWidgets() {
     fl->addRow(tr("Project &Description:"), pteDescription);
     connect(pteDescription, SIGNAL(textChanged()), this, SLOT(projectDescriptionChanged()));
 
+    QFileInfo fi(QApplication::applicationFilePath());
+
     tabLogs=new QTabWidget(this);
     logFileProjectWidget=new QtLogFile(tabLogs);
     logFileProjectWidget->set_log_date_time(true);
+    logFileQDebugWidget=new QtLogFile(tabLogs);
+    logFileQDebugWidget->set_log_file_append(true);
+    logFileQDebugWidget->set_log_date_time(true);
+    logFileQDebugWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+"_qdebug.log"), false);
+    appLogFileQDebugWidget=logFileQDebugWidget;
+
     logFileMainWidget=new QtLogFile(tabLogs);
     logFileMainWidget->set_log_file_append(true);
     logFileMainWidget->set_log_date_time(true);
     logFileProjectWidget->set_log_file_append(true);
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
-    QFileInfo fi(QApplication::applicationFilePath());
     logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
     logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(VERSION_FULL).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()));
     logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));
@@ -705,8 +748,12 @@ void MainWindow::createWidgets() {
     logFileMainWidget->log_text(tr("plugin directory: '%1' ...\n").arg(settings->getPluginDirectory()));
     logFileMainWidget->log_text(tr("assets directory: '%1' ...\n").arg(settings->getAssetsDirectory()));
     tabLogs->addTab(logFileProjectWidget, tr("Project Log"));
+    tabLogs->addTab(logFileQDebugWidget, tr("Debug Log"));
     tabLogs->setCurrentWidget(logFileMainWidget);
     spMain->addWidget(tabLogs);
+
+    logFileQDebugWidget->setVisible(settings->debugLogVisible());
+    tabLogs->setTabEnabled(tabLogs->indexOf(logFileQDebugWidget), settings->debugLogVisible());
 
     prgMainProgress=new QProgressBar(this);
     statusBar()->addPermanentWidget(prgMainProgress);
@@ -986,10 +1033,23 @@ void MainWindow::readSettings() {
     //header_start=settings->getQSettings()->value("csvimport/header_start", header_start).toString();
     //currentFCSFileFormatFilter=settings->getQSettings()->value("mainwindow/currentFCSFileFormatFilter", currentFCSFileFormatFilter).toString();
 
+    logFileQDebugWidget->readSettings(*(settings->getQSettings()), "mainwindow/logDebug");
     logFileMainWidget->readSettings(*(settings->getQSettings()), "mainwindow/logMain");
     logFileProjectWidget->readSettings(*(settings->getQSettings()), "mainwindow/logProject");
 
     helpWindow->readSettings(*settings->getQSettings(), "mainwindow/help_");
+
+    int idxd=tabLogs->indexOf(logFileQDebugWidget);
+    if (settings->debugLogVisible()) {
+        if (idxd<0) tabLogs->addTab(logFileQDebugWidget, tr("Debug Log"));
+        tabLogs->setTabEnabled(tabLogs->indexOf(logFileQDebugWidget), settings->debugLogVisible());
+    } else {
+        if (idxd>=0) tabLogs->removeTab(idxd);
+
+    }
+    logFileQDebugWidget->setVisible(settings->debugLogVisible());
+
+    qInstallMsgHandler(myMessageOutput);
 
     extensionManager->readPluginSettings(settings);
 
@@ -1028,6 +1088,7 @@ void MainWindow::writeSettings() {
     recentMenu->storeSettings(*(settings->getQSettings()), "mainwindow/recentfilelist");
 
     logFileMainWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logMain");
+    logFileQDebugWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logDebug");
     logFileProjectWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logProject");
 
     settings->getQSettings()->setValue("mainwindow/currentProjectDir", currentProjectDir);

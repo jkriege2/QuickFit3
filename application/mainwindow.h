@@ -298,6 +298,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QLineEdit* edtCreator;
 
         QtLogFile* logFileProjectWidget;
+        QtLogFile* logFileQDebugWidget;
         QtLogFile* logFileMainWidget;
         QTabWidget* tabLogs;
 
