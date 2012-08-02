@@ -316,6 +316,14 @@ void QFEvaluationPropertyEditor::copyValErrResultsNoHead() {
     tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole, false);
 }
 
+void QFEvaluationPropertyEditor::copyMedianQuantilesResults(){
+    tvResults->copySelectionAsMedianQuantilesToExcel(QFEvaluationResultsModel::MedianRole, QFEvaluationResultsModel::Quantile25Role, QFEvaluationResultsModel::Quantile75Role);
+}
+
+void QFEvaluationPropertyEditor::copyMedianQuantilesResultsNoHead() {
+    tvResults->copySelectionAsMedianQuantilesToExcel(QFEvaluationResultsModel::MedianRole, QFEvaluationResultsModel::Quantile25Role, QFEvaluationResultsModel::Quantile75Role, false);
+}
+
 void QFEvaluationPropertyEditor::currentTabChanged(int tab)
 {
     int idx=tab-1;
@@ -506,12 +514,16 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
-    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without herader rows/columns"), this);
+    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection without header"), this);
     tbResults->addAction(actCopyResultsNoHead);
-    actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs"), this);
+    actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
-    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs, but without a header (so data only)"), this);
+    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), this);
     tbResults->addAction(actCopyValErrResultsNoHead);
+
+    actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), this);
+    actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), this);
+
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
     actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
@@ -620,6 +632,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     connect(actCopyResultsNoHead, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcelNoHead()));
     connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
     connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
+    connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
+    connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
@@ -672,6 +686,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     menuResults->addAction(actCopyResultsNoHead);
     menuResults->addAction(actCopyValErrResults);
     menuResults->addAction(actCopyValErrResultsNoHead);
+    menuResults->addAction(actCopyMedianQuantilesResults);
+    menuResults->addAction(actCopyMedianQuantilesNoHead);
 
     currentTabChanged(0);
 }

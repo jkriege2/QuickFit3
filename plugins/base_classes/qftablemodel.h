@@ -66,6 +66,8 @@ class QFTableModel : public QAbstractTableModel {
 
         bool doEmitSignals;
 
+        QVariant defaultEditValue;
+
         /** \brief the number of rows */
         quint16 rows;
         /** \brief the number of columns */
@@ -141,6 +143,9 @@ class QFTableModel : public QAbstractTableModel {
         QString columnTitle(quint16 column) const;
         /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
         quint16 getAddRow(quint16 column, QVariant data);
+
+        /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
+        void setDefaultEditValue(QVariant defaultEditValue);
 
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>

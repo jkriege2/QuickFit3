@@ -26,6 +26,7 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
         void copySelectionAsValueErrorToExcel(int valuerole=Qt::EditRole, int errorrole=Qt::EditRole, bool storeHead=true, Qt::Orientation orientation=Qt::Horizontal);
+        void copySelectionAsMedianQuantilesToExcel(int medianrole=Qt::EditRole, int q25role=-1, int q75role=-1, bool storeHead=true, Qt::Orientation orientation=Qt::Horizontal);
     protected:
         virtual void keyPressEvent(QKeyEvent* event);
     private:

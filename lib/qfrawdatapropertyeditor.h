@@ -114,6 +114,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
 
         void copyValErrResults();
         void copyValErrResultsNoHead();
+        void copyMedianQuantilesResults();
+        void copyMedianQuantilesResultsNoHead();
 
         void filterEvaluationTextChanged(const QString& text);
         void filterResultsTextChanged(const QString& text);
@@ -211,6 +213,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actSaveResultsAveraged;
         /** \brief action used to delete selection in tvResults */
         QAction* actDeleteResults;
+        QAction* actCopyMedianQuantilesResults;
+        QAction* actCopyMedianQuantilesNoHead;
 
         QFEnhancedLineEdit* edtFilterEvaluation;
         QFEnhancedLineEdit* edtFilterResults;

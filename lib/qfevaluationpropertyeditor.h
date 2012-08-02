@@ -153,6 +153,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void displayHelpEval();
         void copyValErrResults();
         void copyValErrResultsNoHead();
+        void copyMedianQuantilesResults();
+        void copyMedianQuantilesResultsNoHead();
 
         void filterFilesTextChanged(const QString &text);
         void filterResultsTextChanged(const QString &text);
@@ -214,6 +216,9 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyValErrResults;
         QAction* actCopyValErrResultsNoHead;
+        /** \brief action used to copy selection in tvResults to clipbord */
+        QAction* actCopyMedianQuantilesResults;
+        QAction* actCopyMedianQuantilesNoHead;
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
         QAction* actSaveResultsAveraged;

@@ -645,6 +645,8 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     int width=getProperty("WIDTH", 0).toInt();
     int steps=getProperty("STEPS", 0).toInt();
 
+    if (!propertyExists("IS_OVERVIEW_SCALED")) setQFProperty("IS_OVERVIEW_SCALED", false, false, true);
+
     if((height*width*steps)==0)return false;
 
     // LOAD FILE
@@ -661,7 +663,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
         }
     }
     for(int i=0; i<width*height; i++) {
-        overviewF[i]=cfr->getRaw(i,0);
+        overviewF[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
         overviewFSTD[i]=0;
     }
     delete cfr;

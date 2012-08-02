@@ -292,7 +292,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
-    paramsReadonly<<"FILETYPE";
+    paramsReadonly<<"FILETYPE"<<"IS_OVERVIEW_SCALED";
 
     bool ok=true;
     bool isJanBFile=false;
@@ -754,7 +754,7 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
-    paramsReadonly<<"FILETYPE";
+    paramsReadonly<<"FILETYPE"<<"IS_OVERVIEW_SCALED";
 
     bool ok=true, okk=true;
 
@@ -767,6 +767,8 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
     initParams["FILETYPE"]="RADHARD2";
     initParams["WIDTH"]=width;
     initParams["HEIGHT"]=height;
+    initParams["IS_OVERVIEW_SCALED"]=false;
+
     paramsReadonly<<"WIDTH"<<"HEIGHT";
 
     QString filenameValid=filename+".valid";

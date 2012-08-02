@@ -63,13 +63,13 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         value=0;
         error=0;
         if (crintf) {
-            error=crintf->getRateStdDev(index)*1000;
-            value=crintf->getRateMean(index)*1000;
+            error=crintf->getRateStdDev(index)*1000.0;
+            value=crintf->getRateMean(index)*1000.0;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
         if (scrintf && value==0) {
-            value=scrintf->getSimpleCountrateAverage(index);
-            error=scrintf->getSimpleCountrateVariance(index);
+            value=scrintf->getSimpleCountrateAverage(index)*1000.0;
+            error=scrintf->getSimpleCountrateVariance(index)*1000.0;
         }
         if (crintf||scrintf) return true;
 

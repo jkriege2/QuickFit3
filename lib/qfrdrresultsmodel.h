@@ -41,7 +41,10 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
             Sum2Role=Qt::UserRole+5,       /**< same as AvgRole, but returns the sum of squares (usefull when calculating avergae/SD over several cells) */
             CountRole=Qt::UserRole+6,      /**< returns the number of values represented by the cell (i.e. items in list/matrix, or 1) */
             EvalNameRole=Qt::UserRole+7,   /**< returns the evaluation name of the result in the cell */
-            ResultNameRole=Qt::UserRole+8  /**< returns the resultname of the result in the cell */
+            ResultNameRole=Qt::UserRole+8, /**< returns the resultname of the result in the cell */
+            MedianRole=Qt::UserRole+9,     /**< same as AvgRole, but returns the median  */
+            Quantile25Role=Qt::UserRole+10,/**< same as AvgRole, but returns the 25% quantile  */
+            Quantile75Role=Qt::UserRole+11 /**< same as AvgRole, but returns the 75% quantile  */
         };
     public slots:
         void setResultFilter(QString filter);

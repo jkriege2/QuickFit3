@@ -277,6 +277,174 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
     }
 }
 
+void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, int q25role, int q75role, bool storeHead, Qt::Orientation orientation)
+{
+    if (q25role==-1 && q75role==-1) {
+        copySelectionToExcel(medianrole);
+    } else if (q25role!=-1 && q75role==-1) {
+        copySelectionAsValueErrorToExcel(medianrole, q25role, storeHead, orientation);
+    } else {
+        if (!model()) return;
+        if (!selectionModel()) return;
+        QModelIndexList sel=selectionModel()->selectedIndexes();
+        QSet<QPair<int, int> > rows, cols;
+        int colmin=0;
+        int rowmin=0;
+        for (int i=0; i<sel.size(); i++) {
+            int r=sel[i].row();
+            int c=sel[i].column();
+            rows.insert(qMakePair(r,medianrole) );
+            cols.insert(qMakePair(c,medianrole));
+            if (orientation==Qt::Horizontal) {
+                cols.insert(qMakePair(c,q25role));
+                cols.insert(qMakePair(c,q75role));
+            } else {
+                rows.insert(qMakePair(r,q25role));
+                rows.insert(qMakePair(r,q75role));
+            }
+            if (i==0) {
+                colmin=c;
+                rowmin=r;
+            } else {
+                if (c<colmin) colmin=c;
+                if (r<rowmin) rowmin=r;
+            }
+        }
+        copySelectionAsValueErrorToExcelcompare_firstrole=medianrole;
+        QList<QPair<int, int> > rowlist=QList<QPair<int, int> >::fromSet(rows);
+        qSort(rowlist.begin(), rowlist.end());
+        QList<QPair<int, int> > collist=QList<QPair<int, int> >::fromSet(cols);
+        qSort(collist.begin(), collist.end());
+        int rowcnt=rowlist.size();
+        int colcnt=collist.size();
+        QList<QStringList> data;
+
+        // header row:
+        //
+        //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
+        QStringList hrow;
+        if (storeHead) {
+            hrow.append(""); // empty header for first column (vertical headers!)
+            for (int c=0; c<colcnt; c++) {
+                if (collist[c].second==medianrole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+                else if  (collist[c].second==q25role) hrow.append(QString("\"25% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+                else if  (collist[c].second==q75role) hrow.append(QString("\"75% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+            }
+            data.append(hrow);
+        }
+
+        // now add dta rows:
+        //
+        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
+        //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
+        for (int r=0; r<rowcnt; r++) {
+            QStringList row;
+            if (storeHead) {
+                if (rowlist[r].second==medianrole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+                else if (rowlist[r].second==q25role) row.append(QString("\"25% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+                else if (rowlist[r].second==q75role) row.append(QString("\"75% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+            }
+            for (int c=0; c<colcnt; c++) {
+                row.append(""); // empty columns for data
+            }
+            data.append(row);
+        }
+        for (int i=0; i<sel.size(); i++) {
+            int r=-1;
+            int c=-1;
+            for (int ri=0; ri<rowlist.size(); ri++) {
+                if (rowlist[ri].first==sel[i].row() && rowlist[ri].second==medianrole) {
+                    r=ri;
+                    break;
+                }
+            }
+            for (int ci=0; ci<collist.size(); ci++) {
+                if (collist[ci].first==sel[i].column() && collist[ci].second==medianrole) {
+                    c=ci;
+                    break;
+                }
+            }
+
+            QVariant vdata=sel[i].data(medianrole);
+            QVariant q25data=sel[i].data(q25role);
+            QVariant q75data=sel[i].data(q75role);
+            QString txt="", q25txt="", q75txt="";
+            switch (vdata.type()) {
+                case QVariant::Int:
+                case QVariant::LongLong:
+                case QVariant::UInt:
+                case QVariant::ULongLong:
+                case QVariant::Bool:
+                    txt=vdata.toString();
+                    break;
+                case QVariant::Double:
+                    txt=QLocale().toString(vdata.toDouble());
+                    break;
+                case QVariant::PointF:
+                    txt=QLocale().toString(vdata.toPointF().x());
+                    break;
+                default:
+                    txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
+                    break;
+            }
+            switch (q25data.type()) {
+                case QVariant::Int:
+                case QVariant::LongLong:
+                case QVariant::UInt:
+                case QVariant::ULongLong:
+                case QVariant::Bool:
+                    q25txt=q25data.toString();
+                    break;
+                case QVariant::Double:
+                    q25txt=QLocale().toString(q25data.toDouble());
+                    break;
+                case QVariant::PointF:
+                    q25txt=QLocale().toString(q25data.toPointF().x());
+                    break;
+                default:
+                    q25txt=QString("\"%1\"").arg(q25data.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
+                    break;
+            }
+            switch (q75data.type()) {
+                case QVariant::Int:
+                case QVariant::LongLong:
+                case QVariant::UInt:
+                case QVariant::ULongLong:
+                case QVariant::Bool:
+                    q75txt=q75data.toString();
+                    break;
+                case QVariant::Double:
+                    q75txt=QLocale().toString(q75data.toDouble());
+                    break;
+                case QVariant::PointF:
+                    q75txt=QLocale().toString(q75data.toPointF().x());
+                    break;
+                default:
+                    q75txt=QString("\"%1\"").arg(q75data.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
+                    break;
+            }
+            int shift=0;
+            if (storeHead) shift=1;
+            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) {
+                data[r+shift][c+shift]=txt;
+                if (orientation==Qt::Horizontal) {
+                    if (c+1<=colcnt) data[r+shift][c+1+shift]=q25txt;
+                    if (c+2<=colcnt) data[r+shift][c+2+shift]=q75txt;
+                } else {
+                    if (r+1<=rowcnt) data[r+1+shift][c+shift]=q25txt;
+                    if (r+2<=rowcnt) data[r+2+shift][c+shift]=q75txt;
+                }
+            }
+        }
+
+        QString result="";
+        for (int r=0; r<data.size(); r++) {
+            result+=data[r].join("\t")+"\n";
+        }
+        QApplication::clipboard()->setText(result);
+    }
+}
+
 void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
     if (event->matches(QKeySequence::Copy)) {
         copySelectionToExcel();

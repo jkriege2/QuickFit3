@@ -294,7 +294,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     tbResults->addAction(actCopyResults);
     actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
     tbResults->addAction(actCopyResultsNoHead);
-
+    actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), this);
+    actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), this);
     actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
     actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) as value+error pairs, but without a header (so data only)"), this);
@@ -403,6 +404,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
+    connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
+    connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
 
     menuResults->addAction(actSaveResults);
     menuResults->addAction(actSaveResultsAveraged);
@@ -413,6 +416,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     menuResults->addAction(actCopyResultsNoHead);
     menuResults->addAction(actCopyValErrResults);
     menuResults->addAction(actCopyValErrResultsNoHead);
+    menuResults->addAction(actCopyMedianQuantilesResults);
+    menuResults->addAction(actCopyMedianQuantilesNoHead);
 
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
@@ -638,6 +643,16 @@ void QFRawDataPropertyEditor::copyValErrResults() {
 }
 void QFRawDataPropertyEditor::copyValErrResultsNoHead() {
     tvResults->copySelectionAsValueErrorToExcel(QFRDRResultsModel::AvgRole, QFRDRResultsModel::SDRole, false, Qt::Vertical);
+}
+
+void QFRawDataPropertyEditor::copyMedianQuantilesResults()
+{
+    tvResults->copySelectionAsMedianQuantilesToExcel(QFRDRResultsModel::MedianRole, QFRDRResultsModel::Quantile25Role, QFRDRResultsModel::Quantile75Role, true, Qt::Vertical);
+}
+
+void QFRawDataPropertyEditor::copyMedianQuantilesResultsNoHead()
+{
+    tvResults->copySelectionAsMedianQuantilesToExcel(QFRDRResultsModel::MedianRole, QFRDRResultsModel::Quantile25Role, QFRDRResultsModel::Quantile75Role, false, Qt::Vertical);
 }
 
 void QFRawDataPropertyEditor::currentTabChanged(int tab) {

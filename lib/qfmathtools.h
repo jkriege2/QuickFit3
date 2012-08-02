@@ -140,6 +140,104 @@ double qfstatisticsVariance(const T value) {
     }
     return ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
 }
+
+
+
+
+
+
+
+
+
+/*! \brief return the smallest element from a sorted array
+    \ingroup tools_math_stat
+*/
+template <typename T>
+typename T::value_type qfstatisticsSortedMin(T input) {
+    if (input.size()<=0) return 0;
+    return input[0];
+}
+
+
+/*! \brief return the largest element from a sorted array
+    \ingroup tools_math_stat
+*/
+template <typename T>
+typename T::value_type qfstatisticsSortedMax(T input) {
+    if (input.size()<=0) return 0;
+    return input[input.size()-1];
+}
+
+
+/*! \brief return the median from a sorted array
+    \ingroup tools_math_stat
+
+    if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
+*/
+template <typename T>
+typename T::value_type qfstatisticsSortedMedian(T input) {
+    long long N=input.size();
+    if (N<=0) return 0;
+    if (N==1) return input[0];
+    if (N%2==0) {
+        return (input[N/2-1]+input[N/2])/2.0;
+    } else {
+        return input[N/2];
+    }
+}
+
+
+/*! \brief return the median from a array
+    \ingroup tools_math_stat
+
+    if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
+*/
+template <typename T>
+typename T::value_type qfstatisticsMedian(T input_in) {
+    T input=input_in;
+    qSort(input);
+    return qfstatisticsSortedMedian(input);
+}
+
+
+/*! \brief return the given quantile from a sorted array
+    \ingroup tools_math_stat
+
+*/
+template <typename T>
+typename T::value_type qfstatisticsSortedQuantile(T input, double quantile) {
+    long long N=input.size();
+    if (N<=0) return 0;
+    if (N==1) return input[0];
+
+    long long NQ=(long long)ceil(quantile*(double)N);
+    if (NQ<0) NQ=0;
+    if (NQ>=N) NQ=N-1;
+
+    return input[NQ];
+}
+
+
+/*! \brief return the given quantile from an array
+    \ingroup tools_math_stat
+
+*/
+template <typename T>
+typename T::value_type qfstatisticsQuantile(T input_in, double quantile) {
+    T input=input_in;
+    qSort(input);
+    return qfstatisticsSortedQuantile(input, quantile);
+}
+
+
+
+
+
+
+
+
+
+
 /*! \brief round a value according to the error
     \ingroup qf3lib_mathtools
 

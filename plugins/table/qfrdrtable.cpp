@@ -5,6 +5,8 @@
 #include "qfrdrploteditor.h"
 #include "qftools.h"
 
+#define DEFAULT_EDITVAL double(0.0)
+
 QFRDRTable::GraphInfo::GraphInfo() {
     title="";
     type=QFRDRTable::gtLines;
@@ -68,6 +70,7 @@ QFRDRTable::~QFRDRTable()
 QFTablePluginModel* QFRDRTable::model() {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -77,6 +80,7 @@ QFTablePluginModel* QFRDRTable::model() {
 QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -161,6 +165,7 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
 void QFRDRTable::intReadData(QDomElement* e) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -223,6 +228,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     re = re.nextSiblingElement("row");
                     r++;
                 }
+
                 datamodel->setColumnTitle(columns-1, n);
                 te = te.nextSiblingElement("column");
             }
@@ -291,6 +297,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
 void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }

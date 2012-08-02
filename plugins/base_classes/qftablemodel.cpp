@@ -7,6 +7,7 @@ QFTableModel::QFTableModel(QObject * parent):
     readonly=true;
     readonlyButStillCheckable=false;
     doEmitSignals=true;
+    defaultEditValue=QVariant();
     //quint32 a=xyAdressToUInt32(5, 5);
     //std::cout<<"adress test: "<<a<<" => row="<<UInt32ToRow(a)<<", column="<<UInt32ToColumn(a)<<"\n";
 }
@@ -33,8 +34,11 @@ QVariant QFTableModel::data(const QModelIndex &index, int role) const {
         if (role == Qt::DisplayRole) {
             if (dataMap.contains(a)) return dataMap[a];
         } else if (role == Qt::EditRole) {
-            if (dataEditMap.contains(a)) return dataEditMap[a];
-            else return dataMap[a];
+            QVariant v=QVariant();
+            if (dataEditMap.contains(a)) v=dataEditMap.value(a, v);
+            else if (dataMap.contains(a)) v=dataMap.value(a, v);
+            if (!v.isValid()) v=defaultEditValue;
+            return v;
         } else if (role == Qt::CheckStateRole) {
             if (dataCheckedMap.contains(a)) return dataCheckedMap[a];
         } else if (role == Qt::BackgroundRole) {
@@ -333,6 +337,11 @@ quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
     return rows-1;
 }
 
+void QFTableModel::setDefaultEditValue(QVariant defaultEditValue)
+{
+    this->defaultEditValue=defaultEditValue;
+}
+
 QVariant QFTableModel::cell(quint16 row, quint16 column) const {
     if ((row>=rows) || (column>=columns)) return QVariant();
     quint32 a=xyAdressToUInt32(row, column);
@@ -349,6 +358,7 @@ QVariant QFTableModel::cellEditRole(quint16 row, quint16 column) const {
 void QFTableModel::setColumnTitle(quint16 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly || (column>=columns)) return;
+    for (int c=columnNames.size(); c<columns; c++) columnNames.append(QString::number(c));
     if (column<columnNames.size()) columnNames[column]=name;
     if (doEmitSignals) reset();
 }
