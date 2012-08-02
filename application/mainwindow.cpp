@@ -37,7 +37,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
     #if defined(Q_OS_WIN)
      qWinMsgHandler(type, msg);
     #else
-     qt_message_output(type, msg);
+     //qt_message_output(type, msg);
     #endif
     if (type==QtFatalMsg) abort();
  }
