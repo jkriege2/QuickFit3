@@ -327,11 +327,16 @@ void MaxEntB040::setMmatrix()
 		m_sigmamatrix(i,i)=1.0/(pow(m_stdev(i),2));
 		}
 	m_M=m_Sred.transpose()*m_Vred.transpose()*m_sigmamatrix*m_Vred*m_Sred;
+
     }
     
     
 void MaxEntB040::performIter()
 	{
+
+
+
+
 	if (m_oldDist==false){m_f.resize(m_N);}
 	m_m.resize(m_N);
 	m_u.resize(m_s);
@@ -434,6 +439,14 @@ void MaxEntB040::performIter()
 		////////////////////////////////////////////////
 
 	
+
+
+     ///////
+     //  diagK();
+     //////
+
+
+
 
     }
 //////////////END OF performIter //////////////////
@@ -579,10 +592,6 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
 
 
 
-
-
-
-
 void MaxEntB040::writeDistTaus(double * distTaus)		
 	{
 	for (int i=0; i<m_N; i++)
@@ -598,7 +607,133 @@ void MaxEntB040::writeDistribution(double * dist)
 		dist[i]=m_f(i);
 		}
 	}
-			
+
+
+
+void MaxEntB040::Mmatrix(Eigen::MatrixXd m,int Nd, Eigen::MatrixXd Vred,Eigen::MatrixXd Sred,Eigen::VectorXd stdev)
+    {
+    Eigen::MatrixXd sigmamatrix=Eigen::MatrixXd::Zero(Nd,Nd);
+    for (int i=0; i< Nd ; i++)
+        {
+        sigmamatrix(i,i)=1.0/(pow(stdev(i),2));
+        }
+    m=Sred.transpose()*Vred.transpose()*sigmamatrix*Vred*Sred;
+
+
+
+    qDebug() << "THIS IS m from the new method: =====================================================================";
+    std::cout << m << std::endl;
+
+
+    }
 		
-		
-		
+
+void MaxEntB040::diagK()
+    {
+
+    qDebug() << "===============================================================================";
+    qDebug() << "diag K procedure ===> ===> ===>:";
+    //qDebug() << "the current dimension s = " << m_s ;
+
+    Eigen::MatrixXd ktest(m_s,m_s);
+    ktest=m_K;
+
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(ktest);
+    Eigen::VectorXd evals=es.eigenvalues();
+
+    std::cout << "Eigenvalues of K: "<< std::endl;
+    std::cout << evals << std::endl;
+
+    Eigen::MatrixXd P=es.eigenvectors();
+    Eigen::MatrixXd test=P.transpose()*P;
+
+
+
+    Eigen::MatrixXd ev1=es.eigenvalues().asDiagonal();
+    Eigen::MatrixXd test2=ev1.array().sqrt();
+
+    // Mmatrix method to be implemented externally %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Eigen::MatrixXd m;
+    m.resize(m_s,m_s);
+    Eigen::MatrixXd sigma=Eigen::MatrixXd::Zero(m_Nd,m_Nd);
+    for (int i=0; i< m_Nd ; i++)
+        {
+        sigma(i,i)=1.0/(pow(m_stdev(i),2));
+        }
+    m=m_Sred.transpose()*m_Vred.transpose()*sigma*m_Vred*m_Sred;
+    // end of Mmatrix method                      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    Eigen::MatrixXd ev1sqrt=ev1.array().sqrt();
+    Eigen::MatrixXd A=ev1sqrt*P.transpose()*m*P*ev1sqrt;
+
+
+    // now we solve the Eigenproblem for A:
+
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es2(A);
+    Eigen::VectorXd evalsA=es2.eigenvalues();
+    //std::cout << evals << std::endl;
+
+    Eigen::MatrixXd R=es.eigenvectors();
+    Eigen::MatrixXd test3=R.transpose()*R;
+
+
+    //std::cout << test3 << std::endl;
+    //std::cout << "Eigenvalues from : " << std::endl;
+
+
+    Eigen::MatrixXd Yinv=R.transpose()*ev1sqrt*P.transpose();
+
+    std::cout << Yinv.rows() << "x" << Yinv.cols() << std::endl;
+
+
+
+
+    /*
+    std::cout << "((((((((((((((((()))))))))))))))))" << std::endl;
+    std::cout << P << std:: endl;
+    std::cout << "((((((((((((((((()))))))))))))))))" << std::endl;
+    */
+
+
+    // Eigenvalue selection procedure:
+    int nil=0;
+    for (int i=0 ; i<m_s ; i++ )
+    {
+        if (evals(i)<1e-12){nil++;}
+    }
+    std::cout << nil << std::endl;
+
+    Eigen::MatrixXd P0(m_s,nil);
+    Eigen::MatrixXd P1(m_s,m_s-nil);
+    Eigen::VectorXd Kvals0(nil);
+    Eigen::VectorXd Kvals1(m_s-nil);
+    P0=P.block(0,0,m_s,nil);
+    P1=P.block(0,nil,m_s,m_s-nil);
+    Kvals0=evals.head(nil);
+    Kvals1=evals.tail(m_s-nil);
+
+
+    std::cout << "CHECK: " << std::endl;
+    std::cout << evals << std::endl;
+    std::cout << "=========================" << std::endl;
+    std::cout << Kvals0 << std::endl;
+    std::cout << "=========================" << std::endl;
+    std::cout << Kvals1 << std::endl;
+
+    /*
+    std::cout << P0 << std::endl;
+    std::cout << P0.rows() << "x" << P0.cols() << std::endl;
+    std::cout << P1 << std::endl;
+    std::cout << P1.rows() << "x" << P1.cols() << std::endl;
+    */
+
+
+    qDebug() << "===============================================================================";
+    }
+
+
+
+
+
+

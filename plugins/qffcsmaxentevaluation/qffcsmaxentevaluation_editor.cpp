@@ -20,7 +20,7 @@
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
-////////////c
+////////////
 
 
 #include <QtGui>

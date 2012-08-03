@@ -178,6 +178,12 @@ class MaxEntB040{
     void setMmatrix();
     
     void performIter();
+
+    void diagK();
+
+    void Mmatrix(Eigen::MatrixXd m,int Nd, Eigen::MatrixXd Vred,Eigen::MatrixXd Sred,Eigen::VectorXd stdev);
+
+
     
 };
 
