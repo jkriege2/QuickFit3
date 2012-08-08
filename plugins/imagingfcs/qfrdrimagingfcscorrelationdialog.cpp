@@ -66,6 +66,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     connect(ui->spinLastFrame, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinSegments, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
+    connect(ui->spinBackStatistics, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     connect(ui->spinVideoFrames, SIGNAL(valueChanged(int)), this, SLOT(updateFrameCount()));
     if (opt) readSettings();
     filesToAdd.clear();
@@ -326,6 +327,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/parallel_threads", ui->spinProcesses->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/add_to_project", ui->chkAddToProject->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/statistics", ui->spinStatistics->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/backStatistics", ui->spinBackStatistics->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/video", ui->chkVideo->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/video_frames", ui->spinVideoFrames->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked());
@@ -371,6 +373,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkVideo->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/video", ui->chkVideo->isChecked()).toBool());
     ui->spinVideoFrames->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/video_frames", ui->spinVideoFrames->value()).toInt());
     ui->spinStatistics->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/statistics", ui->spinStatistics->value()).toInt());
+    ui->spinBackStatistics->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/backStatistics", ui->spinBackStatistics->value()).toInt());
     ui->chkACF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/acf", ui->chkACF->isChecked()).toBool());
     ui->chkCCF->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/ccf", ui->chkCCF->isChecked()).toBool());
     ui->spinSegments->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/segments", ui->spinSegments->value()).toInt());
@@ -480,6 +483,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.video_frames=qMax(2,ui->spinVideoFrames->value());
     job.statistics=true;
     job.statistics_frames=qMax(2, ui->spinStatistics->value());
+    job.backstatistics_frames=qMax(2, ui->spinBackStatistics->value());
     job.segments=ui->spinSegments->value();
     job.binning=ui->spinBinning->value();
     job.interleaved_binning=ui->chkInterleavedBinning->isChecked();

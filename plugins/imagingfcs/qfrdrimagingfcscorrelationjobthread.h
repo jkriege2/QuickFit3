@@ -86,6 +86,8 @@ struct IMFCSJob {
     bool ccf;
     /** \brief statistics over frames */
     uint32_t statistics_frames;
+    /** \brief background statistics over frames */
+    uint32_t backstatistics_frames;
     /** \brief calculate statistics */
     bool statistics;
     /** \brief create video */
@@ -379,7 +381,7 @@ data                                                   size [bytes]             
         uint64_t cnt;
     };
 
-    void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max);
+    void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max, bool isBackground=false);
 
 
     int m_status;
@@ -408,6 +410,12 @@ data                                                   size [bytes]             
     QVector<float> statistics_std;
     QVector<float> statistics_min;
     QVector<float> statistics_max;
+
+    QVector<float> backstatistics_time;
+    QVector<float> backstatistics_mean;
+    QVector<float> backstatistics_std;
+    QVector<float> backstatistics_min;
+    QVector<float> backstatistics_max;
 
     QVector<float> statistics_after_time;
     QVector<float> statistics_after_mean;
@@ -445,6 +453,7 @@ data                                                   size [bytes]             
     QString outputFilenameBase;
 
     float* backgroundImage;
+    float* backgroundImageStd;
     float* bleachOffset;
     float* bleachAmplitude;
     float* bleachTime;

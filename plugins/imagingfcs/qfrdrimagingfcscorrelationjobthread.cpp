@@ -23,6 +23,7 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPlugi
     was_canceled=false;
     duration=0;
     backgroundImage=NULL;
+    backgroundImageStd=NULL;
     fit_frames=NULL;
     fit_t=NULL;
     NFitFrames=0;
@@ -31,6 +32,7 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPlugi
 
 QFRDRImagingFCSCorrelationJobThread::~QFRDRImagingFCSCorrelationJobThread() {
     if (backgroundImage) free(backgroundImage);
+    if (backgroundImageStd) free(backgroundImageStd);
 }
 
 double QFRDRImagingFCSCorrelationJobThread::durationMS() const {
@@ -277,10 +279,12 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString configFilename=outputFilenameBase+".evalsettings.txt";
                     QString averageFilename="";
                     QString stdFilename="";
+                    QString backstdFilename="";
                     QString averageFilenameF="";
                     QString backgroundFilename="";
                     QString videoFilename="";
                     QString statisticsFilename="";
+                    QString backstatisticsFilename="";
                     QString acfFilename="";
                     QString ccfFilename="";
                     QString dccfFilename="";
@@ -416,6 +420,30 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     m_status=-1; emit statusChanged(m_status);
                                     backgroundFilename="";
                                     emit messageChanged(tr("could not create background image '%1'!").arg(localFilename));
+                                }
+                            }
+
+                        }
+                        //************** SAVE BACKGROUND STDDEV IMAGE
+                        if ((m_status==1) && !was_canceled && backgroundImageStd) {
+                            bool doSave=false;
+                            for (uint32_t i=0; i<frame_width*frame_height; i++) {
+                                if (backgroundImageStd[i]!=0) {
+                                    doSave=true;
+                                    break;
+                                }
+                            }
+                            if (doSave) {
+                                emit messageChanged(tr("saving background S.D. image ..."));
+                                QString localFilename=backstdFilename=outputFilenameBase+".backgroundstd.tif";
+                                TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                if (tif) {
+                                    TIFFTWriteFloat(tif, backgroundImageStd, frame_width, frame_height);
+                                    TIFFClose(tif);
+                                } else {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    backstdFilename="";
+                                    emit messageChanged(tr("could not create background S.D. image '%1'!").arg(localFilename));
                                 }
                             }
 
@@ -610,9 +638,70 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 f1.close();
                             } else {
                                 emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create statistics plot file '%1': %2!").arg(localFilename).arg(f.errorString()));
+                                emit messageChanged(tr("could not create statistics plot file '%1': %2!").arg(localFilename).arg(f1.errorString()));
                             }
 
+                            localFilename=backstatisticsFilename=outputFilenameBase+".backstatistics.dat";
+                            QFile fb(localFilename);
+                            if (fb.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&fb);
+                                text.setLocale(outLocale);
+                                emit messageChanged(tr("saving background statistics ..."));
+                                int count=backstatistics_time.size();
+                                for (int i=0; i<count; i++) {
+                                    text<<backstatistics_time[i];
+                                    if (i<backstatistics_mean.size()) text<<", "<<backstatistics_mean[i];
+                                    else text<<", 0";
+                                    if (i<backstatistics_std.size()) text<<", "<<backstatistics_std[i];
+                                    else text<<", 0";
+                                    if (i<backstatistics_min.size()) text<<", "<<backstatistics_min[i];
+                                    else text<<", 0";
+                                    if (i<backstatistics_max.size()) text<<", "<<backstatistics_max[i];
+                                    else text<<", 0";
+                                    text<<"\n";
+                                }
+                                fb.close();
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create background statistics file '%1': %2!").arg(localFilename).arg(fb.errorString()));
+                            }
+                            localFilename=outputFilenameBase+".backstatistics.plt";
+                            QFile fb1(localFilename);
+                            if (fb1.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&fb1);
+                                text.setLocale(outLocale);
+                                text<<QString("set xlabel 'time [seconds]'\n");
+                                text<<QString("set ylabel 'pixel grey value'\n");
+                                text<<QString("set title \"Background Statistics '%1'\" noenhanced\n").arg(job.filename);
+                                text<<QString("set style fill transparent solid 0.5 noborder\n");
+                                text<<QString("set multiplot layout 1,2\n");
+                                text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("unset multiplot\n");
+                                text<<QString("pause -1\n");
+                                text<<QString("set multiplot layout 2,2\n");
+                                text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("unset multiplot\n");
+                                text<<QString("pause -1\n");
+                                text<<QString("f(t)=a0+a1*exp(-t/t1)\n");
+                                text<<QString("t1=50\n");
+                                text<<QString("a0=0\n");
+                                text<<QString("a1=500\n");
+                                text<<QString("fit f(x) '%1' using 1:2 via a0, a1, t1\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("set label sprintf('1exp: a0=%f a1=%f t1=%f', a0, a1, t1) at graph 0.5,0.9\n");
+                                text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'exponential fit\n").arg(QFileInfo(backstatisticsFilename).fileName());
+                                text<<QString("pause -1\n");
+                                text<<QString("\n");
+                                text<<QString("\n");
+                                text<<QString("\n");
+                                fb1.close();
+                            } else {
+                                emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create background statistics plot file '%1': %2!").arg(localFilename).arg(fb1.errorString()));
+                            }
                         }
                         emit progressIncrement(10);
 
@@ -709,8 +798,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (!averageFilenameF.isEmpty())        text<<"overview image file real    : " << d.relativeFilePath(averageFilenameF) << "\n";
                                 if (!stdFilename.isEmpty())             text<<"overview std image          : " << d.relativeFilePath(stdFilename) << "\n";
                                 if (!backgroundFilename.isEmpty())      text<<"background image file       : " << d.relativeFilePath(backgroundFilename) << "\n";
+                                if (!backstdFilename.isEmpty())         text<<"background stddev           : " << d.relativeFilePath(backstdFilename) << "\n";
                                 if (!videoFilename.isEmpty())           text<<"video file                  : " << d.relativeFilePath(videoFilename) << "\n";
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << d.relativeFilePath(statisticsFilename) << "\n";
+                                if (!backstatisticsFilename.isEmpty())  text<<"background statistics file  : " << d.relativeFilePath(backstatisticsFilename) << "\n";
                                 if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << d.relativeFilePath(acfFilename) << "\n";
                                 if (!acfFilenameBin.isEmpty())          text<<"bin. autocorrelation file   : " << d.relativeFilePath(acfFilenameBin) << "\n";
                                 if (!ccfFilename.isEmpty())             text<<"crosscorrelation file       : " << d.relativeFilePath(ccfFilename) << "\n";
@@ -1500,7 +1591,7 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
 }
 
 
-void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max) {
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max, bool isBackground) {
 
     float frame_min=frame_data[0];
     float frame_max=frame_data[0];
@@ -1509,11 +1600,11 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
         if (QFFloatIsOK(v)) {
             frame_min=(v<frame_min)?v:frame_min;
             frame_max=(v>frame_max)?v:frame_max;
-            (*average_frame)[i]=(*average_frame)[i]+(float)v/(float)frames;
-            (*sqrsum_frame)[i]=(*sqrsum_frame)[i]+(float)v*(float)v/(float)frames;
+            if (average_frame) (*average_frame)[i]=(*average_frame)[i]+(float)v/(float)frames;
+            if (sqrsum_frame) (*sqrsum_frame)[i]=(*sqrsum_frame)[i]+(float)v*(float)v/(float)frames;
             state.sum+=v;
             state.sum2+=(v*v);
-            state.video_frame[i]=state.video_frame[i]+(float)v/(float)job.video_frames;
+            if (state.video_frame) state.video_frame[i]=state.video_frame[i]+(float)v/(float)job.video_frames;
             state.cnt++;
         }
     }
@@ -1532,14 +1623,16 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
         state.sframe_min=(frame_min<state.sframe_min)?frame_min:state.sframe_min;
         state.sframe_max=(frame_max>state.sframe_max)?frame_max:state.sframe_max;
     }
-    if (job.statistics && ((frame+1)%job.statistics_frames==0)) {
+    if ((!isBackground && job.statistics && ((frame+1)%job.statistics_frames==0))
+        || (isBackground && job.statistics && ((frame+1)%job.backstatistics_frames==0))){
         float N=state.cnt;//frame_width*frame_height*job.statistics_frames;
         if (N==0) N=2;
         statistics_time.append((float)frame*job.frameTime);
         statistics_mean.append(state.sum/N);
         statistics_min.append(state.sframe_min);
         statistics_max.append(state.sframe_max);
-        if (job.statistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
+        if (!isBackground && job.statistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
+        else if (isBackground && job.backstatistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
         state.sum=0;
         state.sum2=0;
         state.sframe_min=0;
@@ -1547,7 +1640,7 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
         state.statFirst=true;
         state.cnt=0;
     }
-    if (job.video && ((frame+1)%job.video_frames==0) && video){
+    if (!isBackground && job.video && state.video_frame && ((frame+1)%job.video_frames==0) && video){
         for (register uint32_t i=0; i<(uint32_t)frame_width*(uint32_t)frame_height; i++) {
             (*video)[video_frame_num*frame_width*frame_height+i]=state.video_frame[i];
             state.video_frame[i]=0;
@@ -1948,7 +2041,9 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
 void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     if (backgroundImage) free(backgroundImage);
+    if (backgroundImageStd) free(backgroundImageStd);
     backgroundImage=(float*)malloc(frame_width*frame_height*sizeof(float));
+    backgroundImageStd=(float*)malloc(frame_width*frame_height*sizeof(float));
     if (job.backgroundCorrection==0) {
         baseline=0;
     } else if (job.backgroundCorrection==1) {
@@ -1969,7 +2064,28 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     // reset background image to 0
     for (register uint64_t i=0; i<frame_width*frame_height; i++) {
         backgroundImage[i]=0;
+        backgroundImageStd[i]=0;
     }
+
+
+    QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state;
+    stat_state.sum=0;
+    stat_state.sum2=0;
+    stat_state.sframe_min=0;
+    stat_state.sframe_max=0;
+    stat_state.cnt=0;
+    stat_state.statFirst=true;
+    stat_state.video_frame=NULL;
+    backstatistics_mean.clear();
+    backstatistics_std.clear();
+    backstatistics_min.clear();
+    backstatistics_max.clear();
+    backstatistics_time.clear();
+    uint16_t vidfnum=0;
+    float bframes_min=0;
+    float bframes_max=0;
+
+
 
     // if we should use a background file for correction, we read it and create an averaged frame from it.
     if (job.backgroundCorrection==3) {
@@ -1999,6 +2115,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                     emit messageChanged(tr("reading frames in background file ..."));
                     uint16_t bframe_width=reader->frameWidth();
                     uint16_t bframe_height=reader->frameHeight();
+                    uint32_t backFrames=reader->countFrames();
 
                     if ((bframe_width==frame_width)&&(bframe_height==frame_height))  {
 
@@ -2011,7 +2128,10 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                             } else {
                                 for (register uint64_t i=0; i<frame_width*frame_height; i++) {
                                     backgroundImage[i]=backgroundImage[i]+frame_data[i];
+                                    backgroundImageStd[i]=backgroundImageStd[i]+frame_data[i]*frame_data[i];
                                 }
+
+                                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frames, backFrames, NULL, NULL, NULL, vidfnum, bframes_min, bframes_max, backstatistics_time, backstatistics_mean, backstatistics_std, backstatistics_min, backstatistics_max, true);
 
                                 if (frames%1000==0) {
                                     emit messageChanged(tr("reading frames in background file (%1)...").arg(frames));
@@ -2022,7 +2142,11 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                         } while (reader->nextFrame() && (m_status==1) && (!was_canceled));
 
                         for (register uint64_t i=0; i<frame_width*frame_height; i++) {
-                            backgroundImage[i]=backgroundImage[i]/(float)frames;
+                            const double s2sum=backgroundImageStd[i];
+                            const double ssum=backgroundImage[i];
+                            const double NN=frames;
+                            backgroundImageStd[i]=sqrt((s2sum-ssum*ssum/NN)/(NN-1.0));
+                            backgroundImage[i]=ssum/(float)frames;
                         }
 
                         free(frame_data);
