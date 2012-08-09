@@ -524,4 +524,22 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
     updateStates();
 }
 
+QString QFLightSourceConfigWidget::getLightsoureConfigForFilename() const
+{
+    if (isLightSourceConnected()) {
+        QString l="";
+        for (int i=0; i<getLineCount(); i++) {
+            if (isLineEnabled(i)) {
+                if (!l.isEmpty()) l+="_";
+                l+=getLineDescription(i)+"_"+doubleToQString(getSetPower(i))+getLineUnit(i);
+            }
+        }
+        if (!l.isEmpty()) {
+            return cleanStringForFilename(l,64,false,true);
+        }
+    }
+    return "";
+
+}
+
 

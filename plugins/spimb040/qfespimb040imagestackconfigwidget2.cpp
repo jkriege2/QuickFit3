@@ -144,6 +144,7 @@ void QFESPIMB040ImageStackConfigWidget2::updateReplaces()
     if (ui->chkStage2->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage2->currentExtensionLinearStage(), ui->cmbStage2->currentAxisID());
     if (ui->chkStage3->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage3->currentExtensionLinearStage(), ui->cmbStage3->currentAxisID());
     setReplaceValue("stack", stack);
+    setGlobalReplaces(opticsSetup);
 }
 
 

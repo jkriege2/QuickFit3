@@ -146,6 +146,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
         /** \brief get main illumination shutter state */
         bool getMainIlluminationShutter();
 
+        /** \brief return a description of the laser configuration */
+        QString getLaserConfig();
+
         bool lightpathLoaded(const QString &filename);
         QString getCurrentLightpath() const;
         QString getCurrentLightpathFilename() const;

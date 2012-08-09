@@ -38,7 +38,7 @@
 #include "filters.h"
 #include "libwid_imexport.h"
 #include "qflightsourceconfigwidgetthread.h"
-
+#include "qftools.h"
 
 
 
@@ -56,6 +56,8 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
 
         void init(QFPluginLogService* log, QFPluginServices* pluginServices);
         void setLog(QFPluginLogService* log);
+
+        QString getLightsoureConfigForFilename() const;
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);

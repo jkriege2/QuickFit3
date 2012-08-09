@@ -213,7 +213,7 @@ void QFESPIMB040AcquisitionConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSe
 
 void QFESPIMB040AcquisitionConfigWidget2::updateReplaces()
 {
-
+    setGlobalReplaces(opticsSetup);
 }
 
 int QFESPIMB040AcquisitionConfigWidget2::repeats() const

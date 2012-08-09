@@ -992,3 +992,23 @@ QString QFESPIMB040OpticsSetup::getAxisNameForStage(QFExtensionLinearStage *stag
     if (ui->stageSetup->getZStage()==stage && ui->stageSetup->getZStageAxis()==axis) return "z";
     return "";
 }
+
+QString QFESPIMB040OpticsSetup::getLaserConfig()
+{
+    QString r="";
+    if (ui->lsLaser1->isLightSourceConnected() && ui->shutterLaser1->isShutterConnected() && ui->shutterLaser1->getShutterState())   {
+        QString l=ui->lsLaser1->getLightsoureConfigForFilename();
+        if (!l.isEmpty()) {
+            if (!r.isEmpty()) r+="_";
+            r+="laser1_"+cleanStringForFilename(l);
+        }
+    }
+    if (ui->lsLaser2->isLightSourceConnected() && ui->shutterLaser2->isShutterConnected() && ui->shutterLaser2->getShutterState())   {
+        QString l=ui->lsLaser2->getLightsoureConfigForFilename();
+        if (!l.isEmpty()) {
+            if (!r.isEmpty()) r+="_";
+            r+="laser2_"+cleanStringForFilename(l);
+        }
+    }
+    return r;
+}
