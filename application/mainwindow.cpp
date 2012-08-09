@@ -1049,7 +1049,8 @@ void MainWindow::readSettings() {
     }
     logFileQDebugWidget->setVisible(settings->debugLogVisible());
 
-    qInstallMsgHandler(myMessageOutput);
+    if (settings->debugLogVisible()) qInstallMsgHandler(myMessageOutput);
+    else qInstallMsgHandler(0);
 
     extensionManager->readPluginSettings(settings);
 
