@@ -90,13 +90,15 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
 
 
 
-QString QFESPIMB040AcquisitionConfigWidget2::prefix1() const {
+QString QFESPIMB040AcquisitionConfigWidget2::prefix1()  {
+    updateReplaces();
     QString filename= ui->edtPrefix1->text();
     filename=transformFilename(filename);
     return filename;
 }
 
-QString QFESPIMB040AcquisitionConfigWidget2::prefix2() const {
+QString QFESPIMB040AcquisitionConfigWidget2::prefix2()  {
+    updateReplaces();
     QString filename= ui->edtPrefix2->text();
     filename=transformFilename(filename);
     return filename;

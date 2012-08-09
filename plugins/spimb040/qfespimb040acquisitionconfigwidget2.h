@@ -52,8 +52,8 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void storeSettings(QSettings& settings, QString prefix) const;
 
 
-        QString prefix1() const;
-        QString prefix2() const;
+        QString prefix1() ;
+        QString prefix2() ;
         bool use1() const;
         bool use2() const;
         bool overview() const;

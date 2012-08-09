@@ -190,6 +190,9 @@ class QFESPIMB040CameraView : public QWidget {
         double pltDataMarginalBottomYMin;
         double pltDataMarginalBottomYMax;
 
+        double MarginalLeftWidth;
+        double MarginalTopWidth;
+
 
 
         /** \brief main image plotter widget */
