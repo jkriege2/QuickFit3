@@ -61,3 +61,7 @@ void QFESPIMB040FilenameTool::fillLineEdits() {
         }
     }
 }
+
+void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup) {
+
+}
