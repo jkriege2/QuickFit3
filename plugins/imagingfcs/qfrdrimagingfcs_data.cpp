@@ -877,6 +877,10 @@ double *QFRDRImagingFCSData::getStatisticsMin() const {
     return statMin;
 }
 
+double *QFRDRImagingFCSData::getStatisticsMax() const {
+    return statMax;
+}
+
 bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
@@ -1165,9 +1169,6 @@ void QFRDRImagingFCSData::maskSet(uint16_t x, uint16_t y) {
     leaveout[y*width+x]=false;
 }
 
-double *QFRDRImagingFCSData::getStatisticsMax() const {
-    return statMax;
-}
 
 
 

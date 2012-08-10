@@ -1333,7 +1333,7 @@ void QFRawDataPropertyEditor::removeFile() {
     }
 }
 
-void QFRawDataPropertyEditor::editFile() {
+void QFRawDataPropertyEditor::copyFile() {
     if (current) {
         int i=lstFiles->currentRow();
         if (i>=0 && i<current->getFilesCount()) {
@@ -1356,7 +1356,7 @@ void QFRawDataPropertyEditor::showEditFilesWarning() {
                                                               "effect after SAVING AND RELOADING the project."));
 }
 
-void QFRawDataPropertyEditor::copyFile()
+void QFRawDataPropertyEditor::editFile()
 {
     if (current) {
         int i=lstFiles->currentRow();
