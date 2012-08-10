@@ -76,7 +76,8 @@ HEADERS += dlgnewproperty.h \
     dlgqfprogressdialog.h \
     qfxmlstreamwriter.h \
     qfpropertyitemdelegate.h \
-    qfdoubleedit.h
+    qfdoubleedit.h \
+    dlg_qffileeditdialog.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -123,11 +124,13 @@ SOURCES += dlgnewproperty.cpp \
     dlgqfprogressdialog.cpp \
     qfxmlstreamwriter.cpp \
     qfpropertyitemdelegate.cpp \
-    qfdoubleedit.cpp
+    qfdoubleedit.cpp \
+    dlg_qffileeditdialog.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
-    dlg_qfprogress.ui
+    dlg_qfprogress.ui \
+    dlg_qffileeditdialog.ui
 
 RESOURCES += lib.qrc
 

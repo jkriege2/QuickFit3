@@ -37,6 +37,12 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     statMax=NULL;
     statT=NULL;
     statN=0;
+    backStatAvg=NULL;
+    backStatStdDev=NULL;
+    backStatMin=NULL;
+    backStatMax=NULL;
+    backStatT=NULL;
+    backStatN=0;
     video=NULL;
     video_width=0;
     video_height=0;
@@ -44,6 +50,8 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     hasStatistics=false;
     statAvgCnt=0;
     statSigmaCnt=0;
+    backStatAvgCnt=0;
+    backStatSigmaCnt=0;
     setResultsInitSize(1000);
     setEvaluationIDMetadataInitSize(1000);
 }
@@ -51,6 +59,7 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
 QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateContents(0,0,0);
      allocateStatistics(0);
+     allocateBackgroundStatistics(0);
      clearOvrImages();
      if (video) free(video);
      video=NULL;
@@ -181,6 +190,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadStatistics(files[i]);
                     hasStatistics=true;
                     statAvgCnt=statisticsAverageVariance(statSigmaCnt, statAvg, statN);
+                } else if (ft=="background_statistics") {
+                    loadBackgroundStatistics(files[i]);
+                    backStatAvgCnt=statisticsAverageVariance(backStatSigmaCnt, backStatAvg, backStatN);
                 } else if (ft=="video") {
                     loadVideo(files[i], &video, &video_width, &video_height, &video_frames);
                 } else if (ft=="background") {
@@ -796,6 +808,30 @@ void QFRDRImagingFCSData::allocateStatistics(uint32_t N) {
 
 }
 
+void QFRDRImagingFCSData::allocateBackgroundStatistics(uint32_t N) {
+    if (backStatAvg) free(backStatAvg);
+    if (backStatStdDev) free(backStatStdDev);
+    if (backStatT) free(backStatT);
+    if (backStatMin) free(backStatMin);
+    if (backStatMax) free(backStatMax);
+    backStatN=N;
+    backStatAvg=NULL;
+    backStatT=NULL;
+    backStatStdDev=NULL;
+    backStatMin=NULL;
+    backStatMax=NULL;
+    if (backStatN>0) {
+        backStatAvg=(double*)calloc(backStatN, sizeof(double));
+        backStatStdDev=(double*)calloc(backStatN, sizeof(double));
+        backStatMin=(double*)calloc(backStatN, sizeof(double));
+        backStatMax=(double*)calloc(backStatN, sizeof(double));
+        backStatT=(double*)calloc(backStatN, sizeof(double));
+    }
+#ifdef DEBUG_SIZES
+    //qDebug()<<"allocatebackStatistics( N="<<N<<"):  "<<bytestostr(backStatN*5*sizeof(double)).c_str();
+#endif
+
+}
 void QFRDRImagingFCSData::recalcCorrelations() {
     if (correlations && correlationMean && correlationStdDev) {
         for (int i=0; i<N; i++) {
@@ -873,6 +909,66 @@ bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
     }
     return false;
 }
+
+
+
+uint32_t QFRDRImagingFCSData::getBackgroundStatisticsN() const {
+    return backStatN;
+}
+
+double *QFRDRImagingFCSData::getBackgroundStatisticsMean() const {
+    return backStatAvg;
+}
+
+double *QFRDRImagingFCSData::getBackgroundStatisticsT() const {
+    return backStatT;
+}
+
+double *QFRDRImagingFCSData::getBackgroundStatisticsStdDev() const {
+    return backStatStdDev;
+}
+
+double *QFRDRImagingFCSData::getBackgroundStatisticsMin() const {
+    return backStatMin;
+}
+
+double *QFRDRImagingFCSData::getBackgroundStatisticsMax() const {
+    return backStatMax;
+}
+
+bool QFRDRImagingFCSData::loadBackgroundStatistics(const QString &filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QTextStream txt(&f);
+        QVector<double> mean, stddev, min, max, time;
+        while (!txt.atEnd()) {
+            QVector<double> line=csvReadline(txt, ',', '#');
+            if (line.size()>1) {
+                time.append(line[0]);
+                mean.append(line[1]);
+                stddev.append(line.value(2, 0));
+                min.append(line.value(3, 0));
+                max.append(line.value(4, 0));
+            }
+        }
+        //qDebug()<<"line read: "<<time.size();
+        allocateBackgroundStatistics(time.size());
+
+        for (uint32_t i=0; i<backStatN; i++) {
+            backStatT[i]=time[i];
+            backStatAvg[i]=mean[i];
+            backStatStdDev[i]=stddev[i];
+            backStatMin[i]=min[i];
+            backStatMax[i]=max[i];
+        }
+
+
+        f.close();
+        return true;
+    }
+    return false;
+}
+
 
 void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
     if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) {
@@ -1218,6 +1314,7 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run) const {
     if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
         if (run>=0) return overviewF[run];
     }
+    if (run==-2) return  backStatAvgCnt/getTauMin()/1000.0;
     if (hasStatistics) return statAvgCnt/getTauMin()/1000.0;
     return 0;
 }
@@ -1226,6 +1323,7 @@ double QFRDRImagingFCSData::getSimpleCountrateVariance(int run) const {
     if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
         if (run>=0 && run<width*height) return overviewFSTD[run];
     }
+    if (run==-2) return sqrt(backStatSigmaCnt)/getTauMin()/1000.0;
     if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
     return 0;
 }

@@ -213,6 +213,41 @@ void QFRawDataPropertyEditor::createWidgets() {
     //fl->setRowStretch(flcounter-1, 2);
     lstFiles=new QListWidget(w);
     lstFiles->setSizePolicy(lstFiles->sizePolicy().verticalPolicy(), QSizePolicy::Preferred);
+    lstFiles->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+
+    actAddFile=new QAction(QIcon(":/lib/file_add.png"), tr("&add file"), this);
+    actAddFile->setEnabled(false);
+    actRemoveFile=new QAction(QIcon(":/lib/file_delete.png"), tr("&delete file"), this);
+    actRemoveFile->setEnabled(false);
+    actEditFile=new QAction(QIcon(":/lib/file_edit.png"), tr("&edit file"), this);
+    actEditFile->setEnabled(false);
+    actCopyFile=new QAction(QIcon(":/lib/file_copy.png"), tr("&duplicate and edit file"), this);
+    actCopyFile->setEnabled(false);
+
+    actEnableFileActions=new QAction(tr("enable file edit functionality"), this);
+    actEnableFileActions->setCheckable(true);
+    actEnableFileActions->setChecked(false);
+
+
+    connect(actEnableFileActions, SIGNAL(triggered()), this, SLOT(showEditFilesWarning()));
+    connect(actEnableFileActions, SIGNAL(triggered(bool)), actAddFile, SLOT(setEnabled(bool)));
+    connect(actEnableFileActions, SIGNAL(triggered(bool)), actRemoveFile, SLOT(setEnabled(bool)));
+    connect(actEnableFileActions, SIGNAL(triggered(bool)), actEditFile, SLOT(setEnabled(bool)));
+    connect(actEnableFileActions, SIGNAL(triggered(bool)), actCopyFile, SLOT(setEnabled(bool)));
+    connect(actAddFile, SIGNAL(triggered()), this, SLOT(addFile()));
+    connect(actRemoveFile, SIGNAL(triggered()), this, SLOT(removeFile()));
+    connect(actEditFile, SIGNAL(triggered()), this, SLOT(editFile()));
+    connect(actCopyFile, SIGNAL(triggered()), this, SLOT(copyFile()));
+
+    lstFiles->addAction(actEnableFileActions);
+    lstFiles->addAction(getSeparatorAction(this));
+    lstFiles->addAction(actAddFile);
+    lstFiles->addAction(actEditFile);
+    lstFiles->addAction(actCopyFile);
+    lstFiles->addAction(actRemoveFile);
+
+
     //fl->addRow(tr("&Files:"), lstFiles);
     fl->addWidget((l=new QLabel(tr("&Files:"), w)), 5, 0);
     l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
@@ -234,7 +269,6 @@ void QFRawDataPropertyEditor::createWidgets() {
     paramFilterProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
     tvProperties->setModel(paramFilterProxy);*/
     tvProperties->setModel(NULL);
-
 
     QWidget* widProperties=new QWidget(this);
     QHBoxLayout* pl1=new QHBoxLayout(this);
@@ -539,6 +573,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         }
         lstFiles->addItems(f);
         lstFiles->setEnabled(true);
+
+
         //paramFilterProxy->setSourceModel();
         //paramFilterProxy->sort(0);
         tvProperties->setModel(current->getPropertyModel());
@@ -1273,5 +1309,67 @@ QMenu *QFRawDataPropertyEditor::getHelpMenu() const
 void QFRawDataPropertyEditor::resizePropertiesLater() {
     timerResizeProps->setSingleShot(true);
     timerResizeProps->start(150);
+}
+
+void QFRawDataPropertyEditor::addFile() {
+    if (current) {
+        QFFileEditDialog* dlg=new QFFileEditDialog(this);
+        dlg->init("", "", "");
+        if (dlg->exec()) {
+            current->addFile(dlg->getFile(), dlg->getType(), dlg->getDescription());
+        }
+        delete dlg;
+    }
+}
+
+void QFRawDataPropertyEditor::removeFile() {
+    if (current) {
+        int i=lstFiles->currentRow();
+        if (i>=0 && i<current->getFilesCount()) {
+            if (QMessageBox::question(this, tr("QuickFit: remove file from RDR"), tr("Do you really want to remove the file\n   '%1'\nfrom the raw data record?").arg(lstFiles->item(i)->text()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                current->deleteFile(i);
+            }
+        }
+    }
+}
+
+void QFRawDataPropertyEditor::editFile() {
+    if (current) {
+        int i=lstFiles->currentRow();
+        if (i>=0 && i<current->getFilesCount()) {
+            QFFileEditDialog* dlg=new QFFileEditDialog(this);
+            dlg->init(current->getFileName(i), current->getFileType(i), current->getFileDescription(i));
+            if (dlg->exec()) {
+                current->addFile(dlg->getFile(), dlg->getType(), dlg->getDescription());
+            }
+            delete dlg;
+        }
+    }
+
+}
+
+void QFRawDataPropertyEditor::showEditFilesWarning() {
+    QMessageBox::warning(this, tr("QuickFit: Edit Files"), tr("This will activate the edit functionalities for files.\n\n"
+                                                              "Note however that you have to use these functions with greate care, "
+                                                              "as changing the files may render the raw data record unusable, e.g. "
+                                                              "if you delet a necessary file! Also note that changes will only take "
+                                                              "effect after SAVING AND RELOADING the project."));
+}
+
+void QFRawDataPropertyEditor::copyFile()
+{
+    if (current) {
+        int i=lstFiles->currentRow();
+        if (i>=0 && i<current->getFilesCount()) {
+            QFFileEditDialog* dlg=new QFFileEditDialog(this);
+            dlg->init(current->getFileName(i), current->getFileType(i), current->getFileDescription(i));
+            if (dlg->exec()) {
+                current->setFileName(i, dlg->getFile());
+                current->setFileType(i, dlg->getType());
+                current->setFileDecsription(i, dlg->getDescription());
+            }
+            delete dlg;
+        }
+    }
 }
 

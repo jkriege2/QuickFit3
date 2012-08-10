@@ -104,6 +104,41 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief returns the description of the last error */
         inline QString errorDescription() { return errorDesc; }
 
+        /** \brief return the path to i-th file */
+        QString getFileName(int i) const;
+        /** \brief return type of i-th file */
+        QString getFileType(int i) const;
+        /** \brief return description of i-th file */
+        QString getFileDescription(int i) const;
+        /** \brief return number of files */
+        int getFilesCount() const;
+        /** \brief set name of i-th file
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         */
+        void setFileName(int i, const QString file);
+        /** \brief set type of i-th file
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         */
+        void setFileType(int i, const QString type);
+        /** \brief set description of i-th file
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         */
+        void setFileDecsription(int i, const QString description);
+        /** \brief add a new file
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         */
+        void addFile(const QString file, const QString type, const QString description);
+        /** \brief delete the i-th file
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         */
+        void deleteFile(int i);
+
+
 
 
     public slots:

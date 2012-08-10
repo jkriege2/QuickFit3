@@ -129,6 +129,17 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief return the array of time points [seconds] for the statsitics */
         double *getStatisticsT() const;
 
+        /** \brief return the number of datapoints in the background statistics dataset */
+        uint32_t getBackgroundStatisticsN() const;
+        /** \brief return the array of average values of the background statsitics */
+        double* getBackgroundStatisticsMean() const;
+        /** \brief return the array of standard deviation values of the background statsitics */
+        double* getBackgroundStatisticsStdDev() const;
+        double* getBackgroundStatisticsMin() const;
+        double* getBackgroundStatisticsMax() const;
+        /** \brief return the array of time points [seconds] for the background  statsitics */
+        double *getBackgroundStatisticsT() const;
+
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);
@@ -161,6 +172,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         /** \brief load the statistics file */
         bool loadStatistics(const QString& filename);
+
+        /** \brief load the background statistics file */
+        bool loadBackgroundStatistics(const QString& filename);
 
         void loadQFPropertiesFromB040SPIMSettingsFile(QSettings& settings);
 
@@ -196,9 +210,22 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double* statMin;
         double* statMax;
 
+        /** \brief background number of data points in the statistics  */
+        uint32_t backStatN;
+        /** \brief background statistics: average vector */
+        double* backStatAvg;
+        /** \brief background statistics: standard deviation vector */
+        double* backStatStdDev;
+        /** \brief background statistics: time [seconds] vector */
+        double* backStatT;
+        double* backStatMin;
+        double* backStatMax;
+
         bool hasStatistics;
         double statAvgCnt;
         double statSigmaCnt;
+        double backStatAvgCnt;
+        double backStatSigmaCnt;
 
         /** \brief overview image */
         double* overviewF;
@@ -235,6 +262,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
         virtual void allocateContents(int x, int y, int N);
         void allocateStatistics(uint32_t N);
+        void allocateBackgroundStatistics(uint32_t N);
 
 
     public:

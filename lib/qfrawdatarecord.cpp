@@ -145,6 +145,71 @@ QStringList QFRawDataRecord::getFilesForType(const QString &type) {
     return result;
 }
 
+QString QFRawDataRecord::getFileName(int i) const
+{
+    return files.value(i, "");
+}
+
+QString QFRawDataRecord::getFileType(int i) const
+{
+    return files_types.value(i, "");
+}
+
+QString QFRawDataRecord::getFileDescription(int i) const
+{
+    return files_desciptions.value(i, "");
+}
+
+int QFRawDataRecord::getFilesCount() const
+{
+    return files.size();
+}
+
+void QFRawDataRecord::setFileName(int i, const QString file)
+{
+    if (i>=0 && i<files.size()) {
+        files[i]=file;
+    }
+    emit basicPropertiesChanged();
+}
+
+void QFRawDataRecord::setFileType(int i, const QString type)
+{
+    if (i>=0 && i<files.size()) {
+        while (i>=files_types.size()) files_types.append("");
+        files_types[i]=type;
+    }
+    emit basicPropertiesChanged();
+}
+
+void QFRawDataRecord::setFileDecsription(int i, const QString description)
+{
+    if (i>=0 && i<files.size()) {
+        while (i>=files_desciptions.size()) files_desciptions.append("");
+        files_desciptions[i]=description;
+    }
+    emit basicPropertiesChanged();
+
+}
+
+void QFRawDataRecord::addFile(const QString file, const QString type, const QString description)
+{
+    files.append(file);
+    setFileType(files.size()-1, type);
+    setFileDecsription(files.size()-1, description);
+    emit basicPropertiesChanged();
+}
+
+void QFRawDataRecord::deleteFile(int i)
+{
+    if (i>=0 && i<files.size()) {
+        files.removeAt(i);
+        if (i<files_types.size()) files_types.removeAt(i);
+        if (i<files_desciptions.size()) files_desciptions.removeAt(i);
+    }
+    emit basicPropertiesChanged();
+}
+
 
 void QFRawDataRecord::setName(const QString &n) {
     bool em=false;

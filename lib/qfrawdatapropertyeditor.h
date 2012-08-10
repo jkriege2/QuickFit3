@@ -21,6 +21,7 @@
 #include "qfstyledbutton.h"
 #include "qfcompleterfromfile.h"
 #include "qfpropertyitemdelegate.h"
+#include "dlg_qffileeditdialog.h"
 
 /*! \brief editor widget (window) for raw data items
     \ingroup qf3lib_project
@@ -59,6 +60,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void readSettings();
         void closeEvent( QCloseEvent * event );
         void resizeEvent ( QResizeEvent * event );
+
 
     private slots:
         /** \brief called when the name editor changes its contents */
@@ -122,6 +124,13 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void currentTabChanged(int tab);
         void checkHelpAvailable();
         void resizePropertiesLater();
+
+
+        void addFile();
+        void removeFile();
+        void editFile();
+        void showEditFilesWarning();
+        void copyFile();
     private:
         QTimer* timerResizeProps;
 
@@ -191,6 +200,12 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actNext;
         QAction* actDelete;
         QAction* actClose;
+
+        QAction* actAddFile;
+        QAction* actRemoveFile;
+        QAction* actEditFile;
+        QAction* actCopyFile;
+        QAction* actEnableFileActions;
 
         QAction* actMakePropertyEditable;
 
