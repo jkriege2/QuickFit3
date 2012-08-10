@@ -284,6 +284,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     QString filename_overview=filename_overvieww;
     QString filename_overviewstd="";
     QString filename_background="";
+    QString filename_backgroundstddev="";
     QString filename_statistics="";
     QString filename_settings="";
     QString filename_acquisition="";
@@ -495,6 +496,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                             filename_overviewstd=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="background image file") {
                             filename_background=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        } else if (name=="background stddev") {
+                            filename_backgroundstddev=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="video file") {
                             filename_video=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="statistics file") {
@@ -572,6 +575,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 files<<filename_background;
                 files_types<<"background";
                 files_descriptions<<tr("background frame");
+            }
+            if (QFile::exists(filename_backgroundstddev)) {
+                files<<filename_backgroundstddev;
+                files_types<<"background_stddev";
+                files_descriptions<<tr("background standard deviation frame");
             }
 
             files<<more_files;

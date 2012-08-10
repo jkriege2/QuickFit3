@@ -188,6 +188,11 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("background frame");
                     ovrImages.append(img);
+                } else if (ft=="background_stddev") {
+                    QFRDRImagingFCSData::ovrImageData img;
+                    loadImage(files[i], &(img.image), &(img.width), &(img.height));
+                    img.name=tr("background standard deviation frame");
+                    ovrImages.append(img);
                 } else if (ft=="display_image") {
                     QFRDRImagingFCSData::ovrImageData img;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
