@@ -30,6 +30,7 @@
 #include <QFrame>
 #include <QFile>
 #include <QToolBar>
+#include "jkverticalscrollarea.h"
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -174,6 +175,7 @@ protected:
         void connectImageWidgets(bool connectTo=true);
         /** \brief called when the user selects a new palette */
         void paletteChanged();
+        void ovrPaletteChanged();
         void histogramSettingsChanged();
         /** \brief called when the user selects to display overlays or not */
         void updateOverlaySettings();
@@ -315,6 +317,9 @@ protected:
 
         /** \brief combobox for the color bar of overview image */
         QComboBox* cmbColorbarOverview;
+        QCheckBox* chkAutorangeOverview;
+        QFDoubleEdit* edtOvrMin;
+        QFDoubleEdit* edtOvrMax;
 
         /** \brief combobox for the color bar of gof image */
         QComboBox* cmbColorbarGof;

@@ -141,7 +141,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     topgrid->setColumnStretch(7, 1);
 
 
+    JKVerticalScrollArea* area=new JKVerticalScrollArea(this);
     QWidget* w=new QWidget(this);
+    area->setWidget(w);
+    area->setWidgetResizable(true);
     QVBoxLayout* vbl=new QVBoxLayout();
     w->setLayout(vbl);
 
@@ -320,6 +323,36 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("grey"), QColor("grey").lighter());
     cmbSelectionStyle->addItem(QIcon(selPix), tr("grey symbol"));
     gli->addRow(tr("selection style:"), cmbSelectionStyle);
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: overview image style
+    ///////////////////////////////////////////////////////////////
+    QGroupBox* wovr=new QGroupBox(tr(" overview image style "), this);
+    vbl->addWidget(wovr);
+    gli=new QFormLayout(this);
+    wovr->setLayout(gli);
+
+    cmbColorbarOverview=new QComboBox(wovr);
+    sl=JKQTFPimagePlot_getPalettes();
+    for (int i=0; i<sl.size(); i++) {
+        cmbColorbarOverview->addItem(JKQTFPimagePlot_getPaletteIcon(i), sl[i]);
+    }
+    gli->addRow(tr("color &palette:"), cmbColorbarOverview);
+
+    chkAutorangeOverview=new QCheckBox("auto", wovr);
+    gli->addRow(tr("color &range:"), chkAutorangeOverview);
+
+    edtOvrMin=new QFDoubleEdit(wovr);
+    edtOvrMin->setCheckBounds(false, false);
+    edtOvrMax=new QFDoubleEdit(wovr);
+    edtOvrMax->setCheckBounds(false, false);
+    coll=new QHBoxLayout();
+    coll->addWidget(edtOvrMin,1);
+    coll->addWidget(new QLabel(" ... "));
+    coll->addWidget(edtOvrMax,1);
+    coll->setContentsMargins(0,0,0,0);
+    gli->addRow(QString(""), coll);
 
 
 
@@ -939,7 +972,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     widACFs->setLayout(layACFs);
     layACFs->addWidget(tbParameterImage, 0, 0, 1, 2);
     layACFs->addWidget(splitterTopBot, 1, 0);
-    layACFs->addWidget(w, 1, 1);
+    layACFs->addWidget(area, 1, 1); // !!!
     layACFs->setColumnStretch(0,5);
     layACFs->setRowStretch(1,0);
     layACFs->setContentsMargins(0,0,0,0);
@@ -1041,6 +1074,16 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
                 current->setQFProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), histogram->getMin(), false, false);
                 current->setQFProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), histogram->getMax(), false, false);
             }
+
+
+            current->setQFProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup), cmbColorbarOverview->currentIndex(), false, false);
+            current->setQFProperty(QString("imfcs_imed_ovrautorange_%1").arg(egroup), chkAutorangeOverview->isChecked(), false, false);
+            if (!chkAutorangeOverview->isChecked()) {
+                current->setQFProperty(QString("imfcs_imed_ovrcolmin_%1").arg(egroup), edtOvrMin->value(), false, false);
+                current->setQFProperty(QString("imfcs_imed_ovrcolmax_%1").arg(egroup), edtOvrMax->value(), false, false);
+            }
+
+
         }
 
     }
@@ -1078,6 +1121,20 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             if (!histogram->getAutorange()) {
                 histogram->setMin(current->getProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
                 histogram->setMax(current->getProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
+            }
+
+            mi=0, ma=1;
+            plteOverview->getDataMinMax(mi, ma);
+            d=current->getProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup),
+                                       settings->getQSettings()->value(QString("imfcsimageeditor/ovrcolorbar"), cmbColorbarOverview->currentIndex())).toInt();
+            if (d>=0) cmbColorbarOverview->setCurrentIndex(d);
+            else if (cmbColorbarOverview->count()>0) cmbColorbarOverview->setCurrentIndex(0);
+            chkAutorangeOverview->setChecked(current->getProperty(QString("imfcs_imed_ovrautorange_%1").arg(egroup), true).toBool());
+            edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
+            edtOvrMax->setEnabled(!chkAutorangeOverview->isChecked());
+            if (!chkAutorangeOverview->isChecked()) {
+                edtOvrMin->setValue(current->getProperty(QString("imfcs_imed_ovrcolmin_%1").arg(egroup), mi).toDouble());
+                edtOvrMax->setValue(current->getProperty(QString("imfcs_imed_ovrcolmax_%1").arg(egroup), ma).toDouble());
             }
 
             connectParameterWidgets(true);
@@ -1219,6 +1276,41 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
     saveImageSettings();
     pltImage->set_doDrawing(oldDoDraw);
     if (oldDoDraw) pltImage->update_plot();
+}
+
+
+void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
+    bool oldDoDraw=pltOverview->get_doDrawing();
+    pltOverview->set_doDrawing(false);
+
+    qDebug()<<"ovrPaletteChanged: "<<oldDoDraw;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    plteOverview->set_palette(cmbColorbarOverview->currentIndex());
+    plteOverview->set_autoImageRange(chkAutorangeOverview->isChecked());
+    if (m && chkAutorangeOverview->isChecked() && m->getImageFromRunsPreview()!=NULL && plteOverviewExcludedData!=NULL) {
+        double mi, ma;
+        statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
+        plteOverview->set_imageMin(mi);
+        plteOverview->set_imageMax(ma);
+    }
+
+    edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
+    edtOvrMax->setEnabled(!chkAutorangeOverview->isChecked());
+    if (!chkAutorangeOverview->isChecked()) {
+        plteOverview->set_imageMin(edtOvrMin->value());
+        plteOverview->set_imageMax(edtOvrMax->value());
+    } else {
+        double mi=0, ma=0;
+        plteOverview->getDataMinMax(mi, ma);
+        edtOvrMin->setValue(mi);
+        edtOvrMax->setValue(ma);
+    }
+    saveImageSettings();
+    pltOverview->set_doDrawing(oldDoDraw);
+    if (oldDoDraw) pltOverview->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRImagingFCSImageEditor::histogramSettingsChanged() {
@@ -1856,6 +1948,7 @@ void QFRDRImagingFCSImageEditor::rawDataChanged() {
     replotData();
     replotMask();
     if (chkImageAutoScale->isChecked()) paletteChanged();
+    if (chkAutorangeOverview->isChecked()) ovrPaletteChanged();
     updateHistogram();
     QApplication::restoreOverrideCursor();
 };
@@ -2009,7 +2102,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         pltImage->setXY(0, w, 0, h);
         pltGofImage->setXY(0, w, 0, h);
 
-        if (plteImageSize<m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
+        if (plteImageSize!=m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
             plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
             plteImageData=(double*)realloc(plteImageData, plteImageSize*sizeof(double));
             plteGofImageData=(double*)realloc(plteGofImageData, plteImageSize*sizeof(double));
@@ -2049,7 +2142,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
 
     if (m) {
         int siz=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-        if (plteOverviewSize<m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
+        if (plteOverviewSize!=m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
             plteOverviewSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
             plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
             plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
@@ -2239,12 +2332,14 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         pltOverview->setXY(0, w, 0, h);
 
         if (m->getImageFromRunsPreview()) {
-            plteOverview->set_autoImageRange(false);
+            plteOverview->set_autoImageRange(chkAutorangeOverview->isChecked());
             double mi=0, ma=0;
-            statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, plteImageSize, mi, ma, false);
-            plteOverview->set_imageMin(mi);
-            plteOverview->set_imageMax(ma);
+            updateSelectionArrays();
+            statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
             plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
+            plteOverview->set_palette(cmbColorbarOverview->currentIndex());
+            ovrPaletteChanged();
+            //qDebug()<<"image range:"<<mi<<" ... "<<ma<<"  imgsize="<<plteImageSize<<"   fromRunsSize="<<m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
 
         } else plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
         plteOverview->set_width(w);
@@ -2623,6 +2718,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_style"), 0).toInt());
     cmbAverageErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_error_style"), 2).toInt());
     cmbColorbar->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), 0).toInt());
+    cmbColorbarOverview->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/ovrcolorbar"), 6).toInt());
     cmbImageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/paramstyle"), 0).toInt());
     cmbOutOfRangeMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/outofrange_mode"), 1).toInt());
     chkDisplayImageOverlay->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image_overlays"), true).toBool());
@@ -2658,6 +2754,7 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_resid"), chkDisplayResiduals->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_avg"), chkDisplayAverage->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/ovrcolorbar"), cmbColorbarOverview->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/paramstyle"), cmbImageStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/outofrange_mode"), cmbOutOfRangeMode->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/avg_style"), cmbAverageStyle->currentIndex());
@@ -2869,8 +2966,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(cmbGofParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
             connect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
             connect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
-            connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
             connect(cmbOutOfRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
+            connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteChanged()));
             connect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(paletteChanged()));
             connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
             connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(paletteChanged()));
@@ -2878,8 +2975,15 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(cmbImageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
             connect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
             connect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+
+            connect(cmbColorbarOverview, SIGNAL(currentIndexChanged(int)), this, SLOT(ovrPaletteChanged()));
+            connect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
+            connect(edtOvrMin, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+            connect(edtOvrMax, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+
             histogram->connectParameterWidgets(connectTo);
             connect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+
         }
     } else {
         connectParameterWidgetsCounter++;
@@ -2897,6 +3001,12 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
         disconnect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
         disconnect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+
+        disconnect(cmbColorbarOverview, SIGNAL(currentIndexChanged(int)), this, SLOT(ovrPaletteChanged()));
+        disconnect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
+        disconnect(edtOvrMin, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+        disconnect(edtOvrMax, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+
         histogram->connectParameterWidgets(connectTo);
         disconnect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
     }
@@ -3789,28 +3899,32 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
 }
 
 void QFRDRImagingFCSImageEditor::moveColorbarsAuto() {
-    if ((double)pltImage->width()>(double)pltImage->height()) {
-        plteImage->set_colorBarRightVisible(true);
-        plteImage->set_colorBarTopVisible(false);
-    } else {
-        plteImage->set_colorBarRightVisible(false);
-        plteImage->set_colorBarTopVisible(true);
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    bool rightVIsible=false;
+    if (m && m->getImageFromRunsHeight() < m->getImageFromRunsWidth()) { // wider than high, i.e. "landscape"
+        rightVIsible=!rightVIsible;
     }
-    if ((double)pltGofImage->width()>(double)pltGofImage->height()) {
-        plteGofImage->set_colorBarRightVisible(true);
-        plteGofImage->set_colorBarTopVisible(false);
+    if ((double)pltImage->width()<=(double)pltImage->height()) {
+        plteImage->set_colorBarRightVisible(rightVIsible);
+        plteImage->set_colorBarTopVisible(!rightVIsible);
     } else {
-        plteGofImage->set_colorBarRightVisible(false);
-        plteGofImage->set_colorBarTopVisible(true);
+        plteImage->set_colorBarRightVisible(!rightVIsible);
+        plteImage->set_colorBarTopVisible(rightVIsible);
     }
-    if ((double)pltOverview->width()>(double)pltOverview->height()) {
-        plteOverview->set_colorBarRightVisible(true);
-        plteOverview->set_colorBarTopVisible(false);
+    if ((double)pltGofImage->width()<=(double)pltGofImage->height()) {
+        plteGofImage->set_colorBarRightVisible(rightVIsible);
+        plteGofImage->set_colorBarTopVisible(!rightVIsible);
     } else {
-        plteOverview->set_colorBarRightVisible(false);
-        plteOverview->set_colorBarTopVisible(true);
+        plteGofImage->set_colorBarRightVisible(!rightVIsible);
+        plteGofImage->set_colorBarTopVisible(rightVIsible);
     }
-
+    if ((double)pltOverview->width()<=(double)pltOverview->height()) {
+        plteOverview->set_colorBarRightVisible(rightVIsible);
+        plteOverview->set_colorBarTopVisible(!rightVIsible);
+    } else {
+        plteOverview->set_colorBarRightVisible(!rightVIsible);
+        plteOverview->set_colorBarTopVisible(rightVIsible);
+    }
 }
 
 void QFRDRImagingFCSImageEditor::showHidePlots()  {
