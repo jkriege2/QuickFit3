@@ -280,6 +280,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gli->addRow(tr("color &palette:"), cmbColorbar);
 
     chkImageAutoScale=new QCheckBox("auto", wimg);
+    chkImageAutoScale->setChecked(true);
     gli->addRow(tr("color &range:"), chkImageAutoScale);
 
     edtColMin=new QFDoubleEdit(wimg);
@@ -341,6 +342,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gli->addRow(tr("color &palette:"), cmbColorbarOverview);
 
     chkAutorangeOverview=new QCheckBox("auto", wovr);
+    chkAutorangeOverview->setChecked(true);
     gli->addRow(tr("color &range:"), chkAutorangeOverview);
 
     edtOvrMin=new QFDoubleEdit(wovr);
