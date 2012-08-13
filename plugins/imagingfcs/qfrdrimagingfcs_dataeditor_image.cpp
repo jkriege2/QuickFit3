@@ -2230,7 +2230,18 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
         double ovrAvg=0;
         double ovrVar=0;
-        ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewSelectedData, m->getImageFromRunsPreview(), qMin(plteOverviewSize, plteImageSize));
+        bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        int cnt=0;
+        for (int i=0; i<w*h; i++) {
+            msk[i]=plteOverviewSelectedData[i]&&(!plteOverviewExcludedData[i]);
+            if (msk[i]) cnt++;
+        }
+        //ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewSelectedData, m->getImageFromRunsPreview(), qMin(plteOverviewSize, w*h));
+        if (cnt>1){
+            ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(), w*h);
+        } else {
+            ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(), w*h, false);
+        }
 
         plteOverviewSelected->set_width(w);
         plteOverviewSelected->set_height(h);
@@ -2244,7 +2255,13 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
         double imgAvg=0;
         double imgVar=0;
-        imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewSelectedData, plteImageData, qMin(plteOverviewSize, plteImageSize));
+        //imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewSelectedData, plteImageData, qMin(plteOverviewSize, w*h));
+        if (cnt>1){
+            imgAvg=statisticsAverageVarianceMasked(imgVar, msk, plteImageData, w*h);
+        } else {
+            imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewExcludedData, plteImageData, w*h, false);
+        }
+        free(msk);
 
         plteImageSelected->set_width(w);
         plteImageSelected->set_height(h);
