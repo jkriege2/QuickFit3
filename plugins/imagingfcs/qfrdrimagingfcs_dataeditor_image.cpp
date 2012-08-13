@@ -1214,8 +1214,8 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
     pltImage->set_doDrawing(false);
 
     plteImage->set_palette(cmbColorbar->currentIndex());
-    //plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
-    plteImage->set_autoImageRange(false);
+    plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
+    //plteImage->set_autoImageRange(false);
     if (chkImageAutoScale->isChecked() && plteImageData!=NULL && plteOverviewExcludedData!=NULL) {
         double mi, ma;
         statisticsMaskedMinMax(plteImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
@@ -1285,7 +1285,6 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     bool oldDoDraw=pltOverview->get_doDrawing();
     pltOverview->set_doDrawing(false);
 
-    qDebug()<<"ovrPaletteChanged: "<<oldDoDraw;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
@@ -1306,6 +1305,7 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     } else {
         double mi=0, ma=0;
         plteOverview->getDataMinMax(mi, ma);
+        //qDebug()<<"ovrPaletteChanged: "<<oldDoDraw<<"   range: "<<mi<<"..."<<ma;
         edtOvrMin->setValue(mi);
         edtOvrMax->setValue(ma);
     }
@@ -1479,6 +1479,7 @@ void QFRDRImagingFCSImageEditor::excludeByIntensity() {
 
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
+        //saveImageSettings();
         disconnect(old, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
@@ -1498,6 +1499,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         selected.clear();
     }
 
+    loadImageSettings();
     fillParameterSet();
 }
 
@@ -1949,8 +1951,8 @@ void QFRDRImagingFCSImageEditor::rawDataChanged() {
     replotImage();
     replotData();
     replotMask();
-    if (chkImageAutoScale->isChecked()) paletteChanged();
-    if (chkAutorangeOverview->isChecked()) ovrPaletteChanged();
+    /*if (!chkImageAutoScale->isChecked()) */paletteChanged();
+    /*if (!chkAutorangeOverview->isChecked()) */ovrPaletteChanged();
     updateHistogram();
     QApplication::restoreOverrideCursor();
 };
@@ -1969,7 +1971,7 @@ void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const Q
             if (p>=0) {
                 cmbParameter->setCurrentIndex(p);
             } else if (cmbParameter->count()>0) {
-                int dc=cmbParameter->findData("fitparam_diff_coeff1");
+                int dc=      cmbParameter->findData("fitparam_diff_coeff1");
                 if (dc<0) dc=cmbParameter->findData("fitparam_diff_coeff");
                 if (dc<0) dc=cmbParameter->findData("fitparam_diff_tau1");
                 if (dc<0) dc=cmbParameter->findData("fitparam_diff_tau");
@@ -2814,6 +2816,7 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
             if (!params[i].second.endsWith("_fix")) {
                 cmbParameter->addItem(params[i].first, params[i].second);
                 cmbGofParameter->addItem(params[i].first, params[i].second);
+                //qDebug()<<params[i].second;
             }
         }
         for (int i=0; i<params.size(); i++) {
@@ -2843,6 +2846,7 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         if (d<0) d=cmbParameter->findData("fitparam_diff_tau");
         if (d<0) d=cmbParameter->findData("fitparam_diff_coeff2");
         if (d>=0) cmbParameter->setCurrentIndex(d);
+        else cmbParameter->setCurrentIndex(0);
         d=cmbGofParameter->findData(current->getProperty(QString("imfcs_imed_gofparam_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
         if (d>=0) cmbGofParameter->setCurrentIndex(d);
         cmbGofParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), 0).toInt());
@@ -2877,9 +2881,9 @@ void QFRDRImagingFCSImageEditor::transformChanged() {
     current->setQFProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), cmbGofParameterTransform->currentIndex(), false, false);
     current->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
     connectParameterWidgets(false);
+    loadImageSettings();
     replotOverview();
     replotImage();
-    loadImageSettings();
     paletteChanged();
     updateOverlaySettings();
     connectParameterWidgets(true);
