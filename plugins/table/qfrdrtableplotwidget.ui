@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>794</width>
+    <width>649</width>
     <height>587</height>
    </rect>
   </property>
@@ -353,6 +353,12 @@
              </item>
              <item row="1" column="3">
               <widget class="QSlider" name="sliderPlotTransparent">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="maximum">
                 <number>255</number>
                </property>
@@ -408,6 +414,12 @@
              </item>
              <item>
               <widget class="QSlider" name="sliderFillTransparent">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="maximum">
                 <number>255</number>
                </property>
@@ -522,6 +534,12 @@
              </item>
              <item>
               <widget class="QSlider" name="sliderErrorTransparent">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="maximum">
                 <number>255</number>
                </property>

@@ -320,13 +320,24 @@ void QFRDRTablePlotWidget::reloadColumns(QComboBox *combo) {
     updating=true;
     int idx=combo->currentIndex();
     //disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
-    combo->clear();
+
     if (current) {
         QFTablePluginModel* tab=current->model();
-        combo->addItem(tr("--- none ---"));
-        for (int i=0; i<tab->columnCount(); i++) {
-            combo->addItem(tr("#%1: %2").arg(i+1).arg(tab->columnTitle(i)), tab->columnTitle(i));
+        while (combo->count()-1>tab->columnCount() && combo->count()>1) {
+            combo->removeItem(combo->count()-1);
         }
+        while (combo->count()-1<tab->columnCount() && tab->columnCount()>0) {
+            combo->addItem("");
+        }
+        combo->setItemText(0, tr("--- none ---"));
+        combo->setItemData(0, QVariant());
+        for (int i=0; i<tab->columnCount(); i++) {
+            combo->setItemText(i+1, tr("#%1: %2").arg(i+1).arg(tab->columnTitle(i)));
+            combo->setItemData(i+1, tab->columnTitle(i));
+        }
+    } else {
+        combo->clear();
+        combo->addItem(tr("--- none ---"));
     }
     updating=updt;
     //connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
