@@ -2066,6 +2066,8 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
         double dy=1;
         if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));*/
+        pltImage->getDatastore()->clear();
+        pltGofImage->getDatastore()->clear();
 
         pltImage->setAbsoluteXY(0, w, 0, h);
         pltImage->get_plotter()->set_maintainAspectRatio(true);
@@ -2129,6 +2131,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         plteGofImage->set_imageMax(ma);
 
     }
+    setCopyableData();
 
     pltImage->set_doDrawing(true);
     pltImage->update_plot();
@@ -2295,6 +2298,8 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
     }
 
+    setCopyableData();
+
     pltOverview->set_doDrawing(true);
     pltImage->set_doDrawing(true);
     pltGofImage->set_doDrawing(true);
@@ -2367,6 +2372,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         plteOverview->set_height(h);
 
     }
+    setCopyableData();
 
     pltOverview->set_doDrawing(true);
     pltOverview->update_plot();
@@ -2409,6 +2415,7 @@ void QFRDRImagingFCSImageEditor::replotMask() {
         plteMask->set_width(w);
         plteMask->set_height(h);
     }
+    setCopyableData();
 
     pltMask->set_doDrawing(true);
     pltMask->update_plot();
@@ -3406,6 +3413,32 @@ void QFRDRImagingFCSImageEditor::printReport() {
     delete p;
     delete doc;
     QApplication::restoreOverrideCursor();
+}
+
+void QFRDRImagingFCSImageEditor::setCopyableData()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    pltImage->getDatastore()->clear();
+    pltGofImage->getDatastore()->clear();
+    pltOverview->getDatastore()->clear();
+    pltMask->getDatastore()->clear();
+
+    if (m) {
+        pltImage->getDatastore()->addCopiedColumn(plteImageData, plteImageSize, formatTransformAndParameter(cmbParameter, cmbParameterTransform));
+        pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
+        pltImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("excluded"));
+
+        pltGofImage->getDatastore()->addCopiedColumn(plteGofImageData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
+        pltGofImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
+        pltGofImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("excluded"));
+
+        pltMask->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
+        pltMask->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
+
+        pltOverview->getDatastore()->addCopiedColumn(m->getImageFromRunsPreview(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
+        pltOverview->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
+        pltOverview->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("excluded"));
+    }
 }
 
 void QFRDRImagingFCSImageEditor::copyToMatlab() {

@@ -16,19 +16,23 @@ extern Q_CORE_EXPORT void qWinMsgHandler(QtMsgType t, const char* str);
 
 void myMessageOutput(QtMsgType type, const char *msg)
  {
+    QString m=msg;
+    while (m.startsWith('\n') && m.size()>0) {
+        m=m.remove(0,1);
+    }
     if (appLogFileQDebugWidget) {
          switch (type) {
          case QtDebugMsg:
-             appLogFileQDebugWidget->log_text_linebreak(msg);
+             appLogFileQDebugWidget->log_text_linebreak_queue(m);
              break;
          case QtWarningMsg:
-             appLogFileQDebugWidget->log_warning_linebreak(msg);
+             appLogFileQDebugWidget->log_warning_linebreak_queue(m);
              break;
          case QtCriticalMsg:
-             appLogFileQDebugWidget->log_error_linebreak(msg);
+             appLogFileQDebugWidget->log_error_linebreak_queue(m);
              break;
          case QtFatalMsg:
-             appLogFileQDebugWidget->log_error_linebreak(QObject::tr("FATAL ERROR: %1\n   APPLICATION WILL BE CLOSED/ABORTED!").arg(msg));
+             appLogFileQDebugWidget->log_error_linebreak_queue(QObject::tr("FATAL ERROR: %1\n   APPLICATION WILL BE CLOSED/ABORTED!").arg(m));
              //abort();
              break;
          }

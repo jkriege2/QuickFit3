@@ -207,6 +207,9 @@ protected:
         void copyDataAsColumns();
         /** \brief print a report of the evaluation results */
         void printReport();
+
+        /** \brief copy image data into datastores of the image plots, so they can be copied to other applications. */
+        void setCopyableData();
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;

@@ -275,6 +275,7 @@ void QFRDRImagingFCSDataEditor::previewClicked(double x, double y, Qt::KeyboardM
     } else {
         lstRunsSelect->selectionModel()->setCurrentIndex(runs.index(idx+1, 0), QItemSelectionModel::ClearAndSelect|QItemSelectionModel::Current);
     }
+    replotOverview();
 }
 
 void QFRDRImagingFCSDataEditor::runsModeChanged(int c) {
@@ -288,7 +289,7 @@ void QFRDRImagingFCSDataEditor::runsModeChanged(int c) {
 
 void QFRDRImagingFCSDataEditor::rawDataChanged() {
     replotData();
-};
+}
 
 void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!current) return;
@@ -304,29 +305,39 @@ void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min
         return;
     }
 
+    qDebug()<<"sliderChanged()";
+    bool dodraw=plotter->get_doDrawing();
+    bool doemit=plotter->get_emitSignals();
     plotter->set_doDrawing(false);
+    plotter->set_emitSignals(false);
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
-    plotter->set_emitSignals(false);
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     plotter->get_plotter()->setGraphsDataRange(sliders->get_userMin(), sliders->get_userMax());
-    plotter->set_doDrawing(true);
-    plotter->set_emitSignals(true);
-    plotter->update_plot();
+
+    if (doemit) {
+        plotter->set_doDrawing(true);
+        plotter->update_plot();
+    }
+    if (dodraw) plotter->set_emitSignals(true);
 
     QApplication::restoreOverrideCursor();
+    qDebug()<<"sliderChanged() ... done";
 
 }
 
 void QFRDRImagingFCSDataEditor::replotOverview() {
+     //qDebug()<<"replotOverview";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    bool doDraw=pltOverview->get_doDrawing();
     pltOverview->set_doDrawing(false);
 
     if (!m) {
         plteOverview->set_image(NULL, JKQTFP_uint16, 1, 1);
-        plteOverviewSelected->set_data(NULL, 1, 1);
+        plteOverviewSelected->set_data(NULL, 0, 0);
+        plteOverviewExcluded->set_data(NULL, 0, 0);
     } else {
         double* ov=m->getImageFromRunsPreview();
         double w=m->getImageFromRunsWidth();
@@ -336,6 +347,8 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         double dy=1;
         if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));
 
+        //qDebug()<<"replotOverview:  "<<w<<" x "<<h;
+
         pltOverview->setXRange(0,w);
         pltOverview->setYRange(0,h);
         pltOverview->set_xTickDistance(dx);
@@ -344,7 +357,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         plteOverviewSelected->set_data(NULL, 0, 0);
         plteOverviewExcluded->set_data(NULL, 0, 0);
 
-        if (plteOverviewSelectedSize<w*h) {
+        if (plteOverviewSelectedSize!=w*h) {
             plteOverviewSelectedSize=w*h;
             plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
             plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
@@ -359,7 +372,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         plteOverview->set_image(ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
-        if (plteOverviewSelectedData) {
+        if (plteOverviewSelectedData && plteOverviewExcludedData) {
             if (cmbRunDisplay->currentIndex()<=1) {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
                     int x=m->runToX(i);
@@ -380,9 +393,12 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         }
     }
 
-    pltOverview->set_doDrawing(true);
-    pltOverview->update_data();
+    if (doDraw) {
+        pltOverview->set_doDrawing(true);
+        pltOverview->update_data();
+    }
     QApplication::restoreOverrideCursor();
+    //qDebug()<<"replotOverview ... DONE";
 }
 
 void QFRDRImagingFCSDataEditor::replotData(int dummy) {
@@ -392,10 +408,13 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
     if (!m) {
         plotter->clearGraphs();
         ds->clear();
+        //qDebug()<<"replot ... DONE";
         return;
     }
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+    bool doDraw=plotter->get_doDrawing();
+    bool doEmit=plotter->get_emitSignals();
     plotter->set_doDrawing(false);
     plotter->set_emitSignals(false);
     sliders->set_min(0);
@@ -408,7 +427,6 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
 
     if (m->getCorrelationN()>0) {
 
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
         JKQTPerrorPlotstyle runerrorstyle=JKQTPnoError;
         switch (cmbRunErrorStyle->currentIndex()) {
@@ -569,17 +587,21 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
         plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotter->zoomToFit(true, true, false,false);
 
-        QApplication::restoreOverrideCursor();
     }
-    plotter->set_doDrawing(true);
-    plotter->set_emitSignals(true);
+    if (doDraw) {
+        plotter->set_doDrawing(true);
+        plotter->update_plot();
+    }
+    if (doEmit) {
+        plotter->set_emitSignals(true);
+    }
     //QTime t;
     //t.start();
-    plotter->update_plot();
     //qDebug()<<"plotting in "<<t.elapsed()<<" ms";
+    //qDebug()<<"replot ... DONE!";
     replotOverview();
     QApplication::restoreOverrideCursor();
-};
+}
 
 
 void QFRDRImagingFCSDataEditor::readSettings() {
