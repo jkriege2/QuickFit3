@@ -770,6 +770,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
                 newPos+=stageDelta;
                 progress.setValue((int)round((double)posIdx/(double)moveTo.size()*100.0));
                 QApplication::processEvents();
+                if (progress.wasCanceled()) {
+                    break;
+                }
             }
             duration=timAcquisition.elapsed()/1000.0;
         }
