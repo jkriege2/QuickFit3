@@ -34,9 +34,9 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         /** \brief return the name (not the full filename with path) for the currently selected camera configuration */
         QString currentConfigName(int camera) const;
         /** \brief return the filename for the currently selected camera preview configuration */
-        QString currentPreviewConfigFilename(int camera) const;
+        QString currentPreviewConfigFilename(int camera, int preview=0) const;
         /** \brief return the name (not the full filename with path) for the currently selected camera preview configuration */
-        QString currentPreviewConfigName(int camera) const;
+        QString currentPreviewConfigName(int camera, int preview=0) const;
         /** \brief return the number of background frames */
         int currentBackgroundFrames(int camera) const;
         /** \brief return whether to save background frames */
@@ -64,7 +64,14 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         int repeats() const;
 
 
-    protected slots:
+        QString lightpathPreview3() const;
+        QString lightpathFilenamePreview3() const;
+        QString lightpathPreview2() const;
+        QString lightpathFilenamePreview2() const;
+
+        bool lightpathActivatedPreview2() const;
+        bool lightpathActivatedPreview3() const;
+protected slots:
         void on_btnAcquire_clicked();
         void on_chkUse1_toggled(bool enabled);
         void on_chkUse2_toggled(bool enabled);

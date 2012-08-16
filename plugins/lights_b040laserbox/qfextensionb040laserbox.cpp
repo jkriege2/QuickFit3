@@ -152,7 +152,7 @@ QString QFExtensionB040LaserBox::getLightSourceLineDescription(unsigned int ligh
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
     //return tr("line #%2: %1 nm").arg(serial->queryCommand("w").toDouble()).arg(wavelengthLine+1);
-    return tr("%1nm").arg(serial->queryCommand("w").toDouble()).arg(wavelengthLine+1);
+    return tr("%1nm").arg(serial->queryCommand("w").toDouble());//.arg(wavelengthLine+1);
     //return tr("line #%1").arg(wavelengthLine+1);
 }
 

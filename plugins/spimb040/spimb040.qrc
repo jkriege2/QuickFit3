@@ -79,5 +79,6 @@
         <file alias="template_save.png">icons/filesave.png</file>
         <file alias="template_open.png">icons/fileopen.png</file>
         <file alias="clear_all.png">icons/clear_all.png</file>
+        <file alias="clock.png">icons/clock.png</file>
     </qresource>
 </RCC>
