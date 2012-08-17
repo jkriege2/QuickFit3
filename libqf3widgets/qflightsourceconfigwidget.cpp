@@ -4,8 +4,8 @@ QFLightSourceConfigWidget::QFLightSourceConfigWidget(QWidget *parent) :
     QFrame(parent)
 {
     useThread=true;
-    lsthread=new QFLightSourceConfigWidgetThread(this);
-    connect(lsthread, SIGNAL(linesChanged(QTime, QList<bool>,QList<double>,QList<double>,QStringList,QStringList,QList<bool>)), this, SLOT(linesChanged(QTime, QList<bool>,QList<double>,QList<double>,QStringList,QStringList,QList<bool>)));
+    m_thread=new QFLightSourceConfigWidgetThread(this);
+    connect(m_thread, SIGNAL(linesChanged(QTime, QList<bool>,QList<double>,QList<double>,QStringList,QStringList,QList<bool>)), this, SLOT(linesChanged(QTime, QList<bool>,QList<double>,QList<double>,QStringList,QStringList,QList<bool>)));
     setFrameStyle(QFrame::Panel|QFrame::Raised);
     setLineWidth(1);
     stateUpdateInterval=237;
@@ -37,6 +37,7 @@ QFLightSourceConfigWidget::~QFLightSourceConfigWidget()
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
     timUpdate->stop();
+    m_thread->stopThread();
 }
 
 void QFLightSourceConfigWidget::init(QFPluginLogService *log, QFPluginServices *pluginServices) {
@@ -88,7 +89,7 @@ void QFLightSourceConfigWidget::disconnectLightSource() {
 void QFLightSourceConfigWidget::lockLightSource() {
     locked=true;
     if (useThread)  {
-        lsthread->stopThread();
+        m_thread->stopThread();
     } else {
         disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
         timUpdate->stop();
@@ -98,7 +99,7 @@ void QFLightSourceConfigWidget::lockLightSource() {
 void QFLightSourceConfigWidget::unlockLightSource() {
     locked=false;
     if (useThread) {
-        lsthread->start();
+        m_thread->start();
     } else {
         connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayStates()));
         timUpdate->setSingleShot(true);
@@ -328,8 +329,8 @@ void QFLightSourceConfigWidget::disConnect() {
     updateStates();
     updateLSLinesWidgets();
     if (useThread) {
-        if (gotConnection) lsthread->start();
-        else lsthread->stopThread();
+        if (gotConnection) m_thread->start();
+        else m_thread->stopThread();
     }
     QApplication::restoreOverrideCursor();
 }
@@ -344,6 +345,7 @@ void QFLightSourceConfigWidget::configure() {
 
 void QFLightSourceConfigWidget::updateLSLinesWidgets() {
     dontAccessWidgets=true;
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     int oldLines=lineWidgets.size();
     int newLines=0;
     QFExtensionLightSource* lightSource=getLightSource();
@@ -401,6 +403,7 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
 
     linesLayoutWidget->setVisible(newLines>0);
     dontAccessWidgets=false;
+    setUpdatesEnabled(updt);
 }
 
 int QFLightSourceConfigWidget::getLineByWidget(QObject *widget) {
@@ -416,6 +419,9 @@ int QFLightSourceConfigWidget::getLineByWidget(QObject *widget) {
 void QFLightSourceConfigWidget::displayStates() {
     if (useThread) return;
     if (locked) return;
+
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+
     QFExtensionLightSource* LightSource;
     int LightSourceID;
     LightSource=getLightSource();
@@ -445,6 +451,7 @@ void QFLightSourceConfigWidget::displayStates() {
     }
 
     updateStates();
+    setUpdatesEnabled(updt);
 
     //QTimer::singleShot(stateUpdateInterval, this, SLOT(displayLightSourceStates()));
     if (!locked) {
@@ -497,6 +504,7 @@ void QFLightSourceConfigWidget::setLinePower(int line, double power) {
 
 void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled) {
     if (dontAccessWidgets) return;
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     //qDebug()<<"linesChanged("<< lineenabled<< setValues <<measuredValues<<")";
     for (int i=0; i<lineWidgets.size(); i++) {
         if (i<lineenabled.size()) {
@@ -522,6 +530,7 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
         }
     }
     updateStates();
+    setUpdatesEnabled(updt);
 }
 
 QString QFLightSourceConfigWidget::getLightsoureConfigForFilename() const

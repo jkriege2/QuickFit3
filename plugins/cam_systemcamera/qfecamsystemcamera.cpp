@@ -244,7 +244,7 @@ bool QFECamSystemcamera::isConnected(unsigned int camera) {
     return false;
 }
 
-bool QFECamSystemcamera::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFECamSystemcamera::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     if (camera>=cameras.size()) return false;
     if (timestamp!=NULL) {
         *timestamp=(uint64_t)round(timer[camera].elapsed());;

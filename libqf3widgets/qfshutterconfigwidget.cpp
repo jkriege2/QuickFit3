@@ -6,14 +6,16 @@
 QFShutterConfigWidget::QFShutterConfigWidget(QWidget* parent):
     QWidget(parent)
 {
-
+    useThread=true;
     shutterStateUpdateInterval=351;
     iconOpened=QPixmap(":/libqf3widgets/shutter_open.png");
     iconClosed=QPixmap(":/libqf3widgets/shutter_closed.png");
 
+    m_thread=new QFShutterConfigWidgetThread(this);
+    connect(m_thread, SIGNAL(stateChanged(bool)), this, SLOT(shutterStateChanged(bool)));
+
+
     timUpdate=new QTimer(this);
-    timUpdate->setSingleShot(true);
-    timUpdate->setInterval(shutterStateUpdateInterval);
 
     m_log=NULL;
     m_pluginServices=NULL;
@@ -26,8 +28,12 @@ QFShutterConfigWidget::QFShutterConfigWidget(QWidget* parent):
     updateStates();
 
 
-    connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
-    timUpdate->start(shutterStateUpdateInterval);
+    if (!useThread) {
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(shutterStateUpdateInterval);
+        connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
+        timUpdate->start(shutterStateUpdateInterval);
+    }
     //QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
 }
 
@@ -37,21 +43,8 @@ QFShutterConfigWidget::~QFShutterConfigWidget()
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
     timUpdate->stop();
-}
+    m_thread->stopThread();
 
-void QFShutterConfigWidget::lockShutters() {
-    locked=true;
-    disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
-    timUpdate->stop();
-}
-
-
-void QFShutterConfigWidget::unlockShutters() {
-    locked=false;
-    connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
-    timUpdate->setSingleShot(true);
-    timUpdate->setInterval(shutterStateUpdateInterval);
-    timUpdate->start(shutterStateUpdateInterval);
 }
 
 
@@ -76,6 +69,7 @@ void QFShutterConfigWidget::loadSettings(QSettings& settings, QString prefix) {
     cmbShutter->loadSettings(settings, prefix+"shutter/");
 
     shutterStateUpdateInterval=settings.value(prefix+"update_interval", shutterStateUpdateInterval).toDouble();
+    updateStates();
 }
 
 void QFShutterConfigWidget::saveSettings(QSettings& settings, QString prefix) {
@@ -168,6 +162,7 @@ void QFShutterConfigWidget::disConnect() {
     bool conn=actConnect->isChecked();
     QFExtensionShutter* shutter=getShutter();
     int shutterID=getShutterID();
+    bool gotConnection=false;
 
     if (shutter) {
         //qDebug()<<"connecting "<<conn;
@@ -176,6 +171,7 @@ void QFShutterConfigWidget::disConnect() {
             shutter->shutterConnect(shutterID);
             if (shutter->isShutterConnected(shutterID)) {
                 m_log->log_text("connected to shutter driver ...\n");
+                gotConnection=true;
             } else {
                 actConnect->setChecked(false);
                 shutter->shutterDisonnect(shutterID);
@@ -189,11 +185,39 @@ void QFShutterConfigWidget::disConnect() {
         actConnect->setChecked(false);
     }
     updateStates();
+    if (useThread) {
+        if (gotConnection) m_thread->start();
+        else m_thread->stopThread();
+    }
     QApplication::restoreOverrideCursor();
 }
 
 
 
+void QFShutterConfigWidget::lockShutters() {
+    locked=true;
+    if (useThread)  {
+        m_thread->stopThread();
+    } else {
+        disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
+        timUpdate->stop();
+    }
+    updateStates();
+}
+
+
+void QFShutterConfigWidget::unlockShutters() {
+    if (useThread) {
+        m_thread->start();
+    } else {
+        connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayShutterStates()));
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(shutterStateUpdateInterval);
+        timUpdate->start(shutterStateUpdateInterval);
+    }
+    locked=false;
+    updateStates();
+}
 
 
 void QFShutterConfigWidget::configure() {
@@ -232,6 +256,7 @@ bool QFShutterConfigWidget::getShutterState() {
 
 
 void QFShutterConfigWidget::displayShutterStates(/*bool automatic*/) {
+    if (useThread) return;
     if (locked) return;
 
     QFExtensionShutter* shutter;
@@ -241,17 +266,7 @@ void QFShutterConfigWidget::displayShutterStates(/*bool automatic*/) {
     if (shutter) {
         if (!moving)  {
             bool opened=shutter->isShutterOpen(shutterID);
-            disconnect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
-            if (opened) {
-                actState->setIcon(iconOpened);
-                actState->setText(tr("opened"));
-                actState->setChecked(true);
-            } else {
-                actState->setIcon(iconClosed);
-                actState->setText(tr("closed"));
-                actState->setChecked(false);
-            }
-            connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
+            updateActionProperties(opened);
             actState->setEnabled(true);
         } else {
             actState->setEnabled(false);
@@ -260,10 +275,11 @@ void QFShutterConfigWidget::displayShutterStates(/*bool automatic*/) {
     updateStates();
 
     if (!locked) {
-        timUpdate->setSingleShot(true);
-        timUpdate->setInterval(shutterStateUpdateInterval);
-        timUpdate->start(shutterStateUpdateInterval);
-
+        if (!useThread)  {
+            timUpdate->setSingleShot(true);
+            timUpdate->setInterval(shutterStateUpdateInterval);
+            timUpdate->start(shutterStateUpdateInterval);
+        }
     }
 
 }
@@ -336,5 +352,33 @@ bool QFShutterConfigWidget::isShutterDone() const {
         return shutter->isLastShutterActionFinished(shutterID);
     }
     return true;
+}
+
+void QFShutterConfigWidget::shutterStateChanged(bool state)
+{
+    updateActionProperties(state);
+    actState->setEnabled(true);
+}
+
+void QFShutterConfigWidget::updateActionProperties()
+{
+    updateActionProperties(!actState->isChecked());
+}
+
+void QFShutterConfigWidget::updateActionProperties(bool opened)
+{
+    disconnect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    if (opened) {
+        actState->setIcon(iconOpened);
+        if (actState->text()!=tr("opened")) actState->setText(tr("opened"));
+        if (!actState->isChecked()) actState->setChecked(true);
+    } else {
+        actState->setIcon(iconClosed);
+        if (actState->text()!=tr("closed")) actState->setText(tr("closed"));
+        if (actState->isChecked()) actState->setChecked(false);
+    }
+    setUpdatesEnabled(updt);
+    connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
 }
 

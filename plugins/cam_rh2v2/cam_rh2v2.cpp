@@ -466,18 +466,18 @@ bool QFExtensionCameraRh2v2::isConnected(unsigned int camera) {
     return true;
 }
 
-bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     if (timestamp!=NULL) {
         *timestamp=(uint64_t) 0;
     }
-	//TODO: the following should be checked prior to execution...
+    //TODO: the following should be checked prior to execution...
     if(cameraSetting[camera].raw.pc->isRunning()){
-    we_endpoint *we_ep = cameraSetting[camera].raw.pc->find_first<we_endpoint>();
+        we_endpoint *we_ep = cameraSetting[camera].raw.pc->find_first<we_endpoint>();
         if(we_ep!=NULL){
             return we_ep->get_frame(data);
-		}
-	}
-	return false;
+        }
+    }
+    return false;
 }
 
 bool QFExtensionCameraRh2v2::flashFPGA(unsigned int camera){

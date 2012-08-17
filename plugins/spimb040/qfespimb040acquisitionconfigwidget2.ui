@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1045</width>
-    <height>576</height>
+    <width>1123</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,8 +76,11 @@ p, li { white-space: pre-wrap; }
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;prefix:      &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;%counter% will be replaced by a number that makes the output files unique.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:600;&quot;&gt;prefix:      &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-style:italic;&quot;&gt;%counter% will be replaced by a number that makes the output files unique. More of these modifiers can be found in the edits context menu&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -200,7 +203,7 @@ p, li { white-space: pre-wrap; }
      <property name="enabled">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="widCam2Settings" columnstretch="0,0,0">
+     <layout class="QGridLayout" name="widCam2Settings" columnstretch="0,0,0,0">
       <property name="margin">
        <number>0</number>
       </property>
@@ -254,26 +257,125 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_2" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
+      <item row="0" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbAcquisitionSettings2" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item row="1" column="2">
-       <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_1" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_1" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_11">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
-      <item row="0" column="2">
-       <widget class="QFCameraConfigEditorWidget" name="cmbAcquisitionSettings2" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
+      <item row="2" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_2" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_3" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item row="4" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -308,13 +410,6 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="3" column="2">
-       <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_3" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -323,7 +418,7 @@ p, li { white-space: pre-wrap; }
      <property name="enabled">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
+     <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0">
       <property name="margin">
        <number>0</number>
       </property>
@@ -337,13 +432,6 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QFCameraConfigEditorWidget" name="cmbAcquisitionSettings1" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="labPreview1">
         <property name="text">
@@ -351,13 +439,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings1_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_1" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
         </property>
        </widget>
       </item>
@@ -369,6 +450,154 @@ p, li { white-space: pre-wrap; }
         <property name="buddy">
          <cstring>spinBackgroundFrames1</cstring>
         </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labPreview1_2">
+        <property name="text">
+         <string>&amp;Preview Settings 2:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings1_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="labPreview1_3">
+        <property name="text">
+         <string>&amp;Preview Settings 3:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings1_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_3" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_2" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_1" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <widget class="QWidget" name="horizontalWidget_4" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>20</width>
+          <height>0</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QFCameraConfigEditorWidget" name="cmbAcquisitionSettings1" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
       <item row="4" column="1">
@@ -403,40 +632,6 @@ p, li { white-space: pre-wrap; }
          </spacer>
         </item>
        </layout>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="labPreview1_2">
-        <property name="text">
-         <string>&amp;Preview Settings 2:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings1_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="labPreview1_3">
-        <property name="text">
-         <string>&amp;Preview Settings 3:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings1_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_2" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_3" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>
@@ -475,6 +670,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QCheckBox" name="chkLightpathPreview2">
      <property name="font">
       <font>
+       <pointsize>8</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -488,6 +684,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QCheckBox" name="chkLightpathPreview3">
      <property name="font">
       <font>
+       <pointsize>8</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -615,8 +812,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>chkBackground</tabstop>
   <tabstop>chkUse1</tabstop>
   <tabstop>edtPrefix1</tabstop>
-  <tabstop>cmbAcquisitionSettings1</tabstop>
-  <tabstop>cmbPreviewSettings1_1</tabstop>
   <tabstop>chkUse2</tabstop>
   <tabstop>edtPrefix2</tabstop>
   <tabstop>btnAcquire</tabstop>
@@ -633,11 +828,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>87</x>
-     <y>407</y>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
      <x>234</x>
-     <y>407</y>
+     <y>439</y>
     </hint>
    </hints>
   </connection>
@@ -649,11 +844,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>69</x>
-     <y>441</y>
+     <y>473</y>
     </hint>
     <hint type="destinationlabel">
      <x>236</x>
-     <y>442</y>
+     <y>474</y>
     </hint>
    </hints>
   </connection>
@@ -665,11 +860,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>61</x>
-     <y>407</y>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
-     <x>396</x>
-     <y>154</y>
+     <x>389</x>
+     <y>171</y>
     </hint>
    </hints>
   </connection>
@@ -681,11 +876,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>79</x>
-     <y>404</y>
+     <y>442</y>
     </hint>
     <hint type="destinationlabel">
      <x>398</x>
-     <y>296</y>
+     <y>328</y>
     </hint>
    </hints>
   </connection>
@@ -697,11 +892,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>127</x>
-     <y>418</y>
+     <y>450</y>
     </hint>
     <hint type="destinationlabel">
-     <x>403</x>
-     <y>173</y>
+     <x>396</x>
+     <y>198</y>
     </hint>
    </hints>
   </connection>
@@ -713,11 +908,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>32</x>
-     <y>441</y>
+     <y>473</y>
     </hint>
     <hint type="destinationlabel">
      <x>395</x>
-     <y>322</y>
+     <y>354</y>
     </hint>
    </hints>
   </connection>
@@ -729,7 +924,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>15</x>
-     <y>412</y>
+     <y>444</y>
     </hint>
     <hint type="destinationlabel">
      <x>481</x>
@@ -745,7 +940,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>21</x>
-     <y>445</y>
+     <y>477</y>
     </hint>
     <hint type="destinationlabel">
      <x>440</x>

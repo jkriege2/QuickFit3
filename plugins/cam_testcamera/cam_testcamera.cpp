@@ -242,7 +242,7 @@ long Poisson(double m)
   return (x - 1);
 }
 
-bool QFECamTestCamera::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFECamTestCamera::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     //std::cout<<"capturing single frame to "<<data<<"   timestamp="<<timestamp<<std::endl;
     if (timestamp!=NULL) {
         //std::cout<<"difftime(startTime, time(0))="<<difftime(startTime, time(0))<<std::endl;

@@ -445,7 +445,7 @@ bool QFExtensionCameraAndor::isConnected(unsigned int camera) {
     return camConnected.contains(camera);
 }
 
-bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     if (!isConnected(camera)) return false;
 
     if (!selectCamera(camera)) return false;
@@ -494,11 +494,12 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
         timer.start();
 #endif
 
-		return true;
-	} else {
-		log_error(tr("\n%1    error: acquiring image (exposure time %2 ms) timed out after %3 seconds ").arg(LOG_PREFIX).arg(info.expoTime*1000.0).arg(timeout/1000.0));
-		return false;
-	}
+        if (parameters) internalGetAcquisitionDescription(camera, parameters);
+        return true;
+    } else {
+        log_error(tr("\n%1    error: acquiring image (exposure time %2 ms) timed out after %3 seconds ").arg(LOG_PREFIX).arg(info.expoTime*1000.0).arg(timeout/1000.0));
+        return false;
+    }
 
 
 }
@@ -795,24 +796,9 @@ bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* p
     }
 }
 
-void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
-    QStringList fileNames, fileTypes;
-    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
-    char text[512];
-    double duration=0;
-    if (thread) {
-        fileNames=thread->getOutputFilenames();
-        fileTypes=thread->getOutputFilenameTypes();
-        duration=thread->getDurationMilliseconds();
-    }
-    for (int i=0; i<fileNames.size(); i++) {
-        QFExtensionCamera::AcquititonFileDescription d;
-        d.name=fileNames[i];
-        d.type=fileTypes[i];
-        d.description=tr("Andor camera acquisition image series");
-        files->append(d);
-    }
+void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int camera, QMap<QString, QVariant>* parameters) {
     QFExtensionCameraAndor::CameraInfo info=camInfos[camera];
+    char text[512];
 
     switch(info.ReadMode) {
         case 0: (*parameters)["read_mode"]=QString("full vertical binning (%1)").arg(info.ReadMode); break;
@@ -903,6 +889,27 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
         case 10: (*parameters)["trigger_mode"]="software (10)"; break;
         default: (*parameters)["trigger_mode"]=info.trigMode; break;
     }
+}
+
+void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+    QStringList fileNames, fileTypes;
+    CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
+    char text[512];
+    double duration=0;
+    if (thread) {
+        fileNames=thread->getOutputFilenames();
+        fileTypes=thread->getOutputFilenameTypes();
+        duration=thread->getDurationMilliseconds();
+    }
+    for (int i=0; i<fileNames.size(); i++) {
+        QFExtensionCamera::AcquititonFileDescription d;
+        d.name=fileNames[i];
+        d.type=fileTypes[i];
+        d.description=tr("Andor camera acquisition image series");
+        files->append(d);
+    }
+
+    internalGetAcquisitionDescription(camera, parameters);
     (*parameters)["duration_milliseconds"]=duration;
 
 }

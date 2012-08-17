@@ -87,7 +87,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/qsettingsmodel.h \
     ../../../../LIB/trunk/qt/linestylecombobox.h \
     qfacquisitionconfigcombobox.h \
-    qfacquisitioncombobox.h
+    qfacquisitioncombobox.h \
+    qfshutterconfigwidgetthread.h \
+    qffilterchangerconfigwidgetthread.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -139,7 +141,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/qsettingsmodel.cpp \
     ../../../../LIB/trunk/qt/linestylecombobox.cpp \
     qfacquisitionconfigcombobox.cpp \
-    qfacquisitioncombobox.cpp
+    qfacquisitioncombobox.cpp \
+    qfshutterconfigwidgetthread.cpp \
+    qffilterchangerconfigwidgetthread.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

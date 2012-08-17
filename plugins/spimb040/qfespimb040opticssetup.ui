@@ -969,7 +969,7 @@ p, li { white-space: pre-wrap; }
       <widget class="Line" name="line_2">
        <property name="styleSheet">
         <string notr="true">QFrame {
-  border: 4px solid;
+  border: 4px solid grey;
   border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(75, 75, 75, 255), stop:1 rgba(235, 235, 235, 255));
 }</string>
        </property>
@@ -994,7 +994,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="styleSheet">
         <string notr="true">QFrame {
-  border: 4px solid;
+  border: 4px solid grey;
   border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(75, 75, 75, 255), stop:1 rgba(235, 235, 235, 255));
 }</string>
        </property>

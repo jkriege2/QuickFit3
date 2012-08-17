@@ -112,7 +112,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         QFPluginServices* m_pluginServices;
         QString m_filterconfig;
 
-        QFLightSourceConfigWidgetThread* lsthread;
+        QFLightSourceConfigWidgetThread* m_thread;
 
 
         void createWidgets();

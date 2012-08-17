@@ -214,7 +214,7 @@ bool QFExtensionCameraRadhard2::isConnected(unsigned int camera) {
     return conn;
 }
 
-bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     sendIterations();
     sendDivider();
 
@@ -247,6 +247,10 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
         for(register int j=0; j<imagesize; j++) {
             data[j] =  data[j]-1;
         }
+    }
+
+    if (parameters) {
+        // TODO: fill in acquisition parameters
     }
 
     return true;

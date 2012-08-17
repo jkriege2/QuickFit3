@@ -12,6 +12,7 @@ QFLightSourceConfigWidgetThread::QFLightSourceConfigWidgetThread(QFLightSourceCo
     stopped=false;
     qRegisterMetaType<QList<bool> >("QList<bool>");
     qRegisterMetaType<QList<double> >("QList<double>");
+    setObjectName("thread_lightsoureconfigwidget_"+parent->objectName());
 }
 
 

@@ -85,9 +85,10 @@ class QFExtensionCamera {
              \param[out] data points to a memory array of getImageWidth()*getImageHeight() items
                          which will be filled with the newly acquired image
              \param[out] timestamp a timestamp for the acquired image in \a data
+             \param[out] parameters this map is filled with the acquisition parameters, if \c !=NULL
              \return \c true on success
           */
-         virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL)=0;
+         virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL, QMap<QString, QVariant>* parameters=NULL)=0;
          /** \brief connect to the device/activate it */
          virtual bool connectDevice(unsigned int camera)=0;
          /** \brief connect to the device/activate it */

@@ -155,7 +155,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionCamera::isConnected() */
         virtual bool isConnected(unsigned int camera);
         /** \copydoc QFExtensionCamera::acquire() */
-        virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL);
+        virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL, QMap<QString, QVariant>* parameters=NULL);
         /** \copydoc QFExtensionCamera::connectDevice() */
         virtual bool connectDevice(unsigned int camera);
         /** \copydoc QFExtensionCamera::disconnectDevice() */
@@ -398,6 +398,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
 
 
+        void internalGetAcquisitionDescription(unsigned int camera, QMap<QString, QVariant> *parameters);
 
 
 

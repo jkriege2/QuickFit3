@@ -34,6 +34,7 @@
 #include "tools.h"
 #include "qfshuttercombobox.h"
 #include "libwid_imexport.h"
+#include "qfshutterconfigwidgetthread.h"
 
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a shutter
@@ -84,6 +85,8 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
 
+        QFShutterConfigWidgetThread* m_thread;
+
 
         void createWidgets();
         void createActions();
@@ -115,6 +118,8 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
 
 
         QTimer timerDisplayUpdate;
+
+        bool useThread;
 
     public:
 
@@ -148,8 +153,11 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         void disConnect();
         void configure();
         void displayShutterStates();
+        void updateActionProperties();
+        void updateActionProperties(bool opened);
     public slots:
         void shutterActionClicked(bool shutterOpened);
+        void shutterStateChanged(bool state);
 };
 
 #endif // QFSHUTTERCONFIGWIDGET_H

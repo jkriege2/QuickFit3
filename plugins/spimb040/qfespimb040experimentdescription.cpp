@@ -61,8 +61,11 @@ void QFESPIMB040ExperimentDescription::on_btnClearAll_clicked() {
 }
 
 void QFESPIMB040ExperimentDescription::updateTime() {
+    bool updt=updatesEnabled();
+    setUpdatesEnabled(false);
     ui->edtTime->setTime(QTime::currentTime());
     ui->edtDate->setDate(QDate::currentDate());
+    setUpdatesEnabled(updt);
     QTimer::singleShot(1013, this, SLOT(updateTime()));
 }
 

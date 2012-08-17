@@ -903,6 +903,8 @@ void QFESPIMB040CameraView::redrawFrame() {
 
 void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     if (currentlyRedrawing) return;
+    bool updt=updatesEnabled();
+    setUpdatesEnabled(false);
     currentlyRedrawing=true;
     QTime tim;
     tim.start();
@@ -915,6 +917,7 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     redrawFrame();
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
     currentlyRedrawing=false;
+    setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040CameraView::prepareImage() {

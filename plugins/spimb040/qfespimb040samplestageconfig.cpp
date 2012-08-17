@@ -778,6 +778,7 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
     if (useThread) return;
 
 
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     bool anyconn=false;
 
         QFExtensionLinearStage* stage;
@@ -862,6 +863,7 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
 
 
         updateStates();
+        setUpdatesEnabled(updt);
 
     /*if ((!locked) && anyconn && automatic) {
         QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
@@ -957,6 +959,7 @@ void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z) {
 }
 
 void QFESPIMB040SampleStageConfig::connectStages() {
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     bool bx=actConnectX->signalsBlocked();
     bool by=actConnectY->signalsBlocked();
     bool bz=actConnectZ->signalsBlocked();
@@ -979,9 +982,11 @@ void QFESPIMB040SampleStageConfig::connectStages() {
     actConnectX->blockSignals(bx);
     actConnectY->blockSignals(by);
     actConnectZ->blockSignals(bz);
+    setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040SampleStageConfig::disconnectStages() {
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     if (actConnectX->isChecked()) {
         actConnectX->setChecked(true);
         actConnectX->trigger();
@@ -994,12 +999,15 @@ void QFESPIMB040SampleStageConfig::disconnectStages() {
         actConnectZ->setChecked(true);
         actConnectZ->trigger();
     }
+    setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040SampleStageConfig::setReadOnly(bool readonly) {
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     cmbStageX->setReadOnly(readonly);
     cmbStageY->setReadOnly(readonly);
     cmbStageZ->setReadOnly(readonly);
+    setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040SampleStageConfig::stageXMoved(QFExtensionLinearStage::AxisState state, double position, double speed) {
@@ -1016,6 +1024,7 @@ void QFESPIMB040SampleStageConfig::stageZMoved(QFExtensionLinearStage::AxisState
 
 void QFESPIMB040SampleStageConfig::updateStageStateWidgets(QLabel* labPos, QLabel* labSpeed, QLabel* labState, bool present, QFExtensionLinearStage::AxisState state, double position, double speed) {
     if (present) {
+        bool updt=updatesEnabled(); setUpdatesEnabled(false);
         labState->setText("");
         switch(state) {
             case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
@@ -1029,14 +1038,18 @@ void QFESPIMB040SampleStageConfig::updateStageStateWidgets(QLabel* labPos, QLabe
         }
         labSpeed->setText(QString::number(speed, 'f', 2));
         labPos->setText(QString::number(position, 'f', 2));
+        setUpdatesEnabled(updt);
     } else {
+        bool updt=updatesEnabled(); setUpdatesEnabled(false);
         labState->setText("---");
         labPos->setText("");
         labSpeed->setText("");
+        setUpdatesEnabled(updt);
     }
 }
 
 void QFESPIMB040SampleStageConfig::joystickStateChanged(bool enabled) {
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     bool anyconn=stageThread->anyConnected();
     //chkJoystick->setEnabled(anyconn);
     spinJoystickMaxSpeed->setEnabled(anyconn && enabled);
@@ -1051,11 +1064,13 @@ void QFESPIMB040SampleStageConfig::joystickStateChanged(bool enabled) {
     } else {
         labJoystick->setPixmap(QPixmap());
     }
+    setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY, bool connZ) {
     bool anyconn=false;
     bool conn=connX;
+    bool updt=updatesEnabled(); setUpdatesEnabled(false);
     anyconn=anyconn||conn;
     if (conn) {
         actConnectX->setChecked(true);
@@ -1107,6 +1122,7 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
     btnMoveRelative->setEnabled(anyconn);
 
     chkJoystick->setEnabled(anyconn);
+    setUpdatesEnabled(updt);
 
 }
 

@@ -1476,7 +1476,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
 
 
-bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32) {
+bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix) {
     //////////////////////////////////////////////////////////////////////////////////////
     // INIT variables
     //////////////////////////////////////////////////////////////////////////////////////
@@ -1511,7 +1511,15 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     // OPEN OUTPUT TIFF FILES
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok) {
-        if (ecamera->acquire(camera, buffer)) {
+        QMap<QString, QVariant> acqD;
+        if (ecamera->acquire(camera, buffer, NULL, &acqD)) {
+            if (acquisitionDescription) {
+                QMapIterator<QString, QVariant> it(acqD);
+                while (it.hasNext()) {
+                    it.next();
+                    (*acquisitionDescription)[acquisitionDescriptionPrefix+it.key()]=it.value();
+                }
+            }
             QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
             tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
             if (!tiff) {
@@ -2362,7 +2370,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
 
     QDateTime time=QDateTime::currentDateTime();
     QString filename32="";
-    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32);
+    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/");
     if (ok) {
         log_text(tr("  - acquired %1!\n").arg(imageDescription));
         acquisitionDescription1[imageID+"/image_width"]=ecamera1->getImageWidth(camera1);
@@ -2513,33 +2521,6 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
                 running=run1||run2;
             }
         }
-
-        /*while (running) {
-            if (time.elapsed()>250) {
-                int prog1=99, prog2=99;
-                if (useCam1) prog1=ecamera1->getAcquisitionProgress(camera1);
-                if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
-                if (progress) progress->setValue(qMin(prog1,prog2));
-                time.start();
-            }
-
-
-
-            QApplication::processEvents();
-            if (progress && progress->wasCanceled()) {
-                running=false;
-                if (userCanceled) *userCanceled=true;
-                if (useCam1) ecamera1->cancelAcquisition(camera1);
-                if (useCam2) ecamera2->cancelAcquisition(camera2);
-                log_warning(tr("  - %1 acquisition canceled by user!\n").arg(imageDescription));
-            } else {
-                bool run1=false;
-                bool run2=false;
-                if (useCam1) run1=ecamera1->isAcquisitionRunning(camera1);
-                if (useCam2) run2=ecamera2->isAcquisitionRunning(camera2);
-                running=run1||run2;
-            }
-        }*/
     }
     if (progress) progress->setValue(100);
 

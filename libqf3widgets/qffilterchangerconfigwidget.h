@@ -35,6 +35,7 @@
 #include "qffilterchangercombobox.h"
 #include "filters.h"
 #include "libwid_imexport.h"
+#include "qffilterchangerconfigwidgetthread.h"
 
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a FilterChanger
@@ -103,6 +104,9 @@ class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
         QFPluginServices* m_pluginServices;
         QString m_filterconfig;
 
+        QFFilterChangerConfigWidgetThread* m_thread;
+        bool useThread;
+
 
         void createWidgets();
         void createActions();
@@ -167,6 +171,7 @@ class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
         void disConnect();
         void configure();
         void displayFilterChangerStates();
+        void filterChanged(int filter);
     public slots:
         void FilterChangerNewFilterSelected(int index);
 };

@@ -137,6 +137,8 @@ QShortcut *QFESPIMB040OpticsSetup::addShortCut(const QString &id, const QString 
 }
 
 void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
+    bool updt=updatesEnabled();
+    setUpdatesEnabled(false);
     ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
     ui->stageSetup->loadSettings(settings, prefix+"stages/");
@@ -164,6 +166,7 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
         shortcuts[i].shortcut->setKey(seq);
         shortcuts[i].shortcut->setEnabled(!seq.isEmpty());
     }
+    setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {

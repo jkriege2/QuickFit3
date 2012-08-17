@@ -7,13 +7,16 @@ QFFilterChangerConfigWidget::QFFilterChangerConfigWidget(QWidget* parent):
     QFrame(parent)
 {
 
+    useThread=true;
     setFrameStyle(QFrame::Panel|QFrame::Raised);
     setLineWidth(1);
     FilterChangerStateUpdateInterval=251;
 
+    m_thread=new QFFilterChangerConfigWidgetThread(this);
+    connect(m_thread, SIGNAL(filterChanged(int)), this, SLOT(filterChanged(int)));
+
+
     timUpdate=new QTimer(this);
-    timUpdate->setSingleShot(true);
-    timUpdate->setInterval(FilterChangerStateUpdateInterval);
 
     m_log=NULL;
     m_pluginServices=NULL;
@@ -26,8 +29,12 @@ QFFilterChangerConfigWidget::QFFilterChangerConfigWidget(QWidget* parent):
     updateStates();
 
 
-    connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
-    timUpdate->start(FilterChangerStateUpdateInterval);
+    if (!useThread) {
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(FilterChangerStateUpdateInterval);
+        connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
+        timUpdate->start(FilterChangerStateUpdateInterval);
+    }
     //QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
 }
 
@@ -37,21 +44,30 @@ QFFilterChangerConfigWidget::~QFFilterChangerConfigWidget()
     locked=true;
     disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
     timUpdate->stop();
+    m_thread->stopThread();
 }
 
 void QFFilterChangerConfigWidget::unlockFilterChangers() {
+    if (useThread) {
+        m_thread->start();
+    } else {
+        connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
+        timUpdate->setSingleShot(true);
+        timUpdate->setInterval(FilterChangerStateUpdateInterval);
+        timUpdate->start(FilterChangerStateUpdateInterval);
+    }
     locked=false;
-    connect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
-    timUpdate->setSingleShot(true);
-    timUpdate->setInterval(FilterChangerStateUpdateInterval);
-    timUpdate->start(FilterChangerStateUpdateInterval);
 }
 
 
 void QFFilterChangerConfigWidget::lockFilterChangers() {
     locked=true;
-    disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
-    timUpdate->stop();
+    if (useThread)  {
+        m_thread->stopThread();
+    } else {
+        disconnect(timUpdate, SIGNAL(timeout()), this, SLOT(displayFilterChangerStates()));
+        timUpdate->stop();
+    }
 }
 
 void QFFilterChangerConfigWidget::setLog(QFPluginLogService* log) {
@@ -157,6 +173,8 @@ void QFFilterChangerConfigWidget::createActions() {
 }
 
 void QFFilterChangerConfigWidget::updateStates() {
+    bool updt=updatesEnabled();
+    setUpdatesEnabled(false);
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     bool conn;
@@ -185,9 +203,12 @@ void QFFilterChangerConfigWidget::updateStates() {
     cmbFilterChanger->setEnabled(!conn);
     actSetFilters->setEnabled(conn);
     cmbFilter->setEnabled(conn);
+    setUpdatesEnabled(updt);
 }
 
 void QFFilterChangerConfigWidget::updateFilters() {
+    bool updt=updatesEnabled();
+    setUpdatesEnabled(false);
     QString idx=cmbFilter->currentText();
     disconnect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     cmbFilter->clear();
@@ -213,6 +234,7 @@ void QFFilterChangerConfigWidget::updateFilters() {
     cmbFilter->setCurrentIndex(cmbFilter->findText(idx));
     connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     updateStates();
+    setUpdatesEnabled(true);
 }
 
 void QFFilterChangerConfigWidget::selectFilters() {
@@ -267,6 +289,8 @@ void QFFilterChangerConfigWidget::disConnect() {
     QFExtensionFilterChanger* FilterChanger=getFilterChanger();
     int FilterChangerID=getFilterChangerID();
 
+    bool gotConnection=false;
+
     if (FilterChanger) {
         //qDebug()<<"connecting "<<conn;
         if (conn) {
@@ -274,6 +298,7 @@ void QFFilterChangerConfigWidget::disConnect() {
             FilterChanger->filterChangerConnect(FilterChangerID);
             if (FilterChanger->isFilterChangerConnected(FilterChangerID)) {
                 m_log->log_text("connected to FilterChanger driver ...\n");
+                gotConnection=true;
             } else {
                 actConnect->setChecked(false);
                 FilterChanger->filterChangerDisonnect(FilterChangerID);
@@ -288,6 +313,10 @@ void QFFilterChangerConfigWidget::disConnect() {
     }
     updateFilters();
     updateStates();
+    if (useThread) {
+        if (gotConnection) m_thread->start();
+        else m_thread->stopThread();
+    }
     QApplication::restoreOverrideCursor();
 }
 
@@ -343,6 +372,7 @@ FilterDescription QFFilterChangerConfigWidget::getCurrentFilterDescription() con
 
 void QFFilterChangerConfigWidget::displayFilterChangerStates(/*bool automatic*/) {
     if (locked) return;
+    if (useThread) return;
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     FilterChanger=getFilterChanger();
@@ -362,7 +392,7 @@ void QFFilterChangerConfigWidget::displayFilterChangerStates(/*bool automatic*/)
     updateStates();
 
     //QTimer::singleShot(FilterChangerStateUpdateInterval, this, SLOT(displayFilterChangerStates()));
-    if (!locked) {
+    if (!locked && !useThread) {
         timUpdate->setSingleShot(true);
         timUpdate->setInterval(FilterChangerStateUpdateInterval);
         timUpdate->start(FilterChangerStateUpdateInterval);
@@ -474,6 +504,16 @@ bool QFFilterChangerConfigWidget::isLastActionComplete() const {
         return FilterChanger->isLastFilterChangerActionFinished(FilterChangerID);
     }
     return true;
+}
+
+void QFFilterChangerConfigWidget::filterChanged(int filter)
+{
+    if (filter!=cmbFilter->currentIndex()) {
+        disconnect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
+        cmbFilter->setCurrentIndex(filter);
+        connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
+    }
+    cmbFilter->setEnabled(true);
 }
 
 
