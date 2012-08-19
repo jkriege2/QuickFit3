@@ -9,6 +9,8 @@
 #include "qffitfunction.h"
 #include <QMap>
 #include "qffitparameterwidget.h"
+#include "MersenneTwister.h"
+#define sqr(x) ((x)*(x))
 
 class QFRDRFCSData;
 
@@ -28,6 +30,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
             return csv;
         }
 
+        QMap<QString, QVariant> getParams();
 
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
@@ -148,9 +151,11 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         };
 
         QMap<QString, paramvalue> params;
+        QMap<QString, QVariant> used_params;
 
         double* tau;
         int tauN;
+        int runs;
         double* corr;
         void updateTau();
         QString csv;
@@ -160,6 +165,8 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         void modelChanged(int index);
         void displayModel(bool newWidget);
         void replotFitFunction();
+        void on_cmbNoiseModel_currentIndexChanged(int index);
+        void updateNoiseEnabled();
 };
 
 #endif // QFRDRFCSFITFUNCTIONSIMULATOR_H

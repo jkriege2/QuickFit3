@@ -168,11 +168,20 @@ void QFPRDRFCS::insertSimulated() {
     if (dlg->exec()==QDialog::Accepted) {
         QString CSV=dlg->getCSV();
 
+        QMap<QString, QVariant> p_sim=dlg->getParams();
         QMap<QString, QVariant> p;
         p["FILETYPE"]="INTERNAL";
         p["INTERNAL_CSV"]=CSV;
         QStringList paramsReadonly;
         paramsReadonly<<"FILETYPE";
+
+        QMapIterator<QString, QVariant> it(p_sim);
+        while (it.hasNext()) {
+            it.next();
+            p[it.key().toUpper()]=it.value();
+            paramsReadonly<<it.key().toUpper();
+        }
+
         QFRawDataRecord* e=project->addRawData(getID(), tr("Simulated FCS Model"), QStringList(), p, paramsReadonly);
         if (e->error()) {
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing simulated FCS curve:\n%1").arg(e->errorDescription()));

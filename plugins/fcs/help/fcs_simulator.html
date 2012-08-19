@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Online-Help</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+	 <h2>FCS Curve Simulator</h2>
+	 <h3>Usage</h3>
+	 This tool allows create raw data records with simulated correlation data. To create a record with synthetic data, use the menu entry "<tt>Data Items|Insert Raw Data|FCS data|FCS Data from fit function</tt>". Then a dialog will pop up, where you can define all parameters for the curves. After clicking "OK", a record with the data as in the dialog will be created and inserted into the project.
+	 
+	 <h3>Parametrizing the synthetic correlation curve</h3>
+	 You can set these parameters for a synthetic correlation curve:
+	 <ul>
+	   <li><b>model function:</b> select the model function $$math:g(\tau, \vec{p})$$ from which you want to create synthetic data</li>
+	   <li><b>parameters:</b> Here you can parametrize the model function</li>
+	   <li><b>lag time range:</b> specify the minimum and maximum lag time $$math:\tau$$ for which you want to evaluate the model function</li>
+	   <li><b>runs:</b> This plugin may create several runs. All runs will have the same model parameters, but the may differ due to noise.</li>
+	   <li><b>noise:</b> Here you can choose a noise model and parameters for your synthetic data:
+		   <ul>
+			 <li><i>Koppel's formula:</i> Koppel derived a formula foe the variance of the ACF, which is evaluated here (see Wohland, T; Rigler, R; Vogel, H (2001): "The standard deviation in fluorescence correlation spectroscopy", Biophys J 80(6), p. 2987-99). In addition to the model parameters you will have to supply the duration of the measurement and the average photon count during the measurement.</li>		   
+			 <li><i>gaussian:</i> adds gaussian noise with a standard deviation which is calculated as a fraction of the $$math:g(\tau)$$ at the minimum lag time. The fraction is given by the parameter "level".</li>		   
+			 <li><i>uniform:</i> adds uniform noise with a width which is calculated as a fraction of the $$math:g(\tau)$$ at the minimum lag time. The fraction is given by the parameter "level".			 
+			 <li><i>local gaussian:</i> like <i>gaussian</i>, but the noise scales with the local value of the ACF.</li>		   
+			 <li><i>local uniform:</i> like <i>uniform</i>, but the noise scales with the local value of the ACF.</li>		   
+		   </ul>		   
+	   </li>
+	 </ul>
+  </body>
+</html>
