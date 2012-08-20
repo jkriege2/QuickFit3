@@ -4,6 +4,7 @@
 #include <cmath>
 
 #define F_AVOGADRO_PRE 6.02214179
+#define REPORTCHECK_DELAY_MS 100
 
 inline double sqr(double x) { return x*x; }
 
@@ -21,6 +22,7 @@ dlgEstimateFocalVolume::dlgEstimateFocalVolume(ProgramOptions* settings, QWidget
     wxy=250;
     wxy_error=0;
     toolDCalc=NULL;
+    toolDCalcReport=NULL;
 
 }
 
@@ -60,6 +62,7 @@ void dlgEstimateFocalVolume::init(double particles, double particles_error, bool
 
    // qDebug()<<QFExtensionManager::getInstance()->getIDList();
     toolDCalc=qobject_cast<QFExtensionTool*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
+    toolDCalcReport=qobject_cast<QFExtensionReportingTool*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
     btnDCalculator->setEnabled(toolDCalc!=NULL);
 
 }
@@ -96,7 +99,14 @@ void dlgEstimateFocalVolume::on_btnHelp_clicked() {
 }
 
 void dlgEstimateFocalVolume::on_btnDCalculator_clicked() {
-    if (toolDCalc) toolDCalc->startTool();
+    if (toolDCalc) {
+        toolDCalc->startTool();
+        if (toolDCalcReport) {
+            DTool=toolDCalcReport->getReportingToolValue("diff_coeff");
+            QTimer::singleShot(REPORTCHECK_DELAY_MS, this, SLOT(checkToolVal()));
+        }
+    }
+
 }
 
 void dlgEstimateFocalVolume::calc_from_C() {
@@ -124,6 +134,17 @@ void dlgEstimateFocalVolume::calc_from_D() {
         //wxy_error=sqrt(sqr(spinDError->value()*tauD/sqrt(spinD->value()*tauD)) + sqr(tauD_error*spinD->value()/sqrt(spinD->value()*tauD)));
         wxy_error=sqrt(tauD*De*De*1.0e-6/D + D*tauD_error*tauD_error*1.0e-6/tauD)*1000.0;
         labFocusparamDiffusion->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
+    }
+}
+
+void dlgEstimateFocalVolume::checkToolVal() {
+    if (toolDCalcReport) {
+        QVariant v=toolDCalcReport->getReportingToolValue("diff_coeff");
+        if (v!=DTool && v.canConvert(QVariant::Double)) {
+            DTool=v;
+            spinD->setValue(DTool.toDouble());
+        }
+        QTimer::singleShot(REPORTCHECK_DELAY_MS, this, SLOT(checkToolVal()));
     }
 }
 

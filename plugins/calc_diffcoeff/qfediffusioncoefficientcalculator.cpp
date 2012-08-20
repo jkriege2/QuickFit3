@@ -88,6 +88,7 @@ void QFEDiffusionCoefficientCalculator::initExtension() {
 void QFEDiffusionCoefficientCalculator::startPlugin() {
     if (!dlg) dlg=new DlgCalcDiffCoeff(this, NULL);
     dlg->show();
+    clearReportVals();
 }
 
 void QFEDiffusionCoefficientCalculator::loadSettings(ProgramOptions* settingspo) {
@@ -129,6 +130,20 @@ void QFEDiffusionCoefficientCalculator::log_error(QString message) {
 void QFEDiffusionCoefficientCalculator::startTool()
 {
     startPlugin();
+}
+
+QVariant QFEDiffusionCoefficientCalculator::getReportingToolValue(const QString &name)
+{
+    return reportVals.value(name, QVariant());
+}
+
+void QFEDiffusionCoefficientCalculator::setReportVal(const QString &name, QVariant val) {
+    reportVals[name]=val;
+}
+
+void QFEDiffusionCoefficientCalculator::clearReportVals()
+{
+    reportVals.clear();
 }
 
 

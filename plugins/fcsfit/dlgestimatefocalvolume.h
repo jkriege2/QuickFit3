@@ -8,6 +8,7 @@
 #include "qfextensiontool.h"
 #include "qfextension.h"
 #include "qfextensionmanager.h"
+#include "qfextensionreportingtool.h"
 
 /*! \brief estimates the focal parameter \f$ w_{xy} \f$ from a given diffusion coefficient or concentration
     \ingroup qf3evalp_fcsfit
@@ -47,6 +48,9 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         double wxy_error;
         ProgramOptions* settings;
         QFExtensionTool* toolDCalc;
+        QFExtensionReportingTool* toolDCalcReport;
+        QVariant DTool;
+
 
         void calc_from_C();
         void calc_from_D();
@@ -59,6 +63,8 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         void on_spinDError_valueChanged(double d);
         void on_btnHelp_clicked();
         void on_btnDCalculator_clicked();
+
+        void checkToolVal();
     private:
 };
 

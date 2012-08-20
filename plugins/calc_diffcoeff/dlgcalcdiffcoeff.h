@@ -30,6 +30,7 @@ class DlgCalcDiffCoeff : public QDialog
         void readSettings();
         void writeSettings();
         void readSamples();
+        void updateReport(const QModelIndex& index);
     private:
         Ui::DlgCalcDiffCoeff *ui;
         QFEDiffusionCoefficientCalculator *plugin;

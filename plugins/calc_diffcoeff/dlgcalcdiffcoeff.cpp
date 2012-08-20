@@ -97,7 +97,10 @@ void DlgCalcDiffCoeff::updateGivenD() {
             ui->spinGivenDT->setValue(set.value(groups[i]+"/temperature", 20).toDouble());
             ui->edtGivenD->setValue(set.value(groups[i]+"/D", 10).toDouble());
             ui->edtGivenDVisc->setValue(set.value(groups[i]+"/viscosity", 1).toDouble());
-            ui->cmbGivenDName->setToolTip(set.value(groups[i]+"/reference", "").toString());
+            //ui->cmbGivenDName->setToolTip(set.value(groups[i]+"/reference", "").toString());
+            QVariant ref=set.value(groups[i]+"/reference", "");
+            if (ref.type()==QVariant::StringList) ref=ref.toStringList().join(", ");
+            ui->edtReference->setText(ref.toString());
             break;
         }
     }
@@ -130,6 +133,7 @@ void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
         set.setValue(QString("sample%1/D").arg(idx_max), ui->edtGivenD->value());
         set.setValue(QString("sample%1/viscosity").arg(idx_max), ui->edtGivenDVisc->value());
         set.setValue(QString("sample%1/temperature").arg(idx_max), ui->spinGivenDT->value());
+        set.setValue(QString("sample%1/reference").arg(idx_max), ui->edtReference->text());
         ui->cmbGivenDName->addItem(name);
     }
 
@@ -183,17 +187,21 @@ void DlgCalcDiffCoeff::readSettings() {
             loadWidgetGeometry(*set, this, plugin->getID()+"/widget/");
             loadSplitter(*set, ui->splitter, plugin->getID()+"/splitter/");
             ui->cmbPlot->setCurrentIndex(set->value(plugin->getID()+"/plot", 0).toInt());
-            ui->cmbSolutionName->setCurrentIndex(set->value(plugin->getID()+"/solution", 0).toInt());
             ui->tabWidget->setCurrentIndex(set->value(plugin->getID()+"/sample", 0).toInt());
             ui->spinSolutionTemperature->setValue(set->value(plugin->getID()+"/temperature", 10).toDouble());
             ui->spinSolutionTemperatureEnd->setValue(set->value(plugin->getID()+"/temperature_end", 40).toDouble());
             ui->spinSolutionTemperatureDelta->setValue(set->value(plugin->getID()+"/temperature_delta", 0.5).toDouble());
             ui->spinSPhereDiameter->setValue(set->value(plugin->getID()+"/diameter", 100).toDouble());
-            ui->edtGivenD->setValue(set->value(plugin->getID()+"/givenD/D", 100).toDouble());
-            ui->edtGivenDVisc->setValue(set->value(plugin->getID()+"/givenD/visc", 1).toDouble());
-            ui->spinGivenDT->setValue(set->value(plugin->getID()+"/givenD/Temp", 20).toDouble());
-            ui->spinGivenD20W->setValue(set->value(plugin->getID()+"/givenD20W", 100).toDouble());
+            //ui->edtGivenD->setValue(set->value(plugin->getID()+"/givenD/D", 100).toDouble());
+            //ui->edtGivenDVisc->setValue(set->value(plugin->getID()+"/givenD/visc", 1).toDouble());
+            //ui->spinGivenDT->setValue(set->value(plugin->getID()+"/givenD/Temp", 20).toDouble());
+            //ui->spinGivenD20W->setValue(set->value(plugin->getID()+"/givenD20W", 100).toDouble());
 
+            ui->cmbSolutionName->setCurrentIndex(set->value(plugin->getID()+"/solution", 0).toInt());
+            ui->cmbGivenDName->setCurrentIndex(set->value(plugin->getID()+"/givenD/name", 0).toInt());
+
+            updateD();
+            updateGivenD();
         }
     }
 }
@@ -215,6 +223,7 @@ void DlgCalcDiffCoeff::writeSettings() {
             set->setValue(plugin->getID()+"/givenD/D", ui->edtGivenD->value());
             set->setValue(plugin->getID()+"/givenD/visc", ui->edtGivenDVisc->value());
             set->setValue(plugin->getID()+"/givenD/Temp", ui->spinGivenDT->value());
+            set->setValue(plugin->getID()+"/givenD/name", ui->cmbGivenDName->currentIndex());
 
             set->setValue(plugin->getID()+"/givenD20W", ui->spinGivenD20W->value());
 
@@ -245,4 +254,23 @@ void DlgCalcDiffCoeff::readSamples() {
 
     updating=false;
     updateD();
+}
+
+void DlgCalcDiffCoeff::updateReport(const QModelIndex &index) {
+    QVariant d=ui->tableView->model()->data(index);
+    switch (index.column()) {
+        case 0:
+            plugin->setReportVal("temperature", d.toDouble());
+            break;
+        case 1:
+            plugin->setReportVal("diff_coeff", d.toDouble());
+            break;
+        case 2:
+            plugin->setReportVal("viscosity", d.toDouble());
+            break;
+        case 3:
+            plugin->setReportVal("density", d.toDouble());
+            break;
+    }
+
 }

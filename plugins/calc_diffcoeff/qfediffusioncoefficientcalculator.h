@@ -6,7 +6,7 @@
 #include "qfextension.h"
 #include "dlgcalcdiffcoeff.h"
 #include "qfextensiontool.h"
-
+#include "qfextensionreportingtool.h"
 /*!
     \defgroup qf3ext_qfe_calc_diffcoeff QFExtension implementation
     \ingroup qf3extensionplugins
@@ -15,9 +15,9 @@
 /*! \brief QFExtension implementation
     \ingroup qf3ext_qfe_calc_diffcoeff
  */
-class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase, public QFExtensionTool {
+class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase, public QFExtensionTool, public QFExtensionReportingTool {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionTool)
+        Q_INTERFACES(QFExtension QFExtensionTool QFExtensionReportingTool)
     public:
         /** Default constructor */
         QFEDiffusionCoefficientCalculator(QObject* parent=NULL);
@@ -58,6 +58,11 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
 
         virtual QAction* getToolStartAction();
         virtual void startTool();
+        virtual QVariant getReportingToolValue(const QString& name=QString(""));
+
+        void setReportVal(const QString& name, QVariant val);
+        void clearReportVals();
+
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -87,6 +92,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         QFPluginLogService* logService;
         DlgCalcDiffCoeff* dlg;
         QAction* actStartPlugin;
+        QMap<QString, QVariant> reportVals;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
