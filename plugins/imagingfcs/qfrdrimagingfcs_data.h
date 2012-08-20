@@ -324,17 +324,17 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageCount() */
-        virtual int getPreviewImageCount() const;
+        virtual int getOverviewImageCount() const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageWidth() */
-        virtual int getPreviewImageWidth(int image) const;
+        virtual int getOverviewImageWidth(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageHeight() */
-        virtual int getPreviewImageHeight(int image) const;
+        virtual int getOverviewImageHeight(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageName() */
-        virtual QString getPreviewImageName(int image) const;
+        virtual QString getOverviewImageName(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImage() */
-        virtual double* getPreviewImage(int image) const;
+        virtual double* getOverviewImage(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */
-        virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getPreviewImageGeoElements(int image) const;
+        virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getOverviewImageAnnotations(int image) const;
 
 
 

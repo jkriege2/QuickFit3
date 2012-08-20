@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="number_and_brightness/qfrdrnumberandbrightness.png">./images/qfrdrnumberandbrightness.png</file>
+    <file alias="number_and_brightness/qfrdrnumberandbrightness_small.png">./images/qfrdrnumberandbrightness_small.png</file>
+</qresource>
+</RCC>

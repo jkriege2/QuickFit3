@@ -299,6 +299,16 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     QFRDRImagingFCSData::ovrImageData img;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=files_desciptions.value(i, ft);
+                    if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
+                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        rect.title=tr("ROI");
+                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
+                        rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
+                        rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
+                        rect.height=fabs(getProperty("ROI_Y_START").toDouble()- getProperty("ROI_Y_END").toDouble());
+                        img.geoElements.append(rect);;
+                    }
                     ovrImages.append(img);
 
                 } else if (ft=="acf" || ft=="ccf" || ft=="dccf") {
@@ -1230,32 +1240,32 @@ void QFRDRImagingFCSData::maskSet(uint16_t x, uint16_t y) {
 
 
 
-int QFRDRImagingFCSData::getPreviewImageCount() const {
+int QFRDRImagingFCSData::getOverviewImageCount() const {
     return 2+ovrImages.size();
 }
 
-int QFRDRImagingFCSData::getPreviewImageWidth(int image) const {
+int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
     if (image==0) return getImageFromRunsWidth();
     if (image==1) return getImageFromRunsWidth();
     if (image-1<=ovrImages.size()) return ovrImages[image-2].width;
     return 0;
 }
 
-int QFRDRImagingFCSData::getPreviewImageHeight(int image) const {
+int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
     if (image==0) return getImageFromRunsHeight();
     if (image==1) return getImageFromRunsHeight();
     if (image-1<=ovrImages.size()) return ovrImages[image-2].height;
     return 0;
 }
 
-QString QFRDRImagingFCSData::getPreviewImageName(int image) const {
+QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
     if (image==0) return tr("overview image (time average)");
     if (image==1) return tr("standard deviation overview image (time average)");
     if (image-1<=ovrImages.size()) return ovrImages[image-2].name;
     return QString("");
 }
 
-double *QFRDRImagingFCSData::getPreviewImage(int image) const {
+double *QFRDRImagingFCSData::getOverviewImage(int image) const {
     if (image==0) return overviewF;
     //qDebug()<<"overviewFSTD="<<overviewFSTD;
     if (image==1) return overviewFSTD;
@@ -1263,7 +1273,7 @@ double *QFRDRImagingFCSData::getPreviewImage(int image) const {
     return NULL;
 }
 
-QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getPreviewImageGeoElements(int image) const {
+QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getOverviewImageAnnotations(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
     if (image>1 && image<=ovrImages.size()) return ovrImages[image-2].geoElements;
     return result;

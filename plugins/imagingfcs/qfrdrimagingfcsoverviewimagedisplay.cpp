@@ -551,8 +551,8 @@ void QFRDRImagingFCSOverviewImageDisplay::connectWidgets(QFRawDataRecord *curren
     this->current=current;
     connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     if (m) {
-        for (int i=0; i<m->getPreviewImageCount(); i++) {
-            cmbImage->addItem(QIcon(":/imaging_fcs/image.png"), m->getPreviewImageName(i));
+        for (int i=0; i<m->getOverviewImageCount(); i++) {
+            cmbImage->addItem(QIcon(":/imaging_fcs/image.png"), m->getOverviewImageName(i));
         }
     }
 
@@ -581,8 +581,8 @@ void QFRDRImagingFCSOverviewImageDisplay::showFrame(int frame) {
 
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
     QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
-    if (m && mv && cmbImage->currentIndex()-m->getPreviewImageCount()<mv->getImageStackCount()) {
-        int idx=cmbImage->currentIndex()-m->getPreviewImageCount();
+    if (m && mv && cmbImage->currentIndex()-m->getOverviewImageCount()<mv->getImageStackCount()) {
+        int idx=cmbImage->currentIndex()-m->getOverviewImageCount();
         int width=mv->getImageStackWidth(idx);
         int height=mv->getImageStackHeight(idx);
         image->set_data(mv->getImageStack(idx, frame), width, height, JKQTPMathImageBase::DoubleArray);
@@ -617,14 +617,14 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
     player->pause();
     pltImage->set_doDrawing(false);
     clearOverlays();
-    if (m && cmbImage->currentIndex()<m->getPreviewImageCount()) {
+    if (m && cmbImage->currentIndex()<m->getOverviewImageCount()) {
         //qDebug()<<"1:    idx="<<cmbImage->currentIndex();
-        int width=m->getPreviewImageWidth(cmbImage->currentIndex());
-        int height=m->getPreviewImageHeight(cmbImage->currentIndex());
+        int width=m->getOverviewImageWidth(cmbImage->currentIndex());
+        int height=m->getOverviewImageHeight(cmbImage->currentIndex());
         //qDebug()<<"2:    w="<<width<<"   h="<<height;
-        QList<QFRDROverviewImageInterface::OverviewImageGeoElement> overlayElements=m->getPreviewImageGeoElements(cmbImage->currentIndex());
+        QList<QFRDROverviewImageInterface::OverviewImageGeoElement> overlayElements=m->getOverviewImageAnnotations(cmbImage->currentIndex());
         //qDebug()<<"3:    data="<<m->getPreviewImage(cmbImage->currentIndex());
-        image->set_data(m->getPreviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
+        image->set_data(m->getOverviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
         image->set_width(width);
         image->set_height(height);
 
@@ -636,7 +636,7 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
         }
 
         histogram->setEnabled(true);
-        showHistograms(m->getPreviewImage(cmbImage->currentIndex()), width*height);
+        showHistograms(m->getOverviewImage(cmbImage->currentIndex()), width*height);
 
         //qDebug()<<"4";
         QList<QColor> cols;
@@ -663,8 +663,8 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
         chkHistVideo->setVisible(false);
         labDescription->setText(tr("<b>image size:</b> %1 &times; %2").arg(width).arg(height));
         //qDebug()<<"6";
-    } else if (mv && cmbImage->currentIndex()-m->getPreviewImageCount()<mv->getImageStackCount()) {
-        int idx=cmbImage->currentIndex()-m->getPreviewImageCount();
+    } else if (mv && cmbImage->currentIndex()-m->getOverviewImageCount()<mv->getImageStackCount()) {
+        int idx=cmbImage->currentIndex()-m->getOverviewImageCount();
         int width=mv->getImageStackWidth(idx);
         double rwidth=(double)width*mv->getImageStackXUnitFactor(idx);
         int height=mv->getImageStackHeight(idx);

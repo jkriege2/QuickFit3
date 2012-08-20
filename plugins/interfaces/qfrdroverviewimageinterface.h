@@ -51,13 +51,13 @@ class QFRDROverviewImageInterface {
         virtual ~QFRDROverviewImageInterface() {}
 
         /** \brief returns the number of available preview images */
-        virtual int getPreviewImageCount() const =0;
+        virtual int getOverviewImageCount() const =0;
         /** \brief returns the width of the given image */
-        virtual int getPreviewImageWidth(int image) const=0;
+        virtual int getOverviewImageWidth(int image) const=0;
         /** \brief returns the height of the given image */
-        virtual int getPreviewImageHeight(int image) const=0;
+        virtual int getOverviewImageHeight(int image) const=0;
         /** \brief returns the name of the given image */
-        virtual QString getPreviewImageName(int image) const=0;
+        virtual QString getOverviewImageName(int image) const=0;
 
         /*! \brief return a pointer to a uint16_t image of size getDataImageWidth() * getDataImageHeight()
 
@@ -66,9 +66,9 @@ class QFRDROverviewImageInterface {
 
             \return  a uint16_t image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
          */
-        virtual double* getPreviewImage(int image) const=0;
+        virtual double* getOverviewImage(int image) const=0;
         /*! \brief returns a list of geometrix elements overlayn to the image */
-        virtual QList<OverviewImageGeoElement> getPreviewImageGeoElements(int image) const=0;
+        virtual QList<OverviewImageGeoElement> getOverviewImageAnnotations(int image) const=0;
 
 };
 
