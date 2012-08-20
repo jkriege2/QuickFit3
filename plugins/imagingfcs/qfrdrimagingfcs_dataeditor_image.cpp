@@ -143,6 +143,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     JKVerticalScrollArea* area=new JKVerticalScrollArea(this);
     QWidget* w=new QWidget(this);
+    /*QFont f=w->font();
+    f.setPointSize(f.pointSize()-1);
+    w->setFont(f);*/
     area->setWidget(w);
     area->setWidgetResizable(true);
     QVBoxLayout* vbl=new QVBoxLayout();
@@ -182,6 +185,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGroupBox* wmask=new QGroupBox(tr(" mask options "), this);
     vbl->addWidget(wmask);
     QGridLayout* glmask=new QGridLayout(this);
+    glmask->setHorizontalSpacing(2);
+    glmask->setVerticalSpacing(2);
     wmask->setLayout(glmask);
 
     int mskgrpRow=0;
@@ -213,14 +218,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     glmask->addWidget(btnLoadMask, mskgrpRow, 2);
     connect(actLoadMask, SIGNAL(triggered()), this, SLOT(loadMask()));
     mskgrpRow++;
-    btnSaveSelection=createButtonAndActionShowText(actSaveSelection, QIcon(":/imaging_fcs/saveselection.png"), tr("&save selection"), w);
-    actSaveSelection->setToolTip(tr("save the selection to harddisk"));
-    glmask->addWidget(btnSaveSelection, mskgrpRow, 0);
-    connect(actSaveSelection, SIGNAL(triggered()), this, SLOT(saveSelection()));
-    btnLoadSelection=createButtonAndActionShowText(actLoadSelection, QIcon(":/imaging_fcs/loadselection.png"), tr("&load selection"), w);
-    actLoadSelection->setToolTip(tr("load a selection from harddisk"));
-    glmask->addWidget(btnLoadSelection, mskgrpRow, 1);
-    connect(actLoadSelection, SIGNAL(triggered()), this, SLOT(loadSelection()));
 
 
     mskgrpRow++;
@@ -252,6 +249,38 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actMaskByParamIntensity, SIGNAL(triggered()), this, SLOT(excludeByParamIntensity()));
 
 
+    mskgrpRow++;
+    frame=new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    glmask->addWidget(frame, mskgrpRow, 0, 1, 3);
+
+    mskgrpRow++;
+    btnSaveSelection=createButtonAndActionShowText(actSaveSelection, QIcon(":/imaging_fcs/saveselection.png"), tr("&save selection to disk"), w);
+    actSaveSelection->setToolTip(tr("save the selection to harddisk"));
+    glmask->addWidget(btnSaveSelection, mskgrpRow, 0);
+    connect(actSaveSelection, SIGNAL(triggered()), this, SLOT(saveSelection()));
+    btnLoadSelection=createButtonAndActionShowText(actLoadSelection, QIcon(":/imaging_fcs/loadselection.png"), tr("&load selection to disk"), w);
+    actLoadSelection->setToolTip(tr("load a selection from harddisk"));
+    glmask->addWidget(btnLoadSelection, mskgrpRow, 1);
+    connect(actLoadSelection, SIGNAL(triggered()), this, SLOT(loadSelection()));
+
+    mskgrpRow++;
+    glmask->addWidget(new QLabel(tr("stored selections:")), mskgrpRow, 0);
+    cmbStoredSelections=new QComboBox(this);
+    glmask->addWidget(cmbStoredSelections, mskgrpRow, 1,1,2);
+    mskgrpRow++;
+    btnSaveSelectionToStored=createButtonAndActionShowText(actSaveSelectionToStored, tr("save selection "), w);
+    actSaveSelectionToStored->setToolTip(tr("save the current selection under a new name to the drop-down field above (record)"));
+    glmask->addWidget(btnSaveSelectionToStored, mskgrpRow, 1);
+    btnDeleteStoredSelection=createButtonAndActionShowText(actDeleteStoredSelection, tr("delete selection "), w);
+    actDeleteStoredSelection->setToolTip(tr("delete the current named selection from the drop-down field above"));
+    glmask->addWidget(btnDeleteStoredSelection, mskgrpRow, 2);
+    connect(actDeleteStoredSelection, SIGNAL(triggered()), this, SLOT(deleteSelection()));
+    connect(actSaveSelectionToStored, SIGNAL(triggered()), this, SLOT(storeSelection()));
+    connect(cmbStoredSelections, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedSelectionInCombo(int)));
+
+
+
 
 
 
@@ -261,6 +290,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGroupBox* wimg=new QGroupBox(tr(" parameter image style "), this);
     vbl->addWidget(wimg);
     QFormLayout* gli=new QFormLayout(this);
+    gli->setSpacing(2);
     wimg->setLayout(gli);
 
     cmbImageStyle=new QComboBox(wimg);
@@ -365,6 +395,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGroupBox* wcp=new QGroupBox(tr(" correlation plot styles "), this);
     vbl->addWidget(wcp);
     QFormLayout* gl=new QFormLayout(this);
+    gl->setSpacing(2);
+
     wcp->setLayout(gl);
 
     QHBoxLayout* cpsHBox=new QHBoxLayout(this);
@@ -392,6 +424,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
+    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epoly.png"), tr("polygons"));
+    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epolybars.png"), tr("polygons+bars"));
     cpsHBox=new QHBoxLayout(this);
     cpsHBox->setContentsMargins(0,0,0,0);
     cpsHBox->addWidget(cmbAverageStyle);
@@ -412,6 +446,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
+    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epoly.png"), tr("polygons"));
+    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epolybars.png"), tr("polygons+bars"));
     cpsHBox=new QHBoxLayout(this);
     cpsHBox->setContentsMargins(0,0,0,0);
     cpsHBox->addWidget(cmbRunStyle);
@@ -448,6 +484,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     QWidget* wpltOverview=new QWidget(this);
     QVBoxLayout* lpltOverview=new QVBoxLayout();
+    lpltOverview->setSpacing(2);
     wpltOverview->setLayout(lpltOverview);
     pltOverview=new JKQtPlotter(wpltOverview);
     pltOverview->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
@@ -975,7 +1012,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     layACFs->addWidget(tbParameterImage, 0, 0, 1, 2);
     layACFs->addWidget(splitterTopBot, 1, 0);
     layACFs->addWidget(area, 1, 1); // !!!
-    layACFs->setColumnStretch(0,5);
+    layACFs->setColumnStretch(0,10);
     layACFs->setRowStretch(1,0);
     layACFs->setContentsMargins(0,0,0,0);
 
@@ -1459,10 +1496,14 @@ void QFRDRImagingFCSImageEditor::loadSelection() {
             }
 
             f.close();
+            selectionEdited();
         }
     }
 
     replotSelection(true);
+    timUpdateAfterClick->setSingleShot(true);
+    timUpdateAfterClick->stop();
+    timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
 
 }
 
@@ -1493,12 +1534,13 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         sliders->enableSliderSignals();
         selected.clear();
         selected.insert(0);
+        selectionEdited();
         connect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     } else {
         selected.clear();
     }
-
+    updateSelectionCombobox();
     loadImageSettings();
     fillParameterSet();
 }
@@ -1525,6 +1567,7 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
                 if (!actImagesScribble->isChecked()) selected.clear();
                 selected.insert(idx);
             }
+            selectionEdited();
         } else {
             if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
                 m->maskToggle(xx,yy);
@@ -1558,6 +1601,7 @@ void QFRDRImagingFCSImageEditor::imageScribbled(double x, double y, Qt::Keyboard
             } else {
                 selected.insert(idx);
             }
+            selectionEdited();
         } else {
             if (first && modifiers==Qt::NoModifier) m->maskClear();
             if (modifiers==Qt::ShiftModifier) {
@@ -1644,6 +1688,7 @@ void QFRDRImagingFCSImageEditor::imageRectangleFinished(double x, double y, doub
                 }
             }
         }
+        selectionEdited();
     } else {
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
@@ -1721,6 +1766,7 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
                 }
             }
         }
+        selectionEdited();
     } else {
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
@@ -1798,6 +1844,7 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
                 }
             }
         }
+        selectionEdited();
     } else {
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
@@ -1863,6 +1910,7 @@ void QFRDRImagingFCSImageEditor::imageLineFinished(double x1, double y1, double 
                 selected.insert(idx);
             }
         }
+        selectionEdited();
     } else {
         if (modifiers==Qt::ControlModifier) {
             for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
@@ -1946,6 +1994,7 @@ void QFRDRImagingFCSImageEditor::updateAfterClick() {
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    updateSelectionCombobox();
     replotSelection(false);
     replotOverview();
     replotImage();
@@ -2481,6 +2530,8 @@ void QFRDRImagingFCSImageEditor::replotData() {
             case 1: runerrorstyle=JKQTPerrorBars; break;
             case 2: runerrorstyle=JKQTPerrorLines; break;
             case 3: runerrorstyle=JKQTPerrorBarsLines; break;
+            case 4: runerrorstyle=JKQTPerrorPolygons; break;
+            case 5: runerrorstyle=JKQTPerrorBarsPolygons; break;
         }
         bool runLine=(cmbRunStyle->currentIndex()!=1);
         JKQTPgraphSymbols runSymbol=JKQTPcross;
@@ -2491,6 +2542,8 @@ void QFRDRImagingFCSImageEditor::replotData() {
             case 1: avgerrorstyle=JKQTPerrorBars; break;
             case 2: avgerrorstyle=JKQTPerrorLines; break;
             case 3: avgerrorstyle=JKQTPerrorBarsLines; break;
+            case 4: avgerrorstyle=JKQTPerrorPolygons; break;
+            case 5: avgerrorstyle=JKQTPerrorBarsPolygons; break;
         }
         bool avgLine=(cmbAverageStyle->currentIndex()!=1);
         JKQTPgraphSymbols avgSymbol=JKQTPcross;
@@ -2512,7 +2565,10 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
             JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
             //g->set_color(QColor("blue"));
-            g->set_errorColor(g->get_color().lighter());
+            QColor cerr=g->get_color().lighter();
+            g->set_errorColor(cerr);
+            cerr.setAlphaF(0.5);
+            g->set_errorFillColor(cerr);
             g->set_lineWidth(2);
             g->set_xColumn(c_tau);
             g->set_yColumn(c_mean);
@@ -2561,7 +2617,10 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 if (m->leaveoutRun(i)) {
                     g->set_color(QColor("grey"));
                 }
-                g->set_errorColor(g->get_color().lighter());
+                QColor cerr=g->get_color().lighter();
+                g->set_errorColor(cerr);
+                cerr.setAlphaF(0.5);
+                g->set_errorFillColor(cerr);
                 plotter->addGraph(g);
 
 #ifdef DEBUG_TIMIMNG
@@ -2642,9 +2701,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     gr->set_lineWidth(1.5);
                     gr->set_xColumn(c_tau);
                     gr->set_yColumn(c_resid);
-                    gr->set_drawLine(true);
+                    gr->set_drawLine(runLine);
                     gr->set_style(Qt::DotLine);
-                    gr->set_symbol(JKQTPnoSymbol);
+                    gr->set_symbol(runSymbol);
                     gr->set_title(tr("residuals for run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
                     gr->set_datarange_start(sliders->get_userMin());
                     gr->set_datarange_end(sliders->get_userMax());
@@ -3011,6 +3070,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(edtOvrMin, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
             connect(edtOvrMax, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
 
+
+
             histogram->connectParameterWidgets(connectTo);
             connect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
 
@@ -3036,6 +3097,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
         disconnect(edtOvrMin, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
         disconnect(edtOvrMax, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+
 
         histogram->connectParameterWidgets(connectTo);
         disconnect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
@@ -3439,6 +3501,98 @@ void QFRDRImagingFCSImageEditor::setCopyableData()
         pltOverview->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
         pltOverview->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("excluded"));
     }
+}
+
+void QFRDRImagingFCSImageEditor::updateSelectionCombobox()
+{
+    bool en=cmbStoredSelections->updatesEnabled();
+    QString idx=cmbStoredSelections->currentText();
+    cmbStoredSelections->setUpdatesEnabled(false);
+    disconnect(cmbStoredSelections, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedSelectionInCombo(int)));
+    cmbStoredSelections->clear();
+    cmbStoredSelections->addItem("--- custom ---");
+
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        for (int s=0; s<m->getImageSelectionCount(); s++) {
+            cmbStoredSelections->addItem(m->getImageSelectionName(s));
+        }
+    }
+
+    connect(cmbStoredSelections, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedSelectionInCombo(int)));
+    cmbStoredSelections->setCurrentIndex(cmbStoredSelections->findText(idx));
+    cmbStoredSelections->setUpdatesEnabled(en);
+}
+
+void QFRDRImagingFCSImageEditor::selectedSelectionInCombo(int index) {
+    if (index>0) {
+        QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+        if (m) {
+            if (index-1<m->getImageSelectionCount()) {
+                selected.clear();
+                bool* sel=m->loadImageSelection(index-1);
+                for (int i=0; i<m->getImageSelectionWidth()*m->getImageSelectionHeight(); i++)  {
+                    if (sel[i]) {
+                        selected.insert(i);
+                    }
+                }
+                replotSelection(true);
+                timUpdateAfterClick->setSingleShot(true);
+                timUpdateAfterClick->stop();
+                timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
+
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::storeSelection()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        bool ok=false;
+        QStringList items;
+        items<<"";
+        for (int i=1; i<cmbStoredSelections->count(); i++) {
+            items<<cmbStoredSelections->itemText(i);
+        }
+        QString name= QInputDialog::getItem(this, tr("store selection"), tr("new name"), items, 0, true, &ok);
+        if (ok) {
+            bool* sel=(bool*)calloc(m->getImageSelectionHeight()*m->getImageSelectionWidth(), sizeof(bool));
+            for (int i=0; i<m->getImageSelectionHeight()*m->getImageSelectionWidth(); i++) sel[i]=false;
+
+            QSetIterator<int32_t> it(selected);
+            while (it.hasNext()) {
+                int idx=it.next();
+                if (idx>=0 && idx<m->getImageSelectionHeight()*m->getImageSelectionWidth()) {
+                    sel[idx]=true;
+                }
+            }
+
+            m->addImageSelection(sel, name);
+
+            free(sel);
+            updateSelectionCombobox();
+            cmbStoredSelections->setCurrentIndex(cmbStoredSelections->findText(name));
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::deleteSelection() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        int idx=cmbStoredSelections->currentIndex();
+        if (idx>0 && idx-1<m->getImageSelectionCount()) {
+            m->deleteImageSelection(idx-1);
+            updateSelectionCombobox();
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::selectionEdited()
+{
+    cmbStoredSelections->setCurrentIndex(0);
 }
 
 void QFRDRImagingFCSImageEditor::copyToMatlab() {

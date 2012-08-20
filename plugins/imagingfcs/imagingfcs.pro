@@ -43,7 +43,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
     ../../../../../LIB/trunk/yaid_rh.h \
     qfrdrimagingfcsseriesdialog.h \
-    qfrdrimagingfcscopydataselectdialog.h
+    qfrdrimagingfcscopydataselectdialog.h \
+    ../interfaces/qfrdrimageselectioninterface.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \

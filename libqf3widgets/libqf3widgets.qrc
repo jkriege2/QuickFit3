@@ -42,6 +42,8 @@
         <file alias="plot_ebars.png">icons/fcsplot_ebars.png</file>
         <file alias="plot_elines.png">icons/fcsplot_elines.png</file>
         <file alias="plot_elinesbars.png">icons/fcsplot_elinesbars.png</file>
+        <file alias="plot_epoly.png">icons/fcsplot_epoly.png</file>
+        <file alias="plot_epolybars.png">icons/fcsplot_epolybars.png</file>
         <file alias="plotenone.png">icons/fcsplot_enone.png</file>
         <file alias="plot_lines.png">icons/fcsplot_lines.png</file>
         <file alias="plot_points.png">icons/fcsplot_points.png</file>
@@ -49,6 +51,7 @@
         <file alias="plot_bars.png">icons/fcsplot_bars.png</file>
         <file alias="plot_steps.png">icons/fcsplot_steps.png</file>
         <file alias="plot_impulses.png">icons/fcsplot_impulses.png</file>
+
         <file alias="connect_filterchanger.png">icons/connect_filterchanger.png</file>
         <file alias="connect_lightsource.png">icons/connect_lightsource.png</file>
         <file alias="connect_shutter.png">icons/connect_shutter.png</file>

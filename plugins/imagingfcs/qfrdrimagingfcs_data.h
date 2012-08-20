@@ -23,6 +23,7 @@
 #include "qtriple.h"
 #include "qfrdrimagingfcsoverviewrateeditor.h"
 #include "qfrdrimagestackinterface.h"
+#include "qfrdrimageselectioninterface.h"
 
 
 
@@ -30,9 +31,9 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface)
     public:
         /** Default constructor */
         QFRDRImagingFCSData(QFProject* parent);
@@ -139,6 +140,32 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double* getBackgroundStatisticsMax() const;
         /** \brief return the array of time points [seconds] for the background  statsitics */
         double *getBackgroundStatisticsT() const;
+
+
+
+
+
+
+
+        /** \copydoc QFRDRImageSelectionInterface::getImageSelectionCount() */
+        virtual int getImageSelectionCount() const;
+        /** \copydoc QFRDRImageSelectionInterface::getImageSelectionName() */
+        virtual QString getImageSelectionName(int selection) const;
+        /** \copydoc QFRDRImageSelectionInterface::loadImageSelection() */
+        virtual bool* loadImageSelection(int selection) const;
+        /** \copydoc QFRDRImageSelectionInterface::addImageSelection() */
+        virtual void addImageSelection(bool* selection, const QString& name=QString(""));
+        /** \copydoc QFRDRImageSelectionInterface::deleteImageSelection() */
+        virtual void deleteImageSelection(int selection);
+        /** \copydoc QFRDRImageSelectionInterface::setImageSelectionName() */
+        virtual void setImageSelectionName(int selection, const QString& name);
+        /** \copydoc QFRDRImageSelectionInterface::getImageSelectionWidth() */
+        virtual int getImageSelectionWidth() const;
+        /** \copydoc QFRDRImageSelectionInterface::getImageSelectionHeight() */
+        virtual int getImageSelectionHeight() const;
+
+
+
 
     protected:
         /** \brief write the contents of the object to a XML file */
@@ -252,6 +279,20 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         uint32_t video_frames;
 
         QList<ovrImageData> ovrImages;
+
+        struct ImageSelection {
+            ImageSelection() {
+                name="";
+                selection=NULL;
+            }
+
+            bool* selection;
+            QString name;
+        };
+
+        QList<ImageSelection> selections;
+
+        void clearSelections();
 
         void clearOvrImages();
 

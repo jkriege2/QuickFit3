@@ -61,6 +61,7 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateStatistics(0);
      allocateBackgroundStatistics(0);
      clearOvrImages();
+     clearSelections();
      if (video) free(video);
      video=NULL;
      video_width=video_height=video_frames=0;
@@ -126,10 +127,31 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
             w.writeEndElement();
         }
     }
+    if (selections.size()>0) {
+        w.writeStartElement("selections");
+        for (int s=0; s<selections.size(); s++) {
+            QString l="";
+            bool* sel=selections[s].selection;
+            int selSize=getImageSelectionWidth()*getImageSelectionHeight();
+            for (int i=0; i<selSize; i++) {
+                if (sel[i]) {
+                    if (l.size()>0) l+=","+QString::number(i);
+                    else l+=QString::number(i);
+                }
+            }
+
+            w.writeStartElement("selection");
+            w.writeAttribute("name", selections[s].name);
+            w.writeAttribute("list", l);
+            w.writeEndElement();
+        }
+        w.writeEndElement();
+    }
 }
 
 void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     leaveoutClear();
+    clearSelections();
 	// read data from the project XML file
 
 
@@ -323,6 +345,37 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             //qDebug()<<lo<<ok;
         }
         recalcCorrelations();
+
+        te=e->firstChildElement("selections");
+        if (!te.isNull()) {
+            int cnt=1;
+            te=te.firstChildElement("selection");
+            while (!te.isNull()) {
+                QString n=te.attribute("name", tr("selection #%1").arg(cnt));
+                QString l=te.attribute("list", "");
+                int selSize=getImageSelectionWidth()*getImageSelectionHeight();
+                QFRDRImagingFCSData::ImageSelection sel;
+                sel.selection=(bool*)calloc(selSize, sizeof(bool));
+                for (int i=0; i<selSize; i++) sel.selection[i]=false;
+                sel.name=n;
+
+                QStringList li=l.split(",");
+                for (int i=0; i<li.size(); i++) {
+                    bool ok=false;
+                    int lo=li[i].toUInt(&ok);
+                    if (ok && lo>=0 && lo<selSize) {
+                        sel.selection[lo]=true;
+                    }
+                }
+
+                selections.append(sel);
+
+                te=te.nextSiblingElement("selection");
+                cnt++;
+            }
+        }
+
+
     }
 
     if (!dataLoaded) {
@@ -930,6 +983,7 @@ double *QFRDRImagingFCSData::getBackgroundStatisticsT() const {
     return backStatT;
 }
 
+
 double *QFRDRImagingFCSData::getBackgroundStatisticsStdDev() const {
     return backStatStdDev;
 }
@@ -1329,6 +1383,80 @@ double QFRDRImagingFCSData::getSimpleCountrateVariance(int run) const {
     if (run==-2) return sqrt(backStatSigmaCnt)/getTauMin()/1000.0;
     if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
     return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int QFRDRImagingFCSData::getImageSelectionCount() const
+{
+    return selections.size();
+}
+
+QString QFRDRImagingFCSData::getImageSelectionName(int selection) const
+{
+    return selections.value(selection, QFRDRImagingFCSData::ImageSelection()).name;
+}
+
+bool *QFRDRImagingFCSData::loadImageSelection(int selection) const
+{
+    return selections.value(selection, QFRDRImagingFCSData::ImageSelection()).selection;
+}
+
+void QFRDRImagingFCSData::addImageSelection(bool *selection, const QString &name)
+{
+    QFRDRImagingFCSData::ImageSelection s;
+    s.name=name;
+    s.selection=(bool*)calloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
+    memcpy(s.selection, selection, getImageSelectionHeight()*getImageSelectionWidth()*sizeof(bool));
+    selections.append(s);
+}
+
+void QFRDRImagingFCSData::deleteImageSelection(int selection)
+{
+    if (selection>=0 && selection<selections.size()) {
+        selections.removeAt(selection);
+    }
+}
+
+void QFRDRImagingFCSData::setImageSelectionName(int selection, const QString &name)
+{
+    if (selection>=0 && selection<selections.size()) {
+         QFRDRImagingFCSData::ImageSelection s=selections[selection];
+         s.name=name;
+         selections[selection]=s;
+    }
+}
+
+int QFRDRImagingFCSData::getImageSelectionHeight() const
+{
+    return getImageFromRunsHeight();
+}
+
+int QFRDRImagingFCSData::getImageSelectionWidth() const
+{
+    return getImageFromRunsWidth();
+}
+
+void QFRDRImagingFCSData::clearSelections()
+{
+    for (int i=0; i<selections.size(); i++) {
+        if (selections[i].selection) delete selections[i].selection;
+    }
+    selections.clear();
 }
 
 

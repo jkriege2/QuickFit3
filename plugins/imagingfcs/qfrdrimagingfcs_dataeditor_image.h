@@ -210,6 +210,13 @@ protected:
 
         /** \brief copy image data into datastores of the image plots, so they can be copied to other applications. */
         void setCopyableData();
+
+        void updateSelectionCombobox();
+
+        void selectedSelectionInCombo(int index);
+        void storeSelection();
+        void deleteSelection();
+        void selectionEdited();
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -381,7 +388,12 @@ protected:
         QFTableModel* tabFitvals;
 
 
-
+        /** \brief combobox to select a stored selection */
+        QComboBox* cmbStoredSelections;
+        QToolButton* btnSaveSelectionToStored;
+        QToolButton* btnDeleteStoredSelection;
+        QAction* actSaveSelectionToStored;
+        QAction* actDeleteStoredSelection;
 
 
 
