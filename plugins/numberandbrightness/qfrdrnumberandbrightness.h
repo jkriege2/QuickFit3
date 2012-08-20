@@ -2,6 +2,9 @@
 #define QFRDRNUMBERANDBRIGHTNESS_H
 
 #include "qfpluginrawdata.h"
+#include "qmodernprogresswidget.h"
+#include "qfrdrimagingfcstools.h"
+
 /*!
     \defgroup qf3rdrdp_number_and_brightness Raw Data Record Plugin
     \ingroup qf3rawdataplugins
@@ -56,7 +59,13 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         virtual QString getIconFilename() const  { return QString(":/number_and_brightness/qfrdrnumberandbrightness.png"); };
     protected slots:
         /** \brief insertdata from file*/
-        void insertRecord();
+        void insertFromImFCSRecord();
+        void insertImFCSFile(const QString &filename);
+
+        /** \brief insert record, if it is not yet contained in the project! */
+        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QMap<QString,QVariant>(), const QStringList& init_params_readonly=QStringList());
+
+        bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
 };
 
 #endif // QFRDRNUMBERANDBRIGHTNESS_H

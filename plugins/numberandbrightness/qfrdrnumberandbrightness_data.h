@@ -45,17 +45,11 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
         /** \brief return a large icon (32x32) */
         virtual QIcon getLargeIcon() const { return QIcon(":/number_and_brightness/qfrdrnumberandbrightness.png"); };
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 1; };
+        virtual int getEditorCount();
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName(int i) {
-            if (i==0) return tr("QFRDRNumberAndBrightness editor");
-            return QString("");
-        };
+        virtual QString getEditorName(int i) ;
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) {
-            if (i==0) return new QFRDRNumberAndBrightnessDataEditor(services, propEditor, parent);
-            return NULL;
-        };
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL);
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
@@ -131,7 +125,7 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageName() */
         virtual QString getOverviewImageName(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImage() */
-        virtual double* getOverviewImage(int image) const;
+        virtual double* getOverviewImage(int img) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */
         virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getOverviewImageAnnotations(int image) const;
 
@@ -140,13 +134,11 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
 
 
         /** \copydoc QFRDRImageToRunInterface::xyToRun() */
-        virtual int xyToRun(int x, int y) const;
-        /** \copydoc QFRDRImageToRunInterface::runToX() */
-        virtual int runToX(int run) const;
-        /** \copydoc QFRDRImageToRunInterface::runToY() */
-        virtual int runToY(int run) const;
-        /** \copydoc QFRDRImageToRunInterface::xyToIndex() */
         virtual int xyToIndex(int x, int y) const;
+        /** \copydoc QFRDRImageToRunInterface::runToX() */
+        virtual int indexToX(int run) const;
+        /** \copydoc QFRDRImageToRunInterface::runToY() */
+        virtual int indexToY(int run) const;
 
     protected:
         /** \brief write the contents of the object to a XML file */

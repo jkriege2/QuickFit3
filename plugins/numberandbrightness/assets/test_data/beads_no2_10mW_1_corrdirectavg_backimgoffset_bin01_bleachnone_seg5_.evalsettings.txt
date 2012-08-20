@@ -1,0 +1,35 @@
+date/time                   : 2012/07/24 17:26:10
+input file                  : ../beads_no2_10mW_1.tif
+overview image file         : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.overview.tif
+overview image file real    : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.overview_float.tif
+overview std image          : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.overviewstd.tif
+background image file       : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.background.tif
+background stddev           : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.backgroundstd.tif
+video file                  : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.video.tif
+statistics file             : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.statistics.dat
+autocorrelation file        : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.autocorrelation.dat
+bin. autocorrelation file   : beads_no2_10mW_1_corrdirectavg_backimgoffset_bin01_bleachnone_seg5_.autocorrelation.bin
+width                       : 160
+height                      : 80
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 50000
+frame count                 : 50000
+first frame                 : 0
+last frame                  : 49999
+correlator S                : 10
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : direct with averaging
+smallest tau [s]            : 0.000825737
+baseline                    : 0
+video sum up                : 50
+video frames                : 1000
+video avgMin                : -1.79449
+video avgMax                : 475.868
+statistics over             : 50
+bleach correction           : remove frame average
+bleach average frames       : 20
+duration [s]                : 170.063

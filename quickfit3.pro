@@ -103,7 +103,7 @@ SUBDIRS += plg_qfe_acquisitiontest
 plg_qfe_acquisitiontest.subdir=./plugins/qfe_acquisitiontest
 plg_qfe_acquisitiontest.depends = lib libqf3widgets
 
-#SUBDIRS += plg_numberandbrightness
+SUBDIRS += plg_numberandbrightness
 plg_numberandbrightness.subdir=./plugins/numberandbrightness
 plg_numberandbrightness.depends = lib libqf3widgets
 

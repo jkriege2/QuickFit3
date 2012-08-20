@@ -1275,7 +1275,7 @@ double *QFRDRImagingFCSData::getOverviewImage(int image) const {
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getOverviewImageAnnotations(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (image>1 && image<=ovrImages.size()) return ovrImages[image-2].geoElements;
+    if (image>1 && image-2<ovrImages.size()) return ovrImages[image-2].geoElements;
     return result;
 }
 

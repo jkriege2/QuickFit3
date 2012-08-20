@@ -6,6 +6,10 @@
 #include "tools.h"
 #include "statistics_tools.h"
 #include "csvtools.h"
+#include "qfrdrimagingfcstools.h"
+#include "qfrdrnumberandbrightness_overvieweditor.h"
+
+#define sqr(x) ((x)*(x))
 
 QFRDRNumberAndBrightnessData::QFRDRNumberAndBrightnessData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -19,6 +23,7 @@ QFRDRNumberAndBrightnessData::QFRDRNumberAndBrightnessData(QFProject* parent):
     imageVariance=NULL;
     numberImage=NULL;
     brightnessImage=NULL;
+    leaveout=NULL;
 
 }
 
@@ -27,6 +32,25 @@ QFRDRNumberAndBrightnessData::~QFRDRNumberAndBrightnessData()
     allocateContents(0,0);
     clearOvrImages();
     clearSelections();
+}
+
+int QFRDRNumberAndBrightnessData::getEditorCount()
+{
+    return 2;
+}
+
+QString QFRDRNumberAndBrightnessData::getEditorName(int i)
+{
+    if (i==0) return tr("number & brightness");
+    if (i==1) return tr("overview images");
+    return QString("");
+}
+
+QFRawDataEditor *QFRDRNumberAndBrightnessData::createEditor(QFPluginServices *services, QFRawDataPropertyEditor *propEditor, int i, QWidget *parent)
+{
+    if (i==0) return new QFRDRNumberAndBrightnessDataEditor(services, propEditor, parent);
+    if (i==1) return new QFRDRNumberAndBrightnessOverviewEditor(services, propEditor, parent);
+    return NULL;
 }
 
 void QFRDRNumberAndBrightnessData::exportData(const QString& format, const QString& filename)const  {
@@ -75,9 +99,27 @@ int QFRDRNumberAndBrightnessData::getHeight() const
 }
 
 void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
+    if (image && imageVariance && background && backgroundVariance && numberImage && brightnessImage) {
+        if (getProperty("BACKGROUND_CORRECTED", false).toBool()) {
+            for (int i=0; i<width*height; i++) {
+                numberImage[i]=sqr(image[i])/(imageVariance[i]-backgroundVariance[i]);
+                brightnessImage[i]=(imageVariance[i]-backgroundVariance[i])/(image[i]);
+            }
+        } else {
+            for (int i=0; i<width*height; i++) {
+                numberImage[i]=sqr(image[i]-background[i])/(imageVariance[i]-backgroundVariance[i]);
+                brightnessImage[i]=(imageVariance[i]-backgroundVariance[i])/(image[i]-background[i]);
+            }
+        }
 
-    resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
-    resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
+        //resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
+        //resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
+    }
+}
+
+bool QFRDRNumberAndBrightnessData::leaveoutRun(int run) const
+{
+    return maskGet(indexToX(run), indexToY(run));
 }
 
 
@@ -127,6 +169,8 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
 
     width=getProperty("WIDTH", 0).toInt();
     height=getProperty("HEIGHT", 0).toInt();
+
+    allocateContents(width, height);
 
     // now also load the data file(s) this record is linked to
     // an error is reported when no file is given!
@@ -284,7 +328,7 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
             if (ok) leaveoutAddRun(lo);
             //qDebug()<<lo<<ok;
         }
-        recalcCorrelations();
+        recalcNumberAndBrightness();
 
         te=e->firstChildElement("selections");
         if (!te.isNull()) {
@@ -324,7 +368,7 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
 {
     bool ok=false;
 
-    if (!image) return false;
+    if (!target) return false;
 
     if (QFile::exists(filename)) {
         TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
@@ -335,27 +379,27 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
             if (nx!=width || ny!=height) {
                 ok=false;
             } else {
-                ok=TIFFReadFrame<double>(tif, image);
+                ok=TIFFReadFrame<double>(tif, target);
             }
             TIFFClose(tif);
         }
     }
 
-    if (!ok && image) {
+    if (!ok && target) {
         for (int i=0; i<width*height; i++) {
-            image[i]=0;
+            target[i]=0;
         }
     }
 
     switch(op) {
         case QFRDRNumberAndBrightnessData::TakeSqrt:
             for (int i=0; i<width*height; i++) {
-                image[i]=sqrt(image[i]);
+                target[i]=sqrt(target[i]);
             }
             break;
         case QFRDRNumberAndBrightnessData::Square:
             for (int i=0; i<width*height; i++) {
-                image[i]=image[i]*image[i];
+                target[i]=target[i]*target[i];
             }
             break;
     }
@@ -378,12 +422,12 @@ void QFRDRNumberAndBrightnessData::allocateContents(int x, int y, int N) {
     leaveout=NULL;
     int NN=1;
     if ((x>0) && (y>0) && (NN>0)) {
-        image=(double*)calloc(x*y*N,sizeof(double));
-        imageVariance=(double*)calloc(x*y*N,sizeof(double));
-        background=(double*)calloc(N,sizeof(double));
-        backgroundVariance=(double*)calloc(N,sizeof(double));
-        numberImage=(double*)calloc(N,sizeof(double));
-        brightnessImage=(double*)calloc(N,sizeof(double));
+        image=(double*)calloc(x*y*NN,sizeof(double));
+        imageVariance=(double*)calloc(x*y*NN,sizeof(double));
+        background=(double*)calloc(x*y*NN,sizeof(double));
+        backgroundVariance=(double*)calloc(x*y*NN,sizeof(double));
+        numberImage=(double*)calloc(x*y*NN,sizeof(double));
+        brightnessImage=(double*)calloc(x*y*NN,sizeof(double));
         leaveout=(bool*)calloc(x*y,sizeof(bool));
         width=x;
         height=y;
@@ -460,7 +504,7 @@ void QFRDRNumberAndBrightnessData::maskLoad(const QString &filename) {
         while (!str.atEnd())  {
             QVector<double> d=csvReadline(str, ',', '#', -1);
             if (d.size()==2) {
-                int idx=xyToRun(d[0], d[1]);
+                int idx=xyToIndex(d[0], d[1]);
                 if (idx>=0 && idx<height*width) leaveout[idx]=true;
             }
         }
@@ -538,82 +582,47 @@ void QFRDRNumberAndBrightnessData::maskSet(uint16_t x, uint16_t y) {
 
 
 int QFRDRNumberAndBrightnessData::getOverviewImageCount() const {
-    return 2+ovrImages.size();
+    return 4+ovrImages.size();
 }
 
 int QFRDRNumberAndBrightnessData::getOverviewImageWidth(int image) const {
-    if (image==0) return width;
-    if (image==1) return width;
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].width;
+    if (image<0) return 0;
+    if (image<4) return width;
+    if (image-4<ovrImages.size()) return ovrImages[image-4].width;
     return 0;
 }
 
 int QFRDRNumberAndBrightnessData::getOverviewImageHeight(int image) const {
-    if (image==0) return height;
-    if (image==1) return height;
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].height;
+    if (image<0) return 0;
+    if (image<4) return height;
+    if (image-4<ovrImages.size()) return ovrImages[image-4].height;
     return 0;
 }
 
 QString QFRDRNumberAndBrightnessData::getOverviewImageName(int image) const {
     if (image==0) return tr("overview image (time average)");
-    if (image==1) return tr("standard deviation overview image (time average)");
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].name;
+    if (image==1) return tr("variance of overview image (time average)");
+    if (image==2) return tr("background image (time average)");
+    if (image==3) return tr("variance of background image (time average)");
+    if (image-4<ovrImages.size()) return ovrImages[image-4].name;
     return QString("");
 }
 
-double *QFRDRNumberAndBrightnessData::getOverviewImage(int image) const {
-    if (image==0) return image;
-    //qDebug()<<"overviewFSTD="<<overviewFSTD;
-    if (image==1) return imageVariance;
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].image;
+double *QFRDRNumberAndBrightnessData::getOverviewImage(int img) const {
+    if (img==0) return image;
+    if (img==1) return imageVariance;
+    if (img==2) return background;
+    if (img==3) return backgroundVariance;
+    if (img-4<ovrImages.size()) return ovrImages[img-4].image;
     return NULL;
 }
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRNumberAndBrightnessData::getOverviewImageAnnotations(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (image>1 && image<=ovrImages.size()) return ovrImages[image-2].geoElements;
+    if (image>3 && image-4<=ovrImages.size()) return ovrImages[image-2].geoElements;
     return result;
 }
 
-int QFRDRNumberAndBrightnessData::getOverviewImageCount() const {
-    return 2+ovrImages.size();
-}
-
-int QFRDRNumberAndBrightnessData::getOverviewImageWidth(int image) const {
-    if (image==0) return width;
-    if (image==1) return width;
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].width;
-    return 0;
-}
-
-int QFRDRNumberAndBrightnessData::getOverviewImageHeight(int image) const {
-    if (image==0) return height;
-    if (image==1) return height;
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].height;
-    return 0;
-}
-
-QString QFRDRNumberAndBrightnessData::getOverviewImageName(int image) const {
-    if (image==0) return tr("overview image (time average)");
-    if (image==1) return tr("standard deviation overview image (time average)");
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].name;
-    return QString("");
-}
-
-double *QFRDRNumberAndBrightnessData::getOverviewImage(int image) const {
-    if (image==0) return overviewF;
-    //qDebug()<<"overviewFSTD="<<overviewFSTD;
-    if (image==1) return overviewFSTD;
-    if (image-1<=ovrImages.size()) return ovrImages[image-2].image;
-    return NULL;
-}
-
-QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRNumberAndBrightnessData::getOverviewImageAnnotations(int image) const {
-    QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (image>1 && image<=ovrImages.size()) return ovrImages[image-2].geoElements;
-    return result;
-}
 
 
 
@@ -740,18 +749,14 @@ bool QFRDRNumberAndBrightnessData::loadVideo(const QString& filename, double** d
     return ok;
 }
 
-int QFRDRNumberAndBrightnessData::xyToRun(int x, int y) const {
+int QFRDRNumberAndBrightnessData::xyToIndex(int x, int y) const {
     return y*width+x;
 }
 
-int QFRDRNumberAndBrightnessData::runToX(int run) const {
+int QFRDRNumberAndBrightnessData::indexToX(int run) const {
     return run%width;
 }
 
-int QFRDRNumberAndBrightnessData::runToY(int run) const {
+int QFRDRNumberAndBrightnessData::indexToY(int run) const {
     return run/width;
-}
-
-int QFRDRNumberAndBrightnessData::xyToIndex(int x, int y) const {
-    return (y*width+x)*N;
 }

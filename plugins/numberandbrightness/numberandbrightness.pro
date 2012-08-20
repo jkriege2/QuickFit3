@@ -18,11 +18,23 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += qfrdrnumberandbrightness.h \
            qfrdrnumberandbrightness_data.h \
-		   qfrdrnumberandbrightness_dataeditor.h
+		   qfrdrnumberandbrightness_dataeditor.h \
+    ../base_classes/qfrdrimagingfcstools.h \
+    ../../../../../LIB/trunk/libtiff_tools.h \
+    qfrdrnumberandbrightness_overvieweditor.h \
+    ../base_classes/qfrdroverviewimagedisplay.h \
+    ../base_classes/qfhistogramview.h \
+    ../base_classes/qftablemodel.h
 
 SOURCES += qfrdrnumberandbrightness.cpp \
            qfrdrnumberandbrightness_data.cpp \
-		   qfrdrnumberandbrightness_dataeditor.cpp
+		   qfrdrnumberandbrightness_dataeditor.cpp \
+    ../base_classes/qfrdrimagingfcstools.cpp \
+    ../../../../../LIB/trunk/libtiff_tools.cpp \
+    qfrdrnumberandbrightness_overvieweditor.cpp \
+    ../base_classes/qfrdroverviewimagedisplay.cpp \
+    ../base_classes/qfhistogramview.cpp \
+    ../base_classes/qftablemodel.cpp
 
 FORMS = 
 
@@ -35,8 +47,12 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml core
+QT += gui xml core opengl
 CONFIG += exceptions rtti stl
 
 
+ASSETS_TESTDATA_FILES.files = ./assets/test_data/*.*
+ASSETS_TESTDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/test_data
+
+INSTALLS += ASSETS_TESTDATA_FILES
 

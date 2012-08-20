@@ -38,7 +38,7 @@ void QFRDRImagingFCSOverviewRateEditor::createWidgets() {
     mainSplitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     mainLay->addWidget(mainSplitter);
 
-    imEditor1=new QFRDRImagingFCSOverviewImageDisplay(this);
+    imEditor1=new QFRDROverviewImageDisplay(this);
     mainSplitter->addWidget(imEditor1);
 
     crEditor=new QFRDRImagingFCSCountrateDisplay(this);

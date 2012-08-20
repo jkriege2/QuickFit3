@@ -1,10 +1,11 @@
-#include "qfrdrimagingfcsoverviewimagedisplay.h"
-#include "qfrdrimagingfcs_data.h"
+#include "qfrdroverviewimagedisplay.h"
 #include "statistics_tools.h"
+#include "qfrdroverviewimageinterface.h"
+#include "qfrdrimagestackinterface.h"
 
 #define sqr(x) ((x)*(x))
 
-QFRDRImagingFCSOverviewImageDisplay::QFRDRImagingFCSOverviewImageDisplay(QWidget *parent) :
+QFRDROverviewImageDisplay::QFRDROverviewImageDisplay(QWidget *parent) :
     QWidget(parent)
 {
     current=NULL;
@@ -16,7 +17,7 @@ QFRDRImagingFCSOverviewImageDisplay::QFRDRImagingFCSOverviewImageDisplay(QWidget
     createWidgets();
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
+void QFRDROverviewImageDisplay::createWidgets() {
     QVBoxLayout* majorLay=new QVBoxLayout(this);
     setLayout(majorLay);
 
@@ -220,7 +221,7 @@ void QFRDRImagingFCSOverviewImageDisplay::createWidgets() {
 
 
 
-void QFRDRImagingFCSOverviewImageDisplay::setImageEditMode() {
+void QFRDROverviewImageDisplay::setImageEditMode() {
     if (actImagesZoom->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
     } else if (actImagesDrawPoints->isChecked()) {
@@ -240,9 +241,10 @@ void QFRDRImagingFCSOverviewImageDisplay::setImageEditMode() {
 
 
 
-void QFRDRImagingFCSOverviewImageDisplay::imageClicked(double x, double y, Qt::KeyboardModifiers modifiers) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
+void QFRDROverviewImageDisplay::imageClicked(double x, double y, Qt::KeyboardModifiers modifiers) {
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (!m) return;
+    if (!current) return;
     int xx=(int)floor(x);
     int yy=(int)floor(y);
 
@@ -271,9 +273,10 @@ void QFRDRImagingFCSOverviewImageDisplay::imageClicked(double x, double y, Qt::K
     }
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool /*last*/) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
+void QFRDROverviewImageDisplay::imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool /*last*/) {
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (!m) return;
+    if (!current) return;
     int xx=(int)floor(x);
     int yy=(int)floor(y);
     int width=image->get_Nx();
@@ -298,9 +301,10 @@ void QFRDRImagingFCSOverviewImageDisplay::imageScribbled(double x, double y, Qt:
 }
 
 
-void QFRDRImagingFCSOverviewImageDisplay::imageRectangleFinished(double x, double y, double rwidth, double rheight, Qt::KeyboardModifiers modifiers) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
+void QFRDROverviewImageDisplay::imageRectangleFinished(double x, double y, double rwidth, double rheight, Qt::KeyboardModifiers modifiers) {
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (!m) return;
+    if (!current) return;
     int width=image->get_Nx();
     int height=image->get_Ny();
     if (selected_width!=width || selected_height!=height) {
@@ -348,9 +352,10 @@ void QFRDRImagingFCSOverviewImageDisplay::imageRectangleFinished(double x, doubl
 }
 
 
-void QFRDRImagingFCSOverviewImageDisplay::imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
+void QFRDROverviewImageDisplay::imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers) {
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (!m) return;
+    if (!current) return;
 
     int width=image->get_Nx();
     int height=image->get_Ny();
@@ -405,9 +410,10 @@ void QFRDRImagingFCSOverviewImageDisplay::imageEllipseFinished(double x, double 
     replotSelection(true);
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::imageCircleFinished(double x, double y, double radius, Qt::KeyboardModifiers modifiers) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
+void QFRDROverviewImageDisplay::imageCircleFinished(double x, double y, double radius, Qt::KeyboardModifiers modifiers) {
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (!m) return;
+    if (!current) return;
 
     int width=image->get_Nx();
     int height=image->get_Ny();
@@ -462,9 +468,10 @@ void QFRDRImagingFCSOverviewImageDisplay::imageCircleFinished(double x, double y
     replotSelection(true);
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
+void QFRDROverviewImageDisplay::imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers) {
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //if (!m) return;
+    if (!current) return;
 
     QLineF line(x1, y1, x2, y2);
     int width=image->get_Nx();
@@ -534,11 +541,11 @@ void QFRDRImagingFCSOverviewImageDisplay::imageLineFinished(double x1, double y1
 
 
 
-QFRDRImagingFCSOverviewImageDisplay::~QFRDRImagingFCSOverviewImageDisplay() {
+QFRDROverviewImageDisplay::~QFRDROverviewImageDisplay() {
     clearOverlays();
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::connectWidgets(QFRawDataRecord *current, QFRawDataRecord *old) {
+void QFRDROverviewImageDisplay::connectWidgets(QFRawDataRecord *current, QFRawDataRecord *old) {
     disconnect(cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
 
@@ -571,11 +578,11 @@ void QFRDRImagingFCSOverviewImageDisplay::connectWidgets(QFRawDataRecord *curren
 
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::rawDataChanged()
+void QFRDROverviewImageDisplay::rawDataChanged()
 {
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::showFrame(int frame) {
+void QFRDROverviewImageDisplay::showFrame(int frame) {
     pltImage->set_doDrawing(false);
     current->setQFProperty("imfcs_invrimgdisp_playpos", player->getPosition(), false, false);
 
@@ -606,7 +613,7 @@ void QFRDRImagingFCSOverviewImageDisplay::showFrame(int frame) {
     player->singleShotTimerStart();
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
+void QFRDROverviewImageDisplay::displayImage() {
     if (!image) return;
     player->pause();
     current->setQFProperty("imfcs_invrimgdisp_image", cmbImage->currentIndex(), false, false);
@@ -703,7 +710,7 @@ void QFRDRImagingFCSOverviewImageDisplay::displayImage() {
     pltImage->update_plot();
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::showHistograms(double *data, int size)
+void QFRDROverviewImageDisplay::showHistograms(double *data, int size)
 {
     if (!histogram) return;
 
@@ -741,7 +748,7 @@ void QFRDRImagingFCSOverviewImageDisplay::showHistograms(double *data, int size)
 }
 
 
-void QFRDRImagingFCSOverviewImageDisplay::updateSelectionArrays() {
+void QFRDROverviewImageDisplay::updateSelectionArrays() {
     double* d=(double*)image->get_data();
     int Nx=image->get_Nx();
     int Ny=image->get_Ny();
@@ -766,14 +773,14 @@ void QFRDRImagingFCSOverviewImageDisplay::updateSelectionArrays() {
     }
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::replotSelection(bool replot) {
+void QFRDROverviewImageDisplay::replotSelection(bool replot) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     updateSelectionArrays();
 
 
-    if (!m) {
+    if (!current) {
         plteSelected->set_data(NULL, 1, 1);
         labImageAvg->clear();
     } else {
@@ -804,21 +811,21 @@ void QFRDRImagingFCSOverviewImageDisplay::replotSelection(bool replot) {
 
 
 
-void QFRDRImagingFCSOverviewImageDisplay::readSettings(QSettings &settings, const QString &prefix) {
+void QFRDROverviewImageDisplay::readSettings(QSettings &settings, const QString &prefix) {
     player->setFPS(settings.value(prefix+"player_fps", player->getFPS()).toDouble());
     player->setReplay(settings.value(prefix+"player_replay", player->getReplay()).toBool());
     histogram->readSettings(settings, prefix+"histogram/");
     chkHistVideo->setChecked(settings.value(prefix+"videohistogram", chkHistVideo->isChecked()).toBool());
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::writeSettings(QSettings &settings, const QString &prefix) {
+void QFRDROverviewImageDisplay::writeSettings(QSettings &settings, const QString &prefix) {
     settings.setValue(prefix+"player_fps", player->getFPS());
     settings.setValue(prefix+"player_replay", player->getReplay());
     histogram->writeSettings(settings, prefix+"histogram/");
     settings.setValue(prefix+"videohistogram", chkHistVideo->isChecked());
 }
 
-void QFRDRImagingFCSOverviewImageDisplay::mouseMoved(double x, double y) {
+void QFRDROverviewImageDisplay::mouseMoved(double x, double y) {
     if (image) {
         labValue->setText(tr("Position: (%1, %2)        Value: %3").arg(x).arg(y).arg(image->getValueAt(x,y)));
     } else {
@@ -827,7 +834,7 @@ void QFRDRImagingFCSOverviewImageDisplay::mouseMoved(double x, double y) {
 }
 
 
-void QFRDRImagingFCSOverviewImageDisplay::clearOverlays() {
+void QFRDROverviewImageDisplay::clearOverlays() {
     for (int i=0; i<overlayGraphs.size(); i++) {
         pltImage->deleteGraph(overlayGraphs[i], true);
     }

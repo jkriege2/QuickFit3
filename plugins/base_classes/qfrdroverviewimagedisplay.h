@@ -1,5 +1,5 @@
-#ifndef QFRDRIMAGINGFCSOVERVIEWIMAGEDISPLAY_H
-#define QFRDRIMAGINGFCSOVERVIEWIMAGEDISPLAY_H
+#ifndef QFRDROVERVIEWIMAGEDISPLAY_H
+#define QFRDROVERVIEWIMAGEDISPLAY_H
 
 #include <QWidget>
 #include <QComboBox>
@@ -16,12 +16,12 @@
 #include <QTabWidget>
 #include "qfhistogramview.h"
 
-class QFRDRImagingFCSOverviewImageDisplay : public QWidget
+class QFRDROverviewImageDisplay : public QWidget
 {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCSOverviewImageDisplay(QWidget *parent = 0);
-        ~QFRDRImagingFCSOverviewImageDisplay();
+        explicit QFRDROverviewImageDisplay(QWidget *parent = 0);
+        ~QFRDROverviewImageDisplay();
         /** \brief connect widgets to current data record */
         void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) ;
 
@@ -101,4 +101,4 @@ class QFRDRImagingFCSOverviewImageDisplay : public QWidget
         
 };
 
-#endif // QFRDRIMAGINGFCSOVERVIEWIMAGEDISPLAY_H
+#endif // QFRDROVERVIEWIMAGEDISPLAY_H

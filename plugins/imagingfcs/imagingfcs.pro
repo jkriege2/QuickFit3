@@ -36,15 +36,15 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscountratedisplay.h \
     ../interfaces/qfrdrimagetoruninterface.h \
     ../interfaces/qfrdroverviewimageinterface.h \
-    qfrdrimagingfcsoverviewimagedisplay.h \
     qfrdrimagingfcsoverviewrateeditor.h \
-    qfrdrimagingfcstools.h \
+    ../base_classes/qfrdrimagingfcstools.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
     ../../../../../LIB/trunk/yaid_rh.h \
     qfrdrimagingfcsseriesdialog.h \
     qfrdrimagingfcscopydataselectdialog.h \
-    ../interfaces/qfrdrimageselectioninterface.h
+    ../interfaces/qfrdrimageselectioninterface.h \
+    ../base_classes/qfrdroverviewimagedisplay.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -63,11 +63,11 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
     qfrdrimagingfcscountratedisplay.cpp \
-    qfrdrimagingfcsoverviewimagedisplay.cpp \
     qfrdrimagingfcsoverviewrateeditor.cpp \
-    qfrdrimagingfcstools.cpp \
+    ../base_classes/qfrdrimagingfcstools.cpp \
     qfrdrimagingfcsseriesdialog.cpp \
-    qfrdrimagingfcscopydataselectdialog.cpp
+    qfrdrimagingfcscopydataselectdialog.cpp \
+    ../base_classes/qfrdroverviewimagedisplay.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

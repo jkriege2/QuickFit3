@@ -6,7 +6,7 @@
 #include "qfrawdataeditor.h"
 #include "qfrdrimagingfcs_data.h"
 #include "qfrdrimagingfcscountratedisplay.h"
-#include "qfrdrimagingfcsoverviewimagedisplay.h"
+#include "qfrdroverviewimagedisplay.h"
 #include "qvisiblehandlesplitter.h"
 
 class QFRDRImagingFCSOverviewRateEditor : public QFRawDataEditor
@@ -31,7 +31,7 @@ class QFRDRImagingFCSOverviewRateEditor : public QFRawDataEditor
         void createWidgets();
 
         QFRDRImagingFCSCountrateDisplay* crEditor;
-        QFRDRImagingFCSOverviewImageDisplay* imEditor1;
+        QFRDROverviewImageDisplay* imEditor1;
 
         QVisibleHandleSplitter* mainSplitter;
 };

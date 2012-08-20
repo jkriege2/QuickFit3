@@ -25,7 +25,7 @@ class QFRDRImageToRunInterface {
             \return  a uint16_t image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
          */
         virtual double* getImageFromRunsPreview() const=0;
-        /** \brief convert a pixel coordinate to a rund index */
+        /** \brief convert a pixel coordinate to a run index */
         virtual int xyToRun(int x, int y) const=0;
         /** \brief convert a run to a pixel x-coordinate */
         virtual int runToX(int run) const=0;
