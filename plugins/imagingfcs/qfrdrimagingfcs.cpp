@@ -230,6 +230,29 @@ void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QStri
     }
 }
 
+void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QStringList &files, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+    bool found=false;
+    for (int i=0; i<project->getRawDataCount(); i++) {
+        QFRawDataRecord*  r=project->getRawDataByNum(i);
+        if (r->getType()==type && r->getName()==name && r->getFolder()==directory) {
+            found=true;
+            break;
+        }
+    }
+    if (!found && project->getRawDataRecordFactory()->contains(type)) {
+
+        // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
+        QFRawDataRecord* e=project->addRawData(type, name, files,  init_params, init_params_readonly, filetypes, filedescriptions);
+        e->setFolder(directory);
+        e->setDescription(description);
+        if (e->error()) { // when an error occured: remove record and output an error message
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(files.value(0, "---")).arg(e->errorDescription()));
+            services->log_error(tr("Error while importing '%1':\n    %2\n").arg(files.value(0, "---")).arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
+        }
+    }
+}
+
 bool QFRDRImagingFCSPlugin::parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions)
 {
     if (QFile::exists(filename_settings)) {
@@ -731,6 +754,24 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
                     project->deleteRawData(e->getID());
                 }
+            }
+
+
+            if (QFile::exists(filename_overview) && QFile::exists(filename_overviewstd) && QFile::exists(filename_background) && QFile::exists(filename_backgroundstddev)) {
+                QFileInfo fi(filename_settings);
+                QStringList files, file_types, file_descriptions;
+                files<<filename_overview<<filename_overviewstd<<filename_background<<filename_backgroundstddev;
+                files_types<<"image"<<"image_std"<<"background"<<"background_stddev";
+                files_descriptions<<""<<""<<""<<"";
+                files<<more_files;
+                files_types<<more_files_types;
+                files_descriptions<<more_files_descriptions;
+
+                QMap<QString,QVariant>& init_params=initParams;
+                QStringList init_params_readonly=paramsReadonly;
+                init_params["BACKGROUND_CORRECTED"]=true;
+                init_params_readonly<<"BACKGROUND_CORRECTED";
+                insertProjectRecord("number_and_brightness", fi.fileName()+tr(" - number & brightness"), files, file_types, file_descriptions, description, QFileInfo(filename_settings).baseName(), init_params, init_params_readonly);
             }
 
             if (QFile::exists(filename_settings)) {
