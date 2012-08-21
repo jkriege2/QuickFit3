@@ -102,12 +102,12 @@ void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
     if (image && imageVariance && background && backgroundVariance && numberImage && brightnessImage) {
         if (getProperty("BACKGROUND_CORRECTED", false).toBool()) {
             for (int i=0; i<width*height; i++) {
-                numberImage[i]=sqr(image[i])/(imageVariance[i]-backgroundVariance[i]);
+                numberImage[i]=(image[i]*image[i])/(imageVariance[i]-backgroundVariance[i]);
                 brightnessImage[i]=(imageVariance[i]-backgroundVariance[i])/(image[i]);
             }
         } else {
             for (int i=0; i<width*height; i++) {
-                numberImage[i]=sqr(image[i]-background[i])/(imageVariance[i]-backgroundVariance[i]);
+                numberImage[i]=(image[i]-background[i])*(image[i]-background[i])/(imageVariance[i]-backgroundVariance[i]);
                 brightnessImage[i]=(imageVariance[i]-backgroundVariance[i])/(image[i]-background[i]);
             }
         }

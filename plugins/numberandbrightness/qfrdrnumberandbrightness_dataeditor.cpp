@@ -204,9 +204,14 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         pltCorrelation->set_doDrawing(false);
 
         reallocMem( m->getWidth()*m->getHeight());
-        memcpy(plteOverviewData, m->getImage(), m->getWidth()*m->getHeight()*sizeof(double));
+        for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
+            plteOverviewData[i]=m->getImage()[i];
+            plteNumberData[i]=m->getNumberImage()[i];
+            plteBrightnessData[i]=m->getBrightnessImage()[i];
+        }
+        /*memcpy(plteOverviewData, m->getImage(), m->getWidth()*m->getHeight()*sizeof(double));
         memcpy(plteNumberData, m->getNumberImage(), m->getWidth()*m->getHeight()*sizeof(double));
-        memcpy(plteBrightnessData, m->getBrightnessImage(), m->getWidth()*m->getHeight()*sizeof(double));
+        memcpy(plteBrightnessData, m->getBrightnessImage(), m->getWidth()*m->getHeight()*sizeof(double));*/
         updateSelectionArrays();
 
         double w=m->getWidth();
