@@ -230,7 +230,7 @@ void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QStri
     }
 }
 
-void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QStringList &files, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+void QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &files, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
     bool found=false;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QFRawDataRecord*  r=project->getRawDataByNum(i);
@@ -680,6 +680,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 }
                 files.prepend(filename);
                 files_types.prepend("acf");
+                files_descriptions.prepend("");
                 //qDebug()<<"filename_overview: "<<filename_overview;
 
                 if (columns>2 && !isJanBFile && !binary){
@@ -700,6 +701,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                 files.prepend(filename);
                 files_types.prepend("ccf");
+                files_descriptions.prepend("");
                 for (int c=1; c<=qMin(4,columns); c++) {
                     initParams["CORRELATION_COLUMN"]=c;
 
@@ -721,6 +723,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                 files.prepend(filename);
                 files_types.prepend("ccf");
+                files_descriptions.prepend("");
                 for (int c=1; c<=4; c++) {
                     initParams["CORRELATION_SET"]=c-1;
 
@@ -741,6 +744,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 if (!binary) initParams["CORRELATION_COLUMN"]=1;
                 files.prepend(filename);
                 files_types.prepend("dccf");
+                files_descriptions.prepend("");
 
                 if (columns>2 && !binary) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
@@ -758,20 +762,24 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
 
             if (QFile::exists(filename_overview) && QFile::exists(filename_overviewstd) && QFile::exists(filename_background) && QFile::exists(filename_backgroundstddev)) {
-                QFileInfo fi(filename_settings);
-                QStringList files, file_types, file_descriptions;
-                files<<filename_overview<<filename_overviewstd<<filename_background<<filename_backgroundstddev;
-                files_types<<"image"<<"image_std"<<"background"<<"background_stddev";
-                files_descriptions<<""<<""<<""<<"";
-                files<<more_files;
-                files_types<<more_files_types;
-                files_descriptions<<more_files_descriptions;
+                QFileInfo fi(filename_overview);
+                qDebug()<<fi.fileName();
+                QStringList ffiles, ffile_types, ffiles_descriptions;
+                ffiles<<filename_overview<<filename_overviewstd<<filename_background<<filename_backgroundstddev;
+                ffile_types<<"image"<<"image_std"<<"background"<<"background_stddev";
+                ffiles_descriptions<<""<<""<<""<<"";
+                ffiles<<more_files;
+                ffile_types<<more_files_types;
+                ffiles_descriptions<<more_files_descriptions;
 
+                qDebug()<<ffiles.size()<<"::: "<<ffiles;
+                qDebug()<<ffile_types.size()<<"::: "<<ffile_types;
+                qDebug()<<ffiles_descriptions.size()<<"::: "<<ffiles_descriptions;
                 QMap<QString,QVariant>& init_params=initParams;
                 QStringList init_params_readonly=paramsReadonly;
                 init_params["BACKGROUND_CORRECTED"]=true;
                 init_params_readonly<<"BACKGROUND_CORRECTED";
-                insertProjectRecord("number_and_brightness", fi.fileName()+tr(" - number & brightness"), files, file_types, file_descriptions, description, QFileInfo(filename_settings).baseName(), init_params, init_params_readonly);
+                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, ffile_types, ffiles_descriptions, description, QFileInfo(filename_overview).baseName(), init_params, init_params_readonly);
             }
 
             if (QFile::exists(filename_settings)) {

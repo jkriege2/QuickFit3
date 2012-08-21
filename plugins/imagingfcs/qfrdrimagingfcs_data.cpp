@@ -192,9 +192,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 }
                 if (!found) {
                     files<<QFileInfo(lfiles[i]).canonicalFilePath();
-                    files_types<<lfiles_types[i];
+                    files_types<<lfiles_types.value(i, "");
                     while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
-                    files_desciptions<<lfiles_descriptions[i];
+                    files_desciptions<<lfiles_descriptions.value(i, "");
                 }
 
 
