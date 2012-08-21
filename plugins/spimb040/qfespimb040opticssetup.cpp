@@ -601,6 +601,7 @@ QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup::getStopRelease(int ca
 
 void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened) {
     ui->shutterMainIllumination->setShutter(opened);
+    if (!opened) ui->shutterTransmission(false)
 }
 
 bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
