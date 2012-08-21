@@ -109,6 +109,8 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     cmbAverageErrors->addItem(QIcon(":/fcs/fcsplot_elines.png"), tr("with error lines"));
     cmbAverageErrors->addItem(QIcon(":/fcs/fcsplot_ebars.png"), tr("with error bars"));
     cmbAverageErrors->addItem(QIcon(":/fcs/fcsplot_elinesbars.png"), tr("with lines and bars"));
+    cmbAverageErrors->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("with error polygons"));
+    cmbAverageErrors->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("with polygons and bars"));
     connect(cmbAverageErrors, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData(int)));
 
     cmbRunDisplay=new QComboBox(w);
@@ -128,6 +130,8 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     cmbRunErrors->addItem(QIcon(":/fcs/fcsplot_elines.png"), tr("with error lines"));
     cmbRunErrors->addItem(QIcon(":/fcs/fcsplot_ebars.png"), tr("with error bars"));
     cmbRunErrors->addItem(QIcon(":/fcs/fcsplot_elinesbars.png"), tr("with lines and bars"));
+    cmbRunErrors->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("with error polygons"));
+    cmbRunErrors->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("with polygons and bars"));
     connect(cmbRunErrors, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData(int)));
 
     lstRunsSelect=new QListView(w);
@@ -252,6 +256,8 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
         case 1: runstyle=JKQTPerrorLines; break;
         case 2: runstyle=JKQTPerrorBars; break;
         case 3: runstyle=JKQTPerrorBarsLines; break;
+        case 4: runstyle=JKQTPerrorPolygons; break;
+        case 5: runstyle=JKQTPerrorBarsPolygons; break;
     }
     //std::cout<<"repainting ... 1\n";
     if (m->getCorrelationN()>0) {
@@ -271,12 +277,17 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                 case 2: styl=JKQTPerrorLines; break;
                 case 3: styl=JKQTPerrorBars; break;
                 case 4: styl=JKQTPerrorBarsLines; break;
+                case 5: styl=JKQTPerrorPolygons; break;
+                case 6: styl=JKQTPerrorBarsPolygons; break;
             }
 
 
             JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
             g->set_color(QColor("darkblue"));
-            g->set_errorColor(QColor("blue").lighter());
+            QColor errc=g->get_color().lighter();
+            g->set_errorColor(errc);
+            errc.setAlphaF(0.5);
+            g->set_errorFillColor(errc);
             g->set_lineWidth(2);
             g->set_xColumn(c_tau);
             g->set_yColumn(c_mean);
@@ -308,7 +319,10 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                 g->set_yErrorColumn(c_rune);
                 g->set_yErrorStyle(runstyle);
                 g->set_xErrorStyle(JKQTPnoError);
-                g->set_errorColor(g->get_errorColor().lighter());
+                QColor errc=g->get_color().lighter();
+                g->set_errorColor(errc);
+                errc.setAlphaF(0.5);
+                g->set_errorFillColor(errc);
                 g->set_errorWidth(1);
 
                 plotter->addGraph(g);
@@ -346,7 +360,10 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                         g->set_color(QColor("grey"));
                     }
                 }
-                g->set_errorColor(g->get_errorColor().lighter());
+                QColor errc=g->get_color().lighter();
+                g->set_errorColor(errc);
+                errc.setAlphaF(0.5);
+                g->set_errorFillColor(errc);
                 if (!isTop) plotter->addGraph(g);
             }
         } else if (cmbRunDisplay->currentIndex()==3) {
@@ -368,7 +385,10 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                     g->set_yErrorColumn(c_rune);
                     g->set_yErrorStyle(runstyle);
                     g->set_xErrorStyle(JKQTPnoError);
-                    g->set_errorColor(g->get_errorColor().lighter());
+                    QColor errc=g->get_color().lighter();
+                    g->set_errorColor(errc);
+                    errc.setAlphaF(0.5);
+                    g->set_errorFillColor(errc);
                     g->set_errorWidth(1);
 
                     plotter->addGraph(g);
@@ -394,7 +414,10 @@ void QFRDRFCSCorrelationEditor::replotData(int dummy) {
                     g->set_yErrorColumn(c_rune);
                     g->set_yErrorStyle(runstyle);
                     g->set_xErrorStyle(JKQTPnoError);
-                    g->set_errorColor(g->get_errorColor().lighter());
+                    QColor errc=g->get_color().lighter();
+                    g->set_errorColor(errc);
+                    errc.setAlphaF(0.5);
+                    g->set_errorFillColor(errc);
                     g->set_errorWidth(1);
 
                     plotter->addGraph(g);

@@ -16,6 +16,7 @@
 #include "datacutslider.h"
 #include "qt/jkqtfastplotter.h"
 #include "jkqtptools.h"
+#include "qfhistogramview.h"
 
 class QFRDRNumberAndBrightnessData; //forward
 
@@ -41,6 +42,8 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
          */
         void replotData();
 
+        void updateHistograms();
+
         void imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
     protected:
         /** \brief create widgets on object creation */
@@ -51,9 +54,14 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
+        void loadPlotSettings();
+        void savePlotSettings();
+
         void addPlotter( JKQtPlotter*& plotter, JKQTPMathImage*& plot, JKQTPOverlayImage*& plteSelected, JKQTPOverlayImage*& plteExcluded);
 
         void reallocMem(int size);
+
+        void updateSelectionArrays();
 
 
         QColor selectionColor;
@@ -83,6 +91,10 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
 
         JKQTPxyLineGraph* plteCorrelation;
 
+        QFHistogramView* histNumber;
+        QFHistogramView* histBrightness;
+        QTabWidget* tabMain;
+
 
 
         double* plteNumberData;
@@ -96,6 +108,10 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         bool* plteOverviewExcludedData;
         /** \brief size of plteOverviewSelectedData */
         int plotsSize;
+
+        /** \brief set which contains all currently selected runs */
+        QSet<int32_t> selected;
+
 };
 
 #endif // QFRDRNUMBERANDBRIGHTNESSEDITOR_H

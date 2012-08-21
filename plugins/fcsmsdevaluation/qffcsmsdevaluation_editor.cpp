@@ -541,7 +541,7 @@ void QFFCSMSDEvaluationEditor::displayData() {
         pltResidualCorrelation->set_doDrawing(false);
         pltResidualCorrelation->set_emitSignals(false);
         pltResidualCorrelation->clearGraphs();
-        pltDistribution->set_doDrawing(false);
+        pltResidualCorrelation->set_doDrawing(false);
         pltDistribution->set_emitSignals(false);
         pltDistribution->clearGraphs();
         pltDistResults->set_doDrawing(false);
@@ -567,8 +567,22 @@ void QFFCSMSDEvaluationEditor::displayData() {
         }
         pltResiduals->getXAxis()->set_drawGrid(chkGrid->isChecked());
         pltResiduals->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResiduals->get_plotter()->set_showKey(chkKeyVisible->isChecked());
+        pltData->get_plotter()->set_showKey(chkKeyVisible->isChecked());
+        pltDistribution->get_plotter()->set_showKey(chkKeyVisible->isChecked());
+        pltDistResults->get_plotter()->set_showKey(chkKeyVisible->isChecked());
         pltData->getXAxis()->set_drawGrid(chkGrid->isChecked());
         pltData->getYAxis()->set_drawGrid(chkGrid->isChecked());
+
+        pltDistribution->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltDistribution->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltDistResults->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltDistResults->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualHistogram->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualHistogram->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualCorrelation->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualCorrelation->getYAxis()->set_drawGrid(chkGrid->isChecked());
+
         pltData->getYAxis()->set_minTicks(5);
         pltResiduals->getYAxis()->set_minTicks(5);
         pltData->get_plotter()->set_showKey(chkShowKey->isChecked());

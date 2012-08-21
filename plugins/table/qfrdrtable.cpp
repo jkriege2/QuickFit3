@@ -47,6 +47,9 @@ QFRDRTable::PlotInfo::PlotInfo()
     axisFontSize=10;
     axisLabelFontSize=12;
     labelFontSize=16;
+    keyTransparency=0.5;
+    keyPosition=JKQTPkeyInsideRight;
+    keyLayout=JKQTPkeyLayoutOneColumn;
 }
 
 
@@ -262,6 +265,10 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.axisLabelFontSize=te.attribute("axislabelfontsize", "12").toDouble();
                 plot.labelFontSize=te.attribute("labelFontSize", "16").toDouble();
 
+                plot.keyTransparency=te.attribute("keytransparency", "0.5").toDouble();
+                plot.keyPosition=String2JKQTPkeyPosition(te.attribute("keyposition", "inside_right"));
+                plot.keyLayout=String2JKQTPkeyLayout(te.attribute("keylayout", "one_column"));
+
                 QDomElement ge=te.firstChildElement("graph");
                 while (!ge.isNull()) {
                     GraphInfo graph;
@@ -336,6 +343,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("axislabelfontsize", CDoubleToQString(plots[i].axisLabelFontSize));
         w.writeAttribute("labelfontsize", CDoubleToQString(plots[i].labelFontSize));
         w.writeAttribute("fontname", plots[i].fontName);
+        w.writeAttribute("keytransparency", CDoubleToQString(plots[i].keyTransparency));
+        w.writeAttribute("keyposition", JKQTPkeyPosition2String(plots[i].keyPosition));
+        w.writeAttribute("keylayout", JKQTPkeyLayout2String(plots[i].keyLayout));
 
         for (int g=0; g<plots[i].graphs.size(); g++) {
             w.writeStartElement("graph");

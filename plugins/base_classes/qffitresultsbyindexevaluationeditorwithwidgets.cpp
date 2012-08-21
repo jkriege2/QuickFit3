@@ -117,6 +117,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_elines.png"), tr("lines"));
     cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_ebars.png"), tr("bars"));
     cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_elinesbars.png"), tr("bars + lines"));
+    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("polygons"));
+    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("polygons + bars"));
     lES->setBuddy(cmbErrorStyle);
 
     QLabel* lRS=new QLabel(tr("   &Residuals: "), toolbar);
@@ -590,8 +592,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         dataEventsEnabled=false;
         chkXLogScale->setChecked(current->getProperty("plot_taulog", true).toBool());
         chkGrid->setChecked(current->getProperty("plot_grid", true).toBool());
-        cmbPlotStyle->setCurrentIndex(current->getProperty("plot_style", 1).toInt());
-        cmbErrorStyle->setCurrentIndex(current->getProperty("plot_errorstyle", 0).toInt());
+        cmbPlotStyle->setCurrentIndex(current->getProperty("plot_style", 0).toInt());
+        cmbErrorStyle->setCurrentIndex(current->getProperty("plot_errorstyle", 2).toInt());
         cmbResidualStyle->setCurrentIndex(current->getProperty("plot_residualsstyle", 0).toInt());
         chkWeightedResiduals->setChecked(current->getProperty("weighted_residuals", false).toBool());
         spinResidualHistogramBins->setValue(current->getProperty("plot_residualshistogrambins", 25).toInt());

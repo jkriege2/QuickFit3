@@ -109,6 +109,7 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         void errorStyleChanged(int style);
         void plotStyleChanged(int style);
         void chkGridToggled(bool checked);
+        void chkKeyVisibleToggled(bool checked);
         void chkXLogScaleToggled(bool checked);
         void fitParamChanged();
 
@@ -158,6 +159,9 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         QCheckBox* chkXLogScale;
         /** \brief checkbox to display grid */
         QCheckBox* chkGrid;
+        /** \brief checkbox to toggle visibility of keys */
+        QCheckBox* chkKeyVisible;
+
         /** \brief toolbar above the plots */
         QToolBar* toolbar;
         /** \brief label to display the current position of the mouse cursor */

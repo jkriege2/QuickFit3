@@ -132,7 +132,8 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     QWidget* sp1=new QWidget(this);
     sp1->setMinimumWidth(10);
     sp1->setMaximumWidth(10);
-    chkGrid=new QCheckBox(tr("&Grid   "), toolbar);
+    chkGrid=new QCheckBox(tr("&Grids   "), toolbar);
+    chkKeyVisible=new QCheckBox(tr("&Keys   "), toolbar);
     chkXLogScale=new QCheckBox(tr("&log. tau   "), toolbar);
     chkXLogScale->setVisible(false);
     labMousePosition=new QLabel(this);
@@ -410,6 +411,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     toolbar->addWidget(cmbResidualStyle);
     toolbar->addWidget(sp1);
     toolbar->addWidget(chkGrid);
+    toolbar->addWidget(chkKeyVisible);
     toolbar->addWidget(chkXLogScale);
     toolbar->addSeparator();
     toolbar->addWidget(sp2);
@@ -502,6 +504,7 @@ void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* curr
         disconnect(cmbPlotStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotStyleChanged(int)));
         disconnect(cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(errorStyleChanged(int)));
         disconnect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
+        disconnect(chkKeyVisible, SIGNAL(toggled(bool)), this, SLOT(chkKeyVisibleToggled(bool)));
         disconnect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
         disconnect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
         disconnect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
@@ -520,6 +523,7 @@ void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* curr
 
         chkXLogScale->setChecked(current->getProperty("plot_taulog", true).toBool());
         chkGrid->setChecked(current->getProperty("plot_grid", true).toBool());
+        chkKeyVisible->setChecked(current->getProperty("show_key", true).toBool());
         cmbPlotStyle->setCurrentIndex(current->getProperty("plot_style", 1).toInt());
         cmbErrorStyle->setCurrentIndex(current->getProperty("plot_errorstyle", 0).toInt());
         cmbResidualStyle->setCurrentIndex(current->getProperty("plot_residualsstyle", 0).toInt());
@@ -552,6 +556,7 @@ void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* curr
         connect(cmbPlotStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotStyleChanged(int)));
         connect(cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(errorStyleChanged(int)));
         connect(chkGrid, SIGNAL(toggled(bool)), this, SLOT(chkGridToggled(bool)));
+        connect(chkKeyVisible, SIGNAL(toggled(bool)), this, SLOT(chkKeyVisibleToggled(bool)));
         connect(chkXLogScale, SIGNAL(toggled(bool)), this, SLOT(chkXLogScaleToggled(bool)));
         connect(cmbResidualStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(residualStyleChanged(int)));
         connect(chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(chkWeightedResidualsToggled(bool)));
@@ -790,6 +795,14 @@ void QFFCSByIndexAndModelEvaluationEditor::chkGridToggled(bool checked) {
     QApplication::restoreOverrideCursor();
 }
 
+void QFFCSByIndexAndModelEvaluationEditor::chkKeyVisibleToggled(bool checked) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    current->setQFProperty("show_key", chkKeyVisible->isChecked(), false, false);
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
 void QFFCSByIndexAndModelEvaluationEditor::plotStyleChanged(int style) {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

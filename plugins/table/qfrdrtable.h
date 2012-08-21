@@ -106,11 +106,26 @@ class QFRDRTable : public QFRawDataRecord {
             bool xlog, ylog;
             bool grid;
             bool showKey;
+
+            /*bool showKeyBorder;
+            double keyBorderWidth;
+            QColor keyBorderColor;
+            QColor keyBackgroundColor;
+            QColor backgroundColor;
+            QColor gridColor;
+            Qt::PenStyle gridStyle;
+            double gridWidth;*/
+
+            QColor axisColor;
+            double axisWidth;
             QString fontName;
             double keyFontSize;
             double labelFontSize;
             double axisFontSize;
             double axisLabelFontSize;
+            double keyTransparency;
+            JKQTPkeyPosition keyPosition;
+            JKQTPkeyLayout keyLayout;
             QList<GraphInfo> graphs;
         };
 

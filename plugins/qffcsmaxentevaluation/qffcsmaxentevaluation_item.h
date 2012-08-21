@@ -69,6 +69,10 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         /** \brief return the current number of distribution points Ndist */
         uint32_t getNumIter() const;
 
+        /** \brief set the current wxy value in nanometers */
+        void setWXY(double wxy);
+        /** \brief return the current wxy value in nanometers */
+        double getWXY() const;
 
 
 
@@ -103,6 +107,9 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         /*! \brief returns an array representing the distribution tau values (lag time axis) for the given record, index, model combination
           */
         QVector<double> getDistributionTaus(QFRawDataRecord* record, int index, int model) const;
+        /*! \brief returns an array representing the distribution tau values (lag time axis) for the given record, index, model combination
+          */
+        QVector<double> getDistributionDs(QFRawDataRecord* record, int index, int model) const;
 
 
         /*! \brief calculates fit statistics for the given fit function and dataset.

@@ -653,6 +653,8 @@ void QFFCSFitEvaluationEditor::replotData() {
             case 1: styl=JKQTPerrorLines; break;
             case 2: styl=JKQTPerrorBars; break;
             case 3: styl=JKQTPerrorBarsLines; break;
+            case 4: styl=JKQTPerrorPolygons; break;
+            case 5: styl=JKQTPerrorBarsPolygons; break;
         }
         //qDebug()<<"   c "<<t.elapsed()<<" ms";
         t.start();
@@ -661,6 +663,9 @@ void QFFCSFitEvaluationEditor::replotData() {
         QColor gcolor=pltData->get_plotter()->get_graphColor();
         g->set_color(gcolor);
         g->set_errorColor(gcolor.lighter());
+        QColor errfc=g->get_errorColor();
+        errfc.setAlphaF(0.5);
+        g->set_errorFillColor(errfc);
         g->set_lineWidth(2);
         g->set_symbolSize(8);
         g->set_symbolWidth(1);

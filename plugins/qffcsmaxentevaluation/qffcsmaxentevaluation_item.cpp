@@ -122,6 +122,14 @@ uint32_t QFFCSMaxEntEvaluationItem::getNumIter() const {
     return round(getFitValue("maxent_numiter"));
 }
 
+void QFFCSMaxEntEvaluationItem::setWXY(double wxy) {
+    setFitValue("maxent_wxy", wxy);
+}
+
+double QFFCSMaxEntEvaluationItem::getWXY() const {
+    return getFitValue("maxent_wxy");
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -214,6 +222,15 @@ QVector<double> QFFCSMaxEntEvaluationItem::getDistributionTaus(QFRawDataRecord *
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
         res=getFitValueNumberArray(record, index, "maxent_tau");
+    }
+    return res;
+}
+
+QVector<double> QFFCSMaxEntEvaluationItem::getDistributionDs(QFRawDataRecord *record, int index, int model) const {
+    QVector<double> res;
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    if (data) {
+        res=getFitValueNumberArray(record, index, "maxent_D");
     }
     return res;
 }
@@ -523,6 +540,9 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
     } else if (parameterID=="maxent_Ndist") {
         defaultValue.value=100;
         return true;
+    } else if (parameterID=="maxent_wxy") {
+        defaultValue.value=250;
+        return true;
     } else if (parameterID=="maxent_numiter") {
         defaultValue.value=20;
         return true;
@@ -540,7 +560,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
     set_doEmitPropertiesChanged(false);
     record->disableEmitResultsChanged();
 
-    qDebug() << "START DEBUGGING 0: We enter the do fit Method with MODEL = " << model;
+    //qDebug() << "START DEBUGGING 0: We enter the do fit Method with MODEL = " << model;
 
 
 
@@ -572,6 +592,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         uint32_t N=data->getCorrelationN();
         double* taus=data->getCorrelationT();
         double* distTaus=NULL;//(double*)calloc(Ndist,sizeof(double));
+        double* distDs=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* dist=NULL;//(double*)calloc(Ndist,sizeof(double));
         double* modelEval=(double*)malloc(N*sizeof(double));
         bool weightsOK=false;
@@ -588,7 +609,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         bool fitSuccess=false;
 
 
-        qDebug() << "DEBUG #1: alpha = " << alpha << " NumIter = " << NumIter << "Ndist =" << Ndist ;
+        //qDebug() << "DEBUG #1: alpha = " << alpha << " NumIter = " << NumIter << "Ndist =" << Ndist ;
 
         //////////Load Model Parameters//////////////////////////////////////////////////////
         //int parameter_count=getParameterCount(model);
@@ -655,14 +676,14 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         dist[i]=init_dist[i];
                     }
                 old_distribution=true;
-                qDebug()<< "OLDDIST TRUE";
+                //qDebug()<< "OLDDIST TRUE";
             }
         else
             {
                 distTaus=NULL;
                 dist=NULL;
                 old_distribution=false;
-                qDebug()<< "OLDDIST FALSE";
+                //qDebug()<< "OLDDIST FALSE";
                 if (int64_t(Ndist)>(rangeMaxDatarange-rangeMinDatarange))
                     {
                         Ndist=(rangeMaxDatarange-rangeMinDatarange);
@@ -679,8 +700,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         /// MaxEnt Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
         MaxEntB040 mem;
-        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus,\
-                    model,getParameterCount(model),param_list);
+        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus, model,getParameterCount(model),param_list);
         mem.run(alpha,NumIter,param_list,model,getParameterCount(model));
         fitSuccess=true;
         if (old_distribution==false)
@@ -699,7 +719,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         for (unsigned int i=0; i<Ndist; i++) {
             double d=dist[i];
             if (!QFFloatIsOK(dist[i])) dist[i]=0;
-            qDebug()<<distTaus[i]<<" ,\t"<<d<<" ,\t"<<dist[i];
+            //qDebug()<<distTaus[i]<<" ,\t"<<d<<" ,\t"<<dist[i];
         }
 
         //////////////////////////////////////////////////////////
@@ -726,11 +746,22 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
         getProject()->getServices()->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(duration).arg(fitSuccess?tr("success"):tr("no convergence")));
 
+        distDs=(double*)calloc(Ndist, sizeof(double));
+        double wxy=getWXY();
+        for (int i=0; i<Ndist; i++) {
+            distDs[i]=wxy*wxy/1000000.0/(4.0*distTaus[i]);
+        }
+
         // now store the results:
         QString param;
         setFitResultValueNumberArray(record, index, model, param="maxent_tau", distTaus, Ndist, QString("seconds"));
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: lag times"), QString("MaxEnt distribution: lag times <i>&tau;</i>"));
+        setFitResultSortPriority(record, index, model, param, true);
+
+        setFitResultValueNumberArray(record, index, model, param="maxent_D", distDs, Ndist, QString("seconds"));
+        setFitResultGroup(record, index, model, param, tr("fit results"));
+        setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: diffusion coefficients"), QString("MaxEnt distribution: diffusion coefficients <i>D</i>"));
         setFitResultSortPriority(record, index, model, param, true);
 
         setFitResultValueNumberArray(record, index, model, param="maxent_distribution", dist, Ndist);
@@ -821,6 +852,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         free(weights);
         free(modelEval);
         free(distTaus);
+        free(distDs);
 
 
     }

@@ -524,6 +524,9 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         p.axisLabelFontSize=ui->spinAxisLabelFontSize->value();
         p.keyFontSize=ui->spinKeyFontSize->value();
         p.labelFontSize=ui->spinTitleFontSize->value();
+        p.keyTransparency=double(ui->sliderKeyTransparency->value())/255.0;
+        p.keyPosition=ui->cmbKeyPosition->getPosition();
+        p.keyLayout=ui->cmbKeyLayout->getKeyLayout();
 
         current->setPlot(this->plot, p);
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
@@ -559,7 +562,16 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->get_plotter()->set_plotLabel(p.title);
         ui->plotter->get_plotter()->set_keyFont(p.fontName);
         ui->plotter->get_plotter()->set_keyFontSize(p.keyFontSize);
+        QFont keyf(p.fontName);
+        keyf.setPointSizeF(p.keyFontSize);
+        QFontMetricsF keyfm(keyf);
+        ui->plotter->get_plotter()->set_key_item_height(qMax(15.0, 1.0*keyfm.height()));
         ui->plotter->setGrid(p.grid);
+        QColor kb=QColor("white");
+        kb.setAlphaF(p.keyTransparency);
+        ui->plotter->get_plotter()->set_keyBackgroundColor(kb);
+        ui->plotter->get_plotter()->set_keyLayout(p.keyLayout);
+        ui->plotter->get_plotter()->set_keyPosition(p.keyPosition);
         ui->plotter->get_plotter()->set_showKey(p.showKey);
         ui->plotter->setXY(p.xmin, p.xmax, p.ymin, p.ymax);
         ui->plotter->clearGraphs(true);
@@ -947,6 +959,9 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinKeyFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinTitleFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->sliderKeyTransparency, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbKeyLayout, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbKeyPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
 
     connect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
     connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
@@ -989,6 +1004,9 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinKeyFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinTitleFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->sliderKeyTransparency, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbKeyLayout, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbKeyPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
 
 
     disconnect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));

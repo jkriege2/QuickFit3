@@ -73,6 +73,8 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
     cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
+    cmbAverageStyle->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("with error polygons"));
+    cmbAverageStyle->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("with polygons and bars"));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageStyle, SLOT(setEnabled(bool)));
 
     cmbAverageErrorStyle=new QComboBox(w);
@@ -80,6 +82,8 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
     cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
+    cmbAverageErrorStyle->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("with error polygons"));
+    cmbAverageErrorStyle->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("with polygons and bars"));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageErrorStyle, SLOT(setEnabled(bool)));
 
     gl->addWidget((l=new QLabel(tr("average &options:"), w)), row, 0);
@@ -433,6 +437,8 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
             case 1: runerrorstyle=JKQTPerrorBars; break;
             case 2: runerrorstyle=JKQTPerrorLines; break;
             case 3: runerrorstyle=JKQTPerrorBarsLines; break;
+            case 4: runerrorstyle=JKQTPerrorPolygons; break;
+            case 5: runerrorstyle=JKQTPerrorBarsPolygons; break;
         }
         bool runLine=(cmbRunStyle->currentIndex()!=1);
         JKQTPgraphSymbols runSymbol=JKQTPcross;
@@ -443,6 +449,8 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
             case 1: avgerrorstyle=JKQTPerrorBars; break;
             case 2: avgerrorstyle=JKQTPerrorLines; break;
             case 3: avgerrorstyle=JKQTPerrorBarsLines; break;
+            case 4: avgerrorstyle=JKQTPerrorPolygons; break;
+            case 5: avgerrorstyle=JKQTPerrorBarsPolygons; break;
         }
         bool avgLine=(cmbAverageStyle->currentIndex()!=1);
         JKQTPgraphSymbols avgSymbol=JKQTPcross;
@@ -475,7 +483,10 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
                 g->set_yErrorColumn(c_rune);
                 g->set_yErrorStyle(runerrorstyle);
                 g->set_xErrorStyle(JKQTPnoError);
-                g->set_errorColor(g->get_color().lighter());
+                QColor errc=g->get_color().lighter();
+                g->set_errorColor(errc);
+                errc.setAlphaF(0.5);
+                g->set_errorFillColor(errc);
                 g->set_errorWidth(1);
                 g->set_drawLine(runLine);
                 g->set_symbol(runSymbol);
@@ -519,7 +530,10 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
                         g->set_color(QColor("grey"));
                     }
                 }
-                g->set_errorColor(g->get_color().lighter());
+                QColor errc=g->get_color().lighter();
+                g->set_errorColor(errc);
+                errc.setAlphaF(0.5);
+                g->set_errorFillColor(errc);
                 if (!isTop) plotter->addGraph(g);
             }
 
@@ -545,7 +559,10 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
                     g->set_yErrorColumn(c_rune);
                     g->set_yErrorStyle(runerrorstyle);
                     g->set_xErrorStyle(JKQTPnoError);
-                    g->set_errorColor(g->get_color().lighter());
+                    QColor errc=g->get_color().lighter();
+                    g->set_errorColor(errc);
+                    errc.setAlphaF(0.5);
+                    g->set_errorFillColor(errc);
                     g->set_symbolSize(5);
                     g->set_errorWidth(1);
 
@@ -566,7 +583,10 @@ void QFRDRImagingFCSDataEditor::replotData(int dummy) {
 
             JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
             g->set_color(QColor("blue"));
-            g->set_errorColor(g->get_color().lighter());
+            QColor errc=g->get_color().lighter();
+            g->set_errorColor(errc);
+            errc.setAlphaF(0.5);
+            g->set_errorFillColor(errc);
             g->set_lineWidth(2);
             g->set_xColumn(c_tau);
             g->set_yColumn(c_mean);

@@ -40,6 +40,11 @@ QFFCSMaxEntEvaluationEditor::~QFFCSMaxEntEvaluationEditor()
 
 
 void QFFCSMaxEntEvaluationEditor::createWidgets() {
+    edtWxy=new QFDoubleEdit(this);
+    edtWxy->setRange(1e-3,1e10);
+    flAlgorithmParams->addRow(tr("<i>w<sub>xy</sub></i> [nm] <i>= </i>"), edtWxy);
+
+
     edtAlpha=new QFDoubleEdit(this);
     edtAlpha->setRange(0, DBL_MAX);
     edtAlpha->setCheckBounds(true, false);
@@ -73,6 +78,8 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     hblModel->addStretch();
 
 
+
+
     tbPlot=new QToolBar(QString("tbPlot"), this);
     tbPlot->setIconSize(QSize(16,16));
     tbPlot->addAction(pltData->get_plotter()->get_actSavePlot());
@@ -85,6 +92,8 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     tbPlot->addAction(pltData->get_plotter()->get_actZoomAll());
     tbPlot->addAction(pltData->get_plotter()->get_actZoomIn());
     tbPlot->addAction(pltData->get_plotter()->get_actZoomOut());
+    tbPlot->addSeparator();
+
 
     toolbar->removeAction(pltData->get_plotter()->get_actSavePlot());
     toolbar->removeAction(pltData->get_plotter()->get_actPrint());
@@ -128,6 +137,9 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomAll());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomIn());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomOut());
+    chkDiffusionCoefficient=new QCheckBox(tr("show D-axis"));
+    tbPlotDistribution->addSeparator();
+    tbPlotDistribution->addWidget(chkDiffusionCoefficient);
 
 
     QWidget* wPltDist=new QWidget(this);
@@ -143,6 +155,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
+    connect(chkDiffusionCoefficient, SIGNAL(toggled(bool)), this, SLOT(chkShowDChanged(bool)));
     /////
 
 }
@@ -160,6 +173,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     QFFCSByIndexAndModelEvaluationEditor::connectWidgets(current, old);
 
     if (old) {
+        disconnect(edtWxy, SIGNAL(valueChanged(double)), this, SLOT(wxyChanged(double)));
         disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         disconnect(edtNdist, SIGNAL(valueChanged(int)),this,SLOT(NdistChanged(int)));
@@ -170,6 +184,9 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     //QFFCSMaxEntEvaluationItem* item_old=qobject_cast<QFFCSMaxEntEvaluationItem*>(old);
     if (item) {
         dataEventsEnabled=false;
+
+        edtWxy->setValue(item->getWXY());
+        connect(edtWxy, SIGNAL(valueChanged(double)), this, SLOT(wxyChanged(double)));
 
         edtAlpha->setValue(item->getAlpha());
         connect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
@@ -184,7 +201,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
 
 
-
+        chkDiffusionCoefficient->setChecked(current->getProperty("show_daxis", false).toBool());
 
 
         dataEventsEnabled=true;
@@ -219,6 +236,7 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
     if (data && eval) {
         bool oldde=dataEventsEnabled;
         dataEventsEnabled=false;
+        edtWxy->setValue(eval->getWXY());
         edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
         edtNdist->setRange(10,data->getCorrelationN()); //qMax(0,data->getCorrelationN())
@@ -291,10 +309,26 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
             pltData->getXAxis()->set_minorTicks(1);
             pltResiduals->getXAxis()->set_minorTicks(1);
         }
+
+
+
         pltResiduals->getXAxis()->set_drawGrid(chkGrid->isChecked());
         pltResiduals->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResiduals->get_plotter()->set_showKey(chkKeyVisible->isChecked());
+        pltData->get_plotter()->set_showKey(chkKeyVisible->isChecked());
+        pltDistribution->get_plotter()->set_showKey(chkKeyVisible->isChecked());
         pltData->getXAxis()->set_drawGrid(chkGrid->isChecked());
         pltData->getYAxis()->set_drawGrid(chkGrid->isChecked());
+
+        pltDistribution->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltDistribution->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualHistogram->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualHistogram->getYAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualCorrelation->getXAxis()->set_drawGrid(chkGrid->isChecked());
+        pltResidualCorrelation->getYAxis()->set_drawGrid(chkGrid->isChecked());
+
+
+
         pltData->getYAxis()->set_minTicks(5);
         pltResiduals->getYAxis()->set_minTicks(5);
 
@@ -641,25 +675,53 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 // plot distribution
                 /////////////////////////////////////////////////////////////////////////////////
                 QVector<double> mem_tau=eval->getDistributionTaus(record, index, model);
+                QVector<double> mem_D=eval->getDistributionDs(record, index, model);
                 QVector<double> mem_dist=eval->getDistribution(record, index, model);
+
+                if (mem_D.size()<mem_tau.size()) {
+                    mem_D=mem_tau;
+                    double wxy=eval->getWXY();
+                    for (int i=0; i<mem_tau.size(); i++) {
+                        mem_D[i]=wxy*wxy/1000000.0/4.0/mem_tau[i];
+                    }
+                }
                 int c_disttau=-1;
+                int c_distD=-1;
                 int c_dist=-1;
                 if (mem_tau.size()>0 && mem_dist.size()>0) {
                     c_disttau=dsdist->addCopiedColumn(mem_tau.data(), mem_tau.size(), "maxent_tau");
+                    c_distD=dsdist->addCopiedColumn(mem_D.data(), mem_D.size(), "maxent_D");
                     c_dist=dsdist->addCopiedColumn(mem_dist.data(), mem_dist.size(), "maxent_dist");;
                 } else {
-                    pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
+                    if (!chkDiffusionCoefficient->isChecked()) pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
                 }
                 JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
                 g_dist->set_drawLine(true);
                 g_dist->set_title("MaxEnt distribution");
-                g_dist->set_xColumn(c_disttau);
+                if (chkDiffusionCoefficient->isChecked()) {
+                    g_dist->set_xColumn(c_distD);
+                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [µm²/s]"));
+                } else {
+                    g_dist->set_xColumn(c_disttau);
+                    pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+                }
                 g_dist->set_yColumn(c_dist);
+                g_dist->set_lineWidth(2);
+                g_dist->set_symbolSize(8);
+                g_dist->set_symbolWidth(1);
+                int plotStyle=cmbPlotStyle->currentIndex();
+                if (plotStyle==0) { // draw points
+                    g_dist->set_drawLine(false);
+                    g_dist->set_symbol(JKQTPcross);
+                } else if (plotStyle==2) {
+                    g_dist->set_symbol(JKQTPcross);
+                }
+
                 pltDistribution->addGraph(g_dist);
                 //qDebug()<<"    g "<<t.elapsed()<<" ms";
                 t.start();
 
-
+                if (chkDiffusionCoefficient->isChecked()) pltDistribution->zoomToFit();
 
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -988,6 +1050,13 @@ void QFFCSMaxEntEvaluationEditor::alphaChanged(double alpha) {
     if (data) data->setAlpha(alpha);
 }
 
+void QFFCSMaxEntEvaluationEditor::wxyChanged(double wxy) {
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setWXY(wxy);
+}
 void QFFCSMaxEntEvaluationEditor::NdistChanged(int Ndist) {
     if (!dataEventsEnabled) return;
     if (!current) return;
@@ -1002,6 +1071,15 @@ void QFFCSMaxEntEvaluationEditor::NumIterChanged(int NumIter) {
     if (!current->getHighlightedRecord()) return;
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (data) data->setNumIter(NumIter);
+}
+
+void QFFCSMaxEntEvaluationEditor::chkShowDChanged(bool checked) {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    current->setQFProperty("show_daxis", chkDiffusionCoefficient->isChecked(), false, false);
+    displayData();
+    QApplication::restoreOverrideCursor();
 }
 
 

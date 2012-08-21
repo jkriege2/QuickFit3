@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
-    <height>587</height>
+    <width>718</width>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QHBoxLayout" name="horizontalLayout_5">
    <item>
     <widget class="QVisibleHandleSplitter" name="splitter">
      <property name="orientation">
@@ -40,14 +40,23 @@
       </layout>
      </widget>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabPlots">
        <attribute name="title">
         <string>&amp;Plots</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>3</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -106,6 +115,12 @@
           <layout class="QFormLayout" name="formLayout">
            <property name="fieldGrowthPolicy">
             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
+           <property name="horizontalSpacing">
+            <number>6</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>3</number>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_3">
@@ -588,9 +603,6 @@
         <string>&amp;System</string>
        </attribute>
        <layout class="QFormLayout" name="formLayout_3">
-        <property name="fieldGrowthPolicy">
-         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-        </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
@@ -604,7 +616,7 @@
         <item row="0" column="1">
          <widget class="QLineEdit" name="edtTitle"/>
         </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
            <string>X axis label:</string>
@@ -614,10 +626,10 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="1">
          <widget class="QLineEdit" name="edtXLabel"/>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
            <string>Y axis label:</string>
@@ -627,10 +639,10 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <widget class="QLineEdit" name="edtYLabel"/>
         </item>
-        <item row="4" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_10">
           <property name="text">
            <string>x axis range:</string>
@@ -640,7 +652,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="3" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QFDoubleEdit" name="edtXMin"/>
@@ -664,7 +676,7 @@
           </item>
          </layout>
         </item>
-        <item row="5" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_11">
           <property name="text">
            <string>y axis range:</string>
@@ -674,7 +686,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="4" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QFDoubleEdit" name="edtYMin"/>
@@ -698,7 +710,7 @@
           </item>
          </layout>
         </item>
-        <item row="6" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="label_12">
           <property name="text">
            <string>axis scaling:</string>
@@ -708,7 +720,7 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="5" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QCheckBox" name="chkLogX">
@@ -739,7 +751,7 @@
           </item>
          </layout>
         </item>
-        <item row="7" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="label_16">
           <property name="text">
            <string>grid:</string>
@@ -749,14 +761,14 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
+        <item row="6" column="1">
          <widget class="QCheckBox" name="chkGrid">
           <property name="text">
            <string>show grid</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
+        <item row="7" column="0">
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>key:</string>
@@ -766,18 +778,7 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QCheckBox" name="chkShowKey">
-            <property name="text">
-             <string>show key</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="9" column="0">
+        <item row="8" column="0">
          <widget class="QLabel" name="label_17">
           <property name="text">
            <string>font name:</string>
@@ -787,10 +788,10 @@
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
+        <item row="8" column="1">
          <widget class="QFontComboBox" name="cmbFontname"/>
         </item>
-        <item row="10" column="0">
+        <item row="9" column="0">
          <widget class="QLabel" name="label_18">
           <property name="text">
            <string>key font size:</string>
@@ -800,7 +801,7 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="1">
+        <item row="9" column="1">
          <widget class="QDoubleSpinBox" name="spinKeyFontSize">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -819,7 +820,7 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
+        <item row="10" column="0">
          <widget class="QLabel" name="label_19">
           <property name="text">
            <string>axis tick font size:</string>
@@ -829,7 +830,7 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="1">
+        <item row="10" column="1">
          <widget class="QDoubleSpinBox" name="spinAxisFontSize">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -848,7 +849,7 @@
           </property>
          </widget>
         </item>
-        <item row="12" column="0">
+        <item row="11" column="0">
          <widget class="QLabel" name="label_20">
           <property name="text">
            <string>axis label font size:</string>
@@ -858,7 +859,7 @@
           </property>
          </widget>
         </item>
-        <item row="12" column="1">
+        <item row="11" column="1">
          <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
           <property name="decimals">
            <number>1</number>
@@ -871,7 +872,17 @@
           </property>
          </widget>
         </item>
-        <item row="13" column="1">
+        <item row="12" column="0">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>title font size:</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinTitleFontSize</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
          <widget class="QDoubleSpinBox" name="spinTitleFontSize">
           <property name="decimals">
            <number>1</number>
@@ -884,15 +895,99 @@
           </property>
          </widget>
         </item>
-        <item row="13" column="0">
-         <widget class="QLabel" name="label_21">
-          <property name="text">
-           <string>title font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinTitleFontSize</cstring>
-          </property>
-         </widget>
+        <item row="7" column="1">
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_37">
+            <property name="text">
+             <string>visible:</string>
+            </property>
+            <property name="buddy">
+             <cstring>chkShowKey</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="chkShowKey">
+            <property name="text">
+             <string>key</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="text">
+             <string>transparency:</string>
+            </property>
+            <property name="buddy">
+             <cstring>sliderKeyTransparency</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSlider" name="sliderKeyTransparency">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>255</number>
+            </property>
+            <property name="singleStep">
+             <number>2</number>
+            </property>
+            <property name="pageStep">
+             <number>50</number>
+            </property>
+            <property name="value">
+             <number>128</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedAppearance">
+             <bool>true</bool>
+            </property>
+            <property name="invertedControls">
+             <bool>false</bool>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::NoTicks</enum>
+            </property>
+            <property name="tickInterval">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>position:</string>
+            </property>
+            <property name="buddy">
+             <cstring>cmbKeyPosition</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="JKQTPkeyPositionComboBox" name="cmbKeyPosition"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_36">
+            <property name="text">
+             <string>layout:</string>
+            </property>
+            <property name="buddy">
+             <cstring>cmbKeyLayout</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="JKQTPkeyLayoutComboBox" name="cmbKeyLayout"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -957,6 +1052,16 @@
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
   </customwidget>
+  <customwidget>
+   <class>JKQTPkeyLayoutComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPkeyPositionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
@@ -988,7 +1093,6 @@
   <tabstop>chkLogX</tabstop>
   <tabstop>chkLogY</tabstop>
   <tabstop>chkGrid</tabstop>
-  <tabstop>chkShowKey</tabstop>
   <tabstop>cmbFontname</tabstop>
   <tabstop>spinKeyFontSize</tabstop>
   <tabstop>spinAxisFontSize</tabstop>

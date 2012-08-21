@@ -67,6 +67,7 @@ void QFHistogramView::createWidgets() {
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
     pltParamHistogram=new JKQtPlotter(this);
+    pltParamHistogram->setMinimumWidth(100);
     pltParamHistogram->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     tvHistogramParameters=new QEnhancedTableView(this);
     tabHistogramParameters=new QFTableModel(this);
@@ -97,6 +98,8 @@ void QFHistogramView::createWidgets() {
 
 
 
+
+    splitterHistogram->setChildrenCollapsible(false);
     splitterHistogram->addWidget(pltParamHistogram);
     splitterHistogram->addWidget(tvHistogramParameters);
     layHist->addWidget(splitterHistogram, 0, 0);

@@ -58,6 +58,7 @@
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
+#include "qfdoubleedit.h"
 ////////////
 
 
@@ -76,9 +77,11 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
 
     protected slots:
         void alphaChanged(double alpha);
+        void wxyChanged(double wxy);
         void weightsChanged(int weights);
         void NdistChanged(int Ndist);
         void NumIterChanged(int NumIter);
+        void chkShowDChanged(bool checked);
 
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -124,6 +127,9 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         JKQtPlotter* pltDistribution;
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
+
+        QFDoubleEdit* edtWxy;
+        QCheckBox* chkDiffusionCoefficient;
 
 
     private:
