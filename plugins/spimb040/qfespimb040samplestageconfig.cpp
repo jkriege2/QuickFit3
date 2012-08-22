@@ -1024,105 +1024,172 @@ void QFESPIMB040SampleStageConfig::stageZMoved(QFExtensionLinearStage::AxisState
 
 void QFESPIMB040SampleStageConfig::updateStageStateWidgets(QLabel* labPos, QLabel* labSpeed, QLabel* labState, bool present, QFExtensionLinearStage::AxisState state, double position, double speed) {
     if (present) {
-        bool updt=updatesEnabled(); setUpdatesEnabled(false);
-        labState->setText("");
+        //bool updt=updatesEnabled(); setUpdatesEnabled(false);
+        if (labState->text()!="") labState->setText("");
         switch(state) {
-            case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
-            case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
+            case QFExtensionLinearStage::Ready : {
+                    QString txt=tr("stage ready");
+                    if (labState->toolTip()!=txt) {
+                        labState->setPixmap(iconReady);
+                        labState->setToolTip(txt);
+                    }
+                } break;
+            case QFExtensionLinearStage::Disconnected : {
+                    QString txt=tr("stage disconnected");
+                    if (labState->toolTip()!=txt) {
+                        labState->setPixmap(iconDisconnected);
+                        labState->setToolTip(txt);
+                    }
+                } break;
             case QFExtensionLinearStage::Moving : {
-                                                      if (speed>0) labState->setPixmap(iconMoving);
-                                                      else labState->setPixmap(iconMovingOpposite);
-                                                  } break;
-            case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
-            default: labState->setText(tr("?")); break;
+                    if (speed>0) {
+                        QString txt=tr("stage moving forward");
+                        if (labState->toolTip()!=txt) {
+                            labState->setPixmap(iconMoving);
+                            labState->setToolTip(txt);
+                        }
+                    } else {
+                        QString txt=tr("stage moving backward");
+                        if (labState->toolTip()!=txt) {
+                            labState->setPixmap(iconMovingOpposite);
+                            labState->setToolTip(txt);
+                        }
+                    }
+                } break;
+            case QFExtensionLinearStage::Error : {
+                    QString txt=tr("an error occured on this stage");
+                    if (labState->toolTip()!=txt) {
+                        labState->setPixmap(iconError);
+                        labState->setToolTip(txt);
+                    }
+                } break;
+            default:
+                if (labState->text()!=tr("?")) labState->setText(tr("?"));
+                break;
         }
-        labSpeed->setText(QString::number(speed, 'f', 2));
-        labPos->setText(QString::number(position, 'f', 2));
-        setUpdatesEnabled(updt);
+        QString txt=QString::number(speed, 'f', 2);
+        if (labSpeed->text()!=txt) labSpeed->setText(txt);
+        txt=QString::number(position, 'f', 2);
+        if (labPos->text()!=txt) labPos->setText(txt);
+        //setUpdatesEnabled(updt);
     } else {
         bool updt=updatesEnabled(); setUpdatesEnabled(false);
-        labState->setText("---");
-        labPos->setText("");
-        labSpeed->setText("");
-        setUpdatesEnabled(updt);
+        if (labState->text()!="---") labState->setText("---");
+        if (!labPos->text().isEmpty()) labPos->setText("");
+        if (!labSpeed->text().isEmpty()) labSpeed->setText("");
+        //setUpdatesEnabled(updt);
     }
 }
 
 void QFESPIMB040SampleStageConfig::joystickStateChanged(bool enabled) {
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    //bool updt=updatesEnabled(); setUpdatesEnabled(false);
     bool anyconn=stageThread->anyConnected();
     //chkJoystick->setEnabled(anyconn);
-    spinJoystickMaxSpeed->setEnabled(anyconn && enabled);
-    btnX2->setEnabled(anyconn && enabled);
-    btnX10->setEnabled(anyconn && enabled);
-    btnD2->setEnabled(anyconn && enabled);
-    btnD10->setEnabled(anyconn && enabled);
+    bool en=anyconn && enabled;
+    if (spinJoystickMaxSpeed->isEnabled()!=en) spinJoystickMaxSpeed->setEnabled(en);
+    if (btnX2->isEnabled()!=en) btnX2->setEnabled(en);
+    if (btnX10->isEnabled()!=en) btnX10->setEnabled(en);
+    if (btnD2->isEnabled()!=en) btnD2->setEnabled(en);
+    if (btnD10->isEnabled()!=en) btnD10->setEnabled(en);
     if (anyconn) {
         if (enabled!=chkJoystick->isChecked()) chkJoystick->setChecked(enabled);
-        if (enabled) labJoystick->setPixmap(iconJoystick);
-        else labJoystick->setPixmap(iconNoJoystick);
+        if (enabled) {
+            QString txt=tr("joystick enabled");
+            if (labJoystick->toolTip()!=txt) {
+                labJoystick->setPixmap(iconJoystick);
+                labJoystick->setToolTip(txt);
+            }
+
+        } else {
+            QString txt=tr("joystick disabled");
+            if (labJoystick->toolTip()!=txt) {
+                labJoystick->setPixmap(iconNoJoystick);
+                labJoystick->setToolTip(txt);
+            }
+        }
     } else {
-        labJoystick->setPixmap(QPixmap());
+        QString txt="";
+        if (labJoystick->toolTip()!=txt) {
+            labJoystick->setPixmap(QPixmap());
+            labJoystick->setToolTip(txt);
+        }
     }
-    setUpdatesEnabled(updt);
+    //setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY, bool connZ) {
     bool anyconn=false;
     bool conn=connX;
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    //bool updt=updatesEnabled(); setUpdatesEnabled(false);
     anyconn=anyconn||conn;
     if (conn) {
-        actConnectX->setChecked(true);
-        actConnectX->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
-        actConnectX->setText(tr("Disconnect x-axis ..."));
+        if (!actConnectX->isChecked()) actConnectX->setChecked(true);
+        QString txt=tr("Disconnect x-axis ...");
+        if (actConnectX->text()!=txt) {
+            actConnectX->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
+            actConnectX->setText(txt);
+        }
     } else {
-        actConnectX->setChecked(false);
-        actConnectX->setIcon(QIcon(":/spimb040/stageconnect.png"));
-        actConnectX->setText(tr("Connect x-axis ..."));
+        if (actConnectX->isChecked()) actConnectX->setChecked(false);
+        QString txt=tr("Connect x-axis ...");
+        if (actConnectX->text()!=txt) {
+            actConnectX->setIcon(QIcon(":/spimb040/stageconnect.png"));
+            actConnectX->setText(txt);
+        }
     }
-    actConfigureX->setEnabled(true);
-    cmbStageX->setEnabled(!conn);
-    spinMoveX->setEnabled(conn);
+    if (!actConfigureX->isEnabled()) actConfigureX->setEnabled(true);
+    if (cmbStageX->isEnabled()!=!conn) cmbStageX->setEnabled(!conn);
+    if (spinMoveX->isEnabled()!=conn) spinMoveX->setEnabled(conn);
 
 
     conn=connY;
     anyconn=anyconn||conn;
     if (conn) {
-        actConnectY->setChecked(true);
-        actConnectY->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
-        actConnectY->setText(tr("Disconnect y-axis ..."));
+        if (!actConnectY->isChecked()) actConnectY->setChecked(true);
+        QString txt=tr("Disconnect y-axis ...");
+        if (actConnectY->text()!=txt) {
+            actConnectY->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
+            actConnectY->setText(txt);
+        }
     } else {
-        actConnectY->setChecked(false);
-        actConnectY->setIcon(QIcon(":/spimb040/stageconnect.png"));
-        actConnectY->setText(tr("Connect y-axis ..."));
+        if (actConnectY->isChecked()) actConnectY->setChecked(false);
+        QString txt=tr("Connect y-axis ...");
+        if (actConnectY->text()!=txt) {
+            actConnectY->setIcon(QIcon(":/spimb040/stageconnect.png"));
+            actConnectY->setText(txt);
+        }
     }
-    actConfigureY->setEnabled(true);
-    cmbStageY->setEnabled(!conn);
-    spinMoveY->setEnabled(conn);
+    if (!actConfigureY->isEnabled()) actConfigureY->setEnabled(true);
+    if (cmbStageY->isEnabled()!=!conn) cmbStageY->setEnabled(!conn);
+    if (spinMoveY->isEnabled()!=conn) spinMoveY->setEnabled(conn);
 
 
     conn=connZ;
     anyconn=anyconn||conn;
     if (conn) {
-        actConnectZ->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
-        actConnectZ->setChecked(true);
-        actConnectZ->setText(tr("Disconnect z-axis ..."));
+        if (!actConnectZ->isChecked()) actConnectZ->setChecked(true);
+        QString txt=tr("Disconnect Z-axis ...");
+        if (actConnectZ->text()!=txt) {
+            actConnectZ->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
+            actConnectZ->setText(txt);
+        }
     } else {
-        actConnectZ->setChecked(false);
-        actConnectZ->setIcon(QIcon(":/spimb040/stageconnect.png"));
-        actConnectZ->setText(tr("Connect z-axis ..."));
+        if (actConnectZ->isChecked()) actConnectZ->setChecked(false);
+        QString txt=tr("Connect Z-axis ...");
+        if (actConnectZ->text()!=txt) {
+            actConnectZ->setIcon(QIcon(":/spimb040/stageconnect.png"));
+            actConnectZ->setText(txt);
+        }
     }
+    if (!actConfigureZ->isEnabled()) actConfigureZ->setEnabled(true);
+    if (cmbStageZ->isEnabled()!=!conn) cmbStageZ->setEnabled(!conn);
+    if (spinMoveZ->isEnabled()!=conn) spinMoveZ->setEnabled(conn);
 
-    actConfigureZ->setEnabled(true);
-    cmbStageZ->setEnabled(!conn);
-    spinMoveZ->setEnabled(conn);
+    if (btnMoveAbsolute->isEnabled()!=anyconn) btnMoveAbsolute->setEnabled(anyconn);
+    if (btnMoveRelative->isEnabled()!=anyconn) btnMoveRelative->setEnabled(anyconn);
 
-    btnMoveAbsolute->setEnabled(anyconn);
-    btnMoveRelative->setEnabled(anyconn);
-
-    chkJoystick->setEnabled(anyconn);
-    setUpdatesEnabled(updt);
+    if (chkJoystick->isEnabled()!=anyconn) chkJoystick->setEnabled(anyconn);
+    //setUpdatesEnabled(updt);
 
 }
 
