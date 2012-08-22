@@ -33,6 +33,14 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->objProjection->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube1->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
     ui->objTube2->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
+    ui->filtDualView1Long->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtDualView1Short->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtDualView1Splitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtDualView2Long->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtDualView2Short->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtDualView2Splitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+
+
     ui->shutterMainIllumination->init(m_log, m_pluginServices);
     ui->shutterLaser1->init(m_log, m_pluginServices);
     ui->shutterLaser2->init(m_log, m_pluginServices);
@@ -147,6 +155,16 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->filtSplitter->loadSettings(settings, prefix+"filters/detection_splitter");
     ui->filtTransmission->loadSettings(settings, prefix+"filters/illumination_transmission");
     ui->filtDetection->loadSettings(settings, prefix+"filters/detection");
+
+    ui->filtDualView1Long->loadSettings(settings, prefix+"filters/dv1_long");
+    ui->filtDualView1Short->loadSettings(settings, prefix+"filters/dv1_short");
+    ui->filtDualView1Splitter->loadSettings(settings, prefix+"filters/dv1_splitter");
+    ui->filtDualView2Long->loadSettings(settings, prefix+"filters/dv2_long");
+    ui->filtDualView2Short->loadSettings(settings, prefix+"filters/dv2_short");
+    ui->filtDualView2Splitter->loadSettings(settings, prefix+"filters/dv2_splitter");
+    ui->chkDualView1->setChecked(settings.value(prefix+"filters/dv1_enabled", false).toBool());
+    ui->chkDualView2->setChecked(settings.value(prefix+"filters/dv2_enabled", false).toBool());
+
     ui->objDetection->loadSettings(settings, prefix+"objectives/detection");
     ui->objProjection->loadSettings(settings, prefix+"objectives/projection");
     ui->objTube1->loadSettings(settings, prefix+"objectives/tubelens1");
@@ -190,6 +208,15 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->lsLaser1->saveSettings(settings, prefix+"lightsource_laser1");
     ui->lsLaser2->saveSettings(settings, prefix+"lightsource_laser2");
     ui->lsTransmission->saveSettings(settings, prefix+"lightsource_transmission");
+    ui->filtDualView1Long->saveSettings(settings, prefix+"filters/dv1_long");
+    ui->filtDualView1Short->saveSettings(settings, prefix+"filters/dv1_short");
+    ui->filtDualView1Splitter->saveSettings(settings, prefix+"filters/dv1_splitter");
+    ui->filtDualView2Long->saveSettings(settings, prefix+"filters/dv2_long");
+    ui->filtDualView2Short->saveSettings(settings, prefix+"filters/dv2_short");
+    ui->filtDualView2Splitter->saveSettings(settings, prefix+"filters/dv2_splitter");
+    settings.setValue(prefix+"filters/dv1_enabled", ui->chkDualView1->isChecked());
+    settings.setValue(prefix+"filters/dv2_enabled", ui->chkDualView2->isChecked());
+
     settings.setValue(prefix+"filterchanger_detection", ui->chkDetectionFilterWheel->isChecked());
 
     for (int i=0; i<shortcuts.size(); i++) {
@@ -232,6 +259,26 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
             setup["filters/detection_cam1/type"]=filter.type;
             setup["filters/detection_cam1/manufacturer"]=filter.manufacturer;
         }
+        if (ui->chkDualView1->isChecked()) {
+            filter=ui->filtDualView1Long->filter();
+            if (filter.isValid) {
+                setup["filters/dualview_cam1/detection_long/name"]=filter.name;
+                setup["filters/dualview_cam1/detection_long/type"]=filter.type;
+                setup["filters/dualview_cam1/detection_long/manufacturer"]=filter.manufacturer;
+            }
+            filter=ui->filtDualView1Short->filter();
+            if (filter.isValid) {
+                setup["filters/dualview_cam1/detection_short/name"]=filter.name;
+                setup["filters/dualview_cam1/detection_short/type"]=filter.type;
+                setup["filters/dualview_cam1/detection_short/manufacturer"]=filter.manufacturer;
+            }
+            filter=ui->filtDualView1Splitter->filter();
+            if (filter.isValid) {
+                setup["filters/dualview_cam1/detection_splitter/name"]=filter.name;
+                setup["filters/dualview_cam1/detection_splitter/type"]=filter.type;
+                setup["filters/dualview_cam1/detection_splitter/manufacturer"]=filter.manufacturer;
+            }
+        }
     }
 
     if (setup_cam<0 || setup_cam==1) {
@@ -240,6 +287,26 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
             setup["filters/detection_cam2/name"]=filter.name;
             setup["filters/detection_cam2/type"]=filter.type;
             setup["filters/detection_cam2/manufacturer"]=filter.manufacturer;
+        }
+        if (ui->chkDualView1->isChecked()) {
+            filter=ui->filtDualView1Long->filter();
+            if (filter.isValid) {
+                setup["filters/dualview_cam2/detection_long/name"]=filter.name;
+                setup["filters/dualview_cam2/detection_long/type"]=filter.type;
+                setup["filters/dualview_cam2/detection_long/manufacturer"]=filter.manufacturer;
+            }
+            filter=ui->filtDualView1Short->filter();
+            if (filter.isValid) {
+                setup["filters/dualview_cam2/detection_short/name"]=filter.name;
+                setup["filters/dualview_cam2/detection_short/type"]=filter.type;
+                setup["filters/dualview_cam2/detection_short/manufacturer"]=filter.manufacturer;
+            }
+            filter=ui->filtDualView1Splitter->filter();
+            if (filter.isValid) {
+                setup["filters/dualview_cam2/detection_splitter/name"]=filter.name;
+                setup["filters/dualview_cam2/detection_splitter/type"]=filter.type;
+                setup["filters/dualview_cam2/detection_splitter/manufacturer"]=filter.manufacturer;
+            }
         }
     }
 
