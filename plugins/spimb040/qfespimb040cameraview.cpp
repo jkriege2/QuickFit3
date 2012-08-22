@@ -1935,9 +1935,11 @@ void QFESPIMB040CameraView::updateGraph() {
     if (plteGraphDataX.size()>1) statisticsMinMax(plteGraphDataX.data(), plteGraphDataX.size(), min, max);
     pltGraph->setXRange(min, max);
     pltGraph->set_xTickDistance(1);
-    if (min<max) {
-        double p=floor(log10(max-min));
+    if (min!=max) {
+        if (min>max) qSwap(min, max);
+        double p=floor(log10(max-min)-0.1);
         pltGraph->set_xTickDistance(pow(10.0, p));
+        pltGraph->set_xZeroTick(floor(min/pow(10.0, p)-5)*pow(10.0, p));
         //qDebug()<<"X: min="<<min<<"  max="<<max<<"  delta="<<fabs(max-min)<<"  td="<<pow(10.0, p);
     }
     min=0;
@@ -1945,9 +1947,12 @@ void QFESPIMB040CameraView::updateGraph() {
     if (plteGraphDataY.size()>1) statisticsMinMax(plteGraphDataY.data(), plteGraphDataY.size(), min, max);
     pltGraph->setYRange(min, max);
     pltGraph->set_yTickDistance(100);
-    if (min<max) {
-        double p=floor(log10(max-min));
+    if (min!=max) {
+        if (min>max) qSwap(min, max);
+        double p=floor(log10(max-min)-0.1);
+        //qDebug()<<min<<max<<max-min<<p<<pow(10.0, p);
         pltGraph->set_yTickDistance(pow(10.0, p));
+        pltGraph->set_yZeroTick(floor(min/pow(10.0, p)-5)*pow(10.0, p));
         //qDebug()<<"Y: min="<<min<<"  max="<<max<<"  delta="<<fabs(max-min)<<"  td="<<pow(10.0, p);
     }
     pltGraph->set_xAxisLabel(tr("time [s]"));
