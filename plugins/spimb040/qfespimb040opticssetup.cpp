@@ -1083,3 +1083,36 @@ QString QFESPIMB040OpticsSetup::getLaserConfig()
     }
     return r;
 }
+
+void QFESPIMB040OpticsSetup::on_btnLoadSetup_clicked() {
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/optics_setup/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lastopticssetupdir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/optics_setup/").toString();
+    QString filename=qfGetOpenFileName(this, tr("open optics setup ..."), dir, tr("optics setup configuration (*.osi)"))    ;
+    if (!filename.isEmpty()) {
+        QSettings set(filename, QSettings::IniFormat);
+        loadSettings(set, "optics_setup/");
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lastopticssetupdir", dir);
+
+}
+
+void QFESPIMB040OpticsSetup::on_btnSaveSetup_clicked()  {
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/optics_setup/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ExperimentDescription/lastopticssetupdir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/optics_setup/").toString();
+    QString filename=qfGetSaveFileName(this, tr("save optics setup ..."), dir, tr("optics setup configuration (*.osi)"))    ;
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        if (QFile::exists(filename)) {
+            ok=false;
+            if (QMessageBox::question(this, tr("save optics setup ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                ok=true;
+            }
+        }
+        if (ok) {
+            QSettings set(filename, QSettings::IniFormat);
+            storeSettings(set, "optics_setup/");
+        }
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lastopticssetupdir", dir);
+
+}

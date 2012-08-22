@@ -279,13 +279,30 @@ bool QF3FilterCombobox::filterExists(QString name) {
 }
 
 void QF3FilterCombobox::loadSettings(QSettings& settings, QString property) {
-    QString id=settings.value(property, "").toString();
+    QString id=settings.value(property+"/id", settings.value(property, "").toString()).toString();
+
     if (id.isEmpty()) cmbFilters->setCurrentIndex(0);
-    else cmbFilters->setCurrentIndex(cmbFilters->findText(id));
+    else {
+        int idx=cmbFilters->findText(id);
+        if (idx<0) {
+            FilterDescription d;
+            d.manufacturer=settings.value(property+"/manufacturer", "").toString();
+            d.name=settings.value(property+"/name", "").toString();
+            d.type=settings.value(property+"/type", "").toString();
+            filters.append(d);
+            storeFilters();
+            loadFilters();
+        }
+        idx=cmbFilters->findText(id);
+        cmbFilters->setCurrentIndex(idx);
+    }
 }
 
 void QF3FilterCombobox::saveSettings(QSettings& settings, QString property) {
-    settings.setValue(property, cmbFilters->currentText());
+    settings.setValue(property+"/id", cmbFilters->currentText());
+    settings.setValue(property+"/manufacturer", filter().manufacturer);
+    settings.setValue(property+"/name", filter().name);
+    settings.setValue(property+"/type", filter().type);
 }
 
 
