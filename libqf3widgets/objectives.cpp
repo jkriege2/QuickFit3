@@ -115,6 +115,8 @@ void QF3ObjectiveCombobox::currentObjectiveChanged(int idx) {
 void QF3ObjectiveCombobox::loadObjectives() {
     objectives.clear();
     QString currentO=cmbObjective->currentText();
+    bool updt=updatesEnabled();
+    setUpdatesEnabled(false);
     cmbObjective->clear();
     QSettings inifileg(globalobjectives, QSettings::IniFormat);
     QSettings inifile(localobjectives, QSettings::IniFormat);
@@ -138,7 +140,8 @@ void QF3ObjectiveCombobox::loadObjectives() {
     int i=cmbObjective->findText(currentO);
     if (i<0) i=0;
     cmbObjective->setCurrentIndex(i);
-    hbl->update();
+    //hbl->update();
+    setUpdatesEnabled(updt);
 
 }
 

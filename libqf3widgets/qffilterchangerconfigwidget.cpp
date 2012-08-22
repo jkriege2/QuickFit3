@@ -513,7 +513,7 @@ void QFFilterChangerConfigWidget::filterChanged(int filter)
         cmbFilter->setCurrentIndex(filter);
         connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     }
-    cmbFilter->setEnabled(true);
+    if (!cmbFilter->isEnabled()) cmbFilter->setEnabled(true);
 }
 
 

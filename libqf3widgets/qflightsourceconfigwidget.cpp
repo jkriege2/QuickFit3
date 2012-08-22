@@ -264,18 +264,26 @@ void QFLightSourceConfigWidget::updateStates() {
     if (LightSource) {
         conn=LightSource->isLightSourceConnected(LightSourceID);
         if (conn) {
-            actConnect->setChecked(true);
-            actConnect->setIcon(QIcon(":/libqf3widgets/disconnect_lightsource.png"));
-            actConnect->setText(tr("Disconnect from light source driver/hardware ..."));
+            if (!actConnect->isChecked()) actConnect->setChecked(true);
+            QString txt=tr("Disconnect from light source driver/hardware ...");
+            if (actConnect->text()!=txt) {
+                actConnect->setText(txt);
+                actConnect->setIcon(QIcon(":/libqf3widgets/disconnect_lightsource.png"));
+            }
         } else {
-            actConnect->setChecked(false);
-            actConnect->setIcon(QIcon(":/libqf3widgets/connect_lightsource.png"));
-            actConnect->setText(tr("Connect from light source driver/hardware ..."));
+            if (actConnect->isChecked()) actConnect->setChecked(false);
+
+            QString txt=tr("Connect from light source driver/hardware ...");
+            if (actConnect->text()!=txt) {
+                actConnect->setText(txt);
+                actConnect->setIcon(QIcon(":/libqf3widgets/connect_lightsource.png"));
+            }
         }
     }
-    actConfigure->setEnabled((LightSource!=NULL) && (LightSourceID>=0));
-    actConnect->setEnabled(true);//(LightSource!=NULL) && (LightSourceID>=0));
-    cmbLightSource->setEnabled(!conn);
+    bool en=(LightSource!=NULL) && (LightSourceID>=0);
+    if (actConfigure->isEnabled()!=en) actConfigure->setEnabled(en);
+    if (!actConnect->isEnabled()) actConnect->setEnabled(true);//(LightSource!=NULL) && (LightSourceID>=0));
+    if (cmbLightSource->isEnabled()!=!conn) cmbLightSource->setEnabled(!conn);
 }
 
 void QFLightSourceConfigWidget::setPowerChanged(double value) {
@@ -513,17 +521,20 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
 
             bool enabled=widgetsEnabled.value(i, false);
 
-            lineWidgets[i].chkEnable->setChecked(lineenabled.value(i, false));
+            bool en=lineenabled.value(i, false);
+            if (en!=lineWidgets[i].chkEnable->isEnabled()) lineWidgets[i].chkEnable->setChecked(en);
 
             double setP=setValues.value(i, lineWidgets[i].spinPower->value());
             if (enabled && (lineWidgets[i].spinPower->value()!=setP)) lineWidgets[i].spinPower->setValue(setP);
 
-            lineWidgets[i].labPower->setText(QString("%1 %2").arg(measuredValues.value(i, 0.0)).arg(powerUnits.value(i, "")));
-            lineWidgets[i].chkEnable->setText(lineNames.value(i, tr("line #%1").arg(i+1)));
+            QString txt=QString("%1 %2").arg(measuredValues.value(i, 0.0)).arg(powerUnits.value(i, ""));
+            if (lineWidgets[i].labPower->text()!=txt) lineWidgets[i].labPower->setText(txt);
+            txt=lineNames.value(i, tr("line #%1").arg(i+1));
+            if (lineWidgets[i].chkEnable->text()!=txt) lineWidgets[i].chkEnable->setText(txt);
 
-            lineWidgets[i].spinPower->setEnabled(enabled);
-            lineWidgets[i].chkEnable->setEnabled(enabled);
-            lineWidgets[i].labPower->setEnabled(enabled);
+            if (lineWidgets[i].spinPower->isEnabled()!=enabled) lineWidgets[i].spinPower->setEnabled(enabled);
+            if (lineWidgets[i].chkEnable->isEnabled()!=enabled) lineWidgets[i].chkEnable->setEnabled(enabled);
+            if (lineWidgets[i].labPower->isEnabled()!=enabled) lineWidgets[i].labPower->setEnabled(enabled);
 
             connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
             connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
