@@ -141,7 +141,7 @@ void QFRDRTableEditor::createWidgets() {
     actSetColumnValues->setToolTip(tr("init the current column with e.g. linearly increasing numbers ..."));
     connect(actSetColumnValues, SIGNAL(triggered()), this, SLOT(slSetColumnValues()));
 
-    actCalculateColumn=new QAction("evaluate formula", this);
+    actCalculateColumn=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
     actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable formula"));
     connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
 

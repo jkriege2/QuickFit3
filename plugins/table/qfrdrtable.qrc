@@ -34,5 +34,8 @@
         <file>icons/plot_vbars.png</file>
         <file>icons/plot_xfilledcurve.png</file>
         <file>icons/plot_yfilledcurve.png</file>
+        <file alias="formula.png">icons/formula.png</file>
+        <file alias="sort_dec.png">icons/sort_decrease.png</file>
+        <file alias="sort_inc.png">icons/sort_incr.png</file>
     </qresource>
 </RCC>

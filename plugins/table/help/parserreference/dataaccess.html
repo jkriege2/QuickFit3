@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Trigonometric Functions</title>
+  </head>
+  <body> 
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<h2>Table Constants</h2>
+	<ul>
+		<li><a name="data"/><!-- func:data -->
+		<b><tt><!-- template -->data(row, column)<!-- /template --></tt> - <i>access a table cell (row, column)</i>:</b><br>
+		returns the value stored in table cell (row, column)
+		<!-- /func:data -->
+		</li>
+		<li><a name="dataleft"/><!-- func:dataleft -->
+		<b><tt><!-- template -->dataleft(delta_column)<!-- /template --></tt> - <i>return the value of a cell, left of the current cell</i>:</b><br>
+		accesses the cell <tt>(row, column-delta_column)</tt>, where (row, columns) is the current cell. So if you want to calculate the sine of the column to the left of the current column, use the expression <tt>sin(dataleft(1))</tt>. Note that you do NOT need a -1 to access a cell on the left. Use negative numbers to access cells on the right!
+		<!-- /func:dataleft -->
+		</li>
+
+
+	</ul>
+	
+	<h2>Table Access Functions</h2>
+	<ul>
+		<li><a name="row"/><!-- func:row -->
+		<b><tt><!-- template -->row<!-- /template --></tt> - <i>row number of current cell</i>:</b><br>
+		
+		<!-- /func:row -->
+		</li>
+		<li><a name="col"/><!-- func:col -->
+		<b><tt><!-- template -->col<!-- /template --></tt> - <i>column number of current cell</i>:</b><br>
+		
+		<!-- /func:col -->
+		</li>
+		<li><a name="column"/><!-- func:column -->
+		<b><tt><!-- template -->column<!-- /template --></tt> - <i>column number of current cell</i>:</b><br>
+		
+		<!-- /func:column -->
+		</li>
+		<li><a name="rows"/><!-- func:rows -->
+		<b><tt><!-- template -->rows<!-- /template --></tt> - <i>number of rows in the table</i>:</b><br>
+		
+		<!-- /func:rows -->
+		</li>
+		<li><a name="columns"/><!-- func:columns -->
+		<b><tt><!-- template -->columns<!-- /template --></tt> - <i>number of columns in the table</i>:</b><br>
+		
+		<!-- /func:columns -->
+		</li>
+
+
+	</ul>
+	
+  </body>
+</html>

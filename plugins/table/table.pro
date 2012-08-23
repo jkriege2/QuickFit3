@@ -57,4 +57,14 @@ CONFIG += exceptions rtti stl
 
 
 
+HELPREF_FILES.files = ./help/parserreference/*.*
+HELPREF_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference/
+
+HELPREFPIC_FILES.files = ./help/parserreference/pic/*.*
+HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference/pic/
+
+
+INSTALLS += HELPREF_FILES HELPREFPIC_FILES
+
+
 
