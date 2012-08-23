@@ -149,7 +149,7 @@ void QFRDRTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     c.setAlphaF(0.3);
     painter->fillRect(QRectF(option.rect.right()-fm.width(id)-4, option.rect.bottom()-fm.height()-4, fm.width(id)+2, fm.height()+2), QBrush(c));
     painter->drawText(option.rect.right()-fm.width(id)-2, option.rect.bottom()-fm.height()-2+fm.ascent(), id);
-
+    painter->restore();
 }
 
 void QFRDRTableDelegate::commitAndCloseEditor()
