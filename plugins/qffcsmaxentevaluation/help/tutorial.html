@@ -6,5 +6,100 @@
   </head>
   <body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<p>This tutorial explains how to use the Maximum Entropy Plugin for QuickFit.
+		This is done by providing a step by step instruction for FCS example data.
+		It might be helpful to read the help and tutorial of the FCS fit plugin as well to
+		get the basic idea of how data evaluation in QuickFit works.
+		</p>
+		
+	<p></p>
+	<p></p>
+	<h2>Getting started</h2>	
+    <p>
+    Once the FCS data has been loaded into the workspace we need to add an MaxEnt Evaluation object to the current project. To do so, click on the "Insert a new evaluation" button and choose
+    "FCS: MaxEnt", or alternatively click on <b>Data Items/Insert Evaluations/FCS: MaxEnt</b>
+    </p>
+    
+    <center><img align="middle" vspace="10" src="./pic/open_maxent.png"></center>
+	<p>
+	Next double click on the new item in the "Evaluations Items" list in the project tree, to open the plugin environment
+	and there switch to the "Evaluation" tab to see the MaxEnt user interface.
+	</p>	
+	
+		
+		
+		
+	<center><img align="middle" vspace="10" src="./pic/maxent_gui2.png"></center>
+    <p>
+    You should see the user interface as explained above. 
+    In the file list on the right hand side
+    we see our opened data record which we wish to process.
+    </p>
+		
+	<h2>MaxEnt Fitting</h2>
+	<p>
+	In this tutorial we work with the data file:
+	<ul><li>DNA_2nM_Al488_10ul.ASC</li></ul>
+	which can be found in the driectory <b>output/assets/plugins/fcs_maxent/tutorial</b>.
+	
+	</p>
+	
+	
+	By following the steps in the list below you should be able to carry out a MaxEnt fit.
+		
+		
+	<ol>
+	<li>
+	<b>Selecting the desired data.</b>
+	First of all make sure that the correct data set is chosen. Check that the data you wish to evaluate
+	appears highlighted in the file list on the right. Then choose which run you wish to work with
+	by using the corresponding sliders for the "run" -field.
+	
+	</li>
+	
+	<li>
+	<b>Set model parameters.</b> To ensure a good performance it is recommended, to use the fit 
+	results from a preliminary FCS fit as input parameters for the MaxEnt fit algorithm.
+	<ul>
+	<li><b>Axial ratio:</b> For the calibration of the axial ratio see the FCS fit help document.
+	If not specified otherwise you might use the default value set by the algorithm.</li>
+	</ul>
+	For the given example data we use the the model "3D diffusion with triplet."
+	In this case a previous FCS fit provided the following values for the triplet decay time 
+	and the triplet fraction
+	<ul>
+	<li>&tau; = 9.39532 &plusmn; 0.75 </li>
+	<li>&theta; = 0.2969 &plusmn; 0.0119 </li>
+	</ul>
+	We adjust the default values for these two model parameters to the newly found fit results
+	for our given data set.
+	</li>
+	
+	<li><b>Select data range.</b> By using the lower & upper cutoff sliders below the plotting boxes
+	we can adjust which data points we wish to neglect. In this example we will cut off the first three data points.</li>
+	
+	<li> If all values are set. We can click on the fit current button and will see both
+	the fitted autocorrelation curve in the main plot window on the left, and the computed Maximum
+	Entropy distribution in the plot box to the right.</li>
+	
+	</ol>	
+		
+		
+	<center><img align="middle" vspace="10" src="./pic/maxent_result.png"></center>	
+		
+
+    <center><img align="middle" vspace="10" src="./pic/gui_tools.png"></center>	
+		
+		
+<p>
+A cursor function in the top toolbar above the plot boxes can be used for a rough analysis.
+For a further analysis of the plotted curves one should use the "Save data of the plot as file (CSV,...)" function
+which is highlighted with a red circle on the left. 
+</p>		
+		
+		
+		
+		
+		
   </body>
 </html>
