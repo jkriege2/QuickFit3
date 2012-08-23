@@ -2,9 +2,39 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Plugin Online-Help</title>
+  <title>Number and Brightness Analysis Plugin</title>
   </head>
   <body>
 	$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	
+	<h2>Functionality</h2>
+	This plugin calculates the particle number and particle brightness from a set of images according to the well-established N&amp;B-method. You can find a detailed description and discussion of this method in these papers:
+	<blockquote><ul>
+	<li>Hong Qian, Elliot L. Elson (1990): <b>"Distribution of molecular aggregation by analysis of fluctuation moments"</b>, <i>PNAS,</i> <b>87</b>(14), 5479-5483,  <a href="http://www.ncbi.nlm.nih.gov/pubmed/2371284">Pubmed: 2371284</a></li>
+	<li>Jay R. Unruh, Enrico Gratton (2008): <b>"Analysis of Molecular Concentration and Brightness from Fluorescence Fluctuation Data with an Electron Multiplied CCD Camera"</b>, <i>Biophysical Journal,</i> <b>95</b>(11), 5385–5398, <a href="http://www.ncbi.nlm.nih.gov/pubmed/18805922">Pubmed: 18805922</a></li>
+	</ul></blockquote>
+	
+	According to these references, four images are needed:
+	<ol>
+	  <li>an intensity image $$math:I$$, best taken with an exposure time smaller than the particle diffusion time.</li>
+	  <li>an intensity variance image $$math:\sigma_I^2$$, e.g. calculated from a series of images.</li>
+	  <li>a background intensity image $$math:B$$, taken with the same settings as image $$math:I$$, but without illumination.</li>
+	  <li>a background variance $$math:\sigma_B^2$$</li>
+	</ol>
+	From these images for every pixel, the plugin calculates the particle number $$math:N$$ and the particle brightness $$math:\epsilon$$:
+	$$bmath:N=\frac{(I-B)^2}{\sigma_I^2-\sigma_B^2}$$
+	$$bmath:\epsilon=\frac{\sigma_I^2-\sigma_B^2}{I-B}$$
+	<b>Note</b> however that these quantities resemble the true values ONLY if the images were taken with a photon counting detector, as e.g. in a confocal laser scanning microscope equipped with APDs. If the detector is an analog detector (e.g. an CCD- or CMOS-camera), additional noise due to the analog-to-digital conversion is generated and the quantities above do no longer resemble the true values. A detailed discussion of this topic is given in the second reference by Unruh and Elson.
+	
+	$$qf_commondoc_backtop$$
+	<br><br><br>
+	<h2>Usage/User Interface</h2>
+	This plugin adds a number-and-brightness raw data record type to QuickFit, which calculates the desired values on the fly. Several options are supplied to add such a record to the project.
+	<h3>number and brightness display editor</h3>
+	The number and brightness tab of the raw data record is split into two tabs with plots:
+	<ol>
+	  <li><b>image plots:</b> This tab shows the three important images: particle number $$math:N$$, particle brightness $$math:\epsilon$$ and the intensity image $$math:I$$. The fourth plot shows a scatter plot of the particle number against the particle brightness.</li>
+	  <li><b>histograms:</b> Shows histograms of the particle number and particle brightness images. Next to the histograms you see a summary of the statistics of these images. <b>Note:</b> Histograms of the input images can be found in the "overview images" tab of the raw data record editor!</li>
+	</ol>
   </body>
 </html>

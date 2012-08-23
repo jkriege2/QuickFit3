@@ -107,6 +107,9 @@ class QFTableModel : public QAbstractTableModel {
         inline void resetChanged() { hasDataChanged=false; }
         inline bool hasChanged() const { return hasDataChanged; }
 
+        /** \brief swap the contents of two cells */
+        void swapCells(quint16 row1, quint16 column1, quint16 row2, quint16 column2);
+
         /** \brief resize the internal table (cells that are out of range will be deleted) */
         void resize(quint16 rows, quint16 columns);
         /** \brief change datatype in cell

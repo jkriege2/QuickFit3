@@ -8,28 +8,32 @@ QFRDRTableDelegate::QFRDRTableDelegate(QObject *parent) :
 }
 
 QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const {
-     if ( index.data().type() == QVariant::DateTime || index.data().type() == QVariant::Time || index.data().type() == QVariant::Date ) {
+    QVariant dat=index.data(Qt::DisplayRole);
+    if (dat.type()==QVariant::Invalid) {
+        dat=index.data(Qt::EditRole);
+    }
+     if ( dat.type() == QVariant::DateTime || dat.type() == QVariant::Time || dat.type() == QVariant::Date ) {
          QDateTimeEdit *editor = new QDateTimeEdit(parent);
          //editor->setDisplayFormat("dd/M/yyyy");
          editor->setCalendarPopup(true);
          return editor;
      }
-     if ( !index.isValid() || index.data().type() == QVariant::Double ) {
+     if ( !index.isValid() || dat.type() == QVariant::Double ) {
          QFDoubleEdit* editor=new QFDoubleEdit(parent);
          editor->setCheckBounds(false, false);
          return editor;
      }
-     if ( index.data().type() == QVariant::Int || index.data().type() == QVariant::LongLong ) {
+     if ( dat.type() == QVariant::Int || dat.type() == QVariant::LongLong ) {
          QSpinBox* editor=new QSpinBox(parent);
          editor->setRange(INT_MIN, INT_MAX);
          return editor;
      }
-     if ( index.data().type() == QVariant::UInt || index.data().type() == QVariant::ULongLong ) {
+     if ( dat.type() == QVariant::UInt || dat.type() == QVariant::ULongLong ) {
          QSpinBox* editor=new QSpinBox(parent);
          editor->setRange(0, UINT_MAX);
          return editor;
      }
-     if ( index.data().type() == QVariant::Bool) {
+     if ( dat.type() == QVariant::Bool) {
          QCheckBox* editor=new QCheckBox(parent);
          return editor;
      }
@@ -95,7 +99,7 @@ void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         } else {
              QDateTimeEdit *dateEditor = qobject_cast<QDateTimeEdit *>(editor);
              if (dateEditor) {
-                 model->setData(index, dateEditor->date().toString());
+                 model->setData(index, dateEditor->dateTime());
              } else {
                 QSpinBox *sEditor = qobject_cast<QSpinBox *>(editor);
                  if (sEditor) {
@@ -111,6 +115,41 @@ void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 
          }
     }
+}
+
+void QFRDRTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QItemDelegate::paint(painter, option, index);
+
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    QFont f(option.font);
+    f.setPointSizeF(7);
+    painter->setFont(f);
+    painter->setPen(QPen(QColor("blue")));
+    QFontMetricsF fm(f);
+
+    QString id="?";
+    switch(index.data().type()) {
+        case QVariant::Bool: id="b"; break;
+        case QVariant::Char: id="c"; break;
+        case QVariant::Date: id="d"; break;
+        case QVariant::DateTime: id="dt"; break;
+        case QVariant::Double: id="f"; break;
+        case QVariant::Int: id="i"; break;
+        case QVariant::LongLong: id="i"; break;
+        case QVariant::String: id="s"; break;
+        case QVariant::Time: id="t"; break;
+        case QVariant::UInt: id="u"; break;
+        case QVariant::ULongLong: id="u"; break;
+    }
+
+    QColor c("white");
+    c.setAlphaF(0.3);
+    painter->fillRect(QRectF(option.rect.right()-fm.width(id)-4, option.rect.bottom()-fm.height()-4, fm.width(id)+2, fm.height()+2), QBrush(c));
+    painter->drawText(option.rect.right()-fm.width(id)-2, option.rect.bottom()-fm.height()-2+fm.ascent(), id);
+
 }
 
 void QFRDRTableDelegate::commitAndCloseEditor()

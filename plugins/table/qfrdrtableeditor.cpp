@@ -1,14 +1,15 @@
 #include "qfrdrtableeditor.h"
-#include "qfrdrtableformuladialog.h"
 #include "qfrdrtablecolumnvaluesdialog.h"
 #include "qfrdrtable.h"
 #include "dlgcsvparameters.h"
-
+#include "qfrdrtablesortdialog.h"
+#include <QtAlgorithms>
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
 {
     //std::cout<<"QFRDRTableEditor() ...\n";
+    dlgMathExpression=NULL;
     createWidgets();
     //std::cout<<"QFRDRTableEditor() ... done\n";
 }
@@ -142,8 +143,12 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSetColumnValues, SIGNAL(triggered()), this, SLOT(slSetColumnValues()));
 
     actCalculateColumn=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
-    actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable formula"));
+    actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
     connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
+
+    actSort=new QAction(QIcon(":/table/sort_inc.png"), tr("sort selected cells"), this);
+    actSort->setToolTip(tr("sort the selected cells"));
+    connect(actSort, SIGNAL(triggered()), this, SLOT(slSort()));
 
 
 
@@ -168,6 +173,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
     tvMain->addAction(actCalculateColumn);
+    tvMain->addAction(actSort);
 
     l->addWidget(tvMain);
 
@@ -200,6 +206,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actSetColumnTitle);
     menuTab->addAction(actSetColumnValues);
     menuTab->addAction(actCalculateColumn);
+    menuTab->addAction(actSort);
     menuTab->addSeparator();
     menuTab->addAction(actClear);
     menuTab->addAction(actResize);
@@ -771,10 +778,10 @@ void QFRDRTableEditor::slCalcColumn() {
         if (m->model()) {
             QModelIndex ci=tvMain->currentIndex();
             if (ci.isValid()) {
-                QFRDRTableFormulaDialog* dlg=new QFRDRTableFormulaDialog(this);
+                if (!dlgMathExpression) dlgMathExpression=new QFRDRTableFormulaDialog(this);
                 QItemSelectionModel* smod=tvMain->selectionModel();
                 if (smod->hasSelection()) {
-                    if (dlg->exec()) {
+                    if (dlgMathExpression->exec()) {
                         QModelIndexList idxs=smod->selectedIndexes();
                         if (idxs.size()>0) {
                             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -793,9 +800,9 @@ void QFRDRTableEditor::slCalcColumn() {
 
 
                             try {
-                                n=mp.parse(dlg->getExpression().toStdString());
+                                n=mp.parse(dlgMathExpression->getExpression().toStdString());
                             } catch(std::exception& E) {
-                                QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the expression '%1':\n%2").arg(dlg->getExpression()).arg(E.what()));
+                                QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the expression '%1':\n%2").arg(dlgMathExpression->getExpression()).arg(E.what()));
                                 ok=false;
                             }
 
@@ -843,7 +850,7 @@ void QFRDRTableEditor::slCalcColumn() {
                                         mp.set_data(NULL);
                                     } catch(std::exception& E) {
                                        ok= QMessageBox::critical(this, tr("QuickFit-table"),
-                                                                 tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(dlg->getExpression()).arg(E.what()).arg(row).arg(column),
+                                                                 tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(dlgMathExpression->getExpression()).arg(E.what()).arg(row).arg(column),
                                                                     QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok;
                                     }
                                     if (!ok) break;
@@ -857,7 +864,108 @@ void QFRDRTableEditor::slCalcColumn() {
                             QApplication::restoreOverrideCursor();
                         }
                     }
-                    delete dlg;
+                }
+
+            }
+        }
+    }
+}
+
+bool QFRDRTableEditorLessThan(const QPair<int, QVariant> &s1, const QPair<int, QVariant> &s2) {
+    qDebug()<<s1.second<<" < "<<s2.second<<"    strcmp: "<<(s1.second.toString().toLower() < s2.second.toString().toLower());
+
+    if (s1.second.type()==QVariant::String && s2.second.type()==QVariant::String) {
+        return s1.second.toString().toLower() < s2.second.toString().toLower();
+    }
+    if (s1.second.canConvert(QVariant::Double) && s2.second.canConvert(QVariant::Double)) {
+        return s1.second.toDouble() < s2.second.toDouble();
+    }
+    if (s1.second.canConvert(QVariant::DateTime) && s2.second.canConvert(QVariant::DateTime)) {
+        return s1.second.toDateTime() < s2.second.toDateTime();
+    }
+    return s1.second.toString().toLower() < s2.second.toString().toLower();
+}
+
+bool QFRDRTableEditorGreaterThan(const QPair<int, QVariant> &s1, const QPair<int, QVariant> &s2) {
+    qDebug()<<s1.second<<" > "<<s2.second<<"    strcmp: "<<(s1.second.toString().toLower() > s2.second.toString().toLower());
+    if (s1.second.type()==QVariant::String && s2.second.type()==QVariant::String) {
+        return s1.second.toString().toLower() > s2.second.toString().toLower();
+    }
+    if (s1.second.canConvert(QVariant::Double) && s2.second.canConvert(QVariant::Double)) {
+        return s1.second.toDouble() > s2.second.toDouble();
+    }
+    if (s1.second.canConvert(QVariant::DateTime) && s2.second.canConvert(QVariant::DateTime)) {
+        return s1.second.toDateTime() > s2.second.toDateTime();
+    }
+    return s1.second.toString().toLower() > s2.second.toString().toLower();
+}
+
+
+void QFRDRTableEditor::slSort() {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QList<QPair<int, QString> > cols;
+            QModelIndex ci=tvMain->currentIndex();
+            if (ci.isValid()) {
+                QFRDRTableSortDialog* dlg=new QFRDRTableSortDialog(this);
+                QItemSelectionModel* smod=tvMain->selectionModel();
+                if (smod->hasSelection()) {
+                    QModelIndexList idxs=smod->selectedIndexes();
+                    QList<QPair<int, QVariant> > rows;
+                    int firstcol=0;
+                    bool first=true;
+                    QList<QVariant> idxData;
+                    for (int i=0; i<idxs.size(); i++) {
+                        if (first) {
+                            firstcol=idxs[i].column();
+                            first=false;
+                        } else {
+                            if (idxs[i].column()<firstcol) firstcol=idxs[i].column();
+                        }
+                        if (!rows.contains(qMakePair(idxs[i].row(), QVariant()))) rows.append(qMakePair(idxs[i].row(), QVariant()));
+                        if (!cols.contains(qMakePair(idxs[i].column(), m->model()->headerData(idxs[i].column(), Qt::Horizontal).toString()))) cols.append(qMakePair(idxs[i].column(), m->model()->headerData(idxs[i].column(), Qt::Horizontal).toString()));
+                        idxData.append(idxs[i].data());
+                    }
+                    dlg->setColumns(cols);
+                    dlg->setCurrentColumn(firstcol);
+
+                    if (dlg->exec()) {
+                        if (idxs.size()>0) {
+                            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                            int sortcol=dlg->sortColumn();
+                            bool ascending=dlg->sortAscending();
+                            qDebug()<<"col: "<<sortcol<<"   ascending: "<<ascending;
+
+                            for (int i=0; i<rows.size(); i++) {
+                                rows[i].second=m->model()->cell(rows[i].first, sortcol);
+                            }
+
+                            QMap<int, int> rowmap;
+                            if (ascending) {
+                                qStableSort(rows.begin(), rows.end(), QFRDRTableEditorLessThan);
+                            } else {
+                                qStableSort(rows.begin(), rows.end(), QFRDRTableEditorGreaterThan);
+                            }
+                            for (int r=0; r<rows.size(); r++) {
+                                rowmap[rows[r].first]=r;
+                            }
+
+                            m->model()->disableSignals();
+
+                            for (int i=0; i<idxs.size(); i++) {
+                                m->model()->deleteCell(idxs[i].row(), idxs[i].column());
+                            }
+
+                            for (int i=0; i<idxs.size(); i++) {
+                                m->model()->setCell(rowmap[idxs[i].row()], idxs[i].column(), idxData[i]);
+                            }
+
+
+                            m->model()->enableSignals(true);
+                            QApplication::restoreOverrideCursor();
+                        }
+                    }
                 }
 
             }

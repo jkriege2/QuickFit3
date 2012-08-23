@@ -137,7 +137,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     pltCorrelation->get_plotter()->set_useAntiAliasingForSystem(true);
     pltCorrelation->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltCorrelation->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
-    pltCorrelation->get_plotter()->set_plotLabel(tr("correlation"));
+    pltCorrelation->get_plotter()->set_plotLabel(tr("scatter plot"));
 
     plteCorrelation=new JKQTPxyLineGraph(pltCorrelation->get_plotter());
     pltCorrelation->addGraph(plteCorrelation);

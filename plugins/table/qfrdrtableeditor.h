@@ -18,6 +18,7 @@
 #include "qfrdrtabledelegate.h"
 #include "qftools.h"
 #include "jkmathparser.h"
+#include "qfrdrtableformuladialog.h"
 
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
@@ -60,10 +61,12 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         void slSetColumnValues();
         void slCalcColumn();
+        void slSort();
 
     protected:
         /** \brief table view for the contents */
         QEnhancedTableView* tvMain;
+        QFRDRTableFormulaDialog* dlgMathExpression;
 
         QString currentTableDir;
 
@@ -86,6 +89,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         QAction* actSetColumnValues;
         QAction* actCalculateColumn;
+        QAction* actSort;
 
         QAction* actCopy;
         QAction* actCut;
