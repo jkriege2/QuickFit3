@@ -385,9 +385,17 @@ void QFESPIMB040CameraView::createMainWidgets() {
     gvbl->setRowStretch(1,1);
 
     pltGraph=new JKQTFastPlotter(gsplitter);
+    plteGraphRange=new JKQTFPYRangePlot(pltGraph, 0,0,QColor("blue"),Qt::DotLine, 1, Qt::SolidPattern);
+    plteGraphRange->setVisible(false);
+    pltGraph->addPlot(plteGraphRange);
     plteGraph=new JKQTFPLinePlot(pltGraph, &plteGraphDataX, &plteGraphDataY);
     pltGraph->addPlot(plteGraph);
     gsplitter->addWidget(pltGraph);
+    labGraphMean=new QLabel(this);
+    QFont f=font();
+    f.setPointSizeF(1.3*f.pointSizeF());
+    labGraphMean->setFont(f);
+    gsplitter->addWidget(labGraphMean);
 
     QWidget* wgset=new QWidget(w);
     gsplitter->addWidget(wgset);
@@ -1944,7 +1952,20 @@ void QFESPIMB040CameraView::updateGraph() {
     }
     min=0;
     max=1;
-    if (plteGraphDataY.size()>1) statisticsMinMax(plteGraphDataY.data(), plteGraphDataY.size(), min, max);
+    double mean=0, var=0;
+    if (plteGraphDataY.size()>1) {
+        statisticsMinMax(plteGraphDataY.data(), plteGraphDataY.size(), min, max);
+        mean=statisticsAverageVariance(var, plteGraphDataY.data(), plteGraphDataY.size());
+        plteGraphRange->setVisible(true);
+        plteGraphRange->set_centerline(mean);
+        plteGraphRange->set_ymin(mean-sqrt(var));
+        plteGraphRange->set_ymax(mean+sqrt(var));
+        labGraphMean->setTextFormat(Qt::RichText);
+        labGraphMean->setText(tr("graph (mean &plusm; S.D.), [min...max]:&nbsp;&nbsp;&nbsp;( %1 &plusm; %2 ),&nbsp;&nbsp;&nbsp;[ %3 ... %4 ]").arg(mean).arg(sqrt(var)).arg(min).arg(max));
+    } else {
+        plteGraphRange->setVisible(false);
+        labGraphMean->setText("");
+    }
     pltGraph->setYRange(min, max);
     pltGraph->set_yTickDistance(100);
     if (min!=max) {

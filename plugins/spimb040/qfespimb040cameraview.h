@@ -264,10 +264,12 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief splitter on graph pane */
         QVisibleHandleSplitter* gsplitter;
+        QLabel* labGraphMean;
         /** \brief plotter for the graph display */
         JKQTFastPlotter* pltGraph;
         /** \brief line plot for the graph display */
         JKQTFPLinePlot* plteGraph;
+        JKQTFPYRangePlot* plteGraphRange;
         /** \brief datavectors for the graph display */
         QVector<double> plteGraphDataX;
         QVector<double> plteGraphDataY;

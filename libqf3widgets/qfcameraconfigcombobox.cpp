@@ -31,6 +31,7 @@ QFCameraConfigComboBox::QFCameraConfigComboBox(QWidget* parent, QString configDi
     m_camIdx=-1;
     m_extension=NULL;
     m_stopresume=NULL;
+    defaultConfig="";
 //    std::cout<<"m_notifier="<<m_notifier<<std::endl;
     if (m_notifier==NULL) m_notifier=new QFCameraConfigComboBoxNotifier(NULL);
     connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(rereadConfigFiles()));
@@ -99,7 +100,11 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
     for (int i=0; i<filenames.size(); i++) {
         QSettings set(filenames[i],QSettings::IniFormat);
         QString fn=set.value("camconfigname", QFileInfo(filenames[i]).baseName()).toString();
-        addItem(QIcon(":/libqf3widgets/camera_config.png"), fn, filenames[i]);
+        if (defaultConfig==fn) {
+            addItem(QIcon(":/libqf3widgets/default_config.png"), fn, filenames[i]);
+        } else {
+            addItem(QIcon(":/libqf3widgets/camera_config.png"), fn, filenames[i]);
+        }
     }
 
     model()->sort(0);
@@ -268,6 +273,17 @@ void QFCameraConfigComboBox::addNew() {
     if (m_stopresume) m_stopresume->resume();
 }
 
+void QFCameraConfigComboBox::setCurrentDefault()
+{
+    defaultConfig=currentText();
+    rereadConfigFiles();
+}
+
+void QFCameraConfigComboBox::setDefaultConfig(QString defConfig)
+{
+    defaultConfig=defConfig;
+    rereadConfigFiles();
+}
 
 
 
@@ -302,6 +318,10 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
     connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
 
+    actSetDefault = new QAction(QIcon(":/libqf3widgets/default_config.png"), tr("&Set current configuration as startup default"), this);
+    connect(actSetDefault, SIGNAL(triggered()), combobox, SLOT(setCurrentDefault()));
+    actSetDefault->setVisible(false);
+
     layout->addSpacing(5);
 
     btnConfig=new QToolButton(this);
@@ -319,12 +339,16 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     btnSaveAs=new QToolButton(this);
     btnSaveAs->setDefaultAction(actSaveAs);
 
+    btnSetDefault=new QToolButton(this);
+    btnSetDefault->setDefaultAction(actSetDefault);
+
     layout->addWidget(btnConfig, 0);
     layout->addSpacing(5);
     layout->addWidget(btnAdd, 0);
     layout->addWidget(btnRename, 0);
     layout->addWidget(btnSaveAs, 0);
     layout->addWidget(btnDelete, 0);
+    layout->addWidget(btnSetDefault, 0);
     layout->addStretch(1);
 
 }
@@ -335,3 +359,17 @@ QFCameraConfigEditorWidget::~QFCameraConfigEditorWidget() {
 void QFCameraConfigEditorWidget::init(QString configDirectory) {
     combobox->init(configDirectory);
 }
+
+void QFCameraConfigEditorWidget::setSetCurrentDefaultEnabled(bool enabled)
+{
+    actSetDefault->setVisible(enabled);
+}
+
+void QFCameraConfigEditorWidget::setDefaultAsCurrentConfig()
+{
+    if (!combobox->getDefaultConfig().isEmpty()) {
+        combobox->setCurrentConfig(combobox->getDefaultConfig());
+    }
+
+}
+

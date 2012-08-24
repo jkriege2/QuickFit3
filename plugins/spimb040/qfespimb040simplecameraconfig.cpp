@@ -157,7 +157,11 @@ void QFESPIMB040SimpleCameraConfig::loadSettings(QSettings& settings, QString pr
     //cmbAcquisitionDevice->setCurrentIndex(settings.value(prefix+"last_device", 0).toInt());
     cmbAcquisitionDevice->loadSettings(settings, prefix+"device/");
     spinAcquisitionDelay->setValue(settings.value(prefix+"acquisition_delay", 0).toDouble());
-    cmbPreviewConfiguration->setCurrentConfig(settings.value(prefix+"preview_config", "default").toString());
+    QString def=settings.value(prefix+"preview_config_default", "").toString();
+    cmbPreviewConfiguration->setDefaultConfig(def);
+    if (def.isEmpty()) {
+        cmbPreviewConfiguration->setCurrentConfig(settings.value(prefix+"preview_config", "default").toString());
+    }
 }
 
 void QFESPIMB040SimpleCameraConfig::storeSettings(QSettings& settings, QString prefix) {
@@ -166,7 +170,8 @@ void QFESPIMB040SimpleCameraConfig::storeSettings(QSettings& settings, QString p
     settings.setValue(prefix+"enabled", isChecked());
     //settings.setValue(prefix+"last_device", cmbAcquisitionDevice->currentIndex());
     settings.setValue(prefix+"acquisition_delay", spinAcquisitionDelay->value());
-    settings.setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());//currentConfigFilename());
+    settings.setValue(prefix+"preview_config", cmbPreviewConfiguration->currentConfigName());
+    settings.setValue(prefix+"preview_config_default", cmbPreviewConfiguration->getDefaultConfig());
     cmbAcquisitionDevice->storeSettings(settings, prefix+"device/");
 
 }
@@ -214,6 +219,7 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
 
     cmbPreviewConfiguration=new QFCameraConfigEditorWidget(this);
     cmbPreviewConfiguration->connectTo(cmbAcquisitionDevice);
+    cmbPreviewConfiguration->setSetCurrentDefaultEnabled(true);
 
     camlayout->addRow(tr("<b>Preview:</b>"), cmbPreviewConfiguration);
     connect(cmbPreviewConfiguration, SIGNAL(currentIndexChanged(int)), this, SLOT(previewCurrentIndexChanged(int)));
@@ -454,7 +460,7 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
             } else {
                 displayStates(QFESPIMB040SimpleCameraConfig::Connected);
                 if (m_log) m_log->log_text(tr("connected to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
-
+                cmbPreviewConfiguration->setDefaultAsCurrentConfig();
             }
         } else {
             //disconnect from the current device and delete the settings widget

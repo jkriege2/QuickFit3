@@ -202,6 +202,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         /** \brief action to configure preview */
         QAction* actPreviewConfig;
 
+
         bool restartPreview;
 
         QTimer* previewTimer;

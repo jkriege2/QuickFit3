@@ -67,6 +67,9 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QEnhancedComboBox {
         void setCurrentConfig(QString name);
 
         void setStopResume(QFCameraConfigComboBoxStartResume* stopresume);
+
+        QString getDefaultConfig() const { return defaultConfig; }
+        void setDefaultConfig(QString defConfig);
     public slots:
         /*! \brief may be used to connect this widget to a QFCameraComboBox
 
@@ -91,6 +94,8 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QEnhancedComboBox {
         /*! \brief rename the current configuration under a new name */
         void renameCurrent();
 
+        void setCurrentDefault();
+
     protected slots:
         void directoryChanged(const QString& path);
     protected:
@@ -100,6 +105,7 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QEnhancedComboBox {
         QFCameraConfigComboBoxStartResume* m_stopresume;
         int m_camIdx;
         static QFCameraConfigComboBoxNotifier* m_notifier;
+        QString defaultConfig;
 
     private:
 };
@@ -134,6 +140,10 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         void setStopResume(QFCameraConfigComboBoxStartResume* stopresume) {
             combobox->setStopResume(stopresume);
         };
+        QString getDefaultConfig() const { return combobox->getDefaultConfig(); }
+        void setDefaultConfig(QString defConfigFilename) { combobox->setDefaultConfig(defConfigFilename); }
+
+        void setSetCurrentDefaultEnabled(bool enabled);
 
     public slots:
         /*! \brief may be used to connect this widget to a QFCameraComboBox
@@ -154,6 +164,7 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
             emit currentIndexChanged(index);
         }
 
+        void setDefaultAsCurrentConfig();
     signals:
         /** \brief current item changed */
         void currentIndexChanged(int index);
@@ -170,6 +181,7 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         QToolButton* btnSaveAs;
         /** \brief button to rename the current preview configuration as a different name */
         QToolButton* btnRename;
+        QToolButton* btnSetDefault;
 
 
         QAction* actAdd;
@@ -177,6 +189,7 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         QAction* actDelete;
         QAction* actSaveAs;
         QAction* actRename;
+        QAction* actSetDefault;
 };
 
 #endif // QFCAMERACONFIGCOMBOBOX_H
