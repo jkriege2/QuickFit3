@@ -109,7 +109,7 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
 
     model()->sort(0);
     for (int i=0; i<count(); i++) {
-        qDebug()<<itemText(i)<<itemData(i);
+        //qDebug()<<itemText(i)<<itemData(i);
     }
     // FINALLY: make sure the combo boxes have their values set.
     int configidx=findText(ac);
