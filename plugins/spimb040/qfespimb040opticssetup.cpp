@@ -686,6 +686,7 @@ QString QFESPIMB040OpticsSetup::getCurrentLightpath() const {
 
 void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp, bool saveMeasured) {
     { // this block ensures that set is destroyed (and the file written) before updateItems() is called
+        if (QFile::exists(filename)) QFile::remove(filename);
         QSettings set(filename, QSettings::IniFormat);
         set.clear();
         set.setValue("name", name);
@@ -892,6 +893,8 @@ void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
                                                                           tr("A lightpath config with the name '%1' already exists.\n  filename: '%2'\nOverwrite?").arg(name).arg(filename),
                                                                           QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
                     if (res==QMessageBox::Yes) {
+                        //qDebug()<<dlg->getCheckedItems();
+                        QFile::remove(filename);
                         saveLightpathConfig(filename, name, dlg->getCheckedItems());
                         ui->cmbLightpathConfig->setCurrentConfig(name);
                         return;

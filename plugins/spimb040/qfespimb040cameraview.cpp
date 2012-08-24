@@ -390,12 +390,18 @@ void QFESPIMB040CameraView::createMainWidgets() {
     pltGraph->addPlot(plteGraphRange);
     plteGraph=new JKQTFPLinePlot(pltGraph, &plteGraphDataX, &plteGraphDataY);
     pltGraph->addPlot(plteGraph);
-    gsplitter->addWidget(pltGraph);
+
+    QWidget* wgplot=new QWidget(w);
+    gsplitter->addWidget(wgplot);
+    QVBoxLayout* ggl=new QVBoxLayout(wgplot);
+    wgplot->setLayout(ggl);
+
+    ggl->addWidget(pltGraph,1);
     labGraphMean=new QLabel(this);
     QFont f=font();
     f.setPointSizeF(1.3*f.pointSizeF());
     labGraphMean->setFont(f);
-    gsplitter->addWidget(labGraphMean);
+    ggl->addWidget(labGraphMean);
 
     QWidget* wgset=new QWidget(w);
     gsplitter->addWidget(wgset);
@@ -1961,7 +1967,8 @@ void QFESPIMB040CameraView::updateGraph() {
         plteGraphRange->set_ymin(mean-sqrt(var));
         plteGraphRange->set_ymax(mean+sqrt(var));
         labGraphMean->setTextFormat(Qt::RichText);
-        labGraphMean->setText(tr("graph (mean &plusm; S.D.), [min...max]:&nbsp;&nbsp;&nbsp;( %1 &plusm; %2 ),&nbsp;&nbsp;&nbsp;[ %3 ... %4 ]").arg(mean).arg(sqrt(var)).arg(min).arg(max));
+        labGraphMean->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+        labGraphMean->setText(tr("graph (mean &plusmn; S.D.), [min...max]:&nbsp;&nbsp;&nbsp;( %1 &plusmn; %2 ),&nbsp;&nbsp;&nbsp;[ %3 ... %4 ]").arg(mean).arg(sqrt(var)).arg(min).arg(max));
     } else {
         plteGraphRange->setVisible(false);
         labGraphMean->setText("");
