@@ -84,7 +84,7 @@ double QFFitFunctionFCSADiff::evaluate(double t, const double* data) const {
     const double alpha3=data[FCSADiff_diff_alpha3];
     const double background=data[FCSADiff_background];
     const double cr=data[FCSADiff_count_rate];
-    double backfactor=1.0/sqr(1.0+background/cr);
+    double backfactor=sqr(cr-background)/sqr(cr);
     if (fabs(cr)<1e-15) backfactor=1;
     double gamma=data[FCSADiff_focus_struct_fac];
     if (gamma==0) gamma=1;

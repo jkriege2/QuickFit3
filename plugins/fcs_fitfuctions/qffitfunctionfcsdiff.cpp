@@ -77,7 +77,7 @@ double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
     const double tauD3=data[FCSDiff_diff_tau3]/1.0e6;
     const double background=data[FCSDiff_background];
     const double cr=data[FCSDiff_count_rate];
-    double backfactor=1.0/sqr(1.0+background/cr);
+    double backfactor=sqr(cr-background)/sqr(cr);
     if (fabs(cr)<1e-15) backfactor=1;
     double gamma=data[FCSDiff_focus_struct_fac];
     if (gamma==0) gamma=1;

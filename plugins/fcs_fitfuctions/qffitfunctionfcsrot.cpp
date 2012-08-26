@@ -69,7 +69,7 @@ double QFFitFunctionFCSRot::evaluate(double t, const double* data) const {
     const double gamma2=sqr(gamma);
     const double background=data[FCSSDiff_background];
     const double cr=data[FCSSDiff_count_rate];
-    double backfactor=1.0/sqr(1.0+background/cr);
+    double backfactor=sqr(cr-background)/sqr(cr);
     if (fabs(cr)<1e-15) backfactor=1;
 
     const double offset=data[FCSSDiff_offset];
