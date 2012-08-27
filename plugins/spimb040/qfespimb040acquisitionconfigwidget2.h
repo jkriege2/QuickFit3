@@ -26,7 +26,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040AcquisitionConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QString configDirectory);
+        explicit QFESPIMB040AcquisitionConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040AcquisitionConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -63,7 +63,13 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         QString lightpath() const;
         int repeats() const;
 
+        QString lightpathPreview(int preview=0);
+        QString lightpathFilenamePreview(int preview=0);
+        bool lightpathActivatedPreview(int preview=0);
+        int previewCount();
 
+        QString lightpathPreview4() const;
+        QString lightpathFilenamePreview4() const;
         QString lightpathPreview3() const;
         QString lightpathFilenamePreview3() const;
         QString lightpathPreview2() const;
@@ -71,7 +77,8 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
 
         bool lightpathActivatedPreview2() const;
         bool lightpathActivatedPreview3() const;
-protected slots:
+        bool lightpathActivatedPreview4() const;
+    protected slots:
         void on_btnAcquire_clicked();
         void on_chkUse1_toggled(bool enabled);
         void on_chkUse2_toggled(bool enabled);
@@ -82,6 +89,8 @@ protected slots:
         QFPluginServices* m_pluginServices;
         Ui::QFESPIMB040AcquisitionConfigWidget2 *ui;
         QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040AcquisitionDescription* acqDescription;
+        QFESPIMB040ExperimentDescription* expDescription;
 };
 
 #endif // QFESPIMB040ACQUISITIONCONFIGWIDGET2_H

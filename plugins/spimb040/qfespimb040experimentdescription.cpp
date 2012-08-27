@@ -37,6 +37,21 @@ void QFESPIMB040ExperimentDescription::storeSettings(QSettings& settings, QStrin
 
 }
 
+QString QFESPIMB040ExperimentDescription::getID() const
+{
+    return ui->edtID->text();
+}
+
+QString QFESPIMB040ExperimentDescription::getTitle() const
+{
+    return ui->edtTitle->text();
+}
+
+QString QFESPIMB040ExperimentDescription::getExperimenter() const
+{
+    return ui->edtExperimenter->text();
+}
+
 QMap<QString, QVariant> QFESPIMB040ExperimentDescription::getDescription() const {
     QMap<QString, QVariant> description;
     description["id"]=ui->edtID->text();

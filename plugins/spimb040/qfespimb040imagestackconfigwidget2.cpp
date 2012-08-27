@@ -13,12 +13,14 @@
 
 #define STAGE_INTERVAL_MS 1313
 
-QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QString configDirectory) :
+QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ImageStackConfigWidget2)
 {
     m_pluginServices=pluginServices;
     this->opticsSetup=stageConfig;
+    this->acqDescription=acqDescription;
+    this->expDescription=expDescription;
     ui->setupUi(this);
     ui->cmbStage->init(pluginServices->getExtensionManager());
     ui->cmbStage2->init(pluginServices->getExtensionManager());
@@ -144,7 +146,7 @@ void QFESPIMB040ImageStackConfigWidget2::updateReplaces()
     if (ui->chkStage2->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage2->currentExtensionLinearStage(), ui->cmbStage2->currentAxisID());
     if (ui->chkStage3->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage3->currentExtensionLinearStage(), ui->cmbStage3->currentAxisID());
     setReplaceValue("stack", stack);
-    setGlobalReplaces(opticsSetup);
+    setGlobalReplaces(opticsSetup, expDescription, acqDescription);
 }
 
 

@@ -36,6 +36,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
     if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
+    if (widAcquisitionDescription) widAcquisitionDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
@@ -46,6 +47,7 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     jksaveSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
     if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
+    if (widAcquisitionDescription) widAcquisitionDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
@@ -74,7 +76,13 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     splitter=new QVisibleHandleSplitter(Qt::Vertical, this);
     mainl->addWidget(splitter);
     tabMain=new QTabWidget(this);
-    splitter->addWidget(tabMain);
+    QVBoxLayout* topl=new QVBoxLayout(this);
+    QWidget* topW=new QWidget(this);
+    topW->setLayout(topl);
+    topl->addWidget(tabMain,1);
+    widAcquisitionDescription=new QFESPIMB040AcquisitionDescription(this);
+    topl->addWidget(widAcquisitionDescription);
+    splitter->addWidget(topW);
     btnHelp=new QPushButton(QIcon(":/lib/help.png"), tr("Help"), this);
     btnHelp->setToolTip(tr("display the online help window"));
     connect(btnHelp, SIGNAL(clicked()), this,SLOT(displayHelp()));
@@ -83,7 +91,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // create input widgets for camera devices
+    // create log pane
     ////////////////////////////////////////////////////////////////////////////////////////////////
     QVBoxLayout* loglayout=new QVBoxLayout(this);
     QWidget* w=new QWidget(this);
@@ -121,7 +129,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //------------------------------------------------------------------------------------------
         // create tab for image series acquisition
         //------------------------------------------------------------------------------------------
-        widAcquisition=new QFESPIMB040AcquisitionConfigWidget2(this, m_pluginServices, optSetup, m_pluginServices->getConfigFileDirectory());
+        widAcquisition=new QFESPIMB040AcquisitionConfigWidget2(this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
         //tabAcquisition->addTab(widAcquisition, tr("Image Series Acquisition"));
         tabMain->addTab(widAcquisition, tr("Acquisition: Image Series"));
         connect(widAcquisition, SIGNAL(doAcquisition()), this, SLOT(doAcquisition()));
@@ -130,7 +138,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //------------------------------------------------------------------------------------------
         // create tab for image stack acquisition
         //------------------------------------------------------------------------------------------
-        widImageStack=new QFESPIMB040ImageStackConfigWidget2(this, m_pluginServices, optSetup, m_pluginServices->getConfigFileDirectory());
+        widImageStack=new QFESPIMB040ImageStackConfigWidget2(this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
         //tabAcquisition->addTab(widImageStack, tr("Image S&tack"));
         tabMain->addTab(widImageStack, tr("Acquisition: Image S&tack"));
         connect(widImageStack, SIGNAL(doStack()), this, SLOT(doImageStack()));
@@ -139,7 +147,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //------------------------------------------------------------------------------------------
         // create tab for cam parameter image series acquisition
         //------------------------------------------------------------------------------------------
-        widCamParamScan=new QFESPIMB040CamParamStackConfigWidget2(this, m_pluginServices, optSetup, m_pluginServices->getConfigFileDirectory());
+        widCamParamScan=new QFESPIMB040CamParamStackConfigWidget2(this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
         tabMain->addTab(widCamParamScan, tr("Acquisition: Camera Parameter Series"));
         connect(widCamParamScan, SIGNAL(doStack()), this, SLOT(doCamParamStack()));
         connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widCamParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
@@ -1656,7 +1664,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 
 
 
-        int backgroundFrames1=1;
+        //int backgroundFrames1=1;
         if (widAcquisition->use1()) {
             if (!QDir().mkpath(QFileInfo(acquisitionPrefix1+".txt").absolutePath())) {
                 ok=false;
@@ -1667,7 +1675,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             useCam1=optSetup->lockCamera(0,&extension1, &ecamera1, &camera1, &previewSettingsFilename1);
             if (QFile::exists(widAcquisition->currentConfigFilename(0))) acquisitionSettingsFilename1=widAcquisition->currentConfigFilename(0);
             if (QFile::exists(widAcquisition->currentPreviewConfigFilename(0))) previewSettingsFilename1=widAcquisition->currentPreviewConfigFilename(0);
-            backgroundFrames1=widAcquisition->currentBackgroundFrames(0);
+            //backgroundFrames1=widAcquisition->currentBackgroundFrames(0);
         }
 
         bool useCam2=false;
@@ -1675,7 +1683,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         QFExtensionCamera* ecamera2=NULL;
         QString acquisitionSettingsFilename2="", previewSettingsFilename2="";
         int camera2=0;
-        int backgroundFrames2=1;
+        //int backgroundFrames2=1;
         if (ok && widAcquisition->use2()) {
             if (!QDir().mkpath(QFileInfo(acquisitionPrefix2+".txt").absolutePath())) {
                 ok=false;
@@ -1684,7 +1692,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             useCam2=optSetup->lockCamera(1,&extension2, &ecamera2, &camera2, &previewSettingsFilename2);
             if (QFile::exists(widAcquisition->currentConfigFilename(1))) acquisitionSettingsFilename2=widAcquisition->currentConfigFilename(1);
             if (QFile::exists(widAcquisition->currentPreviewConfigFilename(1))) previewSettingsFilename2=widAcquisition->currentPreviewConfigFilename(1);
-            backgroundFrames2=widAcquisition->currentBackgroundFrames(1);
+            //backgroundFrames2=widAcquisition->currentBackgroundFrames(1);
         }
 
         progress.setValue(0);
@@ -1713,7 +1721,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             //////////////////////////////////////////////////////////////////////////////////////
             // pacquire background series
             //////////////////////////////////////////////////////////////////////////////////////
-            ok = acquireSeries(lightpathName, "", tr("background image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, widAcquisition->currentBackgroundFrames(0), NULL, &progress, &userCanceled);
+            ok = acquireSeries(lightpathName, "", tr("background image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, widAcquisition->currentBackgroundFrames(0), widAcquisition->currentBackgroundFrames(1), NULL, &progress, &userCanceled);
             if (!ok) {
                 ACQUISITION_ERROR(tr("  - error acquiring background image series!\n"));
             } else {
@@ -1731,96 +1739,52 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 
 
 
-
         //////////////////////////////////////////////////////////////////////////////////////
-        // acquire overview images for different lightpathes 2
+        // acquire overview images
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
-        if (ok && widAcquisition->overview() && widAcquisition->lightpathActivatedPreview2()) {
-            if (ok && useCam1) {
-                progress.setLabelText(tr("acquiring overview image from camera 1, lightpath 2 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview2(), widAcquisition->lightpathPreview2(), extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overviewlp2.tif", "overview_lightpath2", tr("overview before acquisition with lightpath 2 for camera 1"), moreFiles1, acquisitionDescription1);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath 2!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 1, lightpath 2!\n"));
-                }
-
-            }
-            if (ok && useCam2) {
-                progress.setLabelText(tr("acquiring overview image from camera 2, lightpath 2 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview2(), widAcquisition->lightpathPreview2(), extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overviewlp2.tif", "overview_lightpath2", tr("overview before acquisition with lightpath 2 for camera 2"), moreFiles2, acquisitionDescription2);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath 2!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 2, lightpath 2!\n"));
-                }
-
-            }
-
+        QList<int> prevs;
+        for (int ovrImg=1; ovrImg<widAcquisition->previewCount(); ovrImg++) {
+            prevs<<ovrImg;
         }
+        prevs<<0;
+        for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
+            int ovrImg=prevs[ovrImgI];
+            if (ok && widAcquisition->lightpathActivatedPreview(ovrImg)) {
+                if (ok && useCam1) {
+                    progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
+                    QApplication::processEvents();
+                    QString acquisitionPrefix=acquisitionPrefix1+QString("_overviewlp%1.tif").arg(ovrImg+1);
+                    QString prefix=QString("overview_lightpath%1").arg(ovrImg+1);
+                    if (ovrImg==0) {
+                        acquisitionPrefix=acquisitionPrefix1+QString("_overview.tif");
+                        prefix=QString("overview");
+                    }
+                    ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview(ovrImg), widAcquisition->lightpathPreview(ovrImg), extension1, ecamera1, camera1, widAcquisition->currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview before acquisition with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
+                    if (!ok) {
+                        ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath %1!\n").arg(ovrImg+1));
+                    } else {
+                        log_text(tr("  - acquired overview image from camer 1, lightpath %1!\n").arg(ovrImg+1));
+                    }
 
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // acquire overview images for different lightpathes 3
-        //////////////////////////////////////////////////////////////////////////////////////
-        if (ok && widAcquisition->overview() && widAcquisition->lightpathActivatedPreview3()) {
-            if (ok && useCam1) {
-                progress.setLabelText(tr("acquiring overview image from camera 1, lightpath 3 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview3(), widAcquisition->lightpathPreview3(), extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overviewlp3.tif", "overview_lightpath3", tr("overview before acquisition with lightpath 3 for camera 1"), moreFiles1, acquisitionDescription1);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath 3!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 1, lightpath 3!\n"));
                 }
-
-            }
-            if (ok && useCam2) {
-                progress.setLabelText(tr("acquiring overview image from camera 2, lightpath 3 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview3(), widAcquisition->lightpathPreview3(), extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overviewlp3.tif", "overview_lightpath3", tr("overview before acquisition with lightpath 3 for camera 2"), moreFiles2, acquisitionDescription2);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath 3!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 2, lightpath 3!\n"));
+                if (ok && useCam2) {
+                    progress.setLabelText(tr("acquiring overview image from camera 2, lightpath %1 ...").arg(ovrImg+1));
+                    QApplication::processEvents();
+                    QString acquisitionPrefix=acquisitionPrefix1+QString("_overviewlp%1.tif").arg(ovrImg+1);
+                    QString prefix=QString("overview_lightpath%1").arg(ovrImg+1);
+                    if (ovrImg==0) {
+                        acquisitionPrefix=acquisitionPrefix1+QString("_overview.tif");
+                        prefix=QString("overview");
+                    }
+                    ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview(ovrImg), widAcquisition->lightpathPreview(ovrImg), extension2, ecamera2, camera2, widAcquisition->currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix2+QString("_overviewlp%1.tif").arg(ovrImg+1), QString("overview_lightpath%1").arg(ovrImg+1), tr("overview before acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
+                    if (!ok) {
+                        ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath %1!\n").arg(ovrImg+1));
+                    } else {
+                        log_text(tr("  - acquired overview image from camer 2, lightpath %1!\n").arg(ovrImg+1));
+                    }
                 }
-
             }
-
-        }
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // acquire overview images for acquisition lightpath
-        //////////////////////////////////////////////////////////////////////////////////////
-        if (ok && widAcquisition->overview()) {
-            if (ok && useCam1) {
-                progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilename(), widAcquisition->lightpath(), extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview.tif", "overview", tr("overview before acquisition for camera 1"), moreFiles1, acquisitionDescription1);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 1!\n"));
-                }
-
-            }
-            if (ok && useCam2) {
-                progress.setLabelText(tr("acquiring overview image from camera 2 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilename(), widAcquisition->lightpath(), extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview.tif", "overview", tr("overview before acquisition for camera 2"), moreFiles2, acquisitionDescription2);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 2!\n"));
-                }
-
-            }
-
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -1842,103 +1806,62 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         // acquire image series
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
-        ok = acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, 0, &measured, &progress, &userCanceled);
+        ok = acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, 0, 0, &measured, &progress, &userCanceled);
         if (!ok) {
             ACQUISITION_ERROR(tr("  - error acquiring images!\n"));
         } else {
             log_text(tr("  - acquired image series!\n"));
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-        // acquire second set of overview images
-        //////////////////////////////////////////////////////////////////////////////////////
-        progress.nextItem();
-        if (ok && widAcquisition->overview()) {
-            if (ok && useCam1) {
-                progress.setLabelText(tr("acquiring overview image from camera 1 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilename(), widAcquisition->lightpath(), extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview_after.tif", "overview_after", tr("overview after acquisition for camera 1"), moreFiles1, acquisitionDescription1);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camera 1!\n"));
-                }
 
-            }
-            if (ok && useCam2) {
-                progress.setLabelText(tr("acquiring overview image from camera 2 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilename(), widAcquisition->lightpath(), extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview_after.tif", "overview_after", tr("overview after acquisition for camera 2"), moreFiles2, acquisitionDescription2);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camera 2!\n"));
-                }
-
-            }
-
-        }
 
 
 
         //////////////////////////////////////////////////////////////////////////////////////
-        // acquire overview images for different lightpathes 2
+        // acquire overview images
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
-        if (ok && widAcquisition->overview() && widAcquisition->lightpathActivatedPreview2()) {
-            if (ok && useCam1) {
-                progress.setLabelText(tr("acquiring overview image from camera 1, lightpath 2 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview2(), widAcquisition->lightpathPreview2(), extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview_afterlp2.tif", "overview_after_lightpath2", tr("overview after acquisition with lightpath 2 for camera 1"), moreFiles1, acquisitionDescription1);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath 2!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 1, lightpath 2!\n"));
-                }
-
-            }
-            if (ok && useCam2) {
-                progress.setLabelText(tr("acquiring overview image from camera 2, lightpath 2 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview2(), widAcquisition->lightpathPreview2(), extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview_afterlp2.tif", "overview_after_lightpath2", tr("overview after acquisition with lightpath 2 for camera 2"), moreFiles2, acquisitionDescription2);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath 2!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 2, lightpath 2!\n"));
-                }
-
-            }
-
+        prevs.clear();
+        for (int ovrImg=0; ovrImg<widAcquisition->previewCount(); ovrImg++) {
+            prevs<<ovrImg;
         }
+        for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
+            int ovrImg=prevs[ovrImgI];
+            if (ok && widAcquisition->lightpathActivatedPreview(ovrImg)) {
+                if (ok && useCam1) {
+                    progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
+                    QApplication::processEvents();
+                    QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_afterlp%1.tif").arg(ovrImg+1);
+                    QString prefix=QString("overview_after_lightpath%1").arg(ovrImg+1);
+                    if (ovrImg==0) {
+                        acquisitionPrefix=acquisitionPrefix1+QString("_overview_after.tif");
+                        prefix=QString("overview_after");
+                    }
+                    ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview(ovrImg), widAcquisition->lightpathPreview(ovrImg), extension1, ecamera1, camera1, widAcquisition->currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
+                    if (!ok) {
+                        ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath %1!\n").arg(ovrImg+1));
+                    } else {
+                        log_text(tr("  - acquired overview image from camer 1, lightpath %1!\n").arg(ovrImg+1));
+                    }
 
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // acquire overview images for different lightpathes 3
-        //////////////////////////////////////////////////////////////////////////////////////
-        if (ok && widAcquisition->overview() && widAcquisition->lightpathActivatedPreview3()) {
-            if (ok && useCam1) {
-                progress.setLabelText(tr("acquiring overview image from camera 1, lightpath 3 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview3(), widAcquisition->lightpathPreview3(), extension1, ecamera1, camera1, previewSettingsFilename1, acquisitionPrefix1+"_overview_afterlp3.tif", "overview_after_lightpath3", tr("overview after acquisition with lightpath 3 for camera 1"), moreFiles1, acquisitionDescription1);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath 3!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 1, lightpath 3!\n"));
                 }
-
-            }
-            if (ok && useCam2) {
-                progress.setLabelText(tr("acquiring overview image from camera 2, lightpath 3 ..."));
-                QApplication::processEvents();
-                ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview3(), widAcquisition->lightpathPreview3(), extension2, ecamera2, camera2, previewSettingsFilename2, acquisitionPrefix2+"_overview_afterlp3.tif", "overview_after_lightpath3", tr("overview after acquisition with lightpath 3 for camera 2"), moreFiles2, acquisitionDescription2);
-                if (!ok) {
-                    ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath 3!\n"));
-                } else {
-                    log_text(tr("  - acquired overview image from camer 2, lightpath 3!\n"));
+                if (ok && useCam2) {
+                    progress.setLabelText(tr("acquiring overview image from camera 2, lightpath %1 ...").arg(ovrImg+1));
+                    QApplication::processEvents();
+                    QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_afterlp%1.tif").arg(ovrImg+1);
+                    QString prefix=QString("overview_after_lightpath%1").arg(ovrImg+1);
+                    if (ovrImg==0) {
+                        acquisitionPrefix=acquisitionPrefix1+QString("_overview_after.tif");
+                        prefix=QString("overview_after");
+                    }
+                    ok=acquireImageWithLightpath(widAcquisition->lightpathFilenamePreview(ovrImg), widAcquisition->lightpathPreview(ovrImg), extension2, ecamera2, camera2, widAcquisition->currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
+                    if (!ok) {
+                        ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath %1!\n").arg(ovrImg+1));
+                    } else {
+                        log_text(tr("  - acquired overview image from camer 2, lightpath %1!\n").arg(ovrImg+1));
+                    }
                 }
-
             }
-
         }
 
 
@@ -2101,6 +2024,7 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 
     // Experiment Description
     QMap<QString, QVariant> experiment=widExperimentDescription->getDescription();
+    experiment=experiment.unite(widAcquisitionDescription->getDescription());
     experiment["start_time"]= startDateTime;
     {
         QMapIterator <QString, QVariant> it(experiment);
@@ -2187,6 +2111,7 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
 
     // Experiment Description
     QMap<QString, QVariant> experiment=widExperimentDescription->getDescription();
+    experiment=experiment.unite(widAcquisitionDescription->getDescription());
     experiment["start_time"]= startDateTime;
     {
         QMapIterator <QString, QVariant> it(experiment);
@@ -2393,10 +2318,11 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames, QList<QFESPIMB040OpticsSetup::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
+bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames1, int frames2, QList<QFESPIMB040OpticsSetup::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
 {
 
    bool ok=true;
+   QDateTime time;
 
     //////////////////////////////////////////////////////////////////////////////////////
     // prepare cameras  (set camera settings)
@@ -2414,7 +2340,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
         QFile::copy(acquisitionSettingsFilename1, tmpName);
 
         QSettings settings(tmpName, QSettings::IniFormat);
-        if (frames>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, frames);
+        if (frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, frames1);
 
 
         ok=ecamera1->prepareAcquisition(camera1, settings, acquisitionPrefix1);
@@ -2443,7 +2369,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
         QSettings settings(tmpName, QSettings::IniFormat);
 
-        if (frames>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, frames);
+        if (frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, frames2);
 
         ok=ecamera2->prepareAcquisition(camera2, settings, acquisitionPrefix2);
 
@@ -2464,7 +2390,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
     if (ok) {
         if (progress) progress->setLabelText(tr("acquiring %1 images ...").arg(imageDescription));
         log_text(tr("  - acquiring %1 frames!\n").arg(imageDescription));
-        QTime time=QTime::currentTime();
+        time=QDateTime::currentDateTime();
         if (useCam1) {
             ok=ecamera1->startAcquisition(camera1);
             if (!ok) {

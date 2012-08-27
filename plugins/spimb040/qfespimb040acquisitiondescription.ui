@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFESPIMB040AcquisitionDescription</class>
+ <widget class="QWidget" name="QFESPIMB040AcquisitionDescription">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>917</width>
+    <height>44</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string> acquisition description </string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>plate/experiment:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinPlate</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinPlate">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>well:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinWell</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinWell">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>sample/cell:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinCell</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinCell">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>comment:</string>
+        </property>
+        <property name="buddy">
+         <cstring>edtComment</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="edtComment">
+        <property name="placeholderText">
+         <string>comment ...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="font">
+         <font>
+          <pointsize>7</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>date/time:</string>
+        </property>
+        <property name="buddy">
+         <cstring>edtDateTime</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="edtDateTime">
+        <property name="font">
+         <font>
+          <pointsize>7</pointsize>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnClearAll">
+        <property name="text">
+         <string>reset</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>spinPlate</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFESPIMB040AcquisitionDescription</receiver>
+   <slot>spinChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>212</x>
+     <y>-4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinWell</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFESPIMB040AcquisitionDescription</receiver>
+   <slot>spinChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>217</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>-4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinCell</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFESPIMB040AcquisitionDescription</receiver>
+   <slot>spinChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>355</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>424</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>spinChanged()</slot>
+ </slots>
+</ui>

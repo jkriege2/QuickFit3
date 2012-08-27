@@ -11,12 +11,14 @@
 #include <QtCore>
 #include "qfespimb040opticssetup.h"
 
-QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QString configDirectory) :
+QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040CamParamStackConfigWidget2)
 {
     m_pluginServices=pluginServices;
     this->opticsSetup=stageConfig;
+    this->acqDescription=acqDescription;
+    this->expDescription=expDescription;
     ui->setupUi(this);
 
     if (stageConfig) {
@@ -31,6 +33,7 @@ QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWi
     }
     bindLineEdit(ui->edtPrefix1);
     bindLineEdit(ui->edtPrefix2);
+    updateReplaces();
 
 }
 
@@ -89,13 +92,15 @@ void QFESPIMB040CamParamStackConfigWidget2::storeSettings(QSettings& settings, Q
 
 
 
-QString QFESPIMB040CamParamStackConfigWidget2::prefix1() const {
+QString QFESPIMB040CamParamStackConfigWidget2::prefix1()  {
+    updateReplaces();
     QString filename= ui->edtPrefix1->text();
     filename=transformFilename(filename);
     return filename;
 }
 
-QString QFESPIMB040CamParamStackConfigWidget2::prefix2() const {
+QString QFESPIMB040CamParamStackConfigWidget2::prefix2()  {
+    updateReplaces();
     QString filename= ui->edtPrefix2->text();
     filename=transformFilename(filename);
     return filename;
@@ -259,6 +264,11 @@ QString QFESPIMB040CamParamStackConfigWidget2::currentConfigName(int camera) con
     if (camera==0) return ui->cmbCam1Settings->currentConfigName();
     if (camera==1) return ui->cmbCam2Settings->currentConfigName();
     return "";
+}
+
+void QFESPIMB040CamParamStackConfigWidget2::updateReplaces()
+{
+    setGlobalReplaces(opticsSetup, expDescription, acqDescription);
 }
 
 void QFESPIMB040CamParamStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes) {

@@ -20,10 +20,14 @@ class QFESPIMB040ExperimentDescription : public QWidget {
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix) const;
 
+        QString getID() const;
+
         /*! \brief return a map containing the experiment description
          */
         QMap<QString, QVariant> getDescription() const;
-    protected slots:
+        QString getTitle() const;
+        QString getExperimenter() const;
+protected slots:
         void updateTime();
         void on_btnClearAll_clicked();
         void on_btnSaveTemplate_clicked();

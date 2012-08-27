@@ -26,13 +26,15 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QString configDirectory);
+        explicit QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040CamParamStackConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
         QString currentConfigFilename(int camera) const;
         /** \brief return the name (not the full filename with path) for the currently selected camera configuration */
         QString currentConfigName(int camera) const;
+
+        void updateReplaces();
 
     signals:
         void doStack();
@@ -44,8 +46,8 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         void storeSettings(QSettings& settings, QString prefix) const;
 
 
-        QString prefix1() const;
-        QString prefix2() const;
+        QString prefix1();
+        QString prefix2();
         bool use1() const;
         bool use2() const;
         bool saveMeasurements() const;
@@ -80,6 +82,8 @@ protected slots:
         Ui::QFESPIMB040CamParamStackConfigWidget2 *ui;
         QFPluginServices* m_pluginServices;
         QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040AcquisitionDescription* acqDescription;
+        QFESPIMB040ExperimentDescription* expDescription;
 
 };
 

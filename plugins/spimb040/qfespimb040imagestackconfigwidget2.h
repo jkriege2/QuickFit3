@@ -8,6 +8,8 @@
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfespimb040filenametool.h"
 #include "qfespimb040opticssetup.h"
+#include "qfespimb040acquisitiondescription.h"
+#include "qfespimb040experimentdescription.h"
 
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
@@ -25,7 +27,7 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040ImageStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QString configDirectory);
+        explicit QFESPIMB040ImageStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040ImageStackConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -128,6 +130,9 @@ public slots:
         Ui::QFESPIMB040ImageStackConfigWidget2 *ui;
         QFPluginServices* m_pluginServices;
         QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040AcquisitionDescription* acqDescription;
+        QFESPIMB040ExperimentDescription* expDescription;
+
 
 };
 

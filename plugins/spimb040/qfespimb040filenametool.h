@@ -8,6 +8,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include "qfespimb040opticssetup.h"
+#include "qfespimb040experimentdescription.h"
+#include "qfespimb040acquisitiondescription.h"
 
 class QFESPIMB040FilenameTool {
     public:
@@ -17,7 +19,7 @@ class QFESPIMB040FilenameTool {
         void setReplaceValues(const QMap<QString, QString>& replaceValues);
         void setReplaceValue(const QString& key, const QString& value);
         void bindLineEdit(QEnhancedLineEdit* edit);
-        void setGlobalReplaces(QFESPIMB040OpticsSetup* setup);
+        void setGlobalReplaces(QFESPIMB040OpticsSetup* setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq);
 
     protected:
         QMap<QString, QString> replaceValues;

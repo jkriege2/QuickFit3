@@ -42,6 +42,7 @@
 #include "qtriple.h"
 #include "qftools.h"
 #include "qfespimb040experimentdescription.h"
+#include "qfespimb040acquisitiondescription.h"
 
 /*! \brief new SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -81,6 +82,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         QFESPIMB040AcquisitionConfigWidget2* widAcquisition;
         QFESPIMB040ImageStackConfigWidget2* widImageStack;
         QFESPIMB040CamParamStackConfigWidget2* widCamParamScan;
+        QFESPIMB040AcquisitionDescription* widAcquisitionDescription;
 
 
         QTabWidget* tabMain;
@@ -186,7 +188,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
             \note if \a frames \t <=0, the number of frames will NOT be changed, otherwise the number of frames will be set accordingly (if the driver allows it!)
             \note if \a measured is \c NULL no measurements will be stored during acquisition. otherwise they will be stored to this map.
          */
-        bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames=0, QList<QFESPIMB040OpticsSetup::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL);
+        bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames1=0, int frames2=0, QList<QFESPIMB040OpticsSetup::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL);
 
     public:
 

@@ -1,5 +1,6 @@
 #include "qfespimb040filenametool.h"
 #include <QDebug>
+#include "qftools.h"
 
 QFESPIMB040FilenameTool::QFESPIMB040FilenameTool()
 {
@@ -57,11 +58,27 @@ void QFESPIMB040FilenameTool::fillLineEdits() {
         edit->clearContextMenu();
         edit->addInsertContextMenuEntry(QObject::tr("insert %counter% ..."), "%counter%");
         foreach(QString item, replaceValues.keys()) {
-            edit->addInsertContextMenuEntry(QObject::tr("insert %1 ...").arg("%"+item+"%"), "%"+item+"%");
+            edit->addInsertContextMenuEntry(QObject::tr("insert %1 [example: %2]...").arg("%"+item+"%").arg(replaceValues[item]), "%"+item+"%");
         }
     }
 }
 
-void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup) {
-    setReplaceValue("laser", setup->getLaserConfig());
+void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq) {
+    if (setup) setReplaceValue("laser", setup->getLaserConfig());
+    if (exp) {
+        setReplaceValue("exp_title",  cleanStringForFilename(exp->getTitle()));
+        setReplaceValue("exp_id",  cleanStringForFilename(exp->getID()));
+        setReplaceValue("experimenter", cleanStringForFilename(exp->getExperimenter()));
+    }
+    if (acq) {
+        setReplaceValue("cell0000", QString("%1").arg(acq->getCell(), 4, 10, QChar('0')));
+        setReplaceValue("well0000", QString("%1").arg(acq->getWell(), 4, 10, QChar('0')));
+        setReplaceValue("plate0000", QString("%1").arg(acq->getPlate(), 4, 10, QChar('0')));
+        setReplaceValue("cell", QString::number(acq->getCell()));
+        setReplaceValue("well", QString::number(acq->getWell()));
+        setReplaceValue("plate", QString::number(acq->getPlate()));
+        setReplaceValue("comment", cleanStringForFilename(acq->getComment()));
+    }
+    setReplaceValue("today", QDate::currentDate().toString("yyyy_MM_dd"));
+    setReplaceValue("date", QDate::currentDate().toString("yyyy_MM_dd"));
 }

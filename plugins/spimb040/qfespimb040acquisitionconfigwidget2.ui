@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>1123</width>
-    <height>602</height>
+    <height>664</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -28,7 +28,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="4" column="0" colspan="2">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -45,21 +45,21 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
+   <item row="4" column="2">
     <widget class="QCheckBox" name="chkUse2">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
+   <item row="2" column="2">
     <widget class="QCheckBox" name="chkUse1">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
+   <item row="1" column="2">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -70,7 +70,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
+   <item row="1" column="3">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -84,21 +84,21 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
+   <item row="2" column="3">
     <widget class="QEnhancedLineEdit" name="edtPrefix1">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
+   <item row="4" column="3">
     <widget class="QEnhancedLineEdit" name="edtPrefix2">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="12" column="2" colspan="2">
+   <item row="13" column="2" colspan="2">
     <widget class="QPushButton" name="btnAcquire">
      <property name="enabled">
       <bool>false</bool>
@@ -124,7 +124,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="13" column="2">
+   <item row="14" column="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -138,33 +138,6 @@ p, li { white-space: pre-wrap; }
     </spacer>
    </item>
    <item row="0" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;&amp;amp;overview:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="buddy">
-      <cstring>chkOverview</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2" colspan="2">
-    <widget class="QCheckBox" name="chkOverview">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>save an image with the preview acquisition settings as an overview image</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
     <widget class="QLabel" name="label_12">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -181,7 +154,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="1" column="2" colspan="2">
+   <item row="0" column="2" colspan="2">
     <widget class="QCheckBox" name="chkBackground">
      <property name="enabled">
       <bool>false</bool>
@@ -191,19 +164,19 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="4">
+   <item row="12" column="0" colspan="4">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="6" column="3">
+   <item row="5" column="3">
     <widget class="QWidget" name="widCam2Settings2" native="true">
      <property name="enabled">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="widCam2Settings" columnstretch="0,0,0,0">
+     <layout class="QGridLayout" name="widCam2Settings" columnstretch="0,0,0">
       <property name="margin">
        <number>0</number>
       </property>
@@ -227,7 +200,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="labPreviewFrames2">
         <property name="text">
          <string># background fra&amp;mes:</string>
@@ -377,7 +350,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="4" column="2">
+      <item row="5" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QSpinBox" name="spinBackgroundFrames2">
@@ -410,10 +383,50 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labPreview2_4">
+        <property name="text">
+         <string>Previe&amp;w Settings 4:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings2_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_4" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_15">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="3">
+   <item row="3" column="3">
     <widget class="QWidget" name="widCam2Settings1" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -442,7 +455,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="labPreviewFrames1">
         <property name="text">
          <string># background &amp;frames:</string>
@@ -472,7 +485,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="3" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_3" native="true">
@@ -502,7 +515,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="2" column="1">
+      <item row="2" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
          <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_2" native="true">
@@ -532,7 +545,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="1" column="1">
+      <item row="1" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
          <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_1" native="true">
@@ -562,7 +575,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="0" column="1">
+      <item row="0" column="2">
        <widget class="QWidget" name="horizontalWidget_4" native="true">
         <property name="minimumSize">
          <size>
@@ -571,6 +584,9 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <property name="margin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QFCameraConfigEditorWidget" name="cmbAcquisitionSettings1" native="true">
            <property name="minimumSize">
@@ -600,7 +616,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QSpinBox" name="spinBackgroundFrames1">
@@ -633,10 +649,50 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labPreview1_4">
+        <property name="text">
+         <string>&amp;Preview Settings 4:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings1_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_4" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_14">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="10" column="0">
+   <item row="11" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -653,7 +709,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="10" column="2">
+   <item row="11" column="2">
     <widget class="QSpinBox" name="spinRepeat">
      <property name="toolTip">
       <string>a click on Acquire will do that many consecutive measurements with the same settings.</string>
@@ -694,7 +750,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="7" column="2" colspan="2">
+   <item row="6" column="2" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QComboBox" name="cmbLightpath">
@@ -775,7 +831,7 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </item>
-   <item row="7" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_10">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -789,6 +845,57 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="buddy">
       <cstring>chkUse2</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QCheckBox" name="chkLightpathPreview4">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>preview 4 lightpath:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_16">
+     <item>
+      <widget class="QComboBox" name="cmbLightpathPreview4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_16">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="7" column="2" colspan="2">
+    <widget class="QCheckBox" name="chkOverview">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>save an image with the preview acquisition settings as an overview image</string>
      </property>
     </widget>
    </item>
@@ -808,7 +915,6 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>chkOverview</tabstop>
   <tabstop>chkBackground</tabstop>
   <tabstop>chkUse1</tabstop>
   <tabstop>edtPrefix1</tabstop>
@@ -827,12 +933,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>87</x>
-     <y>439</y>
+     <x>105</x>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
-     <x>234</x>
-     <y>439</y>
+     <x>225</x>
+     <y>508</y>
     </hint>
    </hints>
   </connection>
@@ -843,76 +949,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>69</x>
-     <y>473</y>
+     <x>87</x>
+     <y>534</y>
     </hint>
     <hint type="destinationlabel">
-     <x>236</x>
-     <y>474</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkLightpathPreview2</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cmbPreviewSettings1_2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>61</x>
-     <y>439</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>389</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkLightpathPreview2</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cmbPreviewSettings2_2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>79</x>
-     <y>442</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>398</x>
-     <y>328</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkLightpathPreview2</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cmbPreviewSettings1_3</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>127</x>
-     <y>450</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>396</x>
-     <y>198</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkLightpathPreview3</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cmbPreviewSettings2_3</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>32</x>
-     <y>473</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>395</x>
-     <y>354</y>
+     <x>225</x>
+     <y>536</y>
     </hint>
    </hints>
   </connection>
@@ -923,8 +965,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateBackgroundWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>15</x>
-     <y>444</y>
+     <x>33</x>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
      <x>481</x>
@@ -939,12 +981,60 @@ p, li { white-space: pre-wrap; }
    <slot>updateBackgroundWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>21</x>
-     <y>477</y>
+     <x>39</x>
+     <y>534</y>
     </hint>
     <hint type="destinationlabel">
      <x>440</x>
      <y>423</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLightpathPreview4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbLightpathPreview4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>562</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>225</x>
+     <y>564</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLightpathPreview4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFESPIMB040AcquisitionConfigWidget2</receiver>
+   <slot>updateBackgroundWidgets()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>53</x>
+     <y>562</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>517</x>
+     <y>605</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkOverview</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFESPIMB040AcquisitionConfigWidget2</receiver>
+   <slot>updateBackgroundWidgets()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>318</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>489</x>
+     <y>513</y>
     </hint>
    </hints>
   </connection>
