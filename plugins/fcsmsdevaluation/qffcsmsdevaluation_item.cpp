@@ -104,6 +104,14 @@ int QFFCSMSDEvaluationItem::getFitWidth() const {
     return getFitValue(QString("msd_fitwidth"));
 }
 
+bool QFFCSMSDEvaluationItem::getFitRangeLimited() const {
+    return getFitValue(QString("msd_fitlimitedrange"));
+}
+
+void QFFCSMSDEvaluationItem::setFitRangeLimited(bool rangeLimit) {
+    setFitValue(QString("msd_fitlimitedrange"), rangeLimit);
+}
+
 void QFFCSMSDEvaluationItem::setFitWidth(int width) {
     setFitValue(QString("msd_fitwidth"), width);
 }
@@ -441,6 +449,10 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
     }
     if (parameterID==QString("msd_fitwidth")) {
         defaultValue.value=10;
+        return true;
+    }
+    if (parameterID==QString("msd_fitlimitedrange")) {
+        defaultValue.value=1;
         return true;
     }
 

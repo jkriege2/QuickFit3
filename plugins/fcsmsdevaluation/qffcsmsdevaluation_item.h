@@ -117,6 +117,8 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         void setTheory(int i, bool enabled, double pre, double D, double alpha);
         int getFitWidth() const;
         void setFitWidth(int width);
+        bool getFitRangeLimited() const;
+        void setFitRangeLimited(bool rangeLimit);
     protected:
         
         /** \brief write object contents into XML file

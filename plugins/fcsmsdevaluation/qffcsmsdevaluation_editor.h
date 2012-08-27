@@ -78,6 +78,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
 
     protected slots:
         void fitWidthChanged(int width);
+        void fitRangeChanged(bool range);
         void weightsChanged(int weights);
         void updateDistributionResults();
         void updateDistribution();
@@ -149,6 +150,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QCheckBox* chkShowKeyDist;
         QCheckBox* chkShowKeyDistResults;
         QCheckBox* chkShowKey;
+        QCheckBox* chkFitRange;
 
         QAction* actAverageFirstFrames;
 
