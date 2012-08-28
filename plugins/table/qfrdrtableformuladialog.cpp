@@ -155,6 +155,11 @@ QString QFRDRTableFormulaDialog::getExpression() const
     return ui->edtFormula->text();
 }
 
+void QFRDRTableFormulaDialog::setExpression(const QString &exp)
+{
+    ui->edtFormula->setText(exp);
+}
+
 void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
     try {
         ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));

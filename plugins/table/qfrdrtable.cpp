@@ -74,6 +74,7 @@ QFTablePluginModel* QFRDRTable::model() {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
+        datamodel->setVerticalHeaderShowRowNumbers(true);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
@@ -83,6 +84,7 @@ QFTablePluginModel* QFRDRTable::model() {
 QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
@@ -168,6 +170,7 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
 void QFRDRTable::intReadData(QDomElement* e) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
@@ -205,27 +208,17 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 //std::cout<<"resize("<<rows<<", "<<columns<<") DONE\n";
                 while (!re.isNull()) {
                     QString t=re.attribute("type").toLower();
-                    QVariant v=re.attribute("value");
+                    QString ex=re.attribute("expression");
                     if (r+1>rows) {
                         rows=r+1;
                         //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
                         datamodel->resize(rows, columns);
                         //std::cout<<"resize("<<rows<<", "<<columns<<") DONE\n";
                     }
-                    if (t=="bool") { v.convert(QVariant::Bool); }
-                    else if (t=="char") { v.convert(QVariant::Char); }
-                    else if (t=="date") { v.convert(QVariant::Date); }
-                    else if (t=="datetime") { v.convert(QVariant::DateTime); }
-                    else if (t=="double") { v.convert(QVariant::Double); }
-                    else if (t=="int") { v.convert(QVariant::Int); }
-                    else if (t=="longlong") { v.convert(QVariant::LongLong); }
-                    else if (t=="string") { v.convert(QVariant::String); }
-                    else if (t=="stringlist") { v.convert(QVariant::StringList); }
-                    else if (t=="uint") { v.convert(QVariant::UInt); }
-                    else if (t=="ulonglong") { v.convert(QVariant::ULongLong); }
-                    else if (t=="time") { v.convert(QVariant::Time); }
+                    QVariant v=getQVariantFromString(t, re.attribute("value"));
                     //std::cout<<"setCell("<<r<<", "<<columns-1<<", '"<<v.toString().toStdString()<<"' ["<<v.typeName()<<"])\n";
                     datamodel->setCell(r, columns-1, v);
+                    if (!ex.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableExpressionRole, r, columns-1, ex);
 
 
                     re = re.nextSiblingElement("row");
@@ -304,6 +297,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
 void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
@@ -316,8 +310,10 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("title", datamodel->columnTitle(c));
             for (quint16 r=0; r<datamodel->rowCount(); r++) {
                 w.writeStartElement("row");
-                w.writeAttribute("type", QString(datamodel->cell(r, c).typeName()));
-                w.writeAttribute("value", datamodel->cell(r, c).toString());
+                w.writeAttribute("type", getQVariantType(datamodel->cell(r, c)));
+                w.writeAttribute("value", getQVariantData(datamodel->cell(r, c)));
+                QString ex=datamodel->cellUserRole(QFRDRTable::TableExpressionRole, r, c).toString();
+                if (!ex.isEmpty()) w.writeAttribute("expression", ex);
                 w.writeEndElement();
             }
             w.writeEndElement();

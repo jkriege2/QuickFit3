@@ -3,6 +3,7 @@
 
 #include <QItemDelegate>
 #include <climits>
+#include "qfrdrtable.h"
 
 class QFRDRTableDelegate : public QItemDelegate
 {

@@ -1,6 +1,7 @@
 #include "qfrdrtabledelegate.h"
 #include <QtGui>
 #include "qfdoubleedit.h"
+#include "qfrdrtable.h"
 
 QFRDRTableDelegate::QFRDRTableDelegate(QObject *parent) :
     QItemDelegate(parent)
@@ -119,13 +120,18 @@ void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 
 void QFRDRTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    if (!index.data(QFRDRTable::TableExpressionRole).toString().isEmpty()) {
+        QColor c("gainsboro");
+        painter->fillRect(option.rect, QBrush(c));
+    }
+
     QItemDelegate::paint(painter, option, index);
 
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
     QFont f(option.font);
-    f.setPointSizeF(7);
+    f.setPointSizeF(6.5);
     painter->setFont(f);
     painter->setPen(QPen(QColor("blue")));
     QFontMetricsF fm(f);
@@ -147,7 +153,7 @@ void QFRDRTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
     QColor c("white");
     c.setAlphaF(0.3);
-    painter->fillRect(QRectF(option.rect.right()-fm.width(id)-4, option.rect.bottom()-fm.height()-4, fm.width(id)+2, fm.height()+2), QBrush(c));
+    painter->fillRect(QRectF(option.rect.right()-fm.width(id)-4, option.rect.top(), fm.width(id)+4, option.rect.height()), QBrush(c));
     painter->drawText(option.rect.right()-fm.width(id)-2, option.rect.bottom()-fm.height()-2+fm.ascent(), id);
     painter->restore();
 }

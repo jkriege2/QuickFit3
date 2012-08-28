@@ -188,19 +188,19 @@ QVariant getQVariantFromString(const QString& type, const QString& data) {
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     bool c=false;
     if (type=="bool") { c=d.convert(QVariant::Bool); }
-    else if (type=="char") { c=d.convert(QVariant::Char); }
-    else if (type=="date") { c=d.convert(QVariant::Date); }
-    else if (type=="datetime") { c=d.convert(QVariant::DateTime); }
+    else if (type=="char" || type.toLower()=="qchar") { c=d.convert(QVariant::Char); }
+    else if (type=="date" || type.toLower()=="qdate") { c=d.convert(QVariant::Date); }
+    else if (type=="datetime" || type.toLower()=="qdatetime") { c=d.convert(QVariant::DateTime); }
     else if (type=="double") { d=loc.toDouble(data, &c); }
     else if (type=="int") { c=d.convert(QVariant::Int); }
     else if (type=="longlong") { c=d.convert(QVariant::LongLong); }
-    else if (type=="string") { c=d.convert(QVariant::String); }
-    else if (type=="stringlist") { c=d.convert(QVariant::StringList); }
+    else if (type=="string" || type.toLower()=="qstring") { c=d.convert(QVariant::String); }
+    else if (type=="stringlist" || type.toLower()=="qstringlist") { c=d.convert(QVariant::StringList); }
     else if (type=="uint") { c=d.convert(QVariant::UInt); }
     else if (type=="ulonglong") { c=d.convert(QVariant::ULongLong); }
-    else if (type=="time") { c=d.convert(QVariant::Time); }
-    else if (type=="bytearray") { c=d.convert(QVariant::ByteArray); }
-    else if (type=="color") { c=d.convert(QVariant::Color); }
+    else if (type=="time" || type.toLower()=="qtime") { c=d.convert(QVariant::Time); }
+    else if (type=="bytearray" || type.toLower()=="qbytearray") { c=d.convert(QVariant::ByteArray); }
+    else if (type=="color" || type.toLower()=="qcolor") { c=d.convert(QVariant::Color); }
     else {
         d=QVariant();
     }

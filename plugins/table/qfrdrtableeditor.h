@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QHeaderView>
 #include "qfrawdataeditor.h"
 #include "qenhancedtableview.h"
 #include "qfrawdatapropertyeditor.h"
@@ -52,7 +53,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slSetDatatype();
         void slSaveTable();
         void slLoadTable();
-        void slSetColumnTitle();
+        void slSetColumnTitle(int col=-1);
         void slResize();
         void slCopy();
         void slPaste();

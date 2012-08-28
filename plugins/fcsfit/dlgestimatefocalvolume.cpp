@@ -64,6 +64,10 @@ void dlgEstimateFocalVolume::init(double particles, double particles_error, bool
     toolDCalc=qobject_cast<QFExtensionTool*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
     toolDCalcReport=qobject_cast<QFExtensionReportingTool*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
     btnDCalculator->setEnabled(toolDCalc!=NULL);
+    QFExtension* toolDCalcE=qobject_cast<QFExtension*>(QFExtensionManager::getInstance()->getQObjectInstance("calc_diffcoeff"));
+    if (toolDCalcE) {
+        btnDCalculator->setIcon(QIcon(toolDCalcE->getIconFilename()));
+    }
 
 }
 

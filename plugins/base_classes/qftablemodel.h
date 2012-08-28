@@ -80,6 +80,8 @@ class QFTableModel : public QAbstractTableModel {
         QHash<quint32, QVariant> dataBackgroundMap;
         /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
         QHash<quint32, QVariant> dataCheckedMap;
+        /** \brief this map is used to store additional data for roles >=Qt::UserRole */
+        QHash<quint32, QHash<int, QVariant> > moreDataMap;
         /** \brief string list that contains the column names */
         QStringList columnNames;
         /** \brief indicates whether the model is readonly (via the QAbstractTableModel interface!!!) or not */
@@ -88,7 +90,12 @@ class QFTableModel : public QAbstractTableModel {
         bool readonlyButStillCheckable;
         /** \brief indicates whether the data has been changed since the last call of resetChanged(); */
         bool hasDataChanged;
+
+        /** \brief indicates whether the vertical header should show row numbers */
+        bool verticalHeaderShowRowNumbers;
     public:
+
+
         /** Default constructor */
         QFTableModel(QObject * parent=NULL);
         /** Default destructor */
@@ -107,6 +114,9 @@ class QFTableModel : public QAbstractTableModel {
         inline void resetChanged() { hasDataChanged=false; }
         inline bool hasChanged() const { return hasDataChanged; }
 
+        inline void setVerticalHeaderShowRowNumbers(bool enabled) { verticalHeaderShowRowNumbers=enabled; reset(); }
+        inline bool getVerticalHeaderShowRowNumbers() const { return verticalHeaderShowRowNumbers; }
+
         /** \brief swap the contents of two cells */
         void swapCells(quint16 row1, quint16 column1, quint16 row2, quint16 column2);
 
@@ -120,10 +130,16 @@ class QFTableModel : public QAbstractTableModel {
         bool changeDatatype(quint16 row, quint16 column, QVariant::Type newType);
         /** \brief set the given cell to the supplied value */
         void setCell(quint16 row, quint16 column, QVariant value);
+        /** \brief copy the contents of cell (row_old, column_old) to cell (row, column) */
+        void copyCell(quint16 row, quint16 column, quint16 row_old, quint16 column_old);
         /** \brief set the given cell to the supplied value, if the cell is outside the table size, the table is resized accordingly */
         void setCellCreate(quint16 row, quint16 column, QVariant value);
         /** \brief returns the value in the supplied cell */
         QVariant cell(quint16 row, quint16 column) const;
+        /** \brief set the given cell to the supplied value in a role>=Qt::UserRole */
+        void setCellUserRole(int role, quint16 row, quint16 column, QVariant value);
+        /** \brief set the given cell to the supplied value in a role>=Qt::UserRole */
+        void setCellUserRoleCreate(int role, quint16 row, quint16 column, QVariant value);
         /** \brief set the given cell to the supplied value in EditRole */
         void setCellEditRole(quint16 row, quint16 column, QVariant value);
         /** \brief set the given cell to the supplied value in EditRole */
@@ -138,6 +154,8 @@ class QFTableModel : public QAbstractTableModel {
         void setCellCheckedRoleCreate(quint16 row, quint16 column, QVariant value);
         /** \brief returns the value in the supplied cell in EditRole */
         QVariant cellEditRole(quint16 row, quint16 column) const;
+        /** \brief returns the value in the supplied cell in a given role>=Qt::UserRole */
+        QVariant cellUserRole(int role, quint16 row, quint16 column) const;
         /** \brief set the column title */
         void setColumnTitle(quint16 column, QString name);
         /** \brief set the column title */
@@ -218,6 +236,8 @@ class QFTableModel : public QAbstractTableModel {
         bool getDoEmitSignals() const;
         void enableSignals(bool emitReset=true);
         void disableSignals();
+        /*void deleteRows(QList<quint16> rs);
+        void deleteColumns(QList<quint16> rs);*/
     public slots:
         /** \brief append a new row */
         inline void appendRow() { resize(rows+1, columns); }

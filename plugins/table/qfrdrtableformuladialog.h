@@ -60,6 +60,7 @@ class QFRDRTableFormulaDialog : public QDialog
         ~QFRDRTableFormulaDialog();
 
         QString getExpression() const;
+        void setExpression(const QString& exp);
 
    protected slots:
         void on_edtFormula_textChanged(QString text);

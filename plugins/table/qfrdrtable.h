@@ -19,6 +19,11 @@
 class QFRDRTable : public QFRawDataRecord {
         Q_OBJECT
     public:
+        enum {
+            TableExpressionRole = Qt::UserRole+1
+        };
+
+
         enum GraphType {
             gtLines,
             gtImpulsesVertical,
